@@ -54,7 +54,7 @@ const Router = {
   // Main guard logic
   guard() {
     const page = this.currentPage();
-    const isAuth = ICSStorage.Session.isAuthenticated();
+    const isAuth = !!localStorage.getItem('ics_token');
 
     // If user NOT logged in and tries protected page
     if (!isAuth && this.isProtected(page)) {
@@ -83,7 +83,8 @@ const Navigation = {
   },
 
   logout() {
-    ICSStorage.Session.clear();
+    localStorage.removeItem('ics_token');
+    localStorage.removeItem('ics_user');
     Router.goTo("/pages/login.html");
   }
 

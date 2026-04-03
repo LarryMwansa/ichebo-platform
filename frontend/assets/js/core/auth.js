@@ -1,86 +1,122 @@
-// /assets/js/auth.js
-
-// NOTE: This file uses the global ICSStorage object from /utils/storage.js
+// /assets/js/core/auth.js
+// Calls DRF endpoints for authentication
 
 // =========================
 // LOGIN
 // =========================
-function loginUser(credentials) {
+async function loginUser(credentials) {
   const { email, password } = credentials;
-  // MOCK validation (later replaced by API)
-  if (email && password) {
-    // In a real app, you'd fetch the user from an API.
-    // Here, we'll just mock a found user.
-    const user = {
-      id: "user_mock_123", // Mock user needs a stable ID for session consistency
-      name: "John Doe",
-      email: email,
-    };
-
-    ICSStorage.Session.set(user);
-    return { success: true };
-  } else {
+  
+  if (!email || !password) {
     return { success: false, message: "Invalid email or password." };
+  }
+
+  try {
+    const res = await fetch('/api/auth/login/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      return { success: false, message: data.non_field_errors?.[0] || 'Login failed' };
+    }
+
+    const data = await res.json();
+    localStorage.setItem('ics_token', data.token);
+    localStorage.setItem('ics_user', JSON.stringify(data.user));
+    return { success: true, user: data.user };
+  } catch (error) {
+    console.error('Login error:', error);
+    return { success: false, message: 'Network error occurred. Please try again.' };
   }
 }
 
 // =========================
 // REGISTER
 // =========================
-function registerUser(details) {
-  const { name, email, password } = details;
-  if (name && email && password) {
-    // In a real app, you'd POST this to an API.
-    // Here, we create a new user and add them to our mock storage.
-    const user = {
-      id: ICSStorage.AppStorage.generateId(), // Generate a new ID for the user
-      name,
-      email,
-      // IMPORTANT: Never store passwords in localStorage in a real application.
-    };
-
-    // We can add the user to the 'users' app storage for mock persistence
-    ICSStorage.AppStorage.add("users", user);
-
-    // For this flow, we'll automatically log them in.
-    ICSStorage.Session.set(user);
-    return { success: true };
-  } else {
+async function registerUser(details) {
+  const { display_name, email, password } = details;
+  
+  if (!display_name || !email || !password) {
     return { success: false, message: "Please fill all fields." };
+  }
+
+  try {
+    const res = await fetch('/api/auth/register/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ display_name, email, password })
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      const errors = Object.values(data).flat();
+      return { success: false, message: errors[0] || 'Registration failed' };
+    }
+
+    const data = await res.json();
+    localStorage.setItem('ics_token', data.token);
+    localStorage.setItem('ics_user', JSON.stringify(data.user));
+    return { success: true, user: data.user };
+  } catch (error) {
+    console.error('Register error:', error);
+    return { success: false, message: 'Network error occurred. Please try again.' };
   }
 }
 
 // =========================
 // LOGOUT
 // =========================
-function logoutUser() {
-  // This is also handled by ICSRouter.Navigation.logout() which is preferred
-  ICSStorage.Session.clear();
-  window.location.href = "/pages/login.html";
+async function logoutUser() {
+  try {
+    const token = localStorage.getItem('ics_token');
+    if (token) {
+      await fetch('/api/auth/logout/', {
+        method: 'POST',
+        headers: { 'Authorization': `Token ${token}` }
+      });
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+  } finally {
+    localStorage.removeItem('ics_token');
+    localStorage.removeItem('ics_user');
+    window.location.href = '/pages/login.html';
+  }
+}
+
+// =========================
+// GET CURRENT USER
+// =========================
+function getCurrentUser() {
+  const userJson = localStorage.getItem('ics_user');
+  return userJson ? JSON.parse(userJson) : null;
 }
 
 // =========================
 // LOAD USER INTO UI
 // =========================
 function loadUserUI() {
-  const user = ICSStorage.Session.user();
+  const user = getCurrentUser();
 
   if (!user) return;
 
-  const nameEl = document.getElementById("username");
-  const emailEl = document.getElementById("useremail");
+  const nameEl = document.getElementById('username');
+  const emailEl = document.getElementById('useremail');
 
-  if (nameEl) nameEl.textContent = user.name;
+  if (nameEl) nameEl.textContent = user.display_name || user.email;
   if (emailEl) emailEl.textContent = user.email;
 }
 
 // =========================
 // EXPORT (GLOBAL ACCESS)
 // =========================
-// This makes the auth functions available to other scripts like login.js and register.js
 window.ICSAuth = {
   loginUser,
   registerUser,
   logoutUser,
+  getCurrentUser,
   loadUserUI,
 };
