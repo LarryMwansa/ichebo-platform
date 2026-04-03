@@ -10,14 +10,16 @@ from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 def register(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
+        password = serializer.validated_data.pop('password')
         user = serializer.save()
-        user.set_password(serializer.validated_data['password'])
+        user.set_password(password)
         user.save()
         token, created = Token.objects.get_or_create(user=user)
         return Response({
             'token': token.key,
             'user': UserSerializer(user).data
         }, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
