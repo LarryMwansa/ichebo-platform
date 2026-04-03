@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'core',
     'accounts',
+    'tenants',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
