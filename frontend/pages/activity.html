@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="./src/assets/images/favicon.svg" type="image/x-icon">
-    <title>ICS Platform</title>
+    <title>ICS Activity</title>
     <link rel="stylesheet" href="../assets/css/global.css">
 </head>
 
@@ -127,8 +127,88 @@
     <div id="overlay" class="overlay"></div>
 
     <main class="main">
-        <h1>Welcome To ICS Platform</h1>
-        <p>Welcome to the ICS Platform!</p>
+        <section class="activity-grid">
+            <aside class="activity-sidebar card">
+                <h2>Create activity</h2>
+                <form id="activityForm" class="form-card">
+                    <label>Title<span>*</span>
+                        <input id="activityTitle" type="text" placeholder="Enter activity title" required>
+                    </label>
+                    <label>Description
+                        <textarea id="activityDescription" rows="4" placeholder="Describe the activity"></textarea>
+                    </label>
+                    <label>Type
+                        <select id="activityType">
+                            <option value="task">Task</option>
+                            <option value="habit">Habit</option>
+                            <option value="goal">Goal</option>
+                            <option value="event">Event</option>
+                        </select>
+                    </label>
+                    <label>Status
+                        <select id="activityStatus">
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </label>
+                    <label>Scheduled at
+                        <input id="activityScheduledAt" type="datetime-local">
+                    </label>
+                    <label>Due at
+                        <input id="activityDueAt" type="datetime-local">
+                    </label>
+                    <label>KGS pillar
+                        <input id="activityPillar" type="text" placeholder="e.g. Prayer, Learning">
+                    </label>
+                    <label>KGS pathway
+                        <input id="activityPathway" type="text" placeholder="e.g. Discipleship">
+                    </label>
+                    <button type="submit" class="primary">Create activity</button>
+                </form>
+
+                <div class="card">
+                    <h2>Filters</h2>
+                    <label>Type
+                        <select id="filterType">
+                            <option value="">All</option>
+                            <option value="task">Task</option>
+                            <option value="habit">Habit</option>
+                            <option value="goal">Goal</option>
+                            <option value="event">Event</option>
+                        </select>
+                    </label>
+                    <label>Status
+                        <select id="filterStatus">
+                            <option value="">All</option>
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </label>
+                </div>
+            </aside>
+
+            <section class="activity-main">
+                <div class="card">
+                    <div class="section-header">
+                        <h2>Activity list</h2>
+                        <span id="activityCount">0</span>
+                    </div>
+                    <div id="activityList" class="activity-list"></div>
+                    <div id="activityEmptyState" class="empty-state">No activities found. Create one to get started.</div>
+                </div>
+
+                <div class="card">
+                    <div class="section-header">
+                        <h2>Activity history</h2>
+                    </div>
+                    <h3 id="selectedActivityTitle">Select an activity to view history</h3>
+                    <div id="activityLogs" class="activity-logs"></div>
+                    <div id="activityLogsEmpty" class="empty-state">No activity history available.</div>
+                </div>
+            </section>
+        </section>
     </main>
 
     <!-- DRAWER -->
@@ -214,6 +294,14 @@
     <script type="module" src="/assets/js/login.js"></script>
     <script type="module" src="/assets/js/register.js"></script>
 
+    <!-- Activity-specific scripts -->
+    <script src="/assets/js/core/router.js"></script>
+    <script src="/assets/js/core/auth.js"></script>
+    <script src="/assets/js/engines/activity.service.js"></script>
+    <script src="/assets/js/engines/activity.store.js"></script>
+    <script src="/assets/js/apps/activity-app.js"></script>
+
+    <div id="activityMessage" class="message"></div>
 </body>
 
 </html>
