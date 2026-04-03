@@ -13,6 +13,7 @@
 ## Current State Audit
 
 ### What exists and is COMPLETE (keep, wire to Django)
+
 - Navigation system: navbar, app drawer, bottom nav, overlay, theme system
 - Mobile-first shell: index.html, responsive layout, CSS variables
 - `storage.js` — localStorage abstraction (repurpose for UI state only)
@@ -22,12 +23,14 @@
 - Records app UI — forms, list views, detail views (wire to DRF)
 
 ### What exists and needs REFACTORING
+
 - `auth.js` — currently reads/writes localStorage users; must call DRF
 - `router.js` — auth guard reads localStorage session; must read JWT token
 - `storage.js` — remove data persistence role; keep only UI state helpers
 - Records app JS — direct localStorage calls must become service calls
 
 ### What does NOT exist yet (build in order)
+
 - Django project, apps, models, serializers, views, URLs
 - All engine service JS files (`records.service.js`, `activity.service.js` etc.)
 - All remaining app JS files (activity, learn, community, governance, dashboard)
@@ -55,23 +58,28 @@ All engines complete → Dashboard begin
 **Exit criteria:** `https://your-domain.com/api/health/` returns `{"status": "ok"}`. Nothing else. Do not proceed to Phase 1 until this passes.
 
 ### Task 0.1 — VPS baseline
+
 **Files:** none (server commands only)
 
 1. SSH into VPS
 2. Update packages: `sudo apt update && sudo apt upgrade -y`
 3. Install dependencies:
+
    ```bash
    sudo apt install -y python3.11 python3.11-venv python3-pip postgresql postgresql-contrib nginx git
    ```
+
 4. Create deploy user: `sudo adduser ics && sudo usermod -aG sudo ics`
 5. Switch to deploy user: `su - ics`
 6. Commit: n/a (server setup)
 
 ### Task 0.2 — PostgreSQL database
+
 **Files:** none (DB commands only)
 
 1. Start PostgreSQL: `sudo systemctl start postgresql && sudo systemctl enable postgresql`
 2. Create DB and user:
+
    ```bash
    sudo -u postgres psql
    CREATE DATABASE ics_db;
@@ -82,10 +90,13 @@ All engines complete → Dashboard begin
    GRANT ALL PRIVILEGES ON DATABASE ics_db TO ics_user;
    \q
    ```
+
 3. Test connection: `psql -U ics_user -d ics_db -h localhost`
 
 ### Task 0.3 — Django project scaffold
+
 **Files:**
+
 - Create: `~/ics/` (project root)
 - Create: `~/ics/requirements.txt`
 - Create: `~/ics/ics_project/settings/base.py`
@@ -93,21 +104,28 @@ All engines complete → Dashboard begin
 - Create: `~/ics/ics_project/settings/local.py`
 
 1. Create project directory and virtualenv:
+
    ```bash
    mkdir ~/ics && cd ~/ics
    python3.11 -m venv venv
    source venv/bin/activate
    ```
+
 2. Install packages:
+
    ```bash
    pip install django==4.2 djangorestframework django-cors-headers psycopg2-binary python-decouple gunicorn
    pip freeze > requirements.txt
    ```
+
 3. Create Django project:
+
    ```bash
    django-admin startproject ics_project .
    ```
+
 4. Create settings split:
+
    ```bash
    mkdir ics_project/settings
    mv ics_project/settings.py ics_project/settings/base.py
@@ -115,7 +133,9 @@ All engines complete → Dashboard begin
    touch ics_project/settings/local.py
    touch ics_project/settings/__init__.py
    ```
+
 5. `ics_project/settings/base.py` — update DATABASE section:
+
    ```python
    from decouple import config
 
@@ -170,7 +190,9 @@ All engines complete → Dashboard begin
 
    CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')])
    ```
+
 6. Create `.env` file in project root:
+
    ```
    SECRET_KEY=generate-a-long-random-string-here
    DEBUG=True
@@ -182,11 +204,14 @@ All engines complete → Dashboard begin
    DB_PORT=5432
    CORS_ALLOWED_ORIGINS=http://localhost:8000,https://your-domain.com
    ```
+
 7. Run migrations: `python manage.py migrate`
 8. Commit: `git init && git add . && git commit -m "chore: django project scaffold"`
 
 ### Task 0.4 — Health check endpoint
+
 **Files:**
+
 - Create: `~/ics/core/` (Django app)
 - Create: `~/ics/core/views.py`
 - Create: `~/ics/core/urls.py`
@@ -195,6 +220,7 @@ All engines complete → Dashboard begin
 1. Create core app: `python manage.py startapp core`
 2. Add to `INSTALLED_APPS`: `'core',`
 3. `core/views.py`:
+
    ```python
    from rest_framework.decorators import api_view, permission_classes
    from rest_framework.permissions import AllowAny
@@ -205,7 +231,9 @@ All engines complete → Dashboard begin
    def health_check(request):
        return Response({'status': 'ok'})
    ```
+
 4. `core/urls.py`:
+
    ```python
    from django.urls import path
    from . import views
@@ -214,7 +242,9 @@ All engines complete → Dashboard begin
        path('health/', views.health_check, name='health-check'),
    ]
    ```
+
 5. `ics_project/urls.py`:
+
    ```python
    from django.contrib import admin
    from django.urls import path, include
@@ -224,17 +254,21 @@ All engines complete → Dashboard begin
        path('api/', include('core.urls')),
    ]
    ```
+
 6. Run server: `python manage.py runserver`
 7. Test: `curl http://localhost:8000/api/health/`
    Expected: `{"status": "ok"}`
 8. Commit: `git add . && git commit -m "feat: health check endpoint"`
 
 ### Task 0.5 — Nginx + Gunicorn (production)
+
 **Files:**
+
 - Create: `/etc/nginx/sites-available/ics`
 - Create: `~/ics/gunicorn.conf.py`
 
 1. `gunicorn.conf.py`:
+
    ```python
    bind = "127.0.0.1:8001"
    workers = 3
@@ -242,7 +276,9 @@ All engines complete → Dashboard begin
    accesslog = "/var/log/gunicorn/ics_access.log"
    errorlog = "/var/log/gunicorn/ics_error.log"
    ```
+
 2. Nginx config `/etc/nginx/sites-available/ics`:
+
    ```nginx
    server {
        listen 80;
@@ -264,6 +300,7 @@ All engines complete → Dashboard begin
        }
    }
    ```
+
 3. Enable site: `sudo ln -s /etc/nginx/sites-available/ics /etc/nginx/sites-enabled/`
 4. Test config: `sudo nginx -t`
 5. Start Nginx: `sudo systemctl restart nginx`
@@ -279,7 +316,9 @@ All engines complete → Dashboard begin
 **Exit criteria:** Can register a user, log in, receive a token, create a tenant with a materialized path, assign a UserPermission. All via DRF endpoints. No frontend yet.
 
 ### Task 1.1 — Accounts Django app
+
 **Files:**
+
 - Create: `~/ics/accounts/models.py`
 - Create: `~/ics/accounts/serializers.py`
 - Create: `~/ics/accounts/views.py`
@@ -289,6 +328,7 @@ All engines complete → Dashboard begin
 1. Create app: `python manage.py startapp accounts`
 2. Add to `INSTALLED_APPS`: `'accounts',`
 3. `accounts/models.py`:
+
    ```python
    import uuid
    from django.contrib.auth.models import AbstractUser
@@ -319,8 +359,10 @@ All engines complete → Dashboard begin
        def __str__(self):
            return self.email
    ```
+
 4. Add to `settings/base.py`: `AUTH_USER_MODEL = 'accounts.User'`
 5. `accounts/serializers.py`:
+
    ```python
    from rest_framework import serializers
    from django.contrib.auth import authenticate
@@ -364,7 +406,9 @@ All engines complete → Dashboard begin
                      'competence_level', 'status', 'created_at']
            read_only_fields = ['id', 'created_at', 'competence_level']
    ```
+
 6. `accounts/views.py`:
+
    ```python
    from rest_framework import status
    from rest_framework.decorators import api_view, permission_classes
@@ -416,7 +460,9 @@ All engines complete → Dashboard begin
            return Response(serializer.data)
        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
    ```
+
 7. `accounts/urls.py`:
+
    ```python
    from django.urls import path
    from . import views
@@ -428,19 +474,24 @@ All engines complete → Dashboard begin
        path('auth/me/', views.me, name='me'),
    ]
    ```
+
 8. Add to `ics_project/urls.py`: `path('api/', include('accounts.urls')),`
 9. Run: `python manage.py makemigrations accounts && python manage.py migrate`
 10. Test register:
+
     ```bash
     curl -X POST http://localhost:8000/api/auth/register/ \
       -H "Content-Type: application/json" \
       -d '{"email":"test@test.com","display_name":"Test","password":"testpass123"}'
     ```
+
     Expected: `{"token": "...", "user": {...}}`
 11. Commit: `git add . && git commit -m "feat: accounts app — register, login, logout, me"`
 
 ### Task 1.2 — Tenants Django app
+
 **Files:**
+
 - Create: `~/ics/tenants/models.py`
 - Create: `~/ics/tenants/serializers.py`
 - Create: `~/ics/tenants/views.py`
@@ -449,6 +500,7 @@ All engines complete → Dashboard begin
 1. Create app: `python manage.py startapp tenants`
 2. Add to `INSTALLED_APPS`: `'tenants',`
 3. `tenants/models.py`:
+
    ```python
    import uuid
    from django.db import models
@@ -571,13 +623,16 @@ All engines complete → Dashboard begin
            db_table = 'tenants_userpermission'
            unique_together = [['tenant', 'user', 'role']]
    ```
+
 4. Write serializers and views following the same pattern as Task 1.1 — CRUD for Tenant and UserPermission, all authenticated.
 5. Run: `python manage.py makemigrations tenants && python manage.py migrate`
 6. Test: create a tenant via POST, verify path is stored correctly.
 7. Commit: `git add . && git commit -m "feat: tenants app — tenant model + user permissions"`
 
 ### Task 1.3 — accounts/permissions.py (KGS permission helper)
+
 **Files:**
+
 - Create: `~/ics/accounts/permissions.py`
 
 This is the Python implementation of the permission check algorithm from Part 7 of the data contract. Implement once, import everywhere.
@@ -665,7 +720,9 @@ Commit: `git add . && git commit -m "feat: KGS permission helper — check_recor
 **Exit criteria:** Can create, read, update, soft-delete a Record via DRF. Can create a Relationship between two Records. JS `records.service.js` calls these endpoints. Records app UI works against real data.
 
 ### Task 2.1 — Records Django app (models)
+
 **Files:**
+
 - Create: `~/ics/records/models.py`
 
 ```python
@@ -832,12 +889,15 @@ Run: `python manage.py makemigrations records && python manage.py migrate`
 Commit: `git add . && git commit -m "feat: records models — Record + Relationship"`
 
 ### Task 2.2 — Records serializers + views + URLs
+
 **Files:**
+
 - Create: `~/ics/records/serializers.py`
 - Create: `~/ics/records/views.py`
 - Create: `~/ics/records/urls.py`
 
 Endpoints to implement:
+
 ```
 GET    /api/records/              list (filtered by tenant, family, type, class)
 POST   /api/records/              create
@@ -855,7 +915,9 @@ All write endpoints enforce `check_record_permission` from `accounts/permissions
 Commit: `git add . && git commit -m "feat: records DRF endpoints — CRUD + relationships"`
 
 ### Task 2.3 — records.service.js (JS engine)
+
 **Files:**
+
 - Create: `~/ics/frontend/assets/js/engines/records.service.js`
 - Create: `~/ics/frontend/assets/js/engines/relationships.service.js`
 - Create: `~/ics/frontend/assets/js/engines/records.store.js`
@@ -922,7 +984,9 @@ const ICSRecords = (() => {
 Commit: `git add . && git commit -m "feat: records.service.js + relationships.service.js"`
 
 ### Task 2.4 — Wire Records app UI to DRF
+
 **Files:**
+
 - Modify: `~/ics/frontend/assets/js/apps/records-app.js`
 - Modify: `~/ics/frontend/assets/js/core/auth.js`
 - Modify: `~/ics/frontend/assets/js/core/router.js`
@@ -940,10 +1004,13 @@ Commit: `git add . && git commit -m "feat: records.service.js + relationships.se
 **Exit criteria:** Can create, read, update, soft-delete an Activity. ActivityLog is written on every status change. Activity → Record linking works via Relationships (no `linked_record_ids`). JS `activity.service.js` calls DRF endpoints.
 
 ### Task 3.1 — Activity Django app (models)
+
 **Files:**
+
 - Create: `~/ics/activity/models.py`
 
 Model fields per data contract Part 4. Key points:
+
 - `activity_type`: task | habit | goal | event | campaign | project | programme | reminder | skill
 - `parent_activity_id` for nesting: programme → project → campaign → task
 - `kgs_pillar` and `kgs_pathway` fields from data contract
@@ -953,7 +1020,9 @@ Model fields per data contract Part 4. Key points:
 Run migrations. Commit: `git add . && git commit -m "feat: activity models — Activity + ActivityLog"`
 
 ### Task 3.2 — Activity serializers + views + URLs
+
 Endpoints:
+
 ```
 GET    /api/activities/           list
 POST   /api/activities/           create
@@ -966,10 +1035,12 @@ GET    /api/activities/{id}/log/  activity history
 Commit: `git add . && git commit -m "feat: activity DRF endpoints"`
 
 ### Task 3.3 — activity.service.js + activity.store.js
+
 Same pattern as `records.service.js`. Calls DRF activity endpoints.
 Commit: `git add . && git commit -m "feat: activity.service.js + activity.store.js"`
 
 ### Task 3.4 — Build activity-app.js UI
+
 Mobile-first. Displays tasks, habits, goals. Links to records via `ICSRelationships.create()`.
 Commit: `git add . && git commit -m "feat: activity app UI"`
 
@@ -980,7 +1051,9 @@ Commit: `git add . && git commit -m "feat: activity app UI"`
 **Exit criteria:** `identity.service.js` and `tenant.service.js` exist and call DRF. `router.js` uses `identity.service.js` for competence-level-aware route guarding.
 
 ### Task 4.1 — identity.service.js
+
 **Files:**
+
 - Create: `~/ics/frontend/assets/js/engines/identity.service.js`
 
 ```js
@@ -1017,6 +1090,7 @@ const ICSIdentity = (() => {
 Commit: `git add . && git commit -m "feat: identity.service.js"`
 
 ### Task 4.2 — tenant.service.js
+
 Calls `/api/tenants/` endpoints. Handles path resolution and membership queries.
 Commit: `git add . && git commit -m "feat: tenant.service.js"`
 
@@ -1029,33 +1103,39 @@ Commit: `git add . && git commit -m "feat: tenant.service.js"`
 Build order is fixed — do not reorder:
 
 ### Task 5.1 — Bible app (bible.js + Django bible endpoints)
+
 - Store Bible data as `Record` objects with `record_family: "bible"`, `record_type: "bible_note"`
 - Bible reader reads from a static JSON file (no DB needed for scripture text itself)
 - Notes and annotations write to Records via `ICSRecords.create()`
 - Commit: `git add . && git commit -m "feat: bible app"`
 
 ### Task 5.2 — Learn app (learn-app.js + Django learning endpoints)
+
 - Courses are `Record` objects with `record_family: "learning"`
 - Competence level gates via `ICSIdentity.getCurrentUser().competence_level`
 - Commit: `git add . && git commit -m "feat: learn app"`
 
 ### Task 5.3 — Community app (community-app.js + Django community endpoints)
+
 - Tenant membership views
 - Member directory (filtered by user's tenant scope)
 - Commit: `git add . && git commit -m "feat: community app"`
 
 ### Task 5.4 — Governance app (governance-app.js + Django governance endpoints)
+
 - Reads `record_class: "governance"` records only
 - Write access gated to Level 4+ (Level 5 for Handbook records)
 - Version history view using `previous_version_id` / `superseded_by` chain
 - Commit: `git add . && git commit -m "feat: governance app"`
 
 ### Task 5.5 — Profile + Settings apps
+
 - Profile: reads/writes `/api/auth/me/`
 - Settings: theme, language, timezone — stored in `localStorage` (UI state only, not persisted to DB at this phase)
 - Commit: `git add . && git commit -m "feat: profile + settings apps"`
 
 ### Task 5.6 — Notifications app (stub)
+
 - Endpoint: `GET /api/notifications/` — returns empty list for now
 - UI renders list, marks as read
 - Full implementation deferred to Phase 7
@@ -1068,12 +1148,15 @@ Build order is fixed — do not reorder:
 **Exit criteria:** `paraclete.service.js` calls DRF and returns a real `ParacleteDigest` for the logged-in user. Dashboard renders digest data.
 
 ### Task 6.1 — Paraclete Django app
+
 **Files:**
+
 - Create: `~/ics/paraclete/` Django app
 - Create: `~/ics/paraclete/service.py` — orchestration logic (reads from records + activity, writes nothing)
 - Create: `~/ics/paraclete/views.py` — DRF endpoints
 
 Endpoints:
+
 ```
 GET  /api/paraclete/digest/              daily digest
 GET  /api/paraclete/reminders/           pending reminders
@@ -1087,6 +1170,7 @@ POST /api/paraclete/respond/             accept/dismiss suggestion
 Commit: `git add . && git commit -m "feat: paraclete Django service + endpoints"`
 
 ### Task 6.2 — paraclete.service.js
+
 Calls Paraclete DRF endpoints. Returns `ParacleteDigest` for dashboard consumption.
 Commit: `git add . && git commit -m "feat: paraclete.service.js"`
 
@@ -1097,6 +1181,7 @@ Commit: `git add . && git commit -m "feat: paraclete.service.js"`
 **Exit criteria:** Dashboard renders a real `ParacleteDigest`. Shows pending activities, recent records, active prayer count, discipline prompt. Role-aware and tenant-aware.
 
 ### Task 7.1 — dashboard-app.js
+
 - Calls `ICSParaclete.getDailyDigest()`
 - Renders widgets: today's focus, pending activities, recent records, prayer count
 - Competence level determines which widgets are visible
@@ -1109,27 +1194,34 @@ Commit: `git add . && git commit -m "feat: paraclete.service.js"`
 **Exit criteria:** Platform runs stably on VPS. SSL active. Static files served by Nginx. Error logging in place.
 
 ### Task 8.1 — SSL (Let's Encrypt)
+
 ```bash
 sudo apt install certbot python3-certbot-nginx
 sudo certbot --nginx -d your-domain.com
 ```
+
 Commit: `git add . && git commit -m "chore: SSL via Let's Encrypt"`
 
 ### Task 8.2 — Static files
+
 ```bash
 python manage.py collectstatic
 ```
+
 Nginx serves `/static/` from `staticfiles/`. Frontend assets served from `frontend/`.
 Commit: `git add . && git commit -m "chore: static files config"`
 
 ### Task 8.3 — Error logging + Django admin
+
 - Configure `LOGGING` in Django settings to write errors to file
 - Create superuser: `python manage.py createsuperuser`
 - Verify Django admin accessible at `/admin/`
 - Commit: `git add . && git commit -m "chore: logging + admin setup"`
 
 ### Task 8.4 — Systemd service for Gunicorn
+
 Create `/etc/systemd/system/ics.service` so Gunicorn restarts on reboot:
+
 ```ini
 [Unit]
 Description=ICS Gunicorn Service
@@ -1144,10 +1236,12 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 ```
+
 ```bash
 sudo systemctl enable ics
 sudo systemctl start ics
 ```
+
 Commit: `git add . && git commit -m "chore: systemd gunicorn service"`
 
 ---
@@ -1167,6 +1261,7 @@ Commit: `git add . && git commit -m "chore: systemd gunicorn service"`
 | 8 | Production hardening | Phase 7 done | SSL, static files, logging, systemd |
 
 ## Deferred (post-MVP)
+
 - Full `RecordPermission` table (fine-grained per-user permissions)
 - `CustomFieldSchema` formal validation system
 - Video/Live streaming app
@@ -1174,4 +1269,3 @@ Commit: `git add . && git commit -m "chore: systemd gunicorn service"`
 - Donations feature
 - Advanced Paraclete AI features (pattern detection, auto-linking)
 - Push notifications (mobile)
-
