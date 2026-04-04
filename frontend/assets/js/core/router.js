@@ -23,6 +23,11 @@ const ROUTES = {
   defaultPublic: "/pages/login.html"
 };
 
+const ROUTE_COMPETENCE_MIN = {
+  "governance.html": 4,
+  "handbook.html": 5
+}
+
 
 
 // =========================
@@ -52,7 +57,7 @@ const Router = {
   },
 
   // Main guard logic
-  guard() {
+  async guard() {
     const page = this.currentPage();
     const isAuth = !!localStorage.getItem('ics_token');
 
@@ -66,6 +71,25 @@ const Router = {
     if (isAuth && this.isPublic(page)) {
       this.goTo(ROUTES.defaultAuth);
       return;
+    }
+
+    if (isAuth && this.isProtected(page) && window.ICSIdentity?.getCurrentUser) {
+      const user = await window.ICSIdentity.getCurrentUser()
+      if (!user) {
+        localStorage.removeItem('ics_token')
+        localStorage.removeItem('ics_user')
+        this.goTo(ROUTES.defaultPublic)
+        return
+      }
+
+      const min = ROUTE_COMPETENCE_MIN[page]
+      if (typeof min === 'number') {
+        const level = Number(user.competence_level ?? 0)
+        if (Number.isFinite(level) && level < min) {
+          this.goTo(ROUTES.defaultAuth)
+          return
+        }
+      }
     }
   }
 
@@ -96,7 +120,9 @@ const Navigation = {
 // INITIALIZE ROUTER
 // =========================
 function initRouter() {
-  Router.guard();
+  Router.guard().catch(() => {
+    Router.goTo(ROUTES.defaultPublic)
+  })
 }
 
 
