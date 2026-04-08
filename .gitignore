@@ -29,3 +29,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.iml
+
+
+# Files & Folders
+backend/data/bibles_json_6.0
+
