@@ -1,0 +1,18 @@
+<!-- _display_name_edit.html — inline edit form for display name -->
+<form class="inline-edit-form"
+      hx-patch="{% url 'htmx-display-name' %}"
+      hx-target="#display-name-field"
+      hx-swap="innerHTML">
+  {% csrf_token %}
+  <input type="text"
+         name="display_name"
+         value="{{ profile_user.display_name }}"
+         placeholder="Your name"
+         maxlength="100"
+         autofocus>
+  <button type="submit" class="btn-inline-save">Save</button>
+  <button type="button" class="btn-inline-cancel"
+          hx-get="{% url 'htmx-display-name' %}?show=1"
+          hx-target="#display-name-field"
+          hx-swap="innerHTML">Cancel</button>
+</form>

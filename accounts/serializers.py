@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import User
 
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
 
@@ -20,6 +21,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
@@ -33,9 +35,30 @@ class LoginSerializer(serializers.Serializer):
         data['user'] = user
         return data
 
+
 class UserSerializer(serializers.ModelSerializer):
+    preferred_bible_translation_code = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'email', 'display_name', 'avatar_url',
-                  'competence_level', 'status', 'created_at']
+        fields = [
+            'id', 'email', 'display_name', 'avatar_url',
+            'competence_level', 'status', 'created_at',
+            'preferences', 'preferred_bible_translation',
+            'preferred_bible_translation_code',
+        ]
         read_only_fields = ['id', 'created_at', 'competence_level']
+
+    def get_preferred_bible_translation_code(self, obj):
+        if obj.preferred_bible_translation:
+            return obj.preferred_bible_translation.code
+        return None
+
+    def update(self, instance, validated_data):
+        # Merge preferences JSONField rather than replacing it wholesale
+        incoming_prefs = validated_data.pop('preferences', None)
+        if incoming_prefs is not None:
+            current = instance.preferences or {}
+            current.update(incoming_prefs)
+            instance.preferences = current
+        return super().update(instance, validated_data)

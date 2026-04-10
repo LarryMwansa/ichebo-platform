@@ -1,0 +1,38 @@
+<!-- _settings_region.html — Language + Timezone -->
+{% with current_lang=profile_user.preferences.language|default:"en" current_tz=profile_user.preferences.timezone|default:"Africa/Johannesburg" %}
+<div class="settings-section" id="region">
+  <div class="settings-section-header">Language &amp; Region</div>
+  <form class="settings-section-body"
+        hx-patch="{% url 'htmx-region' %}"
+        hx-target="#region-confirm"
+        hx-swap="innerHTML">
+    {% csrf_token %}
+
+    <div class="settings-field">
+      <label for="language-select">Language</label>
+      <select id="language-select" name="language">
+        <option value="en" {% if current_lang == "en" %}selected{% endif %}>English</option>
+        <option value="fr" disabled>Français (coming soon)</option>
+        <option value="pt" disabled>Português (coming soon)</option>
+        <option value="sw" disabled>Kiswahili (coming soon)</option>
+        <option value="zu" disabled>Zulu (coming soon)</option>
+      </select>
+    </div>
+
+    <div class="settings-field">
+      <label for="timezone-select">Timezone</label>
+      <select id="timezone-select" name="timezone">
+        {% for tz in timezone_choices %}
+        <option value="{{ tz }}" {% if current_tz == tz %}selected{% endif %}>{{ tz }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+      <button type="submit" class="btn-save">Save</button>
+      <div id="region-confirm"></div>
+    </div>
+
+  </form>
+</div>
+{% endwith %}

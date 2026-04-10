@@ -1,0 +1,45 @@
+<!-- _settings_appearance.html — Theme selector -->
+{% with current_theme=profile_user.preferences.theme|default:"system" %}
+<div class="settings-section" id="appearance">
+  <div class="settings-section-header">Appearance</div>
+  <div class="settings-section-body">
+
+    <div class="settings-field">
+      <label>Theme</label>
+      <div class="radio-group" id="theme-confirm-target">
+        {% for value, label in "system:System,light:Light,dark:Dark"|slice:"0:"|cut:""|dictsort:"0" %}{% endfor %}
+        <!-- Rendered inline to avoid template tag overhead -->
+        <label class="radio-option">
+          <input type="radio" name="theme" value="system"
+                 {% if current_theme == "system" %}checked{% endif %}
+                 hx-patch="{% url 'htmx-theme' %}"
+                 hx-vals='{"theme":"system"}'
+                 hx-target="#theme-confirm"
+                 hx-swap="innerHTML">
+          System (follow device)
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="theme" value="light"
+                 {% if current_theme == "light" %}checked{% endif %}
+                 hx-patch="{% url 'htmx-theme' %}"
+                 hx-vals='{"theme":"light"}'
+                 hx-target="#theme-confirm"
+                 hx-swap="innerHTML">
+          Light
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="theme" value="dark"
+                 {% if current_theme == "dark" %}checked{% endif %}
+                 hx-patch="{% url 'htmx-theme' %}"
+                 hx-vals='{"theme":"dark"}'
+                 hx-target="#theme-confirm"
+                 hx-swap="innerHTML">
+          Dark
+        </label>
+      </div>
+      <div id="theme-confirm"></div>
+    </div>
+
+  </div>
+</div>
+{% endwith %}

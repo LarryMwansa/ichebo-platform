@@ -1,0 +1,32 @@
+<!-- _settings_bible.html — Preferred Bible translation -->
+{% with current_trans=profile_user.preferred_bible_translation %}
+<div class="settings-section" id="bible">
+  <div class="settings-section-header">Bible</div>
+  <div class="settings-section-body">
+
+    <div class="settings-field">
+      <label>Preferred translation</label>
+      <div class="radio-group">
+        {% for trans in translations %}
+        <label class="radio-option">
+          <input type="radio"
+                 name="translation_code"
+                 value="{{ trans.code }}"
+                 {% if current_trans and current_trans.pk == trans.pk %}checked{% endif %}
+                 {% if not current_trans and trans.code == "KJV" %}checked{% endif %}
+                 hx-post="{% url 'bible:htmx-set-translation' %}"
+                 hx-vals='{"translation_code":"{{ trans.code }}"}'
+                 hx-target="#bible-confirm"
+                 hx-swap="innerHTML">
+          {{ trans.name }} ({{ trans.code }})
+        </label>
+        {% empty %}
+        <p class="empty-state">No translations available.</p>
+        {% endfor %}
+      </div>
+      <div id="bible-confirm"></div>
+    </div>
+
+  </div>
+</div>
+{% endwith %}

@@ -1,0 +1,46 @@
+<!-- _profile_formation.html — Formation + Memberships section -->
+
+<div class="profile-card">
+  <div class="profile-card-title">Formation</div>
+
+  <div class="profile-row">
+    <span class="profile-row-label">Level</span>
+    <div class="level-badge">
+      <span class="level-number">{{ profile_user.competence_level }}</span>
+      {{ kgs_name }}
+    </div>
+  </div>
+
+  <div class="profile-row" style="flex-direction:column;align-items:flex-start;">
+    <span class="profile-row-label" style="margin-bottom:0.375rem;">Platform role</span>
+    <span class="profile-row-value">{{ platform_label }}</span>
+  </div>
+</div>
+
+<!-- Tenant memberships -->
+<div class="profile-card">
+  <div class="profile-card-title">Community Memberships</div>
+
+  <div id="memberships-list"
+       hx-trigger="load"
+       hx-get=""
+       hx-swap="none">
+    {% if memberships %}
+      {% for perm in memberships %}
+      <div class="membership-item">
+        <span class="membership-tenant">{{ perm.tenant.name }}</span>
+        <span class="membership-meta">
+          {{ perm.get_role_display }} &middot; Since {{ perm.granted_at|date:"N Y" }}
+        </span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <p>You are not yet a member of a community.</p>
+        <a href="{% url 'community:my-community' %}" style="color:var(--primary);font-size:0.875rem;">
+          Go to Community
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>

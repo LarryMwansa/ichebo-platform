@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'learn',
     'community',
     'governance',
+    'notifications',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

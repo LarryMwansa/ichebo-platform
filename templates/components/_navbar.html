@@ -26,8 +26,15 @@
   <div class="nav-right">
 
     <!-- Notifications -->
-    <div class="nav-right-item">
-      <button class="icon-btn" aria-label="Notifications" id="notifBtn">🔔</button>
+    <div class="nav-right-item" style="position:relative;">
+      <a href="{% url 'notifications:list' %}" class="icon-btn" aria-label="Notifications" id="notifBtn" style="text-decoration:none;position:relative;">
+        🔔
+        <span id="notif-badge"
+              style="display:none;position:absolute;top:-4px;right:-4px;background:var(--primary);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;align-items:center;justify-content:center;"
+              hx-get="{% url 'notifications-api:unread-badge' %}"
+              hx-trigger="load"
+              hx-swap="outerHTML"></span>
+      </a>
     </div>
 
     <!-- Theme toggle -->
@@ -80,7 +87,8 @@
           </div>
           <hr>
           <a href="{% url 'dashboard:index' %}" role="menuitem">My Dashboard</a>
-          <a href="#" role="menuitem">My Profile</a>
+          <a href="{% url 'profile' %}" role="menuitem">My Profile</a>
+          <a href="{% url 'settings' %}" role="menuitem">Settings</a>
           <form method="post" action="{% url 'logout' %}" style="margin:0;">
             {% csrf_token %}
             <button type="submit" style="display:block;width:100%;text-align:left;padding:12px 15px;font-size:14px;background:none;border:none;color:var(--text);cursor:pointer;" role="menuitem">Logout</button>
@@ -96,8 +104,8 @@
     <div class="dropdown-options nav-right-item">
       <button id="optionsBtn" class="icon-btn" aria-label="Options" aria-expanded="false" aria-controls="optionsMenu">⋮</button>
       <div id="optionsMenu" class="options-menu" role="menu">
-        <a href="#" role="menuitem">Refresh</a>
-        <a href="#" role="menuitem">Settings</a>
+        <a href="#" role="menuitem" onclick="window.location.reload()">Refresh</a>
+        <a href="{% url 'settings' %}" role="menuitem">Settings</a>
       </div>
     </div>
 

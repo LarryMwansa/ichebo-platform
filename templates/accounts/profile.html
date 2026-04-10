@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="accounts-shell">
+
+  <nav class="accounts-tab-row" aria-label="Account navigation">
+    <a href="{% url 'profile' %}" class="accounts-tab accounts-tab--active">Profile</a>
+    <a href="{% url 'settings' %}" class="accounts-tab">Settings</a>
+  </nav>
+
+  <div class="accounts-content">
+
+    {% include "accounts/_profile_identity.html" %}
+    {% include "accounts/_profile_formation.html" %}
+
+  </div>
+</div>
+{% endblock %}

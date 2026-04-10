@@ -1,0 +1,63 @@
+<!-- _profile_identity.html — Identity section -->
+
+<!-- Avatar -->
+<div class="profile-avatar-wrap">
+  {% if profile_user.avatar_url %}
+    <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}" class="profile-avatar">
+  {% else %}
+    <div class="profile-avatar-initials" aria-hidden="true">
+      {{ profile_user.display_name|default:profile_user.email|first|upper }}
+    </div>
+  {% endif %}
+</div>
+
+<!-- Identity card -->
+<div class="profile-card">
+  <div class="profile-card-title">Identity</div>
+
+  <!-- Display name — inline editable -->
+  <div class="profile-row">
+    <span class="profile-row-label">Name</span>
+    <div id="display-name-field">
+      {% include "accounts/_display_name_show.html" %}
+    </div>
+  </div>
+
+  <!-- Email — read only -->
+  <div class="profile-row">
+    <span class="profile-row-label">Email</span>
+    <span class="profile-row-value">{{ profile_user.email }}</span>
+  </div>
+
+  <!-- Member since -->
+  <div class="profile-row">
+    <span class="profile-row-label">Member since</span>
+    <span class="profile-row-value">{{ profile_user.created_at|date:"N j, Y" }}</span>
+  </div>
+
+  <!-- Status -->
+  <div class="profile-row">
+    <span class="profile-row-label">Status</span>
+    <span class="status-badge status-badge--{{ profile_user.status }}">
+      {{ profile_user.get_status_display }}
+    </span>
+  </div>
+</div>
+
+<!-- Bible preference -->
+<div class="profile-card">
+  <div class="profile-card-title">Bible</div>
+  <div class="profile-row">
+    <span class="profile-row-label">Preferred translation</span>
+    <span class="profile-row-value">
+      {% if profile_user.preferred_bible_translation %}
+        {{ profile_user.preferred_bible_translation.name }}
+      {% else %}
+        King James Version (default)
+      {% endif %}
+    </span>
+  </div>
+  <div style="padding:0.5rem 0 0;">
+    <a href="{% url 'settings' %}#bible" style="font-size:0.8125rem;color:var(--primary);">Change translation</a>
+  </div>
+</div>

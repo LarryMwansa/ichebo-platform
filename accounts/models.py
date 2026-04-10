@@ -26,6 +26,7 @@ class User(AbstractUser):
         on_delete=models.SET_NULL,
         related_name='preferred_by_users'
     )
+    preferences = models.JSONField(default=dict, blank=True)
 
     class Meta:
         db_table = 'accounts_user'

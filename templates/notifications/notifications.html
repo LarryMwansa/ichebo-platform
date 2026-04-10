@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div style="max-width:640px;margin:0 auto;padding:1.25rem 1rem 5rem;">
+
+  <h1 style="font-size:1.125rem;font-weight:700;margin-bottom:1rem;">Notifications</h1>
+
+  {% include "notifications/_notification_list.html" %}
+
+</div>
+{% endblock %}
