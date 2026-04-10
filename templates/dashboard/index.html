@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="dashboard-header">
+  <h1>Welcome, {{ user.display_name|default:user.email }}</h1>
+  <p>Competence Level: {{ user.competence_level }} | Role: {{ user.status|title }}</p>
+</div>
+
+<div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+  <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+    <h2>Recent Activities</h2>
+    <p>Activities module is ready.</p>
+  </div>
+  <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+    <h2>Records</h2>
+    <p>Records module is ready.</p>
+  </div>
+</div>
+{% endblock %}

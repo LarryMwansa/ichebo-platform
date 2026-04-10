@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from accounts import views as accounts_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +26,7 @@ urlpatterns = [
     path('api/', include('records.urls')),
     path('api/', include('activity.urls')),
     path('api/calendar/', include('calendar_app.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/register/', accounts_views.RegisterView.as_view(), name='register_ui'),
+    path('', include('dashboard.urls', namespace='dashboard')),
 ]

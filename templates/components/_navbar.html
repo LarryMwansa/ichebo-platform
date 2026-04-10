@@ -1,0 +1,23 @@
+<header class="ics-navbar" role="banner">
+  <button class="ics-navbar__drawer-btn"
+          aria-label="Open app menu"
+          aria-expanded="false"
+          aria-controls="app-drawer"
+          id="drawer-toggle">
+    ☰
+  </button>
+
+  <a href="/" class="ics-navbar__wordmark">ICS Dashboard</a>
+
+  <nav class="ics-navbar__actions" aria-label="Top actions">
+    {% if user.is_authenticated %}
+      <span>{{ user.display_name|default:user.email }}</span>
+      <form method="post" action="{% url 'logout' %}" style="display:inline; margin-left: 10px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--ghost">Log Out</button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}" class="btn btn--primary">Sign in</a>
+    {% endif %}
+  </nav>
+</header>

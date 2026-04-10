@@ -47,3 +47,21 @@ def me(request):
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+from django.contrib.auth import login as auth_login
+from django.views.generic.edit import FormView
+from django.urls import reverse_lazy
+from .forms import RegisterForm
+
+class RegisterView(FormView):
+    template_name = 'registration/register.html'
+    form_class = RegisterForm
+    success_url = reverse_lazy('dashboard:index')
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.username = form.cleaned_data['email']
+        user.set_password(form.cleaned_data['password'])
+        user.save()
+        auth_login(self.request, user)
+        return super().form_valid(form)
