@@ -1,0 +1,71 @@
+{% extends "community/base_community.html" %}
+
+{% block community_content %}
+<div class="community-header">
+  <div class="community-logo">⚙️</div>
+  <div>
+    <div class="community-name">Community Management</div>
+    <div class="community-tier">{{ scope_tenant.name|default:"Your Branch" }}</div>
+  </div>
+</div>
+
+<!-- Nav tiles -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+  <a href="{% url 'community:community-members' %}" class="info-card" style="text-decoration:none">
+    <div class="info-card-icon">👥</div>
+    <div>
+      <div class="info-card-label">Members</div>
+      <div class="info-card-value">{{ member_count }}</div>
+    </div>
+  </a>
+  <a href="{% url 'community:community-pipeline' %}" class="info-card" style="text-decoration:none">
+    <div class="info-card-icon">📊</div>
+    <div>
+      <div class="info-card-label">Pipeline</div>
+      <div class="info-card-value">Formation Stages</div>
+    </div>
+  </a>
+</div>
+
+<!-- Announcements section -->
+<div class="section-heading" style="display:flex;justify-content:space-between;align-items:center">
+  <span>Announcements</span>
+  <button class="btn-secondary btn-sm"
+          hx-get="{% url 'community:htmx-create-announcement' %}"
+          hx-target="#announcement-form-slot"
+          hx-swap="innerHTML">+ New</button>
+</div>
+<div id="announcement-form-slot"></div>
+<div id="announcement-list"
+     hx-get="{% url 'community:htmx-announcement-list' %}"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+  <div class="htmx-indicator">Loading…</div>
+</div>
+
+<!-- Gatherings section -->
+<div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+  <span>Gatherings</span>
+  <button class="btn-secondary btn-sm"
+          hx-get="{% url 'community:htmx-create-gathering' %}"
+          hx-target="#gathering-form-slot"
+          hx-swap="innerHTML">+ Schedule</button>
+</div>
+<div id="gathering-form-slot"></div>
+{% if gatherings %}
+{% for g in gatherings %}
+<div class="gathering-card" id="gathering-{{ g.id }}">
+  <div class="gathering-title">{{ g.title }}</div>
+  {% if g.scheduled_at %}
+  <div class="gathering-meta">{{ g.scheduled_at|date:"d M Y, H:i" }}</div>
+  {% endif %}
+  {% with fmt=g.custom_fields.format|default:"in_person" %}
+  <span class="gathering-format format-{{ fmt }}">{{ fmt|title }}</span>
+  {% endwith %}
+</div>
+{% endfor %}
+{% else %}
+<div class="empty-state" style="padding:20px 0">No gatherings in the next 7 days.</div>
+{% endif %}
+
+{% endblock %}

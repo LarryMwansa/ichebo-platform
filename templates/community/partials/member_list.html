@@ -1,0 +1,14 @@
+{% for m in members %}
+<a href="{% url 'community:community-member-profile' m.user.id %}" class="member-card">
+  <div class="member-avatar">{{ m.user.display_name|first|upper|default:"?" }}</div>
+  <div>
+    <div class="member-name">{{ m.user.display_name|default:m.user.email }}</div>
+    <div class="member-meta">
+      Level {{ m.level|default:0 }}
+      {% if m.metadata.service_order %} · {{ m.metadata.service_order }}{% endif %}
+    </div>
+  </div>
+</a>
+{% empty %}
+<div class="empty-state">No members found.</div>
+{% endfor %}

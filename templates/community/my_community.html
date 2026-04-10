@@ -1,0 +1,110 @@
+{% extends "community/base_community.html" %}
+
+{% block community_content %}
+
+{% if not primary_perm %}
+<div class="empty-state">
+  <p>You are not yet part of a community.</p>
+  <p style="margin-top:8px;font-size:12px">
+    Contact a steward to be added to your local Sceptre Community.
+  </p>
+</div>
+{% else %}
+
+<!-- Community header -->
+<div class="community-header">
+  <div class="community-logo">🏛</div>
+  <div>
+    <div class="community-name">{{ primary_perm.tenant.name|default:"My Community" }}</div>
+    <div class="community-tier">{{ primary_perm.tenant.tier|default:"Church Node"|title }}</div>
+  </div>
+</div>
+
+<!-- Formation stage -->
+<div class="formation-card">
+  <div class="formation-stage-label">Formation Stage</div>
+  <div class="formation-level-name">{{ level_label }}</div>
+  <div class="formation-participation">{{ participation_stage }}</div>
+  <div class="formation-steps">
+    {% for step in participation_steps %}
+    <div class="formation-step {% if step <= level %}active{% endif %}"></div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Shepherd -->
+{% if shepherd %}
+<div class="info-card">
+  <div class="info-card-icon">🤝</div>
+  <div>
+    <div class="info-card-label">Your Shepherd</div>
+    <div class="info-card-value">{{ shepherd.display_name|default:shepherd.email }}</div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Service order -->
+{% if service_order %}
+<div class="info-card">
+  <div class="info-card-icon">⚙️</div>
+  <div>
+    <div class="info-card-label">Service Placement</div>
+    <div class="info-card-value">{{ service_order }}</div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Gifts summary -->
+<div class="gifts-summary">
+  <div class="gifts-count">{{ gifts_count }}</div>
+  <div class="gifts-label">
+    Active gift{{ gifts_count|pluralize }} registered
+  </div>
+</div>
+
+<!-- Upcoming gatherings -->
+<div class="section-heading">Upcoming Gatherings</div>
+{% if upcoming_gatherings %}
+{% for gathering in upcoming_gatherings %}
+<div class="gathering-card">
+  <div class="gathering-title">{{ gathering.title }}</div>
+  {% if gathering.scheduled_at %}
+  <div class="gathering-meta">{{ gathering.scheduled_at|date:"d M Y, H:i" }}</div>
+  {% endif %}
+  {% with fmt=gathering.custom_fields.format|default:"in_person" %}
+  <span class="gathering-format format-{{ fmt }}">
+    {{ fmt|title }}
+  </span>
+  {% endwith %}
+  {% if gathering.custom_fields.location %}
+  <div class="gathering-meta" style="margin-top:6px">📍 {{ gathering.custom_fields.location }}</div>
+  {% endif %}
+  {% if gathering.custom_fields.stream_url %}
+  <a class="gathering-stream-link"
+     href="{{ gathering.custom_fields.stream_url }}"
+     target="_blank" rel="noopener">
+    🔗 Join Online
+  </a>
+  {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<div class="empty-state" style="padding:20px 0">No gatherings scheduled in the next 30 days.</div>
+{% endif %}
+
+<!-- Announcements -->
+<div class="section-heading">Announcements</div>
+{% if announcements %}
+{% for ann in announcements %}
+<div class="announcement-card">
+  <div class="announcement-title">{{ ann.title }}</div>
+  <div class="announcement-content">{{ ann.content|truncatechars:180 }}</div>
+  <div class="announcement-date">{{ ann.created_at|date:"d M Y" }}</div>
+</div>
+{% endfor %}
+{% else %}
+<div class="empty-state" style="padding:20px 0">No announcements yet.</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}

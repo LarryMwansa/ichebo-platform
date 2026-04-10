@@ -1,0 +1,46 @@
+{% extends "community/base_community.html" %}
+
+{% block community_content %}
+<div style="margin-bottom:16px">
+  <input type="search" placeholder="Search members…"
+         name="q" value="{{ search_q }}"
+         hx-get="{% url 'community:htmx-member-search' %}"
+         hx-trigger="keyup changed delay:400ms"
+         hx-target="#member-list"
+         hx-swap="innerHTML"
+         class="community-search-input">
+</div>
+
+<!-- Filters -->
+<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+  <select name="level"
+          hx-get="{% url 'community:htmx-member-search' %}"
+          hx-trigger="change"
+          hx-target="#member-list"
+          hx-swap="innerHTML"
+          hx-include="[name='q'],[name='order']"
+          class="community-filter-select">
+    <option value="">All levels</option>
+    {% for val, label in level_choices %}
+    <option value="{{ val }}" {% if filter_level == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+
+  <select name="order"
+          hx-get="{% url 'community:htmx-member-search' %}"
+          hx-trigger="change"
+          hx-target="#member-list"
+          hx-swap="innerHTML"
+          hx-include="[name='q'],[name='level']"
+          class="community-filter-select">
+    <option value="">All service orders</option>
+    {% for val, label in order_choices %}
+    <option value="{{ val }}" {% if filter_order == val %}selected{% endif %}>{{ val }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<div id="member-list">
+  {% include "community/partials/member_list.html" %}
+</div>
+{% endblock %}

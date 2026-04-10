@@ -1,0 +1,39 @@
+from django.urls import path
+from . import api_views, views
+
+app_name = 'community'
+
+urlpatterns = [
+    # ── Health ──────────────────────────────────────────────────────────────
+    path('api/community/health/', api_views.community_health, name='api-health'),
+
+    # ── My Community surface ─────────────────────────────────────────────────
+    path('community/', views.my_community, name='community-home'),
+
+    # ── Management surface (Level 3+) ────────────────────────────────────────
+    path('community/management/', views.management_home, name='community-management'),
+    path('community/management/members/', views.member_directory, name='community-members'),
+    path('community/management/members/<uuid:member_id>/',
+         views.member_profile, name='community-member-profile'),
+    path('community/management/pipeline/', views.formation_pipeline, name='community-pipeline'),
+
+    # ── HTMX partials ────────────────────────────────────────────────────────
+    path('community/htmx/announcement/create/',
+         views.htmx_create_announcement, name='htmx-create-announcement'),
+    path('community/htmx/announcement/<uuid:record_id>/archive/',
+         views.htmx_archive_announcement, name='htmx-archive-announcement'),
+    path('community/htmx/gathering/create/',
+         views.htmx_create_gathering, name='htmx-create-gathering'),
+    path('community/htmx/gathering/<uuid:record_id>/cancel/',
+         views.htmx_cancel_gathering, name='htmx-cancel-gathering'),
+    path('community/htmx/member/<uuid:permission_id>/shepherd/',
+         views.htmx_set_shepherd, name='htmx-set-shepherd'),
+    path('community/htmx/member/<uuid:permission_id>/order/',
+         views.htmx_set_order, name='htmx-set-order'),
+    path('community/htmx/member/<uuid:permission_id>/deactivate/',
+         views.htmx_deactivate_member, name='htmx-deactivate-member'),
+    path('community/htmx/members/search/',
+         views.htmx_member_search, name='htmx-member-search'),
+    path('community/htmx/announcements/',
+         views.htmx_announcement_list, name='htmx-announcement-list'),
+]

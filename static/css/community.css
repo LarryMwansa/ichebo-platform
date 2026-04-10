@@ -1,0 +1,313 @@
+/* ============================================================
+   community.css — ICS Community App styles
+   Mobile-first. Builds on variables.css design tokens.
+   ============================================================ */
+
+/* ── Surface layout ─────────────────────────────────────────── */
+.community-surface {
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 90px;
+}
+
+/* ── Community header card ──────────────────────────────────── */
+.community-header {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.community-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.community-name { font-size: 16px; font-weight: 600; color: var(--text); }
+.community-tier { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ── Formation stage card ───────────────────────────────────── */
+.formation-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.formation-stage-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.formation-level-name { font-size: 17px; font-weight: 600; color: var(--text); }
+.formation-participation { font-size: 13px; color: var(--primary); margin-top: 2px; }
+.formation-steps { display: flex; gap: 6px; margin-top: 12px; }
+.formation-step {
+  height: 6px;
+  flex: 1;
+  border-radius: 3px;
+  background: var(--border);
+}
+.formation-step.active { background: var(--primary); }
+
+/* ── Info card ──────────────────────────────────────────────── */
+.info-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.info-card-icon { font-size: 20px; flex-shrink: 0; }
+.info-card-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.info-card-value { font-size: 14px; font-weight: 500; color: var(--text); margin-top: 2px; }
+
+/* ── Section heading ────────────────────────────────────────── */
+.section-heading {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 16px 0 8px;
+}
+
+/* ── Gathering card ─────────────────────────────────────────── */
+.gathering-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.gathering-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.gathering-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.gathering-format {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-top: 6px;
+}
+.format-in_person  { background: #e8f5e9; color: #2e7d32; }
+.format-digital    { background: var(--hover); color: var(--primary); }
+.format-hybrid     { background: #fff8e1; color: #f57f17; }
+.gathering-stream-link {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* ── Announcement card ──────────────────────────────────────── */
+.announcement-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.announcement-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.announcement-content { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+.announcement-date { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+/* ── Member card ────────────────────────────────────────────── */
+.member-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.member-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px var(--shadow); }
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.member-name  { font-size: 14px; font-weight: 600; color: var(--text); }
+.member-meta  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ── Formation pipeline ─────────────────────────────────────── */
+.pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.pipeline-col {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+.pipeline-col-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.pipeline-count { font-size: 24px; font-weight: 700; color: var(--primary); line-height: 1; }
+.pipeline-names { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+/* ── Gifts summary ──────────────────────────────────────────── */
+.gifts-summary {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.gifts-count { font-size: 22px; font-weight: 700; color: var(--primary); }
+.gifts-label { font-size: 12px; color: var(--muted); }
+
+/* ── Community form ─────────────────────────────────────────── */
+.community-form {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 16px;
+  margin-bottom: 16px;
+}
+.form-field { margin-bottom: 14px; }
+.form-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 4px;
+}
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus { outline: none; border-color: var(--primary); }
+
+.format-conditional { display: none; }
+.format-conditional.visible { display: block; }
+
+/* ── Search + filter controls ───────────────────────────────── */
+.community-search-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.community-filter-select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+}
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-danger {
+  background: #fce4e4;
+  color: #c62828;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-sm { padding: 6px 12px; font-size: 12px; width: auto; }
+
+/* ── Empty state ────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ── HTMX indicator ─────────────────────────────────────────── */
+.htmx-indicator { opacity: 0; transition: opacity 0.2s; }
+.htmx-request .htmx-indicator { opacity: 1; }
+
+/* ── Desktop ────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .community-surface { padding: 24px; }
+  .pipeline-grid { grid-template-columns: repeat(6, 1fr); }
+}

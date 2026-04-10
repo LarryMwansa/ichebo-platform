@@ -1,0 +1,17 @@
+<div class="community-form" id="announcement-form">
+  <div class="form-field">
+    <label>Title</label>
+    <input type="text" name="title" placeholder="Announcement title" required>
+  </div>
+  <div class="form-field">
+    <label>Content</label>
+    <textarea name="content" rows="4" placeholder="Announcement message…"></textarea>
+  </div>
+  <button class="btn-primary"
+          hx-post="{% url 'community:htmx-create-announcement' %}"
+          hx-target="#announcement-list"
+          hx-swap="innerHTML"
+          hx-include="#announcement-form">
+    Publish Announcement
+  </button>
+</div>

@@ -29,6 +29,7 @@ urlpatterns = [
     path('bible/', include('bible.urls', namespace='bible')),
     path('api/learn/', include('learn.urls')),
     path('learn/', include('learn.urls', namespace='learn')),
+    path('', include('community.urls', namespace='community')),
     path('api/calendar/', include('calendar_app.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', accounts_views.RegisterView.as_view(), name='register_ui'),

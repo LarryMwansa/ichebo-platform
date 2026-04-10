@@ -1,0 +1,24 @@
+{% for ann in announcements %}
+<div class="announcement-card" id="announcement-{{ ann.id }}">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div>
+      <div class="announcement-title">{{ ann.title }}</div>
+      <div class="announcement-content">{{ ann.content|truncatechars:200 }}</div>
+      <div class="announcement-date">{{ ann.created_at|date:"d M Y" }}
+        {% if ann.status == 'archived' %}<span style="color:var(--muted)"> · Archived</span>{% endif %}
+      </div>
+    </div>
+    {% if ann.status == 'active' %}
+    <button class="btn-danger btn-sm"
+            hx-post="{% url 'community:htmx-archive-announcement' ann.id %}"
+            hx-target="#announcement-list"
+            hx-swap="innerHTML"
+            hx-confirm="Archive this announcement?">
+      Archive
+    </button>
+    {% endif %}
+  </div>
+</div>
+{% empty %}
+<div class="empty-state" style="padding:16px 0">No announcements yet.</div>
+{% endfor %}

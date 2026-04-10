@@ -1,0 +1,42 @@
+<div class="community-form" id="gathering-form">
+  <div class="form-field">
+    <label>Title</label>
+    <input type="text" name="title" placeholder="e.g. Sunday Morning Service" required>
+  </div>
+  <div class="form-field">
+    <label>Date &amp; Time</label>
+    <input type="datetime-local" name="scheduled_at" required>
+  </div>
+  <div class="form-field">
+    <label>Format</label>
+    <select name="format"
+            onchange="
+              const fmt = this.value;
+              document.getElementById('loc-field').classList.toggle('visible', fmt !== 'digital');
+              document.getElementById('stream-field').classList.toggle('visible', fmt !== 'in_person');
+            ">
+      <option value="in_person">In Person</option>
+      <option value="digital">Digital</option>
+      <option value="hybrid">Hybrid</option>
+    </select>
+  </div>
+  <div class="form-field format-conditional visible" id="loc-field">
+    <label>Location</label>
+    <input type="text" name="location" placeholder="Venue or address">
+  </div>
+  <div class="form-field format-conditional" id="stream-field">
+    <label>Stream URL</label>
+    <input type="url" name="stream_url" placeholder="https://youtube.com/live/…">
+  </div>
+  <div class="form-field">
+    <label>Description (optional)</label>
+    <textarea name="description" rows="3" placeholder="Agenda or notes…"></textarea>
+  </div>
+  <button class="btn-primary"
+          hx-post="{% url 'community:htmx-create-gathering' %}"
+          hx-target="#gathering-form-slot"
+          hx-swap="innerHTML"
+          hx-include="#gathering-form">
+    Schedule Gathering
+  </button>
+</div>

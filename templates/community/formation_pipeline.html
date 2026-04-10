@@ -1,0 +1,27 @@
+{% extends "community/base_community.html" %}
+
+{% block community_content %}
+<div style="font-size:13px;color:var(--muted);margin-bottom:12px">
+  {{ total }} total active member{{ total|pluralize }}
+</div>
+
+<div class="pipeline-grid">
+{% for col in pipeline_display %}
+<div class="pipeline-col">
+  <div class="pipeline-col-label">{{ col.label }}</div>
+  <div class="pipeline-count">{{ col.count }}</div>
+  <div class="pipeline-names">
+    {% for m in col.members|slice:":5" %}
+      <a href="{% url 'community:community-member-profile' m.user.id %}"
+         style="color:var(--text);text-decoration:none;display:block;font-size:11px;padding:2px 0;">
+        {{ m.user.display_name|default:m.user.email }}
+      </a>
+    {% endfor %}
+    {% if col.count > 5 %}
+      <span style="color:var(--muted)">+{{ col.count|add:"-5" }} more</span>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

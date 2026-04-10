@@ -1,0 +1,12 @@
+{% extends "community/base_community.html" %}
+
+{% block community_content %}
+<div class="empty-state">
+  <p style="font-size:32px;margin-bottom:12px">🔒</p>
+  <p style="font-weight:600;color:var(--text)">Level {{ min_level }}+ required.</p>
+  <p style="margin-top:8px">
+    {% if message %}{{ message }}{% else %}This section is available to stewards and above.{% endif %}
+  </p>
+  <a href="{% url 'community:community-home' %}" class="btn-secondary" style="margin-top:1rem;display:inline-block;">← My Community</a>
+</div>
+{% endblock %}
