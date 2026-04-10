@@ -138,8 +138,22 @@ class Relationship(models.Model):
         Record, on_delete=models.CASCADE, related_name='outgoing_relationships'
     )
     to_record = models.ForeignKey(
-        Record, on_delete=models.CASCADE, related_name='incoming_relationships'
+        Record, on_delete=models.CASCADE, related_name='incoming_relationships',
+        null=True, blank=True
     )
+    bible_verse = models.ForeignKey(
+        'bible.BibleVerse',
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        related_name='governance_references'
+    )
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.to_record is None and self.bible_verse is None:
+            raise ValidationError("A Relationship must target either a Record or a BibleVerse.")
+        if self.to_record is not None and self.bible_verse is not None:
+            raise ValidationError("A Relationship cannot target both a Record and a BibleVerse.")
 
     direction = models.CharField(max_length=20, choices=DIRECTION_CHOICES)
     relationship_type = models.CharField(max_length=30, choices=RELATIONSHIP_TYPE_CHOICES)

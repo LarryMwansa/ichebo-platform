@@ -1,0 +1,105 @@
+<div class="sheet__header">
+  <span class="sheet__title">{{ verse_ref }}</span>
+  <button class="sheet__close-btn"
+          onclick="closeBiblePanel()"
+          aria-label="Close">&#x2715;</button>
+</div>
+
+<div class="bible-annotation-panel__body">
+
+  <!-- Selected verse text -->
+  <blockquote class="bible-annotation-panel__verse">{{ verse.text }}</blockquote>
+
+  <!-- Tenant notes (read-only, attributed) -->
+  {% for note in tenant_notes %}
+  <div class="bible-annotation-panel__tenant-note">
+    <span class="bible-annotation-panel__tenant-badge">Community Note</span>
+    <p>{{ note.content }}</p>
+    <span class="bible-annotation-panel__tenant-attr">— {{ note.created_by.display_name|default:note.created_by.email }}</span>
+  </div>
+  {% endfor %}
+
+  <!-- Learn cross-references -->
+  {% if learn_references %}
+  <div class="bible-annotation-panel__learn-refs">
+    <p class="bible-annotation-panel__section-label">Referenced in Learn</p>
+    {% for lesson in learn_references %}
+    <div class="bible-annotation-panel__learn-ref">
+      <span class="bible-annotation-panel__learn-title">{{ lesson.title }}</span>
+      <span class="bible-annotation-panel__enrol-prompt">Enrol to access</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Handbook references (Level 5 only) -->
+  {% if competence_level >= 5 and handbook_references %}
+  <div class="bible-annotation-panel__handbook-refs">
+    <p class="bible-annotation-panel__section-label">Handbook References</p>
+    {% for rel in handbook_references %}
+    <span class="bible-annotation-panel__handbook-ref">
+      {{ rel.from_record.title }}
+      <span class="badge badge--governance">{{ rel.from_record.record_type }}</span>
+    </span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Personal note area -->
+  <p class="bible-annotation-panel__section-label">Your Note</p>
+  <form hx-post="{% url 'bible:htmx-save-note' %}"
+        hx-target="#save-note-response"
+        hx-swap="innerHTML">
+    {% csrf_token %}
+    <input type="hidden" name="verse_id" value="{{ verse.id }}">
+    <input type="hidden" name="note_class" value="personal">
+    {% if personal_note %}
+    <input type="hidden" name="note_id" value="{{ personal_note.id }}">
+    {% endif %}
+    <textarea name="content"
+              class="bible-annotation-panel__textarea"
+              placeholder="Write a reflection, cross-reference, or personal note…"
+              rows="4"
+              maxlength="2000">{{ personal_note.content|default:'' }}</textarea>
+    <button type="submit" class="btn btn--primary bible-annotation-panel__save-btn">
+      {% if personal_note %}Update Note{% else %}Save Note{% endif %}
+    </button>
+  </form>
+  <div id="save-note-response"></div>
+
+  <!-- Delete personal note -->
+  {% if personal_note %}
+  <form hx-delete="{% url 'bible:htmx-delete-note' personal_note.id %}"
+        hx-target="#bible-annotation-panel"
+        hx-swap="innerHTML"
+        hx-confirm="Delete this note?">
+    {% csrf_token %}
+    <button type="submit" class="btn btn--danger btn--sm bible-annotation-panel__delete-btn">
+      Delete Note
+    </button>
+  </form>
+  {% endif %}
+
+  <!-- Publish tenant note (Level 3+) -->
+  {% if can_publish_tenant_note %}
+  <details class="bible-annotation-panel__tenant-publish">
+    <summary>Publish community note…</summary>
+    <form hx-post="{% url 'bible:htmx-save-note' %}"
+          hx-target="#save-note-response"
+          hx-swap="innerHTML">
+      {% csrf_token %}
+      <input type="hidden" name="verse_id" value="{{ verse.id }}">
+      <input type="hidden" name="note_class" value="organizational">
+      <textarea name="content"
+                class="bible-annotation-panel__textarea"
+                placeholder="Publish a teaching note visible to your branch…"
+                rows="4"
+                maxlength="2000"></textarea>
+      <button type="submit" class="btn btn--secondary bible-annotation-panel__save-btn">
+        Publish to Branch
+      </button>
+    </form>
+  </details>
+  {% endif %}
+
+</div>

@@ -25,6 +25,8 @@ urlpatterns = [
     path('api/', include('tenants.urls')),
     path('api/', include('records.urls')),
     path('api/', include('activity.urls')),
+    path('api/bible/', include('bible.urls')),
+    path('bible/', include('bible.urls', namespace='bible')),
     path('api/calendar/', include('calendar_app.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', accounts_views.RegisterView.as_view(), name='register_ui'),

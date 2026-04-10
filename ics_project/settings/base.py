@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django_filters',
     'calendar_app',
     'dashboard',
+    'bible',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

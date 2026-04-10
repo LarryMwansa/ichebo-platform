@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/bible.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    /* Save reading position to localStorage after each chapter load */
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+      if (e.detail.target.id === 'bible-chapter') {
+        const el = e.detail.target.querySelector('[data-book-code]');
+        if (el) {
+          const bookCode = el.dataset.bookCode;
+          const chapter = el.dataset.chapter;
+          if (bookCode && chapter) {
+            localStorage.setItem('ics_ui.bible_last_position',
+              JSON.stringify({ bookCode, chapter }));
+          }
+        }
+      }
+    });
+  </script>
+{% endblock %}
