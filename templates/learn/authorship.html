@@ -1,0 +1,24 @@
+{% extends "learn/base_learn.html" %}
+
+{% block learn_content %}
+<div class="learn-header">
+  <h2>Authorship</h2>
+</div>
+<div class="programme-grid">
+  <a href="{% url 'learn:learn-author-programme' %}" class="programme-card">
+    <div class="programme-badge">New</div>
+    <h3 class="programme-title">Programme</h3>
+    <p class="programme-meta">Create a qualification programme</p>
+  </a>
+  <a href="{% url 'learn:learn-author-course' %}" class="programme-card">
+    <div class="programme-badge">New</div>
+    <h3 class="programme-title">Course</h3>
+    <p class="programme-meta">Add a course to a programme</p>
+  </a>
+  <a href="{% url 'learn:learn-author-lesson' %}" class="programme-card">
+    <div class="programme-badge">New</div>
+    <h3 class="programme-title">Lesson / Quiz</h3>
+    <p class="programme-meta">Add a lesson, quiz or assignment</p>
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "learn/base_learn.html" %}
+
+{% block learn_content %}
+<div class="learn-header">
+  <a href="{% url 'learn:learn-author' %}" class="btn-back">← Authorship</a>
+  <h2>New Lesson / Quiz / Assignment</h2>
+</div>
+<form method="post" class="author-form">
+  {% csrf_token %}
+  <label>Type
+    <select name="record_type">
+      <option value="lesson">Lesson</option>
+      <option value="quiz">Quiz</option>
+      <option value="assignment">Assignment</option>
+    </select>
+  </label>
+  <label>Title
+    <input type="text" name="title" required maxlength="500">
+  </label>
+  <label>Content (Markdown supported)
+    <textarea name="content" rows="10" placeholder="Write lesson content here…"></textarea>
+  </label>
+  <label>Parent Course
+    <select name="course_id">
+      <option value="">— None —</option>
+      {% for c in courses %}
+      <option value="{{ c.id }}">{{ c.title }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button type="submit" class="btn-primary">Create (Draft)</button>
+</form>
+{% endblock %}

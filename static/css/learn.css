@@ -1,0 +1,427 @@
+/* ============================================================
+   learn.css — ICS Learn App styles
+   Mobile-first. Builds on CSS variables from variables.css.
+   ============================================================ */
+
+/* ── Shell ── */
+.learn-shell {
+  min-height: calc(100vh - 56px);
+  background: var(--bg);
+}
+
+/* ── Tab row ── */
+.learn-tab-row {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  padding: 0 0.5rem;
+  position: sticky;
+  top: 56px;
+  z-index: 100;
+  scrollbar-width: none;
+}
+.learn-tab-row::-webkit-scrollbar { display: none; }
+
+.learn-tab {
+  display: inline-block;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  text-decoration: none;
+}
+.learn-tab:hover { color: var(--text); }
+.learn-tab--active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* ── Page content ── */
+.learn-content {
+  padding: 1rem 1rem 5rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Learn header ── */
+.learn-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.learn-header h1,
+.learn-header h2 {
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ── Pathway banner ── */
+.pathway-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+.pathway-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+.pathway-programme { font-weight: 600; }
+
+/* ── Enrolment card ── */
+.enrolment-card {
+  background: var(--card);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 8px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.enrolment-card.awaiting-cert {
+  border-left: 3px solid var(--primary);
+}
+.enrolment-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+/* ── Progress bar ── */
+.progress-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: var(--hover);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  min-width: 4px;
+}
+.progress-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* ── Badges ── */
+.enrolled-badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 1rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.cert-pending-badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  background: #fff8e1;
+  color: #f57f17;
+  border-radius: 1rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+/* ── Programme grid ── */
+.programme-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+@media (min-width: 600px) {
+  .programme-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.programme-card {
+  background: var(--card);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 2px 8px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.programme-card:hover { transform: translateY(-2px); box-shadow: 0 4px 14px var(--shadow); }
+.programme-card.locked { opacity: 0.55; }
+
+.programme-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+}
+.programme-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+.programme-meta { font-size: 0.8rem; color: var(--muted); margin: 0; }
+.programme-description { font-size: 0.9rem; color: var(--text); line-height: 1.55; }
+.programme-meta-row {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.lock-indicator {
+  font-size: 0.72rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ── Curriculum ── */
+.curriculum-list { margin-top: 1.5rem; }
+.curriculum-list h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+.course-block {
+  margin-bottom: 1.25rem;
+}
+.course-block h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid var(--border);
+}
+.lesson-list { padding-left: 0; }
+.lesson-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+.lesson-item a { color: var(--text); flex: 1; }
+.lesson-item a:hover { color: var(--primary); }
+
+.lesson-type-tag {
+  display: inline-block;
+  padding: 0.125rem 0.4rem;
+  background: var(--hover);
+  color: var(--muted);
+  border-radius: 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ── Lesson viewer ── */
+.lesson-viewer { padding: 0; }
+h2.lesson-title {
+  font-size: clamp(1.25rem, 4vw, 1.6rem);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0.5rem 0 1rem;
+  line-height: 1.25;
+}
+.lesson-content {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text);
+  margin-bottom: 2rem;
+}
+.lesson-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 1rem;
+}
+
+/* ── Quiz ── */
+.quiz-question {
+  margin-bottom: 1rem;
+}
+.quiz-question p {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.quiz-text-answer {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  background: var(--card);
+  color: var(--text);
+  transition: border-color 0.15s;
+}
+.quiz-text-answer:focus { outline: none; border-color: var(--primary); }
+
+/* ── Cert queue ── */
+.cert-card {
+  background: var(--card);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.cert-card h4 { font-size: 1rem; font-weight: 700; margin: 0 0 0.25rem; }
+.cert-meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem; }
+.cert-card.confirmed { border-left: 3px solid #2e7d32; }
+
+/* ── Review queue ── */
+.review-card {
+  background: var(--card);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.review-card h4 { font-size: 1rem; font-weight: 700; margin: 0.25rem 0; }
+.review-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+.review-card.confirmed { border-left: 3px solid #2e7d32; }
+
+/* ── Authorship forms ── */
+.author-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.author-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.author-form input,
+.author-form select,
+.author-form textarea {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: var(--card);
+  color: var(--text);
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.author-form input:focus,
+.author-form select:focus,
+.author-form textarea:focus { outline: none; border-color: var(--primary); }
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.empty-state p { margin-bottom: 1rem; }
+
+/* ── Shared buttons ── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.25rem;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--primary-button-hover, #8c2a2d); }
+.btn-primary[disabled] { opacity: 0.55; cursor: not-allowed; }
+.btn-primary.complete-btn[disabled] { background: #2e7d32; }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.25rem;
+  background: var(--hover);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.btn-secondary:hover { background: var(--border); }
+
+.btn-back {
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.btn-back:hover { color: var(--text); }
+
+.enrol-btn { margin: 0; }
+
+/* ── Programme detail ── */
+.programme-detail { padding: 0; }
+.programme-detail > .programme-badge { margin-bottom: 0.25rem; }
+
+/* ── Dark mode ── */
+body.dark .learn-tab-row { background: var(--card); }
+body.dark .programme-card,
+body.dark .enrolment-card,
+body.dark .cert-card,
+body.dark .review-card { background: var(--card); }

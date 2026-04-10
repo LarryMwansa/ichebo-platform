@@ -1,0 +1,33 @@
+{% extends "learn/base_learn.html" %}
+
+{% block learn_content %}
+<div class="learn-header">
+  <h2>Review Queue</h2>
+</div>
+
+{% if items %}
+  {% for item in items %}
+  <div class="review-card" id="review-{{ item.id }}">
+    <span class="lesson-type-tag">{{ item.record_type }}</span>
+    <h4>{{ item.title }}</h4>
+    <p class="cert-meta">Submitted: {{ item.updated_at|date:"d M Y" }}</p>
+    <div class="review-actions">
+      <button class="btn-primary"
+              hx-post="{% url 'learn:htmx-approve-content' item.id %}"
+              hx-target="#review-{{ item.id }}"
+              hx-swap="outerHTML">
+        Approve
+      </button>
+      <button class="btn-secondary"
+              hx-post="{% url 'learn:htmx-return-content' item.id %}"
+              hx-target="#review-{{ item.id }}"
+              hx-swap="outerHTML">
+        Return to Draft
+      </button>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <p class="empty-state">No items pending review.</p>
+{% endif %}
+{% endblock %}

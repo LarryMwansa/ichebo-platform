@@ -1,0 +1,33 @@
+{% extends "learn/base_learn.html" %}
+
+{% block learn_content %}
+<div class="learn-header">
+  <a href="{% url 'learn:learn-home' %}" class="btn-back">← My Learning</a>
+  <h2>Programmes</h2>
+</div>
+
+<div class="programme-grid">
+  {% for programme in programmes %}
+  <div class="programme-card {% if programme.is_locked %}locked{% endif %}">
+    <div class="programme-badge">
+      {{ programme.metadata.qualification|default:"Programme" }}
+    </div>
+    <h3 class="programme-title">{{ programme.title }}</h3>
+    <p class="programme-meta">
+      {{ programme.metadata.duration_years|default:"?" }} year{{ programme.metadata.duration_years|pluralize }}
+    </p>
+    {% if programme.is_locked %}
+      <span class="lock-indicator">
+        Level {{ programme.permissions_data.required_level|default:1 }} required
+      </span>
+    {% else %}
+      <a href="{% url 'learn:learn-programme' programme.id %}" class="btn-primary">View</a>
+    {% endif %}
+  </div>
+  {% empty %}
+  <div class="empty-state">
+    <p>No programmes are published yet.</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

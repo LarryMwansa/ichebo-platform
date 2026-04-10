@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'calendar_app',
     'dashboard',
     'bible',
+    'learn',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

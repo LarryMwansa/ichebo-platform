@@ -1,0 +1,6 @@
+<button class="btn-primary complete-btn"
+        hx-post="{% url 'learn:htmx-complete-lesson' lesson.id %}"
+        hx-target="#complete-section"
+        hx-swap="outerHTML">
+  Mark Complete
+</button>

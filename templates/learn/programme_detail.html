@@ -1,0 +1,50 @@
+{% extends "learn/base_learn.html" %}
+
+{% block learn_content %}
+<div class="programme-detail">
+  <a href="{% url 'learn:learn-catalogue' %}" class="btn-back">← Programmes</a>
+  <div class="programme-badge">{{ programme.metadata.qualification|default:"Programme" }}</div>
+  <h2>{{ programme.title }}</h2>
+  <p class="programme-description">{{ programme.content|default:programme.summary }}</p>
+  <div class="programme-meta-row">
+    <span>{{ programme.metadata.duration_years|default:"?" }} year{{ programme.metadata.duration_years|pluralize }}</span>
+    <span>Level {{ programme.permissions_data.required_level|default:1 }}</span>
+  </div>
+
+  <!-- Enrolment section -->
+  <div id="enrol-section" style="margin: 1rem 0;">
+    {% if already_enrolled %}
+      <span class="enrolled-badge">Enrolled</span>
+    {% else %}
+      <button class="btn-primary enrol-btn"
+              hx-post="{% url 'learn:htmx-enrol' programme.id %}"
+              hx-target="#enrol-section"
+              hx-swap="outerHTML">
+        Enrol in this Programme
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- Curriculum -->
+  <div class="curriculum-list">
+    <h3>Curriculum</h3>
+    {% for item in curriculum %}
+    <div class="course-block">
+      <h4>{{ forloop.counter }}. {{ item.course.title }}</h4>
+      <ul class="lesson-list">
+        {% for lesson in item.lessons %}
+        <li class="lesson-item">
+          <span class="lesson-type-tag">{{ lesson.record_type }}</span>
+          <a href="{% url 'learn:learn-lesson' lesson.id %}">{{ lesson.title }}</a>
+        </li>
+        {% empty %}
+        <li class="text-small" style="color:var(--muted);">No lessons yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% empty %}
+    <p class="empty-state">No courses in this programme yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "learn/base_learn.html" %}
+
+{% block learn_content %}
+<div class="empty-state" style="padding:3rem 1rem; text-align:center;">
+  <p style="font-size:2rem;">🔒</p>
+  <h2>{{ programme.title }}</h2>
+  <p>This programme requires Level {{ programme.permissions_data.required_level|default:1 }} to access.</p>
+  <a href="{% url 'learn:learn-catalogue' %}" class="btn-secondary">← Back to Programmes</a>
+</div>
+{% endblock %}

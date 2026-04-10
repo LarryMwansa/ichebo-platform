@@ -1,0 +1,23 @@
+{% if lesson.custom_fields.questions %}
+<form hx-post="{% url 'learn:htmx-complete-lesson' lesson.id %}"
+      hx-target="#complete-section"
+      hx-swap="outerHTML">
+  {% csrf_token %}
+  {% for q in lesson.custom_fields.questions %}
+  <div class="quiz-question">
+    <p>{{ q.text }}</p>
+    {% if q.type == 'multiple_choice' %}
+      {% for option in q.options %}
+      <label class="quiz-option">
+        <input type="radio" name="q_{{ q.id }}" value="{{ forloop.counter0 }}">
+        {{ option }}
+      </label>
+      {% endfor %}
+    {% else %}
+      <textarea name="q_{{ q.id }}" class="quiz-text-answer" rows="3"></textarea>
+    {% endif %}
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn-primary">Submit Quiz</button>
+</form>
+{% endif %}

@@ -1,0 +1,44 @@
+{% extends "learn/base_learn.html" %}
+
+{% block learn_content %}
+<div class="lesson-viewer">
+  {% if course %}
+    <a href="{% url 'learn:learn-programme' course.id %}" class="btn-back">← Back to Course</a>
+  {% endif %}
+  <span class="lesson-type-tag">{{ lesson.record_type }}</span>
+  <h2 class="lesson-title">{{ lesson.title }}</h2>
+
+  <div class="lesson-content">
+    {{ lesson.content|linebreaks }}
+  </div>
+
+  <!-- Quiz form if lesson is a quiz -->
+  {% if lesson.record_type == 'quiz' and lesson.custom_fields.questions %}
+  {% include "learn/partials/quiz.html" %}
+  {% endif %}
+
+  <div class="lesson-nav">
+    {% if prev_lesson %}
+      <a href="{% url 'learn:learn-lesson' prev_lesson.id %}" class="btn-secondary">← Previous</a>
+    {% else %}
+      <span></span>
+    {% endif %}
+
+    <div id="complete-section">
+      {% if is_completed %}
+        <button class="btn-primary complete-btn" disabled>✓ Completed</button>
+      {% elif lesson.record_type == 'assignment' %}
+        {% include "learn/partials/assignment_form.html" %}
+      {% else %}
+        {% include "learn/partials/lesson_complete_btn.html" %}
+      {% endif %}
+    </div>
+
+    {% if next_lesson %}
+      <a href="{% url 'learn:learn-lesson' next_lesson.id %}" class="btn-secondary">Next →</a>
+    {% else %}
+      <span></span>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

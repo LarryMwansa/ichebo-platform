@@ -1,0 +1,9 @@
+<form hx-post="{% url 'learn:htmx-complete-lesson' lesson.id %}"
+      hx-target="#complete-section"
+      hx-swap="outerHTML">
+  {% csrf_token %}
+  <textarea name="submission" class="quiz-text-answer"
+            rows="6" placeholder="Write your assignment response here…"
+            required></textarea>
+  <button type="submit" class="btn-primary" style="margin-top:0.5rem;">Submit Assignment</button>
+</form>

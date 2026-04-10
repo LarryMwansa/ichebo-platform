@@ -1,0 +1,36 @@
+{% extends "learn/base_learn.html" %}
+
+{% block learn_content %}
+<div class="learn-header">
+  <a href="{% url 'learn:learn-author' %}" class="btn-back">← Authorship</a>
+  <h2>New Programme</h2>
+</div>
+<form method="post" class="author-form">
+  {% csrf_token %}
+  <label>Title
+    <input type="text" name="title" required maxlength="500">
+  </label>
+  <label>Qualification Level
+    <select name="qualification">
+      <option value="Certificate">Certificate</option>
+      <option value="Diploma">Diploma</option>
+      <option value="Degree">Degree</option>
+      <option value="Masters">Masters</option>
+      <option value="Doctorate">Doctorate</option>
+    </select>
+  </label>
+  <label>Description
+    <textarea name="description" rows="4"></textarea>
+  </label>
+  <label>Duration (years)
+    <input type="number" name="duration_years" min="1" max="10">
+  </label>
+  <label>KGS Pathways (comma-separated)
+    <input type="text" name="pathways" placeholder="Learning, Community Life…">
+  </label>
+  <label>Required Level (1–5)
+    <input type="number" name="required_level" min="1" max="5" value="1">
+  </label>
+  <button type="submit" class="btn-primary">Create (Draft)</button>
+</form>
+{% endblock %}
