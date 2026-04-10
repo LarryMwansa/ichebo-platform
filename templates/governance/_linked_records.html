@@ -1,0 +1,61 @@
+<!-- Linked Records panel — HTMX partial -->
+<div class="gov-panel" id="linked-records-panel">
+  <div class="gov-panel-label">Linked Records</div>
+
+  {% if grouped %}
+    {% for rel_type, entries in grouped.items %}
+    <div class="gov-link-group">
+      <div class="gov-link-group-label">{{ rel_type|title|cut:"_" }}</div>
+      {% for entry in entries %}
+      {% if entry.bible_verse %}
+      <!-- Scripture link -->
+      <div class="gov-link-item gov-scripture-link">
+        <span class="gov-link-type-badge">Scripture</span>
+        <span class="gov-link-title">
+          {{ entry.bible_verse.book.name }} {{ entry.bible_verse.chapter }}:{{ entry.bible_verse.verse }}
+        </span>
+        {% if entry.bible_verse.text %}
+        <p class="gov-verse-text">{{ entry.bible_verse.text|truncatechars:150 }}</p>
+        {% endif %}
+      </div>
+      {% elif entry.record %}
+      <!-- Record link -->
+      <a href="{% if entry.record.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' entry.record.id %}{% else %}{% url 'governance:mandate-detail' entry.record.id %}{% endif %}"
+         class="gov-link-item"
+         hx-get="{% if entry.record.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' entry.record.id %}{% else %}{% url 'governance:mandate-detail' entry.record.id %}{% endif %}"
+         hx-target="#governance-content"
+         hx-push-url="true">
+        <span class="gov-link-type-badge">{{ entry.record.record_type }}</span>
+        <span class="gov-link-title">{{ entry.record.title }}</span>
+        <span class="gov-link-direction">{% if entry.direction == 'out' %}→{% else %}←{% endif %}</span>
+      </a>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endfor %}
+  {% else %}
+  <p class="gov-empty" style="padding:12px 0">No linked records yet.</p>
+  {% endif %}
+
+  <!-- Level 5: Add Link form -->
+  {% if is_level5 %}
+  <div class="gov-add-link-section">
+    <div class="gov-panel-label" style="margin-top:1rem">Add Link</div>
+    <form hx-post="{% url 'governance:htmx-relationship-create' %}"
+          hx-target="#linked-records-panel"
+          hx-swap="outerHTML"
+          style="display:flex;flex-direction:column;gap:8px">
+      {% csrf_token %}
+      <input type="hidden" name="from_record_id" value="{{ record.id }}">
+      <select name="relationship_type" class="gov-form-input">
+        {% for rt in relationship_types %}
+        <option value="{{ rt }}">{{ rt|title|cut:"_" }}</option>
+        {% endfor %}
+      </select>
+      <input type="text" name="to_record_id" placeholder="Target Record ID" class="gov-form-input">
+      <input type="text" name="notes" placeholder="Notes (optional)" class="gov-form-input">
+      <button type="submit" class="gov-action-btn">Add Link</button>
+    </form>
+  </div>
+  {% endif %}
+</div>

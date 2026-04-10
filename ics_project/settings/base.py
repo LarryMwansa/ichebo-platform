@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'bible',
     'learn',
     'community',
+    'governance',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

@@ -1,0 +1,42 @@
+<!-- Key detail -->
+<div class="gov-detail-header">
+  <a href="{% url 'governance:keys-list' %}"
+     class="gov-back-link"
+     hx-get="{% url 'governance:keys-list' %}"
+     hx-target="#governance-content"
+     hx-push-url="true">← My Keys</a>
+  <span class="gov-status-badge gov-status-{{ record.status }}">{{ record.status|title }}</span>
+</div>
+
+{% if record.custom_fields.symbol %}
+<div class="gov-key-symbol gov-key-symbol--large">{{ record.custom_fields.symbol }}</div>
+{% endif %}
+
+<h2 class="gov-detail-title">{{ record.title }}</h2>
+
+{% if record.content %}
+<div class="gov-content-body">{{ record.content|linebreaks }}</div>
+{% endif %}
+
+{% if record.custom_fields.source_context %}
+<div class="gov-panel">
+  <div class="gov-panel-label">Source Context</div>
+  <p style="font-size:13px;color:var(--text)">{{ record.custom_fields.source_context }}</p>
+</div>
+{% endif %}
+
+<div class="gov-action-row">
+  <a href="{% url 'governance:htmx-record-edit' record.id %}"
+     class="gov-action-btn"
+     hx-get="{% url 'governance:htmx-record-edit' record.id %}"
+     hx-target="#governance-content"
+     hx-push-url="true">Edit</a>
+</div>
+
+<!-- Linked Records panel -->
+<div id="linked-records-panel"
+     hx-get="{% url 'governance:htmx-linked-records' record.id %}"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+  <div class="gov-loading">Loading linked records…</div>
+</div>

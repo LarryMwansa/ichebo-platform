@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/governance.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="gov-shell">
+
+  <!-- Branch navigation -->
+  <nav class="gov-tab-row" aria-label="Governance navigation">
+    <a href="{% url 'governance:library-home' %}"
+       class="gov-tab {% if active_branch == 'library' or request.resolver_match.url_name == 'library-home' or request.resolver_match.url_name == 'library-list' or request.resolver_match.url_name == 'library-detail' %}gov-tab--active{% endif %}">
+      Reference Library
+    </a>
+    {% if request.user.competence_level >= 4 %}
+    <a href="{% url 'governance:mandate-home' %}"
+       class="gov-tab {% if active_branch == 'mandate' or request.resolver_match.url_name == 'mandate-home' or request.resolver_match.url_name == 'mandate-list' or request.resolver_match.url_name == 'mandate-detail' %}gov-tab--active{% endif %}">
+      Mandate
+    </a>
+    {% endif %}
+    <a href="{% url 'governance:keys-list' %}"
+       class="gov-tab {% if request.resolver_match.url_name == 'keys-list' or request.resolver_match.url_name == 'keys-detail' %}gov-tab--active{% endif %}">
+      My Keys
+    </a>
+  </nav>
+
+  <!-- Content pane — HTMX target -->
+  <div id="governance-content" class="gov-content">
+    {% include _partial %}
+  </div>
+
+</div>
+{% endblock %}

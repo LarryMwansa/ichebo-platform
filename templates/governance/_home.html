@@ -1,0 +1,54 @@
+<!-- Governance home — branch-selector landing -->
+<div class="gov-section-heading">Prophet's Handbook</div>
+
+<div class="gov-branch-grid">
+
+  <!-- Reference Library -->
+  <div class="gov-branch-card">
+    <div class="gov-branch-label">Reference Library</div>
+    <p class="gov-branch-desc">Apostolic Properties compiled from Scripture via HRS. Eight record types.</p>
+    <div class="gov-type-list">
+      {% for slug, label in library_types.items %}
+      <a href="{% url 'governance:library-list' slug %}"
+         class="gov-type-pill"
+         hx-get="{% url 'governance:library-list' slug %}"
+         hx-target="#governance-content"
+         hx-push-url="true">
+        {{ label }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Mandate branch (Level 4+) -->
+  {% if request.user.competence_level >= 4 %}
+  <div class="gov-branch-card">
+    <div class="gov-branch-label">Mandate</div>
+    <p class="gov-branch-desc">Received directives, governance documents, versioned protocols.</p>
+    <div class="gov-type-list">
+      {% for slug, label in mandate_types.items %}
+      <a href="{% url 'governance:mandate-list' slug %}"
+         class="gov-type-pill"
+         hx-get="{% url 'governance:mandate-list' slug %}"
+         hx-target="#governance-content"
+         hx-push-url="true">
+        {{ label }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- My Keys -->
+  <div class="gov-branch-card">
+    <div class="gov-branch-label">My Keys</div>
+    <p class="gov-branch-desc">Personal symbol-to-meaning mappings drawn from your journal records.</p>
+    <a href="{% url 'governance:keys-list' %}" class="gov-action-btn"
+       hx-get="{% url 'governance:keys-list' %}"
+       hx-target="#governance-content"
+       hx-push-url="true">
+      Open My Keys →
+    </a>
+  </div>
+
+</div>

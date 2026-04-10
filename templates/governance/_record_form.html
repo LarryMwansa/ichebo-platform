@@ -1,0 +1,152 @@
+<!-- Record create / edit form -->
+<div class="gov-detail-header">
+  <span class="gov-back-link">
+    {% if record %}Edit{% else %}New{% endif %}
+    {{ record_type|title|cut:"_" }}
+  </span>
+</div>
+
+<form method="post"
+      {% if record %}
+        hx-post="{% url 'governance:htmx-record-edit' record.id %}"
+      {% else %}
+        hx-post="{% url 'governance:htmx-record-create' %}"
+      {% endif %}
+      hx-target="#governance-content"
+      hx-push-url="true">
+  {% csrf_token %}
+  <input type="hidden" name="record_family" value="{{ record_family }}">
+
+  {% if not record %}
+  <div class="gov-form-group">
+    <label class="gov-form-label">Record Type</label>
+    <select name="record_type" class="gov-form-input">
+      {% if record_family == 'governance' %}
+        <optgroup label="Reference Library">
+          {% for slug, label in library_types.items %}
+          <option value="{{ slug }}" {% if slug == record_type %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </optgroup>
+        <optgroup label="Mandate">
+          {% for slug, label in mandate_types.items %}
+          <option value="{{ slug }}" {% if slug == record_type %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </optgroup>
+      {% else %}
+        <option value="key" selected>Key</option>
+      {% endif %}
+    </select>
+  </div>
+  {% endif %}
+
+  <div class="gov-form-group">
+    <label class="gov-form-label">Title</label>
+    <input type="text" name="title" class="gov-form-input"
+           value="{{ record.title|default:'' }}" required maxlength="500">
+  </div>
+
+  {% if record_family == 'reference' %}
+  <div class="gov-form-group">
+    <label class="gov-form-label">Symbol</label>
+    <input type="text" name="symbol" class="gov-form-input"
+           value="{{ record.custom_fields.symbol|default:'' }}"
+           placeholder="e.g. 🌊 or 'Lion' or 'Red Thread'">
+  </div>
+  {% endif %}
+
+  <div class="gov-form-group">
+    <label class="gov-form-label">Content</label>
+    <textarea name="content" class="gov-form-input" rows="8"
+              placeholder="Markdown supported…">{{ record.content|default:'' }}</textarea>
+  </div>
+
+  <div class="gov-form-group">
+    <label class="gov-form-label">Summary (optional)</label>
+    <textarea name="summary" class="gov-form-input" rows="2">{{ record.summary|default:'' }}</textarea>
+  </div>
+
+  <div class="gov-form-group">
+    <label class="gov-form-label">Tags (comma-separated)</label>
+    <input type="text" name="tags" class="gov-form-input"
+           value="{{ record.tags|join:', '|default:'' }}">
+  </div>
+
+  <div class="gov-form-group">
+    <label class="gov-form-label">Categories (comma-separated)</label>
+    <input type="text" name="categories" class="gov-form-input"
+           value="{{ record.categories|join:', '|default:'' }}">
+  </div>
+
+  <div class="gov-form-group">
+    <label class="gov-form-label">Status</label>
+    <select name="status" class="gov-form-input">
+      <option value="draft" {% if record.status == 'draft' or not record %}selected{% endif %}>Draft</option>
+      <option value="active" {% if record.status == 'active' %}selected{% endif %}>Active</option>
+    </select>
+  </div>
+
+  <!-- HRS Property Attributes (governance records only) -->
+  {% if record_family == 'governance' and is_level5 %}
+  <div class="gov-panel" style="margin:1rem 0">
+    <div class="gov-panel-label">Property Attributes (HRS)</div>
+    {% with cf=record.custom_fields|default:{} %}
+    <div class="gov-form-group">
+      <label class="gov-form-label">Complexity</label>
+      <select name="complexity" class="gov-form-input">
+        <option value="">—</option>
+        {% for opt in complexity_opts %}
+        <option value="{{ opt }}" {% if cf.complexity == opt %}selected{% endif %}>{{ opt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="gov-form-group">
+      <label class="gov-form-label">Relationship Polarity</label>
+      <select name="polarity" class="gov-form-input">
+        <option value="">—</option>
+        {% for opt in polarity_opts %}
+        <option value="{{ opt }}" {% if cf.polarity == opt %}selected{% endif %}>{{ opt|title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="gov-form-group">
+      <label class="gov-form-label">Position</label>
+      <select name="position" class="gov-form-input">
+        <option value="">—</option>
+        {% for opt in position_opts %}
+        <option value="{{ opt }}" {% if cf.position == opt %}selected{% endif %}>{{ opt|title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="gov-form-group">
+      <label class="gov-form-label">Direction</label>
+      <select name="direction" class="gov-form-input">
+        <option value="">—</option>
+        {% for opt in direction_opts %}
+        <option value="{{ opt }}" {% if cf.direction == opt %}selected{% endif %}>{{ opt|title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="gov-form-group">
+      <label class="gov-form-label">Speed</label>
+      <select name="speed" class="gov-form-input">
+        <option value="">—</option>
+        {% for opt in speed_opts %}
+        <option value="{{ opt }}" {% if cf.speed == opt %}selected{% endif %}>{{ opt|title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="gov-form-group">
+      <label class="gov-form-label">Emotional Tone</label>
+      <input type="text" name="emotional_tone" class="gov-form-input"
+             value="{{ cf.emotional_tone|default:'' }}" placeholder="e.g. Peace, Urgency, Authority">
+    </div>
+    {% endwith %}
+  </div>
+  {% endif %}
+
+  <div class="gov-action-row">
+    <button type="submit" class="gov-action-btn">
+      {% if record %}Save Changes{% else %}Create Record{% endif %}
+    </button>
+  </div>
+</form>

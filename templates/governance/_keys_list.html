@@ -1,0 +1,49 @@
+<!-- My Keys list -->
+<div class="gov-list-header">
+  <div>
+    <div class="gov-branch-label">My Keys</div>
+    <h2 class="gov-list-title">Personal Symbol Library</h2>
+  </div>
+  <a href="{% url 'governance:htmx-record-create' %}?record_type=key&record_family=reference"
+     class="gov-action-btn"
+     hx-get="{% url 'governance:htmx-record-create' %}?record_type=key&record_family=reference"
+     hx-target="#governance-content"
+     hx-push-url="true">
+    + New Key
+  </a>
+</div>
+
+<input type="text" name="q" value="{{ search }}"
+       placeholder="Search your keys…"
+       class="gov-search-input"
+       hx-get="{% url 'governance:keys-list' %}"
+       hx-trigger="keyup changed delay:300ms"
+       hx-target="#keys-list"
+       hx-swap="innerHTML">
+
+<div id="keys-list">
+{% for key in keys %}
+<a href="{% url 'governance:keys-detail' key.id %}"
+   class="gov-record-card gov-key-card"
+   hx-get="{% url 'governance:keys-detail' key.id %}"
+   hx-target="#governance-content"
+   hx-push-url="true">
+  {% if key.custom_fields.symbol %}
+  <div class="gov-key-symbol">{{ key.custom_fields.symbol }}</div>
+  {% endif %}
+  <div>
+    <div class="gov-record-title">{{ key.title }}</div>
+    <div class="gov-record-summary">{{ key.content|default:""|truncatechars:80 }}</div>
+    <div class="gov-record-meta">{{ key.created_at|date:"d M Y" }}</div>
+  </div>
+</a>
+{% empty %}
+<div class="gov-empty">
+  <p>Your Keys Library is empty.</p>
+  <p style="margin-top:8px;font-size:13px;max-width:320px;margin-inline:auto">
+    Key Records link symbols from your dreams and journal to their spiritual meanings.
+    Create your first Key to begin your personal reference library.
+  </p>
+</div>
+{% endfor %}
+</div>
