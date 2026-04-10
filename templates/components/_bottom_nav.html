@@ -1,1 +1,37 @@
-<!-- bottom nav stub -->
+<!-- components/_bottom_nav.html -->
+<div class="bottom-bar" role="navigation" aria-label="Main navigation">
+
+  <a href="{% url 'dashboard:index' %}"
+     class="nav-item {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}"
+     aria-label="Home">
+    <span class="app-icon">🏠</span>
+    <span class="nav-label">Home</span>
+  </a>
+
+  <a href="{% url 'bible:reader' %}"
+     class="nav-item {% if request.resolver_match.app_name == 'bible' %}active{% endif %}"
+     aria-label="Bible">
+    <span class="app-icon">📖</span>
+    <span class="nav-label">Bible</span>
+  </a>
+
+  <!-- CENTER: App Drawer Trigger -->
+  <button id="drawerToggle" class="nav-item center-btn" aria-label="Open app menu" aria-expanded="false" aria-controls="drawer">
+    <span class="app-icon" style="font-size:20px;">⬛</span>
+  </button>
+
+  <a href="#"
+     class="nav-item {% if request.resolver_match.app_name == 'activity' %}active{% endif %}"
+     aria-label="Activity">
+    <span class="app-icon">✅</span>
+    <span class="nav-label">Activity</span>
+  </a>
+
+  <a href="#"
+     class="nav-item {% if request.resolver_match.app_name == 'records' %}active{% endif %}"
+     aria-label="Records">
+    <span class="app-icon">📝</span>
+    <span class="nav-label">Records</span>
+  </a>
+
+</div>

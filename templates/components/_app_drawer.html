@@ -1,10 +1,50 @@
-<div id="app-drawer" class="app-drawer" aria-hidden="true" style="display:none; position:fixed; top:0; bottom:0; left:0; width: 250px; background:white; z-index: 100; box-shadow: 2px 0 5px rgba(0,0,0,0.1);">
-  <div style="padding: 20px;">
-    <h2>Navigation</h2>
-    <ul style="list-style: none; padding: 0;">
-      <li><a href="/">Dashboard</a></li>
-      <li><a href="#">Records</a></li>
-      <li><a href="#">Activities</a></li>
-    </ul>
+<!-- components/_app_drawer.html -->
+
+<!-- Overlay (click to close) -->
+<div id="overlay" class="overlay" aria-hidden="true"></div>
+
+<!-- Drawer -->
+<div id="drawer" class="drawer" role="dialog" aria-modal="true" aria-label="App menu">
+
+  <div class="drawer-header">
+    <div class="drawer-title">Apps</div>
+    <button id="closeBtn" class="close-btn" aria-label="Close menu">&times;</button>
   </div>
+
+  <div class="drawer-content">
+    <div class="app-grid" id="appGrid">
+
+      <a href="{% url 'bible:reader' %}" class="app">
+        <div class="app-icon">📖</div>
+        <div class="app-label">Bible</div>
+      </a>
+
+      <a href="#" class="app">
+        <div class="app-icon">✅</div>
+        <div class="app-label">Activity</div>
+      </a>
+
+      <a href="#" class="app">
+        <div class="app-icon">📝</div>
+        <div class="app-label">Records</div>
+      </a>
+
+      <a href="#" class="app">
+        <div class="app-icon">🏫</div>
+        <div class="app-label">Learn</div>
+      </a>
+
+      <a href="#" class="app">
+        <div class="app-icon">🎬</div>
+        <div class="app-label">Church Live</div>
+      </a>
+
+      <a href="#" class="app">
+        <div class="app-icon">👥</div>
+        <div class="app-label">Community</div>
+      </a>
+
+    </div>
+  </div>
+
 </div>
