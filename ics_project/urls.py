@@ -23,4 +23,6 @@ urlpatterns = [
     path('api/', include('accounts.urls')),
     path('api/', include('tenants.urls')),
     path('api/', include('records.urls')),
+    path('api/', include('activity.urls')),
+    path('api/calendar/', include('calendar_app.urls')),
 ]
