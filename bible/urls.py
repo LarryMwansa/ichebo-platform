@@ -1,19 +1,9 @@
 from django.urls import path
-from . import api_views, views
+from . import views
 
 app_name = 'bible'
 
-# API routes
-api_urlpatterns = [
-    path('health/', api_views.health, name='api-health'),
-    path('translations/', api_views.TranslationListView.as_view(), name='api-translations'),
-    path('books/', api_views.BookListView.as_view(), name='api-books'),
-    path('verses/', api_views.VerseListView.as_view(), name='api-verses'),
-    path('verse-context/<uuid:pk>/', api_views.VerseContextView.as_view(), name='api-verse-context'),
-]
-
-# Template + HTMX routes
-urlpatterns = api_urlpatterns + [
+urlpatterns = [
     path('', views.BibleReaderView.as_view(), name='reader'),
     path('<str:book_code>/<int:chapter>/', views.BibleReaderView.as_view(), name='reader-chapter'),
     # HTMX partials
