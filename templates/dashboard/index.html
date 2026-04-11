@@ -1,19 +1,203 @@
 {% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
-{% block content %}
-<div class="dashboard-header">
-  <h1>Welcome, {{ user.display_name|default:user.email }}</h1>
-  <p>Competence Level: {{ user.competence_level }} | Role: {{ user.status|title }}</p>
-</div>
+{% load static %}
 
-<div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-  <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-    <h2>Recent Activities</h2>
-    <p>Activities module is ready.</p>
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+
+  {# ── Header ──────────────────────────────────────────────────────────── #}
+  <div class="dash-header">
+    <div class="dash-greeting">
+      <span class="dash-name">{{ user.display_name|default:user.email }}</span>
+      <span class="dash-role">{{ user.status|title }} · Level {{ user.competence_level }}</span>
+    </div>
+    <div class="dash-date">{{ digest.generated_at|slice:":10" }}</div>
   </div>
-  <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-    <h2>Records</h2>
-    <p>Records module is ready.</p>
+
+  {# ── Today's Focus (all users) ───────────────────────────────────────── #}
+  <div class="dash-widget dash-widget--prompt">
+    <div class="dash-widget__label">Today's Focus</div>
+    <blockquote class="dash-prompt">{{ digest.discipline_prompt }}</blockquote>
+    {% if digest.prompt_pathway %}
+    <div class="dash-prompt-pathway">{{ digest.prompt_pathway|title|cut:"_" }}</div>
+    {% endif %}
   </div>
+
+  {% if digest.competence_level >= 1 %}
+
+  {# ── Activity Summary ────────────────────────────────────────────────── #}
+  <div class="dash-row">
+
+    <div class="dash-widget dash-widget--stat
+      {% if digest.overdue_count > 0 %}dash-widget--warn{% endif %}">
+      <div class="dash-stat-value">{{ digest.overdue_count }}</div>
+      <div class="dash-stat-label">Overdue</div>
+    </div>
+
+    <div class="dash-widget dash-widget--stat">
+      <div class="dash-stat-value">{{ digest.pending_count }}</div>
+      <div class="dash-stat-label">Pending</div>
+    </div>
+
+    {% if digest.pending_reminders %}
+    <div class="dash-widget dash-widget--stat">
+      <div class="dash-stat-value">{{ digest.pending_reminders|length }}</div>
+      <div class="dash-stat-label">Reminders</div>
+    </div>
+    {% endif %}
+
+    {% if digest.competence_level >= 3 and digest.team_pending_count is not None %}
+    <div class="dash-widget dash-widget--stat dash-widget--team">
+      <div class="dash-stat-value">{{ digest.team_pending_count }}</div>
+      <div class="dash-stat-label">Team Pending</div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  {# ── Due Today ───────────────────────────────────────────────────────── #}
+  {% if digest.due_today %}
+  <div class="dash-widget">
+    <div class="dash-widget__label">Due Today</div>
+    <ul class="dash-list">
+      {% for item in digest.due_today %}
+      <li class="dash-list__item">
+        <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}">
+          {{ item.activity_type|slice:":3"|upper }}
+        </span>
+        <span class="dash-list__title">{{ item.title }}</span>
+        {% if item.due_at %}
+        <span class="dash-list__time">{{ item.due_at|slice:"11:16" }}</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {# ── Overdue Items ───────────────────────────────────────────────────── #}
+  {% if digest.overdue_items %}
+  <div class="dash-widget dash-widget--danger">
+    <div class="dash-widget__label">Overdue</div>
+    <ul class="dash-list">
+      {% for item in digest.overdue_items %}
+      <li class="dash-list__item">
+        <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}">
+          {{ item.activity_type|slice:":3"|upper }}
+        </span>
+        <span class="dash-list__title">{{ item.title }}</span>
+        {% if item.due_at %}
+        <span class="dash-list__time dash-list__time--late">{{ item.due_at|slice:":10" }}</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {# ── Reminders ───────────────────────────────────────────────────────── #}
+  {% if digest.pending_reminders %}
+  <div class="dash-widget">
+    <div class="dash-widget__label">Upcoming Reminders</div>
+    <ul class="dash-list">
+      {% for r in digest.pending_reminders %}
+      <li class="dash-list__item">
+        <span class="dash-list__badge dash-list__badge--reminder">REM</span>
+        <span class="dash-list__title">{{ r.title }}</span>
+        {% if r.due_at %}
+        <span class="dash-list__time">{{ r.due_at|slice:"11:16" }}</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {# ── Habit Streaks ───────────────────────────────────────────────────── #}
+  {% if digest.habit_streaks %}
+  <div class="dash-widget">
+    <div class="dash-widget__label">Habit Streaks</div>
+    <ul class="dash-list dash-list--habits">
+      {% for h in digest.habit_streaks %}
+      <li class="dash-list__item">
+        <span class="dash-streak">{{ h.streak }}<span class="dash-streak__unit">d</span></span>
+        <span class="dash-list__title">{{ h.title }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {# ── Learning ────────────────────────────────────────────────────────── #}
+  {% if digest.next_lesson or digest.active_enrolments %}
+  <div class="dash-widget">
+    <div class="dash-widget__label">Learning</div>
+
+    {% if digest.next_lesson %}
+    <a class="dash-next-lesson" href="{{ digest.next_lesson.url }}">
+      <div class="dash-next-lesson__label">Continue</div>
+      <div class="dash-next-lesson__title">{{ digest.next_lesson.title }}</div>
+      <div class="dash-next-lesson__prog">{{ digest.next_lesson.programme_title }}</div>
+    </a>
+    {% endif %}
+
+    {% if digest.active_enrolments %}
+    <div class="dash-enrolments">
+      {% for enr in digest.active_enrolments %}
+      <div class="dash-enrolment">
+        <div class="dash-enrolment__title">{{ enr.title }}</div>
+        <div class="dash-progress-bar">
+          <div class="dash-progress-bar__fill" style="width: {{ enr.progress }}%"></div>
+        </div>
+        <div class="dash-enrolment__pct">{{ enr.progress }}%</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ── Daily Activity Report ───────────────────────────────────────────── #}
+  <div class="dash-widget dash-widget--dar">
+    <div class="dash-widget__label">Daily Activity Report</div>
+    {% if digest.dar_today %}
+    <a class="dash-dar-link" href="{{ digest.dar_today.url }}">
+      {{ digest.dar_today.title }}
+    </a>
+    {% else %}
+    <p class="dash-dar-empty">No DAR written yet today.</p>
+    <a class="dash-dar-cta" href="/records/">Write today's DAR →</a>
+    {% endif %}
+  </div>
+
+  {# ── Team Overview (Level 3+) ────────────────────────────────────────── #}
+  {% if digest.competence_level >= 3 and digest.team_pending_count is not None %}
+  <div class="dash-widget dash-widget--team-overview">
+    <div class="dash-widget__label">Team Overview</div>
+    <div class="dash-row dash-row--tight">
+      <div class="dash-mini-stat">
+        <div class="dash-mini-stat__value">{{ digest.team_pending_count }}</div>
+        <div class="dash-mini-stat__label">Team Pending</div>
+      </div>
+      <div class="dash-mini-stat {% if digest.team_overdue_count > 0 %}dash-mini-stat--warn{% endif %}">
+        <div class="dash-mini-stat__value">{{ digest.team_overdue_count }}</div>
+        <div class="dash-mini-stat__label">Team Overdue</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% else %}
+  {# ── Seeker (Level 0) state ──────────────────────────────────────────── #}
+  <div class="dash-widget dash-seeker-gate">
+    <p>Your journey begins here. Connect with a steward to join a community.</p>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}

@@ -1,0 +1,55 @@
+{# HTMX swappable partial — also included statically on first load #}
+
+<script>
+  (function(){
+    var t = document.getElementById('cal-title');
+    if (t) t.textContent = '{{ week_label }}';
+    var btns = document.querySelectorAll('.cal-nav-btn');
+    if (btns.length === 3) {
+      var base = '{% url "calendar:week" %}';
+      btns[0].href = base + '?date={{ prev_date }}';
+      btns[0].setAttribute('hx-get', btns[0].href);
+      btns[2].href = base + '?date={{ next_date }}';
+      btns[2].setAttribute('hx-get', btns[2].href);
+    }
+  })();
+</script>
+
+<div class="cal-week-grid">
+
+  {# Day header row #}
+  <div class="cal-wk-headers">
+    {% for wd in week_days %}
+    <div class="cal-wk-header {% if wd.is_today %}cal-wk-header--today{% endif %}">
+      <span class="cal-wk-header__dow">{{ wd.weekday_short }}</span>
+      <span class="cal-wk-header__num {% if wd.is_today %}cal-wk-header__num--today{% endif %}">
+        {{ wd.day }}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+
+  {# Day columns #}
+  <div class="cal-wk-cols">
+    {% for wd in week_days %}
+    <div class="cal-wk-col {% if wd.is_today %}cal-wk-col--today{% endif %}">
+      {% if wd.events %}
+        {% for ev in wd.events %}
+        <div class="cal-wk-event cal-wk-event--{{ ev.activity_type }}">
+          {% if ev.time %}
+          <div class="cal-wk-event__time">{{ ev.time }}</div>
+          {% endif %}
+          <div class="cal-wk-event__title">{{ ev.title }}</div>
+          {% if ev.kgs_pathway %}
+          <div class="cal-wk-event__pathway">{{ ev.kgs_pathway|title|cut:"_" }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="cal-wk-empty"></div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+</div>

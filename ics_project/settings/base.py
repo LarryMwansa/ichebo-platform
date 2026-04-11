@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'community',
     'governance',
     'notifications',
+    'paraclete',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -159,3 +160,10 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')])
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': BASE_DIR / 'cache',
+    }
+}

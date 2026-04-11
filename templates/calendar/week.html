@@ -1,0 +1,29 @@
+{% extends "calendar/base_calendar.html" %}
+
+{% block cal_title %}{{ week_label }}{% endblock %}
+
+{% block cal_nav %}
+<a class="cal-nav-btn"
+   href="{% url 'calendar:week' %}?date={{ prev_date }}"
+   hx-get="{% url 'calendar:week' %}?date={{ prev_date }}"
+   hx-target="#cal-body"
+   hx-push-url="true"
+   aria-label="Previous week">‹</a>
+
+<a class="cal-nav-btn cal-nav-btn--today"
+   href="{% url 'calendar:week' %}"
+   hx-get="{% url 'calendar:week' %}"
+   hx-target="#cal-body"
+   hx-push-url="true">Today</a>
+
+<a class="cal-nav-btn"
+   href="{% url 'calendar:week' %}?date={{ next_date }}"
+   hx-get="{% url 'calendar:week' %}?date={{ next_date }}"
+   hx-target="#cal-body"
+   hx-push-url="true"
+   aria-label="Next week">›</a>
+{% endblock %}
+
+{% block cal_body %}
+{% include "calendar/_week_grid.html" %}
+{% endblock %}

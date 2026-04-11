@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Calendar{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/calendar.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cal-shell">
+
+  {# ── Top bar ──────────────────────────────────────────────────────────── #}
+  <div class="cal-topbar">
+
+    {# View toggle #}
+    <div class="cal-view-toggle">
+      <a href="{% url 'calendar:month' %}{% if view == 'month' %}?year={{ year }}&month={{ month }}{% endif %}"
+         class="cal-toggle-btn {% if view == 'month' %}active{% endif %}">Month</a>
+      <a href="{% url 'calendar:week' %}{% if view == 'week' %}?date={{ monday|date:'Y-m-d' }}{% endif %}"
+         class="cal-toggle-btn {% if view == 'week' %}active{% endif %}">Week</a>
+    </div>
+
+    {# Title #}
+    <div class="cal-title" id="cal-title">
+      {% block cal_title %}{% endblock %}
+    </div>
+
+    {# Nav controls #}
+    <div class="cal-nav">
+      {% block cal_nav %}{% endblock %}
+    </div>
+
+  </div>
+
+  {# ── Grid body (HTMX target) ──────────────────────────────────────────── #}
+  <div id="cal-body">
+    {% block cal_body %}{% endblock %}
+  </div>
+
+</div>
+{% endblock %}

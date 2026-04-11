@@ -1,0 +1,266 @@
+[
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 1,
+    "fields": {
+      "text": "Every day is a new beginning in Christ. What is one thing you can lay down today and pick up afresh?",
+      "pathway": "new_life",
+      "min_level": 0,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 2,
+    "fields": {
+      "text": "The old has passed and all things are new. What area of your life still needs to receive the reality of that truth?",
+      "pathway": "new_life",
+      "min_level": 0,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 3,
+    "fields": {
+      "text": "New life is not a one-time event \u2014 it is a daily surrender. What have you surrendered to Christ in the last seven days?",
+      "pathway": "new_life",
+      "min_level": 0,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 4,
+    "fields": {
+      "text": "Your spirit needs daily nourishment. Have you made space today to receive from the Lord?",
+      "pathway": "spiritual_formation",
+      "min_level": 0,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 5,
+    "fields": {
+      "text": "Spiritual formation is not self-improvement \u2014 it is Christ being formed in you. What posture are you holding before Him today?",
+      "pathway": "spiritual_formation",
+      "min_level": 0,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 6,
+    "fields": {
+      "text": "A formed spirit produces stable fruit. Is what you are producing today rooted in formation or in pressure?",
+      "pathway": "spiritual_formation",
+      "min_level": 1,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 7,
+    "fields": {
+      "text": "The Kingdom is built in community. Who in your circle needs a word of encouragement today?",
+      "pathway": "community_life",
+      "min_level": 1,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 8,
+    "fields": {
+      "text": "Community is not proximity \u2014 it is covenant. What covenant commitment to your community have you honoured this week?",
+      "pathway": "community_life",
+      "min_level": 1,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 9,
+    "fields": {
+      "text": "The strength of the community is measured in its weakest member. Who are you actively carrying right now?",
+      "pathway": "community_life",
+      "min_level": 2,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 10,
+    "fields": {
+      "text": "Service is not a role \u2014 it is a posture. What act of service can you offer today, unseen and unrewarded?",
+      "pathway": "service",
+      "min_level": 1,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 11,
+    "fields": {
+      "text": "The servant does not choose when to serve. What opportunity to serve have you let pass this week?",
+      "pathway": "service",
+      "min_level": 1,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 12,
+    "fields": {
+      "text": "Service is love made visible in action. Is the love of Christ driving your service, or is duty?",
+      "pathway": "service",
+      "min_level": 2,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 13,
+    "fields": {
+      "text": "A steward leads by example before instruction. What are you modelling for those who follow you?",
+      "pathway": "leadership",
+      "min_level": 2,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 14,
+    "fields": {
+      "text": "Kingdom leadership is not authority over people \u2014 it is authority for people. Are you using yours for or over?",
+      "pathway": "leadership",
+      "min_level": 2,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 15,
+    "fields": {
+      "text": "The leader who cannot be led cannot be trusted to lead. Who are you submitted to, and is that submission current?",
+      "pathway": "leadership",
+      "min_level": 3,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 16,
+    "fields": {
+      "text": "The diligent learner makes room in every season. What have you studied this week that has shifted your understanding?",
+      "pathway": "learning",
+      "min_level": 1,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 17,
+    "fields": {
+      "text": "Wisdom is received, not achieved. What are you sitting under right now that is building your capacity?",
+      "pathway": "learning",
+      "min_level": 1,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 18,
+    "fields": {
+      "text": "A learner who stops questioning stops growing. What question are you holding before the Lord this week?",
+      "pathway": "learning",
+      "min_level": 2,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 19,
+    "fields": {
+      "text": "The mandate is not waiting for perfect conditions. What one step of mission can you take today in the sphere you occupy?",
+      "pathway": "mission",
+      "min_level": 2,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 20,
+    "fields": {
+      "text": "Mission is not an event \u2014 it is the posture of a sent person. Are you living as someone who has been sent?",
+      "pathway": "mission",
+      "min_level": 2,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 21,
+    "fields": {
+      "text": "The harvest is in the field, not the sanctuary. What field are you standing in this week?",
+      "pathway": "mission",
+      "min_level": 3,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 22,
+    "fields": {
+      "text": "Apostolic stewardship requires faithfulness in the unglamorous. What governance or administrative duty have you deferred?",
+      "pathway": "apostolic_stewardship",
+      "min_level": 3,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 23,
+    "fields": {
+      "text": "The apostolic is established through order, not chaos. What structure are you responsible for that needs attention?",
+      "pathway": "apostolic_stewardship",
+      "min_level": 3,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "paraclete.paracleteprompt",
+    "pk": 24,
+    "fields": {
+      "text": "True apostolic stewardship is measured in what you leave behind, not what you build while you are present. What legacy are you building today?",
+      "pathway": "apostolic_stewardship",
+      "min_level": 4,
+      "is_active": true,
+      "created_at": "2026-04-10T00:00:00Z"
+    }
+  }
+]
