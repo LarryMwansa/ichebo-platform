@@ -4,14 +4,7 @@ from . import api_views, views
 app_name = 'learn'
 
 urlpatterns = [
-    # ── DRF API endpoints ──────────────────────────────────────────────────
-    path('health/', api_views.health, name='api-health'),
-    path('programmes/<uuid:programme_id>/curriculum/',
-         api_views.programme_curriculum, name='programme-curriculum'),
-    path('certifications/queue/',
-         api_views.certification_queue, name='api-certification-queue'),
-    path('certifications/<uuid:certification_id>/confirm/',
-         api_views.confirm_certification, name='certification-confirm'),
+    # (API routes moved to api_urls.py)
 
     # ── Django template views ──────────────────────────────────────────────
     path('', views.my_learning, name='learn-home'),
