@@ -26,7 +26,7 @@ urlpatterns = [
     path('api/', include('tenants.urls')),
     path('api/', include('records.urls')),
     path('api/', include('activity.urls')),
-    path('api/bible/', include('bible.urls')),
+    path('api/bible/', include('bible.api_urls')),
     path('bible/', include('bible.urls', namespace='bible')),
     path('api/learn/', include('learn.urls')),
     path('learn/', include('learn.urls', namespace='learn')),
