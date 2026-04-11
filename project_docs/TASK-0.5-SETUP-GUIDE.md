@@ -3,7 +3,7 @@
 **For:** Ubuntu 22.04 with PostgreSQL already installed  
 **User:** `scepter`  
 **App location:** `/home/scepter/ics/`  
-**Domain:** `your-domain.com` (replace throughout)
+**Domain:** `app.ichebo.online` (replace throughout)
 
 ---
 
@@ -11,12 +11,12 @@
 
 Before you start, have ready:
 
-- [ ] VPS SSH access (user: `scepter`)
-- [ ] Domain name (e.g., `example.com`)
-- [ ] Email for Let's Encrypt SSL
-- [ ] PostgreSQL already running on the VPS
-- [ ] Git repo URL (to clone the ICS app)
-- [ ] A strong password for the PostgreSQL `ics_user` account
+- [x] VPS SSH access (user: `scepter`)
+- [x] Domain name (e.g., `example.com`)
+- [x] Email for Let's Encrypt SSL
+- [x] PostgreSQL already running on the VPS
+- [x] Git repo URL (to clone the ICS app)
+- [x] A strong password for the PostgreSQL `ics_user` account
 
 ---
 
