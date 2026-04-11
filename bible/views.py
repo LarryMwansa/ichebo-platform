@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from .services import (
     get_user_translation, get_chapter_verses, get_all_books,
@@ -24,7 +24,9 @@ class BibleReaderView(LoginRequiredMixin, View):
         books = get_all_books()
         book = BibleBook.objects.filter(code=book_code).first()
         if not book:
-            return redirect('bible:reader')
+            if book_code != DEFAULT_BOOK:
+                return redirect('bible:reader')
+            raise Http404("Bible data is not loaded. Please run the Bible import management command.")
 
         chapters = get_book_chapters(book_code)
         verses = get_chapter_verses(translation, book_code, chapter)

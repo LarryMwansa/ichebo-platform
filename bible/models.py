@@ -8,7 +8,7 @@ class BibleTranslation(models.Model):
     name                = models.CharField(max_length=100)
     language            = models.CharField(max_length=10, default='en')       # from metadata.lang_short
     language_full       = models.CharField(max_length=50, default='English')  # from metadata.lang
-    year                = models.CharField(max_length=10, null=True, blank=True)  # from metadata.year
+    year                = models.CharField(max_length=20, null=True, blank=True)  # from metadata.year
     description         = models.TextField(null=True, blank=True)             # from metadata.description
     copyright_statement = models.TextField(null=True, blank=True)             # from metadata.copyright_statement
     is_copyright        = models.BooleanField(default=False)                  # metadata.copyright == 0 → False
