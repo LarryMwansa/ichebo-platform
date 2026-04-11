@@ -1,13 +1,45 @@
-{% extends "base.html" %}
+{% extends "base_auth.html" %}
 {% block title %}Sign In{% endblock %}
 {% block content %}
 <div class="auth-card">
+
+  <div class="auth-card__brand">
+    <div class="auth-card__logo">ICS</div>
+    <div class="auth-card__tagline">Integrated Community System</div>
+  </div>
+
   <h1>Sign In</h1>
+
+  {% if form.non_field_errors %}
+  <div class="auth-errors">
+    {% for error in form.non_field_errors %}
+      <span>{{ error }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn--primary" style="width: 100%;">Sign In</button>
+
+    <div class="auth-field">
+      <label for="{{ form.username.id_for_label }}">Email</label>
+      {{ form.username }}
+      {% if form.username.errors %}
+        <span class="auth-field__error">{{ form.username.errors|join:", " }}</span>
+      {% endif %}
+    </div>
+
+    <div class="auth-field">
+      <label for="{{ form.password.id_for_label }}">Password</label>
+      {{ form.password }}
+      {% if form.password.errors %}
+        <span class="auth-field__error">{{ form.password.errors|join:", " }}</span>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="auth-btn">Sign In</button>
   </form>
-  <p style="text-align: center; margin-top: 15px;">No account? <a href="{% url 'register_ui' %}">Register</a></p>
+
+  <p class="auth-footer">No account? <a href="{% url 'register_ui' %}">Create one</a></p>
 </div>
 {% endblock %}

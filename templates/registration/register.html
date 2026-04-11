@@ -1,13 +1,61 @@
-{% extends "base.html" %}
-{% block title %}Register{% endblock %}
+{% extends "base_auth.html" %}
+{% block title %}Create Account{% endblock %}
 {% block content %}
 <div class="auth-card">
+
+  <div class="auth-card__brand">
+    <div class="auth-card__logo">ICS</div>
+    <div class="auth-card__tagline">Integrated Community System</div>
+  </div>
+
   <h1>Create Account</h1>
+
+  {% if form.non_field_errors %}
+  <div class="auth-errors">
+    {% for error in form.non_field_errors %}
+      <span>{{ error }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn--primary" style="width: 100%;">Register</button>
+
+    <div class="auth-field">
+      <label for="{{ form.email.id_for_label }}">Email</label>
+      {{ form.email }}
+      {% if form.email.errors %}
+        <span class="auth-field__error">{{ form.email.errors|join:", " }}</span>
+      {% endif %}
+    </div>
+
+    <div class="auth-field">
+      <label for="{{ form.display_name.id_for_label }}">Display Name</label>
+      {{ form.display_name }}
+      {% if form.display_name.errors %}
+        <span class="auth-field__error">{{ form.display_name.errors|join:", " }}</span>
+      {% endif %}
+    </div>
+
+    <div class="auth-field">
+      <label for="{{ form.password.id_for_label }}">Password</label>
+      {{ form.password }}
+      {% if form.password.errors %}
+        <span class="auth-field__error">{{ form.password.errors|join:", " }}</span>
+      {% endif %}
+    </div>
+
+    <div class="auth-field">
+      <label for="{{ form.password_confirm.id_for_label }}">Confirm Password</label>
+      {{ form.password_confirm }}
+      {% if form.password_confirm.errors %}
+        <span class="auth-field__error">{{ form.password_confirm.errors|join:", " }}</span>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="auth-btn">Create Account</button>
   </form>
-  <p style="text-align: center; margin-top: 15px;">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+
+  <p class="auth-footer">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
 </div>
 {% endblock %}
