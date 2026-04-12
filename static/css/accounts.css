@@ -6,10 +6,11 @@
 /* ── Auth shell ─────────────────────────────────────────────── */
 .auth-shell {
   min-height: 100vh;
-  background: var(--bg);
+  background: #f2f2f2;
   display: flex;
   align-items: center;
   justify-content: center;
+  color-scheme: light;
 }
 
 .auth-main {
@@ -18,17 +19,21 @@
   align-items: center;
   justify-content: center;
   padding: 1.5rem 1rem;
+  /* Override global.css main rules not applicable to auth pages */
+  overflow: visible;
+  padding-bottom: 1.5rem;
 }
 
 /* ── Auth card ──────────────────────────────────────────────── */
 .auth-card {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 16px;
   padding: 2rem 1.75rem;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 4px 24px var(--shadow);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.12);
+  color-scheme: light;
 }
 
 .auth-card__brand {
@@ -52,7 +57,7 @@
 .auth-card h1 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--text);
+  color: #222222;
   margin: 0 0 1.5rem;
   text-align: center;
 }
@@ -76,12 +81,14 @@
   padding: 0.625rem 0.875rem;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
-  color: var(--text);
+  background: #ffffff;
+  color: #222222;
   font-size: 0.9375rem;
   font-family: inherit;
   box-sizing: border-box;
   transition: border-color 0.15s, box-shadow 0.15s;
+  /* Force light appearance so OS dark mode doesn't override native controls */
+  color-scheme: light;
 }
 
 .auth-field input:focus {
@@ -112,10 +119,11 @@
 
 /* ── Auth submit button ─────────────────────────────────────── */
 .auth-btn {
+  display: block;
   width: 100%;
   padding: 0.75rem;
-  background: var(--primary);
-  color: #fff;
+  background: var(--primary) !important;
+  color: #ffffff !important;
   border: none;
   border-radius: 8px;
   font-size: 0.9375rem;
@@ -124,9 +132,12 @@
   margin-top: 0.5rem;
   transition: background 0.15s;
   font-family: inherit;
+  text-align: center;
 }
 
-.auth-btn:hover { background: var(--primary-button-hover); }
+.auth-btn:hover {
+  background: var(--primary-button-hover) !important;
+}
 
 /* ── Footer link ────────────────────────────────────────────── */
 .auth-footer {
