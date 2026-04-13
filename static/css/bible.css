@@ -593,8 +593,8 @@
 /* Chapter Header — Book · Chapter title */
 .bible-chapter-header {
   padding: 1rem 0.75rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--card);
+  /* border-bottom: 1px solid var(--border); */
+  /* background: var(--card); */
 }
 
 .bible-chapter-title {
@@ -674,6 +674,6 @@
 
 /* Reader shell padding adjustments */
 .bible-reader-shell {
-  padding-top: 56px; /* topbar height */
+  padding-top: 1px; /* topbar height */
   padding-bottom: 118px; /* nav strip 48px + bottom bar 70px */
 }
