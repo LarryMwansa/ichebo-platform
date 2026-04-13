@@ -590,6 +590,32 @@
   font-size: 22px;
 }
 
+.bible-topbar__version-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  margin-left: auto;
+}
+
+.bible-topbar__version-btn:hover {
+  opacity: 0.85;
+}
+
+.bible-topbar__version-code {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 /* Chapter Header — Book · Chapter title */
 .bible-chapter-header {
   padding: 1rem 0.75rem;

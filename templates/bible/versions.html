@@ -11,7 +11,9 @@
       <span class="material-symbols-outlined">arrow_back</span>
     </a>
     <h1 class="bible-versions-title">Bible Versions</h1>
-    <div style="width: 24px;"></div> {# Spacer for centering #}
+    <a href="{% url 'bible:languages' %}" class="bible-versions-languages-btn" aria-label="Filter by language" title="Filter by language">
+      <span class="material-symbols-outlined">language</span>
+    </a>
   </div>
 
   <!-- Versions list grouped by language -->
@@ -90,6 +92,22 @@
   color: var(--text);
   flex: 1;
   text-align: center;
+}
+
+.bible-versions-languages-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--primary);
+  text-decoration: none;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.bible-versions-languages-btn:hover {
+  background: var(--hover);
 }
 
 .bible-versions-list {

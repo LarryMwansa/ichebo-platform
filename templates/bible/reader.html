@@ -27,9 +27,6 @@
 
   <!-- Actions -->
   <div class="bible-topbar__actions">
-    <a href="{% url 'bible:versions' %}" class="bible-topbar__action-btn" aria-label="Bible versions" title="Bible versions">
-      <span class="material-symbols-outlined">translate</span>
-    </a>
     <a href="{% url 'bible:search' %}" class="bible-topbar__action-btn" aria-label="Search" title="Search verses">
       <span class="material-symbols-outlined">search</span>
     </a>
@@ -37,6 +34,11 @@
       <span class="material-symbols-outlined">tune</span>
     </button>
   </div>
+
+  <!-- Version button (far right) -->
+  <a href="{% url 'bible:versions' %}" class="bible-topbar__version-btn" aria-label="Change Bible version" title="Change Bible version">
+    <span class="bible-topbar__version-code">{{ translation.code }}</span>
+  </a>
 </div>
 {% endblock %}
 

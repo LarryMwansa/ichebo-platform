@@ -340,6 +340,36 @@ def bible_versions_view(request):
 
 
 @login_required
+def bible_languages_view(request):
+    """
+    Bible languages list page.
+    Shows all unique languages with available translations.
+    """
+    # Get all public translations
+    translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
+
+    # Group by language and count
+    languages_data = {}
+    for trans in translations:
+        lang = trans.language_full or 'Unknown'
+        if lang not in languages_data:
+            languages_data[lang] = {
+                'name': lang,
+                'count': 0,
+                'short_code': trans.language,
+            }
+        languages_data[lang]['count'] += 1
+
+    # Sort by name
+    languages_list = sorted(languages_data.values(), key=lambda x: x['name'])
+
+    context = {
+        'languages': languages_list,
+    }
+    return render(request, 'bible/languages.html', context)
+
+
+@login_required
 def htmx_delete_note(request, note_id):
     """HTMX: soft-delete a note. Returns empty response to remove element."""
     if request.method != 'DELETE':

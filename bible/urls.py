@@ -10,6 +10,7 @@ urlpatterns = [
     path('search/', views.bible_search_view, name='search'),
     path('pick/', views.bible_picker_view, name='picker'),
     path('versions/', views.bible_versions_view, name='versions'),
+    path('languages/', views.bible_languages_view, name='languages'),
     # HTMX partials
     path('htmx/chapter/', views.htmx_chapter, name='htmx-chapter'),
     path('htmx/annotation/<uuid:verse_id>/', views.htmx_annotation_panel, name='htmx-annotation-panel'),
