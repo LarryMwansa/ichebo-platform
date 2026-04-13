@@ -27,7 +27,7 @@
 
   <!-- Actions -->
   <div class="bible-topbar__actions">
-    <a href="#" class="bible-topbar__action-btn" aria-label="Bible versions" title="Bible versions">
+    <a href="{% url 'bible:versions' %}" class="bible-topbar__action-btn" aria-label="Bible versions" title="Bible versions">
       <span class="material-symbols-outlined">translate</span>
     </a>
     <a href="{% url 'bible:search' %}" class="bible-topbar__action-btn" aria-label="Search" title="Search verses">

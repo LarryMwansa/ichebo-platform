@@ -312,6 +312,34 @@ def bible_picker_view(request):
 
 
 @login_required
+def bible_versions_view(request):
+    """
+    Bible versions list page.
+    Shows all available Bible translations grouped by language.
+    """
+    # Get user's current translation
+    current_translation = get_user_translation(request.user)
+
+    # Get all public translations
+    translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
+
+    # Group by language
+    versions_by_language = {}
+    for trans in translations:
+        lang = trans.language_full or 'Unknown'
+        if lang not in versions_by_language:
+            versions_by_language[lang] = []
+        versions_by_language[lang].append(trans)
+
+    context = {
+        'current_translation': current_translation,
+        'versions_by_language': versions_by_language,
+        'all_translations': translations,
+    }
+    return render(request, 'bible/versions.html', context)
+
+
+@login_required
 def htmx_delete_note(request, note_id):
     """HTMX: soft-delete a note. Returns empty response to remove element."""
     if request.method != 'DELETE':
