@@ -107,9 +107,8 @@
 
 .app-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 18px;
-    padding: 12px 20px;
 }
 
 /* App Tile */
@@ -148,53 +147,6 @@
 .app-label {
     font-size: 13px;
     font-weight: 500;
-}
-
-/* =========================
-   DRAWER SECTIONS
-========================= */
-
-.drawer-section {
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-}
-
-.drawer-section:last-child {
-    border-bottom: none;
-}
-
-.drawer-section-label {
-    padding: 12px 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--muted);
-}
-
-.drawer-link {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px 20px;
-    font-size: 14px;
-    color: var(--text);
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.drawer-link:hover {
-    background: var(--hover);
-    color: var(--primary);
-}
-
-.drawer-link .material-symbols-outlined {
-    font-size: 20px;
-    color: var(--muted);
-    transition: color 0.2s ease;
-}
-
-.drawer-link:hover .material-symbols-outlined {
-    color: var(--primary);
 }
 
 /* =========================

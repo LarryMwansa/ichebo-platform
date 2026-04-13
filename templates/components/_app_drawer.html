@@ -12,49 +12,29 @@
   </div>
 
   <div class="drawer-content">
+    <div class="app-grid" id="appGrid">
 
-    {# Default context content #}
-    {% block drawer_content %}
-    <div class="drawer-section">
-      <a href="{% url 'profile' %}" class="drawer-link">
-        <span class="material-symbols-outlined">person</span>
-        My Profile
+      <a href="#" class="app">
+        <span class="material-symbols-outlined app-icon">check_circle</span>
+        <div class="app-label">Activity</div>
       </a>
-      <a href="{% url 'settings' %}" class="drawer-link">
-        <span class="material-symbols-outlined">settings</span>
-        Settings
+
+      <a href="#" class="app">
+        <span class="material-symbols-outlined app-icon">description</span>
+        <div class="app-label">Records</div>
       </a>
+
+      <a href="{% url 'governance:library-home' %}" class="app">
+        <span class="material-symbols-outlined app-icon">gavel</span>
+        <div class="app-label">Governance</div>
+      </a>
+
+      <a href="{% url 'calendar:month' %}" class="app">
+        <span class="material-symbols-outlined app-icon">calendar_month</span>
+        <div class="app-label">Calendar</div>
+      </a>
+
     </div>
-    {% endblock %}
-
-    {# Secondary Apps #}
-    <div class="drawer-section">
-      <div class="drawer-section-label">More Apps</div>
-      <div class="app-grid" id="appGrid">
-
-        <a href="#" class="app">
-          <span class="material-symbols-outlined app-icon">check_circle</span>
-          <div class="app-label">Activity</div>
-        </a>
-
-        <a href="#" class="app">
-          <span class="material-symbols-outlined app-icon">description</span>
-          <div class="app-label">Records</div>
-        </a>
-
-        <a href="{% url 'governance:library-home' %}" class="app">
-          <span class="material-symbols-outlined app-icon">gavel</span>
-          <div class="app-label">Governance</div>
-        </a>
-
-        <a href="{% url 'calendar:month' %}" class="app">
-          <span class="material-symbols-outlined app-icon">calendar_month</span>
-          <div class="app-label">Calendar</div>
-        </a>
-
-      </div>
-    </div>
-
   </div>
 
 </div>
