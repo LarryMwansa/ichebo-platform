@@ -42,6 +42,11 @@
 
 {% block content %}
 <div class="bible-reader-shell">
+  <!-- Chapter title -->
+  <div class="bible-chapter-header">
+    <h1 class="bible-chapter-title">{{ book.name }} {{ chapter }}</h1>
+  </div>
+
   <!-- Chapter content (swapped by HTMX on navigation) -->
   <div id="bible-chapter"
        data-book-code="{{ book.code }}"

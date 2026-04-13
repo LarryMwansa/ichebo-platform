@@ -590,10 +590,24 @@
   font-size: 22px;
 }
 
-/* Bible Navigator Strip (sticky, above bottom bar) */
+/* Chapter Header — Book · Chapter title */
+.bible-chapter-header {
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+}
+
+.bible-chapter-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Bible Navigator Strip (fixed above bottom bar) */
 .bible-nav-strip {
   position: fixed;
-  bottom: 70px; /* above bottom bar */
+  bottom: 70px; /* sit directly above bottom bar (70px height) */
   left: 0;
   right: 0;
   height: 48px;
@@ -603,7 +617,7 @@
   padding: 0 16px;
   background: var(--card);
   border-top: 1px solid var(--border);
-  z-index: 70;
+  z-index: 90;
   transition: transform 0.3s ease;
 }
 
