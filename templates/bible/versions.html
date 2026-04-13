@@ -36,10 +36,6 @@
 
           <p class="bible-version-item__name">{{ translation.name }}</p>
 
-          {% if translation.year %}
-          <p class="bible-version-item__year">{{ translation.year }}</p>
-          {% endif %}
-
         </a>
         {% endfor %}
       </div>
@@ -168,19 +164,9 @@
 }
 
 .bible-version-item__name {
-  margin: 0 0 0.25rem 0;
+  margin: 0;
   font-size: 0.9375rem;
   font-weight: 500;
-}
-
-.bible-version-item__year {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--muted);
-}
-
-.bible-version-item--active .bible-version-item__year {
-  color: rgba(255, 255, 255, 0.7);
 }
 
 .bible-versions-empty {
