@@ -1,43 +1,28 @@
 {% extends "bible/base_bible.html" %}
+{% load static %}
 
 {% block title %}Bible · {{ book.name }} {{ chapter }}{% endblock %}
 
 {% block content %}
 <div class="bible-reader-shell">
 
-  <!-- Top bar: prev/book-chapter title/next -->
+  <!-- Topbar: passage | actions (versions, search, settings) -->
   <div class="bible-topbar">
-    <button class="bible-topbar__nav-btn"
-            hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'-1' }}"
-            hx-target="#bible-chapter"
-            hx-swap="innerHTML"
-            aria-label="Previous chapter">&#8592;</button>
-
-    <button class="bible-topbar__title-btn"
-            aria-haspopup="dialog"
-            aria-controls="bible-navigator"
-            id="bible-navigator-toggle">
+    <a href="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}" class="bible-topbar__passage">
+      <span class="material-symbols-outlined">menu_book</span>
       {{ book.name }} {{ chapter }}
-    </button>
-
-    <button class="bible-topbar__nav-btn"
-            hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'1' }}"
-            hx-target="#bible-chapter"
-            hx-swap="innerHTML"
-            aria-label="Next chapter">&#8594;</button>
-  </div>
-
-  <!-- Translation selector row -->
-  <div class="bible-translation-row">
-    {% for t in translations %}
-    <button class="bible-translation-btn {% if t.id == translation.id %}bible-translation-btn--active{% endif %}"
-            hx-post="{% url 'bible:htmx-set-translation' %}"
-            hx-vals='{"translation_code": "{{ t.code }}", "book_code": "{{ book.code }}", "chapter": "{{ chapter }}"}'
-            hx-target="#bible-chapter"
-            hx-swap="innerHTML">
-      {{ t.code }}
-    </button>
-    {% endfor %}
+    </a>
+    <div class="bible-topbar__actions">
+      <a href="#" class="bible-topbar__action-btn" aria-label="Bible versions" title="Bible versions">
+        <span class="material-symbols-outlined">translate</span>
+      </a>
+      <a href="{% url 'bible:search' %}" class="bible-topbar__action-btn" aria-label="Search" title="Search verses">
+        <span class="material-symbols-outlined">search</span>
+      </a>
+      <button class="bible-topbar__action-btn" onclick="window.ICSDrawer.open()" aria-label="Settings" title="Bible settings">
+        <span class="material-symbols-outlined">tune</span>
+      </button>
+    </div>
   </div>
 
   <!-- Chapter content (swapped by HTMX on navigation) -->
@@ -47,86 +32,58 @@
     {% include "bible/_chapter.html" %}
   </div>
 
-  <!-- Annotation overlay + panel -->
-  <div id="bible-annotation-overlay"
-       class="sheet-overlay"
-       hidden
-       onclick="closeBiblePanel()"></div>
-  <div id="bible-annotation-panel"
-       class="sheet bible-annotation-panel"
-       role="dialog"
-       aria-modal="true"
-       aria-label="Verse note">
-    {# Populated by HTMX on verse tap #}
-  </div>
+  <!-- Navigator strip: prev/chapter/next (sticky above bottom bar) -->
+  <div class="bible-nav-strip">
+    <button class="bible-nav-strip__btn"
+            hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'-1' }}"
+            hx-target="#bible-chapter"
+            hx-swap="innerHTML"
+            aria-label="Previous chapter">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
 
-  <!-- Book/Chapter navigator (slide-up sheet) -->
-  <div id="bible-navigator" class="sheet bible-navigator" role="dialog" aria-modal="true" aria-label="Book and chapter navigator">
-    <div class="sheet__header">
-      <span class="sheet__title">Select Passage</span>
-      <button class="sheet__close-btn" id="bible-navigator-close" aria-label="Close">&#x2715;</button>
-    </div>
-    <div class="bible-navigator__body">
-      <div class="bible-navigator__books-col">
-        <p class="bible-navigator__col-label">Book</p>
-        <ul class="bible-nav__book-list" role="list">
-          {% for b in books %}
-          <li>
-            <button class="bible-nav__book-btn {% if b.code == book.code %}bible-nav__book-btn--active{% endif %}"
-                    hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ b.code }}&chapter=1"
-                    hx-target="#bible-chapter"
-                    hx-swap="innerHTML"
-                    data-close-nav="true">
-              {{ b.name }}
-            </button>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-      <div class="bible-navigator__chapters-col">
-        <p class="bible-navigator__col-label">Chapter</p>
-        <div class="bible-nav__chapter-grid">
-          {% for ch in chapters %}
-          <button class="bible-nav__chapter-btn {% if ch == chapter %}bible-nav__chapter-btn--active{% endif %}"
-                  hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ ch }}"
-                  hx-target="#bible-chapter"
-                  hx-swap="innerHTML"
-                  data-close-nav="true">
-            {{ ch }}
-          </button>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
+    <a href="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}" class="bible-nav-strip__chapter">
+      {{ book.name }} {{ chapter }}
+    </a>
+
+    <button class="bible-nav-strip__btn"
+            hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'1' }}"
+            hx-target="#bible-chapter"
+            hx-swap="innerHTML"
+            aria-label="Next chapter">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
   </div>
 
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/bible.js' %}"></script>
+
+<!-- Wire verse taps to drawer for notes -->
 <script>
-  const nav = document.getElementById('bible-navigator');
-  const overlay = document.getElementById('bible-annotation-overlay');
-  const panel = document.getElementById('bible-annotation-panel');
-
-  document.getElementById('bible-navigator-toggle').addEventListener('click', () => {
-    nav.classList.add('bible-navigator--open');
+  document.body.addEventListener('htmx:beforeSwap', (e) => {
+    // When a verse note is fetched, set the drawer title and open it
+    if (e.detail.target.id === 'drawer') {
+      const drawer = document.getElementById('drawer');
+      if (drawer) {
+        const header = drawer.querySelector('.drawer-header');
+        if (header) {
+          const title = header.querySelector('.drawer-title');
+          if (title) {
+            title.textContent = 'Verse Note';
+          }
+        }
+      }
+    }
   });
-  document.getElementById('bible-navigator-close').addEventListener('click', () => {
-    nav.classList.remove('bible-navigator--open');
-  });
-
-  document.querySelectorAll('[data-close-nav]').forEach(btn => {
-    btn.addEventListener('click', () => nav.classList.remove('bible-navigator--open'));
-  });
-
-  function closeBiblePanel() {
-    panel.classList.remove('bible-annotation-panel--open');
-    overlay.setAttribute('hidden', '');
-  }
 
   document.body.addEventListener('htmx:afterSwap', (e) => {
-    if (e.detail.target.id === 'bible-annotation-panel') {
-      panel.classList.add('bible-annotation-panel--open');
-      overlay.removeAttribute('hidden');
+    // After verse note content is loaded, open the drawer
+    if (e.detail.target.id === 'drawer') {
+      window.ICSDrawer?.open?.();
     }
   });
 </script>

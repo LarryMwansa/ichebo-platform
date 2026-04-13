@@ -251,6 +251,67 @@ def htmx_save_note(request):
 
 
 @login_required
+def bible_search_view(request):
+    """
+    Full-page Bible search view.
+    Template handles HTMX search requests.
+    """
+    return render(request, 'bible/search.html')
+
+
+@login_required
+def htmx_search(request):
+    """
+    HTMX: search verses in real-time.
+    GET param: q (search query)
+    Returns list of matching verses.
+    """
+    from .models import BibleVerse
+
+    query = request.GET.get('q', '').strip()
+    results = []
+
+    if len(query) >= 2:
+        translation = get_user_translation(request.user)
+        results = BibleVerse.objects.filter(
+            text__icontains=query,
+            translation=translation
+        ).select_related('book')[:30]
+
+    return render(request, 'bible/_search_results.html', {
+        'results': results,
+        'query': query,
+    })
+
+
+@login_required
+def bible_picker_view(request):
+    """
+    Full-screen book/chapter/verse picker.
+    GET params: book_code, chapter, back (return URL)
+    """
+    back_url = request.GET.get('back', '/bible/')
+    book_code = request.GET.get('book_code', DEFAULT_BOOK)
+    try:
+        chapter = int(request.GET.get('chapter', DEFAULT_CHAPTER))
+    except (ValueError, TypeError):
+        chapter = DEFAULT_CHAPTER
+
+    books = get_all_books()
+    book = BibleBook.objects.filter(code=book_code).first()
+    chapters = get_book_chapters(book_code)
+
+    context = {
+        'books': books,
+        'book': book,
+        'chapter': chapter,
+        'chapters': list(chapters),
+        'back_url': back_url,
+    }
+    return render(request, 'bible/picker.html', context)
+
+
+@login_required
 def htmx_delete_note(request, note_id):
     """HTMX: soft-delete a note. Returns empty response to remove element."""
     if request.method != 'DELETE':
