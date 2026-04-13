@@ -13,12 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function openDrawer() {
     drawer.classList.add('active');
-    if (overlay) overlay.classList.add('active');
+    // Note: No overlay for Bible drawer — allows seeing live changes (font size, etc)
+    // if (overlay) overlay.classList.add('active');
   }
 
   function closeDrawer() {
     drawer.classList.remove('active');
-    if (overlay) overlay.classList.remove('active');
+    // if (overlay) overlay.classList.remove('active');
   }
 
   // Close drawer when close button clicked
