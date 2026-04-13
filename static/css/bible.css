@@ -540,27 +540,25 @@
   transition: transform 0.3s ease;
 }
 
-.bible-topbar__passage {
+.bible-topbar__logo {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: var(--bg);
-  color: var(--primary);
-  font-size: 14px;
-  font-weight: 600;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  color: var(--text);
   text-decoration: none;
-  cursor: pointer;
-  transition: background 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
-.bible-topbar__passage:hover {
-  background: var(--hover);
+.bible-topbar__logo:hover {
+  opacity: 0.8;
 }
 
-.bible-topbar__passage .material-symbols-outlined {
-  font-size: 18px;
+.bible-topbar__logo .logo {
+  width: 100%;
+  height: 100%;
 }
 
 .bible-topbar__actions {
