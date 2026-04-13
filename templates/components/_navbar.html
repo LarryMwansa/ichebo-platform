@@ -28,7 +28,7 @@
     <!-- Notifications -->
     <div class="nav-right-item" style="position:relative;">
       <a href="{% url 'notifications:list' %}" class="icon-btn" aria-label="Notifications" id="notifBtn" style="text-decoration:none;position:relative;">
-        🔔
+        <span class="material-symbols-outlined">notifications</span>
         <span id="notif-badge"
               style="display:none;position:absolute;top:-4px;right:-4px;background:var(--primary);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;align-items:center;justify-content:center;"
               hx-get="{% url 'notifications-api:unread-badge' %}"
@@ -102,7 +102,9 @@
 
     <!-- Options menu -->
     <div class="dropdown-options nav-right-item">
-      <button id="optionsBtn" class="icon-btn" aria-label="Options" aria-expanded="false" aria-controls="optionsMenu">⋮</button>
+      <button id="optionsBtn" class="icon-btn" aria-label="Options" aria-expanded="false" aria-controls="optionsMenu">
+        <span class="material-symbols-outlined">more_vert</span>
+      </button>
       <div id="optionsMenu" class="options-menu" role="menu">
         <a href="#" role="menuitem" onclick="window.location.reload()">Refresh</a>
         <a href="{% url 'settings' %}" role="menuitem">Settings</a>

@@ -4,34 +4,34 @@
   <a href="{% url 'dashboard:index' %}"
      class="nav-item {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}"
      aria-label="Home">
-    <span class="app-icon">🏠</span>
+    <span class="material-symbols-outlined nav-icon">home</span>
     <span class="nav-label">Home</span>
   </a>
 
   <a href="{% url 'bible:reader' %}"
      class="nav-item {% if request.resolver_match.app_name == 'bible' %}active{% endif %}"
      aria-label="Bible">
-    <span class="app-icon">📖</span>
+    <span class="material-symbols-outlined nav-icon">auto_stories</span>
     <span class="nav-label">Bible</span>
   </a>
 
   <!-- CENTER: App Drawer Trigger -->
   <button id="drawerToggle" class="nav-item center-btn" aria-label="Open app menu" aria-expanded="false" aria-controls="drawer">
-    <span class="app-icon" style="font-size:20px;">⬛</span>
+    <span class="material-symbols-outlined nav-icon" style="font-size:24px;">apps</span>
   </button>
 
-  <a href="#"
-     class="nav-item {% if request.resolver_match.app_name == 'activity' %}active{% endif %}"
-     aria-label="Activity">
-    <span class="app-icon">✅</span>
-    <span class="nav-label">Activity</span>
+  <a href="{% url 'learn:learn-home' %}"
+     class="nav-item {% if request.resolver_match.app_name == 'learn' %}active{% endif %}"
+     aria-label="Learn">
+    <span class="material-symbols-outlined nav-icon">school</span>
+    <span class="nav-label">Learn</span>
   </a>
 
-  <a href="#"
-     class="nav-item {% if request.resolver_match.app_name == 'records' %}active{% endif %}"
-     aria-label="Records">
-    <span class="app-icon">📝</span>
-    <span class="nav-label">Records</span>
+  <a href="{% url 'community:community-home' %}"
+     class="nav-item {% if request.resolver_match.app_name == 'community' %}active{% endif %}"
+     aria-label="Community">
+    <span class="material-symbols-outlined nav-icon">group</span>
+    <span class="nav-label">Community</span>
   </a>
 
 </div>

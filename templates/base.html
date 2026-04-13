@@ -20,6 +20,9 @@
   <link rel="stylesheet" href="/static/css/bottom_bar.css">
    <link rel="stylesheet" href="/static/css/accounts.css">
 
+  {# Material Symbols (M3) icons #}
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
   {% block extra_css %}{% endblock %}
 
   {# HTMX — must be present before body renders #}
@@ -37,6 +40,11 @@
     <div id="toast-container" aria-live="polite"></div>
     {% block content %}{% endblock %}
   </main>
+
+  {# Drawer handle — swipe-up surface above bottom bar #}
+  <div id="drawerHandle" class="drawer-handle" aria-label="Open menu" role="button" tabindex="0">
+    <div class="drawer-handle-bar"></div>
+  </div>
 
   {% include "components/_bottom_nav.html" %}
 
