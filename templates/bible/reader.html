@@ -81,6 +81,53 @@
 </div>
 {% endblock %}
 
+{% block drawer_title %}Bible Settings{% endblock %}
+
+{% block drawer_content %}
+<!-- Bible Settings Panel -->
+<div class="bible-settings-panel">
+
+  <!-- Font Size Control -->
+  <div class="bible-settings-group">
+    <label class="bible-settings-label">Font Size</label>
+    <div class="bible-settings-font-size">
+      <button class="bible-settings-btn" id="decreaseFontBtn" aria-label="Decrease font size">
+        <span class="material-symbols-outlined">remove</span>
+      </button>
+      <div class="bible-settings-font-size-display" id="fontSizeDisplay">100%</div>
+      <button class="bible-settings-btn" id="increaseFontBtn" aria-label="Increase font size">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Font Family Control -->
+  <div class="bible-settings-group">
+    <label class="bible-settings-label">Font Family</label>
+    <select id="fontFamilySelect" class="bible-settings-select">
+      <option value="system">System (Default)</option>
+      <option value="serif">Serif</option>
+      <option value="sans-serif">Sans Serif</option>
+      <option value="monospace">Monospace</option>
+    </select>
+  </div>
+
+  <!-- Theme Control -->
+  <div class="bible-settings-group">
+    <label class="bible-settings-label">Theme</label>
+    <div class="bible-settings-theme">
+      <button class="bible-settings-theme-btn bible-settings-theme-btn--light" id="lightModeBtn" aria-label="Light mode" title="Light mode">
+        <span class="material-symbols-outlined">light_mode</span>
+      </button>
+      <button class="bible-settings-theme-btn bible-settings-theme-btn--dark" id="darkModeBtn" aria-label="Dark mode" title="Dark mode">
+        <span class="material-symbols-outlined">dark_mode</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
 {% block extra_js %}
 <!-- Wire verse taps to drawer for notes -->
 <script>
@@ -106,5 +153,113 @@
       window.ICSDrawer?.open?.();
     }
   });
+</script>
+
+<!-- Bible Settings Controls -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ── Font Size Control ──────────────────────────────────────────────────
+  const MIN_FONT_SIZE = 80;
+  const MAX_FONT_SIZE = 150;
+  const STEP = 10;
+  const FONT_SIZE_KEY = 'ics_ui.bible_font_size';
+
+  let currentFontSize = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
+
+  const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+  const decreaseFontBtn = document.getElementById('decreaseFontBtn');
+  const increaseFontBtn = document.getElementById('increaseFontBtn');
+
+  function updateFontSize(size) {
+    currentFontSize = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, size));
+    ICSStorage.setUIState('bible_font_size', currentFontSize);
+    if (fontSizeDisplay) {
+      fontSizeDisplay.textContent = `${currentFontSize}%`;
+    }
+    // Apply to Bible content
+    const bibleChapter = document.getElementById('bible-chapter');
+    if (bibleChapter) {
+      bibleChapter.style.fontSize = `${currentFontSize / 100}em`;
+    }
+  }
+
+  // Initialize font size
+  updateFontSize(currentFontSize);
+
+  if (decreaseFontBtn) {
+    decreaseFontBtn.addEventListener('click', () => {
+      updateFontSize(currentFontSize - STEP);
+    });
+  }
+
+  if (increaseFontBtn) {
+    increaseFontBtn.addEventListener('click', () => {
+      updateFontSize(currentFontSize + STEP);
+    });
+  }
+
+  // ── Font Family Control ────────────────────────────────────────────────
+  const FONT_FAMILY_KEY = 'ics_ui.bible_font_family';
+  const fontFamilySelect = document.getElementById('fontFamilySelect');
+  const savedFontFamily = ICSStorage.getUIState('bible_font_family', 'system');
+
+  const fontFamilyMap = {
+    'system': 'inherit',
+    'serif': 'Georgia, "Times New Roman", serif',
+    'sans-serif': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    'monospace': '"Courier New", monospace'
+  };
+
+  function applyFontFamily(family) {
+    const bibleChapter = document.getElementById('bible-chapter');
+    if (bibleChapter) {
+      bibleChapter.style.fontFamily = fontFamilyMap[family] || 'inherit';
+    }
+    ICSStorage.setUIState('bible_font_family', family);
+  }
+
+  if (fontFamilySelect) {
+    fontFamilySelect.value = savedFontFamily;
+    fontFamilySelect.addEventListener('change', (e) => {
+      applyFontFamily(e.target.value);
+    });
+    // Apply on load
+    applyFontFamily(savedFontFamily);
+  }
+
+  // ── Theme Control ─────────────────────────────────────────────────────
+  const lightModeBtn = document.getElementById('lightModeBtn');
+  const darkModeBtn = document.getElementById('darkModeBtn');
+
+  function updateThemeUI() {
+    const currentTheme = ICSStorage.getTheme();
+    if (lightModeBtn && darkModeBtn) {
+      if (currentTheme === 'light') {
+        lightModeBtn.classList.add('active');
+        darkModeBtn.classList.remove('active');
+      } else {
+        darkModeBtn.classList.add('active');
+        lightModeBtn.classList.remove('active');
+      }
+    }
+  }
+
+  if (lightModeBtn) {
+    lightModeBtn.addEventListener('click', () => {
+      ICSStorage.setTheme('light');
+      updateThemeUI();
+    });
+  }
+
+  if (darkModeBtn) {
+    darkModeBtn.addEventListener('click', () => {
+      ICSStorage.setTheme('dark');
+      updateThemeUI();
+    });
+  }
+
+  // Initialize theme UI
+  updateThemeUI();
+});
 </script>
 {% endblock %}
