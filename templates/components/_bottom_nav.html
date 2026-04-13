@@ -15,10 +15,12 @@
     <span class="nav-label">Bible</span>
   </a>
 
-  <!-- CENTER: App Drawer Trigger -->
-  <button id="drawerToggle" class="nav-item center-btn" aria-label="Open app menu" aria-expanded="false" aria-controls="drawer">
-    <span class="material-symbols-outlined nav-icon" style="font-size:24px;">apps</span>
-  </button>
+  <a href="#"
+     class="nav-item {% if request.resolver_match.app_name == 'activity' %}active{% endif %}"
+     aria-label="Activity">
+    <span class="material-symbols-outlined nav-icon">check_circle</span>
+    <span class="nav-label">Activity</span>
+  </a>
 
   <a href="{% url 'learn:learn-home' %}"
      class="nav-item {% if request.resolver_match.app_name == 'learn' %}active{% endif %}"

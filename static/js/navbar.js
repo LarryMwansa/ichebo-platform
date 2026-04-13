@@ -9,8 +9,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // ── Elements ──────────────────────────────────────────────────────────────
-  const drawerToggle  = document.getElementById('drawerToggle');
-  const drawerHandle  = document.getElementById('drawerHandle');
   const closeBtn      = document.getElementById('closeBtn');
   const drawer        = document.getElementById('drawer');
   const overlay       = document.getElementById('overlay');
@@ -34,27 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.classList.remove('active');
     drawerToggle && drawerToggle.setAttribute('aria-expanded', 'false');
   }
-
-  drawerToggle && drawerToggle.addEventListener('click', () => {
-    drawer.classList.contains('active') ? closeDrawer() : openDrawer();
-  });
-
-  drawerHandle && drawerHandle.addEventListener('click', () => {
-    drawer.classList.contains('active') ? closeDrawer() : openDrawer();
-  });
-
-  // Swipe-up gesture on drawer handle
-  let startY = 0;
-  drawerHandle && drawerHandle.addEventListener('touchstart', (e) => {
-    startY = e.touches[0].clientY;
-  });
-
-  drawerHandle && drawerHandle.addEventListener('touchend', (e) => {
-    const endY = e.changedTouches[0].clientY;
-    if (startY - endY > 30) { // Swiped up at least 30px
-      openDrawer();
-    }
-  });
 
   closeBtn && closeBtn.addEventListener('click', closeDrawer);
   overlay  && overlay.addEventListener('click', () => {
@@ -123,5 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const isDark = document.body.classList.contains('dark');
     applyTheme(isDark ? 'light' : 'dark');
   });
+
+  // ── Drawer API (for pages to open drawer programmatically) ──────────────────
+  // Pages can call window.ICSDrawer.open() to open the drawer
+  window.ICSDrawer = {
+    open: openDrawer,
+    close: closeDrawer
+  };
 
 });

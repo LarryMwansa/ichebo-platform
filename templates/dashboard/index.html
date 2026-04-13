@@ -8,7 +8,33 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard">
+
+{# ── Dashboard Tabs (scrollable pills) ──────────────────────────────────────── #}
+<div class="dashboard-tabs">
+  <a href="#overview" class="dashboard-tab active" data-tab="overview">
+    <span class="material-symbols-outlined">dashboard</span>
+    Overview
+  </a>
+  <a href="#governance" class="dashboard-tab" data-tab="governance">
+    <span class="material-symbols-outlined">gavel</span>
+    Governance
+  </a>
+  <a href="#calendar" class="dashboard-tab" data-tab="calendar">
+    <span class="material-symbols-outlined">calendar_month</span>
+    Calendar
+  </a>
+  <a href="#records" class="dashboard-tab" data-tab="records">
+    <span class="material-symbols-outlined">description</span>
+    Records
+  </a>
+</div>
+
+{# ── Tab Content ────────────────────────────────────────────────────────────── #}
+<div class="dashboard-content">
+
+  {# ── Overview Tab (default) ──────────────────────────────────────────────── #}
+  <div id="overview" class="dashboard-pane active">
+    <div class="dashboard">
 
   {# ── Header ──────────────────────────────────────────────────────────── #}
   <div class="dash-header">
@@ -199,5 +225,37 @@
   </div>
   {% endif %}
 
+    </div>
+  </div>
+
+  {# ── Governance Tab ──────────────────────────────────────────────────────── #}
+  <div id="governance" class="dashboard-pane">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Governance</div>
+      <p>Governance records and documentation will appear here.</p>
+    </div>
+  </div>
+
+  {# ── Calendar Tab ────────────────────────────────────────────────────────── #}
+  <div id="calendar" class="dashboard-pane">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Calendar</div>
+      <p>Calendar view and upcoming events will appear here.</p>
+    </div>
+  </div>
+
+  {# ── Records Tab ─────────────────────────────────────────────────────────── #}
+  <div id="records" class="dashboard-pane">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Records</div>
+      <p>Your records will appear here.</p>
+    </div>
+  </div>
+
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard-tabs.js' %}"></script>
 {% endblock %}
