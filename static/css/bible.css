@@ -561,10 +561,10 @@
   height: 100%;
 }
 
-.bible-topbar__actions {
+.bible-topbar__right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .bible-topbar__action-btn {
@@ -604,7 +604,6 @@
   border: none;
   cursor: pointer;
   transition: opacity 0.2s ease;
-  margin-left: auto;
 }
 
 .bible-topbar__version-btn:hover {

@@ -25,20 +25,18 @@
     </svg>
   </a>
 
-  <!-- Actions -->
-  <div class="bible-topbar__actions">
+  <!-- Right-side actions: search, settings, version -->
+  <div class="bible-topbar__right">
     <a href="{% url 'bible:search' %}" class="bible-topbar__action-btn" aria-label="Search" title="Search verses">
       <span class="material-symbols-outlined">search</span>
     </a>
     <button class="bible-topbar__action-btn" onclick="window.ICSDrawer.open()" aria-label="Settings" title="Bible settings">
       <span class="material-symbols-outlined">tune</span>
     </button>
+    <a href="{% url 'bible:versions' %}" class="bible-topbar__version-btn" aria-label="Change Bible version" title="Change Bible version">
+      <span class="bible-topbar__version-code">{{ translation.code }}</span>
+    </a>
   </div>
-
-  <!-- Version button (far right) -->
-  <a href="{% url 'bible:versions' %}" class="bible-topbar__version-btn" aria-label="Change Bible version" title="Change Bible version">
-    <span class="bible-topbar__version-code">{{ translation.code }}</span>
-  </a>
 </div>
 {% endblock %}
 
