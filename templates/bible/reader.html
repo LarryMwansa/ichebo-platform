@@ -3,65 +3,64 @@
 
 {% block title %}Bible · {{ book.name }} {{ chapter }}{% endblock %}
 
+{% block bible_topbar %}
+<!-- Bible app topbar: passage | actions (versions, search, settings) -->
+<div class="bible-topbar">
+  <a href="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}" class="bible-topbar__passage">
+    <span class="material-symbols-outlined">menu_book</span>
+    {{ book.name }} {{ chapter }}
+  </a>
+  <div class="bible-topbar__actions">
+    <a href="#" class="bible-topbar__action-btn" aria-label="Bible versions" title="Bible versions">
+      <span class="material-symbols-outlined">translate</span>
+    </a>
+    <a href="{% url 'bible:search' %}" class="bible-topbar__action-btn" aria-label="Search" title="Search verses">
+      <span class="material-symbols-outlined">search</span>
+    </a>
+    <button class="bible-topbar__action-btn" onclick="window.ICSDrawer.open()" aria-label="Settings" title="Bible settings">
+      <span class="material-symbols-outlined">tune</span>
+    </button>
+  </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="bible-reader-shell">
-
-  <!-- Topbar: passage | actions (versions, search, settings) -->
-  <div class="bible-topbar">
-    <a href="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}" class="bible-topbar__passage">
-      <span class="material-symbols-outlined">menu_book</span>
-      {{ book.name }} {{ chapter }}
-    </a>
-    <div class="bible-topbar__actions">
-      <a href="#" class="bible-topbar__action-btn" aria-label="Bible versions" title="Bible versions">
-        <span class="material-symbols-outlined">translate</span>
-      </a>
-      <a href="{% url 'bible:search' %}" class="bible-topbar__action-btn" aria-label="Search" title="Search verses">
-        <span class="material-symbols-outlined">search</span>
-      </a>
-      <button class="bible-topbar__action-btn" onclick="window.ICSDrawer.open()" aria-label="Settings" title="Bible settings">
-        <span class="material-symbols-outlined">tune</span>
-      </button>
-    </div>
-  </div>
-
   <!-- Chapter content (swapped by HTMX on navigation) -->
   <div id="bible-chapter"
        data-book-code="{{ book.code }}"
        data-chapter="{{ chapter }}">
     {% include "bible/_chapter.html" %}
   </div>
-
-  <!-- Navigator strip: prev/chapter/next (sticky above bottom bar) -->
-  <div class="bible-nav-strip">
-    <button class="bible-nav-strip__btn"
-            hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'-1' }}"
-            hx-target="#bible-chapter"
-            hx-swap="innerHTML"
-            aria-label="Previous chapter">
-      <span class="material-symbols-outlined">chevron_left</span>
-    </button>
-
-    <a href="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}" class="bible-nav-strip__chapter">
-      {{ book.name }} {{ chapter }}
-    </a>
-
-    <button class="bible-nav-strip__btn"
-            hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'1' }}"
-            hx-target="#bible-chapter"
-            hx-swap="innerHTML"
-            aria-label="Next chapter">
-      <span class="material-symbols-outlined">chevron_right</span>
-    </button>
-  </div>
-
 </div>
+{% endblock %}
 
+{% block bible_nav_strip %}
+<!-- Chapter navigator: prev/chapter/next (sticky above bottom bar) -->
+<div class="bible-nav-strip">
+  <button class="bible-nav-strip__btn"
+          hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'-1' }}"
+          hx-target="#bible-chapter"
+          hx-swap="innerHTML"
+          aria-label="Previous chapter">
+    <span class="material-symbols-outlined">chevron_left</span>
+  </button>
+
+  <a href="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}" class="bible-nav-strip__chapter">
+    {{ book.name }} {{ chapter }}
+  </a>
+
+  <button class="bible-nav-strip__btn"
+          hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'1' }}"
+          hx-target="#bible-chapter"
+          hx-swap="innerHTML"
+          aria-label="Next chapter">
+    <span class="material-symbols-outlined">chevron_right</span>
+  </button>
+</div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/bible.js' %}"></script>
-
 <!-- Wire verse taps to drawer for notes -->
 <script>
   document.body.addEventListener('htmx:beforeSwap', (e) => {
