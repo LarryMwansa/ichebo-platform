@@ -42,12 +42,8 @@
 
 {% block content %}
 <div class="bible-reader-shell">
-  <!-- Chapter title -->
-  <div class="bible-chapter-header">
-    <h1 class="bible-chapter-title">{{ book.name }} {{ chapter }}</h1>
-  </div>
-
   <!-- Chapter content (swapped by HTMX on navigation) -->
+  <!-- Title included in partial so it updates on nav -->
   <div id="bible-chapter"
        data-book-code="{{ book.code }}"
        data-chapter="{{ chapter }}">
@@ -60,25 +56,87 @@
 <!-- Chapter navigator: prev/chapter/next (sticky above bottom bar) -->
 <div class="bible-nav-strip">
   <button class="bible-nav-strip__btn"
-          hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'-1' }}"
-          hx-target="#bible-chapter"
-          hx-swap="innerHTML"
+          onclick="navChapter(-1)"
           aria-label="Previous chapter">
     <span class="material-symbols-outlined">chevron_left</span>
   </button>
 
-  <a href="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}" class="bible-nav-strip__chapter">
+  <a href="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}"
+     class="bible-nav-strip__chapter"
+     id="bible-nav-chapter-link">
     {{ book.name }} {{ chapter }}
   </a>
 
   <button class="bible-nav-strip__btn"
-          hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'1' }}"
-          hx-target="#bible-chapter"
-          hx-swap="innerHTML"
+          onclick="navChapter(1)"
           aria-label="Next chapter">
     <span class="material-symbols-outlined">chevron_right</span>
   </button>
 </div>
+
+<script>
+  // Handle chapter navigation - fetch content and swap manually
+  async function navChapter(offset) {
+    const chapterDiv = document.getElementById('bible-chapter');
+    const innerDiv = chapterDiv?.querySelector('[data-book-code]');
+
+    if (!innerDiv) {
+      console.warn('Could not find chapter data');
+      return;
+    }
+
+    const bookCode = innerDiv.dataset.bookCode || 'GEN';
+    const chapter = parseInt(innerDiv.dataset.chapter || '1');
+    const newChapter = chapter + offset;
+
+    try {
+      // Fetch the new chapter HTML
+      const response = await fetch(
+        `/bible/htmx/chapter/?book_code=${bookCode}&chapter=${newChapter}`
+      );
+
+      if (!response.ok) {
+        console.error('Failed to fetch chapter:', response.status);
+        return;
+      }
+
+      const html = await response.text();
+
+      // Replace the chapter content with innerHTML (equivalent to HTMX's innerHTML swap)
+      chapterDiv.innerHTML = html;
+
+      // Update the nav display after swap
+      updateNavDisplay();
+    } catch (error) {
+      console.error('Error navigating chapter:', error);
+    }
+  }
+
+  // Update nav strip display (chapter name and links) after swap
+  function updateNavDisplay() {
+    const chapterDiv = document.getElementById('bible-chapter');
+    const innerDiv = chapterDiv?.querySelector('[data-book-code]');
+
+    if (!innerDiv) {
+      console.warn('Could not find chapter data for display update');
+      return;
+    }
+
+    const bookCode = innerDiv.dataset.bookCode || 'GEN';
+    const chapter = parseInt(innerDiv.dataset.chapter || '1');
+    const title = document.querySelector('.bible-chapter-title');
+    const bookName = title?.textContent?.split(' ')[0] || 'Genesis';
+
+    console.log('Updating nav display:', { bookCode, chapter, bookName });
+
+    // Update chapter link
+    const link = document.getElementById('bible-nav-chapter-link');
+    if (link) {
+      link.textContent = `${bookName} ${chapter}`;
+      link.href = `/bible/pick/?book_code=${bookCode}&chapter=${chapter}&back=${window.location.pathname}`;
+    }
+  }
+</script>
 {% endblock %}
 
 {% block drawer_title %}Bible Settings{% endblock %}

@@ -289,6 +289,7 @@ def bible_picker_view(request):
     """
     Full-screen book/chapter/verse picker.
     GET params: book_code, chapter, back (return URL)
+    Passes chapters for ALL books so picker can navigate without page reload.
     """
     back_url = request.GET.get('back', '/bible/')
     book_code = request.GET.get('book_code', DEFAULT_BOOK)
@@ -301,11 +302,17 @@ def bible_picker_view(request):
     book = BibleBook.objects.filter(code=book_code).first()
     chapters = get_book_chapters(book_code)
 
+    # Build chapters map for ALL books (so picker can navigate without reload)
+    all_chapters = {}
+    for b in books:
+        all_chapters[b.code] = list(get_book_chapters(b.code))
+
     context = {
         'books': books,
         'book': book,
         'chapter': chapter,
         'chapters': list(chapters),
+        'all_chapters': all_chapters,  # NEW: pass all chapters for all books
         'back_url': back_url,
     }
     return render(request, 'bible/picker.html', context)

@@ -58,18 +58,25 @@
   const currentBookCode = '{{ book.code }}';
   const currentChapter = {{ chapter }};
   const backUrl = '{{ back_url }}';
+
+  // Track currently selected book in picker
+  let selectedBookCode = currentBookCode;
+
   const books = {
     {% for b in books %}
     '{{ b.code }}': '{{ b.name }}',
     {% endfor %}
   };
+
   const bookChapters = {
-    {% for b in books %}
-    '{{ b.code }}': {% if b.code == book.code %}{{ chapters|safe }}{% else %}[]{% endif %},
+    {% for code, chaps in all_chapters.items %}
+    '{{ code }}': {{ chaps|safe }},
     {% endfor %}
   };
 
   function selectBook(bookCode) {
+    // Store the selected book code
+    selectedBookCode = bookCode;
     const stepBooks = document.getElementById('step-books');
     const stepChapters = document.getElementById('step-chapters');
     const label = stepChapters.querySelector('.bible-picker-step-label');
@@ -100,10 +107,8 @@
   }
 
   function selectChapter(chapter) {
-    // Get current book code from data attribute or build from state
-    const stepBooks = document.getElementById('step-books');
-    const activeBook = stepBooks.querySelector('.bible-picker-item--active');
-    const bookCode = activeBook?.textContent || currentBookCode;
+    // Use the book code stored when selectBook was called
+    const bookCode = selectedBookCode || currentBookCode;
 
     // Navigate back to reader at this passage
     window.location.href = `/bible/${bookCode}/${chapter}/`;

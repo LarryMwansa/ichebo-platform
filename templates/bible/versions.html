@@ -205,11 +205,19 @@
 
 <script>
 function selectVersion(translationCode) {
-  // Save to localStorage or send to backend
-  // For now, we'll just set it and navigate back
+  // Get the current passage from the referring page if available
+  const referrer = document.referrer || '/bible/';
+
+  // Extract book_code and chapter from referrer URL
+  const pathMatch = referrer.match(/\/bible\/([A-Z0-9]+)\/(\d+)\//);
+  const bookCode = pathMatch ? pathMatch[1] : 'GEN';
+  const chapter = pathMatch ? pathMatch[2] : '1';
+
+  // Save to localStorage
   localStorage.setItem('ics_ui.bible_translation', translationCode);
-  // Navigate back to Bible reader
-  window.location.href = '/bible/';
+
+  // Navigate back to same passage with new translation
+  window.location.href = `/bible/${bookCode}/${chapter}/`;
 }
 </script>
 
