@@ -1,125 +1,141 @@
 # ICS Platform — Next Phase Advisory
 **Date:** 2026-04-14  
+**Reviewed against:** `production_instance` branch (merged 2026-04-14), Roadmap v3 (2026-04-12), CHANGELOG (2026-04-13)  
 **Branch:** `claude/plan-next-phase-fYdmY`  
-**Status:** Approved — Pending Implementation
+**Status:** Updated after production_instance merge
 
 ---
 
 ## Context
 
-The ICS (Ichebo Christian Services) platform has completed its **initial build phase**, which turns out to be substantially more complete than a typical scaffold. Based on thorough exploration of both the project documentation (roadmap, system designs, data contract) and the actual source files, the platform is approximately **70–80% complete toward MVP**. Most roadmap phases (0–6) have working implementations.
-
-This document identifies what is genuinely missing, what needs hardening, and the recommended priority order for the next phase of development.
+The ICS platform has completed its initial build phase. After merging the `production_instance` branch — which is the canonical source of truth — and reviewing roadmap v3 alongside the actual code, this advisory corrects several significant misreadings from the initial plan and establishes the true next phase.
 
 ---
 
-## Actual State vs Roadmap (Honest Assessment)
+## Corrections to Initial Advisory (What Changed After the Merge)
 
-| Phase | Roadmap Description | Actual State |
-|-------|---------------------|--------------|
+| Area | Initial Assessment | Corrected Assessment |
+|------|--------------------|----------------------|
+| **Phase 4 (JS services)** | Flagged as "incomplete" | **REMOVED by design in v3** — `@login_required` handles auth guards; tenant context is request-scoped in views; no JS layer needed |
+| **Dashboard** | "Minimal — 10 LOC" | **Significantly improved** — tab UI (Overview, Governance, Calendar, Records), context-aware drawer, Material Icons all shipped (CHANGELOG 2026-04-13) |
+| **Bible App** | "Complete, HTMX chapter reader" | **Major UI overhaul shipped** — full-screen picker, real-time search page, sticky navigator strip, scroll-hide behavior, drawer-based notes (CHANGELOG 2026-04-13) |
+| **Learn/Governance/Paraclete views** | "Production-ready, 70–80% MVP" | **Pending per roadmap v3** — extensive view code exists from initial build on `main` but these tasks are marked IN PROGRESS / PENDING in the canonical roadmap; require reconciliation with system design docs |
+| **Settings persistence** | "localStorage only" | **Database** — `User.preferences` JSONField (roadmap v3 confirms this explicitly; the v1/v2 localStorage note is superseded) |
+| **Phase numbering** | Used v2 numbering | **Roadmap v3 renumbers**: Dashboard = Phase 6.2, Production hardening = Phase 7 |
+
+---
+
+## Actual State vs Roadmap v3 (Corrected Assessment)
+
+| Phase | Roadmap v3 Description | Canonical Status |
+|-------|------------------------|-----------------|
 | **0** | VPS + Django scaffold + health check | ✅ Complete |
-| **1** | Auth + Tenant + Identity + Permissions | ✅ Complete — User (UUID, competence_level 0–5), Tenant (9-tier hierarchy), UserPermission, Token auth |
-| **2** | Records Engine (Django + DRF) | ✅ Complete — Record (40+ fields, versioning, soft delete), Relationship (16 types), full DRF |
-| **3** | Activity Engine (Django + DRF) | ✅ Complete — Activity (9 types, recurrence, progress%), ActivityLog, DRF |
-| **4** | Identity + Tenant JS services | ⚠️ Partial — Only `navbar.js`, `storage.js` exist; `identity.service.js`, `tenant.service.js` not found |
-| **5a** | Bible App | ✅ Complete — BibleTranslation/Book/Verse models, HTMX chapter reader |
-| **5b** | Learn App (7 sub-phases A–G) | ✅ Complete — 14 view endpoints + 6 HTMX partials; enrolment, progression, certification, authorship, review queue |
-| **5c** | Community App | ⚠️ Partial — Views exist (584 LOC) but MembershipRequest explicitly "deferred to Phase 2" |
-| **5d** | Governance App | ✅ Complete — Library (Level 3+), Mandate (4+/5+), My Keys, version chains, HRS attributes, atomic supersede |
-| **5e** | Profile + Settings | ✅ Complete — profile read/write, theme/language/timezone in preferences JSONField |
-| **5f** | Notifications (stub) | ⚠️ Explicit stub — "no Notification model in MVP" per source comments |
-| **6** | Paraclete Service | ✅ Complete — Real orchestration logic (406 LOC), 9 dataclasses, digest engine; only "suggestions" deferred |
-| **7** | Dashboard | ⚠️ Minimal — `dashboard/views.py` is only 10 LOC; needs Paraclete digest rendering |
-| **8** | Production Hardening | ⚠️ Partial — Gunicorn configured; SSL/certbot, systemd, static file caching unverified |
-
-> **Only 1 confirmed stub in production code:** `paraclete/service.py` lines 88–90 — suggestions feature explicitly deferred to post-MVP.
-
----
-
-## Critical Gaps (Priority Order)
-
-### 1. Test Coverage — Zero Tests Written (HIGHEST RISK)
-- **All 11 `tests.py` files are empty stubs**
-- Risk: Any refactor or deployment change could silently break core journeys
-- Recommended: Write tests before adding any new features
-
-### 2. Dashboard Depth (Phase 7 Incomplete)
-- `dashboard/views.py` — only 10 LOC; Paraclete digest exists but is not rendered
-- The service (`paraclete/service.py`) returns a full `ParacleteDigest` object but the dashboard view does not render widgets
-- Needs: Role-aware widget rendering, Today's focus, pending activities, active prayer count, discipline prompt
-
-### 3. Template Completeness — Unknown
-- Views are implemented but templates have not been fully verified
-- HTMX partial templates (e.g. `learn/partials/`, `governance/partials/`) need a complete audit
-- Risk: Views can reference templates that don't exist yet
-
-### 4. Community Membership Flow (Deferred)
-- `community/models.py` — MembershipRequest model exists but is explicitly deferred
-- `community/views.py` — 584 LOC of views but the membership approval flow is incomplete
-- Needs: Request submit → tenant steward review → approve/reject → UserPermission creation
-
-### 5. Frontend JS Service Layer (Phase 4 Incomplete)
-- Roadmap calls for: `identity.service.js`, `tenant.service.js`, `records.service.js`, `activity.service.js`, `paraclete.service.js`
-- Only `navbar.js` and `storage.js` currently exist
-- HTMX likely replaces most JS service layer needs, but competence-level-aware route guarding is still missing
-
-### 6. Auth: Token vs JWT — Decision Needed
-- `requirements.txt` uses `djangorestframework` authtoken
-- Roadmap specifies **JWT token auth**
-- Risk: If external clients (mobile app, third-party integrations) are planned, JWT is strongly preferred
-- Decision required: Commit to Token auth (simpler, web-only) OR migrate to JWT (`djangorestframework-simplejwt`)
-
-### 7. Production Hardening (Phase 8)
-- SSL via Let's Encrypt (certbot) — status unverified
-- Static files served by Nginx — status unverified
-- Systemd service for Gunicorn auto-restart — not created
-- Error logging to file — not configured
-- Django admin model registration — likely empty across all apps
+| **1** | Auth + Tenants + HTMX Shell | ✅ Complete |
+| **2** | Records Engine | ✅ Complete |
+| **3** | Activity Engine | ✅ Complete |
+| **4** | Identity + Tenant JS services | ✅ Removed — not applicable to HTMX architecture |
+| **5.1** | Bible App | ✅ Complete + UI overhaul shipped (2026-04-13) |
+| **5.2** | Learn App (7 sub-phases A–G) | 🔄 In Progress — system design complete, build pending |
+| **5.3** | Activity App UI layer | ⏳ Pending |
+| **5.4** | Community App | ⏳ Pending |
+| **5.5** | Governance App | ⏳ Pending |
+| **5.6** | Profile + Settings | ⏳ Pending |
+| **5.7** | Notifications Stub | ⏳ Pending |
+| **6.1** | Paraclete Service | ⏳ Pending |
+| **6.2** | Dashboard (digest rendering + widgets) | ⏳ Pending — shell UI exists; digest wiring not built |
+| **7** | Production Hardening | ⏳ Pending |
 
 ---
 
-## Recommended Next Phase: Focus Areas
+## The Code Reconciliation Problem
 
-### Priority 1 — Test Foundation (1–2 weeks)
-Establish test coverage for all core journeys before building anything new.
+The `main` branch contains extensive view code for apps that roadmap v3 marks as Pending (learn/views.py 478 LOC, governance/views.py 465 LOC, paraclete/service.py 406 LOC). This code was written during a rapid initial build and **may not conform to the system design specifications**.
 
-**Critical test targets:**
+**Before building any new feature, this must be assessed:**
 
-| File | What to test |
-|------|-------------|
-| `accounts/tests.py` | User registration, login, competence_level assignment |
-| `tenants/tests.py` | Tenant creation, UserPermission assignment, role hierarchy |
-| `records/tests.py` | Record CRUD, Relationship creation, version chain (supersede), soft delete, permission gating |
-| `activity/tests.py` | Activity create/complete, ActivityLog entries, recurrence logic |
-| `learn/tests.py` | Enrolment, lesson completion, certification confirmation, competence advancement |
-| `governance/tests.py` | Library access (Level 3+), mandate CRUD, atomic supersede transaction |
-| `paraclete/tests.py` | `build_digest()` returns correct `ParacleteDigest` shape for various user states |
+For each pending app (5.2 Learn → 5.5 Governance), compare the existing view code against the relevant system design document:
+- Does the existing code implement the correct URL routes per roadmap v3?
+- Does it use the correct Record discriminators (`record_family`, `record_type`) per the data contract?
+- Does it follow the correct access level gates (Level 3+, Level 4+, Level 5)?
+- Does it use the correct HTMX partial pattern (HX-Request header detection)?
 
-**Approach:** Django `TestCase` + DRF `APITestCase`; use `factory_boy` for fixtures; start with happy path, then permission gates.
+If yes — retain and clean up. If no — rewrite per the system design doc. **Do not build on top of code that doesn't match the spec.**
 
-### Priority 2 — Dashboard (Complete Phase 7) (3–5 days)
-- Expand `dashboard/views.py` to render `ParacleteDigest` with role-aware widgets
-- Leverage the already-working `paraclete/service.py::build_digest()`
-- Wire all digest fields into `templates/dashboard/dashboard.html`
-- Add HTMX refresh for live digest updates
+---
 
-### Priority 3 — Template Audit (2–3 days)
-- Audit every app's `templates/` directory
-- For each app verify: base template, list/detail pages, HTMX partials all exist and render
-- Smoke test each view via Django test client
-- Priority apps: `learn` (complex HTMX partials), `governance` (versioning UI), `bible` (chapter navigation)
+## Recommended Next Phase (Priority Order)
 
-### Priority 4 — Community Membership Flow (1 week)
-- Complete MembershipRequest submit/approve/reject flow
-- Wire `community/views.py` to create `tenants.UserPermission` on steward approval
-- This unblocks onboarding for real users joining tenant communities
+### Priority 1 — Code Reconciliation Audit (2–3 days)
 
-### Priority 5 — Production Hardening (Phase 8) (3–5 days)
-- **SSL:** `certbot --nginx -d yourdomain.com`
-- **Static files:** verify `STATIC_ROOT`, run `collectstatic`, confirm Nginx serves from that path
-- **Systemd:** create `/etc/systemd/system/ics-gunicorn.service` for auto-restart on reboot
-- **Logging:** configure `LOGGING` in `settings/production.py` → `/var/log/ics/`
-- **Django admin:** register all models in each app's `admin.py`
+Before writing a single new line, audit what the initial build produced vs what roadmap v3 requires.
+
+**Process for each pending app:**
+1. Open the app's system design doc (referenced in roadmap v3 per task)
+2. Compare existing views against the spec'd URL routes, data patterns, access gates
+3. Mark each view as: ✅ Conforms | ⚠️ Needs adjustment | ❌ Rewrite required
+4. Document findings before touching code
+
+**Apps to audit:**
+- `learn/views.py` → `.project_docs/5.learn_app/2026-04-07-ics-learn-app-system-design_v2.md`
+- `governance/views.py` + `governance/services.py` → `.project_docs/8.governance_app/2026-04-10-ics-governance-app-system-design.md`
+- `community/views.py` → `.project_docs/7.community_app/2026-04-08-ics-community-app-system-design.md`
+- `paraclete/service.py` + `paraclete/views.py` → `.project_docs/9.paraclete/2026-04-10-ics-paraclete-service-system-design.md`
+
+### Priority 2 — Task 5.2: Learn App (1–2 weeks)
+
+This is the current roadmap task. Build in strict phase order per the system design doc.
+
+**7 phases (A–G):**
+
+| Phase | What it builds |
+|-------|----------------|
+| A | `CertificationConfirmation` model, `/api/learn/certifications/{id}/confirm/` endpoint, `/api/learn/certifications/queue/` |
+| B | Verify Records endpoint filters work for `record_family: "learning"`; curriculum endpoint |
+| C | Django template views + HTMX partials: My Learning, Catalogue, Enrolment, Lesson Viewer |
+| D | Quiz renderer, Assignment submission |
+| E | Auto-certification signal, steward cert queue UI, competence level advancement |
+| F | Content authorship UI (Level 4+), Handbook review queue (Level 5) |
+| G | Role-aware navigation, Pathway banner, mobile smoke test |
+
+**Critical reference:** `.project_docs/5.learn_app/2026-04-07-ics-learn-app-system-design_v2.md`
+
+**Exit criteria:** `POST /api/learn/certifications/{id}/confirm/` increments `competence_level` in DB. Verifiable in Django admin.
+
+### Priority 3 — Task 5.3: Activity App UI (3–5 days)
+
+Build the UI layer on top of the already-complete Activity Engine (Phase 3).
+
+**Two surfaces:**
+- My Activities: personal (`tenant_id: null`), types: task, habit, goal, skill, reminder
+- Ministry: tenant-scoped, types: campaign, project, task, event
+
+**Reference:** `.project_docs/6.activity_app/2026-04-08-ics-activity-app-system-design.md`
+
+### Priority 4 — Tasks 5.4, 5.5, 5.6, 5.7 (2–3 weeks combined)
+
+Build in strict roadmap order:
+1. **5.4 Community App** — member directory, announcements, gatherings (dual-write with activity/event via `transaction.atomic()`)
+2. **5.5 Governance App** — Reference Library (Level 3+), Mandate (Level 4+/5+), Keys, version chains
+3. **5.6 Profile + Settings** — profile read/write, settings persist to `User.preferences` JSONField
+4. **5.7 Notifications Stub** — empty list endpoint + HTMX badge poll; no new model in MVP
+
+### Priority 5 — Phase 6: Paraclete + Dashboard (1 week)
+
+Only begin after all Phase 5 apps are complete (Paraclete reads from all of them).
+
+- **6.1 Paraclete service** — orchestration engine: digest, reminders, prompt, suggestions stub
+- **6.2 Dashboard** — wire `build_digest()` to dashboard template; role-aware widgets (Level 3+ sees ministry summary); HTMX partial refresh
+
+**Dashboard tab structure already built (CHANGELOG 2026-04-13)** — the shell is ready. What's missing is the data wiring from Paraclete.
+
+### Priority 6 — Phase 7: Production Hardening (3–5 days)
+
+- Error logging → `/var/log/ics/django_errors.log`
+- `collectstatic` verified, Nginx serving from `staticfiles/`
+- Systemd unit (`/etc/systemd/system/ics.service`) for Gunicorn auto-restart
+- SSL via certbot (may already be configured from Task 0.5)
+- Django admin: register all models across all apps
+- All health endpoints return 200
 
 ---
 
@@ -127,59 +143,67 @@ Establish test coverage for all core journeys before building anything new.
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Zero test coverage | **High** — silent regressions on any change | Write tests for core models and permission gates first |
-| Token auth vs JWT undecided | **Medium** — API client compatibility | Decide now; JWT migration touches all auth flows |
-| Template gaps | **High** — broken views in production | Audit templates directory; add missing partials |
-| Dashboard is minimal | **Medium** — primary UX surface is broken | Implement digest rendering before any demo or release |
-| Community membership deferred | **Medium** — onboarding is incomplete | Schedule for next sprint |
-| Notifications stubbed | **Low** (explicitly planned) | Accept for now; build post-MVP |
-| Paraclete suggestions stubbed | **Low** (explicitly planned) | Accept for now; build post-MVP |
+| Initial build code doesn't match system design specs | **High** — building on misaligned code causes cascading rework | Reconciliation audit before any new development |
+| Build order violation | **High** — Learn depends on Activity; Paraclete depends on all Phase 5 apps | Follow roadmap v3 dependency rules strictly |
+| Zero test coverage | **High** — any rework or deployment change can silently break things | Write tests as each app is completed, not deferred to end |
+| Dashboard digest wiring absent | **Medium** — dashboard shell exists but has no live data | Wire Paraclete service to dashboard at Phase 6.2 |
+| Community gathering dual-write complexity | **Medium** — atomically writes Community Record + Activity event | Use `transaction.atomic()` as specified in roadmap v3 |
+| Notifications deferred | **Low** (explicitly planned) | Accept stub in MVP; build triggers post-MVP |
 
 ---
 
-## Immediate Top-5 Actions
+## Build Dependency Chain (Non-Negotiable)
 
-1. **Audit templates directory** — Map every view to its template; identify missing templates before any new feature work
-2. **Write model-level tests** — Start with `records` and `accounts`; these are the foundation everything else depends on
-3. **Implement dashboard rendering** — Connect `build_digest()` to a real dashboard template; this is the primary user-facing surface
-4. **Decide JWT vs Token auth** — One-time architectural decision; document the outcome and implement consistently
-5. **Run production smoke test** — Manually exercise each core journey end-to-end: register → login → enrol in programme → complete lesson → view governance mandate
-
----
-
-## Verification Checklist
-
-```bash
-# Run all tests (baseline — currently all empty)
-python manage.py test
-
-# Core journey smoke test (manual or test client):
-# 1. Register new user → verify competence_level=0
-# 2. Login → verify token returned
-# 3. Create tenant → assign UserPermission
-# 4. Access /learn/ → view catalogue
-# 5. Enrol in programme → verify Activity created with correct metadata
-# 6. Complete lesson → verify ActivityLog entry
-# 7. Access /governance/ → verify Level 3+ gate enforced
-# 8. GET /api/paraclete/digest/ → verify ParacleteDigest JSON shape
-
-# Check for template/config issues
-python manage.py check --deploy
+```
+Phase 0 → Phase 1 → Phase 2 → Phase 3 → Task 5.1 ✅
+                                       → Task 5.2 (Learn) 🔄 NOW
+                                       → Task 5.3 (Activity UI)
+                                       → Task 5.4 (Community)
+                                       → Task 5.5 (Governance)
+                                       → Task 5.6 (Profile)
+                                       → Task 5.7 (Notifications stub)
+                                       → Phase 6.1 (Paraclete)
+                                       → Phase 6.2 (Dashboard)
+                                       → Phase 7 (Hardening)
 ```
 
+> Phase 4 is permanently removed from this chain.
+
 ---
 
-## Files to Act On
+## Test Strategy
 
-| File | Action Required |
-|------|----------------|
-| `accounts/tests.py` | Write: User model tests, auth endpoint tests |
-| `records/tests.py` | Write: Record CRUD, Relationship, version chain tests |
-| `learn/tests.py` | Write: Enrolment, completion, certification tests |
-| `governance/tests.py` | Write: Permission gates, atomic supersede transaction tests |
-| `paraclete/tests.py` | Write: `build_digest()` output tests |
-| `dashboard/views.py` | Expand: Wire `ParacleteDigest` to template (currently 10 LOC) |
-| `templates/dashboard/` | Audit/Create: Dashboard template with all widget sections |
-| `community/views.py` | Complete: Membership request submit/approve/reject flow |
-| `ics_project/settings/production.py` | Review: Logging, static files, ALLOWED_HOSTS |
-| All `admin.py` files | Register: Models for Django admin access |
+Write tests per app as each task is completed — not deferred to the end.
+
+**Pattern for each app:**
+- `TestCase` for Django model logic (relationships, computed fields, signal handlers)
+- `APITestCase` for DRF endpoint auth, permissions, response shape
+- Competence-level gate tests: verify Level 2 user cannot access Level 3+ views
+
+**Start with** records and accounts (foundation); every other app depends on these.
+
+---
+
+## Immediate Next Action
+
+1. Read `.project_docs/5.learn_app/2026-04-07-ics-learn-app-system-design_v2.md` in full
+2. Compare existing `learn/views.py` against the spec — mark conforming vs non-conforming
+3. Begin Task 5.2 Phase A: verify `CertificationConfirmation` model matches spec
+4. Build Phases B–G in order per the system design doc
+5. Commit per phase: `git commit -m "feat: learn app — phase A: model + confirm endpoint"`
+
+---
+
+## Key Reference Documents (Post-Merge Paths)
+
+| Document | Path |
+|----------|------|
+| Roadmap v3 | `.project_docs/2026-04-12-ics-build-roadmap_v3.md` |
+| Data contract v9 | `.project_docs/2.platform_data-contract/ver/2026-04-10-ics-platform-data-contract_v9-amendments.md` |
+| Learn App system design | `.project_docs/5.learn_app/2026-04-07-ics-learn-app-system-design_v2.md` |
+| Activity App system design | `.project_docs/6.activity_app/2026-04-08-ics-activity-app-system-design.md` |
+| Community App system design | `.project_docs/7.community_app/2026-04-08-ics-community-app-system-design.md` |
+| Governance App system design | `.project_docs/8.governance_app/2026-04-10-ics-governance-app-system-design.md` |
+| Paraclete system design | `.project_docs/9.paraclete/2026-04-10-ics-paraclete-service-system-design.md` |
+| HTMX Migration ADR | `.project_docs/ui_build-and-dev/2026-04-07-ics-htmx-migration-adr.md` |
+| CHANGELOG | `CHANGELOG.md` |
