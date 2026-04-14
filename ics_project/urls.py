@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/', include('records.urls')),
     path('api/', include('activity.urls')),
     path('api/bible/', include('bible.api_urls')),
+    path('api/community/', include('community.api_urls', namespace='community-api')),
     path('bible/', include('bible.urls', namespace='bible')),
     path('api/learn/', include('learn.api_urls')),
     path('learn/', include('learn.urls', namespace='learn')),

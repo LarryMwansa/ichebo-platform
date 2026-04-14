@@ -1,8 +1,8 @@
 <!-- Reference Library record detail -->
 <div class="gov-detail-header">
-  <a href="{% url 'governance:library-list' record.record_type %}"
+  <a href="{% url 'governance:reference-list' record.record_type %}"
      class="gov-back-link"
-     hx-get="{% url 'governance:library-list' record.record_type %}"
+     hx-get="{% url 'governance:reference-list' record.record_type %}"
      hx-target="#governance-content"
      hx-push-url="true">
     ← {{ record.record_type|title|cut:"_" }}s
@@ -18,7 +18,7 @@
 <!-- Tags and categories -->
 <div class="gov-record-meta" style="margin-bottom:1rem">
   {% for tag in record.tags %}
-  <a href="{% url 'governance:library-list' record.record_type %}?tag={{ tag }}"
+  <a href="{% url 'governance:reference-list' record.record_type %}?tag={{ tag }}"
      class="gov-tag">{{ tag }}</a>
   {% endfor %}
   {% for cat in record.categories %}<span class="gov-category">{{ cat }}</span>{% endfor %}

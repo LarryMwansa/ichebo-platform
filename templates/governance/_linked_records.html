@@ -20,9 +20,9 @@
       </div>
       {% elif entry.record %}
       <!-- Record link -->
-      <a href="{% if entry.record.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' entry.record.id %}{% else %}{% url 'governance:mandate-detail' entry.record.id %}{% endif %}"
+      <a href="{% if entry.record.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' entry.record.id %}{% else %}{% url 'governance:mandate-detail' entry.record.id %}{% endif %}"
          class="gov-link-item"
-         hx-get="{% if entry.record.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' entry.record.id %}{% else %}{% url 'governance:mandate-detail' entry.record.id %}{% endif %}"
+         hx-get="{% if entry.record.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' entry.record.id %}{% else %}{% url 'governance:mandate-detail' entry.record.id %}{% endif %}"
          hx-target="#governance-content"
          hx-push-url="true">
         <span class="gov-link-type-badge">{{ entry.record.record_type }}</span>

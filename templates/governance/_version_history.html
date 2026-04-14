@@ -11,9 +11,9 @@
       <span class="gov-version-date">{{ v.created_at|date:"d M Y" }}</span>
       {% if v.locked_at %}<span class="gov-version-date">Locked {{ v.locked_at|date:"d M Y" }}</span>{% endif %}
       {% if v.id != record.id %}
-      <a href="{% if v.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' v.id %}{% else %}{% url 'governance:mandate-detail' v.id %}{% endif %}"
+      <a href="{% if v.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' v.id %}{% else %}{% url 'governance:mandate-detail' v.id %}{% endif %}"
          class="gov-version-link"
-         hx-get="{% if v.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' v.id %}{% else %}{% url 'governance:mandate-detail' v.id %}{% endif %}"
+         hx-get="{% if v.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' v.id %}{% else %}{% url 'governance:mandate-detail' v.id %}{% endif %}"
          hx-target="#governance-content"
          hx-push-url="true">View</a>
       {% else %}

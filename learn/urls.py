@@ -8,9 +8,9 @@ urlpatterns = [
 
     # ── Django template views ──────────────────────────────────────────────
     path('', views.my_learning, name='learn-home'),
-    path('programmes/', views.catalogue, name='learn-catalogue'),
-    path('programmes/<uuid:programme_id>/', views.programme_detail, name='learn-programme'),
-    path('lessons/<uuid:lesson_id>/', views.lesson_viewer, name='learn-lesson'),
+    path('catalogue/', views.catalogue, name='learn-catalogue'),
+    path('programme/<uuid:programme_id>/', views.programme_detail, name='learn-programme'),
+    path('lesson/<uuid:lesson_id>/', views.lesson_viewer, name='learn-lesson'),
     path('certifications/', views.certification_queue_view, name='learn-cert-queue'),
 
     # Authorship (Level 4+)

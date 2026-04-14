@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from records.models import Record, Relationship
@@ -313,6 +313,108 @@ def member_profile(request, member_id):
         'order_choices':  KGS_SERVICE_ORDER_CHOICES,
         'level_label':    level_label,
         'stage_info':     stage_info,
+    })
+
+
+# ── Gatherings list (C.1) ────────────────────────────────────────────────────
+
+@login_required
+def gatherings_list(request):
+    """Upcoming gatherings for the user's tenant. Level 1+."""
+    user = request.user
+    if _user_level(user) < 1:
+        return render(request, 'community/seeker_gate.html')
+
+    perms = _get_user_permissions(user)
+    primary_perm = perms[0] if perms else None
+    tenant = primary_perm.tenant if primary_perm else None
+
+    now = timezone.now()
+    qs = Record.objects.filter(
+        record_family='community',
+        record_type='gathering',
+        status__in=['active', 'pending'],
+        deleted_at__isnull=True,
+    ).order_by('custom_fields__scheduled_at')
+
+    if tenant:
+        qs = qs.filter(tenant_id=tenant.id)
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'community/partials/gathering_list.html', {
+            'gatherings': qs[:20],
+            'now': now,
+        })
+
+    return render(request, 'community/gatherings.html', {
+        'gatherings': qs[:20],
+        'now': now,
+        'level': _user_level(user),
+    })
+
+
+# ── Gathering / Announcement detail (C.2) ────────────────────────────────────
+
+@login_required
+def community_detail(request, record_id):
+    """Detail view for a gathering or announcement. Level 1+."""
+    if _user_level(request.user) < 1:
+        return render(request, 'community/seeker_gate.html')
+
+    record = get_object_or_404(
+        Record,
+        id=record_id,
+        record_family='community',
+        record_type__in=['gathering', 'announcement'],
+        deleted_at__isnull=True,
+    )
+
+    linked_activity = None
+    if record.record_type == 'gathering':
+        from records.models import Relationship
+        rel = Relationship.objects.filter(
+            from_record=record,
+            relationship_type='aligns_with',
+        ).first()
+        if rel:
+            act_id = (rel.metadata or {}).get('linked_activity_id')
+            if act_id:
+                try:
+                    linked_activity = Activity.objects.get(id=act_id)
+                except Activity.DoesNotExist:
+                    pass
+
+    return render(request, 'community/community_detail.html', {
+        'record': record,
+        'linked_activity': linked_activity,
+        'level': _user_level(request.user),
+        'is_steward': _user_level(request.user) >= 3,
+    })
+
+
+# ── HTMX: gatherings list partial (C.1) ──────────────────────────────────────
+
+@login_required
+def htmx_gatherings_list(request):
+    """HTMX partial: upcoming gatherings list for the user's tenant."""
+    user = request.user
+    perms = _get_user_permissions(user)
+    primary_perm = perms[0] if perms else None
+    tenant = primary_perm.tenant if primary_perm else None
+
+    qs = Record.objects.filter(
+        record_family='community',
+        record_type='gathering',
+        status__in=['active', 'pending'],
+        deleted_at__isnull=True,
+    ).order_by('custom_fields__scheduled_at')
+
+    if tenant:
+        qs = qs.filter(tenant_id=tenant.id)
+
+    return render(request, 'community/partials/gathering_list.html', {
+        'gatherings': qs[:20],
+        'now': timezone.now(),
     })
 
 

@@ -1,0 +1,30 @@
+{% for gathering in gatherings %}
+{% with cf=gathering.custom_fields %}
+<a href="{% url 'community:community-detail' gathering.id %}" class="announcement-card">
+
+  <div class="announcement-title">{{ gathering.title }}</div>
+
+  <div class="gathering-meta">
+    {% if cf.format %}
+    <span class="gathering-format-badge gathering-format-badge--{{ cf.format }}">
+      {{ cf.format|title|cut:"_" }}
+    </span>
+    {% endif %}
+
+    {% if cf.scheduled_at %}
+    <span class="announcement-date">{{ cf.scheduled_at }}</span>
+    {% endif %}
+
+    {% if cf.location %}
+    <span class="gathering-location">{{ cf.location }}</span>
+    {% endif %}
+  </div>
+
+  {% if cf.stream_url %}
+  <span class="gathering-stream-badge">Live Stream Available</span>
+  {% endif %}
+
+</a>
+{% empty %}
+<div class="community-empty">No upcoming gatherings scheduled.</div>
+{% endfor %}

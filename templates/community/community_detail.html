@@ -1,0 +1,85 @@
+{% extends "community/base_community.html" %}
+
+{% block community_content %}
+<div class="community-section">
+
+  <a href="{% if record.record_type == 'gathering' %}{% url 'community:community-gatherings' %}{% else %}{% url 'community:community-home' %}{% endif %}"
+     class="btn-back">← Back</a>
+
+  <div class="community-section-header" style="margin-top:1rem">
+    <h2 class="community-section-title">{{ record.title }}</h2>
+    <span class="announcement-badge announcement-badge--{{ record.record_type }}">
+      {{ record.record_type|title }}
+    </span>
+  </div>
+
+  {% if record.content %}
+  <p class="community-detail-body">{{ record.content|linebreaks }}</p>
+  {% endif %}
+
+  {% if record.record_type == 'gathering' %}
+  {% with cf=record.custom_fields %}
+  <div class="announcement-card" style="margin-top:1rem">
+
+    {% if cf.format %}
+    <div class="community-meta-row">
+      <span class="community-meta-label">Format</span>
+      <span class="gathering-format-badge gathering-format-badge--{{ cf.format }}">
+        {{ cf.format|title|cut:"_" }}
+      </span>
+    </div>
+    {% endif %}
+
+    {% if cf.scheduled_at %}
+    <div class="community-meta-row">
+      <span class="community-meta-label">Date &amp; Time</span>
+      <span>{{ cf.scheduled_at }}</span>
+    </div>
+    {% endif %}
+
+    {% if cf.location %}
+    <div class="community-meta-row">
+      <span class="community-meta-label">Location</span>
+      <span>{{ cf.location }}</span>
+    </div>
+    {% endif %}
+
+    {% if cf.stream_url %}
+    <div class="community-meta-row">
+      <span class="community-meta-label">Stream</span>
+      <a href="{{ cf.stream_url }}" target="_blank" rel="noopener" class="btn-secondary btn-sm">
+        Join Online
+      </a>
+    </div>
+    {% endif %}
+
+    {% if cf.capacity %}
+    <div class="community-meta-row">
+      <span class="community-meta-label">Capacity</span>
+      <span>{{ cf.capacity }}</span>
+    </div>
+    {% endif %}
+
+  </div>
+  {% endwith %}
+
+  {% if is_steward and record.status == 'active' %}
+  <div style="margin-top:1rem">
+    <button class="btn-secondary btn-sm"
+            hx-post="{% url 'community:htmx-cancel-gathering' record.id %}"
+            hx-confirm="Cancel this gathering?"
+            hx-target="body"
+            hx-push-url="{% url 'community:community-gatherings' %}">
+      Cancel Gathering
+    </button>
+  </div>
+  {% endif %}
+
+  {% endif %}{# end gathering #}
+
+  <div class="community-meta-row" style="margin-top:1.5rem; color:var(--text-muted); font-size:0.8rem">
+    Posted {{ record.created_at|date:"d M Y" }}
+  </div>
+
+</div>
+{% endblock %}

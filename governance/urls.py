@@ -11,23 +11,23 @@ urlpatterns = [
     path('governance/', views.governance_home, name='home'),
 
     # ── Reference Library ────────────────────────────────────────────────────
-    path('governance/library/', views.library_home, name='library-home'),
-    path('governance/library/<str:record_type>/', views.library_list, name='library-list'),
-    path('governance/library/record/<uuid:record_id>/', views.library_detail, name='library-detail'),
+    path('governance/reference/', views.library_home, name='reference-home'),
+    path('governance/reference/<uuid:record_id>/', views.library_detail, name='reference-detail'),
+    path('governance/reference/<str:record_type>/', views.library_list, name='reference-list'),
 
     # ── Mandate branch ───────────────────────────────────────────────────────
     path('governance/mandate/', views.mandate_home, name='mandate-home'),
+    path('governance/mandate/<uuid:record_id>/', views.mandate_detail, name='mandate-detail'),
     path('governance/mandate/<str:record_type>/', views.mandate_list, name='mandate-list'),
-    path('governance/mandate/record/<uuid:record_id>/', views.mandate_detail, name='mandate-detail'),
 
     # ── My Keys ──────────────────────────────────────────────────────────────
     path('governance/keys/', views.keys_list, name='keys-list'),
     path('governance/keys/<uuid:record_id>/', views.keys_detail, name='keys-detail'),
 
-    # ── HTMX partials ────────────────────────────────────────────────────────
-    path('governance/htmx/relationships/<uuid:record_id>/',
+    # ── HTMX partials — linked records + version history ────────────────────
+    path('governance/htmx/record/<uuid:record_id>/links/',
          views.htmx_linked_records, name='htmx-linked-records'),
-    path('governance/htmx/versions/<uuid:record_id>/',
+    path('governance/htmx/record/<uuid:record_id>/history/',
          views.htmx_version_history, name='htmx-version-history'),
 
     # ── Record CRUD ──────────────────────────────────────────────────────────

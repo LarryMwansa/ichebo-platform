@@ -10,8 +10,8 @@
 
   <!-- Branch navigation -->
   <nav class="gov-tab-row" aria-label="Governance navigation">
-    <a href="{% url 'governance:library-home' %}"
-       class="gov-tab {% if active_branch == 'library' or request.resolver_match.url_name == 'library-home' or request.resolver_match.url_name == 'library-list' or request.resolver_match.url_name == 'library-detail' %}gov-tab--active{% endif %}">
+    <a href="{% url 'governance:reference-home' %}"
+       class="gov-tab {% if active_branch == 'reference' or request.resolver_match.url_name == 'reference-home' or request.resolver_match.url_name == 'reference-list' or request.resolver_match.url_name == 'reference-detail' %}gov-tab--active{% endif %}">
       Reference Library
     </a>
     {% if request.user.competence_level >= 4 %}

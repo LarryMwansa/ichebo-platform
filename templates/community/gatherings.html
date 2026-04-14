@@ -1,0 +1,29 @@
+{% extends "community/base_community.html" %}
+{% load static %}
+
+{% block community_content %}
+<div class="community-section">
+
+  <div class="community-section-header">
+    <h2 class="community-section-title">Gatherings</h2>
+    {% if is_steward %}
+    <div id="gathering-form-slot">
+      <button class="btn-primary btn-sm"
+              hx-get="{% url 'community:htmx-create-gathering' %}"
+              hx-target="#gathering-form-slot"
+              hx-swap="innerHTML">
+        + Schedule
+      </button>
+    </div>
+    {% endif %}
+  </div>
+
+  <div id="gatherings-list"
+       hx-get="{% url 'community:htmx-gatherings-list' %}"
+       hx-trigger="load"
+       hx-swap="innerHTML">
+    <div class="community-loading">Loading gatherings…</div>
+  </div>
+
+</div>
+{% endblock %}

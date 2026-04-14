@@ -4,11 +4,10 @@ from . import api_views, views
 app_name = 'community'
 
 urlpatterns = [
-    # ── Health ──────────────────────────────────────────────────────────────
-    path('api/community/health/', api_views.community_health, name='api-health'),
-
     # ── My Community surface ─────────────────────────────────────────────────
     path('community/', views.my_community, name='community-home'),
+    path('community/gatherings/', views.gatherings_list, name='community-gatherings'),
+    path('community/<uuid:record_id>/', views.community_detail, name='community-detail'),
 
     # ── Management surface (Level 3+) ────────────────────────────────────────
     path('community/management/', views.management_home, name='community-management'),
@@ -36,4 +35,6 @@ urlpatterns = [
          views.htmx_member_search, name='htmx-member-search'),
     path('community/htmx/announcements/',
          views.htmx_announcement_list, name='htmx-announcement-list'),
+    path('community/htmx/gatherings/',
+         views.htmx_gatherings_list, name='htmx-gatherings-list'),
 ]

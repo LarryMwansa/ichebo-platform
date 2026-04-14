@@ -18,9 +18,9 @@
 <!-- Type navigation pills -->
 <div class="gov-type-list" style="margin-bottom:1rem">
   {% for slug, label in library_types.items %}
-  <a href="{% url 'governance:library-list' slug %}"
+  <a href="{% url 'governance:reference-list' slug %}"
      class="gov-type-pill {% if slug == record_type %}gov-type-pill--active{% endif %}"
-     hx-get="{% url 'governance:library-list' slug %}"
+     hx-get="{% url 'governance:reference-list' slug %}"
      hx-target="#governance-content"
      hx-push-url="true">
     {{ label }}
@@ -32,16 +32,16 @@
 <input type="text" name="q" value="{{ search }}"
        placeholder="Search {{ type_label|lower }}…"
        class="gov-search-input"
-       hx-get="{% url 'governance:library-list' record_type %}"
+       hx-get="{% url 'governance:reference-list' record_type %}"
        hx-trigger="keyup changed delay:300ms"
        hx-target="#record-list"
        hx-swap="innerHTML">
 
 <div id="record-list">
 {% for record in records %}
-<a href="{% url 'governance:library-detail' record.id %}"
+<a href="{% url 'governance:reference-detail' record.id %}"
    class="gov-record-card"
-   hx-get="{% url 'governance:library-detail' record.id %}"
+   hx-get="{% url 'governance:reference-detail' record.id %}"
    hx-target="#governance-content"
    hx-push-url="true">
   <div class="gov-record-title">{{ record.title }}</div>
