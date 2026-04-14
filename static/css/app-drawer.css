@@ -31,7 +31,7 @@
     bottom: calc(-100% + 70px);
     left: 0;
     width: 100%;
-    max-height: 85%;
+    max-height: 90%;
 
     background: var(--card);
     color: var(--text);
@@ -39,7 +39,8 @@
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
 
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
 
@@ -98,6 +99,7 @@
 .drawer-content {
     padding: 20px;
     overflow-y: auto;
+    flex: 1;
 }
 
 
@@ -109,6 +111,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 18px;
+    padding: 20px;
 }
 
 /* App Tile */
@@ -138,7 +141,9 @@
 
 /* App Icon */
 .app-icon {
-    font-size: 22px;
+    font-size: 28px;
+    color: var(--primary);
+    transition: transform 0.2s ease;
 }
 
 /* App Label */

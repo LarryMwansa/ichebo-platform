@@ -1,0 +1,19 @@
+[Unit]
+Description=ICS Platform Gunicorn
+After=network.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/home/scepter/ics
+Environment="PATH=/home/scepter/ics/.venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=ics_project.settings.production"
+ExecStart=/home/scepter/ics/.venv/bin/gunicorn \
+    ics_project.wsgi:application \
+    -c /home/scepter/ics/gunicorn.conf.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

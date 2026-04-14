@@ -1,0 +1,224 @@
+{% extends "bible/base_bible_minimal.html" %}
+
+{% block title %}Bible Versions{% endblock %}
+
+{% block content %}
+<div class="bible-versions-shell">
+
+  <!-- Header with back button -->
+  <div class="bible-versions-header">
+    <a href="/bible/" class="bible-versions-back" aria-label="Back">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <h1 class="bible-versions-title">Bible Versions</h1>
+    <a href="{% url 'bible:languages' %}" class="bible-versions-languages-btn" aria-label="Filter by language" title="Filter by language">
+      <span class="material-symbols-outlined">language</span>
+    </a>
+  </div>
+
+  <!-- Versions list grouped by language -->
+  <div class="bible-versions-list">
+    {% for language, translations in versions_by_language.items %}
+    <div class="bible-versions-language-group">
+      <h2 class="bible-versions-language-title">{{ language }}</h2>
+      <div class="bible-versions-items">
+        {% for translation in translations %}
+        <a href="{% url 'bible:reader' %}"
+           class="bible-version-item {% if translation.id == current_translation.id %}bible-version-item--active{% endif %}"
+           onclick="selectVersion('{{ translation.code }}'); return false;"
+           role="button"
+           tabindex="0">
+
+          <div class="bible-version-item__header">
+            <h3 class="bible-version-item__code">{{ translation.code }}</h3>
+            {% if translation.id == current_translation.id %}
+            <span class="bible-version-item__badge">Current</span>
+            {% endif %}
+          </div>
+
+          <p class="bible-version-item__name">{{ translation.name }}</p>
+
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="bible-versions-empty">
+      <p>No Bible versions available.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+<style>
+.bible-versions-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+}
+
+.bible-versions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0.75rem;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.bible-versions-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--primary);
+  text-decoration: none;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.bible-versions-back:hover {
+  background: var(--hover);
+}
+
+.bible-versions-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  text-align: center;
+}
+
+.bible-versions-languages-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--primary);
+  text-decoration: none;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.bible-versions-languages-btn:hover {
+  background: var(--hover);
+}
+
+.bible-versions-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 0.75rem;
+}
+
+.bible-versions-language-group {
+  margin-bottom: 2rem;
+}
+
+.bible-versions-language-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bible-versions-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bible-version-item {
+  display: block;
+  padding: 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bible-version-item:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+
+.bible-version-item--active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.bible-version-item__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.bible-version-item__code {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.bible-version-item__badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.bible-version-item__name {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.bible-versions-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* Mobile responsive */
+@media (min-width: 768px) {
+  .bible-versions-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+}
+</style>
+
+<script>
+function selectVersion(translationCode) {
+  // Get the current passage from the referring page if available
+  const referrer = document.referrer || '/bible/';
+
+  // Extract book_code and chapter from referrer URL
+  const pathMatch = referrer.match(/\/bible\/([A-Z0-9]+)\/(\d+)\//);
+  const bookCode = pathMatch ? pathMatch[1] : 'GEN';
+  const chapter = pathMatch ? pathMatch[2] : '1';
+
+  // Save to localStorage
+  localStorage.setItem('ics_ui.bible_translation', translationCode);
+
+  // Navigate back to same passage with new translation
+  window.location.href = `/bible/${bookCode}/${chapter}/`;
+}
+</script>
+
+{% endblock %}

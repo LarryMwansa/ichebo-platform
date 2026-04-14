@@ -1,0 +1,268 @@
+{% extends "bible/base_bible_minimal.html" %}
+
+{% block title %}Select Passage{% endblock %}
+
+{% block content %}
+<div class="bible-picker-shell">
+
+  {# Header with back button #}
+  <div class="bible-picker-header">
+    <a href="{{ back_url }}" class="bible-picker-back" aria-label="Back">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <div class="bible-picker-title">Select Passage</div>
+    <div style="width: 24px;"></div> {# Spacer for centering #}
+  </div>
+
+  {# Picker steps #}
+  <div class="bible-picker-steps">
+
+    {# Step 1: Book Selection #}
+    <div class="bible-picker-step bible-picker-step--active" id="step-books">
+      <div class="bible-picker-step-label">Book</div>
+      <ul class="bible-picker-list">
+        {% for b in books %}
+        <li>
+          <button class="bible-picker-item {% if b.code == book.code %}bible-picker-item--active{% endif %}"
+                  onclick="selectBook('{{ b.code }}')">
+            {{ b.name }}
+          </button>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    {# Step 2: Chapter Selection #}
+    <div class="bible-picker-step" id="step-chapters">
+      <div class="bible-picker-step-label">
+        <button class="bible-picker-back-mini" onclick="goBack()">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        {{ book.name }}
+      </div>
+      <div class="bible-picker-chapter-grid">
+        {% for ch in chapters %}
+        <button class="bible-picker-item {% if ch == chapter %}bible-picker-item--active{% endif %}"
+                onclick="selectChapter({{ ch }})">
+          {{ ch }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  const currentBookCode = '{{ book.code }}';
+  const currentChapter = {{ chapter }};
+  const backUrl = '{{ back_url }}';
+
+  // Track currently selected book in picker
+  let selectedBookCode = currentBookCode;
+
+  const books = {
+    {% for b in books %}
+    '{{ b.code }}': '{{ b.name }}',
+    {% endfor %}
+  };
+
+  const bookChapters = {
+    {% for code, chaps in all_chapters.items %}
+    '{{ code }}': {{ chaps|safe }},
+    {% endfor %}
+  };
+
+  function selectBook(bookCode) {
+    // Store the selected book code
+    selectedBookCode = bookCode;
+    const stepBooks = document.getElementById('step-books');
+    const stepChapters = document.getElementById('step-chapters');
+    const label = stepChapters.querySelector('.bible-picker-step-label');
+    const grid = stepChapters.querySelector('.bible-picker-chapter-grid');
+
+    // Update label
+    label.innerHTML = `
+      <button class="bible-picker-back-mini" onclick="goBack()">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      ${books[bookCode]}
+    `;
+
+    // Update chapter grid
+    grid.innerHTML = '';
+    const chapters = bookChapters[bookCode] || [];
+    chapters.forEach(ch => {
+      const btn = document.createElement('button');
+      btn.className = 'bible-picker-item';
+      btn.textContent = ch;
+      btn.onclick = () => selectChapter(ch);
+      grid.appendChild(btn);
+    });
+
+    // Swap steps
+    stepBooks.classList.remove('bible-picker-step--active');
+    stepChapters.classList.add('bible-picker-step--active');
+  }
+
+  function selectChapter(chapter) {
+    // Use the book code stored when selectBook was called
+    const bookCode = selectedBookCode || currentBookCode;
+
+    // Navigate back to reader at this passage
+    window.location.href = `/bible/${bookCode}/${chapter}/`;
+  }
+
+  function goBack() {
+    const stepBooks = document.getElementById('step-books');
+    const stepChapters = document.getElementById('step-chapters');
+
+    stepChapters.classList.remove('bible-picker-step--active');
+    stepBooks.classList.add('bible-picker-step--active');
+  }
+</script>
+
+<style>
+  .bible-picker-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .bible-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    flex-shrink: 0;
+  }
+
+  .bible-picker-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .bible-picker-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--primary);
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .bible-picker-back:hover {
+    background: var(--hover);
+  }
+
+  .bible-picker-back-mini {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--primary);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border: none;
+    padding: 0;
+  }
+
+  .bible-picker-back-mini:hover {
+    background: var(--hover);
+  }
+
+  .bible-picker-steps {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bible-picker-step {
+    width: 100%;
+    padding: 20px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .bible-picker-step--active {
+    opacity: 1;
+    transform: translateX(0);
+    position: relative;
+  }
+
+  .bible-picker-step-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .bible-picker-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .bible-picker-list li {
+    padding: 0;
+    margin: 0;
+  }
+
+  .bible-picker-chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
+    gap: 8px;
+  }
+
+  .bible-picker-item {
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .bible-picker-item:hover {
+    background: var(--hover);
+    border-color: var(--primary);
+  }
+
+  .bible-picker-item--active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    font-weight: 600;
+  }
+</style>
+{% endblock %}

@@ -251,6 +251,132 @@ def htmx_save_note(request):
 
 
 @login_required
+def bible_search_view(request):
+    """
+    Full-page Bible search view.
+    Template handles HTMX search requests.
+    """
+    return render(request, 'bible/search.html')
+
+
+@login_required
+def htmx_search(request):
+    """
+    HTMX: search verses in real-time.
+    GET param: q (search query)
+    Returns list of matching verses.
+    """
+    from .models import BibleVerse
+
+    query = request.GET.get('q', '').strip()
+    results = []
+
+    if len(query) >= 2:
+        translation = get_user_translation(request.user)
+        results = BibleVerse.objects.filter(
+            text__icontains=query,
+            translation=translation
+        ).select_related('book')[:30]
+
+    return render(request, 'bible/_search_results.html', {
+        'results': results,
+        'query': query,
+    })
+
+
+@login_required
+def bible_picker_view(request):
+    """
+    Full-screen book/chapter/verse picker.
+    GET params: book_code, chapter, back (return URL)
+    Passes chapters for ALL books so picker can navigate without page reload.
+    """
+    back_url = request.GET.get('back', '/bible/')
+    book_code = request.GET.get('book_code', DEFAULT_BOOK)
+    try:
+        chapter = int(request.GET.get('chapter', DEFAULT_CHAPTER))
+    except (ValueError, TypeError):
+        chapter = DEFAULT_CHAPTER
+
+    books = get_all_books()
+    book = BibleBook.objects.filter(code=book_code).first()
+    chapters = get_book_chapters(book_code)
+
+    # Build chapters map for ALL books (so picker can navigate without reload)
+    all_chapters = {}
+    for b in books:
+        all_chapters[b.code] = list(get_book_chapters(b.code))
+
+    context = {
+        'books': books,
+        'book': book,
+        'chapter': chapter,
+        'chapters': list(chapters),
+        'all_chapters': all_chapters,  # NEW: pass all chapters for all books
+        'back_url': back_url,
+    }
+    return render(request, 'bible/picker.html', context)
+
+
+@login_required
+def bible_versions_view(request):
+    """
+    Bible versions list page.
+    Shows all available Bible translations grouped by language.
+    """
+    # Get user's current translation
+    current_translation = get_user_translation(request.user)
+
+    # Get all public translations
+    translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
+
+    # Group by language
+    versions_by_language = {}
+    for trans in translations:
+        lang = trans.language_full or 'Unknown'
+        if lang not in versions_by_language:
+            versions_by_language[lang] = []
+        versions_by_language[lang].append(trans)
+
+    context = {
+        'current_translation': current_translation,
+        'versions_by_language': versions_by_language,
+        'all_translations': translations,
+    }
+    return render(request, 'bible/versions.html', context)
+
+
+@login_required
+def bible_languages_view(request):
+    """
+    Bible languages list page.
+    Shows all unique languages with available translations.
+    """
+    # Get all public translations
+    translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
+
+    # Group by language and count
+    languages_data = {}
+    for trans in translations:
+        lang = trans.language_full or 'Unknown'
+        if lang not in languages_data:
+            languages_data[lang] = {
+                'name': lang,
+                'count': 0,
+                'short_code': trans.language,
+            }
+        languages_data[lang]['count'] += 1
+
+    # Sort by name
+    languages_list = sorted(languages_data.values(), key=lambda x: x['name'])
+
+    context = {
+        'languages': languages_list,
+    }
+    return render(request, 'bible/languages.html', context)
+
+
+@login_required
 def htmx_delete_note(request, note_id):
     """HTMX: soft-delete a note. Returns empty response to remove element."""
     if request.method != 'DELETE':

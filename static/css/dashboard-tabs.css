@@ -1,0 +1,123 @@
+/* =========================
+   DASHBOARD TABS (Scrollable Pills)
+========================= */
+
+.dashboard-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Hide scrollbar but keep scrolling functional */
+.dashboard-tabs::-webkit-scrollbar {
+    height: 4px;
+}
+
+.dashboard-tabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dashboard-tabs::-webkit-scrollbar-thumb {
+    background: var(--muted);
+    border-radius: 2px;
+}
+
+.dashboard-tabs::-webkit-scrollbar-thumb:hover {
+    background: var(--text);
+}
+
+/* Tab Pill */
+.dashboard-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: var(--card);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    text-decoration: none;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.dashboard-tab:hover {
+    background: var(--hover);
+    color: var(--text);
+    border-color: var(--primary);
+}
+
+/* Active Tab */
+.dashboard-tab.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    font-weight: 600;
+}
+
+/* Tab Icon (if present) */
+.dashboard-tab .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Right scroll indicator (optional, visual cue) */
+.dashboard-tabs::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(to right, transparent, var(--bg));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.dashboard-tabs.scrollable::after {
+    opacity: 1;
+}
+
+/* =========================
+   DASHBOARD CONTENT AREA
+========================= */
+
+.dashboard-content {
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tab Pane (shown/hidden) */
+.dashboard-pane {
+    display: none;
+}
+
+.dashboard-pane.active {
+    display: block;
+}

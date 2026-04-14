@@ -1,133 +1,323 @@
 {% extends "bible/base_bible.html" %}
+{% load static %}
 
 {% block title %}Bible · {{ book.name }} {{ chapter }}{% endblock %}
 
+{% block bible_topbar %}
+<!-- Bible app topbar: ICS logo | actions (versions, search, settings) -->
+<div class="bible-topbar">
+  <!-- Logo -->
+  <a href="{% url 'dashboard:index' %}" class="bible-topbar__logo" aria-label="ICS Home">
+    <svg class="logo" id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2559.19 1322.58">
+      <defs>
+        <style>
+          .cls-1 { fill-rule: evenodd; }
+          .cls-1, .cls-2 { fill: var(--text); }
+        </style>
+      </defs>
+      <polygon class="cls-1"
+        points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42" />
+      <path class="cls-2" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z" />
+      <path class="cls-2"
+        d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z" />
+      <path class="cls-2"
+        d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z" />
+    </svg>
+  </a>
+
+  <!-- Right-side actions: search, settings, version -->
+  <div class="bible-topbar__right">
+    <a href="{% url 'bible:search' %}" class="bible-topbar__action-btn" aria-label="Search" title="Search verses">
+      <span class="material-symbols-outlined">search</span>
+    </a>
+    <button class="bible-topbar__action-btn" onclick="window.ICSDrawer.open()" aria-label="Settings" title="Bible settings">
+      <span class="material-symbols-outlined">tune</span>
+    </button>
+    <a href="{% url 'bible:versions' %}" class="bible-topbar__version-btn" aria-label="Change Bible version" title="Change Bible version">
+      <span class="bible-topbar__version-code">{{ translation.code }}</span>
+    </a>
+  </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="bible-reader-shell">
-
-  <!-- Top bar: prev/book-chapter title/next -->
-  <div class="bible-topbar">
-    <button class="bible-topbar__nav-btn"
-            hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'-1' }}"
-            hx-target="#bible-chapter"
-            hx-swap="innerHTML"
-            aria-label="Previous chapter">&#8592;</button>
-
-    <button class="bible-topbar__title-btn"
-            aria-haspopup="dialog"
-            aria-controls="bible-navigator"
-            id="bible-navigator-toggle">
-      {{ book.name }} {{ chapter }}
-    </button>
-
-    <button class="bible-topbar__nav-btn"
-            hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ chapter|add:'1' }}"
-            hx-target="#bible-chapter"
-            hx-swap="innerHTML"
-            aria-label="Next chapter">&#8594;</button>
-  </div>
-
-  <!-- Translation selector row -->
-  <div class="bible-translation-row">
-    {% for t in translations %}
-    <button class="bible-translation-btn {% if t.id == translation.id %}bible-translation-btn--active{% endif %}"
-            hx-post="{% url 'bible:htmx-set-translation' %}"
-            hx-vals='{"translation_code": "{{ t.code }}", "book_code": "{{ book.code }}", "chapter": "{{ chapter }}"}'
-            hx-target="#bible-chapter"
-            hx-swap="innerHTML">
-      {{ t.code }}
-    </button>
-    {% endfor %}
-  </div>
-
   <!-- Chapter content (swapped by HTMX on navigation) -->
+  <!-- Title included in partial so it updates on nav -->
   <div id="bible-chapter"
        data-book-code="{{ book.code }}"
        data-chapter="{{ chapter }}">
     {% include "bible/_chapter.html" %}
   </div>
+</div>
+{% endblock %}
 
-  <!-- Annotation overlay + panel -->
-  <div id="bible-annotation-overlay"
-       class="sheet-overlay"
-       hidden
-       onclick="closeBiblePanel()"></div>
-  <div id="bible-annotation-panel"
-       class="sheet bible-annotation-panel"
-       role="dialog"
-       aria-modal="true"
-       aria-label="Verse note">
-    {# Populated by HTMX on verse tap #}
+{% block bible_nav_strip %}
+<!-- Chapter navigator: prev/chapter/next (sticky above bottom bar) -->
+<div class="bible-nav-strip">
+  <button class="bible-nav-strip__btn"
+          onclick="navChapter(-1)"
+          aria-label="Previous chapter">
+    <span class="material-symbols-outlined">chevron_left</span>
+  </button>
+
+  <a href="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}"
+     class="bible-nav-strip__chapter"
+     id="bible-nav-chapter-link">
+    {{ book.name }} {{ chapter }}
+  </a>
+
+  <button class="bible-nav-strip__btn"
+          onclick="navChapter(1)"
+          aria-label="Next chapter">
+    <span class="material-symbols-outlined">chevron_right</span>
+  </button>
+</div>
+
+<script>
+  // Handle chapter navigation - fetch content and swap manually
+  async function navChapter(offset) {
+    const chapterDiv = document.getElementById('bible-chapter');
+    const innerDiv = chapterDiv?.querySelector('[data-book-code]');
+
+    if (!innerDiv) {
+      console.warn('Could not find chapter data');
+      return;
+    }
+
+    const bookCode = innerDiv.dataset.bookCode || 'GEN';
+    const chapter = parseInt(innerDiv.dataset.chapter || '1');
+    const newChapter = chapter + offset;
+
+    try {
+      // Fetch the new chapter HTML
+      const response = await fetch(
+        `/bible/htmx/chapter/?book_code=${bookCode}&chapter=${newChapter}`
+      );
+
+      if (!response.ok) {
+        console.error('Failed to fetch chapter:', response.status);
+        return;
+      }
+
+      const html = await response.text();
+
+      // Replace the chapter content with innerHTML (equivalent to HTMX's innerHTML swap)
+      chapterDiv.innerHTML = html;
+
+      // Update the nav display after swap
+      updateNavDisplay();
+    } catch (error) {
+      console.error('Error navigating chapter:', error);
+    }
+  }
+
+  // Update nav strip display (chapter name and links) after swap
+  function updateNavDisplay() {
+    const chapterDiv = document.getElementById('bible-chapter');
+    const innerDiv = chapterDiv?.querySelector('[data-book-code]');
+
+    if (!innerDiv) {
+      console.warn('Could not find chapter data for display update');
+      return;
+    }
+
+    const bookCode = innerDiv.dataset.bookCode || 'GEN';
+    const chapter = parseInt(innerDiv.dataset.chapter || '1');
+    const title = document.querySelector('.bible-chapter-title');
+    const bookName = title?.textContent?.split(' ')[0] || 'Genesis';
+
+    console.log('Updating nav display:', { bookCode, chapter, bookName });
+
+    // Update chapter link
+    const link = document.getElementById('bible-nav-chapter-link');
+    if (link) {
+      link.textContent = `${bookName} ${chapter}`;
+      link.href = `/bible/pick/?book_code=${bookCode}&chapter=${chapter}&back=${window.location.pathname}`;
+    }
+  }
+</script>
+{% endblock %}
+
+{% block drawer_title %}Bible Settings{% endblock %}
+
+{% block drawer_content %}
+<!-- Bible Settings Panel -->
+<div class="bible-settings-panel">
+
+  <!-- Font Size Control -->
+  <div class="bible-settings-group">
+    <label class="bible-settings-label">Font Size</label>
+    <div class="bible-settings-font-size">
+      <button class="bible-settings-btn" id="decreaseFontBtn" aria-label="Decrease font size">
+        <span class="material-symbols-outlined">remove</span>
+      </button>
+      <div class="bible-settings-font-size-display" id="fontSizeDisplay">100%</div>
+      <button class="bible-settings-btn" id="increaseFontBtn" aria-label="Increase font size">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+    </div>
   </div>
 
-  <!-- Book/Chapter navigator (slide-up sheet) -->
-  <div id="bible-navigator" class="sheet bible-navigator" role="dialog" aria-modal="true" aria-label="Book and chapter navigator">
-    <div class="sheet__header">
-      <span class="sheet__title">Select Passage</span>
-      <button class="sheet__close-btn" id="bible-navigator-close" aria-label="Close">&#x2715;</button>
-    </div>
-    <div class="bible-navigator__body">
-      <div class="bible-navigator__books-col">
-        <p class="bible-navigator__col-label">Book</p>
-        <ul class="bible-nav__book-list" role="list">
-          {% for b in books %}
-          <li>
-            <button class="bible-nav__book-btn {% if b.code == book.code %}bible-nav__book-btn--active{% endif %}"
-                    hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ b.code }}&chapter=1"
-                    hx-target="#bible-chapter"
-                    hx-swap="innerHTML"
-                    data-close-nav="true">
-              {{ b.name }}
-            </button>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-      <div class="bible-navigator__chapters-col">
-        <p class="bible-navigator__col-label">Chapter</p>
-        <div class="bible-nav__chapter-grid">
-          {% for ch in chapters %}
-          <button class="bible-nav__chapter-btn {% if ch == chapter %}bible-nav__chapter-btn--active{% endif %}"
-                  hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ book.code }}&chapter={{ ch }}"
-                  hx-target="#bible-chapter"
-                  hx-swap="innerHTML"
-                  data-close-nav="true">
-            {{ ch }}
-          </button>
-          {% endfor %}
-        </div>
-      </div>
+  <!-- Font Family Control -->
+  <div class="bible-settings-group">
+    <label class="bible-settings-label">Font Family</label>
+    <select id="fontFamilySelect" class="bible-settings-select">
+      <option value="system">System (Default)</option>
+      <option value="serif">Serif</option>
+      <option value="sans-serif">Sans Serif</option>
+      <option value="monospace">Monospace</option>
+    </select>
+  </div>
+
+  <!-- Theme Control -->
+  <div class="bible-settings-group">
+    <label class="bible-settings-label">Theme</label>
+    <div class="bible-settings-theme">
+      <button class="bible-settings-theme-btn bible-settings-theme-btn--light" id="lightModeBtn" aria-label="Light mode" title="Light mode">
+        <span class="material-symbols-outlined">light_mode</span>
+      </button>
+      <button class="bible-settings-theme-btn bible-settings-theme-btn--dark" id="darkModeBtn" aria-label="Dark mode" title="Dark mode">
+        <span class="material-symbols-outlined">dark_mode</span>
+      </button>
     </div>
   </div>
 
 </div>
+{% endblock %}
 
+{% block extra_js %}
+<!-- Wire verse taps to drawer for notes -->
 <script>
-  const nav = document.getElementById('bible-navigator');
-  const overlay = document.getElementById('bible-annotation-overlay');
-  const panel = document.getElementById('bible-annotation-panel');
-
-  document.getElementById('bible-navigator-toggle').addEventListener('click', () => {
-    nav.classList.add('bible-navigator--open');
-  });
-  document.getElementById('bible-navigator-close').addEventListener('click', () => {
-    nav.classList.remove('bible-navigator--open');
-  });
-
-  document.querySelectorAll('[data-close-nav]').forEach(btn => {
-    btn.addEventListener('click', () => nav.classList.remove('bible-navigator--open'));
-  });
-
-  function closeBiblePanel() {
-    panel.classList.remove('bible-annotation-panel--open');
-    overlay.setAttribute('hidden', '');
-  }
-
-  document.body.addEventListener('htmx:afterSwap', (e) => {
-    if (e.detail.target.id === 'bible-annotation-panel') {
-      panel.classList.add('bible-annotation-panel--open');
-      overlay.removeAttribute('hidden');
+  document.body.addEventListener('htmx:beforeSwap', (e) => {
+    // When a verse note is fetched, set the drawer title and open it
+    if (e.detail.target.id === 'drawer') {
+      const drawer = document.getElementById('drawer');
+      if (drawer) {
+        const header = drawer.querySelector('.drawer-header');
+        if (header) {
+          const title = header.querySelector('.drawer-title');
+          if (title) {
+            title.textContent = 'Verse Note';
+          }
+        }
+      }
     }
   });
+
+  document.body.addEventListener('htmx:afterSwap', (e) => {
+    // After verse note content is loaded, open the drawer
+    if (e.detail.target.id === 'drawer') {
+      window.ICSDrawer?.open?.();
+    }
+  });
+</script>
+
+<!-- Bible Settings Controls -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ── Font Size Control ──────────────────────────────────────────────────
+  const MIN_FONT_SIZE = 80;
+  const MAX_FONT_SIZE = 150;
+  const STEP = 10;
+  const FONT_SIZE_KEY = 'ics_ui.bible_font_size';
+
+  let currentFontSize = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
+
+  const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+  const decreaseFontBtn = document.getElementById('decreaseFontBtn');
+  const increaseFontBtn = document.getElementById('increaseFontBtn');
+
+  function updateFontSize(size) {
+    currentFontSize = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, size));
+    ICSStorage.setUIState('bible_font_size', currentFontSize);
+    if (fontSizeDisplay) {
+      fontSizeDisplay.textContent = `${currentFontSize}%`;
+    }
+    // Apply to Bible content
+    const bibleChapter = document.getElementById('bible-chapter');
+    if (bibleChapter) {
+      bibleChapter.style.fontSize = `${currentFontSize / 100}em`;
+    }
+  }
+
+  // Initialize font size
+  updateFontSize(currentFontSize);
+
+  if (decreaseFontBtn) {
+    decreaseFontBtn.addEventListener('click', () => {
+      updateFontSize(currentFontSize - STEP);
+    });
+  }
+
+  if (increaseFontBtn) {
+    increaseFontBtn.addEventListener('click', () => {
+      updateFontSize(currentFontSize + STEP);
+    });
+  }
+
+  // ── Font Family Control ────────────────────────────────────────────────
+  const FONT_FAMILY_KEY = 'ics_ui.bible_font_family';
+  const fontFamilySelect = document.getElementById('fontFamilySelect');
+  const savedFontFamily = ICSStorage.getUIState('bible_font_family', 'system');
+
+  const fontFamilyMap = {
+    'system': 'inherit',
+    'serif': 'Georgia, "Times New Roman", serif',
+    'sans-serif': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    'monospace': '"Courier New", monospace'
+  };
+
+  function applyFontFamily(family) {
+    const bibleChapter = document.getElementById('bible-chapter');
+    if (bibleChapter) {
+      bibleChapter.style.fontFamily = fontFamilyMap[family] || 'inherit';
+    }
+    ICSStorage.setUIState('bible_font_family', family);
+  }
+
+  if (fontFamilySelect) {
+    fontFamilySelect.value = savedFontFamily;
+    fontFamilySelect.addEventListener('change', (e) => {
+      applyFontFamily(e.target.value);
+    });
+    // Apply on load
+    applyFontFamily(savedFontFamily);
+  }
+
+  // ── Theme Control ─────────────────────────────────────────────────────
+  const lightModeBtn = document.getElementById('lightModeBtn');
+  const darkModeBtn = document.getElementById('darkModeBtn');
+
+  function updateThemeUI() {
+    const currentTheme = ICSStorage.getTheme();
+    if (lightModeBtn && darkModeBtn) {
+      if (currentTheme === 'light') {
+        lightModeBtn.classList.add('active');
+        darkModeBtn.classList.remove('active');
+      } else {
+        darkModeBtn.classList.add('active');
+        lightModeBtn.classList.remove('active');
+      }
+    }
+  }
+
+  if (lightModeBtn) {
+    lightModeBtn.addEventListener('click', () => {
+      ICSStorage.setTheme('light');
+      updateThemeUI();
+    });
+  }
+
+  if (darkModeBtn) {
+    darkModeBtn.addEventListener('click', () => {
+      ICSStorage.setTheme('dark');
+      updateThemeUI();
+    });
+  }
+
+  // Initialize theme UI
+  updateThemeUI();
+});
 </script>
 {% endblock %}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Bible · ICS{% endblock %} — Integrated Community System</title>
+
+  {# Design system — load order is fixed; do not reorder #}
+  {# 1. Tokens #}
+  <link rel="stylesheet" href="/static/css/variables.css">
+  {# 2. Base reset + Google Fonts import #}
+  <link rel="stylesheet" href="/static/css/global.css">
+  {# 3. Shared utilities (layout, typography helpers) #}
+  <link rel="stylesheet" href="/static/css/main.css">
+  {# 4. Theme (dark mode overrides) #}
+  <link rel="stylesheet" href="/static/css/theme.css">
+  {# 5. Bible navigation chrome #}
+  <link rel="stylesheet" href="/static/css/app-drawer.css">
+  <link rel="stylesheet" href="/static/css/bottom_bar.css">
+  <link rel="stylesheet" href="/static/css/bible.css">
+
+  {# Material Symbols (M3) icons #}
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  {% block extra_css %}{% endblock %}
+
+  {# HTMX — must be present before body renders #}
+  <script src="/static/js/htmx.min.js" defer></script>
+
+  {# Theme init — must run before body renders to prevent flash #}
+  <script src="/static/js/storage.js"></script>
+</head>
+<body class="ics-shell" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+  {# Bible topbar — app-level chrome #}
+  {% block bible_topbar %}{% endblock %}
+
+  {# Context drawer (shared) #}
+  {% include "components/_app_drawer.html" %}
+
+  {# Main content area #}
+  <main id="main-content" class="ics-main" role="main">
+    <div id="toast-container" aria-live="polite"></div>
+    {% block content %}{% endblock %}
+  </main>
+
+  {# Bible chapter navigator — between content and bottom bar #}
+  {% block bible_nav_strip %}{% endblock %}
+
+  {# Bottom navigation (shared primary nav) #}
+  {% include "components/_bottom_nav.html" %}
+
+  {# CSRF wiring for HTMX state-mutating requests #}
+  <script>
+    document.addEventListener('htmx:configRequest', (e) => {
+      e.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+    });
+  </script>
+
+  {# Bible reader utilities: scroll-hide, bottom nav active state #}
+  <script src="/static/js/bible.js" defer></script>
+
+  {# Bible drawer control: provides window.ICSDrawer API #}
+  <script src="/static/js/bible-drawer.js" defer></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

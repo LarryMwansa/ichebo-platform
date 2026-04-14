@@ -3,53 +3,20 @@
 <!-- Overlay (click to close) -->
 <div id="overlay" class="overlay" aria-hidden="true"></div>
 
-<!-- Drawer -->
-<div id="drawer" class="drawer" role="dialog" aria-modal="true" aria-label="App menu">
+<!-- Drawer — Context Panel (reusable across pages) -->
+<div id="drawer" class="drawer" role="dialog" aria-modal="true" aria-label="Options">
 
   <div class="drawer-header">
-    <div class="drawer-title">Apps</div>
+    {# Dynamic title — pages can override via context #}
+    <div class="drawer-title">{% block drawer_title %}Options{% endblock %}</div>
     <button id="closeBtn" class="close-btn" aria-label="Close menu">&times;</button>
   </div>
 
   <div class="drawer-content">
-    <div class="app-grid" id="appGrid">
-
-      <a href="{% url 'bible:reader' %}" class="app">
-        <div class="app-icon">📖</div>
-        <div class="app-label">Bible</div>
-      </a>
-
-      <a href="{% url 'calendar:month' %}" class="app">
-        <div class="app-icon">📅</div>
-        <div class="app-label">Calendar</div>
-      </a>
-
-      <a href="#" class="app">
-        <div class="app-icon">✅</div>
-        <div class="app-label">Activity</div>
-      </a>
-
-      <a href="#" class="app">
-        <div class="app-icon">📝</div>
-        <div class="app-label">Records</div>
-      </a>
-
-      <a href="{% url 'learn:learn-home' %}" class="app">
-        <div class="app-icon">🏫</div>
-        <div class="app-label">Learn</div>
-      </a>
-
-      <a href="#" class="app">
-        <div class="app-icon">🎬</div>
-        <div class="app-label">Church Live</div>
-      </a>
-
-      <a href="{% url 'community:community-home' %}" class="app">
-        <div class="app-icon">👥</div>
-        <div class="app-label">Community</div>
-      </a>
-
-    </div>
+    {# Pages/views inject their own drawer content #}
+    {% block drawer_content %}
+    <!-- Default empty state — pages populate this block -->
+    {% endblock %}
   </div>
 
 </div>

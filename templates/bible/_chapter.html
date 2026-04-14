@@ -1,8 +1,13 @@
+<!-- Chapter header (included so it updates on navigation) -->
+<div class="bible-chapter-header">
+  <h1 class="bible-chapter-title">{{ book.name }} {{ chapter }}</h1>
+</div>
+
 <div data-book-code="{{ book.code }}" data-chapter="{{ chapter }}">
   {% for verse in verses %}
   <div class="bible-verse {% if verse.verse in personal_noted %}bible-verse--personal{% endif %} {% if verse.verse in tenant_noted %}bible-verse--tenant{% endif %}"
        hx-get="{% url 'bible:htmx-annotation-panel' verse.id %}"
-       hx-target="#bible-annotation-panel"
+       hx-target="#drawer .drawer-content"
        hx-swap="innerHTML"
        role="button"
        tabindex="0"

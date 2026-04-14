@@ -72,27 +72,3 @@
 }
 
 
-/* Center Button */
-.center-btn {
-    background: var(--text);
-    color: var(--card);
-
-    width: 56px;
-    height: 56px;
-
-    border-radius: 50%;
-    transform: translateY(-20%);
-
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    box-shadow: 0 6px 16px var(--shadow);
-}
-
-.center-btn:active {
-    transform: translateY(-20%) scale(0.9);
-    box-shadow: 0 4px 10px var(--shadow);
-}

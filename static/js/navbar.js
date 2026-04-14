@@ -9,7 +9,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // ── Elements ──────────────────────────────────────────────────────────────
-  const drawerToggle  = document.getElementById('drawerToggle');
   const closeBtn      = document.getElementById('closeBtn');
   const drawer        = document.getElementById('drawer');
   const overlay       = document.getElementById('overlay');
@@ -33,10 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.classList.remove('active');
     drawerToggle && drawerToggle.setAttribute('aria-expanded', 'false');
   }
-
-  drawerToggle && drawerToggle.addEventListener('click', () => {
-    drawer.classList.contains('active') ? closeDrawer() : openDrawer();
-  });
 
   closeBtn && closeBtn.addEventListener('click', closeDrawer);
   overlay  && overlay.addEventListener('click', () => {
@@ -105,5 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const isDark = document.body.classList.contains('dark');
     applyTheme(isDark ? 'light' : 'dark');
   });
+
+  // ── Drawer API (for pages to open drawer programmatically) ──────────────────
+  // Pages can call window.ICSDrawer.open() to open the drawer
+  window.ICSDrawer = {
+    open: openDrawer,
+    close: closeDrawer
+  };
 
 });

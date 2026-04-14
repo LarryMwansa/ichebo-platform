@@ -1,0 +1,85 @@
+{# Search results partial (populated by HTMX) #}
+
+{% if results %}
+<ul class="bible-search-results-list">
+  {% for verse in results %}
+  <li>
+    <a href="{% url 'bible:reader-chapter' verse.book.code verse.chapter %}" class="bible-search-result-item">
+      <div class="bible-search-result-header">
+        <span class="bible-search-result-ref">{{ verse.book.name }} {{ verse.chapter }}:{{ verse.verse }}</span>
+      </div>
+      <div class="bible-search-result-text">{{ verse.text|truncatewords:20 }}</div>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% elif query %}
+<div class="bible-search-no-results">
+  <p>No verses found for "{{ query }}"</p>
+</div>
+{% else %}
+<div class="bible-search-empty">
+  <span class="material-symbols-outlined">search</span>
+  <p>Type to search verses</p>
+</div>
+{% endif %}
+
+<style>
+  .bible-search-results-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .bible-search-result-item {
+    display: block;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    color: inherit;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  .bible-search-result-item:hover {
+    background: var(--hover);
+  }
+
+  .bible-search-result-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .bible-search-result-ref {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .bible-search-result-text {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .bible-search-no-results {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .bible-search-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 12px;
+    color: var(--muted);
+  }
+
+  .bible-search-empty .material-symbols-outlined {
+    font-size: 48px;
+    opacity: 0.5;
+  }
+</style>
