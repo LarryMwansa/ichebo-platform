@@ -1,6 +1,6 @@
 <!-- _display_name_edit.html — inline edit form for display name -->
 <form class="inline-edit-form"
-      hx-patch="{% url 'htmx-display-name' %}"
+      hx-post="{% url 'htmx-display-name' %}"
       hx-target="#display-name-field"
       hx-swap="innerHTML">
   {% csrf_token %}

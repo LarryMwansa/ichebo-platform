@@ -151,7 +151,7 @@ class SettingsView(LoginRequiredMixin, View):
 def htmx_display_name_edit(request):
     """
     GET  → return inline edit form (pencil click)
-    PATCH → save and return read-state partial
+    POST → save display_name and return read-state partial
     """
     if request.method == 'GET':
         # Cancel button also hits GET — if ?show=1 return the read view
@@ -162,7 +162,8 @@ def htmx_display_name_edit(request):
         return render(request, 'accounts/_display_name_edit.html', {
             'profile_user': request.user,
         })
-    # PATCH
+    if request.method != 'POST':
+        return HttpResponse(status=405)
     display_name = request.POST.get('display_name', '').strip()
     if display_name:
         request.user.display_name = display_name
