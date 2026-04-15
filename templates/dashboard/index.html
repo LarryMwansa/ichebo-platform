@@ -9,7 +9,7 @@
 
 {% block content %}
 
-{# ── Dashboard Tabs (scrollable pills) ──────────────────────────────────────── #}
+{# Dashboard Tabs (scrollable pills) #}
 <div class="dashboard-tabs">
   <a href="#overview" class="dashboard-tab active" data-tab="overview">
     <span class="material-symbols-outlined">dashboard</span>
@@ -29,14 +29,14 @@
   </a>
 </div>
 
-{# ── Tab Content ────────────────────────────────────────────────────────────── #}
+{# Tab Content #}
 <div class="dashboard-content">
 
-  {# ── Overview Tab (default) ──────────────────────────────────────────────── #}
+  {# Overview Tab (default) #}
   <div id="overview" class="dashboard-pane active">
     <div class="dashboard">
 
-  {# ── Header ──────────────────────────────────────────────────────────── #}
+  {# Header #}
   <div class="dash-header">
     <div class="dash-greeting">
       <span class="dash-name">{{ user.display_name|default:user.email }}</span>
@@ -45,7 +45,7 @@
     <div class="dash-date">{{ digest.generated_at|slice:":10" }}</div>
   </div>
 
-  {# ── Today's Focus (all users) ───────────────────────────────────────── #}
+  {# Today's Focus (all users) #}
   <div class="dash-widget dash-widget--prompt">
     <div class="dash-widget__label">Today's Focus</div>
     <blockquote class="dash-prompt">{{ digest.discipline_prompt }}</blockquote>
@@ -56,7 +56,7 @@
 
   {% if digest.competence_level >= 1 %}
 
-  {# ── Activity Summary ────────────────────────────────────────────────── #}
+  {# Activity Summary #}
   <div class="dash-row">
 
     <div class="dash-widget dash-widget--stat
@@ -86,7 +86,7 @@
 
   </div>
 
-  {# ── Due Today ───────────────────────────────────────────────────────── #}
+  {# Due Today #}
   {% if digest.due_today %}
   <div class="dash-widget">
     <div class="dash-widget__label">Due Today</div>
@@ -106,7 +106,7 @@
   </div>
   {% endif %}
 
-  {# ── Overdue Items ───────────────────────────────────────────────────── #}
+  {# Overdue Items #}
   {% if digest.overdue_items %}
   <div class="dash-widget dash-widget--danger">
     <div class="dash-widget__label">Overdue</div>
@@ -126,7 +126,7 @@
   </div>
   {% endif %}
 
-  {# ── Reminders ───────────────────────────────────────────────────────── #}
+  {# Reminders #}
   {% if digest.pending_reminders %}
   <div class="dash-widget">
     <div class="dash-widget__label">Upcoming Reminders</div>
@@ -144,7 +144,7 @@
   </div>
   {% endif %}
 
-  {# ── Habit Streaks ───────────────────────────────────────────────────── #}
+  {# Habit Streaks #}
   {% if digest.habit_streaks %}
   <div class="dash-widget">
     <div class="dash-widget__label">Habit Streaks</div>
@@ -159,7 +159,7 @@
   </div>
   {% endif %}
 
-  {# ── Learning ────────────────────────────────────────────────────────── #}
+  {# Learning #}
   {% if digest.next_lesson or digest.active_enrolments %}
   <div class="dash-widget">
     <div class="dash-widget__label">Learning</div>
@@ -188,7 +188,7 @@
   </div>
   {% endif %}
 
-  {# ── Daily Activity Report ───────────────────────────────────────────── #}
+  {# Daily Activity Report #}
   <div class="dash-widget dash-widget--dar">
     <div class="dash-widget__label">Daily Activity Report</div>
     {% if digest.dar_today %}
@@ -197,11 +197,11 @@
     </a>
     {% else %}
     <p class="dash-dar-empty">No DAR written yet today.</p>
-    <a class="dash-dar-cta" href="/records/">Write today's DAR →</a>
+    <a class="dash-dar-cta" href="/records/">Write today's DAR &rarr;</a>
     {% endif %}
   </div>
 
-  {# ── Team Overview (Level 3+) ────────────────────────────────────────── #}
+  {# Team Overview (Level 3+) #}
   {% if digest.competence_level >= 3 and digest.team_pending_count is not None %}
   <div class="dash-widget dash-widget--team-overview">
     <div class="dash-widget__label">Team Overview</div>
@@ -219,7 +219,7 @@
   {% endif %}
 
   {% else %}
-  {# ── Seeker (Level 0) state ──────────────────────────────────────────── #}
+  {# Seeker (Level 0) state #}
   <div class="dash-widget dash-seeker-gate">
     <p>Your journey begins here. Connect with a steward to join a community.</p>
   </div>
@@ -228,27 +228,98 @@
     </div>
   </div>
 
-  {# ── Governance Tab ──────────────────────────────────────────────────────── #}
-  <div id="governance" class="dashboard-pane">
-    <div class="dash-widget">
-      <div class="dash-widget__label">Governance</div>
-      <p>Governance records and documentation will appear here.</p>
+  {# Governance Tab — HTMX lazy-load on first tab activate #}
+  <div id="governance" class="dashboard-pane"
+       hx-get="{% url 'dashboard:htmx-governance' %}"
+       hx-trigger="tabActivated once"
+       hx-target="this"
+       hx-swap="innerHTML">
+    <div class="dash-loading">
+      <span class="dash-loading__text">Loading&hellip;</span>
     </div>
   </div>
 
-  {# ── Calendar Tab ────────────────────────────────────────────────────────── #}
+  {# Calendar Tab — inline from digest data (no extra round-trip) #}
   <div id="calendar" class="dashboard-pane">
+    {% if digest.competence_level >= 1 %}
+
+    {% if digest.due_today %}
     <div class="dash-widget">
-      <div class="dash-widget__label">Calendar</div>
-      <p>Calendar view and upcoming events will appear here.</p>
+      <div class="dash-widget__label">Due Today</div>
+      <ul class="dash-list">
+        {% for item in digest.due_today %}
+        <li class="dash-list__item">
+          <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}">
+            {{ item.activity_type|slice:":3"|upper }}
+          </span>
+          <span class="dash-list__title">{{ item.title }}</span>
+          {% if item.due_at %}
+          <span class="dash-list__time">{{ item.due_at|slice:"11:16" }}</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
     </div>
+    {% endif %}
+
+    {% if digest.overdue_items %}
+    <div class="dash-widget dash-widget--danger">
+      <div class="dash-widget__label">Overdue</div>
+      <ul class="dash-list">
+        {% for item in digest.overdue_items %}
+        <li class="dash-list__item">
+          <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}">
+            {{ item.activity_type|slice:":3"|upper }}
+          </span>
+          <span class="dash-list__title">{{ item.title }}</span>
+          {% if item.due_at %}
+          <span class="dash-list__time dash-list__time--late">{{ item.due_at|slice:":10" }}</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if digest.pending_reminders %}
+    <div class="dash-widget">
+      <div class="dash-widget__label">Upcoming Reminders</div>
+      <ul class="dash-list">
+        {% for r in digest.pending_reminders %}
+        <li class="dash-list__item">
+          <span class="dash-list__badge dash-list__badge--reminder">REM</span>
+          <span class="dash-list__title">{{ r.title }}</span>
+          {% if r.due_at %}
+          <span class="dash-list__time">{{ r.due_at|slice:"11:16" }}</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if not digest.due_today and not digest.overdue_items and not digest.pending_reminders %}
+    <div class="dash-widget">
+      <p class="dash-empty">Nothing scheduled for today.</p>
+      <a href="{% url 'activity:activity-home' %}" class="dash-cta">View all activities &rarr;</a>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="dash-widget dash-seeker-gate">
+      <p>Connect with a steward to join a community and track your activities.</p>
+    </div>
+    {% endif %}
   </div>
 
-  {# ── Records Tab ─────────────────────────────────────────────────────────── #}
-  <div id="records" class="dashboard-pane">
-    <div class="dash-widget">
-      <div class="dash-widget__label">Records</div>
-      <p>Your records will appear here.</p>
+  {# Records Tab — HTMX lazy-load on first tab activate #}
+  <div id="records" class="dashboard-pane"
+       hx-get="{% url 'dashboard:htmx-records' %}"
+       hx-trigger="tabActivated once"
+       hx-target="this"
+       hx-swap="innerHTML">
+    <div class="dash-loading">
+      <span class="dash-loading__text">Loading&hellip;</span>
     </div>
   </div>
 

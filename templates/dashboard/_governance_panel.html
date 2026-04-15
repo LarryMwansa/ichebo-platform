@@ -1,0 +1,49 @@
+{% if locked %}
+<div class="dash-widget dash-gate">
+  <div class="dash-widget__label">Governance</div>
+  <p>Governance records are available to Functional Ministers (Level 3+).</p>
+  <p class="dash-gate__level">Your current level: {{ level }}</p>
+</div>
+{% else %}
+
+<div class="dash-widget">
+  <div class="dash-widget__label">Quick Access</div>
+  <div class="dash-gov-links">
+    <a href="{% url 'governance:reference-home' %}" class="dash-gov-link">
+      <span class="material-symbols-outlined">library_books</span>
+      Reference Library
+    </a>
+    <a href="{% url 'governance:mandate-home' %}" class="dash-gov-link">
+      <span class="material-symbols-outlined">gavel</span>
+      Mandate
+    </a>
+    <a href="{% url 'governance:keys-list' %}" class="dash-gov-link">
+      <span class="material-symbols-outlined">key</span>
+      My Keys
+    </a>
+  </div>
+</div>
+
+{% if recent_docs %}
+<div class="dash-widget">
+  <div class="dash-widget__label">Recent Documents</div>
+  <ul class="dash-list">
+    {% for item in recent_docs %}
+    <li class="dash-list__item">
+      <span class="dash-list__badge dash-list__badge--{{ item.record.record_type }}">
+        {{ item.record.record_type|slice:":3"|upper }}
+      </span>
+      <a class="dash-list__title" href="{{ item.url }}">{{ item.record.title }}</a>
+      <span class="dash-list__time">{{ item.record.updated_at|slice:":10" }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% else %}
+<div class="dash-widget">
+  <p class="dash-empty">No governance documents yet.</p>
+  <a href="{% url 'governance:home' %}" class="dash-cta">Open Governance →</a>
+</div>
+{% endif %}
+
+{% endif %}

@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const pane = document.getElementById(tabId);
       if (pane) {
         pane.classList.add('active');
+        // Fire tabActivated so HTMX lazy-load partials can trigger once
+        if (typeof htmx !== 'undefined') {
+          htmx.trigger(pane, 'tabActivated');
+        }
       }
 
       // Scroll tab into view

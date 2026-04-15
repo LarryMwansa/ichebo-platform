@@ -1,0 +1,24 @@
+{% if records %}
+<div class="dash-widget">
+  <div class="dash-widget__label">Recent Journal Entries</div>
+  <ul class="dash-list">
+    {% for rec in records %}
+    <li class="dash-list__item">
+      <span class="dash-list__badge dash-list__badge--{{ rec.record_type }}">
+        {{ rec.record_type|slice:":3"|upper }}
+      </span>
+      <a class="dash-list__title" href="/records/{{ rec.id }}/">{{ rec.title }}</a>
+      <span class="dash-list__time">{{ rec.updated_at|slice:":10" }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% else %}
+<div class="dash-widget">
+  <p class="dash-empty">No journal entries yet.</p>
+</div>
+{% endif %}
+
+<div class="dash-widget">
+  <a href="/records/" class="dash-cta">All Records →</a>
+</div>
