@@ -38,4 +38,9 @@ urlpatterns = [
 
     # ── Relationship create ──────────────────────────────────────────────────
     path('governance/htmx/relationship/create/', views.htmx_relationship_create, name='htmx-relationship-create'),
+
+    # ── Navigation list partials + journal search ────────────────────────────
+    path('governance/htmx/reference/list/', views.htmx_reference_list, name='htmx-reference-list'),
+    path('governance/htmx/mandate/list/', views.htmx_mandate_list, name='htmx-mandate-list'),
+    path('governance/htmx/journal/search/', views.htmx_journal_search, name='htmx-journal-search'),
 ]

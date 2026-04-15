@@ -292,7 +292,7 @@ def htmx_record_create(request):
 
         rtype = record.record_type
         if rtype in LIBRARY_TYPES:
-            return redirect('governance:library-detail', record_id=record.id)
+            return redirect('governance:reference-detail', record_id=record.id)
         return redirect('governance:mandate-detail', record_id=record.id)
 
     # GET — return the create form
@@ -344,7 +344,7 @@ def htmx_record_edit(request, record_id):
         record.custom_fields = custom_fields
         record.save()
 
-        return redirect('governance:library-detail', record_id=record.id) \
+        return redirect('governance:reference-detail', record_id=record.id) \
             if record.record_type in LIBRARY_TYPES \
             else redirect('governance:mandate-detail', record_id=record.id)
 
@@ -412,9 +412,9 @@ def htmx_record_supersede(request, record_id):
 
     # Redirect to new draft
     if new_record.record_type in LIBRARY_TYPES:
-        redirect_url = f'/governance/library/record/{new_record.id}/'
+        redirect_url = f'/governance/reference/{new_record.id}/'
     else:
-        redirect_url = f'/governance/mandate/record/{new_record.id}/'
+        redirect_url = f'/governance/mandate/{new_record.id}/'
 
     return HttpResponse(
         status=204,
@@ -462,4 +462,50 @@ def htmx_relationship_create(request):
         'grouped':            grouped,
         'relationship_types': RELATIONSHIP_TYPES,
         'is_level5':          True,
+    })
+
+
+# ── HTMX navigation list partials ─────────────────────────────────────────────
+
+@login_required
+def htmx_reference_list(request):
+    """HTMX GET: reference library type-selector panel (embed in dashboard etc.)."""
+    if _level(request.user) < 3:
+        return HttpResponse('')
+    return render(request, 'governance/_reference_type_list.html', {
+        'library_types': LIBRARY_TYPE_LABELS,
+    })
+
+
+@login_required
+def htmx_mandate_list(request):
+    """HTMX GET: mandate branch type-selector panel (embed in dashboard etc.)."""
+    if _level(request.user) < 4:
+        return HttpResponse('')
+    return render(request, 'governance/_mandate_type_list.html', {
+        'mandate_types': MANDATE_TYPE_LABELS,
+    })
+
+
+@login_required
+def htmx_journal_search(request):
+    """HTMX GET: journal record typeahead (?q=). Returns matching record list."""
+    if _level(request.user) < 3:
+        return HttpResponse('')
+
+    from records.models import Record as Rec
+    q = request.GET.get('q', '').strip()
+    if not q or len(q) < 2:
+        return HttpResponse('<div class="gov-journal-results"></div>')
+
+    results = Rec.objects.filter(
+        created_by=request.user,
+        record_family='journal',
+        deleted_at__isnull=True,
+        title__icontains=q,
+    ).order_by('-updated_at')[:10]
+
+    return render(request, 'governance/_journal_results.html', {
+        'results': results,
+        'query':   q,
     })

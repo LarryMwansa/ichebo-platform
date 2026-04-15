@@ -1,0 +1,29 @@
+<div class="activity-card" id="activity-{{ activity.id }}">
+  <div class="activity-card-body">
+    <span class="activity-type-tag activity-type-tag--{{ activity.activity_type }}">
+      {{ activity.activity_type|title }}
+    </span>
+    <span class="activity-title">{{ activity.title }}</span>
+    {% if activity.due_at %}
+    <span class="activity-due {% if activity.due_at < now %}activity-due--overdue{% endif %}">
+      {{ activity.due_at|date:"d M" }}
+    </span>
+    {% endif %}
+    {% if activity.kgs_pathway %}
+    <span class="activity-pathway">{{ activity.kgs_pathway|title }}</span>
+    {% endif %}
+  </div>
+  <div class="activity-card-actions">
+    {% if activity.progress and activity.progress > 0 and activity.progress < 100 %}
+    <div class="progress-bar-wrap" style="width:80px">
+      <div class="progress-bar" style="width:{{ activity.progress }}%"></div>
+    </div>
+    {% endif %}
+    <button class="btn-primary btn-sm"
+            hx-post="{% url 'activity:htmx-complete' activity.id %}"
+            hx-target="#activity-{{ activity.id }}"
+            hx-swap="outerHTML">
+      Done
+    </button>
+  </div>
+</div>

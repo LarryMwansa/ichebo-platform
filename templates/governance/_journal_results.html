@@ -1,0 +1,14 @@
+<div class="gov-journal-results">
+  {% for record in results %}
+  <div class="gov-journal-result"
+       data-id="{{ record.id }}"
+       data-title="{{ record.title }}"
+       hx-on:click="document.getElementById('journal-link-input').value='{{ record.id }}';
+                    document.getElementById('journal-link-label').textContent='{{ record.title|escapejs }}';">
+    <span class="gov-record-title">{{ record.title }}</span>
+    <span class="gov-record-meta">{{ record.created_at|date:"d M Y" }}</span>
+  </div>
+  {% empty %}
+  <div class="gov-empty">No journal records match "{{ query }}".</div>
+  {% endfor %}
+</div>

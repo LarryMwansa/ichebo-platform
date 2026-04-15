@@ -255,18 +255,20 @@ def _populate_reminders(digest, user, now):
 # ---------------------------------------------------------------------------
 
 def _populate_learn(digest, user):
-    from records.models import Record
+    from records.models import Record, Relationship
     from activity.models import Activity
 
-    # Active enrolment activities (programme-level, in_progress)
+    # Programme enrolments (in_progress or pending)
     enrolments = Activity.objects.filter(
         deleted_at__isnull=True,
-        created_by=user,
+        assigned_to=user,
+        activity_type='programme',
         metadata__source_app='learn',
-        status='in_progress',
-    )
+        status__in=['pending', 'in_progress'],
+    ).order_by('-updated_at')
 
     cards = []
+    first_programme = None
     for enr in enrolments:
         prog_id = enr.metadata.get('programme_record_id')
         if not prog_id:
@@ -278,34 +280,47 @@ def _populate_learn(digest, user):
                 title=rec.title,
                 progress=enr.progress,
             ))
+            if first_programme is None:
+                first_programme = rec
         except Record.DoesNotExist:
             pass
 
     digest.active_enrolments = cards
 
-    # Next lesson: most recently updated incomplete lesson task
-    next_task = Activity.objects.filter(
-        deleted_at__isnull=True,
-        created_by=user,
-        metadata__source_app='learn',
-        activity_type='task',
-        status__in=['pending', 'in_progress'],
-    ).order_by('-updated_at').first()
+    if first_programme is None:
+        return
 
-    if next_task:
-        lesson_id = next_task.metadata.get('lesson_record_id')
-        prog_title = next_task.metadata.get('programme_title', '')
-        if lesson_id:
-            try:
-                lesson = Record.objects.get(id=lesson_id)
+    # Next lesson: first uncompleted lesson in the learner's most recent active programme
+    completed_lesson_ids = set(
+        Activity.objects.filter(
+            assigned_to=user,
+            activity_type='lesson',
+            status='completed',
+        ).values_list('metadata__lesson_record_id', flat=True)
+    )
+
+    course_ids = Relationship.objects.filter(
+        to_record_id=first_programme.id,
+        relationship_type='part_of',
+    ).values_list('from_record_id', flat=True)
+
+    for course_id in course_ids:
+        lesson_rels = (
+            Relationship.objects
+            .filter(to_record_id=course_id, relationship_type='part_of')
+            .select_related('from_record')
+            .order_by('from_record__created_at')
+        )
+        for rel in lesson_rels:
+            if str(rel.from_record_id) not in completed_lesson_ids:
+                lesson = rel.from_record
                 digest.next_lesson = LessonCard(
                     record_id=str(lesson.id),
                     title=lesson.title,
-                    programme_title=prog_title,
+                    programme_title=first_programme.title,
                     url=f'/learn/lesson/{lesson.id}/',
                 )
-            except Record.DoesNotExist:
-                pass
+                return
 
 
 # ---------------------------------------------------------------------------

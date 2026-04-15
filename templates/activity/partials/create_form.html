@@ -1,0 +1,46 @@
+<form class="activity-create-form"
+      hx-post="{% url 'activity:htmx-create' %}"
+      hx-target="#activity-create-panel"
+      hx-swap="beforebegin"
+      hx-on::after-request="this.reset()">
+  {% csrf_token %}
+
+  <div class="form-row">
+    <select name="activity_type" class="form-input">
+      {% for slug in all_types %}
+      <option value="{{ slug }}">{{ type_labels|dict_key:slug|default:slug|title }}</option>
+      {% endfor %}
+    </select>
+    <input type="text" name="title" placeholder="Activity title…"
+           class="form-input form-input--grow" required>
+  </div>
+
+  <div class="form-row">
+    <input type="date" name="due_at" class="form-input" placeholder="Due date (optional)">
+    <select name="recurrence" class="form-input">
+      <option value="none">No recurrence</option>
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+      <option value="monthly">Monthly</option>
+    </select>
+    <select name="kgs_pathway" class="form-input">
+      <option value="">Pathway (optional)</option>
+      <option value="new_life">New Life</option>
+      <option value="spiritual_formation">Spiritual Formation</option>
+      <option value="community_life">Community Life</option>
+      <option value="service">Service</option>
+      <option value="leadership">Leadership</option>
+      <option value="learning">Learning</option>
+      <option value="mission">Mission</option>
+      <option value="apostolic_stewardship">Apostolic Stewardship</option>
+    </select>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn-primary">Create</button>
+    <button type="button" class="btn-secondary"
+            hx-get="" hx-target="#activity-create-panel" hx-swap="innerHTML">
+      Cancel
+    </button>
+  </div>
+</form>

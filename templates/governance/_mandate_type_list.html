@@ -1,0 +1,20 @@
+<div class="gov-branch-card">
+  <div class="gov-branch-label">Mandate</div>
+  <div class="gov-type-list">
+    {% for slug, label in mandate_types.items %}
+    <a href="{% url 'governance:mandate-list' slug %}"
+       class="gov-type-pill"
+       hx-get="{% url 'governance:mandate-list' slug %}"
+       hx-target="#governance-content"
+       hx-push-url="true">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+  <a href="{% url 'governance:mandate-home' %}" class="gov-action-btn"
+     hx-get="{% url 'governance:mandate-home' %}"
+     hx-target="#governance-content"
+     hx-push-url="true">
+    Open Mandate →
+  </a>
+</div>

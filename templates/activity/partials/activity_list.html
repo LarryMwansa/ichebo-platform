@@ -1,0 +1,5 @@
+{% for activity in activities %}
+  {% include "activity/partials/activity_card.html" %}
+{% empty %}
+<div class="empty-state">No activities found.</div>
+{% endfor %}

@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/', include('tenants.urls')),
     path('api/', include('records.urls')),
     path('api/', include('activity.urls')),
+    path('activity/', include('activity.template_urls', namespace='activity')),
     path('api/bible/', include('bible.api_urls')),
     path('api/community/', include('community.api_urls', namespace='community-api')),
     path('bible/', include('bible.urls', namespace='bible')),

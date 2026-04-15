@@ -1,0 +1,75 @@
+{% extends "activity/base_activity.html" %}
+
+{% block activity_content %}
+
+<div class="activity-header">
+  <h1>My Activities</h1>
+  <button class="btn-primary"
+          hx-get="{% url 'activity:htmx-create' %}"
+          hx-target="#activity-create-panel"
+          hx-swap="innerHTML">
+    + New
+  </button>
+</div>
+
+<!-- Inline create form panel -->
+<div id="activity-create-panel"></div>
+
+<!-- Type filter pills -->
+<div class="activity-filter-row">
+  <a href="{% url 'activity:activity-home' %}"
+     class="activity-type-pill {% if not active_type %}activity-type-pill--active{% endif %}">
+    All
+  </a>
+  {% for slug in all_types %}
+  <a href="{% url 'activity:activity-home' %}?type={{ slug }}"
+     class="activity-type-pill {% if active_type == slug %}activity-type-pill--active{% endif %}">
+    {{ type_labels|dict_key:slug|default:slug|title }}
+  </a>
+  {% endfor %}
+</div>
+
+<!-- Overdue -->
+{% if overdue %}
+<div class="activity-group">
+  <div class="activity-group-label activity-group-label--overdue">Overdue</div>
+  {% for activity in overdue %}
+    {% include "activity/partials/activity_card.html" %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Due Today -->
+{% if due_today %}
+<div class="activity-group">
+  <div class="activity-group-label">Due Today</div>
+  {% for activity in due_today %}
+    {% include "activity/partials/activity_card.html" %}
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Upcoming -->
+{% if upcoming %}
+<div class="activity-group">
+  <div class="activity-group-label">Upcoming</div>
+  {% for activity in upcoming %}
+    {% include "activity/partials/activity_card.html" %}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if not overdue and not due_today and not upcoming %}
+<div class="empty-state">
+  <p>No activities yet.
+    <button class="btn-primary"
+            hx-get="{% url 'activity:htmx-create' %}"
+            hx-target="#activity-create-panel"
+            hx-swap="innerHTML">
+      Create your first activity
+    </button>
+  </p>
+</div>
+{% endif %}
+
+{% endblock %}
