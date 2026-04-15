@@ -7,14 +7,16 @@ urlpatterns = [
     # ── My Community surface ─────────────────────────────────────────────────
     path('community/', views.my_community, name='community-home'),
     path('community/gatherings/', views.gatherings_list, name='community-gatherings'),
-    path('community/<uuid:record_id>/', views.community_detail, name='community-detail'),
 
-    # ── Management surface (Level 3+) ────────────────────────────────────────
+    # ── Steward management surface (Level 3+) — flat URLs ────────────────────
     path('community/management/', views.management_home, name='community-management'),
-    path('community/management/members/', views.member_directory, name='community-members'),
-    path('community/management/members/<uuid:member_id>/',
+    path('community/members/', views.member_directory, name='community-members'),
+    path('community/members/<uuid:member_id>/',
          views.member_profile, name='community-member-profile'),
-    path('community/management/pipeline/', views.formation_pipeline, name='community-pipeline'),
+    path('community/pipeline/', views.formation_pipeline, name='community-pipeline'),
+
+    # ── Detail — must come after all fixed-string paths ──────────────────────
+    path('community/<uuid:record_id>/', views.community_detail, name='community-detail'),
 
     # ── HTMX partials ────────────────────────────────────────────────────────
     path('community/htmx/announcement/create/',
