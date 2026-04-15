@@ -380,11 +380,18 @@ def _recalculate_programme_progress(user, lesson_id):
     completed_count = len(lesson_ids & completed_ids)
     progress = int((completed_count / len(lesson_ids)) * 100)
 
-    Activity.objects.filter(
+    # Use .save() (not .update()) so post_save signals fire — the
+    # auto-certification signal depends on seeing the updated progress value.
+    programme_activity = Activity.objects.filter(
         activity_type='programme',
         assigned_to=user,
         metadata__programme_record_id=str(programme_id),
-    ).update(progress=progress)
+    ).first()
+    if programme_activity:
+        programme_activity.progress = progress
+        if progress >= 100:
+            programme_activity.status = 'completed'
+        programme_activity.save(update_fields=['progress', 'status'])
 
 
 @login_required
