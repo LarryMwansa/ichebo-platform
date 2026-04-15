@@ -1,0 +1,40 @@
+{% if pending_certifications %}
+  {% for cert in pending_certifications %}
+  <div class="enrolment-card awaiting-cert">
+    <div class="enrolment-title">{{ cert.title }}</div>
+    <span class="cert-pending-badge">Awaiting Steward Confirmation</span>
+  </div>
+  {% endfor %}
+{% endif %}
+
+{% if enrolments %}
+  {% for enrolment in enrolments %}
+  <div class="enrolment-card">
+    <div class="enrolment-title">{{ enrolment.title }}</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" style="width:{{ enrolment.progress|default:0 }}%"></div>
+    </div>
+    <span class="progress-label">{{ enrolment.progress|default:0 }}% complete</span>
+    {% with prog_id=enrolment.metadata.programme_record_id %}
+    {% if prog_id %}
+    <a href="{% url 'learn:learn-programme' prog_id %}" class="btn-primary">Continue</a>
+    {% endif %}
+    {% endwith %}
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <p>You are not enrolled in any programme yet.</p>
+    <a href="{% url 'learn:learn-catalogue' %}" class="btn-primary">Browse Programmes</a>
+  </div>
+{% endif %}
+
+{% if certifications %}
+  <h2 style="margin-top:1.5rem;">Completed</h2>
+  {% for cert in certifications %}
+  <div class="enrolment-card">
+    <div class="enrolment-title">{{ cert.title }}</div>
+    <span class="enrolled-badge">Certified</span>
+  </div>
+  {% endfor %}
+{% endif %}

@@ -1,0 +1,15 @@
+{% if activity %}
+<div class="progress-bar-wrap"
+     id="progress-{{ programme_id }}"
+     hx-get="{% url 'learn:htmx-progress' programme_id %}"
+     hx-trigger="progressUpdated from:body"
+     hx-swap="outerHTML">
+  <div class="progress-bar" style="width:{{ activity.progress|default:0 }}%"></div>
+  <span class="progress-label">{{ activity.progress|default:0 }}% complete</span>
+</div>
+{% else %}
+<div class="progress-bar-wrap" id="progress-{{ programme_id }}">
+  <div class="progress-bar" style="width:0%"></div>
+  <span class="progress-label">Not enrolled</span>
+</div>
+{% endif %}

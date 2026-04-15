@@ -1,0 +1,20 @@
+{% if certifications %}
+  {% for cert in certifications %}
+  <div class="cert-card" id="cert-{{ cert.id }}">
+    <h4>{{ cert.title }}</h4>
+    <p class="cert-meta">Submitted: {{ cert.created_at|date:"d M Y" }}</p>
+    <textarea name="notes" id="notes-{{ cert.id }}"
+              placeholder="Confirmation notes (optional)"
+              class="quiz-text-answer" rows="2"></textarea>
+    <button class="btn-primary"
+            hx-post="{% url 'learn:htmx-confirm-cert' cert.id %}"
+            hx-target="#cert-{{ cert.id }}"
+            hx-swap="outerHTML"
+            hx-include="#notes-{{ cert.id }}">
+      Confirm &amp; Advance Level
+    </button>
+  </div>
+  {% endfor %}
+{% else %}
+  <p class="empty-state">No certifications pending.</p>
+{% endif %}

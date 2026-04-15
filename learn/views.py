@@ -335,6 +335,58 @@ def review_queue(request):
 
 # ── HTMX Partial Views ────────────────────────────────────────────────────────
 
+def _recalculate_programme_progress(user, lesson_id):
+    """Recalculate and persist a programme Activity's progress after a lesson is completed."""
+    # lesson → course
+    course_rel = Relationship.objects.filter(
+        from_record_id=lesson_id, relationship_type='part_of'
+    ).first()
+    if not course_rel:
+        return
+
+    # course → programme
+    prog_rel = Relationship.objects.filter(
+        from_record_id=course_rel.to_record_id, relationship_type='part_of'
+    ).first()
+    if not prog_rel:
+        return
+
+    programme_id = prog_rel.to_record_id
+
+    # all courses in this programme
+    course_ids = list(Relationship.objects.filter(
+        to_record_id=programme_id, relationship_type='part_of'
+    ).values_list('from_record_id', flat=True))
+    if not course_ids:
+        return
+
+    # all lesson records across those courses
+    lesson_ids = {
+        str(lid) for lid in Relationship.objects.filter(
+            to_record_id__in=course_ids, relationship_type='part_of'
+        ).values_list('from_record_id', flat=True)
+    }
+    if not lesson_ids:
+        return
+
+    # completed lesson Activities for this user in this programme
+    completed_ids = set(
+        Activity.objects.filter(
+            assigned_to=user,
+            activity_type='lesson',
+            status='completed',
+        ).values_list('metadata__lesson_record_id', flat=True)
+    )
+    completed_count = len(lesson_ids & completed_ids)
+    progress = int((completed_count / len(lesson_ids)) * 100)
+
+    Activity.objects.filter(
+        activity_type='programme',
+        assigned_to=user,
+        metadata__programme_record_id=str(programme_id),
+    ).update(progress=progress)
+
+
 @login_required
 def htmx_enrol(request, programme_id):
     """HTMX POST: creates enrolment Activity, returns confirmation fragment."""
@@ -375,14 +427,37 @@ def htmx_enrol(request, programme_id):
 
 @login_required
 def htmx_complete_lesson(request, lesson_id):
-    """HTMX POST: marks lesson Activity complete, returns updated button."""
+    """HTMX POST: marks lesson Activity complete (creates if absent), recalculates programme progress."""
     if request.method != 'POST':
         return HttpResponse(status=405)
 
-    Activity.objects.filter(
+    lesson = get_object_or_404(
+        Record, id=lesson_id,
+        record_type__in=['lesson', 'assignment', 'quiz'],
+    )
+
+    existing = Activity.objects.filter(
         metadata__lesson_record_id=str(lesson_id),
-        assigned_to=request.user
-    ).update(status='completed', progress=100)
+        assigned_to=request.user,
+    ).first()
+
+    if existing:
+        existing.status = 'completed'
+        existing.progress = 100
+        existing.save(update_fields=['status', 'progress'])
+    else:
+        Activity.objects.create(
+            activity_type='lesson',
+            title=f'Lesson — {lesson.title}',
+            assigned_to=request.user,
+            created_by=request.user,
+            status='completed',
+            progress=100,
+            kgs_pathway='learning',
+            metadata={'source_app': 'learn', 'lesson_record_id': str(lesson_id)},
+        )
+
+    _recalculate_programme_progress(request.user, lesson_id)
 
     return HttpResponse(
         '<button class="btn-primary complete-btn" disabled>✓ Completed</button>'
@@ -476,3 +551,92 @@ def htmx_return_content(request, record_id):
         f'<span class="cert-pending-badge">Returned to Draft</span>'
         f'</div>'
     )
+
+
+# ── HTMX Data Partials (embed in other pages / lazy-load) ─────────────────────
+
+@login_required
+def htmx_my_learning(request):
+    """HTMX GET: returns My Learning content fragment (enrolments + certs)."""
+    user = request.user
+
+    enrolments = Activity.objects.filter(
+        activity_type='programme',
+        assigned_to=user,
+        status__in=['pending', 'in_progress'],
+    ).order_by('-created_at')
+
+    certifications = Record.objects.filter(
+        record_type='certification',
+        created_by=user,
+        status='active',
+        deleted_at__isnull=True,
+    ).order_by('-updated_at')
+
+    pending_certifications = Record.objects.filter(
+        record_type='certification',
+        created_by=user,
+        status='draft',
+        deleted_at__isnull=True,
+    ).order_by('-created_at')
+
+    return render(request, 'learn/partials/my_learning.html', {
+        'enrolments': enrolments,
+        'certifications': certifications,
+        'pending_certifications': pending_certifications,
+    })
+
+
+@login_required
+def htmx_catalogue(request):
+    """HTMX GET: returns programme catalogue grid fragment."""
+    user_level = _user_level(request.user)
+    programmes = Record.objects.filter(
+        record_family='learning',
+        record_type='programme',
+        status='active',
+        deleted_at__isnull=True,
+    ).order_by('created_at')
+
+    for p in programmes:
+        p.is_locked = user_level < (p.permissions_data.get('required_level', 1))
+
+    return render(request, 'learn/partials/catalogue.html', {
+        'programmes': programmes,
+        'user_level': user_level,
+    })
+
+
+@login_required
+def htmx_progress(request, programme_id):
+    """HTMX GET: returns progress bar fragment for one programme enrolment."""
+    activity = Activity.objects.filter(
+        activity_type='programme',
+        assigned_to=request.user,
+        metadata__programme_record_id=str(programme_id),
+    ).first()
+
+    return render(request, 'learn/partials/progress.html', {
+        'activity': activity,
+        'programme_id': programme_id,
+    })
+
+
+@login_required
+def htmx_cert_queue(request):
+    """HTMX GET: returns certification queue fragment (Level 3+)."""
+    if _user_level(request.user) < 3:
+        return HttpResponse(
+            '<p class="empty-state">Steward access required.</p>',
+            status=403,
+        )
+
+    certifications = Record.objects.filter(
+        record_type='certification',
+        status='draft',
+        deleted_at__isnull=True,
+    ).order_by('created_at')
+
+    return render(request, 'learn/partials/cert_queue.html', {
+        'certifications': certifications,
+    })
