@@ -2,6 +2,7 @@
 from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
@@ -9,7 +10,9 @@ from django.utils import timezone
 from records.models import Record, Relationship
 from activity.models import Activity
 from accounts.models import User
+from tenants.models import Tenant, UserPermission
 
+from .models import MembershipRequest
 from .constants import (
     KGS_SERVICE_ORDERS, KGS_SERVICE_ORDER_CHOICES,
     KGS_PARTICIPATION_STAGES, KGS_COMPETENCE_LABELS,
@@ -28,7 +31,7 @@ def _require_level(request, min_level):
 
 def _get_user_permissions(user):
     """Retrieve active UserPermission rows for a user via Django ORM."""
-    from accounts.models import UserPermission
+    # UserPermission imported at module level
     return list(
         UserPermission.objects.filter(user=user, is_active=True)
         .select_related('tenant')
@@ -38,7 +41,7 @@ def _get_user_permissions(user):
 
 def _get_scope_permissions(scope_tenant, filters=None):
     """All active UserPermissions within a steward's scope tenant."""
-    from accounts.models import UserPermission
+    # UserPermission imported at module level
 
     qs = UserPermission.objects.filter(
         is_active=True,
@@ -150,7 +153,7 @@ def management_home(request):
     gatherings = []
 
     if scope_tenant:
-        from accounts.models import UserPermission
+        # UserPermission imported at module level
         member_count = UserPermission.objects.filter(
             is_active=True,
             tenant__path__startswith=scope_tenant.path,
@@ -260,7 +263,7 @@ def member_profile(request, member_id):
     if not _require_level(request, 3):
         return render(request, 'community/locked.html', {'min_level': 3}, status=403)
 
-    from accounts.models import UserPermission
+    # UserPermission imported at module level
 
     perms = _get_user_permissions(request.user)
     primary_perm = perms[0] if perms else None
@@ -592,7 +595,7 @@ def htmx_set_shepherd(request, permission_id):
     if not _require_level(request, 3) or request.method != 'POST':
         return HttpResponse('')
 
-    from accounts.models import UserPermission
+    # UserPermission imported at module level
 
     perm = UserPermission.objects.filter(id=permission_id).first()
     if perm:
@@ -627,7 +630,7 @@ def htmx_set_order(request, permission_id):
     if not _require_level(request, 3) or request.method != 'POST':
         return HttpResponse('')
 
-    from accounts.models import UserPermission
+    # UserPermission imported at module level
 
     perm = UserPermission.objects.filter(id=permission_id).first()
     if perm:
@@ -655,7 +658,7 @@ def htmx_deactivate_member(request, permission_id):
     if not _require_level(request, 3) or request.method != 'POST':
         return HttpResponse('')
 
-    from accounts.models import UserPermission
+    # UserPermission imported at module level
 
     UserPermission.objects.filter(id=permission_id).update(is_active=False)
 
@@ -684,3 +687,134 @@ def htmx_member_search(request):
     })[:50]
 
     return render(request, 'community/partials/member_list.html', {'members': members})
+
+
+# ── Membership request flow ───────────────────────────────────────────────────
+
+@login_required
+def htmx_request_membership(request):
+    """
+    GET  → membership request form (list of active tenants to choose from)
+    POST → create MembershipRequest; idempotent (one pending request per user/tenant)
+    Accessible to any authenticated user who needs to join a community.
+    """
+    user = request.user
+
+    if request.method == 'POST':
+        tenant_id = request.POST.get('tenant_id', '').strip()
+        note = request.POST.get('note', '').strip() or None
+
+        if not tenant_id:
+            return HttpResponse(
+                '<p class="form-error">Please select a community.</p>'
+            )
+
+        try:
+            tenant = Tenant.objects.get(id=tenant_id, status='active')
+        except Tenant.DoesNotExist:
+            return HttpResponse(
+                '<p class="form-error">Community not found.</p>'
+            )
+
+        # One pending request per user per tenant — idempotency guard
+        existing = MembershipRequest.objects.filter(
+            user=user, tenant=tenant, status='pending'
+        ).first()
+        if existing:
+            return render(
+                request,
+                'community/partials/membership_request_sent.html',
+                {'tenant': tenant, 'already_pending': True},
+            )
+
+        MembershipRequest.objects.create(
+            user=user,
+            tenant=tenant,
+            created_by=user,
+            note=note,
+        )
+        return render(
+            request,
+            'community/partials/membership_request_sent.html',
+            {'tenant': tenant, 'already_pending': False},
+        )
+
+    # GET — return the form
+    tenants = Tenant.objects.filter(status='active').order_by('name')[:50]
+    return render(request, 'community/partials/membership_request_form.html', {
+        'tenants': tenants,
+    })
+
+
+@login_required
+def htmx_pending_requests(request):
+    """
+    GET → list of pending MembershipRequests within the steward's scope.
+    Level 3+ only.
+    """
+    if not _require_level(request, 3):
+        return HttpResponse('')
+
+    perms = _get_user_permissions(request.user)
+    primary_perm = perms[0] if perms else None
+    scope_tenant = primary_perm.tenant if primary_perm else None
+
+    qs = MembershipRequest.objects.filter(
+        status='pending'
+    ).select_related('user', 'tenant').order_by('created_at')
+
+    if scope_tenant:
+        qs = qs.filter(tenant__path__startswith=scope_tenant.path)
+
+    return render(request, 'community/partials/membership_requests.html', {
+        'requests': qs[:30],
+    })
+
+
+@login_required
+def htmx_review_request(request, request_id):
+    """
+    POST → approve or deny a pending MembershipRequest.
+    Level 3+ only.
+
+    action=approve → create UserPermission (role=disciple, level=1), mark approved
+    action=deny    → mark denied
+    Returns the updated request card HTML.
+    """
+    if not _require_level(request, 3) or request.method != 'POST':
+        return HttpResponse('', status=403)
+
+    membership_req = get_object_or_404(MembershipRequest, id=request_id, status='pending')
+    action = request.POST.get('action', '')
+
+    if action not in ('approve', 'deny'):
+        return HttpResponse('<p class="form-error">Invalid action.</p>', status=400)
+
+    with transaction.atomic():
+        membership_req.reviewed_by = request.user
+        membership_req.reviewed_at = timezone.now()
+
+        if action == 'approve':
+            membership_req.status = 'approved'
+            membership_req.save()
+
+            # Create UserPermission — get_or_create prevents duplicates
+            UserPermission.objects.get_or_create(
+                tenant=membership_req.tenant,
+                user=membership_req.user,
+                role='disciple',
+                defaults={
+                    'created_by': request.user,
+                    'tenant_path': membership_req.tenant.path,
+                    'level': 1,
+                    'is_active': True,
+                },
+            )
+        else:
+            membership_req.status = 'denied'
+            membership_req.save()
+
+    return render(request, 'community/partials/membership_request_card.html', {
+        'req': membership_req,
+        'reviewed': True,
+    })

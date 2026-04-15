@@ -1,0 +1,52 @@
+<!-- community/partials/membership_request_card.html -->
+<!-- Single request row — used in the pending list and returned after review -->
+<div class="announcement-card membership-req-card{% if reviewed %} membership-req-card--reviewed{% endif %}"
+     id="membership-req-{{ req.id }}">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;flex-wrap:wrap">
+    <div>
+      <div class="announcement-title">
+        {{ req.user.display_name|default:req.user.email }}
+      </div>
+      <div class="announcement-meta" style="margin-top:2px">
+        {{ req.user.email }} &nbsp;·&nbsp; {{ req.tenant.name }}
+        &nbsp;·&nbsp; {{ req.created_at|date:"d M Y" }}
+      </div>
+      {% if req.note %}
+      <div style="margin-top:6px;font-size:0.85rem;color:var(--text-secondary);
+                  font-style:italic">&ldquo;{{ req.note }}&rdquo;</div>
+      {% endif %}
+    </div>
+
+    {% if reviewed %}
+    <span class="gathering-format
+      {% if req.status == 'approved' %}format-in_person{% else %}format-online{% endif %}"
+          style="align-self:center">
+      {% if req.status == 'approved' %}Approved{% else %}Denied{% endif %}
+    </span>
+    {% else %}
+    <div style="display:flex;gap:0.5rem;align-items:center;flex-shrink:0">
+      <form hx-post="{% url 'community:htmx-review-request' req.id %}"
+            hx-target="#membership-req-{{ req.id }}"
+            hx-swap="outerHTML">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="approve">
+        <button type="submit" class="btn-save" style="padding:0.35rem 0.9rem;font-size:0.8rem">
+          Approve
+        </button>
+      </form>
+      <form hx-post="{% url 'community:htmx-review-request' req.id %}"
+            hx-target="#membership-req-{{ req.id }}"
+            hx-swap="outerHTML">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="deny">
+        <button type="submit" class="btn-secondary btn-sm"
+                style="font-size:0.8rem;border-color:var(--error);color:var(--error)">
+          Deny
+        </button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+</div>

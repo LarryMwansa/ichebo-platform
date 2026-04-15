@@ -1,0 +1,27 @@
+<!-- community/partials/membership_request_sent.html -->
+<!-- Confirmation shown after submitting (or re-submitting) a membership request -->
+<div class="membership-request-sent" id="membership-request-form">
+  {% if already_pending %}
+  <div class="info-card" style="border-color:var(--warning)">
+    <div class="info-card-icon">⏳</div>
+    <div>
+      <div class="info-card-label">Request already pending</div>
+      <div class="info-card-value">
+        Your request to join <strong>{{ tenant.name }}</strong> is awaiting review.
+        You will be notified when a steward approves it.
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="info-card" style="border-color:var(--success)">
+    <div class="info-card-icon">✓</div>
+    <div>
+      <div class="info-card-label">Request sent</div>
+      <div class="info-card-value">
+        Your request to join <strong>{{ tenant.name }}</strong> has been sent.
+        A steward will review it shortly.
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>

@@ -1,12 +1,19 @@
 {% extends "community/base_community.html" %}
 
 {% block community_content %}
-<div class="empty-state">
+<div class="empty-state" style="text-align:left;padding-bottom:0">
   <p style="font-size:32px;margin-bottom:12px">🌱</p>
-  <p style="font-weight:600;color:var(--text)">Community access requires membership.</p>
-  <p style="margin-top:8px">
-    Community features are available to Level 1 Members and above.
-    Complete your formation journey to join a Sceptre Community.
+  <p style="font-weight:600;color:var(--text)">You are not yet a member of a community.</p>
+  <p style="margin-top:8px;color:var(--text-secondary)">
+    Submit a request to join a community. A steward will review and approve your membership.
   </p>
+</div>
+
+<div style="margin-top:1.5rem"
+     id="membership-request-area"
+     hx-get="{% url 'community:htmx-membership-request' %}"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+  <div class="htmx-indicator">Loading&hellip;</div>
 </div>
 {% endblock %}

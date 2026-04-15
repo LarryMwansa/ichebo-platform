@@ -9,6 +9,19 @@
   </div>
 </div>
 
+<!-- Pending membership requests -->
+<div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+  <span>Membership Requests</span>
+</div>
+<div id="membership-requests-list"
+     hx-get="{% url 'community:htmx-pending-requests' %}"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+  <div class="htmx-indicator">Loading&hellip;</div>
+</div>
+
+<div style="margin-top:8px;margin-bottom:16px"></div>
+
 <!-- Nav tiles -->
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
   <a href="{% url 'community:community-members' %}" class="info-card" style="text-decoration:none">

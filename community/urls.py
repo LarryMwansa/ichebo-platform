@@ -39,4 +39,12 @@ urlpatterns = [
          views.htmx_announcement_list, name='htmx-announcement-list'),
     path('community/htmx/gatherings/',
          views.htmx_gatherings_list, name='htmx-gatherings-list'),
+
+    # ── Membership request flow ───────────────────────────────────────────────
+    path('community/htmx/membership/request/',
+         views.htmx_request_membership, name='htmx-membership-request'),
+    path('community/htmx/membership/pending/',
+         views.htmx_pending_requests, name='htmx-pending-requests'),
+    path('community/htmx/membership/<uuid:request_id>/review/',
+         views.htmx_review_request, name='htmx-review-request'),
 ]

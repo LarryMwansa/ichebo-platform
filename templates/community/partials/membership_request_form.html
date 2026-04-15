@@ -1,0 +1,38 @@
+<!-- community/partials/membership_request_form.html -->
+<!-- Form for a user to request membership in a community tenant -->
+<div class="membership-request-form" id="membership-request-form">
+  <div class="section-heading">Request to Join a Community</div>
+
+  {% if tenants %}
+  <form hx-post="{% url 'community:htmx-membership-request' %}"
+        hx-target="#membership-request-form"
+        hx-swap="outerHTML">
+    {% csrf_token %}
+
+    <div class="form-field">
+      <label for="tenant-select">Select a community</label>
+      <select id="tenant-select" name="tenant_id" required>
+        <option value="">— Choose a community —</option>
+        {% for tenant in tenants %}
+        <option value="{{ tenant.id }}">{{ tenant.name }}
+          {% if tenant.tier != 'church_node' %}({{ tenant.get_tier_display }}){% endif %}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="request-note">Message to steward <span style="font-weight:400;color:var(--text-secondary)">(optional)</span></label>
+      <textarea id="request-note" name="note" rows="2"
+                placeholder="Briefly introduce yourself or explain your interest…"
+                maxlength="500"></textarea>
+    </div>
+
+    <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;margin-top:0.5rem">
+      <button type="submit" class="btn-save">Send Request</button>
+    </div>
+  </form>
+  {% else %}
+  <p class="dash-empty">No active communities found.</p>
+  {% endif %}
+</div>

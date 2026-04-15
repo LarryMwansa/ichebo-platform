@@ -1,0 +1,11 @@
+<!-- community/partials/membership_requests.html -->
+<!-- Steward view: list of pending membership requests -->
+{% if requests %}
+{% for req in requests %}
+{% include "community/partials/membership_request_card.html" with req=req reviewed=False %}
+{% endfor %}
+{% else %}
+<div class="empty-state" style="padding:16px 0;font-size:0.9rem;color:var(--text-secondary)">
+  No pending membership requests.
+</div>
+{% endif %}
