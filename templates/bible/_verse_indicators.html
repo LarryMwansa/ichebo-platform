@@ -1,6 +1,12 @@
-{% if has_personal_note %}
-<div style="width: 6px; height: 6px; border-radius: 50%; background: var(--primary); margin-bottom: 2px;" title="Your note"></div>
-{% endif %}
-{% if has_tenant_note %}
-<div style="width: 6px; height: 6px; border-radius: 50%; background: var(--info);" title="Community note"></div>
-{% endif %}
+<div id="indicators-{{ verse.id }}" hx-swap-oob="innerHTML">
+  {% if has_personal_note %}
+  <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--primary); margin-bottom: 2px;" title="Your note"></div>
+  {% endif %}
+  {% if has_tenant_note %}
+  <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--info);" title="Community note"></div>
+  {% endif %}
+</div>
+
+<div class="alert alert-success" style="font-size: 13px; padding: 10px; margin-top: 10px; border-radius: 8px;">
+  Note saved successfully.
+</div>

@@ -381,7 +381,20 @@ def htmx_delete_note(request, note_id):
     note = Record.objects.get(id=note_id, created_by=request.user)
     note.deleted_at = timezone.now()
     note.save(update_fields=['deleted_at'])
-    return HttpResponse('')
+    # Return OOB to clear indicator + success message for drawer
+    verse = note.custom_fields.get('verse') # This might be tricky if custom_fields is JSON
+    # Better: get the verse from the record metadata or lookup
+    from .models import BibleVerse
+    verse_obj = BibleVerse.objects.filter(
+        translation__code=note.custom_fields.get('translation_code', 'ESV'), # Fallback
+        book__code=note.custom_fields.get('book_code'),
+        chapter=note.custom_fields.get('chapter'),
+        verse=note.custom_fields.get('verse'),
+    ).first()
+
+    response_html = f'<div id="indicators-{verse_obj.id}" hx-swap-oob="innerHTML"></div>' if verse_obj else ''
+    response_html += '<div class="alert alert-info">Note deleted.</div>'
+    return HttpResponse(response_html)
 
 
 @login_required

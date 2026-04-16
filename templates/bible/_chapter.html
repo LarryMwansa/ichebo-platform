@@ -6,6 +6,7 @@
 <div class="bible-verse-list" data-book-code="{{ book.code }}" data-chapter="{{ chapter }}" style="display: flex; flex-direction: column; gap: 4px; padding-bottom: 2rem;">
   {% for verse in verses %}
   <div class="bible-verse {% if verse.verse in personal_noted %}bible-verse--personal{% endif %} {% if verse.verse in tenant_noted %}bible-verse--tenant{% endif %}"
+       id="verse-{{ verse.id }}"
        hx-get="{% url 'bible:htmx-annotation-panel' verse.id %}"
        hx-target="#drawerContent"
        hx-swap="innerHTML"
@@ -18,7 +19,7 @@
     
     <span class="bible-verse__text" style="font-size: 1.1em; line-height: 1.7; color: var(--text); flex: 1;">{{ verse.text }}</span>
     
-    <div class="bible-verse__indicators" style="display: flex; flex-direction: column; gap: 4px; justify-content: center;">
+    <div id="indicators-{{ verse.id }}" class="bible-verse__indicators" style="display: flex; flex-direction: column; gap: 4px; justify-content: center; min-width: 8px;">
       {% if verse.verse in personal_noted %}
       <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--primary);" title="Your note"></div>
       {% endif %}
