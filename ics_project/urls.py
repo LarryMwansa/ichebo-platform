@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/', include('core.urls')),
     path('api/', include('accounts.urls')),
     path('api/', include('tenants.urls')),
+    path('tenants/', include('tenants.template_urls', namespace='tenants')),
     path('api/', include('records.urls')),
     path('records/', include('records.template_urls', namespace='records')),
     path('api/', include('activity.urls')),

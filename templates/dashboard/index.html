@@ -233,7 +233,13 @@
   {% else %}
   {# Seeker (Level 0) state #}
   <div class="dash-widget dash-seeker-gate">
-    <p>Your journey begins here. Connect with a steward to join a community.</p>
+    <p style="margin-bottom:0.75rem">Your journey begins here.</p>
+    <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1rem">
+      Complete the platform induction and join a community to begin the Kingdom Governance pathway.
+    </p>
+    <a href="{% url 'community:my-community' %}" class="btn btn-primary">
+      Begin your journey &rarr;
+    </a>
   </div>
   {% endif %}
 
@@ -319,7 +325,8 @@
 
     {% else %}
     <div class="dash-widget dash-seeker-gate">
-      <p>Connect with a steward to join a community and track your activities.</p>
+      <p style="margin-bottom:0.75rem">Join a community to track your activities.</p>
+      <a href="{% url 'community:my-community' %}" class="btn btn-primary">Begin your journey &rarr;</a>
     </div>
     {% endif %}
   </div>

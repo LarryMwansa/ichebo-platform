@@ -1,0 +1,70 @@
+{% extends "tenants/base_tenants.html" %}
+
+{% block tenants_content %}
+<div class="tenants-header">
+  <h2>Create a New Community</h2>
+  <a href="{% url 'tenants:my-tenants' %}" class="btn-back" style="font-size:0.85rem;color:var(--text-secondary);">
+    ← My Communities
+  </a>
+</div>
+
+<p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1.5rem">
+  Communities form the structural backbone of the Kingdom Governance System.
+  As a founding steward, you will be assigned the stewardship role for this community.
+</p>
+
+<form method="post" class="wizard-form">
+  {% csrf_token %}
+
+  <label for="id_name">Community Name <span style="color:var(--error)">*</span></label>
+  <input type="text" id="id_name" name="name" maxlength="200" required
+         value="{{ form_data.name|default:'' }}"
+         placeholder="e.g. Graceland Church Pretoria">
+  {% if errors.name %}<p class="field-error">{{ errors.name }}</p>{% endif %}
+
+  <label for="id_tier">Tier <span style="color:var(--error)">*</span></label>
+  <select id="id_tier" name="tier" required>
+    <option value="">— Select tier —</option>
+    {% for value, label in tier_choices %}
+    <option value="{{ value }}"
+      {% if form_data.tier == value %}selected{% endif %}>
+      {{ label }}
+    </option>
+    {% endfor %}
+  </select>
+  {% if errors.tier %}<p class="field-error">{{ errors.tier }}</p>{% endif %}
+
+  <label for="id_affiliation">Affiliation <span style="color:var(--error)">*</span></label>
+  <select id="id_affiliation" name="affiliation" required>
+    <option value="">— Select affiliation —</option>
+    {% for value, label in affiliation_choices %}
+    <option value="{{ value }}"
+      {% if form_data.affiliation == value %}selected{% endif %}>
+      {{ label }}
+    </option>
+    {% endfor %}
+  </select>
+  {% if errors.affiliation %}<p class="field-error">{{ errors.affiliation }}</p>{% endif %}
+
+  <label for="id_parent_id">Parent Community <span style="color:var(--text-secondary);font-weight:400">(optional)</span></label>
+  <select id="id_parent_id" name="parent_id">
+    <option value="">— None (root community) —</option>
+    {% for tenant in all_active_tenants %}
+    <option value="{{ tenant.id }}"
+      {% if form_data.parent_id == tenant.id|stringformat:"s" %}selected{% endif %}>
+      {{ tenant.name }} ({{ tenant.get_tier_display }})
+    </option>
+    {% endfor %}
+  </select>
+  {% if errors.parent_id %}<p class="field-error">{{ errors.parent_id }}</p>{% endif %}
+
+  <label for="id_description">Description <span style="color:var(--text-secondary);font-weight:400">(optional)</span></label>
+  <textarea id="id_description" name="description"
+            placeholder="Brief description of this community's purpose and focus…">{{ form_data.description|default:'' }}</textarea>
+
+  <div class="wizard-actions">
+    <button type="submit" class="btn btn-primary">Create Community</button>
+    <a href="{% url 'tenants:my-tenants' %}" style="color:var(--text-secondary);font-size:0.9rem;text-decoration:none;">Cancel</a>
+  </div>
+</form>
+{% endblock %}

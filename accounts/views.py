@@ -76,7 +76,7 @@ def me(request):
 class RegisterView(FormView):
     template_name = 'registration/register.html'
     form_class = RegisterForm
-    success_url = reverse_lazy('dashboard:index')
+    success_url = reverse_lazy('community:my-community')
 
     def form_valid(self, form):
         user = form.save(commit=False)
@@ -92,12 +92,12 @@ class RegisterView(FormView):
 # ---------------------------------------------------------------------------
 
 COMPETENCE_LABELS = {
-    0: ('Seeker', 'Level 0 — Seeking'),
-    1: ('Disciple', 'Level 1 — Disciple'),
-    2: ('Servant', 'Level 2 — Servant'),
-    3: ('Functional Minister', 'Level 3 — Functional Minister'),
-    4: ('Steward', 'Level 4 — Steward'),
-    5: ('Senior Steward', 'Level 5 — Senior Steward'),
+    0: ('Seeker',          'Level 0 — Connection'),
+    1: ('Beginner',        'Level 1 — Formation'),
+    2: ('Disciple',        'Level 2 — Alignment'),
+    3: ('Steward',         'Level 3 — Service'),
+    4: ('Senior Steward',  'Level 4 — Leadership'),
+    5: ('Architect',       'Level 5 — Apostolic Stewardship'),
 }
 
 
