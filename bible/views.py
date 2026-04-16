@@ -140,14 +140,27 @@ def htmx_annotation_panel(request, verse_id):
         custom_fields__scripture_reference__icontains=verse_ref_str,
     ).values('id', 'title', 'metadata')[:5]
 
-    # Handbook references (Level 5 only)
-    handbook_references = []
-    if competence_level >= 5:
-        handbook_references = Relationship.objects.filter(
-            bible_verse=verse,
-            relationship_type='references',
-            deleted_at__isnull=True,
-        ).select_related('from_record')[:10]
+    # All formal relationships (Linking Governance, Activities, etc)
+    relationships = Relationship.objects.filter(
+        bible_verse=verse,
+        deleted_at__isnull=True,
+    ).select_related('from_record')
+
+    # Group by family for cleaner UI
+    links = {
+        'governance': [r for r in relationships if r.from_record.record_family == 'governance'],
+        'activity': [r for r in relationships if r.from_record.record_family == 'activity'],
+        'other': [r for r in relationships if r.from_record.record_family not in ['governance', 'activity']],
+    }
+
+    # Learn cross-references (Smart search in lessons)
+    verse_ref_str = f"{verse.book.code} {verse.chapter}:{verse.verse}"
+    learn_references = Record.objects.filter(
+        record_family='learning',
+        record_type='lesson',
+        status='active',
+        custom_fields__scripture_reference__icontains=verse_ref_str,
+    ).values('id', 'title', 'metadata')[:10]
 
     context = {
         'verse': verse,
@@ -155,9 +168,11 @@ def htmx_annotation_panel(request, verse_id):
         'personal_note': personal_note,
         'tenant_notes': tenant_notes,
         'learn_references': learn_references,
-        'handbook_references': handbook_references,
+        'links': links,
         'competence_level': competence_level,
         'can_publish_tenant_note': competence_level >= 3,
+        'book': verse.book,
+        'chapter': verse.chapter,
     }
     return render(request, 'bible/_annotation_panel.html', context)
 
