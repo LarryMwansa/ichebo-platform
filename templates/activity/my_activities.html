@@ -4,11 +4,11 @@
 
 <div class="activity-header">
   <h1>My Activities</h1>
-  <button class="btn-primary"
+  <button class="btn-touch" style="background: var(--primary); color: #fff; padding: 0 16px; min-height: 40px;"
           hx-get="{% url 'activity:htmx-create' %}"
           hx-target="#activity-create-panel"
           hx-swap="innerHTML">
-    + New
+    <span class="material-symbols-outlined" style="margin-right: 4px;">add</span> New
   </button>
 </div>
 
@@ -21,10 +21,10 @@
      class="activity-type-pill {% if not active_type %}activity-type-pill--active{% endif %}">
     All
   </a>
-  {% for slug in all_types %}
+  {% for slug, label in activity_types %}
   <a href="{% url 'activity:activity-home' %}?type={{ slug }}"
      class="activity-type-pill {% if active_type == slug %}activity-type-pill--active{% endif %}">
-    {{ type_labels|dict_key:slug|default:slug|title }}
+    {{ label }}
   </a>
   {% endfor %}
 </div>
@@ -33,9 +33,11 @@
 {% if overdue %}
 <div class="activity-group">
   <div class="activity-group-label activity-group-label--overdue">Overdue</div>
-  {% for activity in overdue %}
-    {% include "activity/partials/activity_card.html" %}
-  {% endfor %}
+  <div class="list-group">
+    {% for activity in overdue %}
+      {% include "activity/partials/activity_card.html" %}
+    {% endfor %}
+  </div>
 </div>
 {% endif %}
 
@@ -43,9 +45,11 @@
 {% if due_today %}
 <div class="activity-group">
   <div class="activity-group-label">Due Today</div>
-  {% for activity in due_today %}
-    {% include "activity/partials/activity_card.html" %}
-  {% endfor %}
+  <div class="list-group">
+    {% for activity in due_today %}
+      {% include "activity/partials/activity_card.html" %}
+    {% endfor %}
+  </div>
 </div>
 {% endif %}
 
@@ -53,22 +57,23 @@
 {% if upcoming %}
 <div class="activity-group">
   <div class="activity-group-label">Upcoming</div>
-  {% for activity in upcoming %}
-    {% include "activity/partials/activity_card.html" %}
-  {% endfor %}
+  <div class="list-group">
+    {% for activity in upcoming %}
+      {% include "activity/partials/activity_card.html" %}
+    {% endfor %}
+  </div>
 </div>
 {% endif %}
 
 {% if not overdue and not due_today and not upcoming %}
 <div class="empty-state">
-  <p>No activities yet.
-    <button class="btn-primary"
-            hx-get="{% url 'activity:htmx-create' %}"
-            hx-target="#activity-create-panel"
-            hx-swap="innerHTML">
-      Create your first activity
-    </button>
-  </p>
+  <p style="margin-bottom: 1.5rem;">No activities yet.</p>
+  <button class="btn-touch" style="background: var(--primary); color: #fff;"
+          hx-get="{% url 'activity:htmx-create' %}"
+          hx-target="#activity-create-panel"
+          hx-swap="innerHTML">
+    Create your first activity
+  </button>
 </div>
 {% endif %}
 

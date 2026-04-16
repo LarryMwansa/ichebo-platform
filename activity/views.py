@@ -52,14 +52,15 @@ def my_activities(request):
             'active_type': active_type,
         })
 
+    activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
+
     return render(request, 'activity/my_activities.html', {
-        'overdue':     overdue,
-        'due_today':   due_today,
-        'upcoming':    upcoming,
-        'active_type': active_type,
-        'type_labels': TYPE_LABELS,
-        'all_types':   ALL_TYPES,
-        'user_level':  _user_level(user),
+        'overdue':       overdue,
+        'due_today':     due_today,
+        'upcoming':      upcoming,
+        'active_type':   active_type,
+        'activity_types': activity_types,
+        'user_level':    _user_level(user),
     })
 
 
@@ -106,10 +107,10 @@ def htmx_create_activity(request):
             'activity': activity,
         })
 
+    activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
     # GET — return the create form
     return render(request, 'activity/partials/create_form.html', {
-        'type_labels': TYPE_LABELS,
-        'all_types':   ALL_TYPES,
+        'activity_types': activity_types,
     })
 
 
@@ -181,11 +182,11 @@ def htmx_edit_activity(request, activity_id):
         )
         return render(request, 'activity/partials/activity_card.html', {'activity': activity})
 
+    activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
     # GET — return edit form pre-populated
     return render(request, 'activity/partials/edit_form.html', {
         'activity': activity,
-        'type_labels': TYPE_LABELS,
-        'all_types': ALL_TYPES,
+        'activity_types': activity_types,
     })
 
 

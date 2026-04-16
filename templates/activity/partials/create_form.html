@@ -1,46 +1,51 @@
-<form class="activity-create-form"
-      hx-post="{% url 'activity:htmx-create' %}"
-      hx-target="#activity-create-panel"
-      hx-swap="beforebegin"
-      hx-on::after-request="this.reset()">
-  {% csrf_token %}
+<div class="activity-form-card">
+  <form class="activity-create-form"
+        hx-post="{% url 'activity:htmx-create' %}"
+        hx-target="#activity-create-panel"
+        hx-swap="beforebegin"
+        hx-on::after-request="this.remove()">
+    {% csrf_token %}
 
-  <div class="form-row">
-    <select name="activity_type" class="form-input">
-      {% for slug in all_types %}
-      <option value="{{ slug }}">{{ type_labels|dict_key:slug|default:slug|title }}</option>
-      {% endfor %}
-    </select>
-    <input type="text" name="title" placeholder="Activity title…"
-           class="form-input form-input--grow" required>
-  </div>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; gap: 8px;">
+        <select name="activity_type" class="form-input-touch" style="flex: 0 0 100px;">
+          {% for slug, label in activity_types %}
+          <option value="{{ slug }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+        <input type="text" name="title" placeholder="What needs to be done?"
+               class="form-input-touch" style="flex: 1;" required>
+      </div>
 
-  <div class="form-row">
-    <input type="date" name="due_at" class="form-input" placeholder="Due date (optional)">
-    <select name="recurrence" class="form-input">
-      <option value="none">No recurrence</option>
-      <option value="daily">Daily</option>
-      <option value="weekly">Weekly</option>
-      <option value="monthly">Monthly</option>
-    </select>
-    <select name="kgs_pathway" class="form-input">
-      <option value="">Pathway (optional)</option>
-      <option value="new_life">New Life</option>
-      <option value="spiritual_formation">Spiritual Formation</option>
-      <option value="community_life">Community Life</option>
-      <option value="service">Service</option>
-      <option value="leadership">Leadership</option>
-      <option value="learning">Learning</option>
-      <option value="mission">Mission</option>
-      <option value="apostolic_stewardship">Apostolic Stewardship</option>
-    </select>
-  </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <input type="date" name="due_at" class="form-input-touch" placeholder="Due date">
+        <select name="recurrence" class="form-input-touch">
+          <option value="none">No recurrence</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </div>
 
-  <div class="form-actions">
-    <button type="submit" class="btn-primary">Create</button>
-    <button type="button" class="btn-secondary"
-            hx-get="" hx-target="#activity-create-panel" hx-swap="innerHTML">
-      Cancel
-    </button>
-  </div>
-</form>
+      <select name="kgs_pathway" class="form-input-touch">
+        <option value="">Pathway (optional)</option>
+        <option value="new_life">New Life</option>
+        <option value="spiritual_formation">Spiritual Formation</option>
+        <option value="community_life">Community Life</option>
+        <option value="service">Service</option>
+        <option value="leadership">Leadership</option>
+        <option value="learning">Learning</option>
+        <option value="mission">Mission</option>
+        <option value="apostolic_stewardship">Apostolic Stewardship</option>
+      </select>
+
+      <div style="display: flex; gap: 8px; margin-top: 8px;">
+        <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; flex: 1;">Create Activity</button>
+        <button type="button" class="btn-touch" style="background: var(--bg); color: var(--muted); border: 1px solid var(--border); flex: 1;"
+                onclick="this.closest('.activity-form-card').remove()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

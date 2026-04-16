@@ -15,7 +15,7 @@
     <span class="nav-label">Bible</span>
   </a>
 
-  <a href="#"
+  <a href="{% url 'activity:activity-home' %}"
      class="nav-item {% if request.resolver_match.app_name == 'activity' %}active{% endif %}"
      aria-label="Activity">
     <span class="material-symbols-outlined nav-icon">check_circle</span>

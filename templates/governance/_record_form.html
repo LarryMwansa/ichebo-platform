@@ -89,7 +89,7 @@
   {% if record_family == 'governance' and is_level5 %}
   <div class="gov-panel" style="margin:1rem 0">
     <div class="gov-panel-label">Property Attributes (HRS)</div>
-    {% with cf=record.custom_fields|default:{} %}
+    {% with cf=record.custom_fields|default:'' %}
     <div class="gov-form-group">
       <label class="gov-form-label">Complexity</label>
       <select name="complexity" class="form-input-touch">

@@ -1,0 +1,175 @@
+/* activity.css — Activity App Specific Styles */
+
+.activity-shell {
+    min-height: calc(100vh - 120px);
+}
+
+.activity-tab-row {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  padding: 0 0.5rem;
+  scrollbar-width: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.activity-tab-row::-webkit-scrollbar { display: none; }
+
+.activity-tab {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.activity-tab--active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.activity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1rem 0.75rem;
+}
+
+.activity-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.activity-filter-row {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 0.5rem 1rem 1rem;
+  scrollbar-width: none;
+}
+.activity-filter-row::-webkit-scrollbar { display: none; }
+
+.activity-type-pill {
+  padding: 6px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.activity-type-pill:hover {
+    border-color: var(--primary);
+    color: var(--text);
+}
+.activity-type-pill--active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.activity-group-label {
+  padding: 1.25rem 1rem 0.5rem;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+.activity-group-label--overdue {
+  color: #ef4444;
+}
+
+/* Card logic using list-item structure */
+.activity-item {
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+}
+
+.activity-main-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.activity-meta-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.activity-type-tag {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--muted);
+    text-transform: uppercase;
+    font-weight: 700;
+    border: 1px solid var(--border);
+}
+
+.activity-due {
+    font-weight: 600;
+}
+.activity-due--overdue {
+    color: #ef4444;
+}
+
+.activity-item--done {
+    opacity: 0.6;
+}
+.activity-item--done .list-item__title {
+    text-decoration: line-through;
+}
+
+/* Actions in list item */
+.activity-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.activity-action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--muted);
+    border: none;
+    cursor: pointer;
+}
+.activity-action-btn:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+.activity-action-btn--complete {
+    color: #10b981;
+}
+.activity-action-btn--delete {
+    color: #ef4444;
+}
+
+/* Create panel */
+#activity-create-panel {
+    padding: 0 1rem;
+}
+.activity-form-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
