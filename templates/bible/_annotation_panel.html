@@ -1,3 +1,6 @@
+<div id="drawerTitle" hx-swap-oob="innerHTML">{{ book.name }} {{ chapter }}:{{ verse.verse }}</div>
+<div id="drawerActions" hx-swap-oob="innerHTML"></div>
+
 <div class="bible-annotation-panel__body" style="display: flex; flex-direction: column; gap: 16px; padding: 1.5rem 1rem;">
 
   <!-- Selected verse text -->
@@ -81,7 +84,7 @@
                 class="btn-touch" 
                 style="background: var(--bg); color: var(--danger); border: 1px solid var(--border);"
                 hx-delete="{% url 'bible:htmx-delete-note' personal_note.id %}"
-                hx-target="#drawer .drawer-content"
+                hx-target="#drawerContent"
                 hx-swap="innerHTML"
                 hx-confirm="Permanently delete this note?">
           <span class="material-symbols-outlined">delete</span>

@@ -6,8 +6,7 @@
     {% for lang in languages %}
     <button class="list-item"
             hx-get="{% url 'bible:versions' %}?lang={{ lang.short_code }}"
-            hx-target="#drawer .drawer-content"
-            onclick="document.querySelector('.drawer-title').textContent = 'Select Version'"
+            hx-target="#drawerContent"
             style="width: 100%; border:none; text-align:left; background: transparent; padding: 12px 1rem;">
       <div class="list-item__content">
         <div class="list-item__title">{{ lang.name }}</div>

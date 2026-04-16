@@ -7,7 +7,7 @@
   {% for verse in verses %}
   <div class="bible-verse {% if verse.verse in personal_noted %}bible-verse--personal{% endif %} {% if verse.verse in tenant_noted %}bible-verse--tenant{% endif %}"
        hx-get="{% url 'bible:htmx-annotation-panel' verse.id %}"
-       hx-target="#drawer .drawer-content"
+       hx-target="#drawerContent"
        hx-swap="innerHTML"
        role="button"
        tabindex="0"

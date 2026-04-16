@@ -19,7 +19,6 @@
     <button class="btn-touch" 
             hx-get="{% url 'bible:htmx-appearance' %}"
             hx-target="#drawerContent"
-            onclick="window.ICSDrawer.open('Appearance')" 
             aria-label="Appearance" style="color: var(--muted); border:none; background:transparent;">
       <span class="material-symbols-outlined">tune</span>
     </button>
@@ -50,7 +49,6 @@
           id="bible-nav-chapter-btn"
           hx-get="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}"
           hx-target="#drawerContent"
-          onclick="window.ICSDrawer.open()"
           style="flex:1; background:transparent; border:none; text-align:center; font-weight:700; color: var(--text); padding: 0.5rem; border-radius: 8px; margin: 0 12px; cursor: pointer;">
     {{ book.name }} {{ chapter }}
   </button>

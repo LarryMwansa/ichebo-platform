@@ -158,11 +158,31 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Drawer API (for pages to open drawer programmatically) ──────────────────
-  // Pages can call window.ICSDrawer.open('Title', 'Action HTML') to open the drawer
   window.ICSDrawer = {
     open: openDrawer,
     close: closeDrawer
   };
 
+  // ── Automated Drawer Management (Lasting Solution) ────────────────────────
+  // Automatically open the drawer when an HTMX request targets the drawer content
+  document.body.addEventListener('htmx:beforeRequest', (e) => {
+    const target = e.detail.target;
+    if (target && (target.id === 'drawerContent' || target.id === 'drawerInner')) {
+      // Show loading state if needed
+      openDrawer('Loading...'); 
+    }
+  });
 
+  document.body.addEventListener('htmx:afterSwap', (e) => {
+    const target = e.detail.target;
+    if (target && (target.id === 'drawerContent' || target.id === 'drawerInner')) {
+      // Re-process newly swapped content
+      htmx.process(target);
+      
+      // If we swapped into the drawer, make sure it's active
+      if (!drawer.classList.contains('active')) {
+        openDrawer();
+      }
+    }
+  });
 });
