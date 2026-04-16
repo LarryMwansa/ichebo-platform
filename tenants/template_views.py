@@ -44,7 +44,7 @@ def my_tenants(request):
         .select_related('tenant')
         .order_by('tenant__name')
     )
-    can_create = level >= 4
+    can_create = level >= 3
     return render(request, 'tenants/my_tenants.html', {
         'perms': perms,
         'can_create': can_create,
@@ -54,7 +54,7 @@ def my_tenants(request):
 @login_required
 def create_tenant(request):
     """Tenant creation wizard — Level 4+ only."""
-    if _user_level(request.user) < 4:
+    if _user_level(request.user) < 3:
         return redirect('tenants:my-tenants')
 
     errors = {}

@@ -38,7 +38,7 @@
       <div class="info-card-value">Formation Stages</div>
     </div>
   </a>
-  {% if request.user.competence_level >= 4 %}
+  {% if request.user.competence_level >= 3 %}
   <a href="{% url 'tenants:create-tenant' %}" class="info-card" style="text-decoration:none">
     <div class="info-card-icon">🏛️</div>
     <div>
