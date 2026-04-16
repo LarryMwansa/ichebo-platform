@@ -8,6 +8,20 @@
 <form method="post" class="author-form"
       action="{% if record %}{% url 'learn:learn-author-programme-edit' record.id %}{% else %}{% url 'learn:learn-author-programme' %}{% endif %}">
   {% csrf_token %}
+  {% if can_create_induction %}
+  <label>Programme Type
+    <select name="programme_type">
+      <option value="programme"
+        {% if record and record.record_type != 'induction' %}selected{% endif %}>
+        Programme (standard)
+      </option>
+      <option value="induction"
+        {% if record and record.record_type == 'induction' %}selected{% endif %}>
+        Induction (globally required for all seekers)
+      </option>
+    </select>
+  </label>
+  {% endif %}
   <label>Title
     <input type="text" name="title" required maxlength="500"
            value="{{ record.title|default:'' }}">

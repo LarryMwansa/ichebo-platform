@@ -40,31 +40,6 @@
   </a>
 </div>
 
-<!-- Orientation requirement -->
-<div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-  <span>Orientation Requirement</span>
-  <button class="btn-secondary btn-sm"
-          hx-get="{% url 'community:htmx-set-orientation' %}"
-          hx-target="#orientation-slot"
-          hx-swap="innerHTML">
-    Edit
-  </button>
-</div>
-<div class="info-card" style="margin-bottom:8px">
-  <div class="info-card-icon">🎓</div>
-  <div>
-    <div class="info-card-label">Required before membership request</div>
-    <div class="info-card-value" id="orientation-value">
-      {% if scope_tenant and scope_tenant.orientation_record %}
-        {{ scope_tenant.orientation_record.title }}
-      {% else %}
-        None
-      {% endif %}
-    </div>
-  </div>
-</div>
-<div id="orientation-slot"></div>
-
 <!-- Announcements section -->
 <div class="section-heading" style="display:flex;justify-content:space-between;align-items:center">
   <span>Announcements</span>

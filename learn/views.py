@@ -220,9 +220,16 @@ def author_programme_form(request, record_id=None):
         )
 
     if request.method == 'POST':
+        # 'induction' type is only available to Level 5 (Architect)
+        raw_type = request.POST.get('programme_type', 'programme')
+        if raw_type == 'induction' and _user_level(request.user) < 5:
+            raw_type = 'programme'
+        programme_type = raw_type if raw_type in ('programme', 'induction') else 'programme'
+
         if record:
             record.title = request.POST.get('title', '').strip()
             record.content = request.POST.get('description', '').strip()
+            record.record_type = programme_type
             meta = record.metadata or {}
             meta.update({
                 'qualification': request.POST.get('qualification', ''),
@@ -230,13 +237,13 @@ def author_programme_form(request, record_id=None):
                 'pathways': request.POST.get('pathways', ''),
             })
             record.metadata = meta
-            record.save(update_fields=['title', 'content', 'metadata', 'updated_at'])
+            record.save(update_fields=['title', 'content', 'record_type', 'metadata', 'updated_at'])
         else:
             Record.objects.create(
                 created_by=request.user,
                 record_class='organizational',
                 record_family='learning',
-                record_type='programme',
+                record_type=programme_type,
                 origin='user',
                 title=request.POST.get('title', '').strip(),
                 content=request.POST.get('description', '').strip(),
@@ -256,7 +263,10 @@ def author_programme_form(request, record_id=None):
             )
         return redirect('learn:learn-author')
 
-    return render(request, 'learn/author_programme_form.html', {'record': record})
+    return render(request, 'learn/author_programme_form.html', {
+        'record': record,
+        'can_create_induction': _user_level(request.user) >= 5,
+    })
 
 
 @login_required

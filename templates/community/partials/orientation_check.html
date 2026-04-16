@@ -1,47 +1,69 @@
 <!-- community/partials/orientation_check.html -->
-<!-- Loaded after tenant selection — shows orientation requirement or unlocked request form -->
+<!-- Loaded after tenant selection — shows global induction status or unlocked request form -->
 
 {% if already_pending %}
 
 <div class="announcement-card" style="border-color:var(--warning)">
   <div class="announcement-title">Request pending</div>
   <div class="announcement-meta" style="margin-top:4px">
-    Your membership request to <strong>{{ tenant.name }}</strong> is awaiting steward review.
-    You will be notified when it is approved.
+    Your membership request to <strong>{{ tenant.name }}</strong> is awaiting
+    steward review. You will be notified when it is approved.
   </div>
 </div>
 
-{% elif orientation and not completed %}
+{% elif pending %}
 
-<!-- Orientation required but not yet completed -->
+<!-- One or more global induction programmes not yet completed -->
 <div class="announcement-card" style="border-color:var(--primary)">
-  <div class="announcement-title" style="color:var(--primary)">Orientation required</div>
+  <div class="announcement-title" style="color:var(--primary)">
+    Induction required
+  </div>
   <div class="announcement-meta" style="margin-top:6px">
-    <strong>{{ tenant.name }}</strong> requires you to complete an orientation course
-    before your membership request can be submitted.
+    Complete the following platform induction
+    programme{{ pending|length|pluralize }} before submitting your
+    membership request to <strong>{{ tenant.name }}</strong>.
   </div>
-  <div style="margin-top:12px">
-    <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:6px">Required course</div>
-    <div style="font-weight:600;margin-bottom:12px">{{ orientation.title }}</div>
-    <a href="{% url 'learn:learn-programme' orientation.id %}"
-       class="btn-primary"
-       style="display:inline-block;text-decoration:none">
-      Go to orientation →
-    </a>
-  </div>
+
+  <ul style="margin:12px 0 4px;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px">
+    {% for prog in required %}
+    {% if prog in pending %}
+    <li style="display:flex;align-items:center;gap:10px">
+      <span style="color:var(--error);font-size:1rem;flex-shrink:0">○</span>
+      <div>
+        <div style="font-weight:600;font-size:0.9rem">{{ prog.title }}</div>
+        <a href="{% url 'learn:learn-programme' prog.id %}"
+           class="btn-secondary btn-sm"
+           style="display:inline-block;margin-top:4px;text-decoration:none;font-size:0.78rem">
+          Start →
+        </a>
+      </div>
+    </li>
+    {% else %}
+    <li style="display:flex;align-items:center;gap:10px">
+      <span style="color:var(--success);font-size:1rem;flex-shrink:0">✓</span>
+      <div style="font-weight:600;font-size:0.9rem;color:var(--text-secondary)">
+        {{ prog.title }}
+      </div>
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
 </div>
 <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:8px">
-  Once you have completed the course, return here to submit your request.
+  Return here after completing the induction to submit your request.
 </p>
 
 {% else %}
 
-<!-- Orientation complete (or not required) — show request form -->
-{% if orientation and completed %}
-<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;
+<!-- All inductions complete (or none required) — show request form -->
+{% if required %}
+<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;
             font-size:0.85rem;color:var(--success)">
-  <span>✓</span>
-  <span>Orientation complete — <strong>{{ orientation.title }}</strong></span>
+  <span style="margin-top:1px">✓</span>
+  <span>
+    Platform induction complete —
+    {% for prog in required %}{{ prog.title }}{% if not forloop.last %}, {% endif %}{% endfor %}
+  </span>
 </div>
 {% endif %}
 
