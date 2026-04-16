@@ -1,124 +1,159 @@
-<div id="drawerTitle" hx-swap-oob="innerHTML">{{ book.name }} {{ chapter }}:{{ verse.verse }}</div>
-<div id="drawerActions" hx-swap-oob="innerHTML"></div>
-
-<div class="bible-annotation-panel__body" style="display: flex; flex-direction: column; gap: 16px; padding: 1.5rem 1rem;">
-
-  <!-- Selected verse text -->
-  <blockquote class="bible-annotation-panel__verse" style="margin: 0; padding: 1rem; background: var(--bg); border-left: 3px solid var(--primary); font-size: 1rem; font-style: italic; color: var(--text); line-height: 1.6;">
-    {{ verse.text }}
-  </blockquote>
-
-  <!-- Tenant notes (read-only, attributed) -->
-  {% for note in tenant_notes %}
-  <div class="activity-form-card" style="padding: 1rem;">
-    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--info); letter-spacing: 0.05em; margin-bottom: 8px;">Community Note</div>
-    <p style="margin: 0; font-size: 0.95rem; line-height: 1.5;">{{ note.content }}</p>
-    <div style="margin-top: 8px; font-size: 0.8rem; color: var(--muted); text-align: right;">— {{ note.created_by.display_name|default:note.created_by.email }}</div>
-  </div>
-  {% endfor %}
-
-  <!-- Learn cross-references -->
-  {% if learn_references %}
-  <div style="margin-top: 8px;">
-    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted);">
-      <span class="material-symbols-outlined" style="font-size: 16px;">bookmark</span>
-      Referenced in Learn
-    </div>
-    <div class="list-group">
-      {% for lesson in learn_references %}
-      <div class="list-item" style="padding: 0.75rem 1rem;">
-        <div class="list-item__content">
-          <div class="list-item__title" style="font-size: 0.9rem;">{{ lesson.title }}</div>
-          <div class="list-item__meta" style="font-size: 0.75rem;">Enrol to access</div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- Handbook references (Level 5 only) -->
-  {% if competence_level >= 5 and handbook_references %}
-  <div style="margin-top: 8px;">
-    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted);">
-      <span class="material-symbols-outlined" style="font-size: 16px;">account_tree</span>
-      Handbook References
-    </div>
-    <div class="list-group">
-      {% for rel in handbook_references %}
-      <div class="list-item" style="padding: 0.75rem 1rem;">
-        <div class="list-item__content">
-          <div class="list-item__title" style="font-size: 0.9rem;">{{ rel.from_record.title }}</div>
-          <div class="list-item__meta"><span class="status-badge status-badge--active" style="display:inline-block; margin-top: 4px;">{{ rel.from_record.record_type }}</span></div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- Personal note area -->
-  <div style="margin-top: 16px;">
-    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 12px;">Your Reflection</div>
-    <form hx-post="{% url 'bible:htmx-save-note' %}"
-          hx-target="#save-note-response"
-          hx-swap="innerHTML">
-      {% csrf_token %}
-      <input type="hidden" name="verse_id" value="{{ verse.id }}">
-      <input type="hidden" name="note_class" value="personal">
-      {% if personal_note %}
-      <input type="hidden" name="note_id" value="{{ personal_note.id }}">
-      {% endif %}
-      <textarea name="content"
-                class="form-input-touch"
-                placeholder="Write a reflection or personal note…"
-                style="min-height: 120px; line-height: 1.6;"
-                maxlength="2000">{{ personal_note.content|default:'' }}</textarea>
-      
-      <div style="display: flex; gap: 8px; margin-top: 12px;">
-        <button type="submit" class="btn-touch" style="flex: 1; background: var(--primary); color: #fff;">
-          {% if personal_note %}Update{% else %}Save Note{% endif %}
-        </button>
-        {% if personal_note %}
-        <button type="button" 
-                class="btn-touch" 
-                style="background: var(--bg); color: var(--danger); border: 1px solid var(--border);"
-                hx-delete="{% url 'bible:htmx-delete-note' personal_note.id %}"
-                hx-target="#drawerContent"
-                hx-swap="innerHTML"
-                hx-confirm="Permanently delete this note?">
-          <span class="material-symbols-outlined">delete</span>
-        </button>
-        {% endif %}
-      </div>
-    </form>
-    <div id="save-note-response"></div>
-  </div>
-
-  <!-- Publish tenant note (Level 3+) -->
-  {% if can_publish_tenant_note %}
-  <details style="margin-top: 16px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
-    <summary style="padding: 12px 1rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; background: var(--bg); transition: background 0.2s ease;">
-      Publish teaching note…
-    </summary>
-    <div style="padding: 1rem; background: var(--card);">
-      <form hx-post="{% url 'bible:htmx-save-note' %}"
-            hx-target="#save-note-response"
-            hx-swap="innerHTML">
-        {% csrf_token %}
-        <input type="hidden" name="verse_id" value="{{ verse.id }}">
-        <input type="hidden" name="note_class" value="organizational">
-        <textarea name="content"
-                  class="form-input-touch"
-                  placeholder="Publish a teaching note visible to your branch…"
-                  style="min-height: 100px;"
-                  maxlength="2000"></textarea>
-        <button type="submit" class="btn-touch" style="width: 100%; margin-top: 12px; background: var(--info); color: #fff;">
-          Publish to Branch
-        </button>
-      </form>
-    </div>
-  </details>
-  {% endif %}
-
+<div id="drawerTitle" hx-swap-oob="innerHTML">Verse Context</div>
+<div id="drawerActions" hx-swap-oob="innerHTML">
+  <span style="font-size: 11px; font-weight: 800; color: var(--primary); padding: 4px 10px; border-radius: 6px; background: color-mix(in srgb, var(--primary) 10%, transparent);">{{ verse.book.code }} {{ verse.chapter }}:{{ verse.verse }}</span>
 </div>
+
+<!-- Annotation Panel Body -->
+<div class="bible-annotation-panel__body" style="display: flex; flex-direction: column; margin: 0; min-height: 100%;">
+
+  <!-- 1. Header: Selected verse text (Fixed at top) -->
+  <div style="padding: 1.5rem 1rem 1rem; background: var(--card); border-bottom: 1px solid var(--border);">
+    <blockquote style="margin: 0; padding: 0.75rem 1rem; background: var(--bg); border-left: 3px solid var(--primary); font-size: 0.95rem; font-style: italic; color: var(--text); line-height: 1.5; border-radius: 0 8px 8px 0;">
+      {{ verse.text }}
+    </blockquote>
+  </div>
+
+  <!-- 2. Tab Navigation (Sticky below verse) -->
+  <div style="position: sticky; top: 0; background: var(--card); border-bottom: 1px solid var(--border); display: flex; padding: 4px 1rem; gap: 8px; z-index: 10;">
+    <button onclick="switchTab('bible-note-tab')" id="bible-note-tab-btn" class="tab-btn tab-btn--active">Bible Note</button>
+    <button onclick="switchTab('teaching-note-tab')" id="teaching-note-tab-btn" class="tab-btn">Teaching</button>
+    <button onclick="switchTab('links-tab')" id="links-tab-btn" class="tab-btn">Links</button>
+  </div>
+
+  <div style="padding: 1rem; flex: 1;">
+    
+    <!-- TAB 1: BIBLE NOTE (Personal + Community) -->
+    <div id="bible-note-tab" class="tab-content">
+      <!-- Community Notes -->
+      {% if tenant_notes %}
+      <div style="margin-bottom: 2rem;">
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 12px;">Community Insights</div>
+        {% for note in tenant_notes %}
+        <div class="activity-form-card" style="padding: 1rem; margin-bottom: 12px;">
+          <p style="margin: 0; font-size: 0.95rem; line-height: 1.5;">{{ note.content }}</p>
+          <div style="margin-top: 8px; font-size: 0.8rem; color: var(--muted); text-align: right;">— {{ note.created_by.display_name|default:note.created_by.email }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Personal Note Form -->
+      <div>
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 12px;">Your Reflection</div>
+        <form hx-post="{% url 'bible:htmx-save-note' %}" hx-target="#save-note-response" hx-swap="innerHTML">
+          {% csrf_token %}
+          <input type="hidden" name="verse_id" value="{{ verse.id }}">
+          <input type="hidden" name="note_class" value="personal">
+          {% if personal_note %}<input type="hidden" name="note_id" value="{{ personal_note.id }}">{% endif %}
+          <textarea name="content" class="form-input-touch" placeholder="Write a reflection…" style="min-height: 180px; line-height: 1.6;" maxlength="2000">{{ personal_note.content|default:'' }}</textarea>
+          <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button type="submit" class="btn-touch" style="flex: 1; background: var(--primary); color: #fff;">
+              {% if personal_note %}Update Reflection{% else %}Save Reflection{% endif %}
+            </button>
+            {% if personal_note %}
+            <button type="button" class="btn-touch" style="background: var(--bg); color: var(--danger); border: 1px solid var(--border);"
+                    hx-delete="{% url 'bible:htmx-delete-note' personal_note.id %}" hx-target="#drawerContent" hx-confirm="Delete this reflection?">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+            {% endif %}
+          </div>
+        </form>
+        <div id="save-note-response" style="margin-top: 12px;"></div>
+      </div>
+    </div>
+
+    <!-- TAB 2: TEACHING NOTE (Learn + Handbook + Publish) -->
+    <div id="teaching-note-tab" class="tab-content" style="display: none;">
+      <!-- References -->
+      {% if learn_references or handbook_references %}
+      <div style="margin-bottom: 2rem;">
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 12px;">Formal References</div>
+        <div class="list-group">
+          {% for lesson in learn_references %}
+          <div class="list-item" style="padding: 0.75rem 1rem;">
+            <div class="list-item__content">
+              <div class="list-item__title" style="font-size: 0.9rem;">{{ lesson.title }}</div>
+              <div class="list-item__meta" style="font-size: 0.75rem;">Learn Lesson</div>
+            </div>
+          </div>
+          {% endfor %}
+          {% for rel in handbook_references %}
+          <div class="list-item" style="padding: 0.75rem 1rem;">
+            <div class="list-item__content">
+              <div class="list-item__title" style="font-size: 0.9rem;">{{ rel.from_record.title }}</div>
+              <div class="list-item__meta" style="font-size: 0.75rem;">Handbook: {{ rel.from_record.record_type }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Publish Teaching Note -->
+      {% if can_publish_tenant_note %}
+      <div>
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--info); letter-spacing: 0.05em; margin-bottom: 12px;">Publish Teaching Note</div>
+        <form hx-post="{% url 'bible:htmx-save-note' %}" hx-target="#save-note-response-teaching" hx-swap="innerHTML">
+          {% csrf_token %}
+          <input type="hidden" name="verse_id" value="{{ verse.id }}">
+          <input type="hidden" name="note_class" value="organizational">
+          <textarea name="content" class="form-input-touch" placeholder="Publish note visible to your branch…" style="min-height: 120px;"></textarea>
+          <button type="submit" class="btn-touch" style="width: 100%; margin-top: 12px; background: var(--info); color: #fff;">
+            Publish to Branch
+          </button>
+        </form>
+        <div id="save-note-response-teaching" style="margin-top: 12px;"></div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- TAB 3: LINKS (Expansion) -->
+    <div id="links-tab" class="tab-content" style="display: none;">
+      <div style="padding: 3rem 1rem; text-align: center; color: var(--muted);">
+        <span class="material-symbols-outlined" style="font-size: 48px; margin-bottom: 1rem; opacity: 0.3;">link</span>
+        <p style="font-size: 0.9rem;">Cross-linking abilities and deep resource associations will appear here.</p>
+        <button class="btn-touch" style="margin-top: 1rem; background: var(--bg); border: 1px solid var(--border); color: var(--muted); font-size: 12px;">
+          Suggest Feature
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .tab-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .tab-btn--active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+  .tab-btn:hover:not(.tab-btn--active) {
+    color: var(--text);
+    background: var(--hover);
+    border-radius: 4px;
+  }
+</style>
+
+<script>
+  function switchTab(tabId) {
+    // Hide all contents
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    // Remove active state from all buttons
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('tab-btn--active'));
+    
+    // Show selected content
+    document.getElementById(tabId).style.display = 'block';
+    // Add active state to clicked button
+    document.getElementById(tabId + '-btn').classList.add('tab-btn--active');
+  }
+</script>
