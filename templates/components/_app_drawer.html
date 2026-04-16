@@ -9,18 +9,23 @@
   {# Tactile handle for dragging #}
   <div class="drawer-handle"></div>
 
-  <div class="drawer-header">
-    {# Left: Dynamic title #}
-    <div class="drawer-title" id="drawerTitle">{% block drawer_title %}Options{% endblock %}</div>
+  <div class="drawer-header" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 16px; height: 56px;">
+    {# Left: Back Button + Title #}
+    <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+      <div id="drawerBack"></div>
+      <div class="drawer-title" id="drawerTitle" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16px; font-weight: 700;">
+        {% block drawer_title %}Options{% endblock %}
+      </div>
+    </div>
     
-    {# Center: Slot for contextual actions (like Versions) #}
-    <div id="drawerActions" class="drawer-header__actions">
+    {# Center: Contextual actions slot #}
+    <div id="drawerActions" style="display: flex; justify-content: center;">
       {% block drawer_actions %}{% endblock %}
     </div>
 
     {# Right: Close button #}
-    <div class="drawer-header__close">
-      <button id="closeBtn" class="close-btn" aria-label="Close menu">&times;</button>
+    <div style="display: flex; justify-content: flex-end;">
+      <button id="closeBtn" class="close-btn" aria-label="Close" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--hover); border-radius: 50%; border: none; font-size: 20px; color: var(--text);">&times;</button>
     </div>
   </div>
 

@@ -1,3 +1,12 @@
+<div id="drawerBack" hx-swap-oob="innerHTML">
+  <button hx-get="{% url 'bible:picker' %}" 
+          hx-target="#drawerContent" 
+          hx-swap="innerHTML"
+          class="btn-touch" 
+          style="border:none; background:transparent; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: var(--primary);">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+</div>
 <div id="drawerTitle" hx-swap-oob="innerHTML">Select Version</div>
 <div id="drawerActions" hx-swap-oob="innerHTML"></div>
 
