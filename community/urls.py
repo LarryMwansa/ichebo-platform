@@ -43,8 +43,12 @@ urlpatterns = [
     # ── Membership request flow ───────────────────────────────────────────────
     path('community/htmx/membership/request/',
          views.htmx_request_membership, name='htmx-membership-request'),
+    path('community/htmx/membership/orientation-check/',
+         views.htmx_orientation_check, name='htmx-orientation-check'),
     path('community/htmx/membership/pending/',
          views.htmx_pending_requests, name='htmx-pending-requests'),
     path('community/htmx/membership/<uuid:request_id>/review/',
          views.htmx_review_request, name='htmx-review-request'),
+    path('community/htmx/orientation/set/',
+         views.htmx_set_orientation, name='htmx-set-orientation'),
 ]

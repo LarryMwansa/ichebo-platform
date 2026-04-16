@@ -50,6 +50,14 @@ class Tenant(models.Model):
     description = models.TextField(blank=True, null=True)
     logo_url = models.URLField(blank=True, null=True)
 
+    # Orientation — a Learn programme/course required before membership request
+    orientation_record = models.ForeignKey(
+        'records.Record',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='orientation_for_tenants',
+    )
+
     # Location (JSON field — PostgreSQL)
     location = models.JSONField(default=dict, blank=True)
     settings_data = models.JSONField(default=dict, blank=True)

@@ -5,10 +5,12 @@
   <p style="font-size:32px;margin-bottom:12px">🌱</p>
   <p style="font-weight:600;color:var(--text)">You are not yet a member of a community.</p>
   <p style="margin-top:8px;color:var(--text-secondary)">
-    Submit a request to join a community. A steward will review and approve your membership.
+    Select a community below. Some communities require you to complete an orientation
+    course before your request can be submitted.
   </p>
 </div>
 
+<!-- Phase 1: tenant picker loads here -->
 <div style="margin-top:1.5rem"
      id="membership-request-area"
      hx-get="{% url 'community:htmx-membership-request' %}"
@@ -16,4 +18,7 @@
      hx-swap="innerHTML">
   <div class="htmx-indicator">Loading&hellip;</div>
 </div>
+
+<!-- Phase 2: orientation / request form swaps into here after tenant selection -->
+<div id="orientation-check-area" style="margin-top:1rem"></div>
 {% endblock %}

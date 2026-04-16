@@ -1,0 +1,29 @@
+<!-- community/partials/orientation_form.html -->
+<!-- Steward: assign an orientation course to the tenant -->
+<div class="announcement-card" style="margin-top:8px" id="orientation-form">
+  <div class="section-heading" style="margin-bottom:8px">Set Orientation Course</div>
+  <form hx-post="{% url 'community:htmx-set-orientation' %}"
+        hx-target="#orientation-value"
+        hx-swap="outerHTML">
+    {% csrf_token %}
+    <div class="form-field">
+      <label for="orient-select">Programme / Course</label>
+      <select id="orient-select" name="record_id">
+        <option value="">— None (no orientation required) —</option>
+        {% for item in learn_content %}
+        <option value="{{ item.id }}"
+          {% if tenant.orientation_record_id == item.id %}selected{% endif %}>
+          [{{ item.record_type|title }}] {{ item.title }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-top:8px">
+      <button type="submit" class="btn-save btn-sm">Save</button>
+      <button type="button" class="btn-secondary btn-sm"
+              hx-get="" hx-target="#orientation-form" hx-swap="outerHTML">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

@@ -146,7 +146,11 @@ def management_home(request):
 
     perms = _get_user_permissions(request.user)
     primary_perm = perms[0] if perms else None
-    scope_tenant = primary_perm.tenant if primary_perm else None
+    scope_tenant = (
+        Tenant.objects.select_related('orientation_record')
+        .get(pk=primary_perm.tenant_id)
+        if primary_perm else None
+    )
 
     member_count = 0
     announcements = []
@@ -691,12 +695,64 @@ def htmx_member_search(request):
 
 # ── Membership request flow ───────────────────────────────────────────────────
 
+def _orientation_completed(user, tenant):
+    """
+    Return True if the user has completed the tenant's orientation requirement.
+    Always True when the tenant has no orientation record assigned.
+    """
+    orientation = tenant.orientation_record
+    if not orientation:
+        return True
+    return Activity.objects.filter(
+        assigned_to=user,
+        status='completed',
+        metadata__programme_record_id=str(orientation.id),
+    ).exists()
+
+
+@login_required
+def htmx_orientation_check(request):
+    """
+    GET ?tenant_id=<uuid>
+    Returns the orientation status partial for the selected tenant:
+    - No orientation required → show membership request form
+    - Orientation required + completed → show membership request form
+    - Orientation required + not done → show orientation prompt card
+    """
+    tenant_id = request.GET.get('tenant_id', '').strip()
+    user = request.user
+
+    if not tenant_id:
+        return HttpResponse('')
+
+    try:
+        tenant = Tenant.objects.select_related('orientation_record').get(
+            id=tenant_id, status='active'
+        )
+    except Tenant.DoesNotExist:
+        return HttpResponse('<p class="form-error">Community not found.</p>')
+
+    orientation = tenant.orientation_record
+    completed = _orientation_completed(user, tenant)
+
+    # Already has a pending request?
+    already_pending = MembershipRequest.objects.filter(
+        user=user, tenant=tenant, status='pending'
+    ).exists()
+
+    return render(request, 'community/partials/orientation_check.html', {
+        'tenant':          tenant,
+        'orientation':     orientation,
+        'completed':       completed,
+        'already_pending': already_pending,
+    })
+
+
 @login_required
 def htmx_request_membership(request):
     """
-    GET  → membership request form (list of active tenants to choose from)
-    POST → create MembershipRequest; idempotent (one pending request per user/tenant)
-    Accessible to any authenticated user who needs to join a community.
+    GET  → tenant picker form (tenant selection triggers orientation check)
+    POST → create MembershipRequest; orientation gate + idempotency guard
     """
     user = request.user
 
@@ -710,10 +766,19 @@ def htmx_request_membership(request):
             )
 
         try:
-            tenant = Tenant.objects.get(id=tenant_id, status='active')
+            tenant = Tenant.objects.select_related('orientation_record').get(
+                id=tenant_id, status='active'
+            )
         except Tenant.DoesNotExist:
             return HttpResponse(
                 '<p class="form-error">Community not found.</p>'
+            )
+
+        # Server-side orientation gate — cannot be bypassed from the browser
+        if not _orientation_completed(user, tenant):
+            return HttpResponse(
+                '<p class="form-error">Please complete the orientation course before submitting a request.</p>',
+                status=403,
             )
 
         # One pending request per user per tenant — idempotency guard
@@ -739,10 +804,67 @@ def htmx_request_membership(request):
             {'tenant': tenant, 'already_pending': False},
         )
 
-    # GET — return the form
+    # GET — return the tenant picker only; orientation check loads via HTMX
     tenants = Tenant.objects.filter(status='active').order_by('name')[:50]
     return render(request, 'community/partials/membership_request_form.html', {
         'tenants': tenants,
+    })
+
+
+@login_required
+def htmx_set_orientation(request):
+    """
+    GET  → orientation assignment form (list of learn programmes/courses)
+    POST → set tenant.orientation_record; clears it when record_id is empty
+    Level 3+ only.
+    """
+    if not _require_level(request, 3):
+        return HttpResponse('', status=403)
+
+    perms = _get_user_permissions(request.user)
+    primary_perm = perms[0] if perms else None
+    if not primary_perm:
+        return HttpResponse('', status=403)
+
+    tenant = primary_perm.tenant
+
+    if request.method == 'POST':
+        record_id = request.POST.get('record_id', '').strip() or None
+        if record_id:
+            try:
+                orientation = Record.objects.get(
+                    id=record_id,
+                    record_family='learning',
+                    record_type__in=['programme', 'course'],
+                    deleted_at__isnull=True,
+                )
+                tenant.orientation_record = orientation
+            except Record.DoesNotExist:
+                return HttpResponse(
+                    '<p class="form-error">Course not found.</p>'
+                )
+        else:
+            tenant.orientation_record = None
+
+        tenant.save(update_fields=['orientation_record'])
+
+        label = tenant.orientation_record.title if tenant.orientation_record else 'None'
+        return HttpResponse(
+            f'<div class="info-card-value" id="orientation-value">'
+            f'✓ {label}'
+            f'</div>'
+        )
+
+    # GET — return the assignment form
+    learn_content = Record.objects.filter(
+        record_family='learning',
+        record_type__in=['programme', 'course'],
+        deleted_at__isnull=True,
+    ).order_by('record_type', 'title')[:100]
+
+    return render(request, 'community/partials/orientation_form.html', {
+        'tenant':        tenant,
+        'learn_content': learn_content,
     })
 
 
