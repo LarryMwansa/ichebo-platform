@@ -12,5 +12,6 @@ urlpatterns = [
     path('notifications/unread-count/', views.unread_count, name='unread-count'),
     path('notifications/unread-badge/', views.htmx_unread_badge, name='unread-badge'),
     path('notifications/mark-all-read/', views.mark_all_read, name='mark-all-read'),
+    path('notifications/<uuid:notification_id>/read/', views.mark_one_read, name='mark-one-read'),
     path('notifications/health/', views.health, name='health'),
 ]

@@ -127,11 +127,14 @@ class ActivityLogTests(TestCase):
         self.assertEqual(log.activity, self.activity)
 
     def test_multiple_logs_per_activity(self):
+        # Activity creation auto-generates a 'created' log via activity/signals.py.
+        # Count that baseline, then verify each manual log increments it.
+        baseline = self.activity.logs.count()
         ActivityLog.objects.create(activity=self.activity, created_by=self.user,
                                    event_type='status_changed', new_value='in_progress')
         ActivityLog.objects.create(activity=self.activity, created_by=self.user,
                                    event_type='status_changed', new_value='completed')
-        self.assertEqual(self.activity.logs.count(), 2)
+        self.assertEqual(self.activity.logs.count(), baseline + 2)
 
     def test_log_uuid_primary_key(self):
         log = ActivityLog.objects.create(

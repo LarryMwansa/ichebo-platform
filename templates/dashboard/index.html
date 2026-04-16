@@ -54,6 +54,28 @@
     {% endif %}
   </div>
 
+  {# Paraclete Suggestions (Level 1+) #}
+  {% if digest.suggestions %}
+  <div class="dash-widget dash-widget--suggestions">
+    <div class="dash-widget__label">Suggested Actions</div>
+    <ul class="dash-list">
+      {% for s in digest.suggestions %}
+      <li class="dash-list__item" style="align-items:flex-start;gap:0.5rem;padding:0.35rem 0;">
+        <span style="flex-shrink:0;font-size:0.8rem;font-weight:700;
+          color:{% if s.priority == 1 %}var(--error){% elif s.priority == 2 %}var(--warning){% else %}var(--primary){% endif %};">
+          {% if s.priority == 1 %}!{% elif s.priority == 2 %}·{% else %}›{% endif %}
+        </span>
+        <span class="dash-list__title" style="flex:1;">
+          {% if s.action_url %}
+          <a href="{{ s.action_url }}" style="color:inherit;text-decoration:none;">{{ s.text }}</a>
+          {% else %}{{ s.text }}{% endif %}
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
   {% if digest.competence_level >= 1 %}
 
   {# Activity Summary #}
@@ -86,11 +108,25 @@
 
   </div>
 
-  {# Due Today #}
-  {% if digest.due_today %}
-  <div class="dash-widget">
-    <div class="dash-widget__label">Due Today</div>
+  {# Action Items — consolidated priority list: Overdue → Due Today → Reminders #}
+  {% if digest.overdue_items or digest.due_today or digest.pending_reminders %}
+  <div class="dash-widget {% if digest.overdue_items %}dash-widget--danger{% endif %}">
+    <div class="dash-widget__label">Action Items</div>
     <ul class="dash-list">
+
+      {% for item in digest.overdue_items %}
+      <li class="dash-list__item">
+        <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}"
+              style="background:var(--error);color:#fff;">
+          {{ item.activity_type|slice:":3"|upper }}
+        </span>
+        <span class="dash-list__title">{{ item.title }}</span>
+        <span class="dash-list__time dash-list__time--late">
+          Overdue{% if item.due_at %} · {{ item.due_at|slice:":10" }}{% endif %}
+        </span>
+      </li>
+      {% endfor %}
+
       {% for item in digest.due_today %}
       <li class="dash-list__item">
         <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}">
@@ -98,39 +134,11 @@
         </span>
         <span class="dash-list__title">{{ item.title }}</span>
         {% if item.due_at %}
-        <span class="dash-list__time">{{ item.due_at|slice:"11:16" }}</span>
+        <span class="dash-list__time">Today · {{ item.due_at|slice:"11:16" }}</span>
         {% endif %}
       </li>
       {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
 
-  {# Overdue Items #}
-  {% if digest.overdue_items %}
-  <div class="dash-widget dash-widget--danger">
-    <div class="dash-widget__label">Overdue</div>
-    <ul class="dash-list">
-      {% for item in digest.overdue_items %}
-      <li class="dash-list__item">
-        <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}">
-          {{ item.activity_type|slice:":3"|upper }}
-        </span>
-        <span class="dash-list__title">{{ item.title }}</span>
-        {% if item.due_at %}
-        <span class="dash-list__time dash-list__time--late">{{ item.due_at|slice:":10" }}</span>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
-
-  {# Reminders #}
-  {% if digest.pending_reminders %}
-  <div class="dash-widget">
-    <div class="dash-widget__label">Upcoming Reminders</div>
-    <ul class="dash-list">
       {% for r in digest.pending_reminders %}
       <li class="dash-list__item">
         <span class="dash-list__badge dash-list__badge--reminder">REM</span>
@@ -140,7 +148,11 @@
         {% endif %}
       </li>
       {% endfor %}
+
     </ul>
+    <a href="/activity/" style="font-size:0.8rem;color:var(--primary);text-decoration:none;display:block;margin-top:6px;">
+      All activities →
+    </a>
   </div>
   {% endif %}
 

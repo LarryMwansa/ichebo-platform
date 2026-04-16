@@ -31,7 +31,7 @@ def _shell_or_partial(request, partial_template, context, shell_template='govern
     """Return partial HTML for HTMX requests, full shell for browser navigation."""
     if _htmx(request):
         return render(request, partial_template, context)
-    context['_partial'] = partial_template
+    context['partial_tpl'] = partial_template
     return render(request, shell_template, context)
 
 

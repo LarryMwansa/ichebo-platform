@@ -134,6 +134,10 @@ def build_digest(user) -> ParacleteDigest:
     if level >= 3:
         _populate_team_counts(digest, user, now, today)
 
+    # Suggestions — rule-based, generated after all other data is populated
+    digest.suggestions = _build_suggestions(digest)
+    digest.suggestion_method = 'rules'
+
     return digest
 
 
@@ -375,6 +379,99 @@ def _populate_team_counts(digest, user, now, today):
         due_at__isnull=False,
         due_at__lt=now,
     ).count()
+
+
+# ---------------------------------------------------------------------------
+# Suggestions (rule-based)
+# ---------------------------------------------------------------------------
+
+def _build_suggestions(digest) -> list:
+    """
+    Generate a prioritised list of plain-text action suggestions based on
+    the fully-populated ParacleteDigest. Called after all other helpers so
+    it can read any field on the digest.
+
+    Returns at most 5 suggestions, most urgent first.
+    Each suggestion is a dict with keys: { text, priority, action_url }.
+    """
+    suggestions = []
+
+    # Rule 1 — Overdue items (highest urgency)
+    if digest.overdue_count > 0:
+        first = digest.overdue_items[0] if digest.overdue_items else None
+        if first:
+            suggestions.append({
+                'text': f'"{first.title}" is overdue — address this today.',
+                'priority': 1,
+                'action_url': f'/activity/{first.id}/',
+            })
+        if digest.overdue_count > 1:
+            suggestions.append({
+                'text': f'You have {digest.overdue_count} overdue activities. Clear the backlog.',
+                'priority': 1,
+                'action_url': '/activity/',
+            })
+
+    # Rule 2 — No DAR submitted today (Level 1+)
+    if digest.competence_level >= 1 and digest.dar_today is None:
+        suggestions.append({
+            'text': 'Submit your Daily Activity Report before the day ends.',
+            'priority': 2,
+            'action_url': '/records/create/?type=dar',
+        })
+
+    # Rule 3 — Habit streak broken (streak == 0 means not completed today)
+    broken_habits = [h for h in digest.habit_streaks if h.streak == 0]
+    if broken_habits:
+        h = broken_habits[0]
+        suggestions.append({
+            'text': f'Restart your "{h.title}" habit — mark it complete today.',
+            'priority': 2,
+            'action_url': f'/activity/{h.activity_id}/',
+        })
+
+    # Rule 4 — Active enrolments but no next lesson found
+    if digest.active_enrolments and digest.next_lesson is None:
+        prog = digest.active_enrolments[0]
+        suggestions.append({
+            'text': f'Continue your programme "{prog.title}" — find the next lesson.',
+            'priority': 3,
+            'action_url': f'/learn/programme/{prog.record_id}/',
+        })
+
+    # Rule 5 — Next lesson is ready
+    if digest.next_lesson:
+        suggestions.append({
+            'text': f'Your next lesson is ready: "{digest.next_lesson.title}".',
+            'priority': 3,
+            'action_url': digest.next_lesson.url,
+        })
+
+    # Rule 6 — Many pending items (workload warning)
+    if digest.pending_count >= 10:
+        suggestions.append({
+            'text': f'You have {digest.pending_count} pending activities. Consider delegating or deferring.',
+            'priority': 3,
+            'action_url': '/activity/',
+        })
+
+    # Rule 7 — Team overdue (Level 3+)
+    if digest.team_overdue_count and digest.team_overdue_count > 0:
+        suggestions.append({
+            'text': f'Your team has {digest.team_overdue_count} overdue activities. Review with your members.',
+            'priority': 2,
+            'action_url': '/community/management/',
+        })
+
+    # Sort by priority (ascending = most urgent first), deduplicate by text
+    seen = set()
+    unique = []
+    for s in sorted(suggestions, key=lambda x: x['priority']):
+        if s['text'] not in seen:
+            seen.add(s['text'])
+            unique.append(s)
+
+    return unique[:5]
 
 
 # ---------------------------------------------------------------------------
