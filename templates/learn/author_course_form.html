@@ -3,16 +3,19 @@
 {% block learn_content %}
 <div class="learn-header">
   <a href="{% url 'learn:learn-author' %}" class="btn-back">← Authorship</a>
-  <h2>New Course</h2>
+  <h2>{% if record %}Edit Course{% else %}New Course{% endif %}</h2>
 </div>
-<form method="post" class="author-form">
+<form method="post" class="author-form"
+      action="{% if record %}{% url 'learn:learn-author-course-edit' record.id %}{% else %}{% url 'learn:learn-author-course' %}{% endif %}">
   {% csrf_token %}
   <label>Title
-    <input type="text" name="title" required maxlength="500">
+    <input type="text" name="title" required maxlength="500"
+           value="{{ record.title|default:'' }}">
   </label>
   <label>Description
-    <textarea name="description" rows="4"></textarea>
+    <textarea name="description" rows="4">{{ record.content|default:'' }}</textarea>
   </label>
+  {% if not record %}
   <label>Parent Programme
     <select name="programme_id">
       <option value="">— None —</option>
@@ -21,6 +24,9 @@
       {% endfor %}
     </select>
   </label>
-  <button type="submit" class="btn-primary">Create (Draft)</button>
+  {% endif %}
+  <button type="submit" class="btn-primary">
+    {% if record %}Save Changes{% else %}Create (Draft){% endif %}
+  </button>
 </form>
 {% endblock %}

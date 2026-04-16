@@ -1,0 +1,30 @@
+<form class="record-create-form"
+      hx-post="{% url 'records:htmx-create' %}"
+      hx-target="#record-create-panel"
+      hx-swap="beforebegin"
+      hx-on::after-request="this.reset()">
+  {% csrf_token %}
+
+  <div class="form-row">
+    <select name="record_type" class="form-input">
+      {% for value, label in record_types %}
+      <option value="{{ value }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+    <input type="text" name="title" placeholder="Entry title…"
+           class="form-input form-input--grow" required>
+  </div>
+
+  <div class="form-row">
+    <textarea name="content" placeholder="Write your entry…"
+              class="form-input form-input--textarea" rows="4"></textarea>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn-primary">Save</button>
+    <button type="button" class="btn-secondary"
+            hx-get="" hx-target="#record-create-panel" hx-swap="innerHTML">
+      Cancel
+    </button>
+  </div>
+</form>

@@ -209,42 +209,66 @@ def authorship(request):
 
 
 @login_required
-def author_programme_form(request):
+def author_programme_form(request, record_id=None):
     if _user_level(request.user) < 4:
         return redirect('learn:learn-home')
 
+    record = None
+    if record_id:
+        record = get_object_or_404(
+            Record, id=record_id, created_by=request.user, deleted_at__isnull=True
+        )
+
     if request.method == 'POST':
-        Record.objects.create(
-            created_by=request.user,
-            record_class='organizational',
-            record_family='learning',
-            record_type='programme',
-            origin='user',
-            title=request.POST.get('title', '').strip(),
-            content=request.POST.get('description', '').strip(),
-            status='draft',
-            metadata={
-                'source_app': 'learn',
+        if record:
+            record.title = request.POST.get('title', '').strip()
+            record.content = request.POST.get('description', '').strip()
+            meta = record.metadata or {}
+            meta.update({
                 'qualification': request.POST.get('qualification', ''),
                 'duration_years': request.POST.get('duration_years', ''),
                 'pathways': request.POST.get('pathways', ''),
-            },
-            permissions_data={
-                'visibility': 'tenant',
-                'required_level': int(request.POST.get('required_level', 1)),
-                'roles_allowed': [],
-                'can_edit': [],
-            }
-        )
+            })
+            record.metadata = meta
+            record.save(update_fields=['title', 'content', 'metadata', 'updated_at'])
+        else:
+            Record.objects.create(
+                created_by=request.user,
+                record_class='organizational',
+                record_family='learning',
+                record_type='programme',
+                origin='user',
+                title=request.POST.get('title', '').strip(),
+                content=request.POST.get('description', '').strip(),
+                status='draft',
+                metadata={
+                    'source_app': 'learn',
+                    'qualification': request.POST.get('qualification', ''),
+                    'duration_years': request.POST.get('duration_years', ''),
+                    'pathways': request.POST.get('pathways', ''),
+                },
+                permissions_data={
+                    'visibility': 'tenant',
+                    'required_level': int(request.POST.get('required_level', 1)),
+                    'roles_allowed': [],
+                    'can_edit': [],
+                }
+            )
         return redirect('learn:learn-author')
 
-    return render(request, 'learn/author_programme_form.html', {})
+    return render(request, 'learn/author_programme_form.html', {'record': record})
 
 
 @login_required
-def author_course_form(request):
+def author_course_form(request, record_id=None):
     if _user_level(request.user) < 4:
         return redirect('learn:learn-home')
+
+    record = None
+    if record_id:
+        record = get_object_or_404(
+            Record, id=record_id, created_by=request.user, deleted_at__isnull=True
+        )
 
     programmes = Record.objects.filter(
         record_family='learning', record_type='programme',
@@ -252,37 +276,51 @@ def author_course_form(request):
     )
 
     if request.method == 'POST':
-        course = Record.objects.create(
-            created_by=request.user,
-            record_class='organizational',
-            record_family='learning',
-            record_type='course',
-            origin='user',
-            title=request.POST.get('title', '').strip(),
-            content=request.POST.get('description', '').strip(),
-            status='draft',
-            metadata={'source_app': 'learn'},
-            permissions_data={'visibility': 'tenant', 'required_level': 1,
-                              'roles_allowed': [], 'can_edit': []},
-        )
-        prog_id = request.POST.get('programme_id')
-        if prog_id:
-            Relationship.objects.create(
+        if record:
+            record.title = request.POST.get('title', '').strip()
+            record.content = request.POST.get('description', '').strip()
+            record.save(update_fields=['title', 'content', 'updated_at'])
+        else:
+            course = Record.objects.create(
                 created_by=request.user,
-                from_record=course,
-                to_record_id=prog_id,
-                relationship_type='part_of',
-                direction='directed',
+                record_class='organizational',
+                record_family='learning',
+                record_type='course',
+                origin='user',
+                title=request.POST.get('title', '').strip(),
+                content=request.POST.get('description', '').strip(),
+                status='draft',
+                metadata={'source_app': 'learn'},
+                permissions_data={'visibility': 'tenant', 'required_level': 1,
+                                  'roles_allowed': [], 'can_edit': []},
             )
+            prog_id = request.POST.get('programme_id')
+            if prog_id:
+                Relationship.objects.create(
+                    created_by=request.user,
+                    from_record=course,
+                    to_record_id=prog_id,
+                    relationship_type='part_of',
+                    direction='directed',
+                )
         return redirect('learn:learn-author')
 
-    return render(request, 'learn/author_course_form.html', {'programmes': programmes})
+    return render(request, 'learn/author_course_form.html', {
+        'programmes': programmes,
+        'record': record,
+    })
 
 
 @login_required
-def author_lesson_form(request):
+def author_lesson_form(request, record_id=None):
     if _user_level(request.user) < 4:
         return redirect('learn:learn-home')
+
+    record = None
+    if record_id:
+        record = get_object_or_404(
+            Record, id=record_id, created_by=request.user, deleted_at__isnull=True
+        )
 
     courses = Record.objects.filter(
         record_family='learning', record_type='course',
@@ -290,31 +328,39 @@ def author_lesson_form(request):
     )
 
     if request.method == 'POST':
-        lesson = Record.objects.create(
-            created_by=request.user,
-            record_class='organizational',
-            record_family='learning',
-            record_type=request.POST.get('record_type', 'lesson'),
-            origin='user',
-            title=request.POST.get('title', '').strip(),
-            content=request.POST.get('content', '').strip(),
-            status='draft',
-            metadata={'source_app': 'learn'},
-            permissions_data={'visibility': 'tenant', 'required_level': 1,
-                              'roles_allowed': [], 'can_edit': []},
-        )
-        course_id = request.POST.get('course_id')
-        if course_id:
-            Relationship.objects.create(
+        if record:
+            record.title = request.POST.get('title', '').strip()
+            record.content = request.POST.get('content', '').strip()
+            record.save(update_fields=['title', 'content', 'updated_at'])
+        else:
+            lesson = Record.objects.create(
                 created_by=request.user,
-                from_record=lesson,
-                to_record_id=course_id,
-                relationship_type='part_of',
-                direction='directed',
+                record_class='organizational',
+                record_family='learning',
+                record_type=request.POST.get('record_type', 'lesson'),
+                origin='user',
+                title=request.POST.get('title', '').strip(),
+                content=request.POST.get('content', '').strip(),
+                status='draft',
+                metadata={'source_app': 'learn'},
+                permissions_data={'visibility': 'tenant', 'required_level': 1,
+                                  'roles_allowed': [], 'can_edit': []},
             )
+            course_id = request.POST.get('course_id')
+            if course_id:
+                Relationship.objects.create(
+                    created_by=request.user,
+                    from_record=lesson,
+                    to_record_id=course_id,
+                    relationship_type='part_of',
+                    direction='directed',
+                )
         return redirect('learn:learn-author')
 
-    return render(request, 'learn/author_lesson_form.html', {'courses': courses})
+    return render(request, 'learn/author_lesson_form.html', {
+        'courses': courses,
+        'record': record,
+    })
 
 
 # ── Handbook Review Queue (Level 5) ──────────────────────────────────────────

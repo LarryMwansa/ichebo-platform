@@ -3,34 +3,42 @@
 {% block learn_content %}
 <div class="learn-header">
   <a href="{% url 'learn:learn-author' %}" class="btn-back">← Authorship</a>
-  <h2>New Programme</h2>
+  <h2>{% if record %}Edit Programme{% else %}New Programme{% endif %}</h2>
 </div>
-<form method="post" class="author-form">
+<form method="post" class="author-form"
+      action="{% if record %}{% url 'learn:learn-author-programme-edit' record.id %}{% else %}{% url 'learn:learn-author-programme' %}{% endif %}">
   {% csrf_token %}
   <label>Title
-    <input type="text" name="title" required maxlength="500">
+    <input type="text" name="title" required maxlength="500"
+           value="{{ record.title|default:'' }}">
   </label>
   <label>Qualification Level
     <select name="qualification">
-      <option value="Certificate">Certificate</option>
-      <option value="Diploma">Diploma</option>
-      <option value="Degree">Degree</option>
-      <option value="Masters">Masters</option>
-      <option value="Doctorate">Doctorate</option>
+      <option value="Certificate" {% if record.metadata.qualification == 'Certificate' %}selected{% endif %}>Certificate</option>
+      <option value="Diploma" {% if record.metadata.qualification == 'Diploma' %}selected{% endif %}>Diploma</option>
+      <option value="Degree" {% if record.metadata.qualification == 'Degree' %}selected{% endif %}>Degree</option>
+      <option value="Masters" {% if record.metadata.qualification == 'Masters' %}selected{% endif %}>Masters</option>
+      <option value="Doctorate" {% if record.metadata.qualification == 'Doctorate' %}selected{% endif %}>Doctorate</option>
     </select>
   </label>
   <label>Description
-    <textarea name="description" rows="4"></textarea>
+    <textarea name="description" rows="4">{{ record.content|default:'' }}</textarea>
   </label>
   <label>Duration (years)
-    <input type="number" name="duration_years" min="1" max="10">
+    <input type="number" name="duration_years" min="1" max="10"
+           value="{{ record.metadata.duration_years|default:'' }}">
   </label>
   <label>KGS Pathways (comma-separated)
-    <input type="text" name="pathways" placeholder="Learning, Community Life…">
+    <input type="text" name="pathways" placeholder="Learning, Community Life…"
+           value="{{ record.metadata.pathways|default:'' }}">
   </label>
+  {% if not record %}
   <label>Required Level (1–5)
     <input type="number" name="required_level" min="1" max="5" value="1">
   </label>
-  <button type="submit" class="btn-primary">Create (Draft)</button>
+  {% endif %}
+  <button type="submit" class="btn-primary">
+    {% if record %}Save Changes{% else %}Create (Draft){% endif %}
+  </button>
 </form>
 {% endblock %}

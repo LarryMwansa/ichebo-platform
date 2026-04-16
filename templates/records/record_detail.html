@@ -1,0 +1,50 @@
+{% extends "records/base_records.html" %}
+
+{% block records_content %}
+
+<div class="record-detail">
+
+  <div class="record-detail-header">
+    <div class="record-detail-meta">
+      <span class="record-type-tag record-type-tag--{{ record.record_type }}">
+        {{ record.record_type|title }}
+      </span>
+      <span class="record-status-tag record-status-tag--{{ record.status }}">
+        {{ record.status|title }}
+      </span>
+    </div>
+    <h1 class="record-detail-title">{{ record.title }}</h1>
+    <div class="record-detail-dates">
+      <span>Created {{ record.created_at|date:"d M Y" }}</span>
+      {% if record.updated_at != record.created_at %}
+      <span>· Updated {{ record.updated_at|date:"d M Y" }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if record.content %}
+  <div class="record-detail-body">
+    {{ record.content|linebreaks }}
+  </div>
+  {% endif %}
+
+  {% if record.created_by == request.user %}
+  <div class="record-detail-actions">
+    <a href="{% url 'records:records-home' %}" class="btn-secondary">← Back</a>
+    <button class="btn-primary"
+            hx-get="{% url 'records:htmx-edit' record.id %}"
+            hx-target="#record-edit-container"
+            hx-swap="innerHTML">
+      Edit
+    </button>
+  </div>
+  <div id="record-edit-container"></div>
+  {% else %}
+  <div class="record-detail-actions">
+    <a href="{% url 'records:records-home' %}" class="btn-secondary">← Back</a>
+  </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

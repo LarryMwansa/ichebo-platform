@@ -1,0 +1,36 @@
+{% extends "records/base_records.html" %}
+
+{% block records_content %}
+
+<div class="records-header">
+  <h1>My Journal</h1>
+  <button class="btn-primary"
+          hx-get="{% url 'records:htmx-create' %}"
+          hx-target="#record-create-panel"
+          hx-swap="innerHTML">
+    + New Entry
+  </button>
+</div>
+
+<!-- Inline create form panel -->
+<div id="record-create-panel"></div>
+
+<!-- Record list -->
+<div id="record-list">
+  {% for record in records %}
+    {% include "records/partials/record_card.html" %}
+  {% empty %}
+    <div class="empty-state">
+      <p>No journal entries yet.
+        <button class="btn-primary"
+                hx-get="{% url 'records:htmx-create' %}"
+                hx-target="#record-create-panel"
+                hx-swap="innerHTML">
+          Write your first entry
+        </button>
+      </p>
+    </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

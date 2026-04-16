@@ -144,6 +144,71 @@ def htmx_complete_activity(request, activity_id):
     )
 
 
+# ── HTMX: edit activity ──────────────────────────────────────────────────────
+
+@login_required
+def htmx_edit_activity(request, activity_id):
+    activity = get_object_or_404(
+        Activity, id=activity_id, created_by=request.user, deleted_at__isnull=True
+    )
+
+    if request.GET.get('show') == '1':
+        return render(request, 'activity/partials/activity_card.html', {'activity': activity})
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        if title:
+            activity.title = title
+        due_raw = request.POST.get('due_at', '').strip()
+        if due_raw:
+            try:
+                from django.utils.dateparse import parse_datetime, parse_date
+                activity.due_at = parse_datetime(due_raw) or (
+                    timezone.make_aware(
+                        timezone.datetime.combine(parse_date(due_raw), timezone.datetime.min.time())
+                    ) if parse_date(due_raw) else activity.due_at
+                )
+            except Exception:
+                pass
+        recurrence = request.POST.get('recurrence')
+        if recurrence:
+            activity.recurrence = recurrence
+        activity.save(update_fields=['title', 'due_at', 'recurrence', 'updated_at'])
+        ActivityLog.objects.create(
+            activity=activity,
+            created_by=request.user,
+            event_type='edited',
+        )
+        return render(request, 'activity/partials/activity_card.html', {'activity': activity})
+
+    # GET — return edit form pre-populated
+    return render(request, 'activity/partials/edit_form.html', {
+        'activity': activity,
+        'type_labels': TYPE_LABELS,
+        'all_types': ALL_TYPES,
+    })
+
+
+# ── HTMX: delete activity ─────────────────────────────────────────────────────
+
+@login_required
+def htmx_delete_activity(request, activity_id):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    activity = get_object_or_404(
+        Activity, id=activity_id, created_by=request.user, deleted_at__isnull=True
+    )
+    activity.deleted_at = timezone.now()
+    activity.save(update_fields=['deleted_at'])
+    ActivityLog.objects.create(
+        activity=activity,
+        created_by=request.user,
+        event_type='deleted',
+    )
+    return HttpResponse('')
+
+
 # ── HTMX: activity list partial ───────────────────────────────────────────────
 
 @login_required

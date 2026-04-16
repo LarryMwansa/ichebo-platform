@@ -25,5 +25,19 @@
             hx-swap="outerHTML">
       Done
     </button>
+    <button class="btn-secondary btn-sm"
+            hx-get="{% url 'activity:htmx-edit' activity.id %}"
+            hx-target="#activity-{{ activity.id }}"
+            hx-swap="outerHTML">
+      Edit
+    </button>
+    <button class="btn-danger btn-sm"
+            hx-post="{% url 'activity:htmx-delete' activity.id %}"
+            hx-target="#activity-{{ activity.id }}"
+            hx-swap="outerHTML"
+            hx-confirm="Delete this activity?"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+      Delete
+    </button>
   </div>
 </div>

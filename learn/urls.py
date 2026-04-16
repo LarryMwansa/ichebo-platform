@@ -16,8 +16,11 @@ urlpatterns = [
     # Authorship (Level 4+)
     path('author/', views.authorship, name='learn-author'),
     path('author/programme/', views.author_programme_form, name='learn-author-programme'),
+    path('author/programme/<uuid:record_id>/', views.author_programme_form, name='learn-author-programme-edit'),
     path('author/course/', views.author_course_form, name='learn-author-course'),
+    path('author/course/<uuid:record_id>/', views.author_course_form, name='learn-author-course-edit'),
     path('author/lesson/', views.author_lesson_form, name='learn-author-lesson'),
+    path('author/lesson/<uuid:record_id>/', views.author_lesson_form, name='learn-author-lesson-edit'),
 
     # Review queue (Level 5)
     path('review/', views.review_queue, name='learn-review'),

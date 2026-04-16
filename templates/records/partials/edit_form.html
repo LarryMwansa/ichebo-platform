@@ -1,0 +1,27 @@
+<div class="record-edit-form" id="record-{{ record.id }}">
+  <form hx-post="{% url 'records:htmx-edit' record.id %}"
+        hx-target="#record-{{ record.id }}"
+        hx-swap="outerHTML">
+    {% csrf_token %}
+
+    <div class="form-row">
+      <input type="text" name="title" value="{{ record.title }}"
+             class="form-input form-input--grow" required>
+    </div>
+
+    <div class="form-row">
+      <textarea name="content" class="form-input form-input--textarea"
+                rows="4">{{ record.content }}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Save</button>
+      <button type="button" class="btn-secondary"
+              hx-get="{% url 'records:htmx-edit' record.id %}?show=1"
+              hx-target="#record-{{ record.id }}"
+              hx-swap="outerHTML">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

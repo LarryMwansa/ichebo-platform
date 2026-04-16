@@ -3,10 +3,12 @@
 {% block learn_content %}
 <div class="learn-header">
   <a href="{% url 'learn:learn-author' %}" class="btn-back">← Authorship</a>
-  <h2>New Lesson / Quiz / Assignment</h2>
+  <h2>{% if record %}Edit {{ record.record_type|title }}{% else %}New Lesson / Quiz / Assignment{% endif %}</h2>
 </div>
-<form method="post" class="author-form">
+<form method="post" class="author-form"
+      action="{% if record %}{% url 'learn:learn-author-lesson-edit' record.id %}{% else %}{% url 'learn:learn-author-lesson' %}{% endif %}">
   {% csrf_token %}
+  {% if not record %}
   <label>Type
     <select name="record_type">
       <option value="lesson">Lesson</option>
@@ -14,12 +16,15 @@
       <option value="assignment">Assignment</option>
     </select>
   </label>
+  {% endif %}
   <label>Title
-    <input type="text" name="title" required maxlength="500">
+    <input type="text" name="title" required maxlength="500"
+           value="{{ record.title|default:'' }}">
   </label>
   <label>Content (Markdown supported)
-    <textarea name="content" rows="10" placeholder="Write lesson content here…"></textarea>
+    <textarea name="content" rows="10" placeholder="Write lesson content here…">{{ record.content|default:'' }}</textarea>
   </label>
+  {% if not record %}
   <label>Parent Course
     <select name="course_id">
       <option value="">— None —</option>
@@ -28,6 +33,9 @@
       {% endfor %}
     </select>
   </label>
-  <button type="submit" class="btn-primary">Create (Draft)</button>
+  {% endif %}
+  <button type="submit" class="btn-primary">
+    {% if record %}Save Changes{% else %}Create (Draft){% endif %}
+  </button>
 </form>
 {% endblock %}
