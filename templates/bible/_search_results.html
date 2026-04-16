@@ -3,22 +3,41 @@
 {% if results %}
 <div class="list-group">
   {% for verse in results %}
-  <a href="{% url 'bible:reader-chapter' verse.book.code verse.chapter %}" class="list-item" style="text-decoration:none;">
-    <div class="list-item__icon" style="background: var(--bg);">
-      <span class="material-symbols-outlined">menu_book</span>
+  <div class="list-item" 
+       hx-get="{% url 'bible:htmx-chapter' %}?book_code={{ verse.book.code }}&chapter={{ verse.chapter }}"
+       hx-target="#bible-chapter"
+       hx-swap="innerHTML"
+       hx-push-url="{% url 'bible:reader-chapter' verse.book.code verse.chapter %}"
+       onclick="window.ICSDrawer.close()"
+       style="cursor: pointer; padding: 1rem; border-bottom: 1px solid var(--border); transition: background 0.2s ease;">
+    
+    <div class="list-item__icon" style="background: var(--bg); border: 1px solid var(--border); width: 32px; height: 32px; flex-shrink: 0;">
+      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">
+        {% if is_reference %}location_on{% else %}subject{% endif %}
+      </span>
     </div>
-    <div class="list-item__content">
-      <div class="list-item__title" style="color: var(--primary);">{{ verse.book.name }} {{ verse.chapter }}:{{ verse.verse }}</div>
-      <div class="list-item__meta" style="color: var(--text); font-size: 0.85rem; line-height: 1.4; margin-top: 4px;">{{ verse.text|truncatewords:20 }}</div>
+
+    <div class="list-item__content" style="margin-left: 12px; min-width: 0; flex: 1;">
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;">
+        <div class="list-item__title" style="font-size: 0.9rem; font-weight: 700; color: var(--primary); white-space: nowrap;">
+          {{ verse.book.name }} {{ verse.chapter }}:{{ verse.verse }}
+        </div>
+        <div style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">{{ verse.translation.code }}</div>
+      </div>
+      <div class="list-item__meta" style="color: var(--text); font-size: 0.85rem; line-height: 1.5; overflow-wrap: break-word; word-wrap: break-word; white-space: normal;">
+        {{ verse.text }}
+      </div>
     </div>
-    <div class="list-item__action">
-      <span class="material-symbols-outlined">chevron_right</span>
+
+    <div class="list-item__action" style="padding-left: 8px;">
+      <span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">chevron_right</span>
     </div>
-  </a>
+  </div>
   {% endfor %}
 </div>
 {% elif query %}
 <div class="bible-search-no-results" style="padding: 4rem 2rem; text-align:center; color: var(--muted);">
+  <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.1; margin-bottom: 1rem;">search_off</span>
   <p>No matches found for "{{ query }}"</p>
 </div>
 {% endif %}

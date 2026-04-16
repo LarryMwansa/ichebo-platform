@@ -278,24 +278,57 @@ def bible_search_view(request):
 def htmx_search(request):
     """
     HTMX: search verses in real-time.
-    GET param: q (search query)
-    Returns list of matching verses.
+    Supports: Reference Jump (e.g. 'Gen 1:1') and Full-Text search.
     """
     from .models import BibleVerse
+    import re
 
     query = request.GET.get('q', '').strip()
     results = []
+    is_reference = False
 
     if len(query) >= 2:
         translation = get_user_translation(request.user)
-        results = BibleVerse.objects.filter(
-            text__icontains=query,
-            translation=translation
-        ).select_related('book')[:30]
+        
+        # 1. Try Reference Detection (e.g. "Gen 1:1" or "Gen 1")
+        # Pattern: [Book] [Chap](:[Verse])?
+        ref_match = re.match(r'^([1-3]?\s*[A-Za-z]+)\s*(\d+)(?::(\d+))?$', query)
+        
+        if ref_match:
+            book_str = ref_match.group(1).upper().replace(' ', '')
+            chapter_num = int(ref_match.group(2))
+            verse_num = int(ref_match.group(3)) if ref_match.group(3) else None
+            
+            # Map common abbreviations or search by prefix
+            book_obj = BibleBook.objects.filter(code__icontains=book_str).first()
+            if not book_obj:
+                book_obj = BibleBook.objects.filter(name__icontains=book_str).first()
+            
+            if book_obj:
+                verse_filter = {
+                    'translation': translation,
+                    'book': book_obj,
+                    'chapter': chapter_num
+                }
+                if verse_num:
+                    verse_filter['verse'] = verse_num
+                
+                ref_results = BibleVerse.objects.filter(**verse_filter).select_related('book', 'translation')
+                if ref_results.exists():
+                    results = list(ref_results)
+                    is_reference = True
+
+        # 2. If no reference match or we want to append keyword results
+        if not is_reference:
+            results = BibleVerse.objects.filter(
+                text__icontains=query,
+                translation=translation
+            ).select_related('book', 'translation')[:20]
 
     return render(request, 'bible/_search_results.html', {
         'results': results,
         'query': query,
+        'is_reference': is_reference,
     })
 
 
