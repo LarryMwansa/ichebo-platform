@@ -14,23 +14,26 @@
   {# Step 1: Book Selection #}
   <div class="bible-picker-step" id="step-books" style="height: 100%; width: 100%; overflow-y: auto;">
     
-    {# Version Quick-Switch Row #}
-    <div style="padding: 1.5rem 1rem 1rem; background: color-mix(in srgb, var(--primary) 4%, transparent); border-bottom: 1px solid var(--border); margin-bottom: 0.5rem;">
-      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 8px;">Version</div>
+    {# Version Selection Tile #}
+    <div style="padding: 1.5rem 1rem 1rem; border-bottom: 1px solid var(--border);">
+      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 10px;">Translation</div>
       <button hx-get="{% url 'bible:versions' %}" 
               hx-target="#drawerContent" 
               hx-swap="innerHTML"
-              class="list-item" 
-              style="width: 100%; height: 56px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 0 1rem; display: flex; align-items: center; justify-content: space-between;">
-        <span style="font-weight: 700; color: var(--text);">{{ translation.name }}</span>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 11px; font-weight: 800; color: #fff; background: var(--primary); padding: 4px 10px; border-radius: 6px; text-transform: uppercase;">{{ translation.code }}</span>
-          <span class="material-symbols-outlined" style="color: var(--muted);">chevron_right</span>
+              class="btn-touch" 
+              style="width: 100%; min-height: 64px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 1rem; display: flex; align-items: center; justify-content: space-between; text-align: left;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 14px; font-weight: 700; color: var(--text);">{{ translation.name }}</span>
+          <span style="font-size: 11px; color: var(--muted); font-weight: 500;">Tap to switch version</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 11px; font-weight: 800; color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, transparent); padding: 4px 10px; border-radius: 6px; text-transform: uppercase; border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);">{{ translation.code }}</span>
+          <span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">chevron_right</span>
         </div>
       </button>
     </div>
 
-    <div style="padding: 0.5rem 1rem 0.5rem; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em;">Book</div>
+    <div style="padding: 1.25rem 1rem 0.5rem; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em;">Select Book</div>
     <div class="list-group">
       {% for b in books %}
       <button class="list-item bible-picker-item {% if b.code == book.code %}bible-picker-item--active{% endif %}"
