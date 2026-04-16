@@ -4,22 +4,25 @@
 {% block title %}Bible · {{ book.name }} {{ chapter }}{% endblock %}
 
 {% block bible_topbar %}
-<div class="bible-topbar">
-  <div style="display: flex; align-items: center; gap: 8px;">
+<div class="bible-topbar" style="height: 48px;">
+  <div style="display: flex; align-items: center; gap: 4px;">
     <a href="{% url 'dashboard:index' %}" class="btn-touch" aria-label="Go Back" style="color: var(--text); border:none; background:transparent;">
-      <span class="material-symbols-outlined">arrow_back</span>
+      <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
     </a>
-    <div class="bible-topbar__title" style="font-size: 1rem; font-weight: 700; color: var(--text);">{{ book.name }} {{ chapter }}</div>
+    <div style="display: flex; align-items: baseline; gap: 6px;">
+      <div class="bible-topbar__title" style="font-size: 0.9rem; font-weight: 700; color: var(--text);">{{ book.name }} {{ chapter }}</div>
+      <div style="font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8;">{{ translation.code }}</div>
+    </div>
   </div>
 
-  <div class="bible-topbar__right" style="display: flex; align-items: center; gap: 4px;">
-    <a href="{% url 'bible:search' %}" class="btn-touch" aria-label="Search" style="color: var(--muted); border:none; background:transparent;">
+  <div class="bible-topbar__right" style="display: flex; align-items: center; gap: 0;">
+    <a href="{% url 'bible:search' %}" class="btn-touch" aria-label="Search" style="color: var(--muted); border:none; background:transparent; transform: scale(0.85);">
       <span class="material-symbols-outlined">search</span>
     </a>
     <button class="btn-touch" 
             hx-get="{% url 'bible:htmx-appearance' %}"
             hx-target="#drawerContent"
-            aria-label="Appearance" style="color: var(--muted); border:none; background:transparent;">
+            aria-label="Appearance" style="color: var(--muted); border:none; background:transparent; transform: scale(0.85);">
       <span class="material-symbols-outlined">tune</span>
     </button>
   </div>
