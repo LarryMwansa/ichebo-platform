@@ -16,15 +16,15 @@
     align-items: center;
 
     border-top: 1px solid var(--border);
-    box-shadow: 0 -2px 10px var(--shadow);
+    /* box-shadow: 0 -2px 10px var(--shadow); */
 
     z-index: 1000;
 }
 
 @media (min-width: 800px) {
-  .bottom-bar {
-    display: none;
-  }
+    .bottom-bar {
+        display: none;
+    }
 }
 
 /* Nav Item */
@@ -76,5 +76,3 @@
     background: var(--text);
     border-radius: 50%;
 }
-
-
