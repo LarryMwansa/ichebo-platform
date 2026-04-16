@@ -8,7 +8,9 @@
   <div class="form-row">
     <select name="record_type" class="form-input">
       {% for value, label in record_types %}
-      <option value="{{ value }}">{{ label }}</option>
+      <option value="{{ value }}" {% if value == active_type %}selected{% endif %}>
+        {{ label }}
+      </option>
       {% endfor %}
     </select>
     <input type="text" name="title" placeholder="Entry title…"

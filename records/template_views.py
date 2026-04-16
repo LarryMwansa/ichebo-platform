@@ -7,11 +7,10 @@ from django.utils import timezone
 from .models import Record
 
 JOURNAL_RECORD_TYPES = [
-    ('note', 'Note'),
-    ('reflection', 'Reflection'),
     ('prayer', 'Prayer'),
-    ('testimony', 'Testimony'),
-    ('dar', 'Daily Activity Report'),
+    ('spirit', 'Spirit'),
+    ('dream', 'Dream'),
+    ('note', 'General'),
 ]
 
 
@@ -19,16 +18,27 @@ JOURNAL_RECORD_TYPES = [
 
 @login_required
 def my_records(request):
+    record_type = request.GET.get('type')
     records = Record.objects.filter(
         created_by=request.user,
         deleted_at__isnull=True,
         record_family='journal',
-    ).order_by('-updated_at')
+    )
+    if record_type:
+        records = records.filter(record_type=record_type)
+    
+    records = records.order_by('-updated_at')
 
-    return render(request, 'records/my_records.html', {
+    context = {
         'records': records,
         'record_types': JOURNAL_RECORD_TYPES,
-    })
+        'active_type': record_type,
+    }
+
+    if request.headers.get('HX-Request') and not request.GET.get('full'):
+        return render(request, 'records/partials/record_list.html', context)
+
+    return render(request, 'records/my_records.html', context)
 
 
 # ── Record detail ─────────────────────────────────────────────────────────────
@@ -69,6 +79,7 @@ def htmx_create_record(request):
     # GET — return the create form
     return render(request, 'records/partials/create_form.html', {
         'record_types': JOURNAL_RECORD_TYPES,
+        'active_type': request.GET.get('record_type', 'note'),
     })
 
 

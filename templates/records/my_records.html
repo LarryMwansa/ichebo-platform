@@ -3,9 +3,25 @@
 {% block records_content %}
 
 <div class="records-header">
-  <h1>My Journal</h1>
+  <div class="journal-tabs">
+    <a href="?full=1" 
+       hx-get="{% url 'records:records-home' %}" 
+       hx-target="#record-list" 
+       class="journal-tab {% if not active_type %}active{% endif %}">
+       All
+    </a>
+    {% for value, label in record_types %}
+    <a href="?type={{ value }}&full=1" 
+       hx-get="{% url 'records:records-home' %}?type={{ value }}" 
+       hx-target="#record-list" 
+       class="journal-tab {% if active_type == value %}active{% endif %}">
+       {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
   <button class="btn-primary"
-          hx-get="{% url 'records:htmx-create' %}"
+          hx-get="{% url 'records:htmx-create' %}?record_type={{ active_type|default:'note' }}"
           hx-target="#record-create-panel"
           hx-swap="innerHTML">
     + New Entry
@@ -15,22 +31,9 @@
 <!-- Inline create form panel -->
 <div id="record-create-panel"></div>
 
-<!-- Record list -->
-<div id="record-list">
-  {% for record in records %}
-    {% include "records/partials/record_card.html" %}
-  {% empty %}
-    <div class="empty-state">
-      <p>No journal entries yet.
-        <button class="btn-primary"
-                hx-get="{% url 'records:htmx-create' %}"
-                hx-target="#record-create-panel"
-                hx-swap="innerHTML">
-          Write your first entry
-        </button>
-      </p>
-    </div>
-  {% endfor %}
+<!-- Record list container -->
+<div id="record-list" class="records-grid">
+  {% include "records/partials/record_list.html" %}
 </div>
 
 {% endblock %}

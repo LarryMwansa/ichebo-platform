@@ -311,7 +311,6 @@
 
 /* ── DAR widget ──────────────────────────────────────────────────────── */
 
-.dash-widget--dar {}
 
 .dash-dar-link {
   display: block;
@@ -370,4 +369,61 @@
   color: var(--muted, #666);
   font-size: var(--fz--1, 0.9rem);
   padding: 32px 16px;
+}
+
+/* ── Journal Widgets ─────────────────────────────────────────────────── */
+
+.dash-journal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.dash-journal-item {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: transform 0.2s, background 0.2s;
+  border: 1px solid var(--border);
+}
+
+.dash-journal-item:hover {
+  transform: translateY(-2px);
+  background: var(--hover);
+}
+
+.dash-journal-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.dash-journal-name {
+  font-size: var(--fz--1);
+  font-weight: var(--font-weight-medium);
+  color: var(--text);
+}
+
+.dash-journal-item--prayer { border-left: 4px solid #c53030; }
+.dash-journal-item--spirit { border-left: 4px solid #2b6cb0; }
+.dash-journal-item--dream  { border-left: 4px solid #6b46c1; }
+.dash-journal-item--note   { border-left: 4px solid #2f855a; }
+
+.dash-cta {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  background: var(--hover);
+  border-radius: 8px;
+  color: var(--primary);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  font-size: var(--fz--1);
+  transition: background 0.2s;
+}
+
+.dash-cta:hover {
+  background: var(--border);
 }

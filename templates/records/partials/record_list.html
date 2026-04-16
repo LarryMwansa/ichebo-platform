@@ -1,0 +1,13 @@
+{% for record in records %}
+  {% include "records/partials/record_card.html" %}
+{% empty %}
+  <div class="empty-state">
+    <p>No journal entries found in this category.</p>
+    <button class="btn-primary"
+            hx-get="{% url 'records:htmx-create' %}?record_type={{ active_type|default:'note' }}"
+            hx-target="#record-create-panel"
+            hx-swap="innerHTML">
+      Write first entry
+    </button>
+  </div>
+{% endfor %}

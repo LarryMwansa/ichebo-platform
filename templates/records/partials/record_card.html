@@ -1,24 +1,31 @@
 <div class="record-card" id="record-{{ record.id }}">
-  <div class="record-card-body">
-    <span class="record-type-tag record-type-tag--{{ record.record_type }}">
-      {{ record.record_type|title }}
+  <div class="record-meta">
+    <span class="record-type-badge record-type-badge--{{ record.record_type }}">
+      {{ record.get_record_type_display|default:record.record_type|title }}
     </span>
-    <a href="{% url 'records:records-detail' record.id %}" class="record-title">
+    <span class="record-date">{{ record.updated_at|date:"d M Y" }}</span>
+  </div>
+
+  <h3>
+    <a href="{% url 'records:records-detail' record.id %}" style="text-decoration:none; color:inherit;">
       {{ record.title }}
     </a>
-    <span class="record-date">{{ record.updated_at|date:"d M Y" }}</span>
-    {% if record.content %}
-    <p class="record-excerpt">{{ record.content|truncatechars:120 }}</p>
-    {% endif %}
+  </h3>
+
+  {% if record.content %}
+  <div class="record-content">
+    {{ record.content|truncatechars:150 }}
   </div>
-  <div class="record-card-actions">
-    <button class="btn-sm btn-secondary"
+  {% endif %}
+
+  <div class="record-actions">
+    <button class="btn-secondary btn-sm"
             hx-get="{% url 'records:htmx-edit' record.id %}"
             hx-target="#record-{{ record.id }}"
             hx-swap="outerHTML">
       Edit
     </button>
-    <button class="btn-sm btn-danger"
+    <button class="btn-danger btn-sm"
             hx-post="{% url 'records:htmx-delete' record.id %}"
             hx-target="#record-{{ record.id }}"
             hx-swap="outerHTML"

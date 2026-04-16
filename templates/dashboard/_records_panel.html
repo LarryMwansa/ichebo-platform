@@ -1,24 +1,42 @@
+<div class="dash-widget">
+  <div class="dash-widget__label">My Journals</div>
+  <div class="dash-journal-grid">
+    <a href="/records/?type=prayer" class="dash-journal-item dash-journal-item--prayer">
+      <span class="dash-journal-icon">🙏</span>
+      <span class="dash-journal-name">Prayer</span>
+    </a>
+    <a href="/records/?type=spirit" class="dash-journal-item dash-journal-item--spirit">
+      <span class="dash-journal-icon">🕊️</span>
+      <span class="dash-journal-name">Spirit</span>
+    </a>
+    <a href="/records/?type=dream" class="dash-journal-item dash-journal-item--dream">
+      <span class="dash-journal-icon">🌙</span>
+      <span class="dash-journal-name">Dream</span>
+    </a>
+    <a href="/records/?type=note" class="dash-journal-item dash-journal-item--note">
+      <span class="dash-journal-icon">📝</span>
+      <span class="dash-journal-name">General</span>
+    </a>
+  </div>
+</div>
+
 {% if records %}
 <div class="dash-widget">
-  <div class="dash-widget__label">Recent Journal Entries</div>
+  <div class="dash-widget__label">Recent Entries</div>
   <ul class="dash-list">
     {% for rec in records %}
     <li class="dash-list__item">
-      <span class="dash-list__badge dash-list__badge--{{ rec.record_type }}">
+      <span class="record-type-badge record-type-badge--{{ rec.record_type }}">
         {{ rec.record_type|slice:":3"|upper }}
       </span>
       <a class="dash-list__title" href="/records/{{ rec.id }}/">{{ rec.title }}</a>
-      <span class="dash-list__time">{{ rec.updated_at|slice:":10" }}</span>
+      <span class="dash-list__time">{{ rec.updated_at|date:"d M" }}</span>
     </li>
     {% endfor %}
   </ul>
 </div>
-{% else %}
-<div class="dash-widget">
-  <p class="dash-empty">No journal entries yet.</p>
-</div>
 {% endif %}
 
 <div class="dash-widget">
-  <a href="/records/" class="dash-cta">All Records →</a>
+  <a href="/records/" class="dash-cta">View All Journals →</a>
 </div>
