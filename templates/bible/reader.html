@@ -16,9 +16,12 @@
   </div>
 
   <div class="bible-topbar__right" style="display: flex; align-items: center; gap: 0;">
-    <a href="{% url 'bible:search' %}" class="btn-touch" aria-label="Search" style="color: var(--muted); border:none; background:transparent; transform: scale(0.85);">
+    <button class="btn-touch" 
+            hx-get="{% url 'bible:htmx-search-sheet' %}"
+            hx-target="#drawerContent"
+            aria-label="Search" style="color: var(--muted); border:none; background:transparent; transform: scale(0.85);">
       <span class="material-symbols-outlined">search</span>
-    </a>
+    </button>
     <button class="btn-touch" 
             hx-get="{% url 'bible:htmx-appearance' %}"
             hx-target="#drawerContent"

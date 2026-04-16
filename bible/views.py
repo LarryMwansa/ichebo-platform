@@ -466,3 +466,11 @@ def htmx_appearance_sheet(request):
     Returns appearance settings bottom sheet.
     """
     return render(request, 'bible/partials/_appearance_sheet.html')
+
+
+@login_required
+def htmx_search_sheet(request):
+    """
+    Returns the scripture search bottom sheet.
+    """
+    return render(request, 'bible/partials/_search_sheet.html')
