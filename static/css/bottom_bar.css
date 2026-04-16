@@ -21,6 +21,16 @@
     z-index: 1000;
 }
 
+@media (min-width: 800px) {
+  .bottom-bar {
+    max-width: 800px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+}
+
 /* Nav Item */
 .nav-item {
     position: relative;

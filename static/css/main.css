@@ -143,4 +143,126 @@
   font-weight: 700;
 }
 
+/* =========================
+   STANDARD UI COMPONENTS 
+========================= */
+
+/* 1. List Item Pattern (Dense, edge-to-edge on mobile) */
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-s);
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  transition: background 0.2s;
+}
+
+.list-item:hover {
+  background: var(--hover);
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--muted);
+}
+
+.list-item__content {
+  flex: 1;
+  min-width: 0; /* allows truncation */
+  display: flex;
+  flex-direction: column;
+}
+
+.list-item__title {
+  font-size: var(--fz-0);
+  font-weight: var(--font-weight-medium);
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-item__meta {
+  font-size: var(--fz--2);
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.list-item__action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+}
+
+/* 2. Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px; /* strict pixel value for tiny uppercase legibility */
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* Semantic Colors */
+.status-badge--draft    { background: #f1f5f9; color: #475569; }
+.status-badge--active   { background: #eff6ff; color: #2563eb; }
+.status-badge--enacted  { background: #ecfdf5; color: #059669; }
+.status-badge--danger   { background: #fef2f2; color: #dc2626; }
+.status-badge--warning  { background: #fffbeb; color: #d97706; }
+
+/* 3. Touch Targets (Forms & Buttons) */
+.btn-touch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px; /* Strict mobile tap target size */
+  padding: 0 var(--space-m);
+  border-radius: 12px;
+  font-size: var(--fz-0);
+  font-weight: var(--font-weight-medium);
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+.btn-touch:active {
+  transform: scale(0.98);
+}
+
+.form-input-touch {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--space-s);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 16px; /* 16px prevents iOS zoom issue */
+  transition: border-color 0.2s;
+}
+
+.form-input-touch:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--card);
+}
+
+
 

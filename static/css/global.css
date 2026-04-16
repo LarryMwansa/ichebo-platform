@@ -38,7 +38,7 @@ html {
 
 body {
     font-family: "Roboto", system-ui, sans-serif;
-    font-size: clamp(1rem, 2vw, 1.125rem);
+    font-size: 16px; /* Strict 16px prevents iOS Safari form zoom */
     font-weight: 400;
     line-height: 1.5;
     background: var(--bg);
@@ -46,14 +46,20 @@ body {
     transition: background 0.4s ease, color 0.4s ease;
 }
 
-
 main,
 section {
   overflow: hidden;
 }
 
-main {
+main, .ics-main {
     padding-bottom: 90px;
+}
+
+/* Mobile-first safe margins for the main content block */
+.ics-main {
+    padding-inline: 16px;
+    max-width: 800px; /* Optional: Constrain width on large screens to read comfortably */
+    margin-inline: auto;
 }
 
 a,

@@ -8,12 +8,21 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 12px;
+    padding: 0 16px;
     box-shadow: 0 1px 3px var(--shadow);
     transition: background 0.3s, color 0.3s;
     position: sticky;
     top: 0;
     z-index: 1000;
+}
+
+@media (min-width: 800px) {
+  .navbar {
+    max-width: 800px;
+    margin: 0 auto;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
 }
 
 .nav-left {

@@ -47,73 +47,41 @@
 
 
 
-    /* === Font Sizes Variable === */
-    /* Step -4: 8.6806px → 8.192px */
-    --fz--4: clamp(0.512rem, 0.5486rem + -0.0305vw, 0.5425rem);
-    /* Step -3: 10.4167px → 10.24px */
-    --fz--3: clamp(0.64rem, 0.6533rem + -0.011vw, 0.651rem);
-    /* Step -2: 12.5px → 12.8px */
-    --fz--2: clamp(0.7813rem, 0.7775rem + 0.0188vw, 0.8rem);
-    /* Step -1: 15px → 16px */
-    --fz--1: clamp(0.9375rem, 0.925rem + 0.0625vw, 1rem);
-    /* Step 0: 18px → 20px */
-    --fz-0: clamp(1.125rem, 1.1rem + 0.125vw, 1.25rem);
-    /* Step 1: 21.6px → 25px */
-    --fz-1: clamp(1.35rem, 1.3075rem + 0.2125vw, 1.5625rem);
-    /* Step 2: 25.92px → 31.25px */
-    --fz-2: clamp(1.62rem, 1.5534rem + 0.3331vw, 1.9531rem);
-    /* Step 3: 31.104px → 39.0625px */
-    --fz-3: clamp(1.944rem, 1.8445rem + 0.4974vw, 2.4414rem);
-    /* Step 4: 37.3248px → 48.8281px */
-    --fz-4: clamp(2.3328rem, 2.189rem + 0.719vw, 3.0518rem);
-    /* Step 5: 44.7898px → 61.0352px */
-    --fz-5: clamp(2.7994rem, 2.5963rem + 1.0153vw, 3.8147rem);
-    /* Step 6: 53.7477px → 76.2939px */
-    --fz-6: clamp(3.3592rem, 3.0774rem + 1.4091vw, 4.7684rem);
-    /* Step 7: 64.4973px → 95.3674px */
-    --fz-7: clamp(4.0311rem, 3.6452rem + 1.9294vw, 5.9605rem);
-    /* Step 8: 77.3967px → 119.2093px */
-    --fz-8: clamp(4.8373rem, 4.3146rem + 2.6133vw, 7.4506rem);
+    /* === Font Sizes Variable (Strict Scale) === */
+    --fz--4: 0.625rem;  /* 10px */
+    --fz--3: 0.6875rem; /* 11px */
+    --fz--2: 0.75rem;   /* 12px - Caption */
+    --fz--1: 0.875rem;  /* 14px - Body Small */
+    --fz-0: 1rem;       /* 16px - Body Base */
+    --fz-1: 1.125rem;   /* 18px - Subtitle */
+    --fz-2: 1.25rem;    /* 20px - Title Small */
+    --fz-3: 1.5rem;     /* 24px - Title Medium */
+    --fz-4: 2rem;       /* 32px - Title Large */
+    --fz-5: 2.5rem;     /* 40px - Display Small */
+    --fz-6: 3rem;       /* 48px - Display Medium */
+    --fz-7: 4rem;       /* 64px - Display Large */
+    --fz-8: 5rem;       /* 80px */
 
-    /* === Spaces Variables === */
-    /* @link https://utopia.fyi/space/calculator?c=320,18,1.2,1920,20,1.25,8,4,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+    /* === Spaces Variables (Strict 8px Grid) === */
+    --space-3xs: 0.25rem; /* 4px */
+    --space-2xs: 0.5rem;  /* 8px */
+    --space-xs: 0.75rem;  /* 12px */
+    --space-s: 1rem;      /* 16px */
+    --space-m: 1.5rem;    /* 24px */
+    --space-l: 2rem;      /* 32px */
+    --space-xl: 3rem;     /* 48px */
+    --space-2xl: 4rem;    /* 64px */
+    --space-3xl: 6rem;    /* 96px */
 
-    /* Space 3xs: 5px → 5px */
-    --space-3xs: clamp(0.3125rem, 0.3125rem + 0vw, 0.3125rem);
-    /* Space 2xs: 9px → 10px */
-    --space-2xs: clamp(0.5625rem, 0.55rem + 0.0625vw, 0.625rem);
-    /* Space xs: 14px → 15px */
-    --space-xs: clamp(0.875rem, 0.8625rem + 0.0625vw, 0.9375rem);
-    /* Space s: 18px → 20px */
-    --space-s: clamp(1.125rem, 1.1rem + 0.125vw, 1.25rem);
-    /* Space m: 27px → 30px */
-    --space-m: clamp(1.6875rem, 1.65rem + 0.1875vw, 1.875rem);
-    /* Space l: 36px → 40px */
-    --space-l: clamp(2.25rem, 2.2rem + 0.25vw, 2.5rem);
-    /* Space xl: 54px → 60px */
-    --space-xl: clamp(3.375rem, 3.3rem + 0.375vw, 3.75rem);
-    /* Space 2xl: 72px → 80px */
-    --space-2xl: clamp(4.5rem, 4.4rem + 0.5vw, 5rem);
-    /* Space 3xl: 108px → 120px */
-    --space-3xl: clamp(6.75rem, 6.6rem + 0.75vw, 7.5rem);
-
-    /* One-up pairs */
-    /* Space 3xs-2xs: 5px → 10px */
-    --space-3xs-2xs: clamp(0.3125rem, 0.25rem + 0.3125vw, 0.625rem);
-    /* Space 2xs-xs: 9px → 15px */
-    --space-2xs-xs: clamp(0.5625rem, 0.4875rem + 0.375vw, 0.9375rem);
-    /* Space xs-s: 14px → 20px */
-    --space-xs-s: clamp(0.875rem, 0.8rem + 0.375vw, 1.25rem);
-    /* Space s-m: 18px → 30px */
-    --space-s-m: clamp(1.125rem, 0.975rem + 0.75vw, 1.875rem);
-    /* Space m-l: 27px → 40px */
-    --space-m-l: clamp(1.6875rem, 1.525rem + 0.8125vw, 2.5rem);
-    /* Space l-xl: 36px → 60px */
-    --space-l-xl: clamp(2.25rem, 1.95rem + 1.5vw, 3.75rem);
-    /* Space xl-2xl: 54px → 80px */
-    --space-xl-2xl: clamp(3.375rem, 3.05rem + 1.625vw, 5rem);
-    /* Space 2xl-3xl: 72px → 120px */
-    --space-2xl-3xl: clamp(4.5rem, 3.9rem + 3vw, 7.5rem);
+    /* One-up pairs (Mapped to the larger strict value for consistency) */
+    --space-3xs-2xs: 0.5rem;
+    --space-2xs-xs: 0.75rem;
+    --space-xs-s: 1rem;
+    --space-s-m: 1.5rem;
+    --space-m-l: 2rem;
+    --space-l-xl: 3rem;
+    --space-xl-2xl: 4rem;
+    --space-2xl-3xl: 6rem;
 
     /* Custom pairs */
     /* Space s-l: 18px → 40px */
