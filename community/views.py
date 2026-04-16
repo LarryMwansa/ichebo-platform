@@ -798,18 +798,26 @@ def htmx_review_request(request, request_id):
             membership_req.status = 'approved'
             membership_req.save()
 
-            # Create UserPermission — get_or_create prevents duplicates
+            # Create UserPermission — get_or_create prevents duplicates on re-approvals
             UserPermission.objects.get_or_create(
                 tenant=membership_req.tenant,
                 user=membership_req.user,
                 role='disciple',
                 defaults={
                     'created_by': request.user,
+                    'granted_by': request.user,
                     'tenant_path': membership_req.tenant.path,
                     'level': 1,
                     'is_active': True,
                 },
             )
+
+            # Advance the applicant's competence_level to at least 1 (Member)
+            # so they clear the seeker gate on their next visit to /community/
+            applicant = membership_req.user
+            if applicant.competence_level < 1:
+                applicant.competence_level = 1
+                applicant.save(update_fields=['competence_level'])
         else:
             membership_req.status = 'denied'
             membership_req.save()
