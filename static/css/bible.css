@@ -6,7 +6,9 @@
 
 /* ─── Layout Shells ───────────────────────────────────────────────────────── */
 
-.bible-reader-shell, .bible-picker-shell, .bible-search-shell {
+.bible-reader-shell,
+.bible-picker-shell,
+.bible-search-shell {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -14,7 +16,8 @@
 }
 
 .bible-reader-shell {
-  padding-bottom: 120px; /* Space for nav strip and bottom nav */
+  padding-bottom: 120px;
+  /* Space for nav strip and bottom nav */
 }
 
 /* Ensure platform shell allows scrolling for the reader */
@@ -82,7 +85,8 @@
 
 .bible-nav-strip {
   position: fixed;
-  bottom: 72px; /* Set above bottom nav */
+  bottom: 69px;
+  /* Set above bottom nav */
   left: 0;
   right: 0;
   height: 56px;
@@ -125,7 +129,7 @@
 }
 
 .bible-nav-strip.scroll-hidden {
-  transform: translateY(calc(100% + 80px)); 
+  transform: translateY(calc(100% + 80px));
 }
 
 /* ─── Picker & Lists ─────────────────────────────────────────────────────── */
@@ -185,8 +189,15 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ─── Responsive Adjustments ──────────────────────────────────────────────── */
@@ -196,11 +207,11 @@
     text-align: center;
     padding: 3rem 1rem 2rem !important;
   }
-  
+
   .bible-chapter-title {
     font-size: 2.25rem !important;
   }
-  
+
   .bible-verse {
     padding: 12px 1.5rem !important;
     border-radius: 12px !important;
