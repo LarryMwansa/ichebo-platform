@@ -41,19 +41,32 @@
 <script>
   (function() {
     const fontSizeDisplay = document.getElementById('sheetFontSizeDisplay');
-    const bibleChapter = document.getElementById('bible-chapter');
+    
+    function getReaderElement() {
+      return document.getElementById('bible-chapter');
+    }
+
     let size = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
 
-    function applySize(s) {
-      size = Math.max(80, Math.min(180, s));
-      if (bibleChapter) bibleChapter.style.fontSize = `${size / 100}em`;
+    function applySize(newSize) {
+      size = Math.max(80, Math.min(180, newSize));
+      const el = getReaderElement();
+      if (el) el.style.fontSize = `${size / 100}em`;
       if (fontSizeDisplay) fontSizeDisplay.textContent = `${size}%`;
       ICSStorage.setUIState('bible_font_size', size);
     }
 
-    document.getElementById('sheetIncreaseFontBtn').onclick = () => applySize(size + 10);
-    document.getElementById('sheetDecreaseFontBtn').onclick = () => applySize(size - 10);
-    applySize(size);
+    // Initialize display
+    if (fontSizeDisplay) fontSizeDisplay.textContent = `${size}%`;
+
+    document.getElementById('sheetIncreaseFontBtn').onclick = (e) => {
+      e.preventDefault();
+      applySize(size + 10);
+    };
+    document.getElementById('sheetDecreaseFontBtn').onclick = (e) => {
+      e.preventDefault();
+      applySize(size - 10);
+    };
 
     const ffSelect = document.getElementById('sheetFontFamilySelect');
     const ffMap = {
@@ -62,20 +75,29 @@
       'sans-serif': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       'monospace': '"Courier New", monospace'
     };
-    ffSelect.onchange = (e) => {
-      if (bibleChapter) bibleChapter.style.fontFamily = ffMap[e.target.value] || 'inherit';
-      ICSStorage.setUIState('bible_font_family', e.target.value);
-    };
-    ffSelect.value = ICSStorage.getUIState('bible_font_family', 'system');
+    if (ffSelect) {
+      ffSelect.onchange = (e) => {
+        const el = getReaderElement();
+        if (el) el.style.fontFamily = ffMap[e.target.value] || 'inherit';
+        ICSStorage.setUIState('bible_font_family', e.target.value);
+      };
+      ffSelect.value = ICSStorage.getUIState('bible_font_family', 'system');
+    }
     
     // Theme toggle helpers
-    document.getElementById('sheetLightModeBtn').onclick = () => {
+    const lightBtn = document.getElementById('sheetLightModeBtn');
+    const darkBtn = document.getElementById('sheetDarkModeBtn');
+    
+    if (lightBtn) lightBtn.onclick = () => {
       document.body.classList.remove('dark');
       localStorage.setItem('ics_theme', 'light');
     };
-    document.getElementById('sheetDarkModeBtn').onclick = () => {
+    if (darkBtn) darkBtn.onclick = () => {
       document.body.classList.add('dark');
       localStorage.setItem('ics_theme', 'dark');
     };
+
+    // Sync UI with current state
+    applySize(size);
   })();
 </script>

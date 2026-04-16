@@ -50,33 +50,35 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.drawerToggle) window.drawerToggle.setAttribute('aria-expanded', 'false');
   }
 
-  // Touch Drag Logic
+  // Pointer Drag Logic (Universal for Touch and Mouse)
   if (drawer) {
-    drawer.addEventListener('touchstart', (e) => {
+    drawer.addEventListener('pointerdown', (e) => {
       // Only drag if on the handle or header
       if (e.target.classList.contains('drawer-handle') || e.target.closest('.drawer-header')) {
-        startY = e.touches[0].clientY;
+        startY = e.clientY;
         isDragging = true;
         drawer.style.transition = 'none';
+        drawer.setPointerCapture(e.pointerId);
       }
-    }, { passive: true });
+    });
 
-    document.addEventListener('touchmove', (e) => {
+    drawer.addEventListener('pointermove', (e) => {
       if (!isDragging) return;
-      currentY = e.touches[0].clientY;
+      currentY = e.clientY;
       const deltaY = currentY - startY;
       
       if (deltaY > 0) { // Only allow dragging down
         drawer.style.transform = `translateY(${deltaY}px)`;
       }
-    }, { passive: true });
+    });
 
-    document.addEventListener('touchend', (e) => {
+    drawer.addEventListener('pointerup', (e) => {
       if (!isDragging) return;
       isDragging = false;
       drawer.style.transition = '';
+      drawer.releasePointerCapture(e.pointerId);
       
-      const deltaY = currentY - startY;
+      const deltaY = e.clientY - startY;
       const threshold = 150; // px to close
 
       if (deltaY > threshold) {

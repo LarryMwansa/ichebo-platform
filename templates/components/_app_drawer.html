@@ -10,23 +10,27 @@
   <div class="drawer-handle"></div>
 
   <div class="drawer-header">
-    {# Dynamic title — pages can override via context or JS API #}
+    {# Left: Dynamic title #}
     <div class="drawer-title" id="drawerTitle">{% block drawer_title %}Options{% endblock %}</div>
     
-    <div class="drawer-header__actions">
-      {# Slot for contextual actions like Version Selection in Bible #}
-      <div id="drawerActions">
-        {% block drawer_actions %}{% endblock %}
-      </div>
+    {# Center: Slot for contextual actions (like Versions) #}
+    <div id="drawerActions" class="drawer-header__actions">
+      {% block drawer_actions %}{% endblock %}
+    </div>
+
+    {# Right: Close button #}
+    <div class="drawer-header__close">
       <button id="closeBtn" class="close-btn" aria-label="Close menu">&times;</button>
     </div>
   </div>
 
   <div class="drawer-content" id="drawerContent">
     {# Pages/views inject their own drawer content #}
-    {% block drawer_content %}
-    <!-- Default empty state -->
-    {% endblock %}
+    <div id="drawerInner">
+      {% block drawer_content %}
+      <!-- Default empty state -->
+      {% endblock %}
+    </div>
   </div>
 
 </div>

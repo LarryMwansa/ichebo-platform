@@ -29,13 +29,24 @@ def get_all_books():
 
 def get_book_chapters(book_code):
     """Return distinct chapter numbers for a book (translation-independent)."""
-    return (
+    # Try default translation first
+    chapters = list(
         BibleVerse.objects
         .filter(book__code=book_code, translation__is_default=True)
         .values_list('chapter', flat=True)
         .distinct()
         .order_by('chapter')
     )
+    if not chapters:
+        # Fallback to any available translation
+        chapters = list(
+            BibleVerse.objects
+            .filter(book__code=book_code)
+            .values_list('chapter', flat=True)
+            .distinct()
+            .order_by('chapter')
+        )
+    return chapters
 
 
 def get_chapter_note_verse_numbers(user, translation, book_code, chapter):

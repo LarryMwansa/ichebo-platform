@@ -14,9 +14,9 @@
        aria-label="{{ book.name }} {{ chapter }}:{{ verse.verse }}"
        style="display: flex; gap: 12px; padding: 12px 1rem; cursor: pointer; border-radius: 8px; transition: background 0.2s ease; position: relative;">
     
-    <span class="bible-verse__num" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); min-width: 1.5rem; text-align: right; padding-top: 4px; flex-shrink: 0;">{{ verse.verse }}</span>
+    <span class="bible-verse__num" style="font-size: 0.8em; font-weight: 700; color: var(--primary); min-width: 1.5rem; text-align: right; padding-top: 4px; flex-shrink: 0;">{{ verse.verse }}</span>
     
-    <span class="bible-verse__text" style="font-size: 1.05rem; line-height: 1.7; color: var(--text); flex: 1;">{{ verse.text }}</span>
+    <span class="bible-verse__text" style="font-size: 1.1em; line-height: 1.7; color: var(--text); flex: 1;">{{ verse.text }}</span>
     
     <div class="bible-verse__indicators" style="display: flex; flex-direction: column; gap: 4px; justify-content: center;">
       {% if verse.verse in personal_noted %}

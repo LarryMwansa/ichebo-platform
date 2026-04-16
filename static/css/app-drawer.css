@@ -81,10 +81,10 @@
 
 /* Drawer Header */
 .drawer-header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 12px 20px 18px; /* Adjusted padding for handle */
+    padding: 12px 20px 18px;
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
@@ -93,14 +93,21 @@
 
 .drawer-header__actions {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    justify-content: center;
+}
+
+.drawer-header__close {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .drawer-title {
     font-size: 18px;
     font-weight: 600;
     color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .close-btn {
@@ -109,6 +116,8 @@
     border: none;
     cursor: pointer;
     color: var(--muted);
+    padding: 4px;
+    line-height: 1;
 }
 
 /* Drawer Content */
