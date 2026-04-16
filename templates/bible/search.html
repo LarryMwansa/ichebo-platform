@@ -6,130 +6,35 @@
 <div class="bible-search-shell">
 
   {# Header with back button #}
-  <div class="bible-search-header">
-    <a href="/bible/" class="bible-search-back" aria-label="Back">
+  <div class="bible-search-header" style="display:flex; align-items:center; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--card);">
+    <a href="/bible/" class="btn-touch bible-search-back" aria-label="Back">
       <span class="material-symbols-outlined">arrow_back</span>
     </a>
-    <div style="flex: 1;"></div>
+    <h1 style="flex:1; margin:0; font-size:1.1rem; text-align:center;">Search Bible</h1>
+    <div style="width: 48px;"></div>
   </div>
 
   {# Search input (sticky) #}
-  <div class="bible-search-input-wrapper">
+  <div class="bible-search-input-wrapper" style="padding: 1rem; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50;">
     <input type="text"
-           class="bible-search-input"
+           class="form-input-touch"
            id="bible-search-input"
-           placeholder="Search verses..."
+           placeholder="Search for verses..."
            autocomplete="off"
            hx-get="{% url 'bible:htmx-search' %}"
-           hx-trigger="keyup delay:300ms"
+           hx-trigger="keyup delay:300ms, search"
            hx-target="#bible-search-results"
            hx-swap="innerHTML"
            hx-include="#bible-search-input">
   </div>
 
   {# Results container (populated by HTMX) #}
-  <div class="bible-search-results" id="bible-search-results">
-    <div class="bible-search-empty">
-      <span class="material-symbols-outlined">search</span>
-      <p>Type to search verses</p>
+  <div class="bible-search-results" id="bible-search-results" style="flex:1; overflow-y:auto;">
+    <div class="bible-search-empty" style="padding: 4rem 2rem; text-align:center; color: var(--muted);">
+      <span class="material-symbols-outlined" style="font-size: 3rem; opacity: 0.3;">search</span>
+      <p style="margin-top: 1rem;">Enter a keyword to search scripture</p>
     </div>
   </div>
 
 </div>
-
-<script>
-  // Focus input on load
-  document.getElementById('bible-search-input').focus();
-</script>
-
-<style>
-  .bible-search-shell {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background: var(--bg);
-    color: var(--text);
-  }
-
-  .bible-search-header {
-    display: flex;
-    align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    background: var(--card);
-    flex-shrink: 0;
-  }
-
-  .bible-search-back {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: transparent;
-    color: var(--primary);
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-
-  .bible-search-back:hover {
-    background: var(--hover);
-  }
-
-  .bible-search-input-wrapper {
-    padding: 12px 20px;
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    sticky: top;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    flex-shrink: 0;
-  }
-
-  .bible-search-input {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 8px;
-    background: var(--bg);
-    color: var(--text);
-    border: 1px solid var(--border);
-    font-size: 16px;
-    font-family: inherit;
-    transition: border-color 0.2s ease;
-  }
-
-  .bible-search-input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(175, 50, 54, 0.1);
-  }
-
-  .bible-search-input::placeholder {
-    color: var(--muted);
-  }
-
-  .bible-search-results {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 0;
-  }
-
-  .bible-search-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    gap: 12px;
-    color: var(--muted);
-  }
-
-  .bible-search-empty .material-symbols-outlined {
-    font-size: 48px;
-    opacity: 0.5;
-  }
-</style>
 {% endblock %}

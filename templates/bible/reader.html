@@ -4,46 +4,36 @@
 {% block title %}Bible · {{ book.name }} {{ chapter }}{% endblock %}
 
 {% block bible_topbar %}
-<!-- Bible app topbar: ICS logo | actions (versions, search, settings) -->
-<div class="bible-topbar">
+<!-- Bible app topbar -->
+<div class="bible-topbar" style="display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: var(--card); border-bottom: 1px solid var(--border); height: 56px; position: sticky; top: 0; z-index: 100;">
   <!-- Logo -->
-  <a href="{% url 'dashboard:index' %}" class="bible-topbar__logo" aria-label="ICS Home">
-    <svg class="logo" id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2559.19 1322.58">
-      <defs>
-        <style>
-          .cls-1 { fill-rule: evenodd; }
-          .cls-1, .cls-2 { fill: var(--text); }
-        </style>
-      </defs>
-      <polygon class="cls-1"
-        points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42" />
+  <a href="{% url 'dashboard:index' %}" class="btn-touch" aria-label="ICS Home" style="display: flex; align-items: center; justify-content: center; width: 48px; border:none; background:transparent;">
+    <svg class="logo" style="width: 24px; height: 24px;" viewBox="0 0 2559.19 1322.58">
+      <defs><style>.cls-1, .cls-2 { fill: var(--text); }</style></defs>
+      <polygon class="cls-1" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42" />
       <path class="cls-2" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z" />
-      <path class="cls-2"
-        d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z" />
-      <path class="cls-2"
-        d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z" />
+      <path class="cls-2" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z" />
+      <path class="cls-2" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z" />
     </svg>
   </a>
 
-  <!-- Right-side actions: search, settings, version -->
-  <div class="bible-topbar__right">
-    <a href="{% url 'bible:search' %}" class="bible-topbar__action-btn" aria-label="Search" title="Search verses">
+  <!-- Right-side actions -->
+  <div class="bible-topbar__right" style="display:flex; align-items:center; gap: 4px;">
+    <a href="{% url 'bible:search' %}" class="btn-touch" aria-label="Search" style="color: var(--muted); border:none; background:transparent;">
       <span class="material-symbols-outlined">search</span>
     </a>
-    <button class="bible-topbar__action-btn" onclick="window.ICSDrawer.open()" aria-label="Settings" title="Bible settings">
+    <button class="btn-touch" onclick="window.ICSDrawer.open()" aria-label="Settings" style="color: var(--muted); border:none; background:transparent;">
       <span class="material-symbols-outlined">tune</span>
     </button>
-    <a href="{% url 'bible:versions' %}" class="bible-topbar__version-btn" aria-label="Change Bible version" title="Change Bible version">
-      <span class="bible-topbar__version-code">{{ translation.code }}</span>
+    <a href="{% url 'bible:versions' %}" class="btn-touch" aria-label="Versions" style="text-decoration:none; display:flex; align-items:center; justify-content:center; border:none; background:transparent;">
+      <span style="font-size: 11px; font-weight: 700; color: #fff; background: var(--primary); padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">{{ translation.code }}</span>
     </a>
   </div>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="bible-reader-shell">
-  <!-- Chapter content (swapped by HTMX on navigation) -->
-  <!-- Title included in partial so it updates on nav -->
+<div class="bible-reader-shell" style="padding-bottom: 120px;">
   <div id="bible-chapter"
        data-book-code="{{ book.code }}"
        data-chapter="{{ chapter }}">
@@ -53,83 +43,61 @@
 {% endblock %}
 
 {% block bible_nav_strip %}
-<!-- Chapter navigator: prev/chapter/next (sticky above bottom bar) -->
-<div class="bible-nav-strip">
-  <button class="bible-nav-strip__btn"
+<!-- Chapter navigator -->
+<div class="bible-nav-strip" style="position: fixed; bottom: 72px; left: 0; right: 0; height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: var(--card); border-top: 1px solid var(--border); z-index: 100;">
+  <button class="btn-touch"
           onclick="navChapter(-1)"
-          aria-label="Previous chapter">
+          aria-label="Previous chapter"
+          style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px;">
     <span class="material-symbols-outlined">chevron_left</span>
   </button>
 
   <a href="{% url 'bible:picker' %}?book_code={{ book.code }}&chapter={{ chapter }}&back={{ request.path }}"
      class="bible-nav-strip__chapter"
-     id="bible-nav-chapter-link">
+     id="bible-nav-chapter-link"
+     style="flex:1; text-align:center; text-decoration:none; font-weight:700; color: var(--text); padding: 0.5rem; border-radius: 8px; margin: 0 12px;">
     {{ book.name }} {{ chapter }}
   </a>
 
-  <button class="bible-nav-strip__btn"
+  <button class="btn-touch"
           onclick="navChapter(1)"
-          aria-label="Next chapter">
+          aria-label="Next chapter"
+          style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px;">
     <span class="material-symbols-outlined">chevron_right</span>
   </button>
 </div>
 
 <script>
-  // Handle chapter navigation - fetch content and swap manually
   async function navChapter(offset) {
     const chapterDiv = document.getElementById('bible-chapter');
     const innerDiv = chapterDiv?.querySelector('[data-book-code]');
-
-    if (!innerDiv) {
-      console.warn('Could not find chapter data');
-      return;
-    }
+    if (!innerDiv) return;
 
     const bookCode = innerDiv.dataset.bookCode || 'GEN';
     const chapter = parseInt(innerDiv.dataset.chapter || '1');
     const newChapter = chapter + offset;
 
     try {
-      // Fetch the new chapter HTML
-      const response = await fetch(
-        `/bible/htmx/chapter/?book_code=${bookCode}&chapter=${newChapter}`
-      );
-
-      if (!response.ok) {
-        console.error('Failed to fetch chapter:', response.status);
-        return;
-      }
-
+      const response = await fetch(`/bible/htmx/chapter/?book_code=${bookCode}&chapter=${newChapter}`);
+      if (!response.ok) return;
       const html = await response.text();
-
-      // Replace the chapter content with innerHTML (equivalent to HTMX's innerHTML swap)
       chapterDiv.innerHTML = html;
-
-      // Update the nav display after swap
       updateNavDisplay();
-    } catch (error) {
-      console.error('Error navigating chapter:', error);
-    }
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } catch (error) { console.error(error); }
   }
 
-  // Update nav strip display (chapter name and links) after swap
   function updateNavDisplay() {
     const chapterDiv = document.getElementById('bible-chapter');
     const innerDiv = chapterDiv?.querySelector('[data-book-code]');
+    if (!innerDiv) return;
 
-    if (!innerDiv) {
-      console.warn('Could not find chapter data for display update');
-      return;
-    }
-
-    const bookCode = innerDiv.dataset.bookCode || 'GEN';
-    const chapter = parseInt(innerDiv.dataset.chapter || '1');
+    const bookCode = innerDiv.dataset.bookCode;
+    const chapter = innerDiv.dataset.chapter;
     const title = document.querySelector('.bible-chapter-title');
-    const bookName = title?.textContent?.split(' ')[0] || 'Genesis';
+    const textPieces = title?.textContent?.trim().split(' ') || [];
+    const bookName = textPieces.slice(0, -1).join(' ') || 'Genesis';
 
-    console.log('Updating nav display:', { bookCode, chapter, bookName });
-
-    // Update chapter link
     const link = document.getElementById('bible-nav-chapter-link');
     if (link) {
       link.textContent = `${bookName} ${chapter}`;
@@ -137,6 +105,7 @@
     }
   }
 </script>
+{% endblock %}
 {% endblock %}
 
 {% block drawer_title %}Bible Settings{% endblock %}

@@ -7,140 +7,47 @@
 
   <!-- Header with back button -->
   <div class="bible-languages-header">
-    <a href="{% url 'bible:versions' %}" class="bible-languages-back" aria-label="Back">
+    <a href="{% url 'bible:versions' %}" class="btn-touch bible-languages-back" aria-label="Back">
       <span class="material-symbols-outlined">arrow_back</span>
     </a>
     <h1 class="bible-languages-title">Languages</h1>
-    <div style="width: 24px;"></div> {# Spacer for centering #}
+    <div style="width: 48px;"></div> {# Spacer for centering #}
   </div>
 
   <!-- Languages list -->
   <div class="bible-languages-list">
-    {% for language in languages %}
-    <a href="{% url 'bible:versions' %}"
-       class="bible-language-item"
-       onclick="filterByLanguage('{{ language.short_code }}'); return false;"
-       role="button"
-       tabindex="0">
+    <div class="list-group">
+      {% for language in languages %}
+      <a href="{% url 'bible:versions' %}"
+         class="list-item"
+         onclick="filterByLanguage('{{ language.short_code }}'); return false;"
+         role="button"
+         tabindex="0"
+         style="text-decoration:none;">
 
-      <div class="bible-language-item__content">
-        <h2 class="bible-language-item__name">{{ language.name }}</h2>
-        <p class="bible-language-item__count">{{ language.count }} version{{ language.count|pluralize }}</p>
+        <div class="list-item__icon" style="background: var(--bg);">
+          <span class="material-symbols-outlined">language</span>
+        </div>
+
+        <div class="list-item__content">
+          <div class="list-item__title" style="color: var(--text);">{{ language.name }}</div>
+          <div class="list-item__meta">{{ language.count }} version{{ language.count|pluralize }}</div>
+        </div>
+
+        <div class="list-item__action">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+
+      </a>
+      {% empty %}
+      <div class="bible-languages-empty">
+        <p>No languages available.</p>
       </div>
-
-      <div class="bible-language-item__arrow">
-        <span class="material-symbols-outlined">chevron_right</span>
-      </div>
-
-    </a>
-    {% empty %}
-    <div class="bible-languages-empty">
-      <p>No languages available.</p>
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
 
 </div>
-
-<style>
-.bible-languages-shell {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: var(--bg);
-}
-
-.bible-languages-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 0.75rem;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-
-.bible-languages-back {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  color: var(--primary);
-  text-decoration: none;
-  border-radius: 50%;
-  transition: background 0.2s ease;
-}
-
-.bible-languages-back:hover {
-  background: var(--hover);
-}
-
-.bible-languages-title {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
-  flex: 1;
-  text-align: center;
-}
-
-.bible-languages-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.5rem 0.75rem;
-}
-
-.bible-language-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  text-decoration: none;
-  color: var(--text);
-  cursor: pointer;
-  margin-bottom: 0.75rem;
-  transition: all 0.2s ease;
-}
-
-.bible-language-item:hover {
-  border-color: var(--primary);
-  background: var(--hover);
-}
-
-.bible-language-item__content {
-  flex: 1;
-}
-
-.bible-language-item__name {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.bible-language-item__count {
-  margin: 0.25rem 0 0 0;
-  font-size: 0.875rem;
-  color: var(--muted);
-}
-
-.bible-language-item__arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted);
-  margin-left: 1rem;
-}
-
-.bible-languages-empty {
-  padding: 2rem 1rem;
-  text-align: center;
-  color: var(--muted);
-}
-</style>
 
 <script>
 function filterByLanguage(languageCode) {
