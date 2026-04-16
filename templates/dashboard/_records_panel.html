@@ -2,9 +2,9 @@
 <link rel="stylesheet" href="{% static 'css/records.css' %}?v=2">
 
 <div class="dash-widget">
-  <div class="records-header" style="margin-bottom: var(--space-s);">
-    <div class="dash-widget__label" style="margin-bottom: 0;">My Journals</div>
-    <button class="btn-primary btn-sm"
+  <div class="records-header" style="display:flex; justify-content:space-between; align-items:center; padding: 16px 16px 0 0;">
+    <div class="dash-widget__label" style="padding-bottom: 0;">My Journals</div>
+    <button class="btn-touch" style="min-height: 36px; padding: 0 12px; background: var(--primary); color: #fff; border-radius: 8px; font-size: 13px;"
             hx-get="{% url 'records:htmx-create' %}"
             hx-target="#dash-record-create-panel"
             hx-swap="innerHTML">
@@ -12,8 +12,9 @@
     </button>
   </div>
   
-  <div id="dash-record-create-panel"></div>
-  <div class="dash-journal-grid">
+  <div id="dash-record-create-panel" style="padding: 0 16px;"></div>
+  
+  <div class="dash-journal-grid" style="padding-top: 16px;">
     <a href="/records/?type=prayer" class="dash-journal-item dash-journal-item--prayer">
       <span class="dash-journal-icon">🙏</span>
       <span class="dash-journal-name">Prayer</span>
@@ -36,20 +37,24 @@
 {% if records %}
 <div class="dash-widget">
   <div class="dash-widget__label">Recent Entries</div>
-  <ul class="dash-list" id="dash-recent-list">
+  <div class="list-group" id="dash-recent-list">
     {% for rec in records %}
-    <li class="dash-list__item">
-      <span class="record-type-badge record-type-badge--{{ rec.record_type }}">
-        {{ rec.record_type|slice:":3"|upper }}
-      </span>
-      <a class="dash-list__title" href="/records/{{ rec.id }}/">{{ rec.title }}</a>
-      <span class="dash-list__time">{{ rec.updated_at|date:"d M" }}</span>
-    </li>
+    <div class="list-item">
+      <div class="list-item__icon">
+        <span class="status-badge" style="background: var(--bg);">
+          {{ rec.record_type|slice:":3"|upper }}
+        </span>
+      </div>
+      <div class="list-item__content">
+        <a class="list-item__title" href="/records/{{ rec.id }}/" style="text-decoration:none;">{{ rec.title }}</a>
+        <div class="list-item__meta">{{ rec.updated_at|date:"d M" }}</div>
+      </div>
+    </div>
     {% endfor %}
-  </ul>
+  </div>
 </div>
 {% endif %}
 
-<div class="dash-widget">
-  <a href="/records/" class="dash-cta">View All Journals →</a>
+<div class="dash-widget" style="margin-top: 12px; padding: 0;">
+  <a href="/records/" class="dash-cta" style="display:block; padding: 16px; text-align:center; font-weight:600; text-decoration:none; color: var(--primary);">View All Journals →</a>
 </div>

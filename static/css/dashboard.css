@@ -50,8 +50,11 @@
 .dash-widget {
   background: var(--card, #fff);
   border: 1px solid var(--border, rgba(0,0,0,.08));
-  border-radius: 10px;
-  padding: 16px;
+  border-radius: 12px; /* Smoother corner */
+  overflow: hidden; /* Prevent edge-bleed of lists */
+  /* padding removed to allow edge-to-edge list styling */
+  display: flex;
+  flex-direction: column;
 }
 
 .dash-widget__label {
@@ -60,7 +63,8 @@
   text-transform: uppercase;
   letter-spacing: .06em;
   color: var(--muted, #666);
-  margin-bottom: 10px;
+  padding: 16px 16px 8px 16px;
+  margin-bottom: 0;
 }
 
 .dash-widget--warn {
@@ -87,10 +91,12 @@
   background: var(--primary, #af3236);
   border-color: transparent;
   color: #fff;
+  padding: 16px; /* Restored padding since it is an explicitly padded block */
 }
 
 .dash-widget--prompt .dash-widget__label {
   color: rgba(255,255,255,.7);
+  padding: 0 0 8px 0;
 }
 
 .dash-prompt {
@@ -149,64 +155,7 @@
 
 /* ── Lists ───────────────────────────────────────────────────────────── */
 
-.dash-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.dash-list__item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border, rgba(0,0,0,.06));
-}
-
-.dash-list__item:last-child {
-  border-bottom: none;
-}
-
-.dash-list__badge {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .04em;
-  padding: 2px 5px;
-  border-radius: 4px;
-  background: var(--hover, #f0f0f0);
-  color: var(--muted, #555);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.dash-list__badge--task    { background: #dbeafe; color: #1e40af; }
-.dash-list__badge--habit   { background: #d1fae5; color: #065f46; }
-.dash-list__badge--event   { background: #ede9fe; color: #5b21b6; }
-.dash-list__badge--reminder { background: #fef3c7; color: #92400e; }
-
-.dash-list__title {
-  flex: 1;
-  font-size: var(--fz--1, 0.9rem);
-  color: var(--text, #222);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.dash-list__time {
-  font-size: var(--fz--3, 0.65rem);
-  color: var(--muted, #666);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.dash-list__time--late {
-  color: #ef4444;
-  font-weight: 600;
-}
+/* Replaced by standard .list-item from main.css */
 
 /* ── Habit streaks ───────────────────────────────────────────────────── */
 
@@ -235,7 +184,7 @@
   background: var(--hover, #f5f5f5);
   border-radius: 8px;
   padding: 12px;
-  margin-bottom: 10px;
+  margin: 0 16px 10px 16px;
   border: 1px solid var(--border, rgba(0,0,0,.08));
   transition: background .15s;
 }
@@ -269,6 +218,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 0 16px 16px 16px;
 }
 
 .dash-enrolment {
@@ -318,6 +268,7 @@
   color: var(--text, #222);
   text-decoration: none;
   font-weight: var(--font-weight-medium, 500);
+  padding: 0 16px 16px 16px;
 }
 
 .dash-dar-link:hover { text-decoration: underline; }
@@ -325,7 +276,8 @@
 .dash-dar-empty {
   color: var(--muted, #666);
   font-size: var(--fz--1, 0.9rem);
-  margin: 0 0 8px;
+  margin: 0;
+  padding: 0 16px 8px 16px;
 }
 
 .dash-dar-cta {
@@ -333,6 +285,8 @@
   color: var(--primary, #af3236);
   text-decoration: none;
   font-weight: var(--font-weight-medium, 500);
+  padding: 0 16px 16px 16px;
+  display: inline-block;
 }
 
 .dash-dar-cta:hover { text-decoration: underline; }
@@ -377,6 +331,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+  padding: 0 16px 16px 16px;
 }
 
 .dash-journal-item {

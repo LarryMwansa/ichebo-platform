@@ -113,44 +113,53 @@
   {% if digest.overdue_items or digest.due_today or digest.pending_reminders %}
   <div class="dash-widget {% if digest.overdue_items %}dash-widget--danger{% endif %}">
     <div class="dash-widget__label">Action Items</div>
-    <ul class="dash-list">
-
+    <div class="list-group">
       {% for item in digest.overdue_items %}
-      <li class="dash-list__item">
-        <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}"
-              style="background:var(--error);color:#fff;">
-          {{ item.activity_type|slice:":3"|upper }}
-        </span>
-        <span class="dash-list__title">{{ item.title }}</span>
-        <span class="dash-list__time dash-list__time--late">
-          Overdue{% if item.due_at %} · {{ item.due_at|slice:":10" }}{% endif %}
-        </span>
-      </li>
+      <div class="list-item">
+        <div class="list-item__icon">
+          <span class="status-badge status-badge--danger">
+            {{ item.activity_type|slice:":3"|upper }}
+          </span>
+        </div>
+        <div class="list-item__content">
+          <div class="list-item__title">{{ item.title }}</div>
+          <div class="list-item__meta" style="color: var(--error); font-weight: 600;">
+            Overdue{% if item.due_at %} · {{ item.due_at|slice:":10" }}{% endif %}
+          </div>
+        </div>
+      </div>
       {% endfor %}
 
       {% for item in digest.due_today %}
-      <li class="dash-list__item">
-        <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}">
-          {{ item.activity_type|slice:":3"|upper }}
-        </span>
-        <span class="dash-list__title">{{ item.title }}</span>
-        {% if item.due_at %}
-        <span class="dash-list__time">Today · {{ item.due_at|slice:"11:16" }}</span>
-        {% endif %}
-      </li>
+      <div class="list-item">
+        <div class="list-item__icon">
+          <span class="status-badge status-badge--active">
+            {{ item.activity_type|slice:":3"|upper }}
+          </span>
+        </div>
+        <div class="list-item__content">
+          <div class="list-item__title">{{ item.title }}</div>
+          <div class="list-item__meta">
+            {% if item.due_at %}Today · {{ item.due_at|slice:"11:16" }}{% endif %}
+          </div>
+        </div>
+      </div>
       {% endfor %}
 
       {% for r in digest.pending_reminders %}
-      <li class="dash-list__item">
-        <span class="dash-list__badge dash-list__badge--reminder">REM</span>
-        <span class="dash-list__title">{{ r.title }}</span>
-        {% if r.due_at %}
-        <span class="dash-list__time">{{ r.due_at|slice:"11:16" }}</span>
-        {% endif %}
-      </li>
+      <div class="list-item">
+        <div class="list-item__icon">
+          <span class="status-badge status-badge--warning">REM</span>
+        </div>
+        <div class="list-item__content">
+          <div class="list-item__title">{{ r.title }}</div>
+          <div class="list-item__meta">
+            {% if r.due_at %}{{ r.due_at|slice:"11:16" }}{% endif %}
+          </div>
+        </div>
+      </div>
       {% endfor %}
-
-    </ul>
+    </div>
     <a href="/activity/" style="font-size:0.8rem;color:var(--primary);text-decoration:none;display:block;margin-top:6px;">
       All activities →
     </a>
@@ -161,14 +170,18 @@
   {% if digest.habit_streaks %}
   <div class="dash-widget">
     <div class="dash-widget__label">Habit Streaks</div>
-    <ul class="dash-list dash-list--habits">
+    <div class="list-group">
       {% for h in digest.habit_streaks %}
-      <li class="dash-list__item">
-        <span class="dash-streak">{{ h.streak }}<span class="dash-streak__unit">d</span></span>
-        <span class="dash-list__title">{{ h.title }}</span>
-      </li>
+      <div class="list-item">
+        <div class="list-item__icon">
+          <span class="dash-streak">{{ h.streak }}<span class="dash-streak__unit">d</span></span>
+        </div>
+        <div class="list-item__content">
+          <div class="list-item__title">{{ h.title }}</div>
+        </div>
+      </div>
       {% endfor %}
-    </ul>
+    </div>
   </div>
   {% endif %}
 
@@ -265,55 +278,67 @@
     {% if digest.due_today %}
     <div class="dash-widget">
       <div class="dash-widget__label">Due Today</div>
-      <ul class="dash-list">
+      <div class="list-group">
         {% for item in digest.due_today %}
-        <li class="dash-list__item">
-          <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}">
-            {{ item.activity_type|slice:":3"|upper }}
-          </span>
-          <span class="dash-list__title">{{ item.title }}</span>
-          {% if item.due_at %}
-          <span class="dash-list__time">{{ item.due_at|slice:"11:16" }}</span>
-          {% endif %}
-        </li>
+        <div class="list-item">
+          <div class="list-item__icon">
+            <span class="status-badge status-badge--active">
+              {{ item.activity_type|slice:":3"|upper }}
+            </span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ item.title }}</div>
+            <div class="list-item__meta">
+              {% if item.due_at %}{{ item.due_at|slice:"11:16" }}{% endif %}
+            </div>
+          </div>
+        </div>
         {% endfor %}
-      </ul>
+      </div>
     </div>
     {% endif %}
 
     {% if digest.overdue_items %}
     <div class="dash-widget dash-widget--danger">
       <div class="dash-widget__label">Overdue</div>
-      <ul class="dash-list">
+      <div class="list-group">
         {% for item in digest.overdue_items %}
-        <li class="dash-list__item">
-          <span class="dash-list__badge dash-list__badge--{{ item.activity_type }}">
-            {{ item.activity_type|slice:":3"|upper }}
-          </span>
-          <span class="dash-list__title">{{ item.title }}</span>
-          {% if item.due_at %}
-          <span class="dash-list__time dash-list__time--late">{{ item.due_at|slice:":10" }}</span>
-          {% endif %}
-        </li>
+        <div class="list-item">
+          <div class="list-item__icon">
+            <span class="status-badge status-badge--danger">
+              {{ item.activity_type|slice:":3"|upper }}
+            </span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ item.title }}</div>
+            <div class="list-item__meta" style="color: var(--error); font-weight: 600;">
+              {% if item.due_at %}{{ item.due_at|slice:":10" }}{% endif %}
+            </div>
+          </div>
+        </div>
         {% endfor %}
-      </ul>
+      </div>
     </div>
     {% endif %}
 
     {% if digest.pending_reminders %}
     <div class="dash-widget">
       <div class="dash-widget__label">Upcoming Reminders</div>
-      <ul class="dash-list">
+      <div class="list-group">
         {% for r in digest.pending_reminders %}
-        <li class="dash-list__item">
-          <span class="dash-list__badge dash-list__badge--reminder">REM</span>
-          <span class="dash-list__title">{{ r.title }}</span>
-          {% if r.due_at %}
-          <span class="dash-list__time">{{ r.due_at|slice:"11:16" }}</span>
-          {% endif %}
-        </li>
+        <div class="list-item">
+          <div class="list-item__icon">
+            <span class="status-badge status-badge--warning">REM</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ r.title }}</div>
+            <div class="list-item__meta">
+              {% if r.due_at %}{{ r.due_at|slice:"11:16" }}{% endif %}
+            </div>
+          </div>
+        </div>
         {% endfor %}
-      </ul>
+      </div>
     </div>
     {% endif %}
 
