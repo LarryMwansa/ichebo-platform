@@ -141,6 +141,7 @@
           const html = await response.text();
           if (chapterDiv) {
             chapterDiv.innerHTML = html;
+            htmx.process(chapterDiv); // Essential: process new verses for HTMX triggers
             if (window.updateNavDisplay) window.updateNavDisplay();
             window.scrollTo({ top: 0, behavior: 'instant' });
           }

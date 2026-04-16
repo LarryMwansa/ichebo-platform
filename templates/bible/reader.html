@@ -83,6 +83,7 @@
       if (!response.ok) return;
       const html = await response.text();
       chapterDiv.innerHTML = html;
+      htmx.process(chapterDiv); // Essential: process new verses for HTMX triggers
       updateNavDisplay();
       window.scrollTo({ top: 0, behavior: 'instant' });
     } catch (error) { console.error(error); }
