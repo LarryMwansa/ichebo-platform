@@ -2,7 +2,9 @@
 
 {% block learn_content %}
 <div class="programme-detail">
-  <a href="{% url 'learn:learn-catalogue' %}" class="btn-back">← Programmes</a>
+  <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; height: 36px;">
+    <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back</span> Programmes
+  </a>
   <div class="programme-badge">{{ programme.metadata.qualification|default:"Programme" }}</div>
   <h2>{{ programme.title }}</h2>
   <p class="programme-description">{{ programme.content|default:programme.summary }}</p>
@@ -14,9 +16,9 @@
   <!-- Enrolment section -->
   <div id="enrol-section" style="margin: 1rem 0;">
     {% if already_enrolled %}
-      <span class="enrolled-badge">Enrolled</span>
+      <span class="status-badge status-badge--active">Enrolled</span>
     {% else %}
-      <button class="btn-primary enrol-btn"
+      <button class="btn-touch enrol-btn" style="background: var(--primary); color: #fff;"
               hx-post="{% url 'learn:htmx-enrol' programme.id %}"
               hx-target="#enrol-section"
               hx-swap="outerHTML">
@@ -31,16 +33,24 @@
     {% for item in curriculum %}
     <div class="course-block">
       <h4>{{ forloop.counter }}. {{ item.course.title }}</h4>
-      <ul class="lesson-list">
+      <div class="list-group">
         {% for lesson in item.lessons %}
-        <li class="lesson-item">
-          <span class="lesson-type-tag">{{ lesson.record_type }}</span>
-          <a href="{% url 'learn:learn-lesson' lesson.id %}">{{ lesson.title }}</a>
-        </li>
+        <a href="{% url 'learn:learn-lesson' lesson.id %}" class="list-item" style="text-decoration:none;">
+          <div class="list-item__icon">
+            <span class="status-badge" style="background: var(--bg);">{{ lesson.record_type|slice:":3"|upper }}</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title" style="color: var(--text);">{{ lesson.title }}</div>
+          </div>
+        </a>
         {% empty %}
-        <li class="text-small" style="color:var(--muted);">No lessons yet.</li>
+        <div class="list-item">
+          <div class="list-item__content">
+            <div class="list-item__meta">No lessons yet.</div>
+          </div>
+        </div>
         {% endfor %}
-      </ul>
+      </div>
     </div>
     {% empty %}
     <p class="empty-state">No courses in this programme yet.</p>

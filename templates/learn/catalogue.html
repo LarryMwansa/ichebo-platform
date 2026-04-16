@@ -2,7 +2,9 @@
 
 {% block learn_content %}
 <div class="learn-header">
-  <a href="{% url 'learn:learn-home' %}" class="btn-back">← My Learning</a>
+  <a href="{% url 'learn:learn-home' %}" class="btn-touch" style="margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; height: 36px;">
+    <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back</span> My Learning
+  </a>
   <h2>Programmes</h2>
 </div>
 
@@ -21,7 +23,7 @@
         Level {{ programme.permissions_data.required_level|default:1 }} required
       </span>
     {% else %}
-      <a href="{% url 'learn:learn-programme' programme.id %}" class="btn-primary">View</a>
+      <a href="{% url 'learn:learn-programme' programme.id %}" class="btn-touch" style="background: var(--primary); color: #fff; width: fit-content;">View</a>
     {% endif %}
   </div>
   {% empty %}

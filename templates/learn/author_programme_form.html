@@ -2,7 +2,9 @@
 
 {% block learn_content %}
 <div class="learn-header">
-  <a href="{% url 'learn:learn-author' %}" class="btn-back">← Authorship</a>
+  <a href="{% url 'learn:learn-author' %}" class="btn-touch" style="margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; height: 36px;">
+    <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back</span> Authorship
+  </a>
   <h2>{% if record %}Edit Programme{% else %}New Programme{% endif %}</h2>
 </div>
 <form method="post" class="author-form"
@@ -23,11 +25,11 @@
   </label>
   {% endif %}
   <label>Title
-    <input type="text" name="title" required maxlength="500"
+    <input type="text" name="title" class="form-input-touch" required maxlength="500"
            value="{{ record.title|default:'' }}">
   </label>
   <label>Qualification Level
-    <select name="qualification">
+    <select name="qualification" class="form-input-touch">
       <option value="Certificate" {% if record.metadata.qualification == 'Certificate' %}selected{% endif %}>Certificate</option>
       <option value="Diploma" {% if record.metadata.qualification == 'Diploma' %}selected{% endif %}>Diploma</option>
       <option value="Degree" {% if record.metadata.qualification == 'Degree' %}selected{% endif %}>Degree</option>
@@ -36,22 +38,22 @@
     </select>
   </label>
   <label>Description
-    <textarea name="description" rows="4">{{ record.content|default:'' }}</textarea>
+    <textarea name="description" class="form-input-touch" rows="4">{{ record.content|default:'' }}</textarea>
   </label>
   <label>Duration (years)
-    <input type="number" name="duration_years" min="1" max="10"
+    <input type="number" name="duration_years" class="form-input-touch" min="1" max="10"
            value="{{ record.metadata.duration_years|default:'' }}">
   </label>
   <label>KGS Pathways (comma-separated)
-    <input type="text" name="pathways" placeholder="Learning, Community Life…"
+    <input type="text" name="pathways" class="form-input-touch" placeholder="Learning, Community Life…"
            value="{{ record.metadata.pathways|default:'' }}">
   </label>
   {% if not record %}
   <label>Required Level (1–5)
-    <input type="number" name="required_level" min="1" max="5" value="1">
+    <input type="number" name="required_level" class="form-input-touch" min="1" max="5" value="1">
   </label>
   {% endif %}
-  <button type="submit" class="btn-primary">
+  <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; width: 100%;">
     {% if record %}Save Changes{% else %}Create (Draft){% endif %}
   </button>
 </form>

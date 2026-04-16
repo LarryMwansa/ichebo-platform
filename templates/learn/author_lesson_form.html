@@ -2,7 +2,9 @@
 
 {% block learn_content %}
 <div class="learn-header">
-  <a href="{% url 'learn:learn-author' %}" class="btn-back">← Authorship</a>
+  <a href="{% url 'learn:learn-author' %}" class="btn-touch" style="margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; height: 36px;">
+    <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back</span> Authorship
+  </a>
   <h2>{% if record %}Edit {{ record.record_type|title }}{% else %}New Lesson / Quiz / Assignment{% endif %}</h2>
 </div>
 <form method="post" class="author-form"
@@ -10,7 +12,7 @@
   {% csrf_token %}
   {% if not record %}
   <label>Type
-    <select name="record_type">
+    <select name="record_type" class="form-input-touch">
       <option value="lesson">Lesson</option>
       <option value="quiz">Quiz</option>
       <option value="assignment">Assignment</option>
@@ -18,15 +20,15 @@
   </label>
   {% endif %}
   <label>Title
-    <input type="text" name="title" required maxlength="500"
+    <input type="text" name="title" class="form-input-touch" required maxlength="500"
            value="{{ record.title|default:'' }}">
   </label>
   <label>Content (Markdown supported)
-    <textarea name="content" rows="10" placeholder="Write lesson content here…">{{ record.content|default:'' }}</textarea>
+    <textarea name="content" class="form-input-touch" rows="10" placeholder="Write lesson content here…">{{ record.content|default:'' }}</textarea>
   </label>
   {% if not record %}
   <label>Parent Course
-    <select name="course_id">
+    <select name="course_id" class="form-input-touch">
       <option value="">— None —</option>
       {% for c in courses %}
       <option value="{{ c.id }}">{{ c.title }}</option>
@@ -34,7 +36,7 @@
     </select>
   </label>
   {% endif %}
-  <button type="submit" class="btn-primary">
+  <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; width: 100%;">
     {% if record %}Save Changes{% else %}Create (Draft){% endif %}
   </button>
 </form>

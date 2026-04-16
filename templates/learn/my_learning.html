@@ -14,7 +14,7 @@
 
 <div class="learn-header">
   <h1>My Learning</h1>
-  <a href="{% url 'learn:learn-catalogue' %}" class="btn-secondary">Browse Programmes</a>
+  <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="border: 1px solid var(--border); padding: 0 12px; height: 36px; font-size: 13px;">Browse Programmes</a>
 </div>
 
 <!-- Awaiting certification banner -->
@@ -22,7 +22,7 @@
   {% for cert in pending_certifications %}
   <div class="enrolment-card awaiting-cert">
     <div class="enrolment-title">{{ cert.title }}</div>
-    <span class="cert-pending-badge">Awaiting Steward Confirmation</span>
+    <div><span class="status-badge status-badge--warning">Awaiting Steward Confirmation</span></div>
   </div>
   {% endfor %}
 {% endif %}
@@ -38,7 +38,7 @@
     <span class="progress-label">{{ enrolment.progress|default:0 }}% complete</span>
     {% with prog_id=enrolment.metadata.programme_record_id %}
     {% if prog_id %}
-    <a href="{% url 'learn:learn-programme' prog_id %}" class="btn-primary">Continue</a>
+    <a href="{% url 'learn:learn-programme' prog_id %}" class="btn-touch" style="background: var(--primary); color: #fff;">Continue</a>
     {% endif %}
     {% endwith %}
   </div>
@@ -46,7 +46,7 @@
 {% else %}
   <div class="empty-state">
     <p>You are not enrolled in any programme yet.</p>
-    <a href="{% url 'learn:learn-catalogue' %}" class="btn-primary">Browse Programmes</a>
+    <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="background: var(--primary); color: #fff;">Browse Programmes</a>
   </div>
 {% endif %}
 
@@ -56,7 +56,7 @@
   {% for cert in certifications %}
   <div class="enrolment-card">
     <div class="enrolment-title">{{ cert.title }}</div>
-    <span class="enrolled-badge">Certified</span>
+    <div><span class="status-badge status-badge--enacted">Certified</span></div>
   </div>
   {% endfor %}
 {% endif %}
