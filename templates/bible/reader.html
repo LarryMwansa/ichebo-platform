@@ -90,26 +90,31 @@
   function updateNavDisplay() {
     const chapterDiv = document.getElementById('bible-chapter');
     const innerDiv = chapterDiv?.querySelector('[data-book-code]');
+    const headerTitle = chapterDiv?.querySelector('.bible-chapter-title');
+    
     if (!innerDiv) return;
 
     const bookCode = innerDiv.dataset.bookCode;
     const chapter = innerDiv.dataset.chapter;
+    const bookNameText = headerTitle?.textContent?.trim() || 'Scripture';
     
     // Update Top bar title
-    const title = document.querySelector('.bible-chapter-title');
-    const textPieces = title?.textContent?.trim().split(' ') || [];
-    const bookName = textPieces.slice(0, -1).join(' ') || 'Scripture';
-    
     const topBarTitle = document.querySelector('.bible-topbar__title');
-    if (topBarTitle) topBarTitle.textContent = `${bookName} ${chapter}`;
+    if (topBarTitle) topBarTitle.textContent = bookNameText;
 
     // Update Nav strip and button
     const navBtn = document.getElementById('bible-nav-chapter-btn');
     if (navBtn) {
-      navBtn.textContent = `${bookName} ${chapter}`;
+      navBtn.textContent = bookNameText;
       navBtn.setAttribute('hx-get', `/bible/pick/?book_code=${bookCode}&chapter=${chapter}&back=${window.location.pathname}`);
       // Re-process HTMX for the new attribute
       htmx.process(navBtn);
+    }
+
+    // Update URL without reload
+    const newUrl = `/bible/${bookCode}/${chapter}/`;
+    if (window.location.pathname !== newUrl) {
+      window.history.pushState({ bookCode, chapter }, '', newUrl);
     }
   }
 

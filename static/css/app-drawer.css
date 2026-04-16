@@ -13,8 +13,8 @@
     opacity: 0;
     visibility: hidden;
     transition: 0.3s ease;
-    z-index: 900;
-    /* below drawer (1000) */
+    z-index: 1050;
+    /* below drawer (1100) */
 }
 
 .overlay.active {
@@ -42,7 +42,7 @@
     overflow-y: auto;
     overflow-x: hidden;
 
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
 
     transform: translateY(20px) scale(0.98);
     opacity: 0;
@@ -52,7 +52,7 @@
         transform 0.3s ease,
         opacity 0.25s ease;
 
-    z-index: 1000;
+    z-index: 1100;
 
     display: flex;
     flex-direction: column;
