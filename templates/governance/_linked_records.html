@@ -47,14 +47,14 @@
           style="display:flex;flex-direction:column;gap:8px">
       {% csrf_token %}
       <input type="hidden" name="from_record_id" value="{{ record.id }}">
-      <select name="relationship_type" class="gov-form-input">
+      <select name="relationship_type" class="form-input-touch">
         {% for rt in relationship_types %}
         <option value="{{ rt }}">{{ rt|title|cut:"_" }}</option>
         {% endfor %}
       </select>
-      <input type="text" name="to_record_id" placeholder="Target Record ID" class="gov-form-input">
-      <input type="text" name="notes" placeholder="Notes (optional)" class="gov-form-input">
-      <button type="submit" class="gov-action-btn">Add Link</button>
+      <input type="text" name="to_record_id" placeholder="Target Record ID" class="form-input-touch">
+      <input type="text" name="notes" placeholder="Notes (optional)" class="form-input-touch">
+      <button type="submit" class="btn-touch" style="background: var(--gov-accent); color: #fff; width: 100%;">Add Link</button>
     </form>
   </div>
   {% endif %}

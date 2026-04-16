@@ -222,11 +222,14 @@
 }
 
 /* Semantic Colors */
-.status-badge--draft    { background: #f1f5f9; color: #475569; }
-.status-badge--active   { background: #eff6ff; color: #2563eb; }
-.status-badge--enacted  { background: #ecfdf5; color: #059669; }
-.status-badge--danger   { background: #fef2f2; color: #dc2626; }
-.status-badge--warning  { background: #fffbeb; color: #d97706; }
+.status-badge--draft      { background: #f1f5f9; color: #475569; }
+.status-badge--active     { background: #eff6ff; color: #2563eb; }
+.status-badge--enacted    { background: #ecfdf5; color: #059669; }
+.status-badge--danger     { background: #fef2f2; color: #dc2626; }
+.status-badge--warning    { background: #fffbeb; color: #d97706; }
+.status-badge--locked     { background: #dce7f7; color: #2E5D9E; }
+.status-badge--superseded { background: #f0f0f0; color: #888888; }
+.status-badge--submitted  { background: #EEE8F5; color: #7B5EA7; }
 
 /* 3. Touch Targets (Forms & Buttons) */
 .btn-touch {

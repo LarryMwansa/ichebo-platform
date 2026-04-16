@@ -7,7 +7,7 @@
     {% for v in chain %}
     <li class="gov-version-item {% if v.id == record.id %}gov-version-item--current{% endif %}">
       <span class="gov-version-num">v{{ v.version|default:1 }}</span>
-      <span class="gov-status-badge gov-status-{{ v.status }}">{{ v.status|title }}</span>
+      <span class="status-badge status-badge--{{ v.status }}">{{ v.status|title }}</span>
       <span class="gov-version-date">{{ v.created_at|date:"d M Y" }}</span>
       {% if v.locked_at %}<span class="gov-version-date">Locked {{ v.locked_at|date:"d M Y" }}</span>{% endif %}
       {% if v.id != record.id %}

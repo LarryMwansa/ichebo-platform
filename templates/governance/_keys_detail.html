@@ -3,9 +3,9 @@
   <a href="{% url 'governance:keys-list' %}"
      class="gov-back-link"
      hx-get="{% url 'governance:keys-list' %}"
-     hx-target="#governance-content"
+      hx-target="#governance-content"
      hx-push-url="true">← My Keys</a>
-  <span class="gov-status-badge gov-status-{{ record.status }}">{{ record.status|title }}</span>
+  <span class="status-badge status-badge--{{ record.status }}">{{ record.status|title }}</span>
 </div>
 
 {% if record.custom_fields.symbol %}
@@ -25,9 +25,9 @@
 </div>
 {% endif %}
 
-<div class="gov-action-row">
+<div class="gov-action-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0;">
   <a href="{% url 'governance:htmx-record-edit' record.id %}"
-     class="gov-action-btn"
+     class="btn-touch" style="background: var(--gov-accent); color: #fff; text-decoration: none;"
      hx-get="{% url 'governance:htmx-record-edit' record.id %}"
      hx-target="#governance-content"
      hx-push-url="true">Edit</a>

@@ -43,7 +43,7 @@
   <div class="gov-branch-card">
     <div class="gov-branch-label">My Keys</div>
     <p class="gov-branch-desc">Personal symbol-to-meaning mappings drawn from your journal records.</p>
-    <a href="{% url 'governance:keys-list' %}" class="gov-action-btn"
+    <a href="{% url 'governance:keys-list' %}" class="btn-touch" style="background: var(--gov-accent); color: #fff; text-decoration: none;"
        hx-get="{% url 'governance:keys-list' %}"
        hx-target="#governance-content"
        hx-push-url="true">

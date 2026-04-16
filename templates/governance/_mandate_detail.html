@@ -7,7 +7,7 @@
      hx-push-url="true">
     ← {{ record.record_type|title }}s
   </a>
-  <div id="record-status-area" class="gov-status-badge gov-status-{{ record.status }}">
+  <div id="record-status-area" class="status-badge status-badge--{{ record.status }}">
     {% if record.status == 'locked' %}🔒 {% endif %}{{ record.status|title }}
     {% if record.version %} · v{{ record.version }}{% endif %}
   </div>
@@ -33,14 +33,14 @@
 
 <!-- Level 5 actions -->
 {% if is_level5 %}
-<div class="gov-action-row">
+<div class="gov-action-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0;">
   {% if record.status != 'locked' %}
   <a href="{% url 'governance:htmx-record-edit' record.id %}"
-     class="gov-action-btn"
+     class="btn-touch" style="background: var(--gov-accent); color: #fff; text-decoration: none;"
      hx-get="{% url 'governance:htmx-record-edit' record.id %}"
      hx-target="#governance-content"
      hx-push-url="true">Edit</a>
-  <button class="gov-action-btn gov-action-btn--lock"
+  <button class="btn-touch" style="background: var(--gov-locked); color: #fff;"
           hx-post="{% url 'governance:htmx-record-lock' record.id %}"
           hx-target="#record-status-area"
           hx-swap="outerHTML"
@@ -48,7 +48,7 @@
     Lock Record
   </button>
   {% endif %}
-  <button class="gov-action-btn gov-action-btn--supersede"
+  <button class="btn-touch" style="background: transparent; color: var(--gov-accent); border: 1.5px solid var(--gov-accent);"
           hx-post="{% url 'governance:htmx-record-supersede' record.id %}"
           hx-confirm="Create a new version of this record?">
     New Version

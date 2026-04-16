@@ -5,7 +5,7 @@
     <h2 class="gov-list-title">{{ type_label }}</h2>
   </div>
   {% if is_level5 %}
-  <a class="gov-action-btn"
+  <a class="btn-touch" style="background: var(--gov-accent); color: #fff; text-decoration: none;"
      href="{% url 'governance:htmx-record-create' %}?record_type={{ record_type }}&record_family=governance"
      hx-get="{% url 'governance:htmx-record-create' %}?record_type={{ record_type }}&record_family=governance"
      hx-target="#governance-content"
@@ -30,25 +30,35 @@
 
 <input type="text" name="q" value="{{ search }}"
        placeholder="Search {{ type_label|lower }}…"
-       class="gov-search-input"
+       class="form-input-touch"
+       style="margin-bottom: 1rem;"
        hx-get="{% url 'governance:mandate-list' record_type %}"
        hx-trigger="keyup changed delay:300ms"
        hx-target="#mandate-record-list"
        hx-swap="innerHTML">
 
-<div id="mandate-record-list">
+<div id="mandate-record-list" class="list-group">
 {% for record in records %}
 <a href="{% url 'governance:mandate-detail' record.id %}"
-   class="gov-record-card"
+   class="list-item" style="text-decoration:none;"
    hx-get="{% url 'governance:mandate-detail' record.id %}"
    hx-target="#governance-content"
    hx-push-url="true">
-  <div class="gov-record-title">{{ record.title }}</div>
-  <div class="gov-record-meta">
-    <span class="gov-status-badge gov-status-{{ record.status }}">{{ record.status|title }}</span>
-    {% if record.version %}<span class="gov-version-badge">v{{ record.version }}</span>{% endif %}
+  <div class="list-item__content">
+    <div class="list-item__title">{{ record.title }}</div>
+    {% if record.summary %}
+      <div class="list-item__meta">{{ record.summary|truncatechars:100 }}</div>
+    {% endif %}
+    <div class="list-item__meta" style="margin-top: 6px;">
+      <span class="status-badge status-badge--{{ record.status }}" style="margin-right: 4px;">{{ record.status|title }}</span>
+      {% if record.version %}
+        <span class="status-badge" style="background: var(--bg); color: var(--gov-accent);">v{{ record.version }}</span>
+      {% endif %}
+    </div>
   </div>
-  {% if record.summary %}<div class="gov-record-summary">{{ record.summary|truncatechars:100 }}</div>{% endif %}
+  <div class="list-item__action">
+    <span class="material-symbols-outlined">chevron_right</span>
+  </div>
 </a>
 {% empty %}
 <div class="gov-empty">No {{ type_label|lower }} records found.</div>
