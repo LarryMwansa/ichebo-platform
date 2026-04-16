@@ -287,9 +287,7 @@ def htmx_search(request):
 @login_required
 def bible_picker_view(request):
     """
-    Full-screen book/chapter/verse picker.
-    GET params: book_code, chapter, back (return URL)
-    Passes chapters for ALL books so picker can navigate without page reload.
+    Book/chapter/verse picker. Handles both full-page and HTMX partials.
     """
     back_url = request.GET.get('back', '/bible/')
     book_code = request.GET.get('book_code', DEFAULT_BOOK)
@@ -302,7 +300,6 @@ def bible_picker_view(request):
     book = BibleBook.objects.filter(code=book_code).first()
     chapters = get_book_chapters(book_code)
 
-    # Build chapters map for ALL books (so picker can navigate without reload)
     all_chapters = {}
     for b in books:
         all_chapters[b.code] = list(get_book_chapters(b.code))
@@ -312,25 +309,23 @@ def bible_picker_view(request):
         'book': book,
         'chapter': chapter,
         'chapters': list(chapters),
-        'all_chapters': all_chapters,  # NEW: pass all chapters for all books
+        'all_chapters': all_chapters,
         'back_url': back_url,
     }
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'bible/partials/_picker_sheet.html', context)
     return render(request, 'bible/picker.html', context)
 
 
 @login_required
 def bible_versions_view(request):
     """
-    Bible versions list page.
-    Shows all available Bible translations grouped by language.
+    Bible versions list. Handles both full-page and HTMX partials.
     """
-    # Get user's current translation
     current_translation = get_user_translation(request.user)
-
-    # Get all public translations
     translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
 
-    # Group by language
     versions_by_language = {}
     for trans in translations:
         lang = trans.language_full or 'Unknown'
@@ -343,19 +338,18 @@ def bible_versions_view(request):
         'versions_by_language': versions_by_language,
         'all_translations': translations,
     }
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'bible/partials/_versions_sheet.html', context)
     return render(request, 'bible/versions.html', context)
 
 
 @login_required
 def bible_languages_view(request):
     """
-    Bible languages list page.
-    Shows all unique languages with available translations.
+    Bible languages list. Handles both full-page and HTMX partials.
     """
-    # Get all public translations
     translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
-
-    # Group by language and count
     languages_data = {}
     for trans in translations:
         lang = trans.language_full or 'Unknown'
@@ -367,12 +361,11 @@ def bible_languages_view(request):
             }
         languages_data[lang]['count'] += 1
 
-    # Sort by name
     languages_list = sorted(languages_data.values(), key=lambda x: x['name'])
+    context = {'languages': languages_list}
 
-    context = {
-        'languages': languages_list,
-    }
+    if request.headers.get('HX-Request'):
+        return render(request, 'bible/partials/_languages_sheet.html', context)
     return render(request, 'bible/languages.html', context)
 
 
@@ -430,3 +423,10 @@ def htmx_set_translation(request):
         'tenant_noted': tenant_noted,
     }
     return render(request, 'bible/_chapter.html', context)
+
+@login_required
+def htmx_appearance_sheet(request):
+    """
+    Returns appearance settings bottom sheet.
+    """
+    return render(request, 'bible/partials/_appearance_sheet.html')

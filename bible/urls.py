@@ -16,6 +16,6 @@ urlpatterns = [
     path('htmx/annotation/<uuid:verse_id>/', views.htmx_annotation_panel, name='htmx-annotation-panel'),
     path('htmx/note/save/', views.htmx_save_note, name='htmx-save-note'),
     path('htmx/note/<uuid:note_id>/delete/', views.htmx_delete_note, name='htmx-delete-note'),
-    path('htmx/translation/set/', views.htmx_set_translation, name='htmx-set-translation'),
     path('htmx/search/', views.htmx_search, name='htmx-search'),
+    path('htmx/appearance/', views.htmx_appearance_sheet, name='htmx-appearance'),
 ]

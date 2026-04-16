@@ -1,0 +1,145 @@
+<div id="drawerTitle" hx-swap-oob="innerHTML">Select Passage</div>
+<div id="drawerActions" hx-swap-oob="innerHTML">
+  <button hx-get="{% url 'bible:versions' %}" 
+          hx-target="#drawerContent" 
+          class="btn-touch" 
+          style="border:none; background:transparent; display: flex; align-items: center; justify-content: center; padding: 0;">
+    <span style="font-size: 11px; font-weight: 700; color: #fff; background: var(--primary); padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">{{ translation.code }}</span>
+  </button>
+</div>
+
+<div class="bible-picker-steps" style="height: 60vh; display: flex; flex-direction: column; margin: -20px;">
+
+  {# Step 1: Book Selection #}
+  <div class="bible-picker-step" id="step-books" style="flex: 1; overflow-y: auto;">
+    <div style="padding: 0.5rem 1rem 1rem; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em;">Book</div>
+    <div class="list-group">
+      {% for b in books %}
+      <button class="list-item bible-picker-item {% if b.code == book.code %}bible-picker-item--active{% endif %}"
+              onclick="selectBook('{{ b.code }}')"
+              style="width: 100%; border:none; text-align:left; background: transparent; padding: 12px 1rem;">
+        <div class="list-item__content">
+          <div class="list-item__title" style="color: {% if b.code == book.code %}var(--primary){% else %}var(--text){% endif %}; font-weight: {% if b.code == book.code %}700{% else %}500{% endif %};">{{ b.name }}</div>
+        </div>
+        {% if b.code == book.code %}
+        <div class="list-item__action"><span class="material-symbols-outlined" style="color: var(--primary);">check_circle</span></div>
+        {% endif %}
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Step 2: Chapter Selection #}
+  <div class="bible-picker-step" id="step-chapters" style="display: none; flex: 1; overflow-y: auto; opacity: 0; transform: translateX(20px);">
+    <div style="display:flex; align-items:center; gap: 8px; padding: 0.5rem 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border);">
+      <button class="btn-touch" onclick="goBackFromPicker()" style="background: var(--bg); border:none; padding: 4px;">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <span id="selected-book-name" style="font-weight: 600;">{{ book.name }}</span>
+    </div>
+    <div class="bible-picker-chapter-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; padding: 0 1rem 2rem;">
+      {% for ch in chapters %}
+      <button class="btn-touch bible-picker-item-grid {% if ch == chapter %}bible-picker-item-grid--active{% endif %}"
+              onclick="selectChapterFromPicker({{ ch }})"
+              style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; color: var(--text);">
+        {{ ch }}
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    const currentBookCode = '{{ book.code }}';
+    const currentChapter = {{ chapter }};
+
+    let selectedBookCode = currentBookCode;
+
+    const booksData = {
+      {% for b in books %}
+      '{{ b.code }}': '{{ b.name|escapejs }}',
+      {% endfor %}
+    };
+
+    const bookChaptersData = {
+      {% for code, chaps in all_chapters.items %}
+      '{{ code }}': {{ chaps|safe }},
+      {% endfor %}
+    };
+
+    window.selectBook = function(bookCode) {
+      selectedBookCode = bookCode;
+      const stepBooks = document.getElementById('step-books');
+      const stepChapters = document.getElementById('step-chapters');
+      const bookNameSpan = document.getElementById('selected-book-name');
+      const grid = stepChapters.querySelector('.bible-picker-chapter-grid');
+
+      bookNameSpan.textContent = booksData[bookCode];
+
+      grid.innerHTML = '';
+      const chapters = bookChaptersData[bookCode] || [];
+      chapters.forEach(ch => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-touch bible-picker-item-grid';
+        if (bookCode === currentBookCode && ch === currentChapter) {
+          btn.classList.add('bible-picker-item-grid--active');
+        }
+        btn.style.background = 'var(--card)';
+        btn.style.border = '1px solid var(--border)';
+        btn.style.borderRadius = '8px';
+        btn.style.fontWeight = '600';
+        btn.style.color = 'var(--text)';
+        btn.textContent = ch;
+        btn.onclick = () => selectChapterFromPicker(ch);
+        grid.appendChild(btn);
+      });
+
+      stepBooks.style.display = 'none';
+      stepChapters.style.display = 'block';
+      setTimeout(() => {
+        stepChapters.style.opacity = '1';
+        stepChapters.style.transform = 'translateX(0)';
+      }, 50);
+    };
+
+    window.selectChapterFromPicker = function(chapter) {
+      const bookCode = selectedBookCode || currentBookCode;
+      // Close drawer and navigate
+      window.ICSDrawer.close();
+      // Use existing navChapter logic if possible, or just redirect
+      if (window.navChapter) {
+         // This is a bit tricky since navChapter uses offset. 
+         // Let's just directly fetch the chapter partial.
+         fetchChapter(bookCode, chapter);
+      } else {
+         window.location.href = `/bible/${bookCode}/${chapter}/`;
+      }
+    };
+
+    async function fetchChapter(bookCode, chapter) {
+      const chapterDiv = document.getElementById('bible-chapter');
+      try {
+        const response = await fetch(`/bible/htmx/chapter/?book_code=${bookCode}&chapter=${chapter}`);
+        if (!response.ok) return;
+        const html = await response.text();
+        chapterDiv.innerHTML = html;
+        if (window.updateNavDisplay) updateNavDisplay();
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } catch (error) { console.error(error); }
+    }
+
+    window.goBackFromPicker = function() {
+      const stepBooks = document.getElementById('step-books');
+      const stepChapters = document.getElementById('step-chapters');
+
+      stepChapters.style.opacity = '0';
+      stepChapters.style.transform = 'translateX(20px)';
+      setTimeout(() => {
+        stepChapters.style.display = 'none';
+        stepBooks.style.display = 'block';
+      }, 200);
+    };
+  })();
+</script>

@@ -18,19 +18,73 @@ document.addEventListener('DOMContentLoaded', () => {
   const optionsMenu   = document.getElementById('optionsMenu');
   const themeToggle   = document.getElementById('themeToggle');
 
-  // ── App Drawer ────────────────────────────────────────────────────────────
-  function openDrawer() {
+  // ── App Drawer & Draggable Bottom Sheet ──────────────────────────────────
+  let startY = 0;
+  let currentY = 0;
+  let isDragging = false;
+
+  function openDrawer(titleText, actionHtml) {
     if (!drawer) return;
+    
+    if (titleText) {
+      const titleEl = document.getElementById('drawerTitle');
+      if (titleEl) titleEl.textContent = titleText;
+    }
+
+    const actionsEl = document.getElementById('drawerActions');
+    if (actionsEl) {
+      actionsEl.innerHTML = actionHtml || '';
+    }
+
     drawer.classList.add('active');
     overlay.classList.add('active');
-    drawerToggle && drawerToggle.setAttribute('aria-expanded', 'true');
+    drawer.style.transform = 'translateY(0)'; // Reset drag pos
+    if (window.drawerToggle) window.drawerToggle.setAttribute('aria-expanded', 'true');
   }
 
   function closeDrawer() {
     if (!drawer) return;
     drawer.classList.remove('active');
     overlay.classList.remove('active');
-    drawerToggle && drawerToggle.setAttribute('aria-expanded', 'false');
+    drawer.style.transform = ''; // Clear inline transform
+    if (window.drawerToggle) window.drawerToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  // Touch Drag Logic
+  if (drawer) {
+    drawer.addEventListener('touchstart', (e) => {
+      // Only drag if on the handle or header
+      if (e.target.classList.contains('drawer-handle') || e.target.closest('.drawer-header')) {
+        startY = e.touches[0].clientY;
+        isDragging = true;
+        drawer.style.transition = 'none';
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      currentY = e.touches[0].clientY;
+      const deltaY = currentY - startY;
+      
+      if (deltaY > 0) { // Only allow dragging down
+        drawer.style.transform = `translateY(${deltaY}px)`;
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      drawer.style.transition = '';
+      
+      const deltaY = currentY - startY;
+      const threshold = 150; // px to close
+
+      if (deltaY > threshold) {
+        closeDrawer();
+      } else {
+        drawer.style.transform = 'translateY(0)';
+      }
+    });
   }
 
   closeBtn && closeBtn.addEventListener('click', closeDrawer);
@@ -102,10 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Drawer API (for pages to open drawer programmatically) ──────────────────
-  // Pages can call window.ICSDrawer.open() to open the drawer
+  // Pages can call window.ICSDrawer.open('Title', 'Action HTML') to open the drawer
   window.ICSDrawer = {
     open: openDrawer,
     close: closeDrawer
   };
+
 
 });

@@ -11,28 +11,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!drawer) return; // Drawer not present on this page
 
-  function openDrawer() {
+  function openDrawer(titleText) {
+    if (!drawer) return;
+    if (titleText) {
+      const titleEl = drawer.querySelector('.drawer-title');
+      if (titleEl) titleEl.textContent = titleText;
+    }
     drawer.classList.add('active');
-    // Note: No overlay for Bible drawer — allows seeing live changes (font size, etc)
-    // if (overlay) overlay.classList.add('active');
+    if (overlay) overlay.classList.add('active');
   }
 
   function closeDrawer() {
+    if (!drawer) return;
     drawer.classList.remove('active');
-    // if (overlay) overlay.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
   }
 
-  // Close drawer when close button clicked
-  if (closeBtn) {
-    closeBtn.addEventListener('click', closeDrawer);
-  }
+  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+  if (overlay)  overlay.addEventListener('click', closeDrawer);
 
-  // Close drawer when overlay clicked
-  if (overlay) {
-    overlay.addEventListener('click', closeDrawer);
-  }
-
-  // Expose drawer API to window
   window.ICSDrawer = {
     open: openDrawer,
     close: closeDrawer

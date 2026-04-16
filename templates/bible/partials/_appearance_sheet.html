@@ -1,0 +1,81 @@
+<div id="drawerTitle" hx-swap-oob="innerHTML">Appearance</div>
+<div id="drawerActions" hx-swap-oob="innerHTML"></div>
+
+<div class="bible-appearance-sheet" style="padding: 0 1rem 2rem;">
+  <div class="bible-settings-group">
+    <label class="bible-settings-label" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; display: block;">Font Size</label>
+    <div style="display: flex; align-items: center; gap: 1rem; background: var(--hover); padding: 12px; border-radius: 8px;">
+      <button class="btn-touch" id="sheetDecreaseFontBtn" style="flex:1; background: var(--card); border: 1px solid var(--border); border-radius: 6px;">
+        <span class="material-symbols-outlined">remove</span>
+      </button>
+      <div id="sheetFontSizeDisplay" style="font-weight: 700; min-width: 60px; text-align: center;">100%</div>
+      <button class="btn-touch" id="sheetIncreaseFontBtn" style="flex:1; background: var(--card); border: 1px solid var(--border); border-radius: 6px;">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="bible-settings-group" style="margin-top: 24px;">
+    <label class="bible-settings-label" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; display: block;">Font Style</label>
+    <select id="sheetFontFamilySelect" class="form-input-touch">
+      <option value="system">System Default</option>
+      <option value="serif">Classic Serif</option>
+      <option value="sans-serif">Modern Sans</option>
+      <option value="monospace">Mono (Reference)</option>
+    </select>
+  </div>
+
+  <div class="bible-settings-group" style="margin-top: 24px;">
+    <label class="bible-settings-label" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; display: block;">Theme Override</label>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-touch" id="sheetLightModeBtn" style="flex:1; background: #fff; color: #333; border: 1px solid #ddd; border-radius: 8px;">
+        <span class="material-symbols-outlined">light_mode</span>
+      </button>
+      <button class="btn-touch" id="sheetDarkModeBtn" style="flex:1; background: #1a1a1a; color: #eee; border: 1px solid #333; border-radius: 8px;">
+        <span class="material-symbols-outlined">dark_mode</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const fontSizeDisplay = document.getElementById('sheetFontSizeDisplay');
+    const bibleChapter = document.getElementById('bible-chapter');
+    let size = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
+
+    function applySize(s) {
+      size = Math.max(80, Math.min(180, s));
+      if (bibleChapter) bibleChapter.style.fontSize = `${size / 100}em`;
+      if (fontSizeDisplay) fontSizeDisplay.textContent = `${size}%`;
+      ICSStorage.setUIState('bible_font_size', size);
+    }
+
+    document.getElementById('sheetIncreaseFontBtn').onclick = () => applySize(size + 10);
+    document.getElementById('sheetDecreaseFontBtn').onclick = () => applySize(size - 10);
+    applySize(size);
+
+    const ffSelect = document.getElementById('sheetFontFamilySelect');
+    const ffMap = {
+      'system': 'inherit',
+      'serif': 'Georgia, "Times New Roman", serif',
+      'sans-serif': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      'monospace': '"Courier New", monospace'
+    };
+    ffSelect.onchange = (e) => {
+      if (bibleChapter) bibleChapter.style.fontFamily = ffMap[e.target.value] || 'inherit';
+      ICSStorage.setUIState('bible_font_family', e.target.value);
+    };
+    ffSelect.value = ICSStorage.getUIState('bible_font_family', 'system');
+    
+    // Theme toggle helpers
+    document.getElementById('sheetLightModeBtn').onclick = () => {
+      document.body.classList.remove('dark');
+      localStorage.setItem('ics_theme', 'light');
+    };
+    document.getElementById('sheetDarkModeBtn').onclick = () => {
+      document.body.classList.add('dark');
+      localStorage.setItem('ics_theme', 'dark');
+    };
+  })();
+</script>

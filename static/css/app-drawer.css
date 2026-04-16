@@ -57,11 +57,24 @@
     display: flex;
     flex-direction: column;
 
-    touch-action: none;
+    display: flex;
+    flex-direction: column;
+    touch-action: pan-y; /* Allow vertical panning for drag */
+}
+
+/* Drag Handle for Bottom Sheets */
+.drawer-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--muted);
+    border-radius: 2px;
+    margin: 8px auto 0;
+    opacity: 0.5;
+    flex-shrink: 0;
 }
 
 .drawer.active {
-    bottom: calc(70px + env(safe-area-inset-bottom));
+    bottom: calc(0px + env(safe-area-inset-bottom)); /* Sit at bottom */
     transform: translateY(0) scale(1);
     opacity: 1;
 }
@@ -71,14 +84,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 20px;
-
+    padding: 12px 20px 18px; /* Adjusted padding for handle */
     border-bottom: 1px solid var(--border);
-
     position: sticky;
     top: 0;
-
     background: var(--card);
+}
+
+.drawer-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .drawer-title {

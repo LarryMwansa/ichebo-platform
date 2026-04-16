@@ -6,10 +6,16 @@
 
 /* ─── Layout Shells ───────────────────────────────────────────────────────── */
 
-.bible-reader-shell {
-  min-height: 100vh;
+.bible-reader-shell, .bible-picker-shell, .bible-search-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   background: var(--bg);
-  padding: 0 0 120px 0; /* Space for sticky nav strip */
+  overflow: hidden;
+}
+
+.bible-reader-shell {
+  padding-bottom: 72px; /* Space for sticky nav strip */
 }
 
 /* ─── Typography & Verses ─────────────────────────────────────────────────── */
@@ -17,6 +23,9 @@
 .bible-verse-list {
   max-width: 680px;
   margin: 0 auto;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .bible-verse {
@@ -49,13 +58,47 @@
 
 /* ─── Navigation Components ──────────────────────────────────────────────── */
 
-.bible-topbar,
-.bible-nav-strip {
+.bible-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  height: 56px;
+  flex-shrink: 0;
+  z-index: 100;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
+.bible-nav-strip {
+  position: fixed;
+  bottom: 72px; /* Set above bottom nav */
+  left: 0;
+  right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  z-index: 90;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.3s ease;
+}
+
 .bible-nav-strip__chapter {
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+  color: var(--text);
+  padding: 0.5rem;
+  border-radius: 8px;
+  margin: 0 12px;
   transition: all 0.2s ease;
 }
 
@@ -74,10 +117,25 @@
 }
 
 .bible-nav-strip.scroll-hidden {
-  transform: translateY(calc(100% + 80px)); /* Hide further to clear bottom nav */
+  transform: translateY(calc(100% + 80px)); 
 }
 
 /* ─── Picker & Lists ─────────────────────────────────────────────────────── */
+
+.bible-picker-steps {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.bible-picker-step {
+  position: absolute;
+  inset: 0;
+  padding: 1rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 .bible-picker-item--active {
   background: color-mix(in srgb, var(--primary) 8%, transparent) !important;
@@ -103,6 +161,7 @@
   max-width: 480px;
   margin: 0 auto;
 }
+
 
 /* ─── Search View ────────────────────────────────────────────────────────── */
 

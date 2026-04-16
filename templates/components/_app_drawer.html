@@ -6,16 +6,26 @@
 <!-- Drawer — Context Panel (reusable across pages) -->
 <div id="drawer" class="drawer" role="dialog" aria-modal="true" aria-label="Options">
 
+  {# Tactile handle for dragging #}
+  <div class="drawer-handle"></div>
+
   <div class="drawer-header">
-    {# Dynamic title — pages can override via context #}
-    <div class="drawer-title">{% block drawer_title %}Options{% endblock %}</div>
-    <button id="closeBtn" class="close-btn" aria-label="Close menu">&times;</button>
+    {# Dynamic title — pages can override via context or JS API #}
+    <div class="drawer-title" id="drawerTitle">{% block drawer_title %}Options{% endblock %}</div>
+    
+    <div class="drawer-header__actions">
+      {# Slot for contextual actions like Version Selection in Bible #}
+      <div id="drawerActions">
+        {% block drawer_actions %}{% endblock %}
+      </div>
+      <button id="closeBtn" class="close-btn" aria-label="Close menu">&times;</button>
+    </div>
   </div>
 
-  <div class="drawer-content">
+  <div class="drawer-content" id="drawerContent">
     {# Pages/views inject their own drawer content #}
     {% block drawer_content %}
-    <!-- Default empty state — pages populate this block -->
+    <!-- Default empty state -->
     {% endblock %}
   </div>
 
