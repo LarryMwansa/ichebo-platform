@@ -1,9 +1,11 @@
 <form class="record-create-form"
       hx-post="{% url 'records:htmx-create' %}"
-      hx-target="#record-create-panel"
-      hx-swap="beforebegin"
+      hx-target="#record-list, #dash-recent-list"
+      hx-swap="afterbegin"
       hx-on::after-request="this.reset()">
   {% csrf_token %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/records.css' %}?v=3">
 
   <div class="form-row">
     <select name="record_type" class="form-input">
@@ -25,7 +27,7 @@
   <div class="form-actions">
     <button type="submit" class="btn-primary">Save</button>
     <button type="button" class="btn-secondary"
-            hx-get="" hx-target="#record-create-panel" hx-swap="innerHTML">
+            onclick="this.closest('form').remove()">
       Cancel
     </button>
   </div>

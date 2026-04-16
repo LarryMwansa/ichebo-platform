@@ -3,6 +3,8 @@
         hx-target="#record-{{ record.id }}"
         hx-swap="outerHTML">
     {% csrf_token %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/records.css' %}?v=3">
 
     <div class="form-row">
       <input type="text" name="title" value="{{ record.title }}"
