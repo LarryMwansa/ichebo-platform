@@ -323,6 +323,12 @@ def bible_versions_view(request):
     """
     Bible versions list. Handles both full-page and HTMX partials.
     """
+    book_code = request.GET.get('book_code', DEFAULT_BOOK)
+    try:
+        chapter = int(request.GET.get('chapter', DEFAULT_CHAPTER))
+    except (ValueError, TypeError):
+        chapter = DEFAULT_CHAPTER
+
     current_translation = get_user_translation(request.user)
     translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
 
@@ -337,6 +343,8 @@ def bible_versions_view(request):
         'current_translation': current_translation,
         'versions_by_language': versions_by_language,
         'all_translations': translations,
+        'book_code': book_code,
+        'chapter': chapter,
     }
 
     if request.headers.get('HX-Request'):

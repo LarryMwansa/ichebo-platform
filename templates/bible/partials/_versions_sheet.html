@@ -1,5 +1,5 @@
 <div id="drawerBack" hx-swap-oob="innerHTML">
-  <button hx-get="{% url 'bible:picker' %}" 
+  <button hx-get="{% url 'bible:picker' %}?book_code={{ book_code }}&chapter={{ chapter }}" 
           hx-target="#drawerContent" 
           hx-swap="innerHTML"
           class="btn-touch" 
@@ -19,7 +19,7 @@
         {% for ver in lang_versions %}
         <button class="list-item" 
                 hx-post="{% url 'bible:htmx-set-translation' %}"
-                hx-vals='{"translation_code": "{{ ver.code }}"}'
+                hx-vals='{"translation_code": "{{ ver.code }}", "book_code": "{{ book_code }}", "chapter": "{{ chapter }}"}'
                 hx-target="#bible-chapter"
                 hx-swap="innerHTML"
                 onclick="window.ICSDrawer.close()"
@@ -40,7 +40,7 @@
 
   <div style="padding: 1rem; border-top: 1px solid var(--border); background: var(--card);">
     <button class="btn-touch" 
-            hx-get="{% url 'bible:languages' %}" 
+            hx-get="{% url 'bible:languages' %}?book_code={{ book_code }}&chapter={{ chapter }}" 
             hx-target="#drawerContent"
             style="width: 100%; background: var(--bg); color: var(--primary); border: 1px solid var(--border); border-radius: 8px;">
       Change Language

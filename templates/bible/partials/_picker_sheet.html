@@ -1,7 +1,7 @@
 <div id="drawerBack" hx-swap-oob="innerHTML"></div>
 <div id="drawerTitle" hx-swap-oob="innerHTML">Select Passage</div>
 <div id="drawerActions" hx-swap-oob="innerHTML">
-  <button hx-get="{% url 'bible:versions' %}" 
+  <button hx-get="{% url 'bible:versions' %}?book_code={{ book.code }}&chapter={{ chapter }}" 
           hx-target="#drawerContent" 
           hx-swap="innerHTML"
           class="btn-touch" 
@@ -18,7 +18,7 @@
     {# Version Selection Tile #}
     <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
       <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 8px;">Translation</div>
-      <button hx-get="{% url 'bible:versions' %}" 
+      <button hx-get="{% url 'bible:versions' %}?book_code={{ book.code }}&chapter={{ chapter }}" 
               hx-target="#drawerContent" 
               hx-swap="innerHTML"
               class="btn-touch" 
