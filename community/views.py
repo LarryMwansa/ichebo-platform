@@ -11,6 +11,7 @@ from records.models import Record, Relationship
 from activity.models import Activity
 from accounts.models import User
 from tenants.models import Tenant, UserPermission
+from learn.models import CertificationConfirmation
 
 from .models import MembershipRequest
 from .constants import (
@@ -857,8 +858,12 @@ def htmx_review_request(request, request_id):
     POST → approve or deny a pending MembershipRequest.
     Level 3+ only.
 
-    action=approve → create UserPermission (role=disciple, level=1), mark approved
-    action=deny    → mark denied
+    action=approve →
+        - Creates UserPermission (role='beginner', level=1)
+        - Advances user.competence_level to 1 (Beginner)
+        - Creates an Induction/Tenant Membership CertificationConfirmation
+          (the steward's approval IS the formal Level 0→1 certification event)
+    action=deny → marks denied
     Returns the updated request card HTML.
     """
     if not _require_level(request, 3) or request.method != 'POST':
@@ -878,11 +883,11 @@ def htmx_review_request(request, request_id):
             membership_req.status = 'approved'
             membership_req.save()
 
-            # Create UserPermission — get_or_create prevents duplicates on re-approvals
+            # Grant Beginner membership — get_or_create prevents duplicate re-approvals
             UserPermission.objects.get_or_create(
                 tenant=membership_req.tenant,
                 user=membership_req.user,
-                role='disciple',
+                role='beginner',
                 defaults={
                     'created_by': request.user,
                     'granted_by': request.user,
@@ -892,12 +897,47 @@ def htmx_review_request(request, request_id):
                 },
             )
 
-            # Advance the applicant's competence_level to at least 1 (Member)
-            # so they clear the seeker gate on their next visit to /community/
+            # Advance competence_level from Seeker (0) to Beginner (1)
             applicant = membership_req.user
-            if applicant.competence_level < 1:
+            prev_level = applicant.competence_level
+            if prev_level < 1:
                 applicant.competence_level = 1
                 applicant.save(update_fields=['competence_level'])
+
+            # Create the Induction / Tenant Membership Certification Record
+            # This is the first entry on the applicant's formation pathway.
+            cert_record = Record.objects.create(
+                created_by=request.user,
+                record_class='personal',
+                record_family='learning',
+                record_type='certification',
+                origin='system',
+                title=f'Induction Certification — {membership_req.tenant.name}',
+                content=(
+                    f'Received into {membership_req.tenant.name} as a Beginner. '
+                    f'First step on the Kingdom Governance pathway.'
+                ),
+                status='active',
+                metadata={
+                    'source_app': 'community',
+                    'certification_type': 'induction',
+                    'tenant_id': str(membership_req.tenant.id),
+                },
+            )
+
+            # Confirm it — the steward's approval IS the certification event
+            CertificationConfirmation.objects.create(
+                certification_record_id=cert_record.id,
+                confirmed_by=request.user,
+                learner_id=applicant.id,
+                previous_competence_level=prev_level,
+                new_competence_level=1,
+                notes=(
+                    f'Induction certification issued on membership approval '
+                    f'for {membership_req.tenant.name}.'
+                ),
+            )
+
         else:
             membership_req.status = 'denied'
             membership_req.save()

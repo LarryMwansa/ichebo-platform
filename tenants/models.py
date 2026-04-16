@@ -82,6 +82,7 @@ class Tenant(models.Model):
 class UserPermission(models.Model):
     ROLE_CHOICES = [
         ('seeker', 'Seeker'),
+        ('beginner', 'Beginner'),
         ('disciple', 'Disciple'),
         ('branch-steward', 'Branch Steward'),
         ('district-steward', 'District Steward'),

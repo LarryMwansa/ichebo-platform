@@ -37,7 +37,7 @@ KGS_SERVICE_ORDER_CHOICES = [(o[0], o[0]) for o in KGS_SERVICE_ORDERS]
 
 KGS_PARTICIPATION_STAGES = {
     0: ("Seeker",          "Connection"),
-    1: ("Member",          "Formation"),
+    1: ("Beginner",        "Formation"),
     2: ("Disciple",        "Alignment"),
     3: ("Steward",         "Service"),
     4: ("Senior Steward",  "Leadership"),
@@ -46,9 +46,9 @@ KGS_PARTICIPATION_STAGES = {
 
 KGS_COMPETENCE_LABELS = {
     0: "Seeker",
-    1: "Foundational Disciple",
-    2: "Active Contributor",
-    3: "Functional Minister",
-    4: "Leader",
-    5: "Apostolic Steward",
+    1: "Beginner",
+    2: "Disciple",
+    3: "Steward",
+    4: "Senior Steward",
+    5: "Architect",
 }
