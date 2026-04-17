@@ -1,22 +1,19 @@
 <div class="list-item activity-item" id="activity-{{ activity.id }}">
-  <div class="list-item__icon">
+  <div class="list-item__icon" style="background: var(--hover); color: var(--primary);">
     <span class="material-symbols-outlined">
       {% if activity.activity_type == 'task' %}check_box{% elif activity.activity_type == 'habit' %}repeat{% elif activity.activity_type == 'goal' %}flag{% elif activity.activity_type == 'reminder' %}notifications{% else %}event_note{% endif %}
     </span>
   </div>
 
   <div class="list-item__content">
-    <div class="list-item__title">{{ activity.title }}</div>
-    <div class="list-item__meta">
-      <span class="badge-unit">{{ activity.activity_type }}</span>
+    <div class="list-item__title" style="font-weight: 700;">{{ activity.title }}</div>
+    <div class="list-item__meta" style="display: flex; align-items: center; gap: 8px;">
+      <span class="badge-unit badge-unit--primary">{{ activity.activity_type }}</span>
       {% if activity.due_at %}
-      <span class="activity-due {% if activity.due_at < now %}activity-due--overdue{% endif %}">
+      <span class="activity-due {% if activity.due_at < now %}activity-due--overdue{% endif %}" style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
         <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
         {{ activity.due_at|date:"d M" }}
       </span>
-      {% endif %}
-      {% if activity.kgs_pathway %}
-      <span>· {{ activity.kgs_pathway|title }}</span>
       {% endif %}
     </div>
   </div>
@@ -27,24 +24,15 @@
             hx-target="#activity-{{ activity.id }}"
             hx-swap="outerHTML"
             title="Mark Done">
-      <span class="material-symbols-outlined">check_circle</span>
+      <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
     </button>
     <button class="activity-action-btn"
             hx-get="{% url 'activity:htmx-edit' activity.id %}"
-            hx-target="#drawerContent"
+            hx-target="#drawerInner"
             hx-swap="innerHTML"
             onclick="window.ICSDrawer.open('Edit Activity')"
             title="Edit">
-      <span class="material-symbols-outlined">edit</span>
-    </button>
-    <button class="activity-action-btn activity-action-btn--delete"
-            hx-post="{% url 'activity:htmx-delete' activity.id %}"
-            hx-target="#activity-{{ activity.id }}"
-            hx-swap="outerHTML"
-            hx-confirm="Delete this activity?"
-            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-            title="Delete">
-      <span class="material-symbols-outlined">delete</span>
+      <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
     </button>
   </div>
 </div>

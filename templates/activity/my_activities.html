@@ -2,31 +2,24 @@
 
 {% block activity_content %}
 
-<div class="activity-header" style="justify-content: space-between; align-items: center;">
-  <h1 style="margin:0; font-size: 1.5rem; font-weight: 700;">My Activities</h1>
-  <button class="btn-touch" 
-          style="background: var(--primary); color: #fff; padding: 0 16px; border-radius: 12px; font-weight: 600;"
-          hx-get="{% url 'activity:htmx-create' %}"
-          hx-target="#drawerContent"
-          hx-swap="innerHTML"
-          onclick="window.ICSDrawer.open('New Activity')">
-    <span class="material-symbols-outlined" style="margin-right: 4px; font-size: 20px;">add</span> New
-  </button>
-</div>
+<div class="activity-page">
+  <header class="explore-header">
+    <h1 class="explore-title">Activity</h1>
+    <p class="explore-subtitle">Timeline, habits & focus pathways</p>
+  </header>
 
-<!-- Type filter chips -->
-<div class="activity-filter-row">
-  <a href="{% url 'activity:activity-home' %}"
-     class="activity-type-pill {% if not active_type %}activity-type-pill--active{% endif %}">
-    All
-  </a>
-  {% for slug, label in activity_types %}
-  <a href="{% url 'activity:activity-home' %}?type={{ slug }}"
-     class="activity-type-pill {% if active_type == slug %}activity-type-pill--active{% endif %}">
-    {{ label }}
-  </a>
-  {% endfor %}
-</div>
+  <nav class="accounts-tab-row" style="margin: 0 -1rem 1.5rem; border-top: 1px solid var(--border);">
+    <a href="{% url 'activity:activity-home' %}"
+       class="accounts-tab {% if not active_type %}accounts-tab--active{% endif %}">
+      All
+    </a>
+    {% for slug, label in activity_types %}
+    <a href="{% url 'activity:activity-home' %}?type={{ slug }}"
+       class="accounts-tab {% if active_type == slug %}accounts-tab--active{% endif %}">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </nav>
 
 <!-- Overdue -->
 <div class="activity-group" id="group-overdue" {% if not overdue %}style="display:none;"{% endif %}>
@@ -59,15 +52,15 @@
 </div>
 
 {% if not overdue and not due_today and not upcoming %}
-<div class="empty-state" style="padding: 4rem 2rem; text-align: center; color: var(--muted);">
-  <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2; margin-bottom: 1rem;">event_busy</span>
-  <p style="margin-bottom: 1.5rem;">No activities found.</p>
-  <button class="btn-touch" style="background: var(--primary); color: #fff; border-radius: 12px; padding: 0 24px;"
+<div class="empty-state">
+  <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2; margin-bottom: 20px; display: block;">event_busy</span>
+  <p>No active missions or habits found.</p>
+  <button class="btn-touch btn-primary" style="margin-top: 16px;"
           hx-get="{% url 'activity:htmx-create' %}"
-          hx-target="#drawerContent"
+          hx-target="#drawerInner"
           hx-swap="innerHTML"
           onclick="window.ICSDrawer.open('New Activity')">
-    Create your first activity
+    Start a Mission
   </button>
 </div>
 {% endif %}
