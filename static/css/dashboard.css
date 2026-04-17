@@ -382,3 +382,47 @@
 .dash-cta:hover {
   background: var(--border);
 }
+/* ── Governance Widget ───────────────────────────────────────────────── */
+
+.dash-gov-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+
+.dash-gov-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.2s;
+  text-align: center;
+  gap: 6px;
+}
+
+.dash-gov-link:hover {
+  border-color: #7B5EA7; /* Gov accent */
+  background: var(--hover);
+  transform: translateY(-2px);
+}
+
+.dash-gov-link .material-symbols-outlined {
+  font-size: 24px;
+  color: #7B5EA7;
+  opacity: 0.8;
+}
+
+.dash-gov-link span:not(.material-symbols-outlined) {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}

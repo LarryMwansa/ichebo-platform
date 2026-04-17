@@ -7,19 +7,19 @@
 {% else %}
 
 <div class="dash-widget">
-  <div class="dash-widget__label">Quick Access</div>
+  <div class="dash-widget__label">Governance Actions</div>
   <div class="dash-gov-links">
     <a href="{% url 'governance:reference-home' %}" class="dash-gov-link">
-      <span class="material-symbols-outlined">library_books</span>
-      Reference Library
+      <span class="material-symbols-outlined">account_balance</span>
+      <span>Library</span>
     </a>
     <a href="{% url 'governance:mandate-home' %}" class="dash-gov-link">
       <span class="material-symbols-outlined">gavel</span>
-      Mandate
+      <span>Mandate</span>
     </a>
     <a href="{% url 'governance:keys-list' %}" class="dash-gov-link">
       <span class="material-symbols-outlined">key</span>
-      My Keys
+      <span>My Keys</span>
     </a>
   </div>
 </div>
@@ -27,22 +27,27 @@
 {% if recent_docs %}
 <div class="dash-widget">
   <div class="dash-widget__label">Recent Documents</div>
-  <ul class="dash-list">
+  <div class="list-group">
     {% for item in recent_docs %}
-    <li class="dash-list__item">
-      <span class="dash-list__badge dash-list__badge--{{ item.record.record_type }}">
-        {{ item.record.record_type|slice:":3"|upper }}
-      </span>
-      <a class="dash-list__title" href="{{ item.url }}">{{ item.record.title }}</a>
-      <span class="dash-list__time">{{ item.record.updated_at|slice:":10" }}</span>
-    </li>
+    <a href="{{ item.url }}" class="list-item">
+      <div class="list-item__content">
+        <div class="list-item__title">{{ item.record.title }}</div>
+        <div class="list-item__meta">
+          <span class="badge-unit">{{ item.record.record_type|title|cut:"_" }}</span>
+          <span class="badge-unit">{{ item.record.updated_at|date:"d M Y" }}</span>
+        </div>
+      </div>
+      <div class="list-item__action">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </div>
+    </a>
     {% endfor %}
-  </ul>
+  </div>
 </div>
 {% else %}
-<div class="dash-widget">
-  <p class="dash-empty">No governance documents yet.</p>
-  <a href="{% url 'governance:home' %}" class="dash-cta">Open Governance →</a>
+<div class="dash-widget" style="padding: 1.5rem; text-align: center;">
+  <p class="dash-empty" style="margin-bottom: 12px;">No governance documents yet.</p>
+  <a href="{% url 'governance:home' %}" class="dash-cta" style="width: 100%;">Open Governance</a>
 </div>
 {% endif %}
 
