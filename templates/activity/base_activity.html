@@ -7,14 +7,6 @@
 
 {% block content %}
 <div class="activity-shell">
-  <!-- Sub-navigation -->
-  <nav class="activity-tab-row" aria-label="Activity navigation">
-    <a href="{% url 'activity:activity-home' %}"
-       class="activity-tab {% if request.resolver_match.url_name == 'activity-home' %}activity-tab--active{% endif %}">
-      My Activities
-    </a>
-  </nav>
-
   <div class="activity-content">
     {% block activity_content %}{% endblock %}
   </div>
