@@ -91,6 +91,19 @@
 .badge--note   { background: #dcfce7; color: #166534; }
 
 /* ── Forms ──────────────────────────────────────────────────── */
+.record-drawer-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .record-form-group {
     margin-bottom: var(--space-s);
+    width: 100%;
+}
+
+.record-form-group select.form-input-touch {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
