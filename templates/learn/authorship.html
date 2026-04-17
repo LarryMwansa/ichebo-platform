@@ -2,23 +2,39 @@
 
 {% block learn_content %}
 <div class="learn-header">
-  <h2>Authorship</h2>
+  <div class="label-caps" hx-get="{% url 'learn:learn-home' %}" hx-target="#main-content" hx-push-url="true" style="cursor:pointer; color:var(--primary);">
+    My Learning &rsaquo;
+  </div>
+  <h1 class="title-small">Curriculum Authorship</h1>
 </div>
+
 <div class="programme-grid">
   <a href="{% url 'learn:learn-author-programme' %}" class="programme-card">
-    <div class="programme-badge">New</div>
-    <h3 class="programme-title">Programme</h3>
-    <p class="programme-meta">Create a qualification programme</p>
+    <div class="list-item__icon" style="background: var(--hover); color: var(--primary); margin-bottom: 8px;">
+      <span class="material-symbols-outlined">account_balance</span>
+    </div>
+    <div class="programme-meta">Core Entity</div>
+    <div class="programme-title">New Programme</div>
+    <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Create a qualification pathway (Degree, Diploma).</div>
   </a>
+
   <a href="{% url 'learn:learn-author-course' %}" class="programme-card">
-    <div class="programme-badge">New</div>
-    <h3 class="programme-title">Course</h3>
-    <p class="programme-meta">Add a course to a programme</p>
+    <div class="list-item__icon" style="background: var(--hover); color: var(--primary); margin-bottom: 8px;">
+      <span class="material-symbols-outlined">menu_book</span>
+    </div>
+    <div class="programme-meta">Module</div>
+    <div class="programme-title">New Course</div>
+    <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Define a subject area within a programme.</div>
   </a>
+
   <a href="{% url 'learn:learn-author-lesson' %}" class="programme-card">
-    <div class="programme-badge">New</div>
-    <h3 class="programme-title">Lesson / Quiz</h3>
-    <p class="programme-meta">Add a lesson, quiz or assignment</p>
+    <div class="list-item__icon" style="background: var(--hover); color: var(--primary); margin-bottom: 8px;">
+      <span class="material-symbols-outlined">draw</span>
+    </div>
+    <div class="programme-meta">Content Unit</div>
+    <div class="programme-title">New Lesson</div>
+    <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Draft lessons, quizzes, or assignments.</div>
   </a>
 </div>
+
 {% endblock %}
