@@ -5,25 +5,29 @@
   background: var(--bg);
 }
 
-.learn-content {
-  padding: var(--space-s) var(--space-s) var(--space-2xl);
+.learn-page {
+  padding: 1.5rem 1rem 6rem;
   max-width: 800px;
   margin: 0 auto;
 }
 
+.learn-section {
+  margin-bottom: 2.5rem;
+}
+
 .learn-header {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: var(--space-m);
-  gap: var(--space-xs);
+  margin-bottom: 2rem;
 }
 
 /* ── Pathway / School Headers ────────────────────────────── */
-.learn-pathway-header {
-  display: flex;
+.learn-pathway-chip {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
-  margin-bottom: var(--space-m);
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 4px 12px;
 }
 
 /* ── Programme Grid (Catalogue) ───────────────────────────── */

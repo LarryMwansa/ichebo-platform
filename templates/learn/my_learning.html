@@ -2,60 +2,69 @@
 
 {% block learn_content %}
 
-<!-- Pathway Context Head -->
-{% if active_pathway %}
-<div class="learn-pathway-header">
-  <span class="badge-unit badge-unit--primary">{{ active_pathway|title }}</span>
-  {% if active_qualification %}
-  <span class="label-caps" style="margin-bottom:0">{{ active_qualification }} Pathway</span>
-  {% endif %}
-</div>
-{% endif %}
+<div class="learn-page">
+  <header class="explore-header">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <h1 class="explore-title">Learn</h1>
+        <p class="explore-subtitle">Programmes, certifications & curriculum</p>
+      </div>
+      <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch btn-sm btn-secondary" style="min-height: 40px; padding: 0 12px;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">apps</span>
+        Catalogue
+      </a>
+    </div>
+  </header>
 
-<div class="learn-header">
-  <h1 class="title-small">My Learning</h1>
-  <div style="display:flex; gap:8px;">
-    <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="border: 1px solid var(--border); background: var(--card); color: var(--text);">
-      <span class="material-symbols-outlined" style="font-size:18px; margin-right:4px;">apps</span>
-      Catalogue
-    </a>
+  {% if active_pathway %}
+  <div class="learn-pathway-chip" style="margin-bottom: 24px;">
+    <span class="badge-unit badge-unit--primary">{{ active_pathway|title }}</span>
+    {% if active_qualification %}
+    <span class="label-caps" style="margin-bottom:0; font-size: 10px;">{{ active_qualification }} Pathway</span>
+    {% endif %}
   </div>
-</div>
+  {% endif %}
 
 <!-- Active enrolments -->
-<div class="list-group">
-  <div class="dash-widget__label" style="padding-left:16px;">Active Programmes</div>
-  {% for enrolment in enrolments %}
-  <a href="{% if enrolment.metadata.programme_record_id %}{% url 'learn:learn-programme' enrolment.metadata.programme_record_id %}{% else %}#{% endif %}" 
-     class="list-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-      <div class="list-item__title" style="white-space: normal; line-height: 1.4;">{{ enrolment.title }}</div>
-      <span class="badge-unit" style="flex-shrink: 0;">{{ enrolment.progress|default:0 }}%</span>
-    </div>
-    <div class="learn-progress-track">
-      <div class="learn-progress-fill" style="width: {{ enrolment.progress|default:0 }}%;"></div>
-    </div>
-  </a>
-  {% empty %}
-  <div class="empty-state">
-    <p>You are not enrolled in any programme yet.</p>
-    <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="background: var(--primary); color: #fff;">Explore Catalogue</a>
-  </div>
-  {% endfor %}
-
-  {% if pending_certifications %}
-    <div class="dash-widget__label" style="padding-left:16px; margin-top:16px;">Awaiting Certification</div>
-    {% for cert in pending_certifications %}
-    <div class="list-item">
-      <div class="list-item__content">
-        <div class="list-item__title">{{ cert.title }}</div>
-        <div class="list-item__meta">Submitted for Stewardship review</div>
+<div class="learn-section">
+  <div class="label-caps" style="color: var(--primary); margin-bottom: 12px; padding-left: 4px;">Active Programmes</div>
+  <div class="list-group">
+    {% for enrolment in enrolments %}
+    <a href="{% if enrolment.metadata.programme_record_id %}{% url 'learn:learn-programme' enrolment.metadata.programme_record_id %}{% else %}#{% endif %}" 
+       class="list-item" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div class="list-item__title" style="white-space: normal; line-height: 1.5; font-weight: 700; font-size: 15px;">{{ enrolment.title }}</div>
+        <span class="badge-unit badge-unit--primary" style="flex-shrink: 0;">{{ enrolment.progress|default:0 }}%</span>
       </div>
-      <div class="list-item__action">
-        <span class="badge-unit" style="background: #fffbeb; color: #92400e;">PENDING</span>
+      <div class="learn-progress-track" style="height: 6px; border-radius: 3px;">
+        <div class="learn-progress-fill" style="width: {{ enrolment.progress|default:0 }}%;"></div>
       </div>
+    </a>
+    {% empty %}
+    <div class="empty-state">
+      <span class="material-symbols-outlined" style="font-size: 40px; opacity: 0.2; margin-bottom: 16px;">school</span>
+      <p>No active enrolments.</p>
+      <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch btn-primary" style="margin-top: 12px;">Explore Catalogue</a>
     </div>
     {% endfor %}
+  </div>
+
+  {% if pending_certifications %}
+    <div class="label-caps" style="margin: 24px 0 12px 4px;">Awaiting Certification</div>
+    <div class="list-group">
+      {% for cert in pending_certifications %}
+      <div class="list-item">
+        <div class="list-item__icon"><span class="material-symbols-outlined">hourglass_empty</span></div>
+        <div class="list-item__content">
+          <div class="list-item__title">{{ cert.title }}</div>
+          <div class="list-item__meta">Submitted for review</div>
+        </div>
+        <div class="list-item__action">
+          <span class="badge-unit" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">REVIEW</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   {% endif %}
 </div>
 

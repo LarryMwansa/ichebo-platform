@@ -1,42 +1,50 @@
 {% extends "learn/base_learn.html" %}
 
 {% block learn_content %}
-<div class="learn-header">
-  <div class="label-caps" hx-get="{% url 'learn:learn-home' %}" hx-target="#main-content" hx-push-url="true" style="cursor:pointer; color:var(--primary);">
-    My Learning &rsaquo;
-  </div>
-  <h1 class="title-small">Programmes</h1>
-</div>
+<div class="learn-page">
+  <header class="explore-header">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+      <a href="{% url 'learn:learn-home' %}" class="btn-touch btn-sm btn-secondary" style="min-height: 32px; width: 32px; padding: 0; border-radius: 8px;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+      </a>
+      <span class="label-caps" style="margin-bottom: 0;">Catalogue</span>
+    </div>
+    <h1 class="explore-title">Programmes</h1>
+    <p class="explore-subtitle">Expand your toolkit with certified missions</p>
+  </header>
 
-<div class="programme-grid">
-  {% for programme in programmes %}
-  <a href="{% if not programme.is_locked %}{% url 'learn:learn-programme' programme.id %}{% else %}#{% endif %}" 
-     class="programme-card {% if programme.is_locked %}locked{% endif %}">
-    
-    <div class="programme-meta">{{ programme.metadata.qualification|default:"Programme" }}</div>
-    <div class="programme-title">{{ programme.title }}</div>
-    
-    <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-      <span class="badge-unit" style="background: var(--hover); color: var(--muted);">
-        {{ programme.metadata.duration_years|default:"?" }} Year{{ programme.metadata.duration_years|pluralize }}
-      </span>
+  <div class="programme-grid" style="padding-top: 12px;">
+    {% for programme in programmes %}
+    <a href="{% if not programme.is_locked %}{% url 'learn:learn-programme' programme.id %}{% else %}{% url 'learn:learn-locked' %}{% endif %}" 
+       class="programme-card {% if programme.is_locked %}locked{% endif %}"
+       style="padding: 20px; min-height: 160px; display: flex; flex-direction: column; gap: 12px;">
+      
+      <div class="programme-meta" style="color: var(--primary); font-weight: 700;">{{ programme.metadata.qualification|default:"Mission" }}</div>
+      <div class="programme-title" style="font-size: 16px; font-weight: 800; line-height: 1.4;">{{ programme.title }}</div>
+      
+      <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
+        <span class="badge-unit" style="background: var(--hover); color: var(--muted); font-size: 10px;">
+          {{ programme.metadata.duration_years|default:"?" }} Year{{ programme.metadata.duration_years|pluralize }}
+        </span>
+        {% if programme.is_locked %}
+          <span class="material-symbols-outlined" style="font-size: 20px; color: var(--muted); opacity: 0.5;">lock</span>
+        {% else %}
+          <span class="material-symbols-outlined" style="font-size: 20px; color: var(--primary);">arrow_circle_right</span>
+        {% endif %}
+      </div>
+
       {% if programme.is_locked %}
-        <span class="material-symbols-outlined" style="font-size: 16px; color: var(--muted);">lock</span>
-      {% else %}
-        <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">arrow_forward</span>
+      <div class="badge-unit" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; text-align: center; border: 1px solid rgba(239, 68, 68, 0.2);">
+        Level {{ programme.permissions_data.required_level|default:1 }} Required
+      </div>
       {% endif %}
+    </a>
+    {% empty %}
+    <div class="empty-state" style="grid-column: 1 / -1;">
+      <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2; margin-bottom: 16px;">shelves</span>
+      <p>No programmes available in this pathway.</p>
     </div>
-
-    {% if programme.is_locked %}
-    <div class="badge-unit" style="margin-top: 4px; background: #fee2e2; color: #991b1b; text-align: center;">
-      Level {{ programme.permissions_data.required_level|default:1 }} Required
-    </div>
-    {% endif %}
-  </a>
-  {% empty %}
-  <div class="empty-state">
-    <p>No programmes are published yet.</p>
+    {% endfor %}
   </div>
-  {% endfor %}
 </div>
 {% endblock %}
