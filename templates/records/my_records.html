@@ -3,36 +3,39 @@
 {% block records_content %}
 
 <div class="records-header">
-  <div class="journal-tabs">
+  <div class="label-caps" style="color: var(--primary);">My Journal</div>
+  
+  <div class="journal-type-grid">
     <a href="?full=1" 
        hx-get="{% url 'records:records-home' %}" 
        hx-target="#record-list" 
-       class="journal-tab {% if not active_type %}active{% endif %}">
+       hx-push-url="true"
+       class="journal-type-pill {% if not active_type %}active{% endif %}">
        All
     </a>
     {% for value, label in record_types %}
     <a href="?type={{ value }}&full=1" 
        hx-get="{% url 'records:records-home' %}?type={{ value }}" 
        hx-target="#record-list" 
-       class="journal-tab {% if active_type == value %}active{% endif %}">
+       hx-push-url="true"
+       class="journal-type-pill {% if active_type == value %}active{% endif %}">
        {{ label }}
     </a>
     {% endfor %}
   </div>
-
-  <button class="btn-primary"
-          hx-get="{% url 'records:htmx-create' %}?record_type={{ active_type|default:'note' }}"
-          hx-target="#record-create-panel"
-          hx-swap="innerHTML">
-    + New Entry
-  </button>
 </div>
 
-<!-- Inline create form panel -->
-<div id="record-create-panel"></div>
+<!-- Floating Action Button for New Entry -->
+<button class="record-add-btn"
+        hx-get="{% url 'records:htmx-create' %}?record_type={{ active_type|default:'note' }}"
+        hx-target="#drawerContent"
+        hx-swap="innerHTML"
+        onclick="window.ICSDrawer.open('New Journal Entry')">
+  <span class="material-symbols-outlined" style="font-size: 32px;">add</span>
+</button>
 
 <!-- Record list container -->
-<div id="record-list" class="records-grid">
+<div id="record-list">
   {% include "records/partials/record_list.html" %}
 </div>
 

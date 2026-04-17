@@ -362,9 +362,16 @@
 }
 
 .dash-journal-item--prayer { border-left: 4px solid #c53030; }
+.dash-journal-item--prayer .dash-journal-icon { color: #c53030; }
+
 .dash-journal-item--spirit { border-left: 4px solid #2b6cb0; }
+.dash-journal-item--spirit .dash-journal-icon { color: #2b6cb0; }
+
 .dash-journal-item--dream  { border-left: 4px solid #6b46c1; }
+.dash-journal-item--dream .dash-journal-icon { color: #6b46c1; }
+
 .dash-journal-item--note   { border-left: 4px solid #2f855a; }
+.dash-journal-item--note .dash-journal-icon { color: #2f855a; }
 
 .dash-cta {
   display: block;

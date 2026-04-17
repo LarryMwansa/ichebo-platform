@@ -2,33 +2,32 @@
 <link rel="stylesheet" href="{% static 'css/records.css' %}?v=2">
 
 <div class="dash-widget">
-  <div class="records-header" style="display:flex; justify-content:space-between; align-items:center; padding: 16px 16px 0 0;">
-    <div class="dash-widget__label" style="padding-bottom: 0;">My Journals</div>
-    <button class="btn-touch" style="min-height: 36px; padding: 0 12px; background: var(--primary); color: #fff; border-radius: 8px; font-size: 13px;"
+  <div class="dash-widget__label" style="display: flex; justify-content: space-between; align-items: center;">
+    <span>My Journals</span>
+    <button class="btn-touch" style="min-height: 32px; padding: 0 12px; background: var(--primary); color: #fff; border-radius: 8px; font-size: 12px; font-weight: 600;"
             hx-get="{% url 'records:htmx-create' %}"
-            hx-target="#dash-record-create-panel"
-            hx-swap="innerHTML">
+            hx-target="#drawerContent"
+            hx-swap="innerHTML"
+            onclick="window.ICSDrawer.open('New Journal Entry')">
       + New Entry
     </button>
   </div>
   
-  <div id="dash-record-create-panel" style="padding: 0 16px;"></div>
-  
-  <div class="dash-journal-grid" style="padding-top: 16px;">
+  <div class="dash-journal-grid" style="padding-bottom: 16px;">
     <a href="/records/?type=prayer" class="dash-journal-item dash-journal-item--prayer">
-      <span class="dash-journal-icon">🙏</span>
+      <span class="material-symbols-outlined dash-journal-icon">self_improvement</span>
       <span class="dash-journal-name">Prayer</span>
     </a>
     <a href="/records/?type=spirit" class="dash-journal-item dash-journal-item--spirit">
-      <span class="dash-journal-icon">🕊️</span>
+      <span class="material-symbols-outlined dash-journal-icon">auto_awesome</span>
       <span class="dash-journal-name">Spirit</span>
     </a>
     <a href="/records/?type=dream" class="dash-journal-item dash-journal-item--dream">
-      <span class="dash-journal-icon">🌙</span>
+      <span class="material-symbols-outlined dash-journal-icon">bedtime</span>
       <span class="dash-journal-name">Dream</span>
     </a>
     <a href="/records/?type=note" class="dash-journal-item dash-journal-item--note">
-      <span class="dash-journal-icon">📝</span>
+      <span class="material-symbols-outlined dash-journal-icon">edit_note</span>
       <span class="dash-journal-name">General</span>
     </a>
   </div>

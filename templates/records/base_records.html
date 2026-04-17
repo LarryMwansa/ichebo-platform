@@ -8,12 +8,7 @@
 {% block content %}
 <div class="records-shell">
 
-  <nav class="records-tab-row" aria-label="Records navigation">
-    <a href="{% url 'records:records-home' %}"
-       class="records-tab {% if request.resolver_match.url_name == 'records-home' %}records-tab--active{% endif %}">
-      My Journal
-    </a>
-  </nav>
+  <!-- Content pane -->
 
   <div class="records-content">
     {% block records_content %}{% endblock %}

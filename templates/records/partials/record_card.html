@@ -1,37 +1,33 @@
-<div class="record-card" id="record-{{ record.id }}">
-  <div class="record-meta">
-    <span class="record-type-badge record-type-badge--{{ record.record_type }}">
-      {{ record.get_record_type_display|default:record.record_type|title }}
-    </span>
-    <span class="record-date">{{ record.updated_at|date:"d M Y" }}</span>
+<div class="list-item" id="record-{{ record.id }}" 
+     hx-get="{% url 'records:records-detail' record.id %}" 
+     hx-target="#main-content" 
+     hx-push-url="true"
+     style="cursor: pointer;">
+  
+  <div class="list-item__content">
+    <div class="list-item__title">{{ record.title }}</div>
+    {% if record.content %}
+      <div class="list-item__meta" style="margin-top: 4px; line-height: 1.4;">
+        {{ record.content|truncatechars:120 }}
+      </div>
+    {% endif %}
+    <div class="list-item__meta" style="margin-top: 8px;">
+      <span class="badge-unit badge--{{ record.record_type }}">
+        {{ record.get_record_type_display|default:record.record_type|title }}
+      </span>
+      <span class="badge-unit" style="background: var(--hover); color: var(--muted);">
+        {{ record.updated_at|date:"d M Y" }}
+      </span>
+    </div>
   </div>
 
-  <h3>
-    <a href="{% url 'records:records-detail' record.id %}" style="text-decoration:none; color:inherit;">
-      {{ record.title }}
-    </a>
-  </h3>
-
-  {% if record.content %}
-  <div class="record-content">
-    {{ record.content|truncatechars:150 }}
-  </div>
-  {% endif %}
-
-  <div class="record-actions">
-    <button class="btn-secondary btn-sm"
+  <div class="list-item__action" onclick="event.stopPropagation();">
+    <button class="btn-touch" style="padding: 8px;"
             hx-get="{% url 'records:htmx-edit' record.id %}"
-            hx-target="#record-{{ record.id }}"
-            hx-swap="outerHTML">
-      Edit
-    </button>
-    <button class="btn-danger btn-sm"
-            hx-post="{% url 'records:htmx-delete' record.id %}"
-            hx-target="#record-{{ record.id }}"
-            hx-swap="outerHTML"
-            hx-confirm="Delete this entry?"
-            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-      Delete
+            hx-target="#drawerContent"
+            hx-swap="innerHTML"
+            onclick="window.ICSDrawer.open('Edit Journal Entry')">
+      <span class="material-symbols-outlined">edit</span>
     </button>
   </div>
 </div>
