@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}You{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=3">
+{% endblock %}
+
+{% block content %}
+
+<div class="you-page">
+
+  <!-- Profile Header -->
+  <div class="you-header">
+    <div class="you-avatar">
+      {% if user.avatar_url %}
+        <img src="{{ user.avatar_url }}" alt="{{ user.display_name }}">
+      {% else %}
+        <span class="you-avatar-letter">{{ user.display_name|default:user.email|first|upper }}</span>
+      {% endif %}
+    </div>
+    <div class="you-identity">
+      <h1 class="you-name">{{ user.display_name|default:user.username }}</h1>
+      <div class="you-meta">{{ user.status|default:"Seeker"|title }} · Level {{ user.competence_level }}</div>
+    </div>
+  </div>
+
+  <!-- Formation Progress -->
+  <div class="you-formation">
+    <div class="you-formation-header">
+      <span class="label-caps">Formation Progress</span>
+      <span class="you-formation-level">{{ user.competence_level }} / 7</span>
+    </div>
+    <div class="you-progress-bar">
+      {% widthratio user.competence_level 7 100 as progress %}
+      <div class="you-progress-fill" style="width: {% widthratio user.competence_level 7 100 %}%;"></div>
+    </div>
+  </div>
+
+  <!-- Quick Links -->
+  <div class="you-section">
+    <div class="label-caps" style="padding: 0 4px; margin-bottom: 12px;">Your Space</div>
+
+    <a href="{% url 'profile' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #eff6ff; color: #1d4ed8;">
+        <span class="material-symbols-outlined">person</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">Profile</div>
+        <div class="explore-card-desc">Your personal information & avatar</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+
+    <a href="{% url 'activity:activity-home' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #f0fdfa; color: #0f766e;">
+        <span class="material-symbols-outlined">task_alt</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">Activity</div>
+        <div class="explore-card-desc">Tasks, habits & daily activity reports</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+
+    <a href="{% url 'community:community-home' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #f0fdf4; color: #15803d;">
+        <span class="material-symbols-outlined">group</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">My Community</div>
+        <div class="explore-card-desc">Your community membership & formation</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+
+    <a href="{% url 'learn:learn-home' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #fdf2f8; color: #be185d;">
+        <span class="material-symbols-outlined">school</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">My Learning</div>
+        <div class="explore-card-desc">Enrolments, progress & certificates</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+  </div>
+
+  <!-- Stats & Inventory -->
+  <div class="you-section">
+    <div class="label-caps" style="padding: 0 4px; margin-bottom: 12px;">Inventory</div>
+
+    <div class="you-stat-grid">
+      <div class="you-stat-card">
+        <div class="you-stat-value">{{ user.competence_level }}</div>
+        <div class="you-stat-label">Level</div>
+      </div>
+      <div class="you-stat-card">
+        <div class="you-stat-value">{{ activity_count|default:"0" }}</div>
+        <div class="you-stat-label">Activities</div>
+      </div>
+      <div class="you-stat-card">
+        <div class="you-stat-value">{{ record_count|default:"0" }}</div>
+        <div class="you-stat-label">Records</div>
+      </div>
+    </div>
+
+    {% if user.spiritual_gifts %}
+    <div class="you-gifts">
+      <div class="label-caps" style="margin-bottom: 8px;">Spiritual Gifts</div>
+      <div class="you-gift-list">
+        {% for gift in user.spiritual_gifts %}
+          <span class="you-gift-tag">{{ gift }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Settings shortcut -->
+  <div class="you-section">
+    <a href="{% url 'settings' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #f8fafc; color: #334155;">
+        <span class="material-symbols-outlined">settings</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">Settings</div>
+        <div class="explore-card-desc">Theme, notifications & preferences</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}

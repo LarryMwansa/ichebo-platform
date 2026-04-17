@@ -146,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── App Launcher ──────────────────────────────────────────────────────────
   launcherBtn && launcherBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    // Use HTMX to load the launcher into the drawer
     htmx.ajax('GET', '/dashboard/htmx/launcher/', {
       target: '#drawerInner',
       swap: 'innerHTML'
@@ -154,7 +153,44 @@ document.addEventListener('DOMContentLoaded', () => {
       openDrawer('ICS Ecosystem');
     });
     
-    // Tactile feedback
+    if (window.navigator && window.navigator.vibrate) {
+      window.navigator.vibrate(10);
+    }
+  });
+
+  // ── FAB (Floating Action Button) ──────────────────────────────────────────
+  const fabBtn = document.getElementById('fabBtn');
+  
+  fabBtn && fabBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fabBtn.classList.toggle('active');
+    
+    // Context-aware: determine create URL based on current page
+    const path = window.location.pathname;
+    let createUrl = '/records/htmx/create-form/';  // Default: quick journal entry
+    let title = 'New Entry';
+
+    if (path.startsWith('/activity')) {
+      createUrl = '/activity/htmx/create-form/';
+      title = 'New Activity';
+    } else if (path.startsWith('/governance')) {
+      createUrl = '/governance/htmx/create-form/';
+      title = 'New Document';
+    }
+
+    // Load context-aware form into drawer
+    htmx.ajax('GET', createUrl, {
+      target: '#drawerInner',
+      swap: 'innerHTML'
+    }).then(() => {
+      openDrawer(title);
+      fabBtn.classList.remove('active');
+    }).catch(() => {
+      // Fallback: open drawer with default records form
+      openDrawer(title);
+      fabBtn.classList.remove('active');
+    });
+
     if (window.navigator && window.navigator.vibrate) {
       window.navigator.vibrate(10);
     }

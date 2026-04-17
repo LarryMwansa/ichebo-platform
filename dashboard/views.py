@@ -66,3 +66,30 @@ def htmx_records_tab(request):
 def htmx_launcher(request):
     """Returns the App Launcher grid component."""
     return render(request, 'components/_app_launcher.html')
+
+
+@login_required
+def explore(request):
+    """Explore hub — unified reference browser."""
+    return render(request, 'dashboard/explore.html')
+
+
+@login_required
+def you(request):
+    """You hub — personal dashboard with stats and quick links."""
+    from activity.models import Activity
+    from records.models import Record
+    user = request.user
+
+    activity_count = Activity.objects.filter(
+        created_by=user, deleted_at__isnull=True
+    ).count()
+
+    record_count = Record.objects.filter(
+        created_by=user, deleted_at__isnull=True
+    ).count()
+
+    return render(request, 'dashboard/you.html', {
+        'activity_count': activity_count,
+        'record_count': record_count,
+    })

@@ -31,10 +31,10 @@
       </button>
     </div>
 
-    <!-- Profile Account -->
+    <!-- Profile Avatar (lightweight: Settings + Logout only) -->
     <div class="nav-right-item">
       {% if user.is_authenticated %}
-      <button id="profileBtn" class="profile-avatar-btn" aria-label="Profile menu">
+      <button id="profileBtn" class="profile-avatar-btn" aria-label="Account menu">
         {% if user.avatar_url %}
           <img src="{{ user.avatar_url }}" alt="{{ user.display_name }}">
         {% else %}
@@ -53,12 +53,6 @@
           </div>
         </div>
         <div class="profile-menu-items">
-          <a href="{% url 'dashboard:index' %}" role="menuitem">
-            <span class="material-symbols-outlined">dashboard</span> My Dashboard
-          </a>
-          <a href="{% url 'profile' %}" role="menuitem">
-            <span class="material-symbols-outlined">person</span> My Profile
-          </a>
           <a href="{% url 'settings' %}" role="menuitem">
             <span class="material-symbols-outlined">settings</span> Settings
           </a>

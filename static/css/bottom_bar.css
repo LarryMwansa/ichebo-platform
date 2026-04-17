@@ -35,8 +35,19 @@
 
     font-size: 18px;
     color: var(--muted);
+    text-decoration: none;
+    font-family: inherit;
 
     transition: transform 0.2s ease, color 0.2s ease;
+}
+
+/* Button resets for nav items (launcher) */
+button.nav-item {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--muted);
 }
 
 /* Label */

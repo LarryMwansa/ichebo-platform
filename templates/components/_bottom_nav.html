@@ -2,7 +2,7 @@
 <div class="bottom-bar" role="navigation" aria-label="Main navigation">
 
   <a href="{% url 'dashboard:index' %}"
-     class="nav-item {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}"
+     class="nav-item {% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'index' %}active{% endif %}"
      aria-label="Home">
     <span class="material-symbols-outlined nav-icon">home</span>
     <span class="nav-label">Home</span>
@@ -15,23 +15,23 @@
     <span class="nav-label">Bible</span>
   </a>
 
-  <a href="{% url 'activity:activity-home' %}"
-     class="nav-item {% if request.resolver_match.app_name == 'activity' %}active{% endif %}"
-     aria-label="Activity">
-    <span class="material-symbols-outlined nav-icon">check_circle</span>
-    <span class="nav-label">Activity</span>
+  <a href="{% url 'dashboard:explore' %}"
+     class="nav-item {% if request.resolver_match.url_name == 'explore' %}active{% endif %}"
+     aria-label="Explore">
+    <span class="material-symbols-outlined nav-icon">explore</span>
+    <span class="nav-label">Explore</span>
   </a>
 
-  <a href="{% url 'learn:learn-home' %}"
-     class="nav-item {% if request.resolver_match.app_name == 'learn' %}active{% endif %}"
-     aria-label="Learn">
-    <span class="material-symbols-outlined nav-icon">school</span>
-    <span class="nav-label">Learn</span>
+  <a href="{% url 'dashboard:you' %}"
+     class="nav-item {% if request.resolver_match.url_name == 'you' %}active{% endif %}"
+     aria-label="You">
+    <span class="material-symbols-outlined nav-icon">person</span>
+    <span class="nav-label">You</span>
   </a>
 
-  <button id="launcherBtn" class="nav-item" aria-label="Apps Menu" style="background: none; border: none; color: inherit; padding: 0; cursor: pointer;">
+  <button id="launcherBtn" class="nav-item" aria-label="More Apps">
     <span class="material-symbols-outlined nav-icon">apps</span>
-    <span class="nav-label">Apps</span>
+    <span class="nav-label">More</span>
   </button>
 
 </div>

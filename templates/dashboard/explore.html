@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Explore{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=3">
+{% endblock %}
+
+{% block content %}
+
+<div class="explore-page">
+
+  <div class="explore-header">
+    <h1 class="explore-title">Explore</h1>
+    <p class="explore-subtitle">Browse references, resources & directories</p>
+  </div>
+
+  <!-- Search (future: wire to global search endpoint) -->
+  <div class="explore-search">
+    <span class="material-symbols-outlined" style="color: var(--muted);">search</span>
+    <input type="text" class="explore-search-input" placeholder="Search everything…" disabled>
+  </div>
+
+  <!-- Primary Surfaces -->
+  <div class="explore-section">
+    <div class="label-caps" style="padding: 0 4px; margin-bottom: 12px;">Resources</div>
+
+    <a href="{% url 'bible:reader' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #fff7ed; color: #c2410c;">
+        <span class="material-symbols-outlined">auto_stories</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">Bible</div>
+        <div class="explore-card-desc">Read, search, and annotate scripture</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+
+    <a href="{% url 'governance:home' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #faf5ff; color: #7e22ce;">
+        <span class="material-symbols-outlined">account_balance</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">Governance Library</div>
+        <div class="explore-card-desc">Edicts, decrees, principles & ordinances</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+
+    <a href="{% url 'records:records-home' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #ecfeff; color: #0e7490;">
+        <span class="material-symbols-outlined">description</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">Records & Journals</div>
+        <div class="explore-card-desc">Prayers, dreams, spirit entries & notes</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+
+    <a href="{% url 'learn:learn-home' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #fdf2f8; color: #be185d;">
+        <span class="material-symbols-outlined">school</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">Course Catalogue</div>
+        <div class="explore-card-desc">Programmes, modules & lessons</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+  </div>
+
+  <!-- Community & People -->
+  <div class="explore-section">
+    <div class="label-caps" style="padding: 0 4px; margin-bottom: 12px;">People & Community</div>
+
+    <a href="{% url 'community:community-home' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #f0fdf4; color: #15803d;">
+        <span class="material-symbols-outlined">group</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">Community</div>
+        <div class="explore-card-desc">Your community, gatherings & members</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+
+    <a href="{% url 'community:community-members' %}" class="explore-card">
+      <div class="explore-card-icon" style="background: #eff6ff; color: #1d4ed8;">
+        <span class="material-symbols-outlined">contacts</span>
+      </div>
+      <div class="explore-card-content">
+        <div class="explore-card-title">Member Directory</div>
+        <div class="explore-card-desc">Find and connect with members</div>
+      </div>
+      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}
