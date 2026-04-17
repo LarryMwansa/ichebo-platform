@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Bible UI Standardization & Library Expansion (2026-04-17)
+- **Contextual Search Drawer**: Real-time scriptural search moved from standalone page to integrated bottom sheet.
+- **Reference Jump Search**: RegEx-based parser recognizes canonical references (e.g., "Gen 1:1") for direct navigation.
+- **Multi-Step Selection Workflow**: Fluid drawer navigation between Passage Picker, Version Selector, and Language Selector with OOB header updates.
+- **Library Expansion (17 Versions)**: Ingested premium translations including ESV, NASB, NKJV, NLT, MSG, AMP, and TNIV.
+- **XML Import Infrastructure**: New `load_bible_xml` management command for specialized `<XMLBIBLE>` data schemas.
+- **Cross-Reference Engine**: Links tab in annotation panel now surfaces associations from Governance, Activity, and Learn apps.
+- **Dynamic Indicators**: Real-time verse "note dots" powered by HTMX OOB swaps (Primary for personal, Info for branch).
+- **Persistent Reading State**: Translation switches now maintain the user's exact reading position (book/chapter) via post-back context.
+
 #### Dashboard UI Improvements (2026-04-13)
 - **Scrollable pill tabs on dashboard home** — Overview, Governance, Calendar, Records tabs with horizontal scroll
 - **Dashboard tab switching** — Smooth fade-in animations between tab content panes
@@ -235,5 +245,5 @@ When contributing changes:
 
 ---
 
-*Last Updated: 2026-04-13*  
-*Changelog Maintained By: Claude Haiku 4.5*
+*Last Updated: 2026-04-17*  
+*Changelog Maintained By: Antigravity*
