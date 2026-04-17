@@ -25,14 +25,6 @@
   </div>
 </div>
 
-<!-- Floating Action Button for New Entry -->
-<button class="record-add-btn"
-        hx-get="{% url 'records:htmx-create' %}?record_type={{ active_type|default:'note' }}"
-        hx-target="#drawerContent"
-        hx-swap="innerHTML"
-        onclick="window.ICSDrawer.open('New Journal Entry')">
-  <span class="material-symbols-outlined" style="font-size: 32px;">add</span>
-</button>
 
 <!-- Record list container -->
 <div id="record-list">

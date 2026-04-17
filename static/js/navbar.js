@@ -167,14 +167,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Context-aware: determine create URL based on current page
     const path = window.location.pathname;
-    let createUrl = '/records/htmx/create-form/';  // Default: quick journal entry
+    let createUrl = '/records/htmx/create/';  // Default: quick journal entry
     let title = 'New Entry';
 
     if (path.startsWith('/activity')) {
-      createUrl = '/activity/htmx/create-form/';
+      createUrl = '/activity/htmx/create/';
       title = 'New Activity';
     } else if (path.startsWith('/governance')) {
-      createUrl = '/governance/htmx/create-form/';
+      createUrl = '/governance/htmx/record/create/';
       title = 'New Document';
     }
 
@@ -183,10 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
       target: '#drawerInner',
       swap: 'innerHTML'
     }).then(() => {
-      openDrawer(title);
-      fabBtn.classList.remove('active');
-    }).catch(() => {
-      // Fallback: open drawer with default records form
       openDrawer(title);
       fabBtn.classList.remove('active');
     });

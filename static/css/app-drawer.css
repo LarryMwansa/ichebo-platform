@@ -77,6 +77,7 @@
     bottom: calc(0px + env(safe-area-inset-bottom)); /* Sit at bottom */
     transform: translateY(0) scale(1);
     opacity: 1;
+    min-height: 420px; /* Prevent dwarf mode */
 }
 
 /* Drawer Header */

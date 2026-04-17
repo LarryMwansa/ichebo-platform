@@ -49,23 +49,6 @@
   border-color: var(--primary);
 }
 
-/* ── Record Create Action ───────────────────────────────────── */
-.record-add-btn {
-  position: fixed;
-  bottom: 80px; /* Above bottom bar */
-  right: var(--space-s);
-  width: 56px;
-  height: 56px;
-  border-radius: 28px;
-  background: var(--primary);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 16px var(--shadow);
-  z-index: 100;
-  border: none;
-}
 
 /* ── Detail View ────────────────────────────────────────────── */
 .record-detail-header {
