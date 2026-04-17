@@ -1,11 +1,11 @@
 <!-- Governance home — branch-selector landing -->
-<div class="gov-section-heading">Prophet's Handbook</div>
+<div class="label-caps gov-section-heading">Prophet's Handbook</div>
 
 <div class="gov-branch-grid">
 
   <!-- Reference Library -->
   <div class="gov-branch-card">
-    <div class="gov-branch-label">Reference Library</div>
+    <div class="label-caps gov-branch-label" style="color: var(--gov-accent);">Reference Library</div>
     <p class="gov-branch-desc">Apostolic Properties compiled from Scripture via HRS. Eight record types.</p>
     <div class="gov-type-list">
       {% for slug, label in library_types.items %}
@@ -23,7 +23,7 @@
   <!-- Mandate branch (Level 4+) -->
   {% if request.user.competence_level >= 4 %}
   <div class="gov-branch-card">
-    <div class="gov-branch-label">Mandate</div>
+    <div class="label-caps gov-branch-label" style="color: var(--gov-accent);">Mandate</div>
     <p class="gov-branch-desc">Received directives, governance documents, versioned protocols.</p>
     <div class="gov-type-list">
       {% for slug, label in mandate_types.items %}
@@ -41,13 +41,15 @@
 
   <!-- My Keys -->
   <div class="gov-branch-card">
-    <div class="gov-branch-label">My Keys</div>
+    <div class="label-caps gov-branch-label" style="color: var(--gov-accent);">My Keys</div>
     <p class="gov-branch-desc">Personal symbol-to-meaning mappings drawn from your journal records.</p>
-    <a href="{% url 'governance:keys-list' %}" class="btn-touch" style="background: var(--gov-accent); color: #fff; text-decoration: none;"
+    <a href="{% url 'governance:keys-list' %}" class="btn-touch" 
+       style="background: var(--gov-accent); color: #fff; width: 100%;"
        hx-get="{% url 'governance:keys-list' %}"
        hx-target="#governance-content"
        hx-push-url="true">
-      Open My Keys →
+      Open My Keys
+      <span class="material-symbols-outlined" style="margin-left: 8px; font-size: 18px;">chevron_right</span>
     </a>
   </div>
 

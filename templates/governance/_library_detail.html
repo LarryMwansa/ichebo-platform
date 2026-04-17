@@ -1,27 +1,30 @@
 <!-- Reference Library record detail -->
 <div class="gov-detail-header">
-  <a href="{% url 'governance:reference-list' record.record_type %}"
-     class="gov-back-link"
-     hx-get="{% url 'governance:reference-list' record.record_type %}"
-     hx-target="#governance-content"
-     hx-push-url="true">
-    ← {{ record.record_type|title|cut:"_" }}s
-  </a>
-  <div id="record-status-area" class="status-badge status-badge--{{ record.status }}">
-    {% if record.status == 'locked' %}🔒 {% endif %}{{ record.status|title }}
+  <div class="label-caps" 
+       hx-get="{% url 'governance:reference-list' record.record_type %}" 
+       hx-target="#governance-content" 
+       hx-push-url="true"
+       style="cursor: pointer; color: var(--gov-accent); margin-bottom: 4px;">
+    Reference Library {% if record.record_type %}&rsaquo; {{ record.record_type|title|cut:"_" }}s{% endif %}
+  </div>
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+    <h2 class="gov-detail-title" style="margin:0;">{{ record.title }}</h2>
+    <div id="record-status-area">
+      <span class="badge-unit {% if record.status == 'active' or record.status == 'locked' %}badge-unit--primary{% endif %}">
+        {% if record.status == 'locked' %}🔒 {% endif %}{{ record.status }}
+      </span>
+    </div>
   </div>
 </div>
 
-<h2 class="gov-detail-title">{{ record.title }}</h2>
 {% if record.summary %}<p class="gov-detail-summary">{{ record.summary }}</p>{% endif %}
 
 <!-- Tags and categories -->
-<div class="gov-record-meta" style="margin-bottom:1rem">
+<div class="gov-record-meta" style="margin-bottom: var(--space-m); display: flex; flex-wrap: wrap; gap: 8px;">
   {% for tag in record.tags %}
-  <a href="{% url 'governance:reference-list' record.record_type %}?tag={{ tag }}"
-     class="gov-tag">{{ tag }}</a>
+  <span class="badge-unit">{{ tag }}</span>
   {% endfor %}
-  {% for cat in record.categories %}<span class="gov-category">{{ cat }}</span>{% endfor %}
 </div>
 
 <!-- Content -->
@@ -33,7 +36,7 @@
 {% with cf=record.custom_fields %}
 {% if cf.complexity or cf.polarity or cf.position or cf.direction or cf.speed or cf.emotional_tone %}
 <div class="gov-panel">
-  <div class="gov-panel-label">Property Attributes</div>
+  <div class="label-caps" style="color: var(--gov-accent); margin-bottom: 12px;">Property Attributes</div>
   <dl class="gov-attrs">
     {% if cf.complexity %}<dt>Complexity</dt><dd>{{ cf.complexity }}</dd>{% endif %}
     {% if cf.polarity %}<dt>Polarity</dt><dd>{{ cf.polarity }}</dd>{% endif %}
@@ -48,23 +51,27 @@
 
 <!-- Level 5 actions -->
 {% if is_level5 %}
-<div class="gov-action-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0;">
-  <a href="{% url 'governance:htmx-record-edit' record.id %}"
-     class="btn-touch" style="background: var(--gov-accent); color: #fff; text-decoration: none;"
-     hx-get="{% url 'governance:htmx-record-edit' record.id %}"
-     hx-target="#governance-content"
-     hx-push-url="true">Edit</a>
+<div class="gov-action-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin: 2rem 0;">
+  <button class="btn-touch" style="background: var(--gov-accent); color: #fff; flex: 1;"
+          hx-get="{% url 'governance:htmx-record-edit' record.id %}"
+          hx-target="#drawerContent"
+          hx-swap="innerHTML"
+          onclick="window.ICSDrawer.open('Edit Record')">
+    Edit
+  </button>
+  
   {% if record.status != 'locked' %}
-  <button class="btn-touch" style="background: var(--gov-locked); color: #fff;"
+  <button class="btn-touch" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); flex: 1;"
           hx-post="{% url 'governance:htmx-record-lock' record.id %}"
           hx-target="#record-status-area"
           hx-swap="outerHTML"
           hx-confirm="Lock this record? It cannot be edited after locking.">
-    Lock Record
+    Lock
   </button>
   {% endif %}
+  
   {% if record.status in 'locked,active' %}
-  <button class="btn-touch" style="background: transparent; color: var(--gov-accent); border: 1.5px solid var(--gov-accent);"
+  <button class="btn-touch" style="background: transparent; color: var(--gov-accent); border: 1.5px solid var(--gov-accent); flex: 1;"
           hx-post="{% url 'governance:htmx-record-supersede' record.id %}"
           hx-confirm="Create a new version of this record?">
     New Version
@@ -74,9 +81,12 @@
 {% endif %}
 
 <!-- Linked Records panel (HTMX lazy-load) -->
-<div id="linked-records-panel"
-     hx-get="{% url 'governance:htmx-linked-records' record.id %}"
-     hx-trigger="load"
-     hx-swap="innerHTML">
-  <div class="gov-loading">Loading linked records…</div>
+<div class="gov-panel" style="padding: 0;">
+  <div class="label-caps" style="padding: 1rem 1rem 0; margin-bottom: 0;">Linked Records</div>
+  <div id="linked-records-panel"
+       hx-get="{% url 'governance:htmx-linked-records' record.id %}"
+       hx-trigger="load"
+       hx-swap="innerHTML">
+    <div style="padding: 1rem; color: var(--muted); font-size: 13px;">Loading…</div>
+  </div>
 </div>
