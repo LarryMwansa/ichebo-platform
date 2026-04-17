@@ -1,43 +1,44 @@
 <!-- _profile_identity.html — Identity section -->
 
-<!-- Avatar -->
-<div class="profile-avatar-wrap">
-  {% if profile_user.avatar_url %}
-    <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}" class="profile-avatar">
-  {% else %}
-    <div class="profile-avatar-initials" aria-hidden="true">
-      {{ profile_user.display_name|default:profile_user.email|first|upper }}
-    </div>
-  {% endif %}
-</div>
-
 <!-- Identity card -->
 <div class="profile-card">
-  <div class="profile-card-title">Identity</div>
+  <div class="label-caps" style="color: var(--primary); margin-bottom: 16px;">Identity</div>
 
   <!-- Display name — inline editable -->
   <div class="profile-row">
-    <span class="profile-row-label">Name</span>
-    <div id="display-name-field">
+    <div class="profile-row-left">
+      <span class="material-symbols-outlined profile-row-icon">badge</span>
+      <span class="profile-row-label">Display Name</span>
+    </div>
+    <div id="display-name-field" class="profile-row-value">
       {% include "accounts/_display_name_show.html" %}
     </div>
   </div>
 
   <!-- Email — read only -->
   <div class="profile-row">
-    <span class="profile-row-label">Email</span>
+    <div class="profile-row-left">
+      <span class="material-symbols-outlined profile-row-icon">mail</span>
+      <span class="profile-row-label">Email Address</span>
+    </div>
     <span class="profile-row-value">{{ profile_user.email }}</span>
   </div>
 
   <!-- Member since -->
   <div class="profile-row">
-    <span class="profile-row-label">Member since</span>
-    <span class="profile-row-value">{{ profile_user.created_at|date:"N j, Y" }}</span>
+    <div class="profile-row-left">
+      <span class="material-symbols-outlined profile-row-icon">calendar_today</span>
+      <span class="profile-row-label">Joined</span>
+    </div>
+    <span class="profile-row-value">{{ profile_user.created_at|date:"j N Y" }}</span>
   </div>
 
   <!-- Status -->
   <div class="profile-row">
-    <span class="profile-row-label">Status</span>
+    <div class="profile-row-left">
+      <span class="material-symbols-outlined profile-row-icon">verified_user</span>
+      <span class="profile-row-label">Account Status</span>
+    </div>
     <span class="status-badge status-badge--{{ profile_user.status }}">
       {{ profile_user.get_status_display }}
     </span>
@@ -46,18 +47,26 @@
 
 <!-- Bible preference -->
 <div class="profile-card">
-  <div class="profile-card-title">Bible</div>
+  <div class="label-caps" style="color: var(--primary); margin-bottom: 16px;">Spiritual Workspace</div>
+  
   <div class="profile-row">
-    <span class="profile-row-label">Preferred translation</span>
+    <div class="profile-row-left">
+      <span class="material-symbols-outlined profile-row-icon">auto_stories</span>
+      <span class="profile-row-label">Preferred Bible</span>
+    </div>
     <span class="profile-row-value">
       {% if profile_user.preferred_bible_translation %}
         {{ profile_user.preferred_bible_translation.name }}
       {% else %}
-        King James Version (default)
+        King James Version
       {% endif %}
     </span>
   </div>
-  <div style="padding:0.5rem 0 0;">
-    <a href="{% url 'settings' %}#bible" style="font-size:0.8125rem;color:var(--primary);">Change translation</a>
+  
+  <div style="padding: 12px 0 4px;">
+    <a href="{% url 'settings' %}#bible" class="btn-touch btn-sm" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
+      <span class="material-symbols-outlined" style="font-size: 18px;">settings_applications</span>
+      Configure Workspace
+    </a>
   </div>
 </div>

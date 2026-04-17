@@ -10,11 +10,6 @@
 {% block content %}
 <div class="accounts-shell">
 
-  <nav class="accounts-tab-row" aria-label="Account navigation">
-    <a href="{% url 'profile' %}" class="accounts-tab">Profile</a>
-    <a href="{% url 'settings' %}" class="accounts-tab accounts-tab--active">Settings</a>
-  </nav>
-
   <div class="accounts-content">
 
     {% include "accounts/_settings_appearance.html" %}

@@ -1,9 +1,11 @@
-<!-- _display_name_show.html — read state for display name (HTMX target) -->
-<div class="display-name-row">
+<div class="display-name-row" style="display: flex; align-items: center; gap: 8px;">
   <span class="profile-row-value">{{ profile_user.display_name|default:"—" }}</span>
   <button class="profile-row-action"
           aria-label="Edit display name"
           hx-get="{% url 'htmx-display-name' %}"
           hx-target="#display-name-field"
-          hx-swap="innerHTML">✏️</button>
+          hx-swap="innerHTML"
+          style="background: none; border: none; cursor: pointer; color: var(--primary); display: flex;">
+    <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+  </button>
 </div>

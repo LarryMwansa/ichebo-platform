@@ -10,12 +10,26 @@
 {% block content %}
 <div class="accounts-shell">
 
-  <nav class="accounts-tab-row" aria-label="Account navigation">
-    <a href="{% url 'profile' %}" class="accounts-tab accounts-tab--active">Profile</a>
-    <a href="{% url 'settings' %}" class="accounts-tab">Settings</a>
-  </nav>
-
   <div class="accounts-content">
+    
+    <!-- Profile Hero -->
+    <div class="profile-hero">
+      <div class="profile-avatar-wrap">
+        {% if profile_user.avatar_url %}
+          <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}" class="profile-avatar">
+        {% else %}
+          <div class="profile-avatar-initials" aria-hidden="true">
+            {{ profile_user.display_name|default:profile_user.email|first|upper }}
+          </div>
+        {% endif %}
+      </div>
+      <div class="profile-hero-meta">
+          <h2 class="profile-hero-name">{{ profile_user.display_name|default:profile_user.username }}</h2>
+          <span class="status-badge status-badge--{{ profile_user.status }}">
+            {{ profile_user.get_status_display }}
+          </span>
+      </div>
+    </div>
 
     {% include "accounts/_profile_identity.html" %}
     {% include "accounts/_profile_formation.html" %}

@@ -1,44 +1,57 @@
 <!-- _profile_formation.html — Formation + Memberships section -->
 
 <div class="profile-card">
-  <div class="profile-card-title">Formation</div>
+  <div class="label-caps" style="color: var(--primary); margin-bottom: 20px;">Formation</div>
 
-  <div class="profile-row">
-    <span class="profile-row-label">Level</span>
-    <div class="level-badge">
-      <span class="level-number">{{ profile_user.competence_level }}</span>
-      {{ kgs_name }}
+  <div class="formation-status-large">
+    <div class="formation-level-circle">
+      <span class="formation-level-number">{{ profile_user.competence_level }}</span>
+      <span class="formation-level-label">Level</span>
+    </div>
+    <div class="formation-details">
+      <h3 class="formation-pathway-title">{{ kgs_name }}</h3>
+      <p class="formation-role-label">Platform Role: <strong>{{ platform_label }}</strong></p>
     </div>
   </div>
 
-  <div class="profile-row" style="flex-direction:column;align-items:flex-start;">
-    <span class="profile-row-label" style="margin-bottom:0.375rem;">Platform role</span>
-    <span class="profile-row-value">{{ platform_label }}</span>
+  <div class="formation-progress-container" style="margin-top: 24px;">
+    {% widthratio profile_user.competence_level 7 100 as progress %}
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span class="label-caps" style="font-size: 10px;">Pathway Maturity</span>
+        <span style="font-size: 11px; font-weight: 700; color: var(--primary);">{{ progress }}%</span>
+    </div>
+    <div class="you-progress-bar">
+      <div class="you-progress-fill" style="width: {{ progress }}%;"></div>
+    </div>
   </div>
 </div>
 
 <!-- Tenant memberships -->
 <div class="profile-card">
-  <div class="profile-card-title">Community Memberships</div>
+  <div class="label-caps" style="color: var(--primary); margin-bottom: 16px;">Community Memberships</div>
 
-  <div id="memberships-list"
-       hx-trigger="load"
-       hx-get=""
-       hx-swap="none">
+  <div id="memberships-list">
     {% if memberships %}
       {% for perm in memberships %}
-      <div class="membership-item">
-        <span class="membership-tenant">{{ perm.tenant.name }}</span>
-        <span class="membership-meta">
-          {{ perm.get_role_display }} &middot; Since {{ perm.granted_at|date:"N Y" }}
-        </span>
+      <div class="membership-item-standard">
+        <div class="membership-icon">
+          <span class="material-symbols-outlined">hub</span>
+        </div>
+        <div class="membership-info">
+          <span class="membership-tenant-name">{{ perm.tenant.name }}</span>
+          <span class="membership-meta-data">
+            {{ perm.get_role_display }} &middot; Since {{ perm.granted_at|date:"M Y" }}
+          </span>
+        </div>
+        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 18px;">chevron_right</span>
       </div>
       {% endfor %}
     {% else %}
       <div class="empty-state">
-        <p>You are not yet a member of a community.</p>
-        <a href="{% url 'community:community-home' %}" style="color:var(--primary);font-size:0.875rem;">
-          Go to Community
+        <span class="material-symbols-outlined" style="font-size: 40px; margin-bottom: 12px; display: block;">group_off</span>
+        <p>No active community memberships found.</p>
+        <a href="{% url 'community:community-home' %}" class="btn-touch btn-sm" style="margin-top: 12px; display: inline-flex;">
+          Explore Communities
         </a>
       </div>
     {% endif %}
