@@ -1,42 +1,50 @@
-<div class="community-form" id="gathering-form">
-  <div class="form-field">
-    <label>Title</label>
-    <input type="text" name="title" placeholder="e.g. Sunday Morning Service" required>
+<div class="record-drawer-form" id="gathering-form">
+  <div class="record-form-group">
+    <label class="label-caps">Gathering Title</label>
+    <input type="text" name="title" class="form-input-touch" placeholder="e.g. Sunday Morning Service" required>
   </div>
-  <div class="form-field">
-    <label>Date &amp; Time</label>
-    <input type="datetime-local" name="scheduled_at" required>
+  
+  <div class="record-form-group">
+    <label class="label-caps">Date & Time</label>
+    <input type="datetime-local" name="scheduled_at" class="form-input-touch" required>
   </div>
-  <div class="form-field">
-    <label>Format</label>
-    <select name="format"
+  
+  <div class="record-form-group">
+    <label class="label-caps">Delivery Format</label>
+    <select name="format" class="form-input-touch"
             onchange="
               const fmt = this.value;
-              document.getElementById('loc-field').classList.toggle('visible', fmt !== 'digital');
-              document.getElementById('stream-field').classList.toggle('visible', fmt !== 'in_person');
+              document.getElementById('loc-field').style.display = (fmt !== 'digital' ? 'block' : 'none');
+              document.getElementById('stream-field').style.display = (fmt !== 'in_person' ? 'block' : 'none');
             ">
       <option value="in_person">In Person</option>
-      <option value="digital">Digital</option>
-      <option value="hybrid">Hybrid</option>
+      <option value="digital">Digital (Online Only)</option>
+      <option value="hybrid">Hybrid (Both)</option>
     </select>
   </div>
-  <div class="form-field format-conditional visible" id="loc-field">
-    <label>Location</label>
-    <input type="text" name="location" placeholder="Venue or address">
+
+  <div class="record-form-group" id="loc-field">
+    <label class="label-caps">Location / Venue</label>
+    <input type="text" name="location" class="form-input-touch" placeholder="Physical address or venue name">
   </div>
-  <div class="form-field format-conditional" id="stream-field">
-    <label>Stream URL</label>
-    <input type="url" name="stream_url" placeholder="https://youtube.com/live/…">
+
+  <div class="record-form-group" id="stream-field" style="display: none;">
+    <label class="label-caps">Stream Link</label>
+    <input type="url" name="stream_url" class="form-input-touch" placeholder="https://youtube.com/live/…">
   </div>
-  <div class="form-field">
-    <label>Description (optional)</label>
-    <textarea name="description" rows="3" placeholder="Agenda or notes…"></textarea>
+
+  <div class="record-form-group">
+    <label class="label-caps">Additional Notes</label>
+    <textarea name="description" class="form-input-touch" rows="3" placeholder="Bullet points or agenda…"></textarea>
   </div>
-  <button class="btn-primary"
-          hx-post="{% url 'community:htmx-create-gathering' %}"
-          hx-target="#gathering-form-slot"
-          hx-swap="innerHTML"
-          hx-include="#gathering-form">
-    Schedule Gathering
-  </button>
+
+  <div style="margin-top: var(--space-m);">
+    <button class="btn-touch" style="background: var(--primary); color: #fff; width: 100%; font-weight: 700;"
+            hx-post="{% url 'community:htmx-create-gathering' %}"
+            hx-target="#gathering-form-slot"
+            hx-swap="innerHTML"
+            hx-include="#gathering-form">
+      Publish Gathering
+    </button>
+  </div>
 </div>

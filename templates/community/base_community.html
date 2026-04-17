@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends base_template %}
 {% load static %}
 
 {% block extra_css %}
@@ -6,7 +6,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="community-surface">
-  {% block community_content %}{% endblock %}
+<div class="community-shell">
+  <div class="community-content">
+    {% block community_content %}{% endblock %}
+  </div>
 </div>
 {% endblock %}

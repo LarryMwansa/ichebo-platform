@@ -1,27 +1,42 @@
 {% extends "community/base_community.html" %}
 
 {% block community_content %}
-<div style="font-size:13px;color:var(--muted);margin-bottom:12px">
-  {{ total }} total active member{{ total|pluralize }}
-</div>
 
-<div class="pipeline-grid">
-{% for col in pipeline_display %}
-<div class="pipeline-col">
-  <div class="pipeline-col-label">{{ col.label }}</div>
-  <div class="pipeline-count">{{ col.count }}</div>
-  <div class="pipeline-names">
-    {% for m in col.members|slice:":5" %}
-      <a href="{% url 'community:community-member-profile' m.user.id %}"
-         style="color:var(--text);text-decoration:none;display:block;font-size:11px;padding:2px 0;">
-        {{ m.user.display_name|default:m.user.email }}
-      </a>
-    {% endfor %}
-    {% if col.count > 5 %}
-      <span style="color:var(--muted)">+{{ col.count|add:"-5" }} more</span>
-    {% endif %}
+<div class="community-header">
+  <div class="community-avatar">
+    <span class="material-symbols-outlined">analytics</span>
+  </div>
+  <div class="community-info">
+    <div class="community-name">Formation Pipeline</div>
+    <div class="community-tier">{{ total }} Total Active Member{{ total|pluralize }}</div>
   </div>
 </div>
-{% endfor %}
+
+<div class="pipeline-scroll">
+  {% for col in pipeline_display %}
+  <div class="pipeline-lane">
+    <div class="pipeline-lane-header">
+      <div class="label-caps">{{ col.label }}</div>
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px;">
+        <div class="formation-level" style="font-size: 24px;">{{ col.count }}</div>
+        <div class="label-caps" style="color: var(--muted); text-transform: lowercase;">members</div>
+      </div>
+    </div>
+    
+    <div class="list-group" style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; min-height: 100px; padding: 4px;">
+      {% for m in col.members|slice:":8" %}
+        <a href="{% url 'community:community-member-profile' m.user.id %}" class="list-item" style="padding: 8px 12px; border: none; background: transparent;">
+          <div class="list-item__title" style="font-size: 13px;">{{ m.user.display_name|default:m.user.email }}</div>
+        </a>
+      {% endfor %}
+      {% if col.count > 8 %}
+        <div class="list-item__meta" style="padding: 8px 12px; text-align: center;">+{{ col.count|add:"-8" }} more</div>
+      {% endif %}
+      {% if col.count == 0 %}
+        <div class="empty-state" style="padding: 20px 0; font-size: 11px;">(Empty)</div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
 </div>
 {% endblock %}

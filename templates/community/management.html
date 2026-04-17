@@ -1,100 +1,116 @@
 {% extends "community/base_community.html" %}
 
 {% block community_content %}
+
 <div class="community-header">
-  <div class="community-logo">⚙️</div>
-  <div>
+  <div class="community-avatar">
+    <span class="material-symbols-outlined">settings_suggest</span>
+  </div>
+  <div class="community-info">
     <div class="community-name">Community Management</div>
-    <div class="community-tier">{{ scope_tenant.name|default:"Your Branch" }}</div>
+    <div class="community-tier">Administrative Oversight · {{ scope_tenant.name|default:"Local Node" }}</div>
   </div>
 </div>
 
 <!-- Pending membership requests -->
-<div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-  <span>Membership Requests</span>
+<div class="section-header">
+  <div class="label-caps">Membership Requests</div>
 </div>
 <div id="membership-requests-list"
      hx-get="{% url 'community:htmx-pending-requests' %}"
      hx-trigger="load"
      hx-swap="innerHTML">
-  <div class="htmx-indicator">Loading&hellip;</div>
+  <div class="htmx-indicator">Loading registry&hellip;</div>
 </div>
 
-<div style="margin-top:8px;margin-bottom:16px"></div>
+<div style="margin-top: var(--space-l);"></div>
 
-<!-- Nav tiles -->
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-  <a href="{% url 'community:community-members' %}" class="info-card" style="text-decoration:none">
-    <div class="info-card-icon">👥</div>
-    <div>
-      <div class="info-card-label">Members</div>
-      <div class="info-card-value">{{ member_count }}</div>
+<!-- Management Navigation Grid -->
+<div class="stat-grid">
+  <a href="{% url 'community:community-members' %}" class="stat-item" style="text-decoration: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="stat-item__label">Members</div>
+      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">groups</span>
     </div>
+    <div class="stat-item__value">{{ member_count }} Registered</div>
   </a>
-  <a href="{% url 'community:community-pipeline' %}" class="info-card" style="text-decoration:none">
-    <div class="info-card-icon">📊</div>
-    <div>
-      <div class="info-card-label">Pipeline</div>
-      <div class="info-card-value">Formation Stages</div>
+
+  <a href="{% url 'community:community-pipeline' %}" class="stat-item" style="text-decoration: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="stat-item__label">Pipeline</div>
+      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">analytics</span>
     </div>
+    <div class="stat-item__value">Formation Tracking</div>
   </a>
+
   {% if request.user.competence_level >= 3 %}
-  <a href="{% url 'tenants:create-tenant' %}" class="info-card" style="text-decoration:none">
-    <div class="info-card-icon">🏛️</div>
-    <div>
-      <div class="info-card-label">New Community</div>
-      <div class="info-card-value">Create</div>
+  <a href="{% url 'tenants:create-tenant' %}" class="stat-item" style="text-decoration: none;">
+     <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="stat-item__label">New Node</div>
+      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">add_home</span>
     </div>
+    <div class="stat-item__value">Create Community</div>
   </a>
-  <a href="{% url 'tenants:my-tenants' %}" class="info-card" style="text-decoration:none">
-    <div class="info-card-icon">🗂️</div>
-    <div>
-      <div class="info-card-label">My Communities</div>
-      <div class="info-card-value">All communities</div>
+
+  <a href="{% url 'tenants:my-tenants' %}" class="stat-item" style="text-decoration: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="stat-item__label">Hierarchy</div>
+      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">account_tree</span>
     </div>
+    <div class="stat-item__value">My Communities</div>
   </a>
   {% endif %}
 </div>
 
-<!-- Announcements section -->
-<div class="section-heading" style="display:flex;justify-content:space-between;align-items:center">
-  <span>Announcements</span>
-  <button class="btn-secondary btn-sm"
+<!-- Announcements Section -->
+<div class="section-header" style="margin-top: var(--space-l);">
+  <div class="label-caps">Announcements</div>
+  <button class="btn-touch btn-sm" style="color: var(--primary);"
           hx-get="{% url 'community:htmx-create-announcement' %}"
           hx-target="#announcement-form-slot"
-          hx-swap="innerHTML">+ New</button>
+          hx-swap="innerHTML">
+    <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+  </button>
 </div>
 <div id="announcement-form-slot"></div>
-<div id="announcement-list"
+<div id="announcement-list" class="list-group"
      hx-get="{% url 'community:htmx-announcement-list' %}"
      hx-trigger="load"
      hx-swap="innerHTML">
-  <div class="htmx-indicator">Loading…</div>
+  <div class="htmx-indicator">Loading bulletins&hellip;</div>
 </div>
 
-<!-- Gatherings section -->
-<div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-  <span>Gatherings</span>
-  <button class="btn-secondary btn-sm"
+<!-- Gatherings Section -->
+<div class="section-header" style="margin-top: var(--space-l);">
+  <div class="label-caps">Seven-Day Calendar</div>
+  <button class="btn-touch btn-sm" style="color: var(--primary);"
           hx-get="{% url 'community:htmx-create-gathering' %}"
           hx-target="#gathering-form-slot"
-          hx-swap="innerHTML">+ Schedule</button>
+          hx-swap="innerHTML">
+    <span class="material-symbols-outlined" style="font-size: 18px;">calendar_add_on</span>
+  </button>
 </div>
 <div id="gathering-form-slot"></div>
+
 {% if gatherings %}
-{% for g in gatherings %}
-<div class="gathering-card" id="gathering-{{ g.id }}">
-  <div class="gathering-title">{{ g.title }}</div>
-  {% if g.scheduled_at %}
-  <div class="gathering-meta">{{ g.scheduled_at|date:"d M Y, H:i" }}</div>
-  {% endif %}
-  {% with fmt=g.custom_fields.format|default:"in_person" %}
-  <span class="gathering-format format-{{ fmt }}">{{ fmt|title }}</span>
-  {% endwith %}
-</div>
-{% endfor %}
+  {% for g in gatherings %}
+  <div class="gathering-card" id="gathering-{{ g.id }}">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+      <div class="gathering-title">{{ g.title }}</div>
+      {% with fmt=g.custom_fields.format|default:"in_person" %}
+      <span class="gathering-format-badge format-{{ fmt }}">{{ fmt|title }}</span>
+      {% endwith %}
+    </div>
+    {% if g.scheduled_at %}
+    <div class="gathering-meta">
+      <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+      {{ g.scheduled_at|date:"D, d M · H:i" }}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
 {% else %}
-<div class="empty-state" style="padding:20px 0">No gatherings in the next 7 days.</div>
+  <div class="empty-state" style="padding: 24px 0;">No gatherings in the next 7 days.</div>
 {% endif %}
 
 {% endblock %}

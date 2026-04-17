@@ -2,22 +2,29 @@
 
 {% block community_content %}
 
-<!-- Header -->
+<!-- Profile Header -->
 <div class="community-header">
-  <div class="member-avatar" style="width:56px;height:56px;font-size:22px">
+  <div class="community-avatar">
     {{ member_user.display_name|first|upper }}
   </div>
-  <div>
+  <div class="community-info">
     <div class="community-name">{{ member_user.display_name|default:member_user.email }}</div>
-    <div class="community-tier">{{ level_label }} · {{ stage_info.1 }}</div>
+    <div class="community-tier">
+      <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">verified</span>
+      {{ level_label }} · {{ stage_info.1 }}
+    </div>
   </div>
 </div>
 
-<!-- Formation steps -->
-<div class="formation-card">
-  <div class="formation-stage-label">Formation</div>
-  <div class="formation-level-name">{{ level_label }}</div>
-  <div class="formation-participation">{{ stage_info.1 }}</div>
+<!-- Formation Track -->
+<div class="formation-track">
+  <div class="formation-status">
+    <div>
+      <div class="label-caps">Formation Stage</div>
+      <div class="formation-level">{{ level_label }}</div>
+    </div>
+    <div class="badge-unit badge-unit--primary">{{ stage_info.1 }}</div>
+  </div>
   <div class="formation-steps">
     {% for step in "12345" %}
     <div class="formation-step {% if forloop.counter <= member_user.competence_level %}active{% endif %}"></div>
@@ -25,17 +32,21 @@
   </div>
 </div>
 
-<!-- Shepherd assignment -->
-<div class="info-card" id="shepherd-card">
-  <div class="info-card-icon">🤝</div>
-  <div style="flex:1">
-    <div class="info-card-label">Shepherd</div>
-    <div class="info-card-value" id="shepherd-value">
-      {% if member_perm.metadata.shepherd_id %}Assigned{% else %}Not assigned{% endif %}
+<!-- Stewardship Actions -->
+<div class="stat-grid">
+  <!-- Shepherd -->
+  <div class="stat-item">
+    <div class="stat-item__label">Shepherd Assignment</div>
+    <div class="stat-item__value" id="shepherd-value" style="margin-bottom: 8px;">
+      {% if member_perm.metadata.shepherd_id %}
+        Assigned
+      {% else %}
+        <span style="color: var(--muted);">Unassigned</span>
+      {% endif %}
     </div>
-    <form style="margin-top:8px;display:flex;gap:8px;align-items:center">
-      <select name="shepherd_id" class="community-filter-select" style="flex:1">
-        <option value="">— Remove shepherd —</option>
+    <div style="display: flex; gap: 8px;">
+      <select name="shepherd_id" class="form-input-touch" style="height: 36px; min-height: 36px; font-size: 13px; flex: 1;">
+        <option value="">— Clear —</option>
         {% for s in shepherds %}
         <option value="{{ s.user.id }}"
                 {% if s.user.id|stringformat:"s" == member_perm.metadata.shepherd_id %}selected{% endif %}>
@@ -43,28 +54,25 @@
         </option>
         {% endfor %}
       </select>
-      <button class="btn-secondary btn-sm"
+      <button class="btn-touch btn-sm" style="background: var(--primary); color: #fff;"
               hx-post="{% url 'community:htmx-set-shepherd' member_perm.id %}"
               hx-target="#shepherd-value"
               hx-swap="outerHTML"
               hx-include="[name='shepherd_id']">
-        Set
+        SET
       </button>
-    </form>
-  </div>
-</div>
-
-<!-- Service order -->
-<div class="info-card" id="order-card">
-  <div class="info-card-icon">⚙️</div>
-  <div style="flex:1">
-    <div class="info-card-label">Service Order</div>
-    <div class="info-card-value" id="order-value">
-      {{ member_perm.metadata.service_order|default:"Not assigned" }}
     </div>
-    <form style="margin-top:8px;display:flex;gap:8px;align-items:center">
-      <select name="service_order" class="community-filter-select" style="flex:1">
-        <option value="">— Remove placement —</option>
+  </div>
+
+  <!-- Service Order -->
+  <div class="stat-item">
+    <div class="stat-item__label">Service Placement</div>
+    <div class="stat-item__value" id="order-value" style="margin-bottom: 8px;">
+      {{ member_perm.metadata.service_order|default:"Not Placed" }}
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <select name="service_order" class="form-input-touch" style="height: 36px; min-height: 36px; font-size: 13px; flex: 1;">
+        <option value="">— Clear —</option>
         {% for val, label in order_choices %}
         <option value="{{ val }}"
                 {% if val == member_perm.metadata.service_order %}selected{% endif %}>
@@ -72,49 +80,65 @@
         </option>
         {% endfor %}
       </select>
-      <button class="btn-secondary btn-sm"
+      <button class="btn-touch btn-sm" style="background: var(--primary); color: #fff;"
               hx-post="{% url 'community:htmx-set-order' member_perm.id %}"
               hx-target="#order-value"
               hx-swap="outerHTML"
               hx-include="[name='service_order']">
-        Set
+        SET
       </button>
-    </form>
+    </div>
   </div>
 </div>
 
-<!-- Gifts -->
+<!-- Spiritual Register -->
 {% if gifts %}
-<div class="section-heading">Gifts Register</div>
-{% for gift in gifts %}
-<div class="announcement-card">
-  <div class="announcement-title">{{ gift.title }}</div>
-  <div class="announcement-content">
-    Competence: {{ gift.progress }}%
-    {% if gift.metadata.service_order %} · {{ gift.metadata.service_order }}{% endif %}
+<div class="section-header">
+  <div class="label-caps">Spiritual Register</div>
+</div>
+<div class="list-group">
+  {% for gift in gifts %}
+  <div class="list-item">
+    <div class="list-item__icon" style="color: var(--primary);"><span class="material-symbols-outlined">auto_awesome</span></div>
+    <div class="list-item__content">
+      <div class="list-item__title">{{ gift.title }}</div>
+      <div class="list-item__meta">
+        Competence: {{ gift.progress }}%
+        {% if gift.metadata.service_order %} · {{ gift.metadata.service_order }}{% endif %}
+      </div>
+    </div>
   </div>
+  {% endfor %}
 </div>
-{% endfor %}
 {% endif %}
 
-<!-- Certifications -->
+<!-- Academic / Achievement Register -->
 {% if certifications %}
-<div class="section-heading">Certifications</div>
-{% for cert in certifications %}
-<div class="announcement-card">
-  <div class="announcement-title">{{ cert.title }}</div>
-  <div class="announcement-date">{{ cert.created_at|date:"d M Y" }}</div>
+<div class="section-header" style="margin-top: var(--space-l);">
+  <div class="label-caps">Certifications</div>
 </div>
-{% endfor %}
+<div class="list-group">
+  {% for cert in certifications %}
+  <div class="list-item">
+    <div class="list-item__icon" style="color: var(--primary);"><span class="material-symbols-outlined">workspace_premium</span></div>
+    <div class="list-item__content">
+      <div class="list-item__title">{{ cert.title }}</div>
+      <div class="list-item__meta">{{ cert.created_at|date:"d M Y" }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
 {% endif %}
 
-<!-- Deactivate membership -->
-<div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border)">
-  <button class="btn-danger"
+<!-- Danger Zone -->
+<div style="margin-top: var(--space-2xl); padding: var(--space-m); border: 1px dashed var(--border); border-radius: 16px; text-align: center;">
+  <div class="label-caps" style="color: var(--muted); margin-bottom: 12px;">Administrative Actions</div>
+  <button class="btn-touch" style="background: #fef2f2; color: #991b1b; width: 100%; border: 1px solid #fee2e2;"
           hx-post="{% url 'community:htmx-deactivate-member' member_perm.id %}"
           hx-target="#deactivate-slot"
           hx-swap="innerHTML"
           hx-confirm="Deactivate this member's community membership? This cannot be undone without steward action.">
+    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 8px;">person_off</span>
     Deactivate Membership
   </button>
   <div id="deactivate-slot"></div>

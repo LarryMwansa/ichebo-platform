@@ -1,14 +1,17 @@
 {% for m in members %}
-<a href="{% url 'community:community-member-profile' m.user.id %}" class="member-card">
-  <div class="member-avatar">{{ m.user.display_name|first|upper|default:"?" }}</div>
-  <div>
-    <div class="member-name">{{ m.user.display_name|default:m.user.email }}</div>
-    <div class="member-meta">
+<a href="{% url 'community:community-member-profile' m.user.id %}" class="list-item" style="padding: 12px 16px;">
+  <div class="member-avatar" style="width: 40px; height: 40px; border-radius: 12px; font-size: 16px;">
+    {{ m.user.display_name|first|upper|default:"?" }}
+  </div>
+  <div class="list-item__content">
+    <div class="list-item__title">{{ m.user.display_name|default:m.user.email }}</div>
+    <div class="list-item__meta">
       Level {{ m.level|default:0 }}
       {% if m.metadata.service_order %} · {{ m.metadata.service_order }}{% endif %}
     </div>
   </div>
+  <span class="material-symbols-outlined" style="color: var(--border); font-size: 20px;">chevron_right</span>
 </a>
 {% empty %}
-<div class="empty-state">No members found.</div>
+<div class="empty-state" style="padding: 40px 0;">No members found.</div>
 {% endfor %}

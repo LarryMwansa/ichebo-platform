@@ -4,27 +4,39 @@
 
 {% if not primary_perm %}
 <div class="empty-state">
+  <span class="material-symbols-outlined" style="font-size: 48px; color: var(--muted); margin-bottom: 16px;">diversity_4</span>
   <p>You are not yet part of a community.</p>
-  <p style="margin-top:8px;font-size:12px">
-    Contact a steward to be added to your local Sceptre Community.
+  <p style="margin-top:8px;font-size:12px; color: var(--muted);">
+    Contact a steward to be added to your local Sceptre Community node.
   </p>
 </div>
 {% else %}
 
-<!-- Community header -->
+<!-- Community Identity -->
 <div class="community-header">
-  <div class="community-logo">🏛</div>
-  <div>
+  <div class="community-avatar">
+    <span class="material-symbols-outlined">account_balance</span>
+  </div>
+  <div class="community-info">
     <div class="community-name">{{ primary_perm.tenant.name|default:"My Community" }}</div>
-    <div class="community-tier">{{ primary_perm.tenant.tier|default:"Church Node"|title }}</div>
+    <div class="community-tier">
+      <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">hub</span>
+      {{ primary_perm.tenant.tier|default:"Church Node"|title }}
+    </div>
   </div>
 </div>
 
-<!-- Formation stage -->
-<div class="formation-card">
-  <div class="formation-stage-label">Formation Stage</div>
-  <div class="formation-level-name">{{ level_label }}</div>
-  <div class="formation-participation">{{ participation_stage }}</div>
+<!-- Formation & Integration Progress -->
+<div class="formation-track">
+  <div class="formation-status">
+    <div>
+      <div class="label-caps" style="margin-bottom: 4px;">Formation Stage</div>
+      <div class="formation-level">{{ level_label }}</div>
+    </div>
+    <div class="badge-unit badge-unit--primary" style="margin-bottom: 4px;">
+      {{ participation_stage }}
+    </div>
+  </div>
   <div class="formation-steps">
     {% for step in participation_steps %}
     <div class="formation-step {% if step <= level %}active{% endif %}"></div>
@@ -32,79 +44,97 @@
   </div>
 </div>
 
-<!-- Shepherd -->
-{% if shepherd %}
-<div class="info-card">
-  <div class="info-card-icon">🤝</div>
-  <div>
-    <div class="info-card-label">Your Shepherd</div>
-    <div class="info-card-value">{{ shepherd.display_name|default:shepherd.email }}</div>
+<!-- Contextual Stats / Info -->
+<div class="stat-grid">
+  {% if shepherd %}
+  <div class="stat-item">
+    <div class="stat-item__label">Shepherd</div>
+    <div class="stat-item__value">{{ shepherd.display_name|default:shepherd.email }}</div>
   </div>
-</div>
-{% endif %}
+  {% endif %}
 
-<!-- Service order -->
-{% if service_order %}
-<div class="info-card">
-  <div class="info-card-icon">⚙️</div>
-  <div>
-    <div class="info-card-label">Service Placement</div>
-    <div class="info-card-value">{{ service_order }}</div>
+  {% if service_order %}
+  <div class="stat-item">
+    <div class="stat-item__label">Service Placement</div>
+    <div class="stat-item__value">{{ service_order }}</div>
   </div>
-</div>
-{% endif %}
+  {% endif %}
 
-<!-- Gifts summary -->
-<div class="gifts-summary">
-  <div class="gifts-count">{{ gifts_count }}</div>
-  <div class="gifts-label">
-    Active gift{{ gifts_count|pluralize }} registered
+  <div class="stat-item" style="grid-column: span 2;">
+     <div class="stat-item__label">Spiritual Gifts</div>
+     <div style="display: flex; justify-content: space-between; align-items: center;">
+       <div class="stat-item__value">{{ gifts_count }} Active Gift{{ gifts_count|pluralize }}</div>
+       <span class="material-symbols-outlined" style="color: var(--primary);">auto_awesome</span>
+     </div>
   </div>
 </div>
 
-<!-- Upcoming gatherings -->
-<div class="section-heading">Upcoming Gatherings</div>
+<!-- Upcoming Gatherings -->
+<div class="section-header">
+  <div class="label-caps">Upcoming Gatherings</div>
+  <a href="{% url 'community:gatherings' %}" class="btn-touch btn-sm" style="color: var(--primary);">View All</a>
+</div>
+
 {% if upcoming_gatherings %}
-{% for gathering in upcoming_gatherings %}
-<div class="gathering-card">
-  <div class="gathering-title">{{ gathering.title }}</div>
-  {% if gathering.scheduled_at %}
-  <div class="gathering-meta">{{ gathering.scheduled_at|date:"d M Y, H:i" }}</div>
-  {% endif %}
-  {% with fmt=gathering.custom_fields.format|default:"in_person" %}
-  <span class="gathering-format format-{{ fmt }}">
-    {{ fmt|title }}
-  </span>
-  {% endwith %}
-  {% if gathering.custom_fields.location %}
-  <div class="gathering-meta" style="margin-top:6px">📍 {{ gathering.custom_fields.location }}</div>
-  {% endif %}
-  {% if gathering.custom_fields.stream_url %}
-  <a class="gathering-stream-link"
-     href="{{ gathering.custom_fields.stream_url }}"
-     target="_blank" rel="noopener">
-    🔗 Join Online
-  </a>
-  {% endif %}
-</div>
-{% endfor %}
+  {% for gathering in upcoming_gatherings %}
+  <div class="gathering-card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+      <div class="gathering-title">{{ gathering.title }}</div>
+      {% with format=gathering.custom_fields.format|default:"in_person" %}
+      <span class="gathering-format-badge format-{{ format }}">
+        {{ format|replace:"_, "|title }}
+      </span>
+      {% endwith %}
+    </div>
+    
+    <div class="gathering-meta">
+      <span class="material-symbols-outlined" style="font-size: 16px;">calendar_today</span>
+      {{ gathering.scheduled_at|date:"D, d M · H:i" }}
+    </div>
+    
+    {% if gathering.custom_fields.location %}
+    <div class="gathering-meta">
+      <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span>
+      {{ gathering.custom_fields.location }}
+    </div>
+    {% endif %}
+
+    {% if gathering.custom_fields.stream_url %}
+    <a href="{{ gathering.custom_fields.stream_url }}" target="_blank" class="btn-touch" style="margin-top: 12px; background: var(--hover); color: var(--primary); justify-content: center; width: 100%;">
+      <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 8px;">videocam</span>
+      Join Online
+    </a>
+    {% endif %}
+  </div>
+  {% endfor %}
 {% else %}
-<div class="empty-state" style="padding:20px 0">No gatherings scheduled in the next 30 days.</div>
+  <div class="empty-state" style="padding: 32px 0;">
+    <p>No gatherings scheduled in the next 30 days.</p>
+  </div>
 {% endif %}
 
 <!-- Announcements -->
-<div class="section-heading">Announcements</div>
-{% if announcements %}
-{% for ann in announcements %}
-<div class="announcement-card">
-  <div class="announcement-title">{{ ann.title }}</div>
-  <div class="announcement-content">{{ ann.content|truncatechars:180 }}</div>
-  <div class="announcement-date">{{ ann.created_at|date:"d M Y" }}</div>
+<div class="section-header" style="margin-top: var(--space-l);">
+  <div class="label-caps">Announcements</div>
 </div>
-{% endfor %}
-{% else %}
-<div class="empty-state" style="padding:20px 0">No announcements yet.</div>
-{% endif %}
+
+<div class="list-group">
+  {% if announcements %}
+    {% for ann in announcements %}
+    <div class="list-item" style="flex-direction: column; align-items: stretch; padding: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+        <div class="list-item__title" style="white-space: normal; line-height: 1.4;">{{ ann.title }}</div>
+        <div class="list-item__meta">{{ ann.created_at|date:"d M" }}</div>
+      </div>
+      <div class="list-item__meta" style="white-space: normal; line-height: 1.5; margin-top: 4px;">
+        {{ ann.content|truncatechars:140 }}
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state" style="padding: 24px 0;">No announcements yet.</div>
+  {% endif %}
+</div>
 
 {% endif %}
 {% endblock %}

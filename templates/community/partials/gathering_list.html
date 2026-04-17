@@ -1,30 +1,33 @@
 {% for gathering in gatherings %}
 {% with cf=gathering.custom_fields %}
-<a href="{% url 'community:community-detail' gathering.id %}" class="announcement-card">
-
-  <div class="announcement-title">{{ gathering.title }}</div>
-
-  <div class="gathering-meta">
-    {% if cf.format %}
-    <span class="gathering-format-badge gathering-format-badge--{{ cf.format }}">
-      {{ cf.format|title|cut:"_" }}
+<a href="{% url 'community:community-detail' gathering.id %}" class="gathering-card">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+    <div class="gathering-title">{{ gathering.title }}</div>
+    <span class="gathering-format-badge format-{{ cf.format|default:'in_person' }}">
+      {{ cf.format|default:'in_person'|replace:"_, "|title }}
     </span>
-    {% endif %}
-
-    {% if cf.scheduled_at %}
-    <span class="announcement-date">{{ cf.scheduled_at }}</span>
-    {% endif %}
-
-    {% if cf.location %}
-    <span class="gathering-location">{{ cf.location }}</span>
-    {% endif %}
   </div>
 
-  {% if cf.stream_url %}
-  <span class="gathering-stream-badge">Live Stream Available</span>
+  <div class="gathering-meta">
+    <span class="material-symbols-outlined" style="font-size: 16px;">calendar_today</span>
+    {{ gathering.scheduled_at|default:gathering.created_at|date:"D, d M · H:i" }}
+  </div>
+
+  {% if cf.location %}
+  <div class="gathering-meta">
+    <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span>
+    {{ cf.location }}
+  </div>
   {% endif %}
 
+  {% if cf.stream_url %}
+  <div class="gathering-meta" style="color: var(--primary);">
+    <span class="material-symbols-outlined" style="font-size: 16px;">videocam</span>
+    Live Stream Available
+  </div>
+  {% endif %}
 </a>
+{% endwith %}
 {% empty %}
-<div class="community-empty">No upcoming gatherings scheduled.</div>
+<div class="empty-state" style="padding: 40px 0;">No upcoming gatherings scheduled.</div>
 {% endfor %}
