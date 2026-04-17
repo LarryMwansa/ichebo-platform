@@ -1,3 +1,4 @@
+{% load core_tags %}
 {% for gathering in gatherings %}
 {% with cf=gathering.custom_fields %}
 <a href="{% url 'community:community-detail' gathering.id %}" class="gathering-card">
