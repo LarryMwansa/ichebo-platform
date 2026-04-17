@@ -14,19 +14,19 @@
   <div style="padding: 0 1rem 1rem; flex: 1; overflow-y: auto;">
     {% for language, lang_versions in versions_by_language.items %}
     <div style="margin-top: 1.5rem;">
-      <div style="padding: 0 1rem 0.5rem; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em;">{{ language }}</div>
+      <div class="label-caps" style="padding: 0 1rem;">{{ language }}</div>
       <div class="list-group">
         {% for ver in lang_versions %}
-        <button class="list-item" 
+        <button class="list-item {% if ver == current_translation %}bible-picker-item--active{% endif %}" 
                 hx-post="{% url 'bible:htmx-set-translation' %}"
                 hx-vals='{"translation_code": "{{ ver.code }}", "book_code": "{{ book_code }}", "chapter": "{{ chapter }}"}'
                 hx-target="#bible-chapter"
                 hx-swap="innerHTML"
                 onclick="window.ICSDrawer.close()"
-                style="width: 100%; border:none; text-align:left; background: transparent; padding: 12px 1rem;">
+                style="width: 100%; border:none; text-align:left; background: transparent;">
           <div class="list-item__content">
             <div class="list-item__title" style="color: {% if ver == current_translation %}var(--primary){% else %}var(--text){% endif %}; font-weight: {% if ver == current_translation %}700{% else %}500{% endif %};">{{ ver.name }}</div>
-            <div class="list-item__meta" style="font-size: 0.75rem;">{{ ver.code }}</div>
+            <div class="list-item__meta">{{ ver.code }}</div>
           </div>
           {% if ver == current_translation %}
           <div class="list-item__action"><span class="material-symbols-outlined" style="color: var(--primary);">check_circle</span></div>

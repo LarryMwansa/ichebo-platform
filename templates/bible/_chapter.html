@@ -23,10 +23,10 @@
     
     <div id="indicators-{{ verse.id }}" class="bible-verse__indicators" style="display: flex; flex-direction: column; gap: 4px; justify-content: center; min-width: 8px;">
       {% if verse.verse in personal_noted %}
-      <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--primary);" title="Your note"></div>
+      <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--primary);" title="Your reflection"></div>
       {% endif %}
       {% if verse.verse in tenant_noted %}
-      <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--info);" title="Community note"></div>
+      <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--secondary-light);" title="Community insight"></div>
       {% endif %}
     </div>
   </div>

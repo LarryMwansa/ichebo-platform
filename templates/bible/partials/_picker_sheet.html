@@ -17,25 +17,25 @@
     
     {# Version Selection Tile #}
     <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
-      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 8px;">Select Bible Version</div>
+      <div class="label-caps">Select Bible Version</div>
       <button hx-get="{% url 'bible:versions' %}?book_code={{ book.code }}&chapter={{ chapter }}" 
               hx-target="#drawerContent" 
               hx-swap="innerHTML"
               class="btn-touch" 
               style="width: 100%; min-height: 48px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0 1rem; text-align: left;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
           <span style="font-size: 14px; font-weight: 700; color: var(--text);">{{ translation.name }}</span>
           <span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">chevron_right</span>
         </div>
       </button>
     </div>
 
-    <div style="padding: 1.25rem 1rem 0.5rem; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em;">Select Book</div>
-    <div class="list-group">
+    <div class="label-caps" style="padding: 1.25rem 1rem 0.5rem;">Select Book</div>
+    <div class="list-group" style="border:none; border-radius: 0;">
       {% for b in books %}
-      <button class="list-item bible-picker-item {% if b.code == book.code %}bible-picker-item--active{% endif %}"
+      <button class="list-item {% if b.code == book.code %}bible-picker-item--active{% endif %}"
               onclick="window.ICSPicker.selectBook('{{ b.code }}')"
-              style="width: 100%; border:none; text-align:left; background: transparent; padding: 12px 1rem;">
+              style="width: 100%; border:none; text-align:left; background: transparent;">
         <div class="list-item__content">
           <div class="list-item__title" style="color: {% if b.code == book.code %}var(--primary){% else %}var(--text){% endif %}; font-weight: {% if b.code == book.code %}700{% else %}500{% endif %};">{{ b.name }}</div>
         </div>
@@ -50,10 +50,10 @@
   {# Step 2: Chapter Selection #}
   <div class="bible-picker-step" id="step-chapters" style="display: none; height: 100%; width: 100%; overflow-y: auto; opacity: 0; transform: translateX(20px);">
     <div style="display:flex; align-items:center; gap: 8px; padding: 0.5rem 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--card); z-index: 10;">
-      <button class="btn-touch" onclick="window.ICSPicker.goBack()" style="background: var(--bg); border:none; padding: 4px;">
-        <span class="material-symbols-outlined">chevron_left</span>
+      <button class="btn-touch" onclick="window.ICSPicker.goBack()" style="background: var(--bg); border:none; padding: 4px; min-height: 32px; width: 32px; border-radius: 50%;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
       </button>
-      <span id="selected-book-name" style="font-weight: 600;">{{ book.name }}</span>
+      <span id="selected-book-name" style="font-weight: 700; font-size: 1rem;">{{ book.name }}</span>
     </div>
     <div class="bible-picker-chapter-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; padding: 0 1rem 2rem;">
       {% for ch in chapters %}

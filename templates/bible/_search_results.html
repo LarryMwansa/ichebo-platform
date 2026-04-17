@@ -9,27 +9,27 @@
        hx-swap="innerHTML"
        hx-push-url="{% url 'bible:reader-chapter' verse.book.code verse.chapter %}"
        onclick="window.ICSDrawer.close()"
-       style="cursor: pointer; padding: 1rem; border-bottom: 1px solid var(--border); transition: background 0.2s ease;">
+       style="cursor: pointer; align-items: flex-start; padding: 1rem;">
     
-    <div class="list-item__icon" style="background: var(--bg); border: 1px solid var(--border); width: 32px; height: 32px; flex-shrink: 0;">
+    <div class="list-item__icon" style="background: var(--bg); border: 1px solid var(--border); width: 32px; height: 32px; flex-shrink: 0; margin-top: 2px;">
       <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">
         {% if is_reference %}location_on{% else %}subject{% endif %}
       </span>
     </div>
 
     <div class="list-item__content" style="margin-left: 12px; min-width: 0; flex: 1;">
-      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;">
-        <div class="list-item__title" style="font-size: 0.9rem; font-weight: 700; color: var(--primary); white-space: nowrap;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+        <div class="list-item__title" style="font-size: 0.9rem; font-weight: 700; color: var(--primary); white-space: nowrap; overflow: visible; text-overflow: unset;">
           {{ verse.book.name }} {{ verse.chapter }}:{{ verse.verse }}
         </div>
-        <div style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">{{ verse.translation.code }}</div>
+        <div class="badge-unit">{{ verse.translation.code }}</div>
       </div>
-      <div class="list-item__meta" style="color: var(--text); font-size: 0.85rem; line-height: 1.5; overflow-wrap: break-word; word-wrap: break-word; white-space: normal;">
+      <div class="list-item__meta" style="color: var(--text); font-size: 0.85rem; line-height: 1.5; overflow: visible; text-overflow: unset; white-space: normal;">
         {{ verse.text }}
       </div>
     </div>
 
-    <div class="list-item__action" style="padding-left: 8px;">
+    <div class="list-item__action" style="padding-left: 8px; align-self: center;">
       <span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">chevron_right</span>
     </div>
   </div>

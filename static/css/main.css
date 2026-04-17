@@ -147,6 +147,26 @@
    STANDARD UI COMPONENTS 
 ========================= */
 
+/* 1. Typography Extensions */
+.label-caps {
+  font-size: 11px; /* strict for small caps legibility */
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-2xs);
+}
+
+/* 2. List Item Pattern (Dense, edge-to-edge on mobile) */
+.list-group {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
 /* 1. List Item Pattern (Dense, edge-to-edge on mobile) */
 .list-item {
   display: flex;
@@ -207,29 +227,22 @@
   color: var(--muted);
 }
 
-/* 2. Status Badges */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px; /* strict pixel value for tiny uppercase legibility */
-  font-weight: var(--font-weight-bold);
+/* 3. Semantic Badges */
+.badge-unit {
+  font-size: 10px;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  white-space: nowrap;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--hover);
+  color: var(--muted);
 }
 
-/* Semantic Colors */
-.status-badge--draft      { background: #f1f5f9; color: #475569; }
-.status-badge--active     { background: #eff6ff; color: #2563eb; }
-.status-badge--enacted    { background: #ecfdf5; color: #059669; }
-.status-badge--danger     { background: #fef2f2; color: #dc2626; }
-.status-badge--warning    { background: #fffbeb; color: #d97706; }
-.status-badge--locked     { background: #dce7f7; color: #2E5D9E; }
-.status-badge--superseded { background: #f0f0f0; color: #888888; }
-.status-badge--submitted  { background: #EEE8F5; color: #7B5EA7; }
+.badge-unit--primary {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
 
 /* 3. Touch Targets (Forms & Buttons) */
 .btn-touch {

@@ -11,17 +11,17 @@
 <div id="drawerActions" hx-swap-oob="innerHTML"></div>
 
 <div class="bible-languages-sheet" style="height: 60vh; overflow-y: auto; margin: -20px;">
-  <div class="list-group">
+  <div class="list-group" style="border:none; border-radius: 0;">
     {% for lang in languages %}
     <button class="list-item"
             hx-get="{% url 'bible:versions' %}?lang={{ lang.short_code }}"
             hx-target="#drawerContent"
-            style="width: 100%; border:none; text-align:left; background: transparent; padding: 12px 1rem;">
+            style="width: 100%; border:none; text-align:left; background: transparent;">
       <div class="list-item__content">
         <div class="list-item__title">{{ lang.name }}</div>
         <div class="list-item__meta">{{ lang.count }} version{{ lang.count|pluralize }}</div>
       </div>
-      <div class="list-item__action"><span class="material-symbols-outlined" style="color: var(--muted);">chevron_right</span></div>
+      <div class="list-item__action"><span class="material-symbols-outlined">chevron_right</span></div>
     </button>
     {% endfor %}
   </div>

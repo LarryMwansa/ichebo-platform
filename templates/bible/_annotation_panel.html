@@ -1,6 +1,6 @@
 <div id="drawerTitle" hx-swap-oob="innerHTML">Verse Context</div>
 <div id="drawerActions" hx-swap-oob="innerHTML">
-  <span style="font-size: 11px; font-weight: 800; color: var(--primary); padding: 4px 10px; border-radius: 6px; background: color-mix(in srgb, var(--primary) 10%, transparent);">{{ verse.book.code }} {{ verse.chapter }}:{{ verse.verse }}</span>
+  <div class="bible-badge-version">{{ verse.book.code }} {{ verse.chapter }}:{{ verse.verse }}</div>
 </div>
 
 <!-- Annotation Panel Body -->
@@ -27,11 +27,11 @@
       <!-- Community Notes -->
       {% if tenant_notes %}
       <div style="margin-bottom: 2rem;">
-        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 12px;">Community Insights</div>
+        <div class="label-caps">Community Insights</div>
         {% for note in tenant_notes %}
-        <div class="activity-form-card" style="padding: 1rem; margin-bottom: 12px;">
-          <p style="margin: 0; font-size: 0.95rem; line-height: 1.5;">{{ note.content }}</p>
-          <div style="margin-top: 8px; font-size: 0.8rem; color: var(--muted); text-align: right;">— {{ note.created_by.display_name|default:note.created_by.email }}</div>
+        <div class="bible-note-card">
+          <p class="bible-note-card__content">{{ note.content }}</p>
+          <div class="bible-note-card__footer">— {{ note.created_by.display_name|default:note.created_by.email }}</div>
         </div>
         {% endfor %}
       </div>
@@ -39,7 +39,7 @@
 
       <!-- Personal Note Form -->
       <div>
-        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 12px;">Your Reflection</div>
+        <div class="label-caps">Your Reflection</div>
         <form hx-post="{% url 'bible:htmx-save-note' %}" hx-target="#save-note-response" hx-swap="innerHTML">
           {% csrf_token %}
           <input type="hidden" name="verse_id" value="{{ verse.id }}">
@@ -47,7 +47,7 @@
           {% if personal_note %}<input type="hidden" name="note_id" value="{{ personal_note.id }}">{% endif %}
           <textarea name="content" class="form-input-touch" placeholder="Write a reflection…" style="min-height: 180px; line-height: 1.6;" maxlength="2000">{{ personal_note.content|default:'' }}</textarea>
           <div style="display: flex; gap: 8px; margin-top: 12px;">
-            <button type="submit" class="btn-touch" style="flex: 1; background: var(--primary); color: #fff;">
+            <button type="submit" class="btn-touch" style="flex: 1; background: var(--primary); color: #fff; border:none;">
               {% if personal_note %}Update Reflection{% else %}Save Reflection{% endif %}
             </button>
             {% if personal_note %}
@@ -68,15 +68,15 @@
       <!-- Learn Lessons (Primary Teaching) -->
       {% if learn_references %}
       <div style="margin-bottom: 2rem;">
-        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 12px;">Learning Modules</div>
+        <div class="label-caps">Learning Modules</div>
         <div class="list-group">
           {% for lesson in learn_references %}
-          <a href="/learning/lessons/{{ lesson.id }}/" class="list-item" style="padding: 0.75rem 1rem; text-decoration: none; display: block;">
+          <a href="/learning/lessons/{{ lesson.id }}/" class="list-item" style="text-decoration: none;">
             <div class="list-item__content">
-              <div class="list-item__title" style="font-size: 0.9rem; color: var(--text);">{{ lesson.title }}</div>
-              <div class="list-item__meta" style="font-size: 0.75rem; color: var(--muted);">Available in Learn App</div>
+              <div class="list-item__title">{{ lesson.title }}</div>
+              <div class="list-item__meta">Available in Learn App</div>
             </div>
-            <div class="list-item__action"><span class="material-symbols-outlined" style="font-size: 18px; color: var(--muted);">open_in_new</span></div>
+            <div class="list-item__action"><span class="material-symbols-outlined" style="font-size: 18px;">open_in_new</span></div>
           </a>
           {% endfor %}
         </div>
@@ -86,13 +86,13 @@
       <!-- Governance/Handbook Refs -->
       {% if links.governance %}
       <div style="margin-bottom: 2rem;">
-        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 12px;">Governance Context</div>
+        <div class="label-caps">Governance Context</div>
         <div class="list-group">
           {% for rel in links.governance %}
-          <a href="/governance/records/{{ rel.from_record.id }}/" class="list-item" style="padding: 0.75rem 1rem; text-decoration: none; display: block;">
+          <a href="/governance/records/{{ rel.from_record.id }}/" class="list-item" style="text-decoration: none;">
             <div class="list-item__content">
-              <div class="list-item__title" style="font-size: 0.9rem; color: var(--text);">{{ rel.from_record.title }}</div>
-              <div class="list-item__meta" style="font-size: 0.75rem; color: var(--muted);">{{ rel.from_record.record_type }} · {{ rel.relationship_type|title }}</div>
+              <div class="list-item__title">{{ rel.from_record.title }}</div>
+              <div class="list-item__meta">{{ rel.from_record.record_type }} · {{ rel.relationship_type|title }}</div>
             </div>
           </a>
           {% endfor %}
@@ -103,13 +103,13 @@
       <!-- Publish Teaching Note -->
       {% if can_publish_tenant_note %}
       <div>
-        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--info); letter-spacing: 0.05em; margin-bottom: 12px;">Publish Teaching Note</div>
+        <div class="label-caps" style="color: var(--secondary-light);">Publish Teaching Note</div>
         <form hx-post="{% url 'bible:htmx-save-note' %}" hx-target="#save-note-response-teaching" hx-swap="innerHTML">
           {% csrf_token %}
           <input type="hidden" name="verse_id" value="{{ verse.id }}">
           <input type="hidden" name="note_class" value="organizational">
           <textarea name="content" class="form-input-touch" placeholder="Publish note visible to your branch…" style="min-height: 120px;"></textarea>
-          <button type="submit" class="btn-touch" style="width: 100%; margin-top: 12px; background: var(--info); color: #fff;">
+          <button type="submit" class="btn-touch" style="width: 100%; margin-top: 12px; background: var(--secondary-light); color: #fff; border:none;">
             Publish to Branch
           </button>
         </form>
@@ -124,13 +124,13 @@
       {% if links.activity or links.other %}
         {% if links.activity %}
         <div style="margin-bottom: 2rem;">
-          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 12px;">Related Activities</div>
+          <div class="label-caps">Related Activities</div>
           <div class="list-group">
             {% for rel in links.activity %}
-            <a href="/activities/{{ rel.from_record.id }}/" class="list-item" style="padding: 0.75rem 1rem; text-decoration: none; display: block;">
+            <a href="/activities/{{ rel.from_record.id }}/" class="list-item" style="text-decoration: none;">
               <div class="list-item__content">
-                <div class="list-item__title" style="font-size: 0.9rem; color: var(--text);">{{ rel.from_record.title }}</div>
-                <div class="list-item__meta" style="font-size: 0.75rem; color: var(--muted);">Activity Log</div>
+                <div class="list-item__title">{{ rel.from_record.title }}</div>
+                <div class="list-item__meta">Activity Log</div>
               </div>
             </a>
             {% endfor %}
@@ -140,13 +140,13 @@
 
         {% if links.other %}
         <div style="margin-bottom: 2rem;">
-          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 12px;">Other Associations</div>
+          <div class="label-caps">Other Associations</div>
           <div class="list-group">
             {% for rel in links.other %}
-            <div class="list-item" style="padding: 0.75rem 1rem;">
+            <div class="list-item">
               <div class="list-item__content">
-                <div class="list-item__title" style="font-size: 0.9rem; color: var(--text);">{{ rel.from_record.title }}</div>
-                <div class="list-item__meta" style="font-size: 0.75rem; color: var(--muted);">{{ rel.from_record.record_family|title }} · {{ rel.relationship_type }}</div>
+                <div class="list-item__title">{{ rel.from_record.title }}</div>
+                <div class="list-item__meta">{{ rel.from_record.record_family|title }} · {{ rel.relationship_type }}</div>
               </div>
             </div>
             {% endfor %}
@@ -165,9 +165,9 @@
       
       <!-- Dynamic Cross-Reference Suggestions -->
       <div style="margin-top: 2rem; padding: 1rem; background: var(--hover); border-radius: 12px;">
-        <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--primary); margin-bottom: 8px;">Symbolic Intelligence</div>
+        <div class="label-caps" style="color: var(--primary); margin-bottom: 8px;">Symbolic Intelligence</div>
         <p style="font-size: 0.85rem; line-height: 1.5; color: var(--muted); margin: 0;">Paraclete AI can suggest cross-references based on symbolic patterns in this verse.</p>
-        <button class="btn-touch" style="margin-top: 12px; width: 100%; background: var(--primary); color: #fff; font-size: 13px;">
+        <button class="btn-touch" style="margin-top: 12px; width: 100%; background: var(--primary); color: #fff; font-size: 13px; border:none;">
           Generate AI Suggestions
         </button>
       </div>
