@@ -32,7 +32,10 @@
   {# Theme init — must run before body renders to prevent flash #}
   <script src="/static/js/storage.js"></script>
 </head>
-<body class="ics-shell" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body class="ics-shell {% block immersive %}{% endblock %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+  {# Global HTMX Progress Bar #}
+  <div class="htmx-progress-bar"><div class="htmx-progress-inner"></div></div>
 
   {% include "components/_navbar.html" %}
   {% include "components/_app_drawer.html" %}
@@ -44,14 +47,7 @@
 
   {% include "components/_bottom_nav.html" %}
 
-  {# CSRF wiring for HTMX state-mutating requests #}
-  <script>
-    document.addEventListener('htmx:configRequest', (e) => {
-      e.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-    });
-  </script>
-
-  {# Navbar UI: app drawer toggle, scroll-hide, bottom nav active state #}
+  {# Navbar UI & Shell Logic #}
   <script src="/static/js/navbar.js" defer></script>
 
   {% block extra_js %}{% endblock %}

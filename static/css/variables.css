@@ -5,16 +5,17 @@
 :root {
 
     /* Color Variables */
-    --bg: #f2f2f2;
-    --card: #ffffff;
-    --text: #222;
-    --muted: #666;
-    --border: rgba(0, 0, 0, 0.08);
-    --shadow: rgba(0, 0, 0, 0.1);
-    --hover: #f0f0f0;
-
-    /* NEED TO REVIEW THIS COLORS */
+    --bg: #ffffff;
+    --bg-alpha: rgba(255, 255, 255, 0.75);
+    --card: #f8f9fa;
+    --border: #e9ecef;
+    --muted: #6c757d;
+    --hover: #f1f3f5;
+    --shadow: rgba(0, 0, 0, 0.05);
     --primary: #af3236;
+    --primary-alpha: rgba(175, 50, 54, 0.15);
+    --text: #1a1a1a;
+
     --secondary-light: #185abc;
     --secondary-dark: #0c397b;
 

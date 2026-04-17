@@ -1,0 +1,101 @@
+<!-- components/_app_launcher.html -->
+<div class="app-launcher-grid">
+  <a href="{% url 'dashboard:index' %}" class="launcher-item">
+    <div class="launcher-icon" style="background: #eff6ff; color: #1d4ed8;">
+      <span class="material-symbols-outlined">dashboard</span>
+    </div>
+    <span class="launcher-label">Home</span>
+  </a>
+
+  <a href="{% url 'bible:reader' %}" class="launcher-item">
+    <div class="launcher-icon" style="background: #fff7ed; color: #c2410c;">
+      <span class="material-symbols-outlined">auto_stories</span>
+    </div>
+    <span class="launcher-label">Bible</span>
+  </a>
+
+  <a href="{% url 'learn:learn-home' %}" class="launcher-item">
+    <div class="launcher-icon" style="background: #fdf2f8; color: #be185d;">
+      <span class="material-symbols-outlined">school</span>
+    </div>
+    <span class="launcher-label">Learn</span>
+  </a>
+
+  <a href="{% url 'community:community-home' %}" class="launcher-item">
+    <div class="launcher-icon" style="background: #f0fdf4; color: #15803d;">
+      <span class="material-symbols-outlined">group</span>
+    </div>
+    <span class="launcher-label">Community</span>
+  </a>
+
+  <a href="{% url 'governance:governance-home' %}" class="launcher-item">
+    <div class="launcher-icon" style="background: #faf5ff; color: #7e22ce;">
+      <span class="material-symbols-outlined">account_balance</span>
+    </div>
+    <span class="launcher-label">Governance</span>
+  </a>
+
+  <a href="{% url 'records:record-list' %}" class="launcher-item">
+    <div class="launcher-icon" style="background: #ecfeff; color: #0e7490;">
+      <span class="material-symbols-outlined">description</span>
+    </div>
+    <span class="launcher-label">Records</span>
+  </a>
+  
+  <a href="{% url 'activity:activity-home' %}" class="launcher-item">
+    <div class="launcher-icon" style="background: #f0fdfa; color: #0f766e;">
+      <span class="material-symbols-outlined">task_alt</span>
+    </div>
+    <span class="launcher-label">Activity</span>
+  </a>
+
+  <a href="{% url 'settings' %}" class="launcher-item">
+    <div class="launcher-icon" style="background: #f8fafc; color: #334155;">
+      <span class="material-symbols-outlined">settings</span>
+    </div>
+    <span class="launcher-label">Settings</span>
+  </a>
+</div>
+
+<style>
+.app-launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.launcher-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.2s;
+}
+
+.launcher-item:active { transform: scale(0.92); }
+
+.launcher-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+.launcher-icon .material-symbols-outlined {
+  font-size: 28px;
+}
+
+.launcher-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+</style>

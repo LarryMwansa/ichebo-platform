@@ -29,11 +29,9 @@
     <span class="nav-label">Learn</span>
   </a>
 
-  <a href="{% url 'community:community-home' %}"
-     class="nav-item {% if request.resolver_match.app_name == 'community' %}active{% endif %}"
-     aria-label="Community">
-    <span class="material-symbols-outlined nav-icon">group</span>
-    <span class="nav-label">Community</span>
-  </a>
+  <button id="launcherBtn" class="nav-item" aria-label="Apps Menu" style="background: none; border: none; color: inherit; padding: 0; cursor: pointer;">
+    <span class="material-symbols-outlined nav-icon">apps</span>
+    <span class="nav-label">Apps</span>
+  </button>
 
 </div>

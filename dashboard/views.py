@@ -60,3 +60,9 @@ def htmx_records_tab(request):
     return render(request, 'dashboard/_records_panel.html', {
         'records': records,
     })
+
+
+@login_required
+def htmx_launcher(request):
+    """Returns the App Launcher grid component."""
+    return render(request, 'components/_app_launcher.html')

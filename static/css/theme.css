@@ -5,12 +5,14 @@
 /* 🌙 DARK MODE */
 body.dark {
     --bg: #121212;
+    --bg-alpha: rgba(18, 18, 18, 0.85);
     --card: #1e1e1e;
     --text: #f5f5f5;
     --muted: #aaa;
-    --border: rgba(255, 255, 255, 0.1);
+    --border: rgba(255, 255, 255, 0.08);
     --shadow: rgba(0, 0, 0, 0.5);
     --hover: #2a2a2a;
+    --primary-alpha: rgba(175, 50, 54, 0.25);
 }
 
 /* Theme Fade */

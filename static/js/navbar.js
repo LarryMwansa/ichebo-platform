@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const optionsBtn    = document.getElementById('optionsBtn');
   const optionsMenu   = document.getElementById('optionsMenu');
   const themeToggle   = document.getElementById('themeToggle');
+  const launcherBtn  = document.getElementById('launcherBtn');
 
   // ── App Drawer & Draggable Bottom Sheet ──────────────────────────────────
   let startY = 0;
@@ -136,25 +137,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ── Theme Toggle ──────────────────────────────────────────────────────────
-  const THEME_KEY = 'ics_theme';
-
-  function applyTheme(theme) {
-    if (theme === 'dark') {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
-    localStorage.setItem(THEME_KEY, theme);
-  }
-
-  // Apply saved theme on load
-  const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
-  applyTheme(savedTheme);
-
   themeToggle && themeToggle.addEventListener('click', () => {
-    const isDark = document.body.classList.contains('dark');
-    applyTheme(isDark ? 'light' : 'dark');
+    const current = window.ICSStorage.getTheme();
+    const next = current === 'dark' ? 'light' : 'dark';
+    window.ICSStorage.setTheme(next);
+  });
+
+  // ── App Launcher ──────────────────────────────────────────────────────────
+  launcherBtn && launcherBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    // Use HTMX to load the launcher into the drawer
+    htmx.ajax('GET', '/dashboard/htmx/launcher/', {
+      target: '#drawerInner',
+      swap: 'innerHTML'
+    }).then(() => {
+      openDrawer('ICS Ecosystem');
+    });
+    
+    // Tactile feedback
+    if (window.navigator && window.navigator.vibrate) {
+      window.navigator.vibrate(10);
+    }
   });
 
   // ── Drawer API (for pages to open drawer programmatically) ──────────────────
@@ -166,11 +169,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Automated Drawer Management (Lasting Solution) ────────────────────────
   // Automatically open the drawer when an HTMX request targets the drawer content
   document.body.addEventListener('htmx:beforeRequest', (e) => {
+    document.body.classList.add('htmx-loading'); // Global loading state
+    
     const target = e.detail.target;
     if (target && (target.id === 'drawerContent' || target.id === 'drawerInner')) {
-      // Show loading state if needed
       openDrawer('Loading...'); 
     }
+  });
+
+  document.body.addEventListener('htmx:afterRequest', () => {
+    document.body.classList.remove('htmx-loading');
   });
 
   document.body.addEventListener('htmx:afterSwap', (e) => {
