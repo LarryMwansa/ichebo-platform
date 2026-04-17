@@ -2,63 +2,118 @@
 
 {% block learn_content %}
 
-<!-- Pathway banner -->
+<!-- Pathway Context Head -->
 {% if active_pathway %}
-<div class="pathway-banner">
-  <span class="pathway-label">{{ active_pathway|title }}</span>
+<div class="learn-pathway-header">
+  <span class="badge-unit badge-unit--primary">{{ active_pathway|title }}</span>
   {% if active_qualification %}
-  <span class="pathway-programme">{{ active_qualification }}</span>
+  <span class="label-caps" style="margin-bottom:0">{{ active_qualification }} Pathway</span>
   {% endif %}
 </div>
 {% endif %}
 
 <div class="learn-header">
-  <h1>My Learning</h1>
-  <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="border: 1px solid var(--border); padding: 0 12px; height: 36px; font-size: 13px;">Browse Programmes</a>
+  <h1 class="title-small">My Learning</h1>
+  <div style="display:flex; gap:8px;">
+    <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="border: 1px solid var(--border); background: var(--card); color: var(--text);">
+      <span class="material-symbols-outlined" style="font-size:18px; margin-right:4px;">apps</span>
+      Catalogue
+    </a>
+  </div>
 </div>
 
-<!-- Awaiting certification banner -->
-{% if pending_certifications %}
-  {% for cert in pending_certifications %}
-  <div class="enrolment-card awaiting-cert">
-    <div class="enrolment-title">{{ cert.title }}</div>
-    <div><span class="status-badge status-badge--warning">Awaiting Steward Confirmation</span></div>
-  </div>
-  {% endfor %}
-{% endif %}
-
 <!-- Active enrolments -->
-{% if enrolments %}
+<div class="list-group">
+  <div class="dash-widget__label" style="padding-left:16px;">Active Programmes</div>
   {% for enrolment in enrolments %}
-  <div class="enrolment-card">
-    <div class="enrolment-title">{{ enrolment.title }}</div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar" style="width:{{ enrolment.progress|default:0 }}%"></div>
+  <a href="{% if enrolment.metadata.programme_record_id %}{% url 'learn:learn-programme' enrolment.metadata.programme_record_id %}{% else %}#{% endif %}" 
+     class="list-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div class="list-item__title" style="white-space: normal; line-height: 1.4;">{{ enrolment.title }}</div>
+      <span class="badge-unit" style="flex-shrink: 0;">{{ enrolment.progress|default:0 }}%</span>
     </div>
-    <span class="progress-label">{{ enrolment.progress|default:0 }}% complete</span>
-    {% with prog_id=enrolment.metadata.programme_record_id %}
-    {% if prog_id %}
-    <a href="{% url 'learn:learn-programme' prog_id %}" class="btn-touch" style="background: var(--primary); color: #fff;">Continue</a>
-    {% endif %}
-    {% endwith %}
-  </div>
-  {% endfor %}
-{% else %}
+    <div class="learn-progress-track">
+      <div class="learn-progress-fill" style="width: {{ enrolment.progress|default:0 }}%;"></div>
+    </div>
+  </a>
+  {% empty %}
   <div class="empty-state">
     <p>You are not enrolled in any programme yet.</p>
-    <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="background: var(--primary); color: #fff;">Browse Programmes</a>
-  </div>
-{% endif %}
-
-<!-- Completed certifications -->
-{% if certifications %}
-  <h2 style="margin-top:1.5rem;">Completed</h2>
-  {% for cert in certifications %}
-  <div class="enrolment-card">
-    <div class="enrolment-title">{{ cert.title }}</div>
-    <div><span class="status-badge status-badge--enacted">Certified</span></div>
+    <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="background: var(--primary); color: #fff;">Explore Catalogue</a>
   </div>
   {% endfor %}
+
+  {% if pending_certifications %}
+    <div class="dash-widget__label" style="padding-left:16px; margin-top:16px;">Awaiting Certification</div>
+    {% for cert in pending_certifications %}
+    <div class="list-item">
+      <div class="list-item__content">
+        <div class="list-item__title">{{ cert.title }}</div>
+        <div class="list-item__meta">Submitted for Stewardship review</div>
+      </div>
+      <div class="list-item__action">
+        <span class="badge-unit" style="background: #fffbeb; color: #92400e;">PENDING</span>
+      </div>
+    </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Management Section (Role-Based) -->
+{% if request.user.competence_level >= 3 %}
+<div class="list-group" style="margin-top: 2rem;">
+  <div class="dash-widget__label" style="padding-left:16px;">Stewardship & Authorship</div>
+  
+  <a href="{% url 'learn:learn-cert-queue' %}" class="list-item">
+    <div class="list-item__icon"><span class="material-symbols-outlined">verified</span></div>
+    <div class="list-item__content">
+      <div class="list-item__title">Certification Queue</div>
+      <div class="list-item__meta">Review student completion requests</div>
+    </div>
+    <span class="material-symbols-outlined">chevron_right</span>
+  </a>
+
+  {% if request.user.competence_level >= 4 %}
+  <a href="{% url 'learn:learn-author' %}" class="list-item">
+    <div class="list-item__icon"><span class="material-symbols-outlined">edit_square</span></div>
+    <div class="list-item__content">
+      <div class="list-item__title">Curriculum Authoring</div>
+      <div class="list-item__meta">Draft and publish lessons & programmes</div>
+    </div>
+    <span class="material-symbols-outlined">chevron_right</span>
+  </a>
+  {% endif %}
+
+  {% if request.user.competence_level >= 5 %}
+  <a href="{% url 'learn:learn-review' %}" class="list-item">
+    <div class="list-item__icon"><span class="material-symbols-outlined">approval_delegation</span></div>
+    <div class="list-item__content">
+      <div class="list-item__title">Review Queue</div>
+      <div class="list-item__meta">Final oversight and publication approval</div>
+    </div>
+    <span class="material-symbols-outlined">chevron_right</span>
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- Completed -->
+{% if certifications %}
+<div class="list-group" style="margin-top: 2rem;">
+  <div class="dash-widget__label" style="padding-left:16px;">Certifications Earned</div>
+  {% for cert in certifications %}
+  <div class="list-item">
+    <div class="list-item__icon" style="color: var(--primary);"><span class="material-symbols-outlined">workspace_premium</span></div>
+    <div class="list-item__content">
+      <div class="list-item__title">{{ cert.title }}</div>
+      <div class="list-item__meta">Awarded on {{ cert.created_at|date:"d M Y" }}</div>
+    </div>
+    <div class="list-item__action">
+      <span class="badge-unit" style="background: #f0fdf4; color: #166534;">ENACTED</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
 {% endif %}
 
 {% endblock %}

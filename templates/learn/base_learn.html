@@ -8,35 +8,7 @@
 {% block content %}
 <div class="learn-shell">
 
-  <!-- Role-aware tab navigation -->
-  <nav class="learn-tab-row" aria-label="Learn navigation">
-    <a href="{% url 'learn:learn-home' %}"
-       class="learn-tab {% if request.resolver_match.url_name == 'learn-home' %}learn-tab--active{% endif %}">
-      My Learning
-    </a>
-    <a href="{% url 'learn:learn-catalogue' %}"
-       class="learn-tab {% if request.resolver_match.url_name == 'learn-catalogue' %}learn-tab--active{% endif %}">
-      Browse
-    </a>
-    {% if request.user.competence_level >= 3 %}
-    <a href="{% url 'learn:learn-cert-queue' %}"
-       class="learn-tab {% if request.resolver_match.url_name == 'learn-cert-queue' %}learn-tab--active{% endif %}">
-      Certifications
-    </a>
-    {% endif %}
-    {% if request.user.competence_level >= 4 %}
-    <a href="{% url 'learn:learn-author' %}"
-       class="learn-tab {% if request.resolver_match.url_name == 'learn-author' %}learn-tab--active{% endif %}">
-      Author
-    </a>
-    {% endif %}
-    {% if request.user.competence_level >= 5 %}
-    <a href="{% url 'learn:learn-review' %}"
-       class="learn-tab {% if request.resolver_match.url_name == 'learn-review' %}learn-tab--active{% endif %}">
-      Review Queue
-    </a>
-    {% endif %}
-  </nav>
+  <!-- Content pane -->
 
   <div class="learn-content">
     {% block learn_content %}{% endblock %}
