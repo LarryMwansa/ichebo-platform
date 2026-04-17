@@ -72,7 +72,7 @@ def htmx_create_activity(request):
         activity_type = request.POST.get('activity_type', 'task')
         title = request.POST.get('title', '').strip()
         if not title:
-            return HttpResponse('<p class="activity-error">Title is required.</p>', status=400)
+            return HttpResponse('<div class="badge-unit" style="background: var(--danger); color: #fff;">Title is required</div>', status=400)
 
         due_raw = request.POST.get('due_at', '').strip()
         due_at = None
@@ -137,12 +137,9 @@ def htmx_complete_activity(request, activity_id):
         new_value='completed',
     )
 
-    return HttpResponse(
-        f'<div class="activity-card activity-card--done" id="activity-{activity.id}">'
-        f'<span class="activity-title">{activity.title}</span>'
-        f'<span class="activity-badge activity-badge--done">Done</span>'
-        f'</div>'
-    )
+    return render(request, 'activity/partials/_completed_item.html', {
+        'activity': activity,
+    })
 
 
 # ── HTMX: edit activity ──────────────────────────────────────────────────────

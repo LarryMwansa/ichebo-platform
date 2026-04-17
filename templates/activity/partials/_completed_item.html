@@ -1,0 +1,22 @@
+<div class="list-item activity-item activity-item--done" id="activity-{{ activity.id }}">
+  <div class="list-item__icon">
+    <span class="material-symbols-outlined" style="color: var(--success);">check_circle</span>
+  </div>
+  <div class="list-item__content">
+    <div class="list-item__title" style="text-decoration: line-through; opacity: 0.7;">{{ activity.title }}</div>
+    <div class="list-item__meta">
+      <span class="badge-unit">Completed</span>
+    </div>
+  </div>
+  <div class="list-item__action">
+    <button class="activity-action-btn activity-action-btn--delete"
+            hx-post="{% url 'activity:htmx-delete' activity.id %}"
+            hx-target="#activity-{{ activity.id }}"
+            hx-swap="outerHTML"
+            hx-confirm="Delete this activity?"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            title="Delete">
+      <span class="material-symbols-outlined">delete</span>
+    </button>
+  </div>
+</div>

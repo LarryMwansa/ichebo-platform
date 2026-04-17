@@ -1,49 +1,60 @@
-<div class="activity-form-card">
+<div class="activity-drawer-form" style="padding: 1rem;">
   <form class="activity-create-form"
         hx-post="{% url 'activity:htmx-create' %}"
-        hx-target="#activity-create-panel"
-        hx-swap="beforebegin"
-        hx-on::after-request="this.remove()">
+        hx-target="#activity-list-upcoming"
+        hx-swap="afterbegin"
+        onclick="if(event.target.type==='submit') window.ICSDrawer.close()">
     {% csrf_token %}
 
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <div style="display: flex; gap: 8px;">
-        <select name="activity_type" class="form-input-touch" style="flex: 0 0 100px;">
-          {% for slug, label in activity_types %}
-          <option value="{{ slug }}">{{ label }}</option>
-          {% endfor %}
-        </select>
-        <input type="text" name="title" placeholder="What needs to be done?"
-               class="form-input-touch" style="flex: 1;" required>
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      
+      <div>
+        <label class="label-caps" style="margin-bottom: 8px; display: block;">Activity Details</label>
+        <div style="display: flex; gap: 8px;">
+          <select name="activity_type" class="form-input-touch" style="flex: 0 0 110px; border-radius: 12px;">
+            {% for slug, label in activity_types %}
+            <option value="{{ slug }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+          <input type="text" name="title" placeholder="What needs to be done?"
+                 class="form-input-touch" style="flex: 1; border-radius: 12px;" required autofocus>
+        </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <input type="date" name="due_at" class="form-input-touch" placeholder="Due date">
-        <select name="recurrence" class="form-input-touch">
-          <option value="none">No recurrence</option>
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div>
+          <label class="label-caps" style="margin-bottom: 8px; display: block;">Due Date</label>
+          <input type="date" name="due_at" class="form-input-touch" style="width: 100%; border-radius: 12px;">
+        </div>
+        <div>
+          <label class="label-caps" style="margin-bottom: 8px; display: block;">Recurrence</label>
+          <select name="recurrence" class="form-input-touch" style="width: 100%; border-radius: 12px;">
+            <option value="none">No recurrence</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="label-caps" style="margin-bottom: 8px; display: block;">KGS Pathway</label>
+        <select name="kgs_pathway" class="form-input-touch" style="width: 100%; border-radius: 12px;">
+          <option value="">None (General)</option>
+          <option value="new_life">New Life</option>
+          <option value="spiritual_formation">Spiritual Formation</option>
+          <option value="community_life">Community Life</option>
+          <option value="service">Service</option>
+          <option value="leadership">Leadership</option>
+          <option value="learning">Learning</option>
+          <option value="mission">Mission</option>
+          <option value="apostolic_stewardship">Apostolic Stewardship</option>
         </select>
       </div>
 
-      <select name="kgs_pathway" class="form-input-touch">
-        <option value="">Pathway (optional)</option>
-        <option value="new_life">New Life</option>
-        <option value="spiritual_formation">Spiritual Formation</option>
-        <option value="community_life">Community Life</option>
-        <option value="service">Service</option>
-        <option value="leadership">Leadership</option>
-        <option value="learning">Learning</option>
-        <option value="mission">Mission</option>
-        <option value="apostolic_stewardship">Apostolic Stewardship</option>
-      </select>
-
-      <div style="display: flex; gap: 8px; margin-top: 8px;">
-        <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; flex: 1;">Create Activity</button>
-        <button type="button" class="btn-touch" style="background: var(--bg); color: var(--muted); border: 1px solid var(--border); flex: 1;"
-                onclick="this.closest('.activity-form-card').remove()">
-          Cancel
+      <div style="margin-top: 1rem;">
+        <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; width: 100%; border-radius: 12px; font-weight: 700;">
+          Create Activity
         </button>
       </div>
     </div>

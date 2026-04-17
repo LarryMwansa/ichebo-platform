@@ -1,35 +1,39 @@
-<div class="activity-form-card" id="activity-{{ activity.id }}" style="margin: 8px;">
+<div class="activity-drawer-form" style="padding: 1rem;">
   <form hx-post="{% url 'activity:htmx-edit' activity.id %}"
         hx-target="#activity-{{ activity.id }}"
-        hx-swap="outerHTML">
+        hx-swap="outerHTML"
+        onclick="if(event.target.type==='submit') window.ICSDrawer.close()">
     {% csrf_token %}
 
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span class="activity-type-tag">{{ activity.activity_type }}</span>
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      
+      <div>
+        <label class="label-caps" style="margin-bottom: 8px; display: block;">Edit Details ({{ activity.activity_type }})</label>
         <input type="text" name="title" value="{{ activity.title }}"
-               class="form-input-touch" style="flex: 1;" required>
+               class="form-input-touch" style="width: 100%; border-radius: 12px;" required autofocus>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <input type="date" name="due_at"
-               value="{% if activity.due_at %}{{ activity.due_at|date:'Y-m-d' }}{% endif %}"
-               class="form-input-touch">
-        <select name="recurrence" class="form-input-touch">
-          <option value="none" {% if activity.recurrence == 'none' %}selected{% endif %}>None</option>
-          <option value="daily" {% if activity.recurrence == 'daily' %}selected{% endif %}>Daily</option>
-          <option value="weekly" {% if activity.recurrence == 'weekly' %}selected{% endif %}>Weekly</option>
-          <option value="monthly" {% if activity.recurrence == 'monthly' %}selected{% endif %}>Monthly</option>
-        </select>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div>
+          <label class="label-caps" style="margin-bottom: 8px; display: block;">Due Date</label>
+          <input type="date" name="due_at" 
+                 value="{% if activity.due_at %}{{ activity.due_at|date:'Y-m-d' }}{% endif %}"
+                 class="form-input-touch" style="width: 100%; border-radius: 12px;">
+        </div>
+        <div>
+          <label class="label-caps" style="margin-bottom: 8px; display: block;">Recurrence</label>
+          <select name="recurrence" class="form-input-touch" style="width: 100%; border-radius: 12px;">
+            <option value="none" {% if activity.recurrence == 'none' %}selected{% endif %}>None</option>
+            <option value="daily" {% if activity.recurrence == 'daily' %}selected{% endif %}>Daily</option>
+            <option value="weekly" {% if activity.recurrence == 'weekly' %}selected{% endif %}>Weekly</option>
+            <option value="monthly" {% if activity.recurrence == 'monthly' %}selected{% endif %}>Monthly</option>
+          </select>
+        </div>
       </div>
 
-      <div style="display: flex; gap: 8px; margin-top: 4px;">
-        <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; flex: 1;">Save</button>
-        <button type="button" class="btn-touch" style="background: var(--bg); color: var(--muted); border: 1px solid var(--border); flex: 1;"
-                hx-get="{% url 'activity:htmx-edit' activity.id %}?show=1"
-                hx-target="#activity-{{ activity.id }}"
-                hx-swap="outerHTML">
-          Cancel
+      <div style="margin-top: 1rem;">
+        <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; width: 100%; border-radius: 12px; font-weight: 700;">
+          Save Changes
         </button>
       </div>
     </div>

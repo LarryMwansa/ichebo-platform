@@ -2,20 +2,19 @@
 
 {% block activity_content %}
 
-<div class="activity-header">
-  <h1>My Activities</h1>
-  <button class="btn-touch" style="background: var(--primary); color: #fff; padding: 0 16px; min-height: 40px;"
+<div class="activity-header" style="justify-content: space-between; align-items: center;">
+  <h1 style="margin:0; font-size: 1.5rem; font-weight: 700;">My Activities</h1>
+  <button class="btn-touch" 
+          style="background: var(--primary); color: #fff; padding: 0 16px; border-radius: 12px; font-weight: 600;"
           hx-get="{% url 'activity:htmx-create' %}"
-          hx-target="#activity-create-panel"
-          hx-swap="innerHTML">
-    <span class="material-symbols-outlined" style="margin-right: 4px;">add</span> New
+          hx-target="#drawerContent"
+          hx-swap="innerHTML"
+          onclick="window.ICSDrawer.open('New Activity')">
+    <span class="material-symbols-outlined" style="margin-right: 4px; font-size: 20px;">add</span> New
   </button>
 </div>
 
-<!-- Inline create form panel -->
-<div id="activity-create-panel"></div>
-
-<!-- Type filter pills -->
+<!-- Type filter chips -->
 <div class="activity-filter-row">
   <a href="{% url 'activity:activity-home' %}"
      class="activity-type-pill {% if not active_type %}activity-type-pill--active{% endif %}">
@@ -30,48 +29,44 @@
 </div>
 
 <!-- Overdue -->
-{% if overdue %}
-<div class="activity-group">
-  <div class="activity-group-label activity-group-label--overdue">Overdue</div>
-  <div class="list-group">
+<div class="activity-group" id="group-overdue" {% if not overdue %}style="display:none;"{% endif %}>
+  <div class="label-caps" style="color: var(--danger);">Overdue</div>
+  <div class="list-group" id="activity-list-overdue">
     {% for activity in overdue %}
       {% include "activity/partials/activity_card.html" %}
     {% endfor %}
   </div>
 </div>
-{% endif %}
 
 <!-- Due Today -->
-{% if due_today %}
-<div class="activity-group">
-  <div class="activity-group-label">Due Today</div>
-  <div class="list-group">
+<div class="activity-group" id="group-today" {% if not due_today %}style="display:none;"{% endif %}>
+  <div class="label-caps">Due Today</div>
+  <div class="list-group" id="activity-list-today">
     {% for activity in due_today %}
       {% include "activity/partials/activity_card.html" %}
     {% endfor %}
   </div>
 </div>
-{% endif %}
 
 <!-- Upcoming -->
-{% if upcoming %}
-<div class="activity-group">
-  <div class="activity-group-label">Upcoming</div>
-  <div class="list-group">
+<div class="activity-group" id="group-upcoming">
+  <div class="label-caps">Upcoming</div>
+  <div class="list-group" id="activity-list-upcoming">
     {% for activity in upcoming %}
       {% include "activity/partials/activity_card.html" %}
     {% endfor %}
   </div>
 </div>
-{% endif %}
 
 {% if not overdue and not due_today and not upcoming %}
-<div class="empty-state">
-  <p style="margin-bottom: 1.5rem;">No activities yet.</p>
-  <button class="btn-touch" style="background: var(--primary); color: #fff;"
+<div class="empty-state" style="padding: 4rem 2rem; text-align: center; color: var(--muted);">
+  <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2; margin-bottom: 1rem;">event_busy</span>
+  <p style="margin-bottom: 1.5rem;">No activities found.</p>
+  <button class="btn-touch" style="background: var(--primary); color: #fff; border-radius: 12px; padding: 0 24px;"
           hx-get="{% url 'activity:htmx-create' %}"
-          hx-target="#activity-create-panel"
-          hx-swap="innerHTML">
+          hx-target="#drawerContent"
+          hx-swap="innerHTML"
+          onclick="window.ICSDrawer.open('New Activity')">
     Create your first activity
   </button>
 </div>
