@@ -89,9 +89,12 @@ def you(request):
         created_by=user, deleted_at__isnull=True
     ).count()
 
+    digest = build_digest(user)
+
     return render(request, 'dashboard/you.html', {
         'activity_count': activity_count,
         'record_count': record_count,
+        'digest': digest,
     })
 def htmx_explore_create_menu(request):
     """Returns the creation selection menu for the Explore context."""

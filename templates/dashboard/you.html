@@ -38,6 +38,57 @@
     </div>
   </div>
 
+  <!-- Personal Calendar / Schedule (Moved from Home) -->
+  <div class="you-section">
+    <div class="label-caps" style="padding: 0 4px; margin-bottom: 8px;">My Schedule</div>
+    
+    <div class="list-group">
+      {% if digest.due_today or digest.pending_reminders or digest.overdue_items %}
+        
+        {% for item in digest.overdue_items %}
+        <div class="list-item">
+          <div class="list-item__icon" style="background: #fef2f2; color: #ef4444;">
+            <span class="material-symbols-outlined">priority_high</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ item.title }}</div>
+            <div class="list-item__meta">OVERDUE · {{ item.activity_type|title }}</div>
+          </div>
+        </div>
+        {% endfor %}
+
+        {% for item in digest.due_today %}
+        <div class="list-item">
+          <div class="list-item__icon" style="background: #fffbeb; color: #f59e0b;">
+            <span class="material-symbols-outlined">schedule</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ item.title }}</div>
+            <div class="list-item__meta">TODAY · {{ item.due_at|slice:"11:16"|default:"All day" }}</div>
+          </div>
+        </div>
+        {% endfor %}
+
+        {% for r in digest.pending_reminders %}
+        <div class="list-item">
+          <div class="list-item__icon" style="background: #f0f9ff; color: #0369a1;">
+            <span class="material-symbols-outlined">notifications_active</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ r.title }}</div>
+            <div class="list-item__meta">REMINDER · {{ r.due_at|slice:"11:16"|default:"All day" }}</div>
+          </div>
+        </div>
+        {% endfor %}
+
+      {% else %}
+        <div class="empty-state" style="padding: 1.5rem; text-align: center; color: var(--muted); background: var(--hover); border-radius: 12px;">
+           <p style="font-size: 0.9rem;">Your schedule is clear for today.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
   <!-- Quick Links -->
   <div class="you-section">
     <div class="label-caps" style="padding: 0 4px; margin-bottom: 8px;">Your Space</div>
