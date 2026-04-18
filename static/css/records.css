@@ -14,8 +14,8 @@
 .records-header {
   display: flex;
   flex-direction: column;
-  margin-bottom: var(--space-m);
-  gap: var(--space-s);
+  margin-bottom: var(--space-s);
+  gap: var(--space-2xs);
 }
 
 /* ── Detail View ────────────────────────────────────────────── */

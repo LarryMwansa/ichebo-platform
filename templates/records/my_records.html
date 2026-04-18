@@ -10,7 +10,12 @@
 
 {% block records_content %}
 
-<nav class="accounts-tab-row" style="margin: 0 -1rem 1.5rem; border-top: 1px solid var(--border);">
+<div class="records-header">
+  <h1 class="explore-title">My Journal</h1>
+  <p class="explore-subtitle">Prayers, reflections & spiritual notes</p>
+</div>
+
+<nav class="accounts-tab-row" style="margin: 0 -1rem 2rem; border-top: 1px solid var(--border);">
   <a href="{% url 'records:records-home' %}"
      class="accounts-tab {% if not active_type %}accounts-tab--active{% endif %}">
     All
@@ -22,7 +27,6 @@
   </a>
   {% endfor %}
 </nav>
-
 
 <!-- Record list container -->
 <div id="record-list">
