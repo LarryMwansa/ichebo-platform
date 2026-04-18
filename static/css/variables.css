@@ -33,6 +33,15 @@
     --button-secondary-hover: #333333;
     --button-text: #fffeff;
 
+    /* Semantic Colors (Info, Success, Error, Warning) */
+    --info: #0c5c9e;
+    --info-light: #e3f2fd;
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --error: #dc2626;
+    --error-light: #fee2e2;
+    --warning: #ca8a04;
+    --warning-light: #fef3c7;
 
     /* Typography Variables */
     --font-family-base: "Roboto", system-ui, sans-serif;

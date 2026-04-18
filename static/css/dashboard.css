@@ -65,12 +65,13 @@
 }
 
 .dash-widget--danger {
-  border-color: #ef4444;
-  background: #fef2f2;
+  border-color: var(--error);
+  background: var(--error-light);
 }
 
 .dash-widget--team {
-  border-color: #7c3aed;
+  border-color: var(--info);
+  background: var(--info-light);
 }
 
 /* ── Hero Sections (Paraclete / High Impact) ────────────────────────── */
@@ -79,10 +80,10 @@
   background: var(--primary, #af3236);
   color: #fff;
   padding: 24px 20px;
-  border-radius: 24px;
+  border-radius: 16px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px -10px rgba(175, 50, 54, 0.4);
+  box-shadow: 0 8px 24px -8px rgba(175, 50, 54, 0.3);
 }
 
 .dash-hero--paraclete {
@@ -115,7 +116,7 @@
   font-weight: 600;
   line-height: 1.4;
   font-style: italic;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   color: #fff;
   border: none;
 }
