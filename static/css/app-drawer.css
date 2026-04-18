@@ -129,25 +129,31 @@
     min-height: 400px; /* Ensure drawer expands for launcher */
 }
 
-/* Icon Colors */
-.icon-blue { background: #eff6ff; color: #1d4ed8; }
-.icon-orange { background: #fff7ed; color: #c2410c; }
-.icon-pink { background: #fdf2f8; color: #be185d; }
-.icon-green { background: #f0fdf4; color: #15803d; }
-.icon-purple { background: #faf5ff; color: #7e22ce; }
-.icon-cyan { background: #ecfeff; color: #0e7490; }
-.icon-teal { background: #f0fdfa; color: #0f766e; }
-.icon-slate { background: #f8fafc; color: #334155; }
+/* Icon Colors — component-scoped tokens */
+.icon-blue   { --icon-bg: #eff6ff;  --icon-fg: #1d4ed8; }
+.icon-orange { --icon-bg: #fff7ed;  --icon-fg: #c2410c; }
+.icon-pink   { --icon-bg: #fdf2f8;  --icon-fg: #be185d; }
+.icon-green  { --icon-bg: #f0fdf4;  --icon-fg: #15803d; }
+.icon-purple { --icon-bg: #faf5ff;  --icon-fg: #7e22ce; }
+.icon-cyan   { --icon-bg: #ecfeff;  --icon-fg: #0e7490; }
+.icon-teal   { --icon-bg: #f0fdfa;  --icon-fg: #0f766e; }
+.icon-slate  { --icon-bg: #f8fafc;  --icon-fg: #334155; }
+
+[class^="icon-"],
+[class*=" icon-"] {
+  background: var(--icon-bg);
+  color: var(--icon-fg);
+}
 
 /* Dark Mode Icon Overrides */
-body.dark .icon-blue { background: rgba(29, 78, 216, 0.15); color: #60a5fa; }
-body.dark .icon-orange { background: rgba(194, 65, 12, 0.15); color: #fb923c; }
-body.dark .icon-pink { background: rgba(190, 24, 93, 0.15); color: #f472b6; }
-body.dark .icon-green { background: rgba(21, 128, 61, 0.15); color: #4ade80; }
-body.dark .icon-purple { background: rgba(126, 34, 206, 0.15); color: #c084fc; }
-body.dark .icon-cyan { background: rgba(14, 116, 144, 0.15); color: #22d3ee; }
-body.dark .icon-teal { background: rgba(15, 118, 110, 0.15); color: #2dd4bf; }
-body.dark .icon-slate { background: rgba(51, 65, 85, 0.15); color: #94a3b8; }
+body.dark .icon-blue   { --icon-bg: rgba(29, 78, 216, 0.15);   --icon-fg: #60a5fa; }
+body.dark .icon-orange { --icon-bg: rgba(194, 65, 12, 0.15);   --icon-fg: #fb923c; }
+body.dark .icon-pink   { --icon-bg: rgba(190, 24, 93, 0.15);   --icon-fg: #f472b6; }
+body.dark .icon-green  { --icon-bg: rgba(21, 128, 61, 0.15);   --icon-fg: #4ade80; }
+body.dark .icon-purple { --icon-bg: rgba(126, 34, 206, 0.15);  --icon-fg: #c084fc; }
+body.dark .icon-cyan   { --icon-bg: rgba(14, 116, 144, 0.15);  --icon-fg: #22d3ee; }
+body.dark .icon-teal   { --icon-bg: rgba(15, 118, 110, 0.15);  --icon-fg: #2dd4bf; }
+body.dark .icon-slate  { --icon-bg: rgba(51, 65, 85, 0.15);    --icon-fg: #94a3b8; }
 
 /* =========================
    APP GRID
