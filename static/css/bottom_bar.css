@@ -37,8 +37,10 @@
     color: var(--muted);
     text-decoration: none;
     font-family: inherit;
+    padding: 8px;
+    min-width: 52px;
 
-    transition: transform 0.2s ease, color 0.2s ease;
+    transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
 /* Button resets for nav items (launcher) */
@@ -60,9 +62,17 @@ button.nav-item {
     color: var(--text);
 }
 
+/* Hover State */
+.nav-item:hover {
+    color: var(--text);
+    background: var(--hover);
+    border-radius: 12px;
+}
+
 /* Tap Feedback */
 .nav-item:active {
-    transform: scale(0.9);
+    transform: scale(0.95);
+    background: var(--border);
 }
 
 .nav-item.active .app-icon {
