@@ -74,7 +74,7 @@
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
-  transition: all 0.2s;
+  transition: background 0.2s ease-out, border-color 0.2s ease-out, color 0.2s ease-out;
   text-align: center;
   color: var(--muted);
 }

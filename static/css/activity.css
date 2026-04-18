@@ -16,7 +16,7 @@
 
 /* Card logic using list-item structure */
 .activity-item {
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
 .activity-item--done {
@@ -53,7 +53,7 @@
     color: var(--muted);
     border: none;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.2s ease-out, transform 0.2s ease-out;
 }
 .activity-action-btn:hover {
     background: var(--hover);

@@ -85,7 +85,7 @@
   color: var(--text);
   font-size: 15px;
   font-family: inherit;
-  transition: all 0.2s;
+  transition: background 0.2s ease-out, border-color 0.2s ease-out;
   cursor: pointer;
 }
 .settings-field select:focus,
@@ -184,7 +184,7 @@
   color: var(--muted);
   white-space: nowrap;
   border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  transition: border-color 0.2s ease-out, color 0.2s ease-out;
   text-decoration: none;
   margin-bottom: -1px;
 }
@@ -421,7 +421,7 @@
   border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.2s;
+  transition: background 0.2s ease-out, border-color 0.2s ease-out, color 0.2s ease-out;
 }
 .radio-option:has(input:checked) {
   border-color: var(--primary);

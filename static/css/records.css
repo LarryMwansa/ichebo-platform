@@ -36,7 +36,7 @@
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: background 0.2s ease-out, color 0.2s ease-out;
   color: var(--muted);
 }
 .journal-type-pill:hover {
