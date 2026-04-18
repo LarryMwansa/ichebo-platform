@@ -13,7 +13,8 @@
         hx-post="{% url 'governance:htmx-record-create' %}"
       {% endif %}
       hx-target="#governance-content"
-      hx-push-url="true">
+      hx-push-url="true"
+      hx-on::responseEnd="if (event.detail.xhr.status === 204) { document.dispatchEvent(new Event('govRecordCreated')); }">
   {% csrf_token %}
   <input type="hidden" name="record_family" value="{{ record_family }}">
 
