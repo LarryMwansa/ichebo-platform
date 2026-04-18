@@ -36,12 +36,16 @@
     /* Semantic Colors (Info, Success, Error, Warning) */
     --info: #0c5c9e;
     --info-light: #e3f2fd;
+    --info-dark: #1e40af;
     --success: #16a34a;
     --success-light: #dcfce7;
+    --success-dark: #166534;
     --error: #dc2626;
     --error-light: #fee2e2;
+    --error-dark: #991b1b;
     --warning: #ca8a04;
     --warning-light: #fef3c7;
+    --warning-dark: #92400e;
 
     /* Typography Variables */
     --font-family-base: "Roboto", system-ui, sans-serif;

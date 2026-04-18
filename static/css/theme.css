@@ -13,6 +13,16 @@ body.dark {
     --shadow: rgba(0, 0, 0, 0.5);
     --hover: #2a2a2a;
     --primary-alpha: rgba(175, 50, 54, 0.25);
+
+    /* Semantic colors — dark mode overrides */
+    --info: #60a5fa;
+    --info-light: rgba(96, 165, 250, 0.12);
+    --success: #4ade80;
+    --success-light: rgba(74, 222, 128, 0.12);
+    --error: #f87171;
+    --error-light: rgba(248, 113, 113, 0.12);
+    --warning: #fbbf24;
+    --warning-light: rgba(251, 191, 36, 0.12);
 }
 
 /* Theme Fade */
@@ -61,14 +71,14 @@ body.dark {
     opacity: 1;
     transform: scale(1) rotate(0deg);
     transform-origin: center;
-    transition: all 0.4s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .moon {
     opacity: 0;
     transform: scale(0.6) translateX(4px);
     transform-origin: center;
-    transition: all 0.4s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 /* DARK MODE STATE */
