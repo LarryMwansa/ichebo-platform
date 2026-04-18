@@ -21,9 +21,9 @@
 }
 
 /* Ensure platform shell allows scrolling for the reader */
-.ics-main {
-  overflow-y: auto !important;
-  height: auto !important;
+.bible-reader-shell .ics-main {
+  overflow-y: auto;
+  height: auto;
 }
 
 /* ─── Topbar ─────────────────────────────────────────────────────────────── */
@@ -59,7 +59,7 @@
 }
 
 .bible-verse:active {
-  background: var(--hover) !important;
+  background: var(--hover);
   transform: scale(0.995);
 }
 
@@ -150,21 +150,21 @@
 }
 
 .bible-picker-item--active {
-  background: color-mix(in srgb, var(--primary) 8%, transparent) !important;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
 .bible-picker-item-grid {
   aspect-ratio: 1;
-  display: flex !important;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 !important;
+  padding: 0;
 }
 
 .bible-picker-item-grid--active {
-  background: var(--primary) !important;
-  color: #fff !important;
-  border-color: var(--primary) !important;
+  background: var(--primary);
+  color: var(--button-text);
+  border-color: var(--primary);
 }
 
 /* ─── Annotation Panel ───────────────────────────────────────────────────── */
@@ -233,20 +233,33 @@
   }
 }
 
+/* ─── Chapter Header & Title ───────────────────────────────────────────────── */
+
+.bible-chapter-header {
+  padding: 1.5rem 1rem 1rem;
+}
+
+.bible-chapter-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
 /* ─── Responsive Adjustments ──────────────────────────────────────────────── */
 
 @media (min-width: 768px) {
   .bible-chapter-header {
     text-align: center;
-    padding: 3rem 1rem 2rem !important;
+    padding: 3rem 1rem 2rem;
   }
 
   .bible-chapter-title {
-    font-size: 2.25rem !important;
+    font-size: 2.25rem;
   }
 
   .bible-verse {
-    padding: 12px 1.5rem !important;
-    border-radius: 12px !important;
+    padding: 12px 1.5rem;
+    border-radius: 12px;
   }
 }

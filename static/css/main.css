@@ -356,7 +356,7 @@ body.dark .form-input-touch option {
 /* Immersive Shell (Hide Navigation Chrome) */
 .ics-shell--immersive .navbar,
 .ics-shell--immersive .bottom-bar {
-  display: none !important;
+  display: none;
 }
 
 .ics-shell--immersive .ics-main {
@@ -366,7 +366,7 @@ body.dark .form-input-touch option {
 
 /* Immersive mode also hides FAB */
 .ics-shell--immersive .fab {
-  display: none !important;
+  display: none;
 }
 
 /* =========================
