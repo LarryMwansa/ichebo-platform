@@ -2,7 +2,7 @@
 <div class="bottom-bar" role="navigation" aria-label="Main navigation">
 
   <a href="{% url 'dashboard:index' %}"
-     class="nav-item {% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'index' %}active{% endif %}"
+     class="nav-item {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}"
      aria-label="Home">
     <span class="material-symbols-outlined nav-icon">home</span>
     <span class="nav-label">Home</span>

@@ -89,9 +89,9 @@ button.nav-item {
 .nav-item.active::after {
     content: "";
     position: absolute;
-    bottom: 4px;
-    width: 4px;
-    height: 4px;
+    bottom: 2px;
+    width: 6px;
+    height: 6px;
     background: var(--text);
     border-radius: 50%;
 }
