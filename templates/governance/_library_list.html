@@ -6,31 +6,36 @@
 
 <!-- Reference Library record list -->
 <div class="gov-detail-header">
-  <div class="label-caps" 
-       hx-get="{% url 'governance:reference-home' %}" 
-       hx-target="#governance-content" 
+  <div class="label-caps"
+       hx-get="{% url 'governance:reference-home' %}"
+       hx-target="#governance-content"
        hx-push-url="true"
        style="cursor: pointer; color: var(--gov-accent);">
     Reference Library {% if type_label %}&rsaquo; {{ type_label }}{% endif %}
   </div>
-  
-  <div class="gov-list-header">
-    <h2 class="gov-list-title">{{ type_label }}</h2>
-  </div>
+
+  <h2 class="gov-list-title">{{ type_label }}</h2>
 </div>
 
-<!-- Category Grid Filter -->
-<div class="gov-type-list">
+<!-- Category navigation (Horizontal tabs) -->
+<nav class="accounts-tab-row" style="margin: 0 -1rem 2rem; border-top: 1px solid var(--border);">
+  <a href="{% url 'governance:reference-home' %}"
+     class="accounts-tab {% if not record_type %}accounts-tab--active{% endif %}"
+     hx-get="{% url 'governance:reference-home' %}"
+     hx-target="#governance-content"
+     hx-push-url="true">
+    All
+  </a>
   {% for slug, label in library_types.items %}
   <a href="{% url 'governance:reference-list' slug %}"
-     class="gov-type-pill {% if slug == record_type %}gov-type-pill--active{% endif %}"
+     class="accounts-tab {% if slug == record_type %}accounts-tab--active{% endif %}"
      hx-get="{% url 'governance:reference-list' slug %}"
      hx-target="#governance-content"
      hx-push-url="true">
     {{ label }}
   </a>
   {% endfor %}
-</div>
+</nav>
 
 <!-- Search -->
 <div style="margin-bottom: var(--space-s);">
