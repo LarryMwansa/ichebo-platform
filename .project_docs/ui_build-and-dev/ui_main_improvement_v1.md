@@ -34,7 +34,13 @@ Ensure the creation flow is seamless across all primary surfaces.
 - [x] **Refine `navbar.js`**: Expand the path-matching logic for current `pathname`.
 
 ## 4. App-by-App Rollout (Current Priorities)
-1. **Records**: Standardize record lists and detail headers.
-2. **Activity**: Unify list layout with the dashboard's "Action Items" pattern.
-3. **Explore/You**: Finalize the layout and transition cards to standardized list items.
-4. **Learn**: Adjust programme cards to use the same vertical grid as activities.
+- [x] **Records**: Standardize record lists and detail headers.
+- [x] **Activity**: Unify list layout with the dashboard's "Action Items" pattern.
+- [x] **Explore/You**: Finalize the layout and transition cards to standardized list items.
+- [x] **Learn**: Adjust programme cards to use the same vertical grid as activities.
+
+## 5. Next Phase: Global Polish & Micro-interactions
+- [ ] **Tab Reconciliation**: Unify the `dashboard-tabs.js` pills with the global bottom navigation.
+- [ ] **State Persistence**: Ensure the drawer state persists across quick-create transitions.
+- [ ] **Drawer Ergonomics**: Add pull-to-dismiss gesture for the app drawer on mobile.
+- [ ] **Accessibility Audit**: Ensure all icons have proper `aria-label` and `label-caps` use semantic `<label>`.

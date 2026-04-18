@@ -1,19 +1,25 @@
 <div class="list-item activity-item" id="activity-{{ activity.id }}">
-  <div class="list-item__icon" style="background: var(--hover); color: var(--primary);">
-    <span class="material-symbols-outlined">
-      {% if activity.activity_type == 'task' %}check_box{% elif activity.activity_type == 'habit' %}repeat{% elif activity.activity_type == 'goal' %}flag{% elif activity.activity_type == 'reminder' %}notifications{% else %}event_note{% endif %}
+  <div class="list-item__icon">
+    <span class="status-badge 
+      {% if activity.due_at and activity.due_at < now %}status-badge--danger
+      {% elif activity.due_at and activity.due_at.date == now.date %}status-badge--active
+      {% elif activity.activity_type == 'reminder' %}status-badge--warning
+      {% else %}status-badge--muted{% endif %}">
+      {{ activity.activity_type|slice:":3"|upper }}
     </span>
   </div>
 
   <div class="list-item__content">
     <div class="list-item__title" style="font-weight: 700;">{{ activity.title }}</div>
     <div class="list-item__meta" style="display: flex; align-items: center; gap: 8px;">
-      <span class="badge-unit badge-unit--primary">{{ activity.activity_type }}</span>
       {% if activity.due_at %}
       <span class="activity-due {% if activity.due_at < now %}activity-due--overdue{% endif %}" style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
         <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
         {{ activity.due_at|date:"d M" }}
       </span>
+      {% endif %}
+      {% if activity.recurrence != 'none' %}
+      <span class="badge-unit" style="font-size: 9px;"><span class="material-symbols-outlined" style="font-size: 10px;">sync</span> {{ activity.recurrence }}</span>
       {% endif %}
     </div>
   </div>

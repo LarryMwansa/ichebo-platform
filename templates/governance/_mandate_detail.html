@@ -1,12 +1,16 @@
-<!-- Mandate record detail -->
-<div class="gov-detail-header">
-  <a href="{% url 'governance:mandate-list' record.record_type %}"
-     class="gov-back-link"
-     hx-get="{% url 'governance:mandate-list' record.record_type %}"
-     hx-target="#governance-content"
-     hx-push-url="true">
-    ← {{ record.record_type|title }}s
+<div class="nav-left" id="nav-left-content" hx-swap-oob="true">
+  <a href="{% url 'governance:mandate-list' record.record_type %}" 
+     hx-get="{% url 'governance:mandate-list' record.record_type %}" 
+     hx-target="#governance-content" 
+     hx-push-url="true"
+     class="btn-touch" aria-label="Back">
+    <span class="material-symbols-outlined">arrow_back</span>
   </a>
+  <span class="nav-title">{{ record.title|truncatechars:20 }}</span>
+</div>
+
+<!-- Mandate record detail -->
+<div class="gov-detail-header" style="justify-content: flex-end;">
   <div id="record-status-area" class="status-badge status-badge--{{ record.status }}">
     {% if record.status == 'locked' %}🔒 {% endif %}{{ record.status|title }}
     {% if record.version %} · v{{ record.version }}{% endif %}

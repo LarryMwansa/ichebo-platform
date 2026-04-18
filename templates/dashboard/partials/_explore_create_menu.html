@@ -1,0 +1,45 @@
+<!-- dashboard/partials/_explore_create_menu.html -->
+<div class="explore-create-menu" style="padding: 1rem;">
+  <div class="label-caps" style="margin-bottom: 1.5rem;">New Creation</div>
+  
+  <div class="list-group">
+    <button class="list-item" 
+            hx-get="{% url 'records:htmx-create' %}" 
+            hx-target="#drawerInner"
+            style="width: 100%; text-align: left; background: none; border: none;">
+      <div class="list-item__icon" style="background: rgba(14, 116, 144, 0.1); color: #0e7490;">
+        <span class="material-symbols-outlined">description</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">Journal Entry</div>
+        <div class="list-item__meta">Log a prayer, dream, or note</div>
+      </div>
+    </button>
+
+    <button class="list-item" 
+            hx-get="{% url 'governance:htmx-record-create' %}" 
+            hx-target="#drawerInner"
+            style="width: 100%; text-align: left; background: none; border: none;">
+      <div class="list-item__icon" style="background: rgba(126, 34, 206, 0.1); color: #7e22ce;">
+        <span class="material-symbols-outlined">account_balance</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">Governance Record</div>
+        <div class="list-item__meta">Draft a decree, principle or edict</div>
+      </div>
+    </button>
+
+    <button class="list-item" 
+            hx-get="{% url 'activity:htmx-create' %}" 
+            hx-target="#drawerInner"
+            style="width: 100%; text-align: left; background: none; border: none;">
+      <div class="list-item__icon" style="background: rgba(21, 128, 61, 0.1); color: #15803d;">
+        <span class="material-symbols-outlined">task_alt</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">Activity / Mission</div>
+        <div class="list-item__meta">Assign a task or start a habit</div>
+      </div>
+    </button>
+  </div>
+</div>

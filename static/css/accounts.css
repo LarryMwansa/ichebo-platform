@@ -358,7 +358,7 @@
   color: var(--muted);
 }
 
-/* ── Empty state ────────────────────────────────────────────── */
+/* ── Empty state (Handled by standard patterns now) ──────────────── */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -371,19 +371,6 @@
   width: 100%;
 }
 
-/* ── Status badges ──────────────────────────────────────────── */
-.status-badge {
-  display: inline-block;
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: capitalize;
-}
-.status-badge--active   { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.status-badge--seeker   { background: rgba(37, 99, 235, 0.15); color: #2563eb; }
-.status-badge--suspended { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-.status-badge--pending_verification { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
 
 /* ── Settings Header ────────────────────────────────────────── */
 .settings-section-header {
