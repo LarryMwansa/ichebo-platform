@@ -50,25 +50,35 @@
     <div class="dash-widget dash-widget--dar {% if not digest.dar_today %}dash-widget--pending{% endif %}">
       <div class="dash-widget__label">Daily Briefing</div>
       <div class="dash-dar-content">
-        {% if digest.dar_today %}
         <div class="dash-dar-status">
-          <span class="material-symbols-outlined" style="color: var(--success);">check_circle</span>
-          <div class="dash-dar-text">
-            <strong>DAR Completed</strong>
-            <span>{{ digest.dar_today.title }}</span>
-          </div>
+          {% if digest.dar_today %}
+            <span class="material-symbols-outlined" style="color: var(--success); font-size: 28px;">check_circle</span>
+            <div class="dash-dar-text">
+              <strong>DAR Completed</strong>
+              <span>{{ digest.dar_today.title }}</span>
+            </div>
+          {% else %}
+            <span class="material-symbols-outlined" style="color: var(--warning); font-size: 28px;">pending_actions</span>
+            <div class="dash-dar-text">
+              <strong>DAR MANDATORY</strong>
+              <span>Submission required for discipline record.</span>
+            </div>
+          {% endif %}
         </div>
-        <a class="btn-touch btn-outline" href="{{ digest.dar_today.url }}">View Report</a>
-        {% else %}
-        <div class="dash-dar-status">
-          <span class="material-symbols-outlined" style="color: var(--warning);">pending_actions</span>
-          <div class="dash-dar-text">
-            <strong>DAR MANDATORY</strong>
-            <span>You haven't submitted your report for today.</span>
-          </div>
+        
+        <div class="dash-dar-actions">
+          {% if digest.dar_today %}
+            <a class="btn-touch btn-outline-sm" href="{{ digest.dar_today.url }}">View</a>
+          {% else %}
+            <button class="btn-touch btn-primary-sm" 
+                    hx-get="{% url 'records:htmx-create' %}?record_type=dar"
+                    hx-target="#drawerInner"
+                    hx-swap="innerHTML"
+                    onclick="window.ICSDrawer.open('Daily Activity Report')">
+              Write &rarr;
+            </button>
+          {% endif %}
         </div>
-        <a class="btn-touch btn-primary" href="/records/">Write Report &rarr;</a>
-        {% endif %}
       </div>
     </div>
   </section>

@@ -10,6 +10,7 @@ JOURNAL_RECORD_TYPES = [
     ('prayer', 'Prayer'),
     ('spirit', 'Spirit'),
     ('dream', 'Dream'),
+    ('dar', 'Activity Report'),
     ('note', 'General'),
 ]
 
