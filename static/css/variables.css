@@ -51,6 +51,10 @@
     /* Accent Colors */
     --accent-indigo: #6366f1;
     --accent-purple: #7e22ce;
+    --accent-rose: #9d174d;
+    --accent-rose-light: #fce7f3;
+    --accent-event: #5b21b6;
+    --accent-event-light: #ede9fe;
     --primary-tint: #fff8f8;
 
     /* Shadows */

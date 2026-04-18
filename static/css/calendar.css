@@ -193,13 +193,13 @@
   cursor: default;
 }
 
-.cal-pill--task      { background: #dbeafe; color: #1e40af; }
-.cal-pill--habit     { background: #d1fae5; color: #065f46; }
-.cal-pill--event     { background: #ede9fe; color: #5b21b6; }
-.cal-pill--reminder  { background: var(--warning-light); color: #92400e; }
-.cal-pill--goal      { background: #fce7f3; color: #9d174d; }
-.cal-pill--campaign  { background: #e0f2fe; color: #0369a1; }
-.cal-pill--more      { background: var(--hover, #eee); color: var(--muted, #666); }
+.cal-pill--task      { background: var(--info-light);         color: var(--info-dark); }
+.cal-pill--habit     { background: var(--success-light);      color: var(--success-dark); }
+.cal-pill--event     { background: var(--accent-event-light); color: var(--accent-event); }
+.cal-pill--reminder  { background: var(--warning-light);      color: var(--warning-dark); }
+.cal-pill--goal      { background: var(--accent-rose-light);  color: var(--accent-rose); }
+.cal-pill--campaign  { background: color-mix(in srgb, var(--info) 10%, transparent); color: var(--info); }
+.cal-pill--more      { background: var(--hover, #eee);        color: var(--muted, #666); }
 
 /* ── Week grid ───────────────────────────────────────────────────────── */
 
@@ -292,15 +292,15 @@
   gap: 2px;
 }
 
-.cal-wk-event--task      { background: #dbeafe; }
-.cal-wk-event--habit     { background: #d1fae5; }
-.cal-wk-event--event     { background: #ede9fe; }
+.cal-wk-event--task      { background: var(--info-light); }
+.cal-wk-event--habit     { background: var(--success-light); }
+.cal-wk-event--event     { background: var(--accent-event-light); }
 .cal-wk-event--reminder  { background: var(--warning-light); }
-.cal-wk-event--goal      { background: #fce7f3; }
-.cal-wk-event--campaign  { background: #e0f2fe; }
-.cal-wk-event--project   { background: #f0fdf4; }
-.cal-wk-event--skill     { background: #f5f3ff; }
-.cal-wk-event--programme { background: #ecfdf5; }
+.cal-wk-event--goal      { background: var(--accent-rose-light); }
+.cal-wk-event--campaign  { background: color-mix(in srgb, var(--info) 10%, transparent); }
+.cal-wk-event--project   { background: color-mix(in srgb, var(--success) 8%, transparent); }
+.cal-wk-event--skill     { background: var(--accent-event-light); }
+.cal-wk-event--programme { background: var(--success-light); }
 
 .cal-wk-event__time {
   font-size: 9px;
