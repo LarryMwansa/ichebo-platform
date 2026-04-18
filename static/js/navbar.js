@@ -174,8 +174,34 @@ document.addEventListener('DOMContentLoaded', () => {
       createUrl = '/activity/htmx/create/';
       title = 'New Activity';
     } else if (path.startsWith('/governance')) {
-      createUrl = '/governance/htmx/record/create/';
-      title = 'New Document';
+      // Extract record_type and record_family from governance URL paths
+      // Paths: /governance/reference/{type}/, /governance/mandate/{type}/, /governance/keys/
+      const match = path.match(/\/governance\/(reference|mandate|keys)(?:\/([a-z_-]+))?/);
+      let recordFamily = 'reference';
+      let recordType = 'key';
+      let titlePrefix = 'New';
+
+      if (match) {
+        const branch = match[1];
+        const type = match[2];
+
+        if (branch === 'reference' && type) {
+          recordFamily = 'governance';
+          recordType = type;
+          titlePrefix = `New ${type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}`;
+        } else if (branch === 'mandate' && type) {
+          recordFamily = 'governance';
+          recordType = type;
+          titlePrefix = `New ${type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}`;
+        } else if (branch === 'keys') {
+          recordFamily = 'reference';
+          recordType = 'key';
+          titlePrefix = 'New Key';
+        }
+      }
+
+      createUrl = `/governance/htmx/record/create/?record_type=${recordType}&record_family=${recordFamily}`;
+      title = titlePrefix;
     } else if (path.includes('/explore')) {
       createUrl = '/htmx/explore-menu/';
       title = 'Quick Create';
