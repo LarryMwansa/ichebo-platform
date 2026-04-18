@@ -1,8 +1,6 @@
 <form class="record-drawer-form"
       hx-post="{% url 'records:htmx-create' %}"
-      hx-target="#record-list, #dash-recent-list"
-      hx-swap="afterbegin"
-      hx-on::after-request="if(event.detail.successful) window.ICSDrawer.close()">
+      hx-swap="none">
   {% csrf_token %}
 
   <div class="record-form-group">

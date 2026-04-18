@@ -75,7 +75,9 @@ def htmx_create_record(request):
             title=title,
             content=request.POST.get('content', '').strip(),
         )
-        return render(request, 'records/partials/record_card.html', {'record': record})
+        response = render(request, 'records/partials/record_card.html', {'record': record})
+        response['HX-Trigger'] = 'recordCreated'
+        return response
 
     # GET — return the create form
     return render(request, 'records/partials/create_form.html', {

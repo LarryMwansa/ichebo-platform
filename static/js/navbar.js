@@ -210,8 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('htmx-loading'); // Global loading state
     const target = e.detail.target;
     if (target && (target.id === 'drawerContent' || target.id === 'drawerInner')) {
-      // If we don't have a pending title, and the drawer isn't active, show Loading
-      // If the drawer IS active, don't flicker the title back to Loading
       if (window._pendingDrawerTitle) {
         openDrawer(window._pendingDrawerTitle);
         window._pendingDrawerTitle = null;
@@ -221,10 +219,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-
-  document.body.addEventListener('htmx:afterRequest', () => {
+  // Global success listener and auto-closing
+  document.body.addEventListener('htmx:afterRequest', (e) => {
     document.body.classList.remove('htmx-loading');
+    
+    // If request was successful and it was targeted at the drawer, 
+    // we consider auto-closing if the server didn't provide a specific response.
+    // However, we rely more on the dedicated triggers below for specific creation events.
+    if (e.detail.successful && (e.detail.target.id === 'drawerInner')) {
+      // Small delay to let any OOB swaps happen
+      setTimeout(() => {
+        // If the server returned an empty response or a small fragment, we might close
+        // But for now, we'll let the recordCreated/activityCreated handle it.
+      }, 100);
+    }
   });
+
+  // Dedicated Success Triggers (Sent by Django via HX-Trigger Header)
+  document.body.addEventListener('recordCreated', () => {
+    closeDrawer();
+    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate([10, 30, 10]);
+  });
+
+  document.body.addEventListener('activityCreated', () => {
+    closeDrawer();
+    if (window.navigator && window.navigator.vibrate) window.navigator.vibrate([10, 30, 10]);
+  });
+
+  document.body.addEventListener('govRecordCreated', () => {
+    closeDrawer();
+    if (window.navigator.vibrate) window.navigator.vibrate([10, 30, 10]);
+  });
+
 
   document.body.addEventListener('htmx:afterSwap', (e) => {
     const target = e.detail.target;

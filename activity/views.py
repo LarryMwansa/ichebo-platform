@@ -103,9 +103,11 @@ def htmx_create_activity(request):
             metadata={'source_app': 'activity'},
         )
 
-        return render(request, 'activity/partials/activity_card.html', {
+        response = render(request, 'activity/partials/activity_card.html', {
             'activity': activity,
         })
+        response['HX-Trigger'] = 'activityCreated'
+        return response
 
     activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
     # GET — return the create form

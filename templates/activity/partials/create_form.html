@@ -1,9 +1,7 @@
 <div class="activity-drawer-form" style="padding: 1rem;">
   <form class="activity-create-form"
         hx-post="{% url 'activity:htmx-create' %}"
-        hx-target="#activity-list-upcoming"
-        hx-swap="afterbegin"
-        onclick="if(event.target.type==='submit') window.ICSDrawer.close()">
+        hx-swap="none">
     {% csrf_token %}
 
     <div style="display: flex; flex-direction: column; gap: 1rem;">

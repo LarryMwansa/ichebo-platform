@@ -1,4 +1,5 @@
 <div class="list-item" id="record-{{ record.id }}" 
+     hx-swap-oob="afterbegin:#record-list"
      hx-get="{% url 'records:records-detail' record.id %}" 
      hx-target="#main-content" 
      hx-push-url="true"

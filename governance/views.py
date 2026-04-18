@@ -287,13 +287,18 @@ def htmx_record_create(request):
             },
         )
 
+        from django.urls import reverse
         if record_family == 'reference':
-            return redirect('governance:keys-detail', record_id=record.id)
+            target_url = reverse('governance:keys-detail', kwargs={'record_id': record.id})
+        elif record.record_type in LIBRARY_TYPES:
+            target_url = reverse('governance:reference-detail', kwargs={'record_id': record.id})
+        else:
+            target_url = reverse('governance:mandate-detail', kwargs={'record_id': record.id})
 
-        rtype = record.record_type
-        if rtype in LIBRARY_TYPES:
-            return redirect('governance:reference-detail', record_id=record.id)
-        return redirect('governance:mandate-detail', record_id=record.id)
+        # Since this is htmx_record_create, we always return HX-Redirect to the detail view
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = target_url
+        return response
 
     # GET — return the create form
     record_type   = request.GET.get('record_type', 'key')
