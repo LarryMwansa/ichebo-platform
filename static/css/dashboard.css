@@ -136,7 +136,7 @@
 }
 
 .dash-suggestion-pill {
-  padding: 8px 14px;
+  padding: 8px 12px;
   background: rgba(255,255,255,0.12);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -245,7 +245,7 @@
 
 .dash-streak-strip {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   padding: 0 16px 16px;
   overflow-x: auto;
   scrollbar-width: none;
@@ -302,7 +302,7 @@
   border: 1.5px solid var(--primary);
   color: var(--primary);
   background: transparent;
-  padding: 7px 16px;
+  padding: 8px 16px;
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 700;

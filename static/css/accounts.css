@@ -65,7 +65,7 @@
 .auth-field {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: var(--space-3xs);
   margin-bottom: 1rem;
 }
 
@@ -78,7 +78,7 @@
 .settings-field select,
 .settings-field input[type="text"] {
   width: 100%;
-  padding: 12px 14px;
+  padding: 12px 16px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--bg);
@@ -98,7 +98,7 @@
 
 .auth-field input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 12px 16px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: #ffffff;
@@ -178,7 +178,7 @@
 .accounts-tab-row::-webkit-scrollbar { display: none; }
 .accounts-tab {
   display: inline-block;
-  padding: 0.875rem 0.5rem;
+  padding: var(--space-s) var(--space-2xs);
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--muted);
@@ -380,7 +380,7 @@
 /* ── Settings Header ────────────────────────────────────────── */
 .settings-section-header {
   margin: -1.25rem -1.25rem 1.25rem;
-  padding: 1.125rem 1.25rem 0.875rem;
+  padding: 16px 20px 12px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -392,7 +392,7 @@
 .settings-section-body {
   display: flex;
   flex-direction: column;
-  gap: 1.125rem;
+  gap: var(--space-s);
 }
 
 /* ── Form components ────────────────────────────────────────── */
@@ -409,7 +409,7 @@
 .radio-group {
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: var(--space-2xs);
 }
 .radio-option {
   display: flex;

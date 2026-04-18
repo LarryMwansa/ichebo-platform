@@ -17,7 +17,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 8px 12px;
   background: var(--card, #fff);
   border-bottom: 1px solid var(--border, rgba(0,0,0,.08));
   flex-shrink: 0;
@@ -76,7 +76,7 @@
   justify-content: center;
   font-size: var(--fz--1, 0.9rem);
   font-weight: var(--font-weight-medium, 500);
-  padding: 5px 10px;
+  padding: 4px 12px;
   border-radius: 6px;
   border: 1px solid var(--border, rgba(0,0,0,.1));
   background: var(--card, #fff);
@@ -93,7 +93,7 @@
   font-size: var(--fz--3, 0.65rem);
   text-transform: uppercase;
   letter-spacing: .06em;
-  padding: 5px 8px;
+  padding: 4px 8px;
 }
 
 /* ── Grid body ───────────────────────────────────────────────────────── */
@@ -222,7 +222,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 4px 6px;
+  padding: 8px 4px;
   gap: 4px;
   border-right: 1px solid var(--border, rgba(0,0,0,.06));
 }
@@ -266,7 +266,7 @@
 
 .cal-wk-col {
   border-right: 1px solid var(--border, rgba(0,0,0,.06));
-  padding: 6px 4px;
+  padding: 8px 4px;
   min-height: 120px;
   display: flex;
   flex-direction: column;
@@ -286,7 +286,7 @@
 /* Week event cards */
 .cal-wk-event {
   border-radius: 5px;
-  padding: 5px 6px;
+  padding: 4px 8px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -329,7 +329,7 @@
 /* ── Responsive: narrow screens ──────────────────────────────────────── */
 
 @media (max-width: 480px) {
-  .cal-pill { font-size: 8px; padding: 1px 3px; }
+  .cal-pill { font-size: 8px; padding: 2px 4px; }
   .cal-cell { min-height: 56px; padding: 2px; }
   .cal-cell__day { font-size: 10px; }
 
