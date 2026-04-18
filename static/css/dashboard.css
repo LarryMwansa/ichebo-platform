@@ -94,7 +94,7 @@
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--tracking-widest);
   opacity: 0.8;
   margin-bottom: 12px;
 }
@@ -223,7 +223,7 @@
 
 .dash-stat-value {
   font-size: 1.75rem;
-  font-weight: 800;
+  font-weight: var(--font-weight-black);
   color: var(--text);
   line-height: 1;
 }
@@ -231,7 +231,7 @@
 .dash-stat-label {
   font-size: 0.65rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-wide);
   color: var(--muted);
   margin-top: 6px;
   font-weight: 600;
@@ -263,7 +263,7 @@
 }
 
 .dash-streak-val {
-  font-weight: 800;
+  font-weight: var(--font-weight-black);
   color: var(--primary);
   font-size: 1rem;
 }

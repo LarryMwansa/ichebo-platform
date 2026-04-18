@@ -248,7 +248,7 @@ body.dark .icon-slate  { --icon-bg: rgba(51, 65, 85, 0.15);    --icon-fg: #94a3b
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: var(--tracking-wide);
     color: var(--muted);
     text-align: center;
 }

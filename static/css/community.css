@@ -42,7 +42,7 @@
 
 .community-name {
   font-size: var(--fz-2);
-  font-weight: 800;
+  font-weight: var(--font-weight-black);
   color: var(--text);
   line-height: 1.2;
 }
@@ -52,7 +52,7 @@
   color: var(--muted);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-wide);
   margin-top: 4px;
 }
 
@@ -74,7 +74,7 @@
 
 .formation-level {
   font-size: var(--fz-3);
-  font-weight: 800;
+  font-weight: var(--font-weight-black);
   color: var(--text);
 }
 
@@ -118,7 +118,7 @@
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-wider);
 }
 
 .stat-item__value {
@@ -163,7 +163,7 @@
   padding: 2px 8px;
   border-radius: 6px;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: var(--font-weight-black);
   text-transform: uppercase;
   background: var(--hover);
 }

@@ -150,7 +150,7 @@
   font-weight: 700;
   text-transform: uppercase;
   font-size: 10px;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-wide);
   padding-top: 2px;
 }
 .gov-attrs dd { color: var(--text); margin: 0; font-weight: 500; }
@@ -197,7 +197,7 @@
     box-shadow: 0 2px 8px var(--shadow);
 }
 .gov-version-num {
-  font-weight: 800;
+  font-weight: var(--font-weight-black);
   color: var(--gov-accent);
   font-size: 14px;
 }

@@ -214,7 +214,7 @@
 }
 .profile-hero-name {
   font-size: var(--fz-2);
-  font-weight: 800;
+  font-weight: var(--font-weight-black);
   letter-spacing: var(--tracking-m);
   margin: 0;
 }
@@ -235,7 +235,7 @@
   background: var(--primary);
   color: #fff;
   font-size: 1.75rem;
-  font-weight: 800;
+  font-weight: var(--font-weight-black);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -304,7 +304,7 @@
 }
 .formation-level-number {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: var(--font-weight-black);
   line-height: 1;
   color: var(--primary);
 }
@@ -384,7 +384,7 @@
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-wider);
   color: var(--primary);
   border-bottom: 1px solid var(--border);
   background: var(--hover);

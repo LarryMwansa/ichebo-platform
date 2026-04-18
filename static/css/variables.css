@@ -66,6 +66,7 @@
     --font-weight-regular: 400;
     --font-weight-medium: 500;
     --font-weight-bold: 700;
+    --font-weight-black: 800;
 
     /* Apply token values as defaults so UA controls and components inherit them */
     color-scheme: light dark;
@@ -123,6 +124,11 @@
     --tracking-xl: -0.15ch;
     --tracking-2xl: -0.175ch;
     --tracking-3xl: -0.2ch;
+
+    /* Positive tracking — expanded labels, badges, caps */
+    --tracking-wide: 0.05em;
+    --tracking-wider: 0.08em;
+    --tracking-widest: 0.1em;
 
 
     /* === Transitions === */
