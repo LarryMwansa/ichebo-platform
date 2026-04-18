@@ -336,9 +336,9 @@ def _get_dar_today(user, today) -> Optional[DARCard]:
 
     dar = Record.objects.filter(
         created_by=user,
-        record_type='note',
         created_at__date=today,
-        metadata__dar=True,
+    ).filter(
+        models.Q(record_type='dar') | models.Q(metadata__dar=True)
     ).first()
 
     if not dar:
@@ -413,11 +413,10 @@ def _build_suggestions(digest) -> list:
             })
 
     # Rule 2 — No DAR submitted today (Level 1+)
-    if digest.competence_level >= 1 and digest.dar_today is None:
         suggestions.append({
             'text': 'Submit your Daily Activity Report before the day ends.',
             'priority': 2,
-            'action_url': '/records/create/?type=dar',
+            'action_url': '/records/htmx/create/?record_type=dar',
         })
 
     # Rule 3 — Habit streak broken (streak == 0 means not completed today)

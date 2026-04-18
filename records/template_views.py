@@ -65,15 +65,21 @@ def htmx_create_record(request):
         if not title:
             return HttpResponse('<p class="record-error">Title is required.</p>', status=400)
 
+        rtype = request.POST.get('record_type', 'note')
+        metadata = {'source_app': 'records'}
+        if rtype == 'dar':
+            metadata['dar'] = True
+
         record = Record.objects.create(
             created_by=request.user,
             record_class='personal',
             record_family='journal',
-            record_type=request.POST.get('record_type', 'note'),
+            record_type=rtype,
             origin='user',
             status='active',
             title=title,
             content=request.POST.get('content', '').strip(),
+            metadata=metadata,
         )
         response = render(request, 'records/partials/record_card.html', {'record': record})
         response['HX-Trigger'] = 'recordCreated'
