@@ -18,38 +18,6 @@
   gap: var(--space-s);
 }
 
-/* ── Journal Categories (Grid) ────────────────────────────── */
-.journal-type-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-3xs);
-}
-
-.journal-type-pill {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 4px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background 0.2s ease-out, color 0.2s ease-out;
-  color: var(--muted);
-}
-.journal-type-pill:hover {
-  border-color: var(--primary);
-  color: var(--text);
-}
-.journal-type-pill.active {
-  background: var(--primary);
-  color: var(--button-text);
-  border-color: var(--primary);
-}
-
-
 /* ── Detail View ────────────────────────────────────────────── */
 .record-detail-header {
   margin-bottom: var(--space-m);

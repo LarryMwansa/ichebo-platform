@@ -10,28 +10,18 @@
 
 {% block records_content %}
 
-<div class="records-header">
-  <div class="label-caps" style="color: var(--primary);">My Journal</div>
-  
-  <div class="journal-type-grid">
-    <a href="?full=1" 
-       hx-get="{% url 'records:records-home' %}" 
-       hx-target="#record-list" 
-       hx-push-url="true"
-       class="journal-type-pill {% if not active_type %}active{% endif %}">
-       All
-    </a>
-    {% for value, label in record_types %}
-    <a href="?type={{ value }}&full=1" 
-       hx-get="{% url 'records:records-home' %}?type={{ value }}" 
-       hx-target="#record-list" 
-       hx-push-url="true"
-       class="journal-type-pill {% if active_type == value %}active{% endif %}">
-       {{ label }}
-    </a>
-    {% endfor %}
-  </div>
-</div>
+<nav class="accounts-tab-row" style="margin: 0 -1rem 1.5rem; border-top: 1px solid var(--border);">
+  <a href="{% url 'records:records-home' %}"
+     class="accounts-tab {% if not active_type %}accounts-tab--active{% endif %}">
+    All
+  </a>
+  {% for value, label in record_types %}
+  <a href="{% url 'records:records-home' %}?type={{ value }}"
+     class="accounts-tab {% if active_type == value %}accounts-tab--active{% endif %}">
+    {{ label }}
+  </a>
+  {% endfor %}
+</nav>
 
 
 <!-- Record list container -->
