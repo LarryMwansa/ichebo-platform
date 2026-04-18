@@ -73,8 +73,8 @@
 
 .nav-left .btn-touch {
     color: var(--text);
-    padding: 0 8px;
-    min-height: 40px;
+    padding: 0 12px;
+    min-height: 44px;
 }
 
 .nav-right-item {
@@ -89,8 +89,8 @@
     cursor: pointer;
     color: var(--text);
 
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
 
     display: flex;
     align-items: center;
