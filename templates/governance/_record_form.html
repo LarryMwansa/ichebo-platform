@@ -19,6 +19,8 @@
   <input type="hidden" name="record_family" value="{{ record_family }}">
 
   {% if not record %}
+  <!-- Show record type selector only if no specific type was requested (allow changing) -->
+  {% if record_family == 'reference' or not record_type or record_type == 'key' %}
   <div class="gov-form-group">
     <label class="gov-form-label">Record Type</label>
     <select name="record_type" class="form-input-touch">
@@ -38,6 +40,21 @@
       {% endif %}
     </select>
   </div>
+  {% else %}
+  <!-- When a specific governance type is provided, show it as context with hidden field -->
+  <div class="gov-form-group" style="padding: 8px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px;">
+    <div style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Creating</div>
+    <div style="font-size: 15px; font-weight: 500; color: var(--text);">
+      {% for slug, label in library_types.items %}
+        {% if slug == record_type %}{{ label }}{% endif %}
+      {% endfor %}
+      {% for slug, label in mandate_types.items %}
+        {% if slug == record_type %}{{ label }}{% endif %}
+      {% endfor %}
+    </div>
+    <input type="hidden" name="record_type" value="{{ record_type }}">
+  </div>
+  {% endif %}
   {% endif %}
 
   <div class="gov-form-group">
