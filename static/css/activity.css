@@ -33,7 +33,7 @@
     gap: 4px;
 }
 .activity-due--overdue {
-    color: #ef4444; /* Keep red for overdue but consider variable if exists */
+    color: var(--error); /* Keep red for overdue but consider variable if exists */
 }
 
 /* Actions in list item */
@@ -60,16 +60,16 @@
     color: var(--text);
 }
 .activity-action-btn--complete {
-    color: #10b981;
+    color: var(--success);
 }
 .activity-action-btn--complete:hover {
-    background: color-mix(in srgb, #10b981 10%, transparent);
+    background: color-mix(in srgb, var(--success) 10%, transparent);
 }
 .activity-action-btn--delete {
-    color: #ef4444;
+    color: var(--error);
 }
 .activity-action-btn--delete:hover {
-    background: color-mix(in srgb, #ef4444 10%, transparent);
+    background: color-mix(in srgb, var(--error) 10%, transparent);
 }
 
 /* Create panel */

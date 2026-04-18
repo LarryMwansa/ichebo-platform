@@ -308,8 +308,8 @@ select.form-input-touch {
 }
 
 .form-input-touch option {
-  background-color: #ffffff; /* Fallback for white */
-  color: #222222; /* Fallback for dark text */
+  background-color: var(--bg); /* Fallback for white */
+  color: var(--text); /* Fallback for dark text */
 }
 
 /* Maintain dark mode for options if needed */

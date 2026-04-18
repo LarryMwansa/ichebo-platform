@@ -47,7 +47,7 @@
 }
 
 .logo-text {
-    background: linear-gradient(135deg, var(--primary), #6366f1);
+    background: linear-gradient(135deg, var(--primary), var(--accent-indigo));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -241,10 +241,10 @@
     background: none;
     cursor: pointer;
     text-align: left;
-    color: #ef4444;
+    color: var(--error);
 }
 
-.logout-btn .material-symbols-outlined { color: #ef4444; }
+.logout-btn .material-symbols-outlined { color: var(--error); }
 
 
 /* =========================

@@ -65,7 +65,7 @@
 /* Active Tab */
 .dashboard-tab.active {
     background: var(--primary);
-    color: #fff;
+    color: var(--button-text);
     border-color: var(--primary);
     font-weight: 600;
 }

@@ -84,7 +84,7 @@
 }
 .gov-type-pill--active {
   background: var(--gov-accent);
-  color: #fff;
+  color: var(--button-text);
   border-color: var(--gov-accent);
 }
 

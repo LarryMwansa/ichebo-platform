@@ -43,9 +43,18 @@
     --error: #dc2626;
     --error-light: #fee2e2;
     --error-dark: #991b1b;
+    --error-border: #fca5a5;
     --warning: #ca8a04;
     --warning-light: #fef3c7;
     --warning-dark: #92400e;
+
+    /* Accent Colors */
+    --accent-indigo: #6366f1;
+    --accent-purple: #7e22ce;
+    --primary-tint: #fff8f8;
+
+    /* Shadows */
+    --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.12);
 
     /* Typography Variables */
     --font-family-base: "Roboto", system-ui, sans-serif;
