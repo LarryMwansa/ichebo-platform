@@ -10,13 +10,6 @@
     <div class="gov-branch-label">My Keys</div>
     <h2 class="gov-list-title">Personal Symbol Library</h2>
   </div>
-  <a href="{% url 'governance:htmx-record-create' %}?record_type=key&record_family=reference"
-     class="btn-touch" style="background: var(--gov-accent); color: #fff; text-decoration: none;"
-     hx-get="{% url 'governance:htmx-record-create' %}?record_type=key&record_family=reference"
-     hx-target="#governance-content"
-     hx-push-url="true">
-    + New Key
-  </a>
 </div>
 
 <input type="text" name="q" value="{{ search }}"

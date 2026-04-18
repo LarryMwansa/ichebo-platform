@@ -16,15 +16,6 @@
   
   <div class="gov-list-header">
     <h2 class="gov-list-title">{{ type_label }}</h2>
-    {% if is_level5 %}
-    <button class="btn-touch" style="background: var(--gov-accent); color: #fff; min-height: 40px; padding: 0 16px; border-radius: 12px;"
-            hx-get="{% url 'governance:htmx-record-create' %}?record_type={{ record_type }}&record_family=governance"
-            hx-target="#drawerContent"
-            hx-swap="innerHTML"
-            onclick="window.ICSDrawer.open('New {{ type_label }}')">
-      <span class="material-symbols-outlined" style="margin-right: 4px; font-size: 20px;">add</span> New
-    </button>
-    {% endif %}
   </div>
 </div>
 
