@@ -37,7 +37,9 @@
   {# Global HTMX Progress Bar #}
   <div class="htmx-progress-bar"><div class="htmx-progress-inner"></div></div>
 
-  {% include "components/_navbar.html" %}
+  {% block navbar %}
+    {% include "components/_navbar.html" %}
+  {% endblock %}
   {% include "components/_app_drawer.html" %}
 
   <main id="main-content" class="ics-main" role="main">

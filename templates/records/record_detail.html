@@ -1,23 +1,27 @@
 {% extends "records/base_records.html" %}
 
-{% block records_content %}
-
-<div class="record-detail-header">
-  <div class="label-caps" 
+{% block nav_left %}
+  <div class="nav-left" id="nav-left-content" hx-swap-oob="true">
+    <a href="{% url 'records:records-home' %}" 
        hx-get="{% url 'records:records-home' %}" 
        hx-target="#main-content" 
        hx-push-url="true"
-       style="cursor: pointer; color: var(--primary); margin-bottom: 8px;">
-    My Journal &rsaquo; {{ record.get_record_type_display|default:record.record_type|title }}
+       class="btn-touch" aria-label="Back">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <span class="nav-title">{{ record.title|truncatechars:25 }}</span>
+  </div>
+{% endblock %}
+
+{% block records_content %}
+
+<div class="record-detail-header" style="margin-top: var(--space-s);">
+  <div class="label-caps" style="color: var(--primary); margin-bottom: 4px;">
+    {{ record.get_record_type_display|default:record.record_type|title }}
   </div>
   
-  <h1 class="record-title">{{ record.title }}</h1>
-  
-  <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-    <span class="badge-unit badge--{{ record.record_type }}">
-      {{ record.get_record_type_display|default:record.record_type|title }}
-    </span>
-    <span class="badge-unit" style="background: var(--hover); color: var(--muted);">
+  <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
+    <span class="badge-unit" style="background: var(--hover); color: var(--muted); font-size: 11px;">
       {{ record.updated_at|date:"d M Y @ H:i" }}
     </span>
   </div>

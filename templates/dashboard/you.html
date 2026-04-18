@@ -40,56 +40,66 @@
 
   <!-- Quick Links -->
   <div class="you-section">
-    <div class="label-caps" style="padding: 0 4px; margin-bottom: 12px;">Your Space</div>
+    <div class="label-caps" style="padding: 0 4px; margin-bottom: 8px;">Your Space</div>
 
-    <a href="{% url 'profile' %}" class="explore-card">
-      <div class="explore-card-icon" style="background: #eff6ff; color: #1d4ed8;">
-        <span class="material-symbols-outlined">person</span>
-      </div>
-      <div class="explore-card-content">
-        <div class="explore-card-title">Profile</div>
-        <div class="explore-card-desc">Your personal information & avatar</div>
-      </div>
-      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
-    </a>
+    <div class="list-group">
+      <a href="{% url 'profile' %}" class="list-item">
+        <div class="list-item__icon" style="background: #eff6ff; color: #1d4ed8;">
+          <span class="material-symbols-outlined">person</span>
+        </div>
+        <div class="list-item__content">
+          <div class="list-item__title">Profile</div>
+          <div class="list-item__meta">Your personal information & avatar</div>
+        </div>
+        <div class="list-item__action">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+      </a>
 
-    <a href="{% url 'activity:activity-home' %}" class="explore-card">
-      <div class="explore-card-icon" style="background: #f0fdfa; color: #0f766e;">
-        <span class="material-symbols-outlined">task_alt</span>
-      </div>
-      <div class="explore-card-content">
-        <div class="explore-card-title">Activity</div>
-        <div class="explore-card-desc">Tasks, habits & daily activity reports</div>
-      </div>
-      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
-    </a>
+      <a href="{% url 'activity:activity-home' %}" class="list-item">
+        <div class="list-item__icon" style="background: #f0fdfa; color: #0f766e;">
+          <span class="material-symbols-outlined">task_alt</span>
+        </div>
+        <div class="list-item__content">
+          <div class="list-item__title">Activity</div>
+          <div class="list-item__meta">Tasks, habits & daily activity reports</div>
+        </div>
+        <div class="list-item__action">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+      </a>
 
-    <a href="{% url 'community:community-home' %}" class="explore-card">
-      <div class="explore-card-icon" style="background: #f0fdf4; color: #15803d;">
-        <span class="material-symbols-outlined">group</span>
-      </div>
-      <div class="explore-card-content">
-        <div class="explore-card-title">My Community</div>
-        <div class="explore-card-desc">Your community membership & formation</div>
-      </div>
-      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
-    </a>
+      <a href="{% url 'community:community-home' %}" class="list-item">
+        <div class="list-item__icon" style="background: #f0fdf4; color: #15803d;">
+          <span class="material-symbols-outlined">group</span>
+        </div>
+        <div class="list-item__content">
+          <div class="list-item__title">My Community</div>
+          <div class="list-item__meta">Your community membership & formation</div>
+        </div>
+        <div class="list-item__action">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+      </a>
 
-    <a href="{% url 'learn:learn-home' %}" class="explore-card">
-      <div class="explore-card-icon" style="background: #fdf2f8; color: #be185d;">
-        <span class="material-symbols-outlined">school</span>
-      </div>
-      <div class="explore-card-content">
-        <div class="explore-card-title">My Learning</div>
-        <div class="explore-card-desc">Enrolments, progress & certificates</div>
-      </div>
-      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
-    </a>
+      <a href="{% url 'learn:learn-home' %}" class="list-item">
+        <div class="list-item__icon" style="background: #fdf2f8; color: #be185d;">
+          <span class="material-symbols-outlined">school</span>
+        </div>
+        <div class="list-item__content">
+          <div class="list-item__title">My Learning</div>
+          <div class="list-item__meta">Enrolments, progress & certificates</div>
+        </div>
+        <div class="list-item__action">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+      </a>
+    </div>
   </div>
 
   <!-- Stats & Inventory -->
   <div class="you-section">
-    <div class="label-caps" style="padding: 0 4px; margin-bottom: 12px;">Inventory</div>
+    <div class="label-caps" style="padding: 0 4px; margin-bottom: 8px;">Inventory</div>
 
     <div class="you-stat-grid">
       <div class="you-stat-card">
@@ -120,16 +130,20 @@
 
   <!-- Settings shortcut -->
   <div class="you-section">
-    <a href="{% url 'settings' %}" class="explore-card">
-      <div class="explore-card-icon" style="background: #f8fafc; color: #334155;">
-        <span class="material-symbols-outlined">settings</span>
-      </div>
-      <div class="explore-card-content">
-        <div class="explore-card-title">Settings</div>
-        <div class="explore-card-desc">Theme, notifications & preferences</div>
-      </div>
-      <span class="material-symbols-outlined explore-card-arrow">chevron_right</span>
-    </a>
+    <div class="list-group">
+      <a href="{% url 'settings' %}" class="list-item">
+        <div class="list-item__icon" style="background: #f8fafc; color: #334155;">
+          <span class="material-symbols-outlined">settings</span>
+        </div>
+        <div class="list-item__content">
+          <div class="list-item__title">Settings</div>
+          <div class="list-item__meta">Theme, notifications & preferences</div>
+        </div>
+        <div class="list-item__action">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+      </a>
+    </div>
   </div>
 
 </div>

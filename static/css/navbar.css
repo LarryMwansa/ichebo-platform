@@ -60,6 +60,23 @@
     gap: 5px;
 }
 
+.nav-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-left: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+.nav-left .btn-touch {
+    color: var(--text);
+    padding: 0 8px;
+    min-height: 40px;
+}
+
 .nav-right-item {
     position: relative;
 }

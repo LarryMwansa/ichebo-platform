@@ -1,16 +1,18 @@
 <!-- components/_navbar.html -->
 <div class="navbar">
 
-  <!-- LEFT: Logo -->
-  <div class="nav-left">
+  <!-- LEFT: Slot (Logo or Back button) -->
+  <div class="nav-left" id="nav-left-content">
+    {% block nav_left %}
     <a href="{% url 'dashboard:index' %}" class="logo-link">
        <div class="logo-container">🏛️ <span class="logo-text">ICS</span></div>
     </a>
+    {% endblock %}
   </div>
 
   <!-- RIGHT: Actions -->
-  <div class="nav-right">
-
+  <div class="nav-right" id="nav-right-content">
+    {% block nav_right %}
     <!-- Notifications -->
     <div class="nav-right-item">
       <a href="{% url 'notifications:list' %}" class="icon-btn" aria-label="Notifications" id="notifBtn">
@@ -68,6 +70,6 @@
       <a href="{% url 'login' %}" class="btn-touch btn-sm">Sign In</a>
       {% endif %}
     </div>
-
+    {% endblock %}
   </div>
 </div>

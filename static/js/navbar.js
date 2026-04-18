@@ -176,6 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (path.startsWith('/governance')) {
       createUrl = '/governance/htmx/record/create/';
       title = 'New Document';
+    } else if (path.includes('/explore')) {
+      createUrl = '/records/htmx/create/'; // Default to record for now
+      title = 'Quick Journal';
+    } else if (path.includes('/you')) {
+      createUrl = '/activity/htmx/create/'; // Default to activity for 'You'
+      title = 'New Activity';
     }
 
     // Load context-aware form into drawer
