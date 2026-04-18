@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── App Launcher ──────────────────────────────────────────────────────────
   launcherBtn && launcherBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    openDrawer('ICS Ecosystem');
+    window._pendingDrawerTitle = 'ICS Ecosystem';
     
     htmx.ajax('GET', '/htmx/launcher/', {
       target: '#drawerInner',
@@ -186,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load context-aware form into drawer
     // The htmx:beforeRequest listener will handle opening the drawer + title
+    window._pendingDrawerTitle = title;
     htmx.ajax('GET', createUrl, {
       target: '#drawerInner',
       swap: 'innerHTML'
@@ -193,8 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fabBtn.classList.remove('active');
 
-    // Store title for the beforeRequest listener to use
-    window._pendingDrawerTitle = title;
+    if (window.navigator && window.navigator.vibrate) {
+      window.navigator.vibrate(10);
+    }
   });
 
   // ── Drawer API (for pages to open drawer programmatically) ──────────────────
@@ -208,11 +210,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('htmx-loading'); // Global loading state
     const target = e.detail.target;
     if (target && (target.id === 'drawerContent' || target.id === 'drawerInner')) {
-      const title = window._pendingDrawerTitle || 'Loading...';
-      openDrawer(title);
-      window._pendingDrawerTitle = null; // consume it
+      // If we don't have a pending title, and the drawer isn't active, show Loading
+      // If the drawer IS active, don't flicker the title back to Loading
+      if (window._pendingDrawerTitle) {
+        openDrawer(window._pendingDrawerTitle);
+        window._pendingDrawerTitle = null;
+      } else if (!drawer.classList.contains('active')) {
+        openDrawer('Loading...');
+      }
     }
   });
+
 
   document.body.addEventListener('htmx:afterRequest', () => {
     document.body.classList.remove('htmx-loading');
