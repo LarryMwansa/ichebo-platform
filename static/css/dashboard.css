@@ -1,13 +1,88 @@
+/* =========================
+   DASHBOARD (Refined Shell)
+========================= */
+
+.dashboard {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 16px 16px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────── */
+
+.dash-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.dash-greeting {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dash-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.dash-role {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.dash-date {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* ── Widget base ─────────────────────────────────────────────────────── */
+
+.dash-widget {
+  background: var(--card, #fff);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+}
+
+.dash-widget__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  padding: 16px 16px 8px;
+}
+
+.dash-widget--danger {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.dash-widget--team {
+  border-color: #7c3aed;
+}
+
 /* ── Hero Sections (Paraclete / High Impact) ────────────────────────── */
 
 .dash-hero {
   background: var(--primary, #af3236);
   color: #fff;
   padding: 24px 20px;
-  border-radius: 20px;
+  border-radius: 24px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 25px -5px rgba(175, 50, 54, 0.3);
+  box-shadow: 0 10px 30px -10px rgba(175, 50, 54, 0.4);
 }
 
 .dash-hero--paraclete {
@@ -36,11 +111,13 @@
 
 .dash-prompt {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 600;
   line-height: 1.4;
   font-style: italic;
   font-family: 'Outfit', sans-serif;
+  color: #fff;
+  border: none;
 }
 
 .dash-hero__pathway {
@@ -59,10 +136,11 @@
 
 .dash-suggestion-pill {
   padding: 8px 14px;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 99px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   color: #fff;
   text-decoration: none;
@@ -70,49 +148,45 @@
   align-items: center;
   gap: 6px;
   transition: all 0.2s;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.08);
+  max-width: 100%;
+}
+
+.dash-suggestion-pill span:not(.material-symbols-outlined) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dash-suggestion-pill:hover {
-  background: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.2);
   transform: translateY(-2px);
-}
-
-.dash-suggestion-pill--urgent {
-  background: rgba(255, 255, 255, 0.9);
-  color: #af3236;
 }
 
 /* ── DAR Section ────────────────────────────────────────────────────── */
 
+.dash-widget--dar {
+  border-left: 4px solid var(--warning);
+}
+
 .dash-widget--pending {
-  border: 1.5px solid var(--warning);
   background: var(--warning-light, #fffbeb);
+  border: 1px solid var(--warning);
 }
 
 .dash-dar-content {
-  padding: 0 16px 16px;
+  padding: 8px 16px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
-@media (max-width: 400px) {
-  .dash-dar-content {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .dash-dar-actions {
-    align-self: flex-end;
-  }
-}
-
 .dash-dar-status {
   display: flex;
   gap: 12px;
   align-items: center;
-  min-width: 0; /* Allow text truncate if needed */
+  min-width: 0;
 }
 
 .dash-dar-text {
@@ -122,69 +196,64 @@
 }
 
 .dash-dar-text strong {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .dash-dar-text span {
   font-size: 0.75rem;
   color: var(--muted);
-  line-height: 1.2;
 }
 
-.dash-dar-actions {
-  flex-shrink: 0;
+/* ── Stats Grid ──────────────────────────────────────────────────────── */
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
-/* ── Button Variants ────────────────────────────────────────────────── */
+.dash-widget--stat {
+  padding: 16px;
+  text-align: center;
+  justify-content: center;
+}
 
-.btn-primary-sm {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 10px;
-  font-size: 0.8rem;
+.dash-stat-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+}
+
+.dash-stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-top: 6px;
   font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
 }
 
-.btn-outline-sm {
-  background: transparent;
-  color: var(--primary);
-  border: 1.5px solid var(--primary);
-  padding: 5px 14px;
-  border-radius: 10px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-  transition: background 0.2s;
-}
-
-.btn-outline-sm:hover {
-  background: rgba(175, 50, 54, 0.05);
+.dash-widget--team .dash-stat-value {
+  color: #7c3aed;
 }
 
 /* ── Streak Strip ────────────────────────────────────────────────────── */
 
 .dash-streak-strip {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   padding: 0 16px 16px;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
 .dash-streak-pill {
   flex-shrink: 0;
   background: var(--hover);
-  padding: 8px 16px;
+  padding: 8px 12px;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -195,41 +264,56 @@
 .dash-streak-val {
   font-weight: 800;
   color: var(--primary);
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .dash-streak-title {
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--text);
 }
 
-/* ── Utilities ───────────────────────────────────────────────────────── */
-
-.dash-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
+/* ── Utility ─────────────────────────────────────────────────────────── */
 
 .dash-widget__cta {
   padding: 12px;
   text-align: center;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
   color: var(--primary);
   text-decoration: none;
   background: var(--hover);
   border-top: 1px solid var(--border);
 }
 
-.btn-outline {
+.btn-primary-sm {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-outline-sm {
   border: 1.5px solid var(--primary);
   color: var(--primary);
   background: transparent;
-  padding: 8px 16px;
+  padding: 7px 16px;
   border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
   text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .dash-dar-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .dash-dar-actions {
+    align-self: flex-end;
+  }
 }

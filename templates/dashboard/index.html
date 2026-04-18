@@ -36,10 +36,21 @@
     {% if digest.suggestions %}
     <div class="dash-hero__suggestions">
       {% for s in digest.suggestions %}
-      <a href="{{ s.action_url|default:'#' }}" class="dash-suggestion-pill {% if s.priority == 1 %}dash-suggestion-pill--urgent{% endif %}">
-        <span class="material-symbols-outlined">{% if s.priority == 1 %}priority_high{% else %}bolt{% endif %}</span>
-        {{ s.text }}
-      </a>
+        {% if "/records/" in s.action_url and "dar" in s.action_url %}
+        <button class="dash-suggestion-pill"
+                hx-get="{% url 'records:htmx-create' %}?record_type=dar"
+                hx-target="#drawerInner"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer.open('Daily Activity Report')">
+          <span class="material-symbols-outlined">bolt</span>
+          <span>{{ s.text }}</span>
+        </button>
+        {% else %}
+        <a href="{{ s.action_url|default:'#' }}" class="dash-suggestion-pill">
+          <span class="material-symbols-outlined">{% if s.priority == 1 %}priority_high{% else %}bolt{% endif %}</span>
+          <span>{{ s.text }}</span>
+        </a>
+        {% endif %}
       {% endfor %}
     </div>
     {% endif %}
