@@ -146,11 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── App Launcher ──────────────────────────────────────────────────────────
   launcherBtn && launcherBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    htmx.ajax('GET', '/dashboard/htmx/launcher/', {
+    openDrawer('ICS Ecosystem');
+    
+    htmx.ajax('GET', '/htmx/launcher/', {
       target: '#drawerInner',
       swap: 'innerHTML'
-    }).then(() => {
-      openDrawer('ICS Ecosystem');
     });
     
     if (window.navigator && window.navigator.vibrate) {
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Context-aware: determine create URL based on current page
     const path = window.location.pathname;
-    let createUrl = '/records/htmx/create/';  // Default: quick journal entry
+    let createUrl = '/records/htmx/create/';
     let title = 'New Entry';
 
     if (path.startsWith('/activity')) {
@@ -177,25 +177,24 @@ document.addEventListener('DOMContentLoaded', () => {
       createUrl = '/governance/htmx/record/create/';
       title = 'New Document';
     } else if (path.includes('/explore')) {
-      createUrl = '/dashboard/htmx/explore-menu/';
+      createUrl = '/htmx/explore-menu/';
       title = 'Quick Create';
     } else if (path.includes('/you')) {
-      createUrl = '/activity/htmx/create/'; // Default to activity for 'You'
+      createUrl = '/activity/htmx/create/';
       title = 'New Activity';
     }
 
     // Load context-aware form into drawer
+    // The htmx:beforeRequest listener will handle opening the drawer + title
     htmx.ajax('GET', createUrl, {
       target: '#drawerInner',
       swap: 'innerHTML'
-    }).then(() => {
-      openDrawer(title);
-      fabBtn.classList.remove('active');
     });
 
-    if (window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate(10);
-    }
+    fabBtn.classList.remove('active');
+
+    // Store title for the beforeRequest listener to use
+    window._pendingDrawerTitle = title;
   });
 
   // ── Drawer API (for pages to open drawer programmatically) ──────────────────
@@ -205,13 +204,13 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // ── Automated Drawer Management (Lasting Solution) ────────────────────────
-  // Automatically open the drawer when an HTMX request targets the drawer content
   document.body.addEventListener('htmx:beforeRequest', (e) => {
     document.body.classList.add('htmx-loading'); // Global loading state
-    
     const target = e.detail.target;
     if (target && (target.id === 'drawerContent' || target.id === 'drawerInner')) {
-      openDrawer('Loading...'); 
+      const title = window._pendingDrawerTitle || 'Loading...';
+      openDrawer(title);
+      window._pendingDrawerTitle = null; // consume it
     }
   });
 
@@ -222,13 +221,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.addEventListener('htmx:afterSwap', (e) => {
     const target = e.detail.target;
     if (target && (target.id === 'drawerContent' || target.id === 'drawerInner')) {
-      // Re-process newly swapped content
       htmx.process(target);
-      
-      // If we swapped into the drawer, make sure it's active
       if (!drawer.classList.contains('active')) {
         openDrawer();
       }
     }
   });
 });
+
+

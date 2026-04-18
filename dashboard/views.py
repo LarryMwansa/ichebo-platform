@@ -93,7 +93,7 @@ def you(request):
         'activity_count': activity_count,
         'record_count': record_count,
     })
-@login_required
 def htmx_explore_create_menu(request):
     """Returns the creation selection menu for the Explore context."""
     return render(request, 'dashboard/partials/_explore_create_menu.html')
+
