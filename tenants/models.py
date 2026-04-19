@@ -116,6 +116,11 @@ class UserPermission(models.Model):
         related_name='permissions_granted', null=True
     )
 
+    # Metadata for Community and Governance features (v8 amendment)
+    # shepherd_id: UUID of pastoral supervisor (Community feature)
+    # service_order: KGS Service Order label (Community feature)
+    metadata = models.JSONField(default=dict, blank=True)
+
     class Meta:
         db_table = 'tenants_userpermission'
         unique_together = [['tenant', 'user', 'role']]
