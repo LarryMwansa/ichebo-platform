@@ -71,9 +71,12 @@
                value="{{ record.metadata.pathways|default:'' }}">
       </div>
 
-      <div style="margin-top: 12px;">
-        <button type="submit" class="btn-touch btn-primary" style="width: 100%;">
-          {% if record %}Save Changes{% else %}Publish Draft{% endif %}
+      <div style="margin-top: 12px; display: flex; gap: 12px;">
+        <button type="submit" name="action" value="save" class="btn-touch btn-secondary" style="flex: 1;">
+          {% if record %}Save Draft{% else %}Save as Draft{% endif %}
+        </button>
+        <button type="submit" name="action" value="submit" class="btn-touch btn-primary" style="flex: 1;">
+          Submit for Review
         </button>
       </div>
     </div>

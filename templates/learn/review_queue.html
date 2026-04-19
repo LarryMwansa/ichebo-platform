@@ -2,32 +2,64 @@
 
 {% block learn_content %}
 <div class="learn-header">
-  <h2>Review Queue</h2>
+  <h1 class="title-small">Content Review Queue</h1>
+  <p class="explore-subtitle">Approve or return submitted learning content</p>
 </div>
 
 {% if items %}
+<div style="display: flex; flex-direction: column; gap: 16px;">
   {% for item in items %}
-  <div class="review-card" id="review-{{ item.id }}">
-    <span class="lesson-type-tag">{{ item.record_type }}</span>
-    <h4>{{ item.title }}</h4>
-    <p class="cert-meta">Submitted: {{ item.updated_at|date:"d M Y" }}</p>
-    <div class="review-actions">
-      <button class="btn-primary"
-              hx-post="{% url 'learn:htmx-approve-content' item.id %}"
-              hx-target="#review-{{ item.id }}"
-              hx-swap="outerHTML">
-        Approve
-      </button>
-      <button class="btn-secondary"
-              hx-post="{% url 'learn:htmx-return-content' item.id %}"
-              hx-target="#review-{{ item.id }}"
-              hx-swap="outerHTML">
-        Return to Draft
-      </button>
+  <div class="review-card" id="review-{{ item.id }}" style="display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--bg-secondary); border-radius: 8px;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="lesson-type-tag" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; background: var(--info-light); color: var(--info-dark);">
+          {{ item.record_type|title }}
+        </span>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <h4 style="margin: 0; font-size: 14px; font-weight: 600;">{{ item.title }}</h4>
+          {% if item.parent_programme %}
+          <p class="cert-meta" style="margin: 0; font-size: 12px;">
+            <span style="color: var(--muted);">Part of:</span> {{ item.parent_programme.title }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+      <span style="font-size: 12px; color: var(--muted);">{{ item.updated_at|date:"d M" }}</span>
+    </div>
+
+    {% if item.content %}
+    <div style="font-size: 13px; line-height: 1.5; color: var(--text); padding: 12px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+      {{ item.content|truncatechars:280 }}
+    </div>
+    {% endif %}
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+      <div style="font-size: 12px; color: var(--muted);">
+        Submitted by <strong>{{ item.author_display }}</strong>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn-touch btn-primary" style="min-height: 36px; padding: 8px 16px; font-size: 13px;"
+                hx-post="{% url 'learn:htmx-approve-content' item.id %}"
+                hx-target="#review-{{ item.id }}"
+                hx-swap="outerHTML swap:1s">
+          Approve
+        </button>
+        <button class="btn-touch btn-secondary" style="min-height: 36px; padding: 8px 16px; font-size: 13px;"
+                hx-post="{% url 'learn:htmx-return-content' item.id %}"
+                hx-target="#review-{{ item.id }}"
+                hx-swap="outerHTML swap:1s">
+          Return
+        </button>
+      </div>
     </div>
   </div>
   {% endfor %}
+</div>
 {% else %}
-  <p class="empty-state">No items pending review.</p>
+<div class="empty-state" style="padding: 48px 24px; text-align: center;">
+  <span class="material-symbols-outlined" style="font-size: 48px; color: var(--muted); margin-bottom: 16px; display: block;">check_circle</span>
+  <p style="font-size: 14px; color: var(--text);">No items pending review.</p>
+  <p style="font-size: 12px; color: var(--muted);">All submitted content has been reviewed.</p>
+</div>
 {% endif %}
 {% endblock %}

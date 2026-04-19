@@ -35,9 +35,12 @@
   </div>
   {% endif %}
 
-  <div style="margin-top: 2rem;">
-    <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; width: 100%; font-weight: 700;">
-      {% if record %}Save Changes{% else %}Create Draft Course{% endif %}
+  <div style="margin-top: 2rem; display: flex; gap: 12px;">
+    <button type="submit" name="action" value="save" class="btn-touch btn-secondary" style="flex: 1;">
+      {% if record %}Save Draft{% else %}Save as Draft{% endif %}
+    </button>
+    <button type="submit" name="action" value="submit" class="btn-touch btn-primary" style="flex: 1;">
+      Submit for Review
     </button>
   </div>
 </form>

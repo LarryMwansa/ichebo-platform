@@ -205,7 +205,27 @@ def certification_queue_view(request):
 def authorship(request):
     if _user_level(request.user) < 4:
         return redirect('learn:learn-home')
-    return render(request, 'learn/authorship.html', {})
+
+    # Get user's draft and submitted records
+    user_records = Record.objects.filter(
+        created_by=request.user,
+        record_family='learning',
+        status__in=['draft', 'submitted'],
+        deleted_at__isnull=True,
+    ).order_by('-updated_at')
+
+    # Organize by type
+    by_type = {}
+    for record in user_records:
+        rtype = record.record_type
+        if rtype not in by_type:
+            by_type[rtype] = {'draft': [], 'submitted': []}
+        by_type[rtype][record.status].append(record)
+
+    return render(request, 'learn/authorship.html', {
+        'user_records': user_records,
+        'by_type': by_type,
+    })
 
 
 @login_required
@@ -220,6 +240,9 @@ def author_programme_form(request, record_id=None):
         )
 
     if request.method == 'POST':
+        # Check if this is a submit action (not just save)
+        is_submit = request.POST.get('action') == 'submit'
+
         # 'induction' type is only available to Level 5 (Architect)
         raw_type = request.POST.get('programme_type', 'programme')
         if raw_type == 'induction' and _user_level(request.user) < 5:
@@ -237,17 +260,37 @@ def author_programme_form(request, record_id=None):
                 'pathways': request.POST.get('pathways', ''),
             })
             record.metadata = meta
-            record.save(update_fields=['title', 'content', 'record_type', 'metadata', 'updated_at'])
+            if is_submit:
+                record.status = 'submitted'
+                # Associate with Handbook when submitted
+                from tenants.models import Tenant
+                try:
+                    handbook = Tenant.objects.get(path='/global/handbook/', tier='handbook')
+                    record.tenant = handbook
+                except Tenant.DoesNotExist:
+                    pass
+            record.save(update_fields=['title', 'content', 'record_type', 'metadata', 'updated_at', 'status', 'tenant'])
         else:
+            status = 'submitted' if is_submit else 'draft'
+            tenant_id = None
+            if is_submit:
+                from tenants.models import Tenant
+                try:
+                    handbook = Tenant.objects.get(path='/global/handbook/', tier='handbook')
+                    tenant_id = handbook.id
+                except Tenant.DoesNotExist:
+                    pass
+
             Record.objects.create(
                 created_by=request.user,
+                tenant_id=tenant_id,
                 record_class='organizational',
                 record_family='learning',
                 record_type=programme_type,
                 origin='user',
                 title=request.POST.get('title', '').strip(),
                 content=request.POST.get('description', '').strip(),
-                status='draft',
+                status=status,
                 metadata={
                     'source_app': 'learn',
                     'qualification': request.POST.get('qualification', ''),
@@ -282,24 +325,45 @@ def author_course_form(request, record_id=None):
 
     programmes = Record.objects.filter(
         record_family='learning', record_type='programme',
-        status__in=['active', 'draft']
+        status__in=['active', 'draft', 'submitted']
     )
 
     if request.method == 'POST':
+        is_submit = request.POST.get('action') == 'submit'
+
         if record:
             record.title = request.POST.get('title', '').strip()
             record.content = request.POST.get('description', '').strip()
-            record.save(update_fields=['title', 'content', 'updated_at'])
+            if is_submit:
+                record.status = 'submitted'
+                from tenants.models import Tenant
+                try:
+                    handbook = Tenant.objects.get(path='/global/handbook/', tier='handbook')
+                    record.tenant = handbook
+                except Tenant.DoesNotExist:
+                    pass
+            record.save(update_fields=['title', 'content', 'updated_at', 'status', 'tenant'])
         else:
+            status = 'submitted' if is_submit else 'draft'
+            tenant_id = None
+            if is_submit:
+                from tenants.models import Tenant
+                try:
+                    handbook = Tenant.objects.get(path='/global/handbook/', tier='handbook')
+                    tenant_id = handbook.id
+                except Tenant.DoesNotExist:
+                    pass
+
             course = Record.objects.create(
                 created_by=request.user,
+                tenant_id=tenant_id,
                 record_class='organizational',
                 record_family='learning',
                 record_type='course',
                 origin='user',
                 title=request.POST.get('title', '').strip(),
                 content=request.POST.get('description', '').strip(),
-                status='draft',
+                status=status,
                 metadata={'source_app': 'learn'},
                 permissions_data={'visibility': 'tenant', 'required_level': 1,
                                   'roles_allowed': [], 'can_edit': []},
@@ -384,7 +448,19 @@ def review_queue(request):
         record_family='learning',
         status='submitted',
         deleted_at__isnull=True,
-    ).order_by('updated_at')
+    ).order_by('-updated_at')  # Most recent first
+
+    # Enrich items with author info and parent programme (for courses/lessons)
+    for item in items:
+        item.author_display = item.created_by.display_name or item.created_by.email
+
+        # For courses, get parent programme
+        if item.record_type == 'course':
+            parent_rel = Relationship.objects.filter(
+                from_record_id=item.id, relationship_type='part_of'
+            ).first()
+            if parent_rel:
+                item.parent_programme = Record.objects.filter(id=parent_rel.to_record_id).first()
 
     return render(request, 'learn/review_queue.html', {'items': items})
 
@@ -585,13 +661,23 @@ def htmx_approve_content(request, record_id):
     record.status = 'active'
     record.save(update_fields=['status', 'updated_at'])
 
-    return HttpResponse(
-        f'<div class="review-card confirmed">'
-        f'<span class="lesson-type-tag">{record.record_type}</span>'
-        f'<h4>{record.title}</h4>'
-        f'<span class="enrolled-badge">✓ Approved</span>'
-        f'</div>'
-    )
+    # Return HTMX fragment that fades out
+    html = f'''
+    <div class="review-card" style="opacity: 0.5; background: var(--success-light); border: 1px solid var(--success); transition: all 0.3s ease;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span class="lesson-type-tag" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; background: var(--success-light); color: var(--success);">
+            {record.record_type.title()}
+          </span>
+          <h4 style="margin: 0; font-size: 14px; font-weight: 600;">{record.title}</h4>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding: 8px 12px; background: var(--success); color: #fff; border-radius: 4px; font-size: 12px; font-weight: 600;">
+        ✓ Approved
+      </div>
+    </div>
+    '''
+    return HttpResponse(html)
 
 
 @login_required
@@ -604,16 +690,34 @@ def htmx_return_content(request, record_id):
         return HttpResponse(status=403)
 
     record = get_object_or_404(Record, id=record_id, status='submitted')
-    record.status = 'draft'
-    record.save(update_fields=['status', 'updated_at'])
+    feedback = request.POST.get('feedback', '')
 
-    return HttpResponse(
-        f'<div class="review-card">'
-        f'<span class="lesson-type-tag">{record.record_type}</span>'
-        f'<h4>{record.title}</h4>'
-        f'<span class="cert-pending-badge">Returned to Draft</span>'
-        f'</div>'
-    )
+    # Store feedback in metadata if provided
+    if feedback:
+        meta = record.metadata or {}
+        meta['review_feedback'] = feedback
+        record.metadata = meta
+
+    record.status = 'draft'
+    record.save(update_fields=['status', 'updated_at', 'metadata'])
+
+    # Return HTMX fragment that fades out
+    html = f'''
+    <div class="review-card" style="opacity: 0.5; background: var(--warning-light); border: 1px solid var(--warning); transition: all 0.3s ease;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span class="lesson-type-tag" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; background: var(--warning-light); color: var(--warning);">
+            {record.record_type.title()}
+          </span>
+          <h4 style="margin: 0; font-size: 14px; font-weight: 600;">{record.title}</h4>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding: 8px 12px; background: var(--warning); color: #fff; border-radius: 4px; font-size: 12px; font-weight: 600;">
+        ↶ Returned to Draft
+      </div>
+    </div>
+    '''
+    return HttpResponse(html)
 
 
 # ── HTMX Data Partials (embed in other pages / lazy-load) ─────────────────────
