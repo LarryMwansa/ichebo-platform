@@ -4,7 +4,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
-from .models import Record
+from .models import Record, Relationship
+from governance.services import get_linked_records
 
 JOURNAL_RECORD_TYPES = [
     ('prayer', 'Prayer'),
@@ -134,3 +135,58 @@ def htmx_delete_record(request, record_id):
     record.deleted_at = timezone.now()
     record.save(update_fields=['deleted_at'])
     return HttpResponse('')
+
+
+# ── HTMX: linked records panel ────────────────────────────────────────────────
+
+@login_required
+def htmx_linked_records(request, record_id):
+    record = get_object_or_404(Record, id=record_id, deleted_at__isnull=True)
+    grouped = get_linked_records(record_id)
+
+    return render(request, '_linked_records_section.html', {
+        'record': record,
+        'grouped': grouped,
+        'relationship_types': Relationship.RELATIONSHIP_TYPE_CHOICES,
+        'can_add_link': True,
+    })
+
+
+# ── HTMX: create relationship ─────────────────────────────────────────────────
+
+@login_required
+def htmx_relationship_create(request):
+    if request.method != 'POST':
+        return HttpResponse('', status=405)
+
+    from_record_id = request.POST.get('from_record_id', '').strip()
+    to_record_id = request.POST.get('to_record_id', '').strip()
+    rel_type = request.POST.get('relationship_type', '')
+    notes = request.POST.get('notes', '').strip() or None
+
+    try:
+        from_record = get_object_or_404(Record, id=from_record_id, deleted_at__isnull=True)
+        to_record = get_object_or_404(Record, id=to_record_id, deleted_at__isnull=True) if to_record_id else None
+
+        if not to_record:
+            return HttpResponse('<p style="color:var(--error)">Target record not found.</p>', status=400)
+
+        Relationship.objects.create(
+            created_by=request.user,
+            from_record=from_record,
+            to_record=to_record,
+            relationship_type=rel_type,
+            direction='directed',
+            notes=notes,
+        )
+
+        # Return refreshed linked records panel
+        grouped = get_linked_records(from_record_id)
+        return render(request, '_linked_records_section.html', {
+            'record': from_record,
+            'grouped': grouped,
+            'relationship_types': Relationship.RELATIONSHIP_TYPE_CHOICES,
+            'can_add_link': True,
+        })
+    except Exception as e:
+        return HttpResponse(f'<p style="color:var(--error)">Error: {str(e)}</p>', status=400)

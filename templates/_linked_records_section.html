@@ -1,0 +1,62 @@
+<!-- Linked Records panel — Generic reusable partial (all record types) -->
+<div class="linked-records-panel gov-panel" id="linked-records-panel">
+  <div class="gov-panel-label">Linked Records</div>
+
+  {% if grouped %}
+    {% for rel_type, entries in grouped.items %}
+    <div class="gov-link-group">
+      <div class="gov-link-group-label">{{ rel_type|title|cut:"_" }}</div>
+      {% for entry in entries %}
+      {% if entry.bible_verse %}
+      <!-- Scripture link -->
+      <div class="gov-link-item gov-scripture-link">
+        <span class="gov-link-type-badge">Scripture</span>
+        <span class="gov-link-title">
+          {{ entry.bible_verse.book.name }} {{ entry.bible_verse.chapter }}:{{ entry.bible_verse.verse }}
+        </span>
+        {% if entry.bible_verse.text %}
+        <p class="gov-verse-text">{{ entry.bible_verse.text|truncatechars:150 }}</p>
+        {% endif %}
+      </div>
+      {% elif entry.record %}
+      <!-- Record link — generic router based on record_family -->
+      <div class="gov-link-item" style="cursor: pointer;"
+           hx-get="{% url 'records:records-detail' entry.record.id %}"
+           hx-target="#main-content"
+           hx-push-url="true">
+        <span class="gov-link-type-badge">{{ entry.record.record_type }}</span>
+        <span class="gov-link-title">{{ entry.record.title }}</span>
+        <span class="gov-link-meta" style="font-size:11px;color:var(--muted);">{{ entry.record.record_family }}</span>
+        <span class="gov-link-direction">{% if entry.direction == 'out' %}→{% else %}←{% endif %}</span>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endfor %}
+  {% else %}
+  <p class="gov-empty" style="padding:12px 0">No linked records yet.</p>
+  {% endif %}
+
+  <!-- Add Link form (everyone) -->
+  {% if can_add_link %}
+  <div class="gov-add-link-section">
+    <div class="gov-panel-label" style="margin-top:1rem">Add Link</div>
+    <form hx-post="{% url 'records:htmx-relationship-create' %}"
+          hx-target="#linked-records-panel"
+          hx-swap="outerHTML"
+          style="display:flex;flex-direction:column;gap:8px">
+      {% csrf_token %}
+      <input type="hidden" name="from_record_id" value="{{ record.id }}">
+      <select name="relationship_type" class="form-input-touch">
+        <option value="">Choose relationship type...</option>
+        {% for value, label in relationship_types %}
+        <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+      <input type="text" name="to_record_id" placeholder="Target Record ID" class="form-input-touch">
+      <input type="text" name="notes" placeholder="Notes (optional)" class="form-input-touch">
+      <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; width: 100%;">Add Link</button>
+    </form>
+  </div>
+  {% endif %}
+</div>

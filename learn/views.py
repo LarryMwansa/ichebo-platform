@@ -5,6 +5,7 @@ from django.http import HttpResponse
 
 from records.models import Record, Relationship
 from activity.models import Activity
+from governance.services import get_linked_records
 
 
 def _user_level(user):
@@ -806,4 +807,18 @@ def htmx_cert_queue(request):
 
     return render(request, 'learn/partials/cert_queue.html', {
         'certifications': certifications,
+    })
+
+
+@login_required
+def htmx_linked_records(request, record_id):
+    """HTMX GET: returns linked records panel for a lesson or programme."""
+    record = get_object_or_404(Record, id=record_id, deleted_at__isnull=True)
+    grouped = get_linked_records(record_id)
+
+    return render(request, '_linked_records_section.html', {
+        'record': record,
+        'grouped': grouped,
+        'relationship_types': Relationship.RELATIONSHIP_TYPE_CHOICES,
+        'can_add_link': True,
     })

@@ -42,5 +42,15 @@
       <span></span>
     {% endif %}
   </div>
+
+  <!-- Linked Records Panel -->
+  <div style="margin-top: 2rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
+    <div id="linked-records-panel"
+         hx-get="{% url 'learn:htmx-linked-records' lesson.id %}"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+      <div style="color: var(--muted); font-size: 13px;">Loading linked records…</div>
+    </div>
+  </div>
 </div>
 {% endblock %}

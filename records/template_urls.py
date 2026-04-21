@@ -9,4 +9,6 @@ urlpatterns = [
     path('htmx/create/', template_views.htmx_create_record, name='htmx-create'),
     path('htmx/<uuid:record_id>/edit/', template_views.htmx_edit_record, name='htmx-edit'),
     path('htmx/<uuid:record_id>/delete/', template_views.htmx_delete_record, name='htmx-delete'),
+    path('htmx/<uuid:record_id>/linked-records/', template_views.htmx_linked_records, name='htmx-linked-records'),
+    path('htmx/relationship/create/', template_views.htmx_relationship_create, name='htmx-relationship-create'),
 ]

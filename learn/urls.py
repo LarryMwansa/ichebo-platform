@@ -41,4 +41,5 @@ urlpatterns = [
     path('htmx/catalogue/', views.htmx_catalogue, name='htmx-catalogue'),
     path('htmx/progress/<uuid:programme_id>/', views.htmx_progress, name='htmx-progress'),
     path('htmx/cert-queue/', views.htmx_cert_queue, name='htmx-cert-queue'),
+    path('htmx/linked-records/<uuid:record_id>/', views.htmx_linked_records, name='htmx-linked-records'),
 ]
