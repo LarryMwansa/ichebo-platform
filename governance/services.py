@@ -115,7 +115,7 @@ def get_linked_records(record_id):
     incoming = (
         Relationship.objects
         .filter(to_record_id=record_id, deleted_at__isnull=True)
-        .select_related('from_record')
+        .select_related('from_record', 'bible_verse', 'bible_verse__book')
     )
 
     grouped = {}
@@ -131,7 +131,7 @@ def get_linked_records(record_id):
             'direction': 'in',
             'rel': rel,
             'record': rel.from_record,
-            'bible_verse': None,
+            'bible_verse': rel.bible_verse,
         })
 
     return grouped

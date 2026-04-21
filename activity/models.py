@@ -68,6 +68,11 @@ class Activity(models.Model):
     metadata = models.JSONField(default=dict, blank=True)
     # metadata keys: source_app, icon, color, is_template, template_id, service_order
 
+    linked_record = models.ForeignKey(
+        'records.Record', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='linked_activities'
+    )
+
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
 

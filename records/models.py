@@ -121,6 +121,7 @@ class Relationship(models.Model):
         ('has_subject', 'Has Subject'),
         ('has_entity', 'Has Entity'),
         ('tagged_in', 'Tagged In'),
+        ('community_ref', 'Community Reference'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

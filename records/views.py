@@ -1,9 +1,12 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.utils import timezone
 from .models import Record, Relationship
 from .serializers import RecordSerializer, RelationshipSerializer
 from accounts.permissions import check_record_permission
+from governance.services import get_linked_records
 
 class RecordViewSet(viewsets.ModelViewSet):
     serializer_class = RecordSerializer
@@ -47,8 +50,38 @@ class RecordViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-from rest_framework.response import Response
-from rest_framework.decorators import action
+    @action(detail=True, methods=['get'])
+    def related(self, request, pk=None):
+        record = self.get_object()
+        grouped = get_linked_records(record.id)
+        result = {}
+        for rel_type, entries in grouped.items():
+            result[rel_type] = []
+            for entry in entries:
+                item = {
+                    'direction': entry['direction'],
+                    'relationship_id': str(entry['rel'].id),
+                    'strength': entry['rel'].strength,
+                    'notes': entry['rel'].notes,
+                }
+                if entry.get('bible_verse'):
+                    bv = entry['bible_verse']
+                    item['bible_verse'] = {
+                        'id': bv.id,
+                        'reference': str(bv),
+                        'text': bv.text,
+                    }
+                elif entry.get('record'):
+                    r = entry['record']
+                    item['record'] = {
+                        'id': str(r.id),
+                        'title': r.title,
+                        'record_type': r.record_type,
+                        'record_family': r.record_family,
+                        'status': r.status,
+                    }
+                result[rel_type].append(item)
+        return Response(result)
 
 class RelationshipViewSet(viewsets.ModelViewSet):
     serializer_class = RelationshipSerializer
