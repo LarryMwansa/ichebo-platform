@@ -39,16 +39,23 @@
           hx-get="{% url 'records:htmx-edit' record.id %}"
           hx-target="#drawerContent"
           hx-swap="innerHTML"
-          onclick="window.ICSDrawer.open('Edit Journal Entry')">
+          onclick="window.ICSDrawer.open('Edit Entry')">
     Edit Entry
   </button>
-  <a href="{% url 'records:records-home' %}" 
-     hx-get="{% url 'records:records-home' %}" 
-     hx-target="#main-content" 
-     hx-push-url="true"
-     class="btn-touch" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); flex: 1; text-align: center;">
+  <button class="btn-touch" style="background: var(--error); color: #fff; flex: 1;"
+          hx-post="{% url 'records:htmx-delete' record.id %}"
+          hx-target="#main-content"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          hx-confirm="Delete this entry?">
+    Delete
+  </button>
+  <button class="btn-touch" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); flex: 1;"
+          hx-get="{% url 'records:records-home' %}"
+          hx-target="#main-content"
+          hx-push-url="true">
     Close
-  </a>
+  </button>
 </div>
 {% endif %}
 

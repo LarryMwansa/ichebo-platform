@@ -1,3 +1,7 @@
+<div hx-swap-oob="innerHTML:#nav-left-content">
+  <div class="nav-left" style="display: none;"></div>
+</div>
+
 <form class="record-drawer-form"
       hx-post="{% url 'records:htmx-create' %}"
       hx-swap="none">
@@ -31,7 +35,7 @@
       Save Entry
     </button>
     <button type="button" class="btn-touch" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); flex: 1;"
-            onclick="window.ICSDrawer.close()">
+            onclick="window.ICSDrawer.close(); htmx.ajax('GET', '{% url 'records:records-home' %}', { target: '#main-content', swap: 'innerHTML', pushUrl: true });">
       Cancel
     </button>
   </div>

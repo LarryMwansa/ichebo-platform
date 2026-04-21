@@ -108,7 +108,10 @@ def htmx_edit_record(request, record_id):
         if title:
             record.title = title
         record.content = request.POST.get('content', '').strip()
-        record.save(update_fields=['title', 'content', 'updated_at'])
+        rtype = request.POST.get('record_type', record.record_type)
+        if rtype:
+            record.record_type = rtype
+        record.save(update_fields=['title', 'content', 'record_type', 'updated_at'])
         return render(request, 'records/partials/record_card.html', {'record': record})
 
     # GET — return edit form pre-populated

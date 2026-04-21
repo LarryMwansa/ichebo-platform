@@ -22,13 +22,20 @@
     </div>
   </div>
 
-  <div class="list-item__action" onclick="event.stopPropagation();">
+  <div class="list-item__action" onclick="event.stopPropagation();" style="display: flex; gap: 4px;">
     <button class="btn-touch" style="padding: 8px;"
             hx-get="{% url 'records:htmx-edit' record.id %}"
             hx-target="#drawerContent"
             hx-swap="innerHTML"
-            onclick="window.ICSDrawer.open('Edit Journal Entry')">
+            onclick="window.ICSDrawer.open('Edit Entry')">
       <span class="material-symbols-outlined">edit</span>
+    </button>
+    <button class="btn-touch" style="padding: 8px; color: var(--error);"
+            hx-post="{% url 'records:htmx-delete' record.id %}"
+            hx-target="#record-{{ record.id }}"
+            hx-swap="outerHTML swap:1s"
+            hx-confirm="Delete this entry?">
+      <span class="material-symbols-outlined">delete</span>
     </button>
   </div>
 </div>
