@@ -17,6 +17,18 @@
   </div>
 </div>
 
+{% if via_record %}
+<div class="breadcrumb-via" style="margin-bottom: 8px;">
+  <a href="{% url 'governance:mandate-detail' via_record.id %}" 
+     hx-get="{% url 'governance:mandate-detail' via_record.id %}" 
+     hx-target="#governance-content" 
+     style="font-size: 11px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+    <span class="material-symbols-outlined" style="font-size: 14px;">arrow_back_ios</span>
+    Linked via: <span style="text-decoration: underline;">{{ via_record.title|truncatechars:30 }}</span>
+  </a>
+</div>
+{% endif %}
+
 <h2 class="gov-detail-title">{{ record.title }}</h2>
 {% if record.summary %}<p class="gov-detail-summary">{{ record.summary }}</p>{% endif %}
 

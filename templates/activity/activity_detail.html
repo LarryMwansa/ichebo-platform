@@ -17,6 +17,18 @@
 {% block activity_content %}
 <div class="activity-detail" style="margin-top: var(--space-s);">
   
+  {% if via_record %}
+  <div class="breadcrumb-via" style="margin-bottom: 12px;">
+    <a href="{% url 'records:records-detail' via_record.id %}" 
+       hx-get="{% url 'records:records-detail' via_record.id %}" 
+       hx-target="#main-content" 
+       style="font-size: 11px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+      <span class="material-symbols-outlined" style="font-size: 14px;">arrow_back_ios</span>
+      Linked via: <span style="text-decoration: underline;">{{ via_record.title|truncatechars:30 }}</span>
+    </a>
+  </div>
+  {% endif %}
+
   <!-- Header -->
   <div class="activity-detail-header">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">

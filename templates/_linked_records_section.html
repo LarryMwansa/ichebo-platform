@@ -21,7 +21,7 @@
       {% elif entry.record %}
       <!-- Record link — generic router based on record_family -->
       <div class="gov-link-item" style="cursor: pointer;"
-           hx-get="{% url 'records:records-detail' entry.record.id %}"
+           hx-get="{% url 'records:records-detail' entry.record.id %}?via={{ record.id }}"
            hx-target="#main-content"
            hx-push-url="true">
         <span class="gov-link-type-badge">{{ entry.record.record_type }}</span>

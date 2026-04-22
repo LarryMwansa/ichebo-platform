@@ -54,7 +54,16 @@ def record_detail(request, record_id):
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied
 
-    return render(request, 'records/record_detail.html', {'record': record})
+    # Breadcrumb: find where we came from
+    via_record = None
+    via_id = request.GET.get('via')
+    if via_id:
+        via_record = Record.objects.filter(id=via_id).first()
+
+    return render(request, 'records/record_detail.html', {
+        'record': record,
+        'via_record': via_record,
+    })
 
 
 # ── HTMX: create record ───────────────────────────────────────────────────────

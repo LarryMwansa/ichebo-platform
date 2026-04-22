@@ -26,8 +26,17 @@ def activity_detail(request, activity_id):
     activity = get_object_or_404(
         Activity, id=activity_id, deleted_at__isnull=True
     )
+    
+    # Breadcrumb: find where we came from
+    via_record = None
+    via_id = request.GET.get('via')
+    if via_id:
+        from records.models import Record
+        via_record = Record.objects.filter(id=via_id).first()
+
     return render(request, 'activity/activity_detail.html', {
         'activity': activity,
+        'via_record': via_record,
         'user_level': _user_level(request.user),
     })
 

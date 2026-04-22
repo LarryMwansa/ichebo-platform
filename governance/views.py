@@ -106,8 +106,15 @@ def library_detail(request, record_id):
         Record, id=record_id, record_family='governance',
         record_type__in=LIBRARY_TYPES, deleted_at__isnull=True
     )
+
+    via_record = None
+    via_id = request.GET.get('via')
+    if via_id:
+        via_record = Record.objects.filter(id=via_id).first()
+
     return _shell_or_partial(request, 'governance/_library_detail.html', {
         'record':      record,
+        'via_record':  via_record,
         'library_types': LIBRARY_TYPE_LABELS,
         'is_level5':   _level(request.user) >= 5,
     })
@@ -155,8 +162,15 @@ def mandate_detail(request, record_id):
         Record, id=record_id, record_family='governance',
         record_type__in=MANDATE_TYPES, deleted_at__isnull=True
     )
+
+    via_record = None
+    via_id = request.GET.get('via')
+    if via_id:
+        via_record = Record.objects.filter(id=via_id).first()
+
     return _shell_or_partial(request, 'governance/_mandate_detail.html', {
         'record':        record,
+        'via_record':    via_record,
         'mandate_types': MANDATE_TYPE_LABELS,
         'is_level5':     _level(request.user) >= 5,
     })

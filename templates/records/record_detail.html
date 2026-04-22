@@ -16,6 +16,18 @@
 {% block records_content %}
 
 <div class="record-detail-header" style="margin-top: var(--space-s);">
+  {% if via_record %}
+  <div class="breadcrumb-via" style="margin-bottom: 8px;">
+    <a href="{% url 'records:records-detail' via_record.id %}" 
+       hx-get="{% url 'records:records-detail' via_record.id %}" 
+       hx-target="#main-content" 
+       style="font-size: 11px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+      <span class="material-symbols-outlined" style="font-size: 14px;">arrow_back_ios</span>
+      Linked via: <span style="text-decoration: underline;">{{ via_record.title|truncatechars:30 }}</span>
+    </a>
+  </div>
+  {% endif %}
+
   <div class="label-caps" style="color: var(--primary); margin-bottom: 4px;">
     {{ record.get_record_type_display|default:record.record_type|title }}
   </div>
