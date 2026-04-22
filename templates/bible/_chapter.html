@@ -26,6 +26,9 @@
       {% if verse.verse in tenant_noted %}
       <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--secondary-light);" title="Community insight"></div>
       {% endif %}
+      {% if verse.verse in linked_noted %}
+      <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--success);" title="Linked records"></div>
+      {% endif %}
     </div>
   </div>
   {% empty %}

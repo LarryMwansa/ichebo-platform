@@ -74,6 +74,15 @@ def htmx_chapter(request):
     personal_noted, tenant_noted = get_chapter_note_verse_numbers(
         request.user, translation, book_code, chapter
     )
+
+    from records.models import Relationship
+    linked_noted = list(Relationship.objects.filter(
+        bible_verse__translation=translation,
+        bible_verse__book__code=book_code,
+        bible_verse__chapter=chapter,
+        deleted_at__isnull=True
+    ).values_list('bible_verse__verse', flat=True).distinct())
+
     book = BibleBook.objects.filter(code=book_code).first()
 
     context = {
@@ -83,6 +92,7 @@ def htmx_chapter(request):
         'verses': verses,
         'personal_noted': personal_noted,
         'tenant_noted': tenant_noted,
+        'linked_noted': linked_noted,
     }
     return render(request, 'bible/_chapter.html', context)
 
@@ -169,6 +179,7 @@ def htmx_annotation_panel(request, verse_id):
         'tenant_notes': tenant_notes,
         'learn_references': learn_references,
         'links': links,
+        'total_links': relationships.count(),
         'has_links': relationships.exists(),
         'competence_level': competence_level,
         'can_publish_tenant_note': competence_level >= 3,

@@ -3,6 +3,18 @@
   <div class="bible-badge-version">{{ verse.book.code }} {{ verse.chapter }}:{{ verse.verse }}</div>
 </div>
 
+<div class="nav-left" id="nav-left-content" hx-swap-oob="true">
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <div class="status-badge" 
+         style="background: {% if total_links > 0 %}var(--success){% else %}var(--hover){% endif %}; 
+                color: {% if total_links > 0 %}#fff{% else %}var(--muted){% endif %}; 
+                font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.05em;">
+       {{ total_links }} LINK{{ total_links|pluralize|upper }}
+    </div>
+    <span style="font-size: 13px; font-weight: 600; color: var(--text);">{{ verse.book.code }} {{ verse.chapter }}:{{ verse.verse }}</span>
+  </div>
+</div>
+
 <!-- Annotation Panel Body -->
 <div class="bible-annotation-panel__body" style="display: flex; flex-direction: column; margin: 0; min-height: 100%;">
 
