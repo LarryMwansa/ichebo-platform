@@ -1,16 +1,27 @@
 {% extends "records/base_records.html" %}
 
 {% block nav_left %}
-  <div class="nav-left" id="nav-left-content" hx-swap-oob="true">
-    <a href="{% url 'records:records-home' %}" 
-       hx-get="{% url 'records:records-home' %}" 
+  {% if request.htmx %}
+    <div class="nav-left" id="nav-left-content" hx-swap-oob="true">
+      <a href="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'records:records-home' %}{% endif %}" 
+         hx-get="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'records:records-home' %}{% endif %}" 
+         hx-target="#main-content" 
+         hx-push-url="true"
+         class="btn-touch" aria-label="Back">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <span class="nav-title">{{ record.title|truncatechars:25 }}</span>
+    </div>
+  {% else %}
+    <a href="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'records:records-home' %}{% endif %}" 
+       hx-get="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'records:records-home' %}{% endif %}" 
        hx-target="#main-content" 
        hx-push-url="true"
        class="btn-touch" aria-label="Back">
       <span class="material-symbols-outlined">arrow_back</span>
     </a>
     <span class="nav-title">{{ record.title|truncatechars:25 }}</span>
-  </div>
+  {% endif %}
 {% endblock %}
 
 {% block records_content %}
@@ -63,7 +74,7 @@
     Delete
   </button>
   <button class="btn-touch" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); flex: 1;"
-          hx-get="{% url 'records:records-home' %}"
+          hx-get="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'records:records-home' %}{% endif %}"
           hx-target="#main-content"
           hx-push-url="true">
     Close
