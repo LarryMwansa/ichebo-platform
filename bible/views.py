@@ -266,6 +266,38 @@ def htmx_save_note(request):
 
 
 @login_required
+def htmx_relationship_create(request):
+    """
+    HTMX: create a relationship between a Record and a BibleVerse.
+    """
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    from records.models import Record, Relationship
+    from .models import BibleVerse
+
+    from_record_id = request.POST.get('from_record_id')
+    bible_verse_id = request.POST.get('bible_verse_id')
+    rel_type = request.POST.get('relationship_type', 'references')
+    notes = request.POST.get('notes', '').strip() or None
+
+    from_record = get_object_or_404(Record, id=from_record_id)
+    bible_verse = get_object_or_404(BibleVerse, id=bible_verse_id)
+
+    Relationship.objects.create(
+        created_by=request.user,
+        from_record=from_record,
+        bible_verse=bible_verse,
+        relationship_type=rel_type,
+        direction='directed',
+        notes=notes,
+    )
+
+    # Return refreshed annotation panel
+    return htmx_annotation_panel(request, bible_verse_id)
+
+
+@login_required
 def bible_search_view(request):
     """
     Full-page Bible search view.

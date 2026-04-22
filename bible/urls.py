@@ -20,4 +20,5 @@ urlpatterns = [
     path('htmx/search/sheet/', views.htmx_search_sheet, name='htmx-search-sheet'),
     path('htmx/appearance/', views.htmx_appearance_sheet, name='htmx-appearance'),
     path('htmx/set-translation/', views.htmx_set_translation, name='htmx-set-translation'),
+    path('htmx/relationship/create/', views.htmx_relationship_create, name='htmx-relationship-create'),
 ]

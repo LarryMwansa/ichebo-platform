@@ -121,7 +121,31 @@
     <!-- TAB 3: LINKS (Cross-Refs & Activity) -->
     <div id="links-tab" class="tab-content" style="display: none;">
       
-      {% if links.activity or links.other %}
+      <div style="margin-bottom: 1.5rem;">
+        <button class="btn-touch" style="width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--primary); font-size: 13px; font-weight: 600;"
+                onclick="openLinkModal()">
+          <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">add_link</span>
+          Add Manual Link
+        </button>
+      </div>
+
+      {% if links.activity or links.governance or links.other %}
+        {% if links.governance %}
+        <div style="margin-bottom: 2rem;">
+          <div class="label-caps">Governance Context</div>
+          <div class="list-group">
+            {% for rel in links.governance %}
+            <a href="/governance/records/{{ rel.from_record.id }}/" class="list-item" style="text-decoration: none;">
+              <div class="list-item__content">
+                <div class="list-item__title">{{ rel.from_record.title }}</div>
+                <div class="list-item__meta">{{ rel.from_record.record_type|title }} · {{ rel.relationship_type|title|cut:"_" }}</div>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
         {% if links.activity %}
         <div style="margin-bottom: 2rem;">
           <div class="label-caps">Related Activities</div>
@@ -130,7 +154,7 @@
             <a href="/activities/{{ rel.from_record.id }}/" class="list-item" style="text-decoration: none;">
               <div class="list-item__content">
                 <div class="list-item__title">{{ rel.from_record.title }}</div>
-                <div class="list-item__meta">Activity Log</div>
+                <div class="list-item__meta">Activity · {{ rel.relationship_type|title|cut:"_" }}</div>
               </div>
             </a>
             {% endfor %}
@@ -146,7 +170,7 @@
             <div class="list-item">
               <div class="list-item__content">
                 <div class="list-item__title">{{ rel.from_record.title }}</div>
-                <div class="list-item__meta">{{ rel.from_record.record_family|title }} · {{ rel.relationship_type }}</div>
+                <div class="list-item__meta">{{ rel.from_record.record_family|title }} · {{ rel.relationship_type|title|cut:"_" }}</div>
               </div>
             </div>
             {% endfor %}
@@ -154,12 +178,9 @@
         </div>
         {% endif %}
       {% else %}
-        <div style="padding: 3rem 1rem; text-align: center; color: var(--muted);">
+        <div style="padding: 2rem 1rem; text-align: center; color: var(--muted);">
           <span class="material-symbols-outlined" style="font-size: 40px; margin-bottom: 1rem; opacity: 0.3;">rebase_edit</span>
-          <p style="font-size: 0.9rem;">No cross-references or record links found for this verse.</p>
-          <button class="btn-touch" style="margin-top: 1rem; background: var(--bg); border: 1px solid var(--border); color: var(--primary); font-size: 13px; font-weight: 600;">
-            Add Manual Link
-          </button>
+          <p style="font-size: 0.85rem;">No cross-references or record links found for this verse.</p>
         </div>
       {% endif %}
       
@@ -172,6 +193,27 @@
         </button>
       </div>
     </div>
+
+    <!-- Hidden form for relationship creation -->
+    <form id="bible-link-form" hx-post="{% url 'bible:htmx-relationship-create' %}" hx-target="#drawerContent">
+      {% csrf_token %}
+      <input type="hidden" name="bible_verse_id" value="{{ verse.id }}">
+      <input type="hidden" name="from_record_id" id="target-record-id">
+      <input type="hidden" name="relationship_type" value="references">
+    </form>
+
+    {% include "records/partials/_link_modal.html" %}
+
+    <script>
+      // Override selectRecord for Bible context
+      window.selectRecord = function(recordId, recordTitle) {
+        if (confirm('Link this verse to "' + recordTitle + '"?')) {
+          document.getElementById('target-record-id').value = recordId;
+          htmx.trigger('#bible-link-form', 'submit');
+        }
+        closeLinkModal();
+      };
+    </script>
 
   </div>
 </div>
