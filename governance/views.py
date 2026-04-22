@@ -203,11 +203,24 @@ def htmx_linked_records(request, record_id):
 
     record = get_object_or_404(Record, id=record_id, deleted_at__isnull=True)
     grouped = get_linked_records(record_id)
+    
+    # Better labels for governance context
+    rel_types = [
+        ('derived_from', 'Derived From'),
+        ('aligns_with', 'Aligns With'),
+        ('authorised_by', 'Authorised By'),
+        ('has_symbol', 'Has Symbol'),
+        ('matches_pattern', 'Matches Pattern'),
+        ('has_subject', 'Has Subject'),
+        ('has_entity', 'Has Entity'),
+        ('references', 'References'),
+        ('relates_to', 'Relates To'),
+    ]
 
     return render(request, 'governance/_linked_records.html', {
         'record':             record,
         'grouped':            grouped,
-        'relationship_types': RELATIONSHIP_TYPES,
+        'relationship_types': rel_types,
         'is_level5':          _level(request.user) >= 5,
     })
 

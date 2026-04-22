@@ -139,16 +139,37 @@ def htmx_delete_record(request, record_id):
 
 # ── HTMX: linked records panel ────────────────────────────────────────────────
 
+RELATIONSHIP_CONTEXTS = {
+    'learning': ['part_of', 'answers', 'fulfills', 'references', 'relates_to'],
+    'governance': ['derived_from', 'aligns_with', 'authorised_by', 'has_symbol', 'matches_pattern', 'has_subject', 'has_entity', 'references'],
+    'activity': ['assigned_to', 'tracks', 'completes', 'aligns_with', 'relates_to'],
+    'community': ['community_ref', 'tagged_in', 'relates_to'],
+    'personal': ['relates_to', 'references', 'tracks'],
+}
+
 @login_required
 def htmx_linked_records(request, record_id):
     record = get_object_or_404(Record, id=record_id, deleted_at__isnull=True)
     grouped = get_linked_records(record_id)
+    
+    # Filter relationship types based on family or explicit context param
+    context_slug = request.GET.get('context', record.record_family)
+    allowed_types = RELATIONSHIP_CONTEXTS.get(context_slug, [])
+    
+    if allowed_types:
+        relationship_types = [
+            (val, label) for val, label in Relationship.RELATIONSHIP_TYPE_CHOICES 
+            if val in allowed_types
+        ]
+    else:
+        relationship_types = Relationship.RELATIONSHIP_TYPE_CHOICES
 
     return render(request, '_linked_records_section.html', {
         'record': record,
         'grouped': grouped,
-        'relationship_types': Relationship.RELATIONSHIP_TYPE_CHOICES,
+        'relationship_types': relationship_types,
         'can_add_link': True,
+        'context': context_slug,
     })
 
 

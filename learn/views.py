@@ -816,9 +816,17 @@ def htmx_linked_records(request, record_id):
     record = get_object_or_404(Record, id=record_id, deleted_at__isnull=True)
     grouped = get_linked_records(record_id)
 
+    # Filter for learning context
+    allowed_types = ['part_of', 'answers', 'fulfills', 'references', 'relates_to']
+    relationship_types = [
+        (val, label) for val, label in Relationship.RELATIONSHIP_TYPE_CHOICES 
+        if val in allowed_types
+    ]
+
     return render(request, '_linked_records_section.html', {
         'record': record,
         'grouped': grouped,
-        'relationship_types': Relationship.RELATIONSHIP_TYPE_CHOICES,
+        'relationship_types': relationship_types,
         'can_add_link': True,
+        'context': 'learning',
     })
