@@ -169,10 +169,12 @@ def htmx_annotation_panel(request, verse_id):
         'tenant_notes': tenant_notes,
         'learn_references': learn_references,
         'links': links,
+        'has_links': relationships.exists(),
         'competence_level': competence_level,
         'can_publish_tenant_note': competence_level >= 3,
         'book': verse.book,
         'chapter': verse.chapter,
+        'active_tab': request.GET.get('active_tab', 'bible-note-tab'),
     }
     return render(request, 'bible/_annotation_panel.html', context)
 
@@ -258,10 +260,13 @@ def htmx_save_note(request):
 
     has_tenant = note_class == 'organizational' or False
 
+    has_links = Relationship.objects.filter(bible_verse=verse, deleted_at__isnull=True).exists()
+
     return render(request, 'bible/_verse_indicators.html', {
         'verse': verse,
         'has_personal_note': has_personal,
         'has_tenant_note': has_tenant,
+        'has_links': has_links,
     })
 
 
@@ -293,7 +298,9 @@ def htmx_relationship_create(request):
         notes=notes,
     )
 
-    # Return refreshed annotation panel
+    # Return refreshed annotation panel with Links tab active
+    request.GET = request.GET.copy()
+    request.GET['active_tab'] = 'links-tab'
     return htmx_annotation_panel(request, bible_verse_id)
 
 

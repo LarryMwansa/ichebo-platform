@@ -15,15 +15,15 @@
 
   <!-- 2. Tab Navigation (Sticky below verse) -->
   <div style="position: sticky; top: 0; background: var(--card); border-bottom: 1px solid var(--border); display: flex; padding: 4px 1rem; gap: 8px; z-index: 10;">
-    <button onclick="switchTab('bible-note-tab')" id="bible-note-tab-btn" class="tab-btn tab-btn--active">Bible Note</button>
-    <button onclick="switchTab('teaching-note-tab')" id="teaching-note-tab-btn" class="tab-btn">Teaching</button>
-    <button onclick="switchTab('links-tab')" id="links-tab-btn" class="tab-btn">Links</button>
+    <button onclick="switchTab('bible-note-tab')" id="bible-note-tab-btn" class="tab-btn {% if active_tab == 'bible-note-tab' %}tab-btn--active{% endif %}">Bible Note</button>
+    <button onclick="switchTab('teaching-note-tab')" id="teaching-note-tab-btn" class="tab-btn {% if active_tab == 'teaching-note-tab' %}tab-btn--active{% endif %}">Teaching</button>
+    <button onclick="switchTab('links-tab')" id="links-tab-btn" class="tab-btn {% if active_tab == 'links-tab' %}tab-btn--active{% endif %}">Links</button>
   </div>
 
   <div style="padding: 1rem; flex: 1;">
     
     <!-- TAB 1: BIBLE NOTE (Personal + Community) -->
-    <div id="bible-note-tab" class="tab-content">
+    <div id="bible-note-tab" class="tab-content" style="{% if active_tab != 'bible-note-tab' %}display: none;{% endif %}">
       <!-- Community Notes -->
       {% if tenant_notes %}
       <div style="margin-bottom: 2rem;">
@@ -63,7 +63,7 @@
     </div>
 
     <!-- TAB 2: TEACHING NOTE (Learn + Handbook + Publish) -->
-    <div id="teaching-note-tab" class="tab-content" style="display: none;">
+    <div id="teaching-note-tab" class="tab-content" style="{% if active_tab != 'teaching-note-tab' %}display: none;{% endif %}">
       
       <!-- Learn Lessons (Primary Teaching) -->
       {% if learn_references %}
@@ -119,7 +119,7 @@
     </div>
 
     <!-- TAB 3: LINKS (Cross-Refs & Activity) -->
-    <div id="links-tab" class="tab-content" style="display: none;">
+    <div id="links-tab" class="tab-content" style="{% if active_tab != 'links-tab' %}display: none;{% endif %}">
       
       <div style="margin-bottom: 1.5rem;">
         <button class="btn-touch" style="width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--primary); font-size: 13px; font-weight: 600;"
@@ -217,6 +217,9 @@
 
   </div>
 </div>
+
+<!-- Indicator update (OOB) -->
+{% include "bible/_verse_indicators.html" with has_personal_note=personal_note has_tenant_note=tenant_notes has_links=has_links %}
 
 <style>
   .tab-btn {
