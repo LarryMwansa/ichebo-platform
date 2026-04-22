@@ -1,5 +1,9 @@
 <div class="list-item activity-item" id="activity-{{ activity.id }}" 
-     hx-swap-oob="afterbegin:#activity-list-upcoming">
+     hx-swap-oob="afterbegin:#activity-list-upcoming"
+     hx-get="{% url 'activity:activity-detail' activity.id %}"
+     hx-target="#main-content"
+     hx-push-url="true"
+     style="cursor: pointer;">
   <div class="list-item__icon">
     <span class="status-badge 
       {% if activity.due_at and activity.due_at < now %}status-badge--danger
@@ -25,7 +29,7 @@
     </div>
   </div>
 
-  <div class="activity-actions">
+  <div class="activity-actions" onclick="event.stopPropagation();">
     <button class="activity-action-btn activity-action-btn--complete"
             hx-post="{% url 'activity:htmx-complete' activity.id %}"
             hx-target="#activity-{{ activity.id }}"

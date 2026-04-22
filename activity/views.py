@@ -21,6 +21,17 @@ TYPE_LABELS = {
 }
 
 
+@login_required
+def activity_detail(request, activity_id):
+    activity = get_object_or_404(
+        Activity, id=activity_id, deleted_at__isnull=True
+    )
+    return render(request, 'activity/activity_detail.html', {
+        'activity': activity,
+        'user_level': _user_level(request.user),
+    })
+
+
 # ── My Activities home ────────────────────────────────────────────────────────
 
 @login_required
@@ -139,6 +150,12 @@ def htmx_complete_activity(request, activity_id):
         new_value='completed',
     )
 
+    if request.GET.get('redirect') == 'detail':
+        from django.urls import reverse
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
+        return response
+
     return render(request, 'activity/partials/_completed_item.html', {
         'activity': activity,
     })
@@ -234,3 +251,25 @@ def htmx_activity_list(request):
         'activities':  qs,
         'active_type': activity_type,
     })
+
+
+@login_required
+def htmx_set_activity_link(request, activity_id):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+    
+    activity = get_object_or_404(
+        Activity, id=activity_id, created_by=request.user, deleted_at__isnull=True
+    )
+    record_id = request.POST.get('record_id')
+    if record_id:
+        from records.models import Record
+        record = get_object_or_404(Record, id=record_id)
+        activity.linked_record = record
+        activity.save(update_fields=['linked_record', 'updated_at'])
+    
+    # Return HX-Redirect to refresh the full detail page with the new link
+    from django.urls import reverse
+    response = HttpResponse(status=204)
+    response['HX-Redirect'] = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
+    return response

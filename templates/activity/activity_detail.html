@@ -1,0 +1,155 @@
+{% extends "activity/base_activity.html" %}
+{% load static %}
+
+{% block nav_left %}
+  <div class="nav-left" id="nav-left-content" hx-swap-oob="true">
+    <a href="{% url 'activity:activity-home' %}" 
+       hx-get="{% url 'activity:activity-home' %}" 
+       hx-target="#main-content" 
+       hx-push-url="true"
+       class="btn-touch" aria-label="Back">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <span class="nav-title">{{ activity.title|truncatechars:20 }}</span>
+  </div>
+{% endblock %}
+
+{% block activity_content %}
+<div class="activity-detail" style="margin-top: var(--space-s);">
+  
+  <!-- Header -->
+  <div class="activity-detail-header">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+      <div>
+        <span class="status-badge 
+          {% if activity.due_at and activity.due_at < now %}status-badge--danger
+          {% elif activity.due_at and activity.due_at.date == now.date %}status-badge--active
+          {% else %}status-badge--muted{% endif %}" style="margin-bottom: 8px; display: inline-block;">
+          {{ activity.activity_type|upper }}
+        </span>
+        <h2 style="margin: 0; font-size: 24px; font-weight: 700;">{{ activity.title }}</h2>
+      </div>
+      <div class="activity-status-badge">
+        <span class="badge-unit {% if activity.status == 'completed' %}badge-unit--primary{% else %}badge-unit--warning{% endif %}">
+          {{ activity.status|title }}
+        </span>
+      </div>
+    </div>
+
+    <div class="activity-meta-strip" style="display: flex; gap: 16px; margin-bottom: 24px; color: var(--muted); font-size: 13px;">
+      {% if activity.due_at %}
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">event</span>
+        <span>Due {{ activity.due_at|date:"d M Y" }}</span>
+      </div>
+      {% endif %}
+      {% if activity.recurrence != 'none' %}
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">sync</span>
+        <span>{{ activity.recurrence|title }}</span>
+      </div>
+      {% endif %}
+      {% if activity.kgs_pathway %}
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">account_tree</span>
+        <span>{{ activity.kgs_pathway|title|cut:"_" }}</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Description -->
+  {% if activity.description %}
+  <div class="activity-section" style="margin-bottom: 2rem;">
+    <div class="label-caps" style="margin-bottom: 8px;">Description</div>
+    <div class="activity-description-box" style="line-height: 1.6; color: var(--text);">
+      {{ activity.description|linebreaks }}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Primary Linked Record (FK) -->
+  <div class="activity-section" style="margin-bottom: 2rem;">
+    <div class="label-caps" style="margin-bottom: 8px;">Linked Context</div>
+    {% if activity.linked_record %}
+    <div class="list-item" style="background: var(--hover); border-radius: 12px; cursor: pointer;"
+         hx-get="{% url 'records:records-detail' activity.linked_record.id %}"
+         hx-target="#main-content"
+         hx-push-url="true">
+      <div class="list-item__icon">
+        <span class="material-symbols-outlined">description</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">{{ activity.linked_record.title }}</div>
+        <div class="list-item__meta">{{ activity.linked_record.record_type|title }} · {{ activity.linked_record.record_family|title }}</div>
+      </div>
+      <div class="list-item__action">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-state-mini" style="padding: 1.5rem; text-align: center; background: var(--hover); border-radius: 12px; color: var(--muted); border: 1px dashed var(--border);">
+      <p style="font-size: 13px; margin: 0;">No primary record linked to this activity.</p>
+      <button class="btn-touch" style="margin-top: 12px; font-size: 12px; background: var(--bg); border: 1px solid var(--border);"
+              onclick="openLinkModal()">
+        Attach Record
+      </button>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Actions -->
+  <div class="activity-detail-actions" style="margin-bottom: 3rem; display: flex; gap: 8px;">
+    {% if activity.status != 'completed' %}
+    <button class="btn-touch" style="background: var(--primary); color: #fff; flex: 2;"
+            hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=detail"
+            hx-target="#main-content"
+            hx-push-url="true"
+            hx-confirm="Mark this activity as completed?">
+      Mark Completed
+    </button>
+    {% endif %}
+    <button class="btn-touch" style="background: var(--bg); border: 1px solid var(--border); flex: 1;"
+            hx-get="{% url 'activity:htmx-edit' activity.id %}"
+            hx-target="#drawerInner"
+            hx-swap="innerHTML"
+            onclick="window.ICSDrawer.open('Edit Activity')">
+      Edit
+    </button>
+  </div>
+
+  <!-- Linked Records Panel (of the Anchor Record) -->
+  {% if activity.linked_record %}
+  <div class="gov-panel" style="padding: 0; margin-top: 2rem;">
+    <div class="label-caps" style="padding: 1rem 1rem 0; margin-bottom: 0;">Deep Relationships</div>
+    <div style="padding: 0 1rem 0.5rem; font-size: 11px; color: var(--muted);">via {{ activity.linked_record.title }}</div>
+    <div id="linked-records-panel"
+         hx-get="{% url 'records:htmx-linked-records' activity.linked_record.id %}"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+      <div style="padding: 1rem; color: var(--muted); font-size: 13px;">Loading…</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Hidden form for setting link -->
+  <form id="set-link-form" hx-post="{% url 'activity:htmx-set-link' activity.id %}" hx-swap="none">
+    {% csrf_token %}
+    <input type="hidden" name="record_id" id="target-record-id">
+  </form>
+
+  {% include "records/partials/_link_modal.html" %}
+
+  <script>
+    // Override selectRecord from _link_modal.html for this specific context
+    window.selectRecord = function(recordId, recordTitle) {
+      if (confirm('Link this activity to "' + recordTitle + '"?')) {
+        document.getElementById('target-record-id').value = recordId;
+        htmx.trigger('#set-link-form', 'submit');
+      }
+      closeLinkModal();
+    };
+  </script>
+
+</div>
+{% endblock %}
