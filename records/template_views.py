@@ -190,3 +190,29 @@ def htmx_relationship_create(request):
         })
     except Exception as e:
         return HttpResponse(f'<p style="color:var(--error)">Error: {str(e)}</p>', status=400)
+
+
+# ── HTMX: search records ──────────────────────────────────────────────────
+
+@login_required
+def htmx_record_search(request):
+    query = request.GET.get('q', '').strip()
+    family = request.GET.get('family', '').strip()
+    record_type = request.GET.get('type', '').strip()
+
+    qs = Record.objects.filter(deleted_at__isnull=True).order_by('-created_at')
+
+    if query:
+        qs = qs.filter(title__icontains=query)
+    if family:
+        qs = qs.filter(record_family=family)
+    if record_type:
+        qs = qs.filter(record_type=record_type)
+
+    results = qs[:50]
+
+    return render(request, 'records/partials/_search_results.html', {
+        'results': results,
+        'query': query,
+        'has_results': results.exists(),
+    })

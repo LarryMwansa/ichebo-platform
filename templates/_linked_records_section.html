@@ -39,24 +39,62 @@
 
   <!-- Add Link form (everyone) -->
   {% if can_add_link %}
-  <div class="gov-add-link-section">
+  <div class="gov-add-link-section" id="link-form-section">
     <div class="gov-panel-label" style="margin-top:1rem">Add Link</div>
+
+    <!-- Modal trigger button -->
+    <button type="button" class="btn-touch" style="background: var(--primary); color: #fff; width: 100%; margin-bottom: 12px;"
+            onclick="openLinkModal()">
+      Search Records to Link
+    </button>
+
+    <!-- Form (hidden until record selected) -->
     <form hx-post="{% url 'records:htmx-relationship-create' %}"
           hx-target="#linked-records-panel"
           hx-swap="outerHTML"
-          style="display:flex;flex-direction:column;gap:8px">
+          style="display:none;flex-direction:column;gap:8px" id="link-form">
       {% csrf_token %}
       <input type="hidden" name="from_record_id" value="{{ record.id }}">
-      <select name="relationship_type" class="form-input-touch">
+
+      <!-- Selected record display -->
+      <div style="padding: 12px; background: var(--hover); border-radius: 6px; margin-bottom: 8px;">
+        <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Selected Record:</div>
+        <div id="to-record-title" style="font-weight: 600; font-size: 14px;">None</div>
+      </div>
+
+      <select name="relationship_type" class="form-input-touch" required>
         <option value="">Choose relationship type...</option>
         {% for value, label in relationship_types %}
         <option value="{{ value }}">{{ label }}</option>
         {% endfor %}
       </select>
-      <input type="text" name="to_record_id" placeholder="Target Record ID" class="form-input-touch">
       <input type="text" name="notes" placeholder="Notes (optional)" class="form-input-touch">
-      <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; width: 100%;">Add Link</button>
+      <input type="hidden" name="to_record_id" id="to-record-id-input" value="">
+
+      <div style="display: flex; gap: 8px;">
+        <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; flex: 1;">Save Link</button>
+        <button type="button" class="btn-touch" style="background: var(--bg); border: 1px solid var(--border); flex: 1;" onclick="resetLinkForm()">Clear</button>
+      </div>
     </form>
   </div>
+
+  <!-- Link modal -->
+  {% include "records/partials/_link_modal.html" %}
+
+  <!-- Show form when record selected -->
+  <script>
+    const originalSelectRecord = window.selectRecord;
+    window.selectRecord = function(recordId, recordTitle) {
+      originalSelectRecord(recordId, recordTitle);
+      document.getElementById('link-form').style.display = 'flex';
+    };
+
+    function resetLinkForm() {
+      document.getElementById('link-form').style.display = 'none';
+      document.getElementById('to-record-id-input').value = '';
+      document.getElementById('to-record-title').textContent = 'None';
+      document.getElementById('link-form').reset();
+    }
+  </script>
   {% endif %}
 </div>

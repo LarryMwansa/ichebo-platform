@@ -1,0 +1,137 @@
+<!-- Link creation modal — hybrid search + filter -->
+<div id="link-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; padding: 2rem;">
+  <div style="background: var(--bg); border-radius: 12px; max-width: 800px; height: 80vh; margin: auto; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+
+    <!-- Header -->
+    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="margin: 0; font-size: 18px;">Link to Record</h2>
+      <button onclick="closeLinkModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted);">&times;</button>
+    </div>
+
+    <!-- Content -->
+    <div style="display: flex; flex: 1; overflow: hidden;">
+
+      <!-- Left: Filters -->
+      <div style="width: 200px; padding: 1rem; border-right: 1px solid var(--border); overflow-y: auto; background: var(--hover);">
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase;">Family</label>
+          <select id="link-filter-family"
+                  class="form-input-touch"
+                  style="width: 100%; font-size: 13px;"
+                  onchange="updateLinkSearch()">
+            <option value="">All Families</option>
+            <option value="journal">Journal</option>
+            <option value="governance">Governance</option>
+            <option value="learning">Learning</option>
+            <option value="activity">Activity</option>
+            <option value="community">Community</option>
+            <option value="reference">Reference</option>
+            <option value="bible">Bible</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase;">Type</label>
+          <select id="link-filter-type"
+                  class="form-input-touch"
+                  style="width: 100%; font-size: 13px;"
+                  onchange="updateLinkSearch()">
+            <option value="">All Types</option>
+            <option value="principle">Principle</option>
+            <option value="class">Class</option>
+            <option value="mandate">Mandate</option>
+            <option value="lesson">Lesson</option>
+            <option value="quiz">Quiz</option>
+            <option value="programme">Programme</option>
+            <option value="prayer">Prayer</option>
+            <option value="spirit">Spirit</option>
+            <option value="dream">Dream</option>
+            <option value="note">Note</option>
+            <option value="task">Task</option>
+            <option value="goal">Goal</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Right: Search + Results -->
+      <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+
+        <!-- Search box -->
+        <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
+          <input type="text"
+                 id="link-search-input"
+                 placeholder="Search by title..."
+                 class="form-input-touch"
+                 style="width: 100%;"
+                 oninput="updateLinkSearch()"
+                 onkeydown="if(event.key==='Escape') closeLinkModal()">
+        </div>
+
+        <!-- Results -->
+        <div id="link-search-results"
+             style="flex: 1; overflow-y: auto;"
+             hx-get="{% url 'records:htmx-record-search' %}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+          <div style="padding: 2rem; text-align: center; color: var(--muted);">Loading records…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding: 1rem; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end;">
+      <button onclick="closeLinkModal()" class="btn-touch" style="background: var(--bg); border: 1px solid var(--border); color: var(--text);">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openLinkModal() {
+  document.getElementById('link-modal').style.display = 'flex';
+  document.getElementById('link-search-input').focus();
+  updateLinkSearch();
+}
+
+function closeLinkModal() {
+  document.getElementById('link-modal').style.display = 'none';
+}
+
+function updateLinkSearch() {
+  const query = document.getElementById('link-search-input').value;
+  const family = document.getElementById('link-filter-family').value;
+  const type = document.getElementById('link-filter-type').value;
+
+  const params = new URLSearchParams({
+    q: query,
+    family: family,
+    type: type,
+  });
+
+  htmx.ajax('GET', '{% url "records:htmx-record-search" %}?' + params.toString(), {
+    target: '#link-search-results',
+    swap: 'innerHTML'
+  });
+}
+
+function selectRecord(recordId, recordTitle) {
+  document.getElementById('to-record-id-input').value = recordId;
+  document.getElementById('to-record-title').textContent = recordTitle;
+  closeLinkModal();
+  // Scroll form into view
+  document.getElementById('link-form-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('link-modal').style.display !== 'none') {
+    closeLinkModal();
+  }
+});
+
+// Close modal when clicking outside
+document.getElementById('link-modal')?.addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeLinkModal();
+  }
+});
+</script>
