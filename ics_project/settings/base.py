@@ -185,3 +185,4 @@ CACHES = {
         'LOCATION': BASE_DIR / 'cache',
     }
 }
+FIREBASE_SERVICE_ACCOUNT_PATH = config("FIREBASE_SERVICE_ACCOUNT_PATH", default=None)

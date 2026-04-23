@@ -7,6 +7,7 @@ urlpatterns = [
     path('auth/login/', views.login, name='login'),
     path('auth/logout/', views.logout, name='logout'),
     path('auth/me/', views.me, name='me'),
+    path('auth/fcm-token/', views.update_fcm_token, name='update-fcm-token'),
 ]
 
 # Template + HTMX routes (mounted at accounts/ in root urls.py)

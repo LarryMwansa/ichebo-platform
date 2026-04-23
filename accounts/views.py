@@ -69,6 +69,24 @@ def me(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_fcm_token(request):
+    """
+    POST: Save or update the FCM token for the authenticated user.
+    Body: {"fcm_token": "..."}
+    """
+    token = request.data.get('fcm_token')
+    if not token:
+        return Response({"error": "fcm_token is required"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user = request.user
+    user.fcm_token = token
+    user.save(update_fields=['fcm_token', 'updated_at'])
+    
+    return Response({"status": "success", "message": "FCM token updated"})
+
+
 # ---------------------------------------------------------------------------
 # Auth form views
 # ---------------------------------------------------------------------------

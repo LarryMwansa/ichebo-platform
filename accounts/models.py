@@ -27,6 +27,7 @@ class User(AbstractUser):
         related_name='preferred_by_users'
     )
     preferences = models.JSONField(default=dict, blank=True)
+    fcm_token = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         db_table = 'accounts_user'
