@@ -16,6 +16,7 @@ class SyncChangesView(APIView):
     """
     Delta Sync API for mobile/offline support.
     Returns all Records, Activities, and Notifications modified after the 'since' timestamp.
+    Includes hierarchical visibility for stewards.
     """
     permission_classes = [IsAuthenticated]
 
@@ -25,32 +26,42 @@ class SyncChangesView(APIView):
 
         user = request.user
         
+        # Identification of oversight tenants for stewards
+        steward_roles = [
+            'branch-steward', 'district-steward', 'provincial-steward',
+            'national-steward', 'regional-steward', 'continental-steward',
+            'global-steward', 'admin'
+        ]
+        user_perms = user.tenant_permissions.all().select_related('tenant')
+        direct_tenant_ids = [p.tenant_id for p in user_perms]
+        oversight_paths = [p.tenant.path for p in user_perms if p.role in steward_roles]
+
         # 1. Records
-        # Visibility: Created by user OR in user's tenants OR global governance records
         record_qs = Record.objects.filter(deleted_at__isnull=True)
         if since:
             record_qs = record_qs.filter(updated_at__gte=since)
         
-        user_tenant_ids = user.tenant_permissions.values_list('tenant_id', flat=True)
+        record_filter = Q(created_by=user) | Q(tenant_id__in=direct_tenant_ids) | \
+                        Q(record_class='governance', permissions_data__visibility='global')
         
-        record_qs = record_qs.filter(
-            Q(created_by=user) | 
-            Q(tenant_id__in=user_tenant_ids) |
-            Q(record_class='governance', permissions_data__visibility='global')
-        ).distinct()
+        for path in oversight_paths:
+            record_filter |= Q(tenant__path__startswith=path)
+        
+        record_qs = record_qs.filter(record_filter).distinct()
 
         # 2. Activities
-        # Visibility: Created by user OR assigned to user
         activity_qs = Activity.objects.filter(deleted_at__isnull=True)
         if since:
             activity_qs = activity_qs.filter(updated_at__gte=since)
             
-        activity_qs = activity_qs.filter(
-            Q(created_by=user) | Q(assigned_to=user)
-        ).distinct()
+        activity_filter = Q(created_by=user) | Q(assigned_to=user) | Q(tenant_id__in=direct_tenant_ids)
+        
+        for path in oversight_paths:
+            activity_filter |= Q(tenant__path__startswith=path)
+
+        activity_qs = activity_qs.filter(activity_filter).distinct()
 
         # 3. Notifications
-        # Visibility: Only the user's notifications
         notification_qs = Notification.objects.filter(user=user)
         if since:
             notification_qs = notification_qs.filter(updated_at__gte=since)
