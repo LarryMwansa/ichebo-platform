@@ -41,12 +41,14 @@ class Notification(models.Model):
     data = models.JSONField(default=dict, blank=True)
     read_at = models.DateTimeField(null=True, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
     class Meta:
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['user', 'read_at']),
             models.Index(fields=['user', 'created_at']),
+            models.Index(fields=['user', 'updated_at']),
         ]
 
     def __str__(self):
