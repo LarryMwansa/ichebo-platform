@@ -610,41 +610,30 @@ def htmx_confirm_cert(request, cert_id):
     if request.method != 'POST':
         return HttpResponse(status=405)
 
-    from django.contrib.auth import get_user_model
-    from .models import CertificationConfirmation
-    from django.utils import timezone
+    from .services import confirm_certification_record, CertificationError
 
     if _user_level(request.user) < 3:
         return HttpResponse('<div class="cert-card">Permission denied.</div>', status=403)
 
     cert = get_object_or_404(Record, id=cert_id, record_type='certification', status='draft')
-    metadata = cert.metadata or {}
-    learner_id = metadata.get('learner_id') or str(cert.created_by_id)
-    target_level = metadata.get('target_level', 1)
 
-    User = get_user_model()
-    learner = get_object_or_404(User, id=learner_id)
-    previous_level = getattr(learner, 'competence_level', 0)
-    new_level = min(previous_level + 1, target_level)
+    try:
+        confirmation = confirm_certification_record(
+            cert_record=cert,
+            confirmed_by=request.user,
+            notes=request.POST.get('notes', ''),
+        )
+    except CertificationError as exc:
+        return HttpResponse(
+            f'<div class="cert-card"><p class="form-error">{exc}</p></div>',
+            status=400,
+        )
 
-    cert.status = 'active'
-    cert.save(update_fields=['status', 'updated_at'])
-
-    learner.competence_level = new_level
-    learner.save(update_fields=['competence_level'])
-
-    CertificationConfirmation.objects.create(
-        certification_record_id=cert.id,
-        confirmed_by=request.user,
-        learner_id=learner.id,
-        previous_competence_level=previous_level,
-        new_competence_level=new_level,
-        notes=request.POST.get('notes', '')
-    )
-
+    prev = confirmation.previous_competence_level
+    new = confirmation.new_competence_level
     return HttpResponse(
         f'<div class="cert-card confirmed">'
-        f'<span class="enrolled-badge">✓ Confirmed — Level {previous_level} → {new_level}</span>'
+        f'<span class="enrolled-badge">✓ Confirmed — Level {prev} → {new}</span>'
         f'</div>'
     )
 

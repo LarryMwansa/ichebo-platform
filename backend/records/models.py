@@ -159,6 +159,8 @@ class Relationship(models.Model):
     direction = models.CharField(max_length=20, choices=DIRECTION_CHOICES)
     relationship_type = models.CharField(max_length=30, choices=RELATIONSHIP_TYPE_CHOICES)
     notes = models.TextField(blank=True, null=True)
+    # Extra context stored by the creating app (e.g. linked_activity_id for gathering dual-write)
+    metadata = models.JSONField(default=dict, blank=True)
     strength = models.CharField(
         max_length=10,
         choices=[('weak','Weak'),('medium','Medium'),('strong','Strong')],
@@ -170,5 +172,6 @@ class Relationship(models.Model):
         indexes = [
             models.Index(fields=['from_record']),
             models.Index(fields=['to_record']),
+            models.Index(fields=['bible_verse']),
             models.Index(fields=['relationship_type']),
         ]

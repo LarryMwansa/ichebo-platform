@@ -5,15 +5,17 @@ from django.utils import timezone
 from records.models import Record, Relationship
 
 
-# ── Record type groups ─────────────────────────────────────────────────────────
-
+# ── Record type groups (v10 authority matrix, Part 15.2) ──────────────────────
+#
+# Reference Library — Level 3+ read, Level 5 write, Handbook tenant only
 LIBRARY_TYPES = [
     'class', 'principle', 'concept', 'divine_pattern',
-    'subject', 'entity', 'narrative', 'framework',
 ]
 
+# Mandate Branch — Level 4+ read, Level 5 write, Handbook tenant only
 MANDATE_TYPES = [
-    'mandate', 'statement', 'programme', 'protocol', 'procedure',
+    'mandate', 'statement', 'framework', 'narrative',
+    'subject', 'entity', 'protocol', 'procedure', 'programme',
 ]
 
 LIBRARY_TYPE_LABELS = {
@@ -21,18 +23,18 @@ LIBRARY_TYPE_LABELS = {
     'principle':      'Principles',
     'concept':        'Concepts',
     'divine_pattern': 'Divine Patterns',
-    'subject':        'Subjects',
-    'entity':         'Entities',
-    'narrative':      'Narratives',
-    'framework':      'Frameworks',
 }
 
 MANDATE_TYPE_LABELS = {
     'mandate':   'Mandates',
     'statement': 'Statements',
-    'programme': 'Programmes',
+    'framework': 'Frameworks',
+    'narrative': 'Narratives',
+    'subject':   'Subjects',
+    'entity':    'Entities',
     'protocol':  'Protocols',
     'procedure': 'Procedures',
+    'programme': 'Programmes',
 }
 
 HRS_COMPLEXITY_CHOICES = ['Low', 'Medium', 'High', 'Transcendent']
@@ -41,17 +43,19 @@ HRS_POSITION_CHOICES   = ['up', 'down', 'left', 'right']
 HRS_DIRECTION_CHOICES  = ['forward', 'backward']
 HRS_SPEED_CHOICES      = ['fast', 'slow']
 
+# v10 relationship types for Governance App (Part 3.4 — has_subject/has_entity removed)
 RELATIONSHIP_TYPES = [
     'part_of', 'derived_from', 'aligns_with', 'authorised_by',
-    'references', 'has_subject', 'has_entity',
+    'references', 'tracks', 'community_ref',
 ]
 
 
 def get_handbook_records(record_type, search='', status_filter=None):
-    """Returns QS of governance Handbook records of a given type."""
+    """Returns QS of governance records of a given type scoped to the Handbook tenant."""
     qs = Record.objects.filter(
         record_family='governance',
         record_type=record_type,
+        tenant__tier='handbook',
         deleted_at__isnull=True,
     ).order_by('-created_at')
 

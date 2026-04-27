@@ -413,6 +413,7 @@ def _build_suggestions(digest) -> list:
             })
 
     # Rule 2 — No DAR submitted today (Level 1+)
+    if not digest.dar_today:
         suggestions.append({
             'text': 'Submit your Daily Activity Report before the day ends.',
             'priority': 2,

@@ -11,8 +11,6 @@ from records.models import Record, Relationship
 from activity.models import Activity
 from accounts.models import User
 from tenants.models import Tenant, UserPermission
-from learn.models import CertificationConfirmation
-
 from .models import MembershipRequest
 from .constants import (
     KGS_SERVICE_ORDERS, KGS_SERVICE_ORDER_CHOICES,
@@ -883,59 +881,20 @@ def htmx_review_request(request, request_id):
             membership_req.status = 'approved'
             membership_req.save()
 
-            # Grant Beginner membership — get_or_create prevents duplicate re-approvals
+            # Grant tenant membership — get_or_create prevents duplicate re-approvals.
+            # competence_level is NOT written here — level advancement only happens
+            # via POST /api/learn/certifications/{id}/confirm/ (locked ADR).
             UserPermission.objects.get_or_create(
                 tenant=membership_req.tenant,
                 user=membership_req.user,
-                role='beginner',
+                role='disciple',
                 defaults={
                     'created_by': request.user,
                     'granted_by': request.user,
                     'tenant_path': membership_req.tenant.path,
-                    'level': 1,
+                    'level': membership_req.user.competence_level,
                     'is_active': True,
                 },
-            )
-
-            # Advance competence_level from Seeker (0) to Beginner (1)
-            applicant = membership_req.user
-            prev_level = applicant.competence_level
-            if prev_level < 1:
-                applicant.competence_level = 1
-                applicant.save(update_fields=['competence_level'])
-
-            # Create the Induction / Tenant Membership Certification Record
-            # This is the first entry on the applicant's formation pathway.
-            cert_record = Record.objects.create(
-                created_by=request.user,
-                record_class='personal',
-                record_family='learning',
-                record_type='certification',
-                origin='system',
-                title=f'Induction Certification — {membership_req.tenant.name}',
-                content=(
-                    f'Received into {membership_req.tenant.name} as a Beginner. '
-                    f'First step on the Kingdom Governance pathway.'
-                ),
-                status='active',
-                metadata={
-                    'source_app': 'community',
-                    'certification_type': 'induction',
-                    'tenant_id': str(membership_req.tenant.id),
-                },
-            )
-
-            # Confirm it — the steward's approval IS the certification event
-            CertificationConfirmation.objects.create(
-                certification_record_id=cert_record.id,
-                confirmed_by=request.user,
-                learner_id=applicant.id,
-                previous_competence_level=prev_level,
-                new_competence_level=1,
-                notes=(
-                    f'Induction certification issued on membership approval '
-                    f'for {membership_req.tenant.name}.'
-                ),
             )
 
         else:

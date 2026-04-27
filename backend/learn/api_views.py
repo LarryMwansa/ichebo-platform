@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from records.models import Record, Relationship
 from .models import CertificationConfirmation
 from .serializers import CertificationConfirmSerializer
+from .services import confirm_certification_record, CertificationError
 
 User = get_user_model()
 
@@ -129,38 +130,14 @@ def confirm_certification(request, certification_id):
         status='draft'
     )
 
-    metadata = certification_record.metadata or {}
-    learner_id = metadata.get('learner_id') or str(certification_record.created_by_id)
-    target_level = metadata.get('target_level', 1)
-
-    learner = get_object_or_404(User, id=learner_id)
-    previous_level = getattr(learner, 'competence_level', 0)
-
-    if previous_level >= target_level:
-        return Response(
-            {"detail": "Learner is already at or above the target competence level."},
-            status=status.HTTP_400_BAD_REQUEST
+    try:
+        confirmation = confirm_certification_record(
+            cert_record=certification_record,
+            confirmed_by=request.user,
+            notes=request.data.get('notes', ''),
         )
-
-    new_level = min(previous_level + 1, target_level)
-
-    # Advance certification status
-    certification_record.status = 'active'
-    certification_record.save(update_fields=['status', 'updated_at'])
-
-    # Advance learner competence level — ONLY write path in the system
-    learner.competence_level = new_level
-    learner.save(update_fields=['competence_level'])
-
-    # Audit record
-    confirmation = CertificationConfirmation.objects.create(
-        certification_record_id=certification_record.id,
-        confirmed_by=request.user,
-        learner_id=learner.id,
-        previous_competence_level=previous_level,
-        new_competence_level=new_level,
-        notes=request.data.get('notes', '')
-    )
+    except CertificationError as exc:
+        return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
     serializer = CertificationConfirmSerializer(confirmation)
     return Response(serializer.data, status=status.HTTP_200_OK)
