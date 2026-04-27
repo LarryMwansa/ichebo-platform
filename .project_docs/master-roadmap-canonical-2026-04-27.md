@@ -213,7 +213,7 @@ LAYER 6 — VERSION 3: SCALE           (future — Redis, Docker, AI, advanced f
 sudo apt install -y python3.10 python3.10-venv python3-pip postgresql postgresql-contrib nginx git
 ```
 
-4. Create deploy user: `sudo adduser ics && sudo usermod -aG sudo ics`
+1. Create deploy user: `sudo adduser ics && sudo usermod -aG sudo ics`
 2. Switch to deploy user: `su - ics`
 
 ### Task 0.2 — PostgreSQL database
@@ -1201,7 +1201,7 @@ EMAIL_HOST_PASSWORD=your-brevo-smtp-key
 DEFAULT_FROM_EMAIL=noreply@your-domain.com
 ```
 
-4. Add to `settings/base.py`:
+1. Add to `settings/base.py`:
 
 ```python
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -1213,7 +1213,7 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 ```
 
-5. Test:
+1. Test:
 
 ```bash
 python manage.py shell
@@ -1307,7 +1307,6 @@ sudo systemctl status minio
 - `ics-media` — public read (avatars, logos)
 - `ics-private` — private (attachments, presigned URLs)
 
-
 ```bash
 
 # Refresh Minio
@@ -1334,7 +1333,6 @@ mc anonymous set download local/ics-media
 ```
 
 Think of them as the MinIO admin account:
-
 
 |Variable|What to put|Example|
 |---|---|---|
@@ -1448,7 +1446,7 @@ crontab -e
 
 Add this line:
 
-```
+```Bash
 0 2 * * * /home/scepter/backup.sh >> /var/log/ics/backup.log 2>&1
 ```
 
