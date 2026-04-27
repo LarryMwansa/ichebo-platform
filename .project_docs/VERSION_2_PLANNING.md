@@ -186,8 +186,82 @@ The learning stack as defined in the Learn App system design:
 
 ---
 
-### Summary: Phase 1 (L1–L2)
-- **Commits:** 2 (backend + UI)
+### L3: Learn App — Carry-Forward Items from MVP
+
+These two items were identified during the Phase 5.2 audit as incomplete in MVP. They are deferred here rather than patched now because assessment submission design may shift once the full five-programme qualification framework is built in L1–L2.
+
+**Item 1 — Register `CertificationConfirmation` in Django admin**
+
+The model exists and is migrated. It is not registered in `learn/admin.py`. The roadmap exit criteria requires "Verifiable in Django admin."
+
+- File: `learn/admin.py`
+- Change: register `CertificationConfirmation` with `list_display` showing `certification_record_id`, `learner_id`, `confirmed_by`, `previous_competence_level`, `new_competence_level`, `confirmed_at`
+
+**Item 2 — Assessment submission backend (`POST /learn/htmx/assessment/{id}/submit/`)**
+
+The quiz and assignment templates (`partials/quiz.html`, `partials/assignment_form.html`) exist and render correctly. There is no view or URL to receive the submission. The form posts to nowhere.
+
+This is deferred to Version 2 (not patched in MVP) because:
+
+- Quiz and assignment types are likely to be extended when real induction programme content is authored
+- The submission model (what gets persisted, how it relates to progress) should be decided alongside the full assessment design in L1
+- The correct pattern is: submission creates an `Activity (activity_type: "task")` with `metadata.lesson_record_id` and `metadata.submission_text`, which is then counted by `_recalculate_programme_progress()`
+
+When building:
+
+- Add `htmx_submit_assessment(request, lesson_id)` to `learn/views.py`
+- Add URL: `POST /learn/htmx/assessment/<uuid:lesson_id>/submit/`
+- Wire both quiz and assignment form templates to this endpoint
+- Ensure the created Activity is counted correctly by the existing progress recalculation logic
+
+**Acceptance criteria for L3:**
+
+- `CertificationConfirmation` visible and filterable in Django admin
+- Submitting a quiz or assignment creates an Activity record and triggers progress recalculation
+- Progress reaches 100% correctly when all lessons and assessments are completed
+
+---
+
+### L4: Settings and Activity UI — Carry-Forward Items from MVP
+
+Two small gaps identified across Phase 5.3 (Activity) and Phase 5.6 (Profile + Settings). Deferred to Version 2 because both touch areas that will expand in v2 anyway.
+
+**Item 1 — Bible translation preference save (`accounts`)**
+
+The settings page renders a Bible translation selector (`_settings_bible.html`) and the available translations are passed in context from `SettingsView`. There is no view or URL to receive and persist the selection.
+
+When building:
+
+- Add `htmx_settings_bible(request)` to `accounts/views.py`
+- Persist to `User.preferences['bible_translation']` (same pattern as theme and region handlers)
+- Add URL: `POST /accounts/htmx/settings/bible/`
+- Wire the `_settings_bible.html` template form to this endpoint
+- The `UserProfile.preferred_bible_translation` FK field may also need updating — confirm which field is the authoritative store when building the induction profile in V2.2
+
+**Item 2 — Distinct ministry and calendar URL routes (`activity`)**
+
+All data and HTMX actions for ministry types (campaign, project, event) exist in the current `my_activities()` view via type filter. There is no distinct `GET /activity/ministry/` or `GET /activity/calendar/` URL as specified in the roadmap.
+
+This is low priority — the functionality is present, just not split into dedicated surfaces. Deferred to Version 2 because the Activity app UI is scheduled to expand with assigned-to-me queues and richer calendar views anyway.
+
+When building:
+
+- Add `ministry()` view to `activity/views.py` — filters to ministry types (`campaign`, `project`, `task`, `event`), adds assigned-to-me tab
+- Add `calendar_view()` view — dated list of all activities with `due_at` set, ordered chronologically
+- Add URLs to `activity/template_urls.py`: `GET /activity/ministry/` and `GET /activity/calendar/`
+- Update app drawer / nav links to point to the new routes
+
+**Acceptance criteria for L4:**
+
+- Selecting and saving a Bible translation in Settings persists to the database and is respected by the Bible app on next load
+- `/activity/ministry/` renders ministry-type activities distinct from personal activities
+- `/activity/calendar/` renders a dated list of all activities with due dates
+
+---
+
+### Summary: Phase 1 (L1–L2–L3–L4)
+
+- **Commits:** 4 (backend, UI, Learn carry-forwards, Settings/Activity carry-forwards)
 - **Effort:** ~40% of Version 2 velocity
 - **Dependencies:** None (Learn App is the foundation)
 
