@@ -1,40 +1,38 @@
 # ICS Platform — Data Contract & Architecture Document
 
-> **Version:** v9 — 2026-04-10
-> **Previous version:** v8 — 2026-04-08
+> **Version:** v10 — 2026-04-27 (Canonical Consolidated)
+> **Previous version:** v9 — 2026-04-10
+> **Status:** Approved — Canonical Reference
+> **Supersedes:** All previous data contract versions (v1–v9)
 >
-> **v9 Amendments (Governance App — pre-build):**
-> 1. `record_type` enum: `"article"` added to journal family (Part 3.1) — **superseded by MVP amendment below**.
-> 2. `journal` family → type mapping updated to include `"article"` (Part 3.1) — **superseded by MVP amendment below**.
-> 3. `governance` family: `"calendar"` type marked deferred (Part 3.1 note).
-> 4. Handbook read access rule amended: Level 4+ read, Level 5 write (Part 2.5.2).
-> 5. Property Attributes `custom_fields` specification added (Part 15.3).
-> 6. Governance record lifecycle defined: `draft → active → locked → superseded` (Part 15.4).
-> 7. Governance App record type authority matrix added (Part 15.5).
-> 8. Part 15 (Governance App Engine) added — three-surface model, branch structure, HRS relationship viewer, Keys Library surface, DRF endpoints.
-> 9. Part 12 updated: Task 5.5 Governance App marked as system design complete (`2026-04-10-ics-governance-app-system-design.docx`).
+> **How this document was produced:**
+> v9 was the accumulated canonical reference. v10 (2026-04-25) was a partial rewrite that
+> introduced 9 formal amendments but accidentally omitted large sections of v9 that remain
+> authoritative. This document is the correct consolidation: v9 as the full base, with all
+> 9 v10 amendments applied in-place, journal family types corrected to match MVP reality,
+> governance record type list and Relationship.strength kept as v9, and all three previously
+> undocumented breaking changes resolved by explicit decision.
 >
-> **v8 Amendments (Community App — pre-build):**
-> 1. `record_family: "community"` formally defined (Part 3.1).
-> 2. `UserPermission.metadata` added (Part 2.2).
-> 3. Gathering dual-write pattern documented (Part 14.4).
-> 4. `gathering` Record `custom_fields` specification added (Part 14.4).
-> 5. Calendar App Part 11.4 phasing updated.
-> 6. Part 14 (Community App Engine) added.
-> 7. `MembershipRequest` model documented as deferred (Part 14.8).
-> 8. Part 12 updated with Community App system design status.
+> **Amendment decisions applied:**
+> 1. Journal family types corrected to MVP reality: `prayer | spirit | dream | dar | note`
+>    (`sermon` and `article` retired; `spirit`, `dar` formalised from MVP code).
+>    User-defined custom types are a planned V2 feature — not in this contract.
+> 2. Governance record type list: v9 list retained (v10 rewrite list discarded as undocumented).
+> 3. `Relationship.strength`: v9 enum (`weak | medium | strong | null`) retained.
+>    Float type from v10 rewrite discarded as undocumented breaking change.
 >
-> **Everything else in v8 is unchanged and remains locked.**
-
-> **For Claude:** When implementing, read this document fully before writing any code. All schemas, rules, and patterns here are authoritative. Do not infer from app code.
+> **For Claude:** When implementing, read this document fully before writing any code.
+> All schemas, rules, and patterns here are authoritative. Do not infer from app code.
 
 **Goal:** Define the complete, locked data contracts, service boundaries, and schema definitions for the ICS (Integrated Community System) platform — the digital twin of the Kingdom Governance System (KGS).
 
 **Architecture:** Django + PostgreSQL backend (single source of truth). Four locked architectural decisions: (1) materialised path for tenant hierarchy, (2) single `records` table with `record_class` discriminator, (3) Paraclete as a standalone orchestration service separate from the Activity Engine, (4) Handbook as a prime `tier:"handbook"` tenant at `/global/handbook/` with Level 5 write access only (Level 4+ read — see Part 2.5.2).
 
-**UI Architecture (locked — 2026-04-07):** All app UIs are built in Django templates + HTMX. There are no vanilla JS app files (`activity-app.js`, `learn-app.js`, etc.). HTMX handles dynamic interactions. `storage.js` is retained for UI state only (theme, session token). The data contract schemas and DRF service layer are unaffected by this decision.
+**UI Architecture (locked — 2026-04-07):** All app UIs are built in Django templates + HTMX. There are no vanilla JS app files. HTMX handles dynamic interactions. `storage.js` is retained for UI state only (theme, session token). The data contract schemas and DRF service layer are unaffected by this decision.
 
-**Tech Stack:** Python/Django 4.2, Django REST Framework, PostgreSQL, Django templates, HTMX, mobile-first CSS with CSS variables.
+**Mobile (v10 — ADR-001):** Flutter mobile app targets iOS and Android. All data access goes through the same DRF endpoints. Delta sync via `GET /api/sync/changes/` (Part 11).
+
+**Tech Stack:** Python/Django 4.2 LTS, Django REST Framework, PostgreSQL, Django templates, HTMX, Flutter (mobile).
 
 ---
 
@@ -88,6 +86,14 @@ A user with `scope_path = "/global/africa/southafrica/gauteng/"` can see all rec
 
 No app template may bypass the DRF service layer. All reads and writes go through DRF endpoints. Django views prepare context from DRF responses or direct ORM calls within their own Django app boundary only. Cross-app data access always goes through the API or a shared service module.
 
+### 1.5 competence_level has one write path only
+
+`competence_level` may only be written by `POST /api/learn/certifications/{id}/confirm/`. No other code may write to this field. This is an absolute lock — see ADR-003.
+
+### 1.6 Single records table — no new model tables for content types
+
+All content is stored in the single `records_record` table using the `record_class` / `record_family` / `record_type` discriminator. Do not create new model tables for new content types.
+
 ---
 
 ## Part 2 — User & Identity Schema
@@ -103,15 +109,15 @@ User = {
   created_at:   "ISO-8601",
 
   // Identity
-  email:        "string",
+  email:        "string",        // Username field — unique, required
   display_name: "string",
-  avatar_url:   "string | null",
+  avatar_url:   "string | null", // @property returning avatar.url (MinIO ImageField) (v10)
 
   // Competence & Formation
   // 0a = Guest (anonymous, no account) — not stored, describes unauthenticated sessions
   // 0b = Seeker (registered, formation not yet complete) — status: 'seeker'
   // 1–5 = active formation levels mapped to KGS (see section 2.3)
-  competence_level: 0 | 1 | 2 | 3 | 4 | 5,
+  competence_level: 0 | 1 | 2 | 3 | 4 | 5,  // SOLE WRITE PATH: POST /api/learn/certifications/{id}/confirm/
 
   // Platform status
   status: "seeker | active | suspended | pending_verification",
@@ -122,6 +128,14 @@ User = {
     language: "en | ...",
     timezone: "Africa/Johannesburg | ..."
   },
+
+  // v10 Amendment 10.2 — Induction tracking
+  induction_enrolled_at:  "ISO-8601 | null",  // set when UserPermission for Induction Tenant created
+  induction_completed_at: "ISO-8601 | null",  // set when certifications/confirm/ called with induction_completion context
+  induction_pathway:      "reconditioning | beginners | null",  // set on entrant type selection
+
+  // v10 Amendment 10.7 — FCM push token
+  fcm_token: "string | null",  // Firebase Cloud Messaging — updated by Flutter app on login
 
   updated_at: "ISO-8601"
 }
@@ -136,11 +150,22 @@ preferred_bible_translation = FK → bible.BibleTranslation (nullable)
 # Updated by: POST /bible/htmx/translation/set/
 
 bio = TextField(null=True, blank=True)
+
+# v10 Amendment 10.3 — Profile registration fields (PII)
+full_name   = CharField(max_length=255)           # Legal/formal name
+address     = TextField(null=True, blank=True)
+country     = CharField(max_length=2, null=True)  # ISO 3166-1 alpha-2 (e.g. "ZA")
+id_number   = EncryptedCharField(null=True)       # National ID / passport — ENCRYPTED
+age         = IntegerField(null=True)
+gender      = CharField(choices=['male','female','prefer_not_to_say'], null=True)
+occupation  = CharField(max_length=255, null=True)
+education   = TextField(null=True)                # Highest qualification description
+born_again  = BooleanField(null=True)             # Kingdom participation indicator
 ```
 
-### 2.2 UserPermission object
+**SECURITY:** `id_number` must be stored encrypted (`django-encrypted-model-fields`). Store `FIELD_ENCRYPTION_KEY` in `.env` — never in code. `id_number` must be `write_only` in `UserProfileSerializer`. Access requires an explicit Level 4+ admin endpoint. Never returned in any standard API response.
 
-**v8 Amendment:** `metadata` field added carrying two optional Community App fields. No migration required — `metadata` is a `JSONField` with `default=dict`.
+### 2.2 UserPermission object
 
 ```js
 UserPermission = {
@@ -157,43 +182,41 @@ UserPermission = {
   granted_at:   "ISO-8601",
   granted_by:   "uuid",
 
-  // v8: Community App metadata (optional, JSONField default={})
+  // Community App metadata (optional, JSONField default={})
   metadata: {
     shepherd_id:   "uuid | null",
     // user_id of the pastoral supervisor assigned to this member within this tenant.
     // Set by a steward (Level 3+) via Community App member management.
-    // Null = no pastoral assignment recorded yet.
 
     service_order: "string | null"
     // Free-text KGS Service Order label (e.g. "Order of Pastoral Care").
-    // Matches the 24 Orders defined in the KGS framework.
     // Not a FK — KGS Service Orders are not modelled as DB rows in MVP.
-    // Set by a steward (Level 3+) via Community App member management.
   }
 }
 ```
 
-**Indexing note:** No new index required in MVP. `shepherd_id` lookups use `UserPermission.objects.filter(metadata__shepherd_id=steward_id, tenant_path__startswith=scope_path)` — acceptable at MVP member counts. Add `GinIndex` on `metadata` post-MVP if performance degrades.
+**Indexing note:** No GinIndex on `metadata` in MVP. `shepherd_id` lookups use `UserPermission.objects.filter(metadata__shepherd_id=steward_id, tenant_path__startswith=scope_path)`. Add `GinIndex` post-MVP if performance degrades.
 
 ### 2.3 Competence levels mapped to KGS
 
 | Level | KGS Name               | Platform label    | Role token              | What they can do                              |
 |-------|------------------------|-------------------|-------------------------|-----------------------------------------------|
 | 0a    | Guest                  | Guest             | *(no User object)*      | Landing page, public records, tenant directory |
-| 0b    | Seeker                 | Seeker            | `seeker`                | Bible reader, personal records (limited), Learning portal entry, no tenant membership |
-| 1     | Foundational Disciple  | Member            | `member`                | Full personal records, join one tenant, learn |
+| 0b    | Seeker                 | Seeker            | `seeker`                | Bible reader, personal records (limited), induction, no tenant membership |
+| 1     | Foundational Disciple  | Member            | `disciple`              | Full personal records, join one tenant, learn |
 | 2     | Active Contributor     | Disciple/Operator | `disciple`              | Org records, lead small groups within a node  |
-| 3     | Functional Minister    | Steward           | `branch-steward` or higher | Manage teams, create programmes             |
+| 3     | Functional Minister    | Steward           | `branch-steward` or higher | Manage teams, create programmes, confirm certs |
 | 4     | Leader                 | Senior Steward    | `district-steward` or higher | Create governance records, manage tenant  |
 | 5     | Apostolic Steward      | Architect         | `global-steward` or `admin` | Cross-tenant governance, Handbook write, system config |
 
 **Level 0b (Seeker) access rules:**
+
 - Can create personal records but limited to 10 total until Level 1 is reached
 - Cannot join a tenant or participate in community features
-- Can browse the Learning portal and begin foundation programmes
+- Can browse the Learning portal and begin induction / foundation programmes
 - Can read scripture and create personal bible notes (subject to 10-record limit)
 - Cannot see tenant (organizational) bible notes — no tenant membership
-- Cannot see Handbook scripture references — Level 5 only
+- Cannot see Handbook scripture references — Level 3+ read (Reference Library), Level 4+ read (Mandate Branch)
 
 ### 2.4 Tenant object
 
@@ -208,7 +231,8 @@ Tenant = {
   slug:         "string",
   path:         "/global/africa/southafrica/gauteng/pretoria/sceptre-abc/",
 
-  tier: "handbook | church_node | church_collective | district | provincial | national | regional | continental | global",
+  // v10 Amendment 10.1: "induction" added to tier enum
+  tier: "handbook | church_node | church_collective | district | provincial | national | regional | continental | global | induction",
   affiliation: "ichebo | independent | affiliate",
   status: "active | pending | suspended",
   is_collective: false,
@@ -259,12 +283,12 @@ HandbookTenant = {
 }
 ```
 
-### 2.5.2 Access rules (v9 amendment)
+### 2.5.2 Access rules
 
-**v9 Amendment:** Handbook read access changed from "Level 5 only" to tiered read by record type. Write remains Level 5 only.
+Handbook read access is tiered by record type. Write remains Level 5 only.
 
 ```python
-# Permission check algorithm update (Part 7 supplemented):
+# Permission check algorithm (Part 7 Handbook branch):
 if record.tenant.tier == "handbook":
     if record.record_type in REFERENCE_LIBRARY_TYPES:
         # Reference Library types: shared, objective, HRS-produced knowledge
@@ -299,8 +323,8 @@ REFERENCE_LIBRARY_TYPES = ["class", "principle", "concept", "divine_pattern"]
 | `procedure`     | An operational process for recurring tasks             |
 | `mandate`       | A directive from the Kingdom Mandate                   |
 | `statement`     | A formal declaration or position                       |
-| `programme`     | A governance-context structured programme (record_class:'governance') |
-| `calendar`      | A time-governed plan — **deferred to Phase 2** (v9)   |
+| `programme`     | A governance-context structured programme (`record_class:'governance'`) |
+| `calendar`      | A time-governed plan — **deferred to Phase 2**         |
 
 **Handbook ↔ Scripture linkage:** A Level 5 Architect may link any governance record to specific `BibleVerse` rows using a `Relationship` with `relationship_type: "references"`, `direction: "directed"`, and `bible_verse_id` set (Part 3.2).
 
@@ -316,16 +340,33 @@ Core HRS relationship types:
 | `authorised_by`    | governance_procedure → governance_mandate                |
 | `references`       | governance_narrative → governance_subject                |
 | `references`       | governance_record → BibleVerse (via bible_verse_id)      |
-| `has_subject`      | governance_framework → governance_subject                |
-| `has_entity`       | governance_mandate → governance_entity                   |
+
+Note: `has_subject` and `has_entity` are retired. Existing data using these types is retained in the DB but no new relationships of these types should be created. Migration of existing rows is deferred.
+
+### 2.5.5 Induction Tenant — System Singleton (v10)
+
+The Induction Tenant is seeded by `python manage.py seed_induction_tenant`. It has `tier: "induction"` and `path: "/global/induction/"`. It cannot be deleted or renamed via normal UI flows.
+
+```js
+InductionTenant = {
+  name:        "Induction",
+  slug:        "induction",
+  path:        "/global/induction/",
+  tier:        "induction",
+  affiliation: "ichebo",
+  status:      "active",
+  settings: { allow_public_records: false, require_approval: false, max_members: null }
+}
+```
+
+- **Content scoping:** users in the Induction Tenant see only Records with `metadata.source_app == "induction"`.
+- **On induction completion:** Induction Tenant `UserPermission.is_active` set to `False`; home tenant `UserPermission` created (`level=1`, `role="disciple"`).
 
 ---
 
 ## Part 3 — Records Engine Schema
 
 ### 3.1 Record object (universal)
-
-**v9 Amendment:** `record_type` enum extended with `"article"`. `journal` family → type mapping updated. `"calendar"` type marked deferred in governance family.
 
 ```js
 Record = {
@@ -340,17 +381,17 @@ Record = {
 
   record_family: "journal | governance | activity | learning | reference | bible | community",
 
-  record_type: "prayer | dream | note | sermon | article | class | principle | concept |
-                divine_pattern | narrative | subject | entity | mandate | statement |
-                programme | framework | protocol | procedure | calendar | event | campaign |
-                project | habit | task | skill | course | lesson | assignment | quiz |
-                certification | key | property | bible_note | announcement | gathering | custom",
+  record_type: "[see Part 3.2 type registry]",
 
   // Family → Type mapping (enforced at service layer):
-  //   journal     → prayer | dream | note | sermon | article
-  //                 (article = general written entry or essay; Level 1+;
-  //                  personal by default; may be linked to governance records
-  //                  via Relationship but is not itself a governance record)
+  //   journal     → prayer | spirit | dream | dar | note
+  //                 prayer    = personal prayer entry
+  //                 spirit    = Spirit Journal entry (prophetic / hearing from God)
+  //                 dream     = Dream Journal entry
+  //                 dar       = Daily Activity Report (personal ministry summary)
+  //                 note      = General journal / reflection entry
+  //                 NOTE: 'sermon' and 'article' are retired. User-defined custom types
+  //                 are planned for a future version — not in this contract.
   //   governance  → class | principle | concept | divine_pattern | narrative |
   //                 subject | entity | mandate | statement | programme |
   //                 framework | protocol | procedure
@@ -358,7 +399,7 @@ Record = {
   //                 to Governance App Phase 2. No UI is built for it in MVP.
   //   activity    → event | campaign | project | habit | task | skill
   //   learning    → programme | course | lesson | assignment | quiz | certification
-  //   reference   → key | property
+  //   reference   → key | property | attachment (v10)
   //   bible       → bible_note
   //   community   → announcement | gathering
   //                 (report | pastoral_note — deferred, schema in Part 14.8/14.9)
@@ -374,7 +415,7 @@ Record = {
   summary:      "string | null",
 
   status: "draft | submitted | active | completed | archived | locked | superseded",
-  // 'submitted'  = awaiting review by a higher authority (Learn App cert queue, Governance)
+  // 'submitted'  = awaiting review by a higher authority
   // 'locked'     = approved governance record — only valid after lifecycle transition
   // 'superseded' = replaced by a new version; record retained for history chain
 
@@ -389,12 +430,12 @@ Record = {
   categories: [],
 
   custom_fields: {},
-  // community/announcement: no required custom_fields
   // community/gathering: see Part 14.4 for custom_fields specification
   // governance/reference types: see Part 15.3 for Property Attributes custom_fields
+  // reference/attachment (v10): custom_fields["file_url"] = presigned MinIO URL (1-hour expiry)
 
   metadata: {
-    source_app:    "records | bible | activity | learn | community | governance | ...",
+    source_app:    "records | bible | activity | learn | community | governance | induction | ...",
     record_origin: "string | null",
     custom_field_definitions: []
   },
@@ -404,7 +445,7 @@ Record = {
     // private    = only created_by can read
     // tenant     = any member of exactly this tenant can read
     // collective = this tenant + its parent chain up to the first Church Collective tier
-    // public     = any authenticated user (Level 0b and above)
+    // public     = any authenticated user (Level 1 and above — Level 0b excluded)
     required_level: 1,
     roles_allowed:  [],
     can_edit:       [],
@@ -415,9 +456,21 @@ Record = {
 }
 ```
 
-### 3.2 Relationship object
+### 3.2 Record Type Registry (full)
 
-**v6 Amendment:** `to_record_id` is nullable. `bible_verse_id` optional field added. Exactly one of the two must be non-null.
+| record_family  | record_type values                                                                  | record_class       | Min level         |
+|----------------|-------------------------------------------------------------------------------------|--------------------|-------------------|
+| `journal`      | `prayer`, `spirit`, `dream`, `dar`, `note`                                          | `personal`         | 0b                |
+| `governance`   | `class`, `principle`, `concept`, `divine_pattern`, `narrative`, `subject`, `entity`, `mandate`, `statement`, `programme`, `framework`, `protocol`, `procedure` | `governance` | 4 (write), 3 (read) |
+| `activity`     | `event`, `campaign`, `project`, `habit`, `task`, `skill`                            | `organizational`   | 2                 |
+| `learning`     | `programme`, `course`, `lesson`, `assignment`, `quiz`, `certification`              | `organizational`   | 1 (enrol), 4 (author) |
+| `reference`    | `key`, `property`, `attachment` (v10)                                               | `personal` / `organizational` | 3 (key), 1 (property) |
+| `bible`        | `bible_note`                                                                        | `personal`         | 0b                |
+| `community`    | `announcement`, `gathering`, `report` (deferred), `pastoral_note` (deferred)       | `organizational`   | 1 (read), 3 (create) |
+
+> **attachment (v10):** stores file metadata only. The file is stored in MinIO `ics-private` bucket. `custom_fields["file_url"]` carries the presigned URL (1-hour expiry). No separate Attachment model.
+
+### 3.3 Relationship object
 
 ```js
 Relationship = {
@@ -435,16 +488,19 @@ Relationship = {
 
   direction: "directed | bidirectional",
 
-  relationship_type: "relates_to | derived_from | references | answers | fulfills | requests | has_symbol | matches_pattern | assigned_to | tracks | completes | part_of | aligns_with | authorised_by | tagged_in",
+  // v10 Amendment 10.5: "community_ref" added (scheduled for Version 2.3)
+  relationship_type: "relates_to | derived_from | references | answers | fulfills | requests | has_symbol | matches_pattern | assigned_to | tracks | completes | part_of | aligns_with | authorised_by | tagged_in | community_ref",
 
   notes:    "string | null",
-  strength: "weak | medium | strong | null",
+  strength: "weak | medium | strong | null",   // enum — NOT float
+
+  metadata: {},  // JSONField — extra context stored by the creating app
 
   deleted_at: "ISO-8601 | null"
 }
 ```
 
-### 3.3 Controlled relationship type vocabulary
+### 3.4 Controlled relationship type vocabulary
 
 **Activity App usage (Part 10.6):**
 
@@ -456,17 +512,16 @@ Relationship = {
 | `project`           | `aligns_with`         | activity_record → campaign_record    |
 | `skill`             | `aligns_with`         | skill_record → service_order_record  |
 
-The Learn App exclusively uses `tracks` (lesson/habit → programme) and `part_of` (lesson → course → programme). Activity App links must not use `part_of` — that relationship type is reserved for curriculum and governance hierarchy structure.
+The Learn App exclusively uses `tracks` and `part_of`. Activity App links must not use `part_of` — reserved for curriculum and governance hierarchy structure.
 
-**Community App usage (v8):**
+**Community App usage:**
 
 | Community record type | Use relationship_type | Direction                                |
 |-----------------------|-----------------------|------------------------------------------|
 | `gathering`           | `aligns_with`         | gathering_record → activity_event_record |
+| `gathering`, `announcement` | `community_ref` (v10 — Version 2.3) | community_record → governance_record |
 
-A `gathering` Record is always linked to its corresponding `event` Activity via `aligns_with` — written atomically by the Community App dual-write transaction (Part 14.4).
-
-**Governance App usage (v9):**
+**Governance App usage:**
 
 | Governance record type          | Use relationship_type | Direction                               |
 |---------------------------------|-----------------------|-----------------------------------------|
@@ -497,16 +552,6 @@ Activity = {
 
   // Classification
   activity_type: "task | habit | goal | event | campaign | project | programme | reminder | skill",
-  // task      = a single actionable item; personal or assigned
-  // habit     = a recurring personal discipline (recurrence always set)
-  // goal      = a personal or team objective with measurable progress
-  // event     = a scheduled gathering, service, or ministry occasion
-  //             gathering Activities created via Community App carry metadata.source_app:'community'
-  // campaign  = a time-bound operational initiative (KGS Harvest Campaign etc.)
-  // project   = a structured body of work nested under a campaign
-  // programme = learning enrolment hierarchy — authored and owned by Learn App; read-only in Activity App
-  // reminder  = a time-triggered prompt; created by user or Paraclete
-  // skill     = a gift, talent, or competence entry in the user's gifts register
 
   // Identity
   title:          "string",
@@ -515,11 +560,17 @@ Activity = {
   // Timing
   scheduled_at:   "ISO-8601 | null",
   due_at:         "ISO-8601 | null",
+  completed_at:   "ISO-8601 | null",  // set automatically on status → completed
   recurrence:     "none | daily | weekly | monthly | custom",
   recurrence_rule:"string | null",
 
   // Hierarchy
   parent_activity_id: "uuid | null",
+
+  // v10 Amendment 10.4 — Explicit Record link (replaces loose metadata coupling)
+  linked_record_id: "uuid | null",  // FK → records.Record, SET_NULL on delete
+  // Replaces: metadata['programme_record_id'], metadata['lesson_record_id'] (deprecated)
+  // New code MUST use linked_record_id. Old metadata keys retained for backward compat only.
 
   // Progress
   status:   "pending | in_progress | completed | cancelled | deferred",
@@ -534,12 +585,14 @@ Activity = {
 
   // Metadata
   metadata: {
-    source_app:   "activity | paraclete | learn | governance | community",
+    source_app:   "activity | paraclete | learn | governance | community | induction",
     icon:         "string | null",
     color:        "string | null",
     is_template:  false,
     template_id:  "uuid | null",
     service_order: "string | null",
+    programme_record_id: "uuid | null",  // DEPRECATED — use linked_record_id
+    lesson_record_id:    "uuid | null",  // DEPRECATED — use linked_record_id
   },
 
   updated_at:  "ISO-8601",
@@ -561,6 +614,8 @@ Activity = {
 
 ### 4.2 ActivityLog object
 
+Created by Django signal on every status transition. Immutable once written.
+
 ```js
 ActivityLog = {
   id:           "uuid",
@@ -568,8 +623,8 @@ ActivityLog = {
   created_by:   "uuid",
   created_at:   "ISO-8601",
 
-  activity_id:  "uuid",
-  event_type:   "created | status_changed | progress_updated | assigned | linked | commented",
+  activity_id:    "uuid",
+  event_type:     "created | status_changed | progress_updated | assigned | linked | commented",
   previous_value: "any | null",
   new_value:      "any | null",
   note:           "string | null"
@@ -610,12 +665,36 @@ The Paraclete is a standalone orchestration service. It does NOT own any data. I
 ParacleteDigest = {
   user_id:         "uuid",
   generated_at:    "ISO-8601",
-  pending_tasks:   Activity[],      // due today or overdue, assigned_to = user
-  upcoming_events: CalendarEvent[], // next 7 days
-  habit_streaks:   { activity_id: uuid, streak_days: integer }[],
-  discipline_prompt: "string | null",
-  link_suggestions:  { record_id: uuid, suggested_record_id: uuid, reason: string }[],
-  active_reminders:  Activity[]     // activity_type:'reminder', status:'pending'
+  competence_level: 0 | 1 | 2 | 3 | 4 | 5,
+
+  // Activity surface
+  pending_count:    integer,
+  overdue_count:    integer,
+  due_today:        ActivityCard[],
+  overdue_items:    ActivityCard[],
+  habit_streaks:    HabitStreak[],   // { activity_id, title, streak, last_completed }
+
+  // Reminders
+  pending_reminders: ActivityCard[],
+
+  // Learn
+  active_enrolments: ProgrammeCard[],  // { record_id, title, progress }
+  next_lesson:       LessonCard | null, // { record_id, title, programme_title, url }
+
+  // Prompt
+  discipline_prompt: "string",
+  prompt_pathway:    "string",
+
+  // DAR
+  dar_today: DARCard | null,  // { record_id, title, created_at, url }
+
+  // Suggestions (rule-based)
+  suggestions: [{ text: "string", priority: 1|2|3, action_url: "string" }],
+  suggestion_method: "rules | deferred",
+
+  // Team (Level 3+)
+  team_pending_count:  integer | null,
+  team_overdue_count:  integer | null,
 }
 ```
 
@@ -627,6 +706,16 @@ GET /api/activities/?assigned_to={user_id}&overdue=true
 GET /api/activities/?activity_type=habit&status=in_progress&created_by={user_id}
 GET /api/activities/?activity_type=reminder&status=pending&created_by={user_id}
 GET /api/activities/?tenant_id={id}&status=pending
+```
+
+### 5.5 Paraclete endpoints
+
+```
+GET /api/paraclete/digest/        — full ParacleteDigest for the authenticated user
+GET /api/paraclete/reminders/     — pending reminders only
+GET /api/paraclete/prompt/        — discipline prompt only
+GET /api/paraclete/suggest/{id}/  — suggestions for a specific record (deferred — stub in MVP)
+POST /api/paraclete/respond/      — user responds to a suggestion (deferred — stub in MVP)
 ```
 
 ---
@@ -644,11 +733,12 @@ GET /api/activities/?tenant_id={id}&status=pending
   activity/         ← Activity + ActivityLog models (Activity Engine)
   learn/            ← CertificationConfirmation model + curriculum endpoint
   bible/            ← BibleTranslation, BibleBook, BibleVerse models
-  community/        ← Community App (v8 — Django app, no models except MembershipRequest stub)
-  governance/       ← Governance App (v9 — Django app, no models, UI layer only)
+  community/        ← Community App (Django app, no models except MembershipRequest stub)
+  governance/       ← Governance App (Django app, no models, UI layer only)
   calendar_app/     ← Calendar aggregation service (no models)
-  paraclete/        ← Orchestration service (no models)
+  paraclete/        ← Orchestration service (ParacletePrompt model only)
   frontend/         ← Static assets (CSS, storage.js, navbar.js)
+  notifications/    ← Notification model (v10)
 ```
 
 ### 6.2 App ownership rules (cross-app dependency policy)
@@ -663,6 +753,7 @@ GET /api/activities/?tenant_id={id}&status=pending
 | BibleVerse       | bible       | read via DRF; referenced by Relationship FK            |
 | BibleTranslation | bible       | read via DRF; FK dep in accounts.UserProfile           |
 | Tenant           | tenants     | read via DRF only                                      |
+| Notification     | notifications | written by signals in other apps                     |
 
 **Community App and Governance App own no models.** They are UI + coordination layers that write to Records, Activity, and UserPermission via their respective DRF endpoints.
 
@@ -672,8 +763,8 @@ GET /api/activities/?tenant_id={id}&status=pending
 
 ```python
 def can_access(user, record):
-    # 1. Handbook short-circuit (v9 amendment)
-    if record.tenant.tier == 'handbook':
+    # 1. Handbook short-circuit
+    if record.tenant and record.tenant.tier == 'handbook':
         REFERENCE_LIBRARY_TYPES = ['class', 'principle', 'concept', 'divine_pattern']
         if record.record_type in REFERENCE_LIBRARY_TYPES:
             return user.competence_level >= 3   # read
@@ -686,28 +777,28 @@ def can_access(user, record):
         return False
 
     # 3. Visibility scope
-    if record.permissions.visibility == 'private':
+    if record.permissions['visibility'] == 'private':
         return record.created_by == user.id
 
-    if record.permissions.visibility == 'tenant':
+    if record.permissions['visibility'] == 'tenant':
         return UserPermission.objects.filter(
             user=user,
             tenant_path=record.tenant.path,
             is_active=True
         ).exists()
 
-    if record.permissions.visibility == 'collective':
+    if record.permissions['visibility'] == 'collective':
         return UserPermission.objects.filter(
             user=user,
             tenant_path__startswith=record.tenant.collective_root_path,
             is_active=True
         ).exists()
 
-    if record.permissions.visibility == 'public':
+    if record.permissions['visibility'] == 'public':
         return user.competence_level >= 1  # Level 0b cannot see public org records
 
     # 4. Level gate
-    if user.competence_level < record.permissions.required_level:
+    if user.competence_level < record.permissions['required_level']:
         return False
 
     return True
@@ -762,7 +853,7 @@ CREATE INDEX idx_perm_tenant_path  ON user_permission(tenant_path varchar_patter
 CREATE INDEX idx_perm_is_active    ON user_permission(is_active);
 ```
 
-**Note (v8):** `UserPermission.metadata` is a JSONField. `shepherd_id` and `service_order` queries are infrequent (steward-level, not hot paths). No GinIndex added in MVP. Add post-MVP if query times degrade.
+**Note:** `UserPermission.metadata` is a JSONField. No GinIndex added in MVP. Add post-MVP if query times degrade.
 
 ---
 
@@ -770,11 +861,12 @@ CREATE INDEX idx_perm_is_active    ON user_permission(is_active);
 
 ### 9.1 Record + Activity dual write
 
-When the platform needs both a persistent Record and an active Activity for the same thing, the convention is:
+When the platform needs both a persistent Record and an active Activity for the same thing:
 
-1. The orchestrating app creates the Record first (`POST /api/records/`)
-2. Then creates the Activity with a Relationship linking the two (`POST /api/activities/` + `POST /api/relationships/`)
-3. If either step fails, the view rolls back both (`Django transaction.atomic`)
+1. Create the Record first (`POST /api/records/`)
+2. Create the Activity with `linked_record` set (`POST /api/activities/`)
+3. Create the Relationship linking the two (`POST /api/relationships/`)
+4. Wrap all three in `django.db.transaction.atomic()`
 
 This pattern is used by: Learn App (programme enrolment), Community App (gathering create — Part 14.4).
 
@@ -845,7 +937,7 @@ Activity { metadata: { is_template: false, template_id: "{source_template_id}" }
 
 ### 10.6 Relationship type rules
 
-*(See Part 3.3)*
+*(See Part 3.4)*
 
 ### 10.7 Required API filters
 
@@ -908,7 +1000,7 @@ GET /api/calendar/events/
 
 Returns: `CalendarEvent[]` sorted by `scheduled_at` ascending, then `due_at`.
 
-**Community events in Calendar (v8):** Gathering events are `activity_type:'event'` Activities with `metadata.source_app:'community'`. The Calendar endpoint already queries the Activity table — community gatherings appear automatically. Filtering for community gatherings specifically: `GET /api/calendar/events/?source_app=community`
+**Community events in Calendar:** Gathering events are `activity_type:'event'` Activities with `metadata.source_app:'community'`. The Calendar endpoint already queries the Activity table — community gatherings appear automatically. Filtering: `GET /api/calendar/events/?source_app=community`
 
 ### 11.4 MVP scope and phasing
 
@@ -936,31 +1028,97 @@ Returns: `CalendarEvent[]` sorted by `scheduled_at` ascending, then `due_at`.
 
 ---
 
-## Part 12 — What to Build Next (Ordered)
+## Part 12 — Learn App Engine (Data Patterns & Contracts)
 
-*Updated in v9: Governance App system design marked complete. Phase numbering updated per Roadmap v3.*
+### 12.1 Learning content structure
 
-### Phase 5 — Remaining apps (in order)
+All learning content is stored as Records with `record_family: "learning"`. Curriculum structure is defined by `Relationship (relationship_type: "part_of")`.
 
-| Task | App | Status |
-|------|-----|--------|
-| 5.1 | Bible App | ✅ Complete — `2026-04-08-ics-bible-app-system-design_v2.md` |
-| 5.2 | Learn App | 🔄 In Progress — `2026-04-07-ics-learn-app-system-design_v2.md` |
-| 5.3 | Activity App | ⏳ Pending — `2026-04-08-ics-activity-app-system-design.md` |
-| 5.4 | Community App | ⏳ Pending — `2026-04-08-ics-community-app-system-design.md` |
-| 5.5 | Governance App | ⏳ Pending — `2026-04-10-ics-governance-app-system-design.docx` |
-| 5.6 | Profile + Settings | ⏳ Pending — `2026-04-10-ics-profile-settings-notifications-spec.docx` |
-| 5.7 | Notifications stub | ⏳ Pending — same spec as 5.6 |
+- **Programme:** `record_class: "organizational"`, `record_type: "programme"`
+- **Course:** `record_type: "course"` — linked to programme via `part_of`
+- **Lesson:** `record_type: "lesson"` — linked to course via `part_of`. May have `custom_fields["video_url"]`
+- **Assignment / Quiz:** `record_type: "assignment" | "quiz"`
+- **Certification:** `record_type: "certification"` — created by signal when programme Activity reaches `progress: 100`
 
-### Phase 6 — Paraclete Service + Dashboard
+### 12.2 Enrolment pattern
 
-`paraclete/service.py` calls Django ORM directly using the Activity filters defined in Part 5.4. Returns `ParacleteDigest` for Dashboard consumption. Dashboard renders digest widgets. Role-aware and tenant-aware.
+Enrolment = `Activity (activity_type: "programme")`. No separate Enrolment model exists.
 
-Reference: `2026-04-10-ics-paraclete-service-system-design.docx`
+```js
+{
+  activity_type:  "programme",
+  assigned_to:    user.id,
+  linked_record:  programme_record.id,   // v10 — was metadata.programme_record_id
+  status:         "in_progress",
+  progress:       0-100,
+  metadata: {
+    source_app:  "learn",
+    kgs_pathway: "Service"
+  }
+}
+```
 
-### Phase 7 — Production Hardening
+### 12.3 Five Qualification Programmes
 
-Error logging, security settings, systemd Gunicorn service, final smoke test. Nginx + Gunicorn setup is in Roadmap v3 Task 0.5.
+| Programme | Level | Duration | Prerequisites |
+|-----------|-------|----------|---------------|
+| Certificate | 1 | 1 year | None |
+| Diploma     | 2 | 3 years | Certificate |
+| Degree      | 3 | 4 years | Diploma |
+| Masters     | 4 | 4–5 years | Degree |
+| Doctorate   | 5 | 7 years | Masters |
+
+### 12.4 Three Induction Programmes (v10)
+
+| Programme | Entrant type | Court |
+|-----------|-------------|-------|
+| Reconditioning Programme | Existing believers | Outer Court |
+| Beginners Programme | Kingdom-curious newcomers | Outer Court |
+| Community Programme | All inductees | Inner Court (auto-enrolled on Outer Court completion) |
+
+### 12.5 CertificationConfirmation model
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | uuid | |
+| `certification_record_id` | uuid | FK → `records.Record` |
+| `confirmed_by` | FK → User | The confirming steward (Level 3+) |
+| `learner_id` | uuid | FK → User |
+| `previous_competence_level` | integer | |
+| `new_competence_level` | integer | |
+| `confirmed_at` | ISO-8601 | `auto_now_add=True` |
+| `notes` | string \| null | |
+| `placement_tenant_id` | uuid \| null | Set when `context == "induction_completion"` (v10) |
+
+### 12.6 `certifications/confirm/` — Extended Logic (v10)
+
+**Standard behaviour (all calls):** set certification Record `status → "active"`; increment `competence_level` by 1 (via `learn/services.py::confirm_certification_record()` — the sole authorised write path); create `CertificationConfirmation` audit record.
+
+**Extended behaviour when `metadata.context == "induction_completion"` (v10):**
+
+Request body adds: `{ "placement_tenant_id": "uuid" }` (required)
+
+In addition to standard logic:
+
+1. Set `user.induction_completed_at = now()`
+2. Create `UserPermission`: `tenant_id=placement_tenant_id`, `level=1`, `role="disciple"`, `is_active=True`
+3. Deactivate Induction Tenant `UserPermission`: `is_active=False`
+4. Write `ActivityLog`: `"Induction completed — placed in {tenant.name}"`
+5. Send email notification via Brevo
+
+**Validation:**
+- `placement_tenant_id` required when `metadata.context == "induction_completion"`
+- Confirming user must be Level 3+ within the Induction Tenant
+- `placement_tenant_id` must be a valid, active, non-induction tenant
+
+### 12.7 Learn App DRF endpoints
+
+```
+GET  /api/learn/health/
+GET  /api/learn/programmes/{id}/curriculum/
+GET  /api/learn/certifications/queue/
+POST /api/learn/certifications/{id}/confirm/
+```
 
 ---
 
@@ -1038,7 +1196,7 @@ A Level 5 Architect links a governance record to a `BibleVerse` via `Relationshi
 | See tenant (community) notes    | ✗        | ✓        | ✓        | ✓       |
 | Publish tenant note             | ✗        | ✗        | ✓        | ✓       |
 | See Learn cross-references      | ✗        | ✓        | ✓        | ✓       |
-| See Handbook references         | ✗        | ✗        | ✗        | ✓       |
+| See Handbook references         | ✗        | ✗        | ✓ (Ref Library) | ✓ |
 
 ### 13.8 Bible App DRF endpoints
 
@@ -1125,11 +1283,11 @@ Record {
   created_by:     "uuid",            // must be Level 3+
   metadata:       { source_app: "community" },
   custom_fields: {
-    format:       "in_person | digital | hybrid",
-    location:     "string | null",
-    stream_url:   "string | null",   // MVP: external URL; Video App integration later
-    capacity:     "integer | null",
-    scheduled_at: "ISO-8601 | null", // denormalised from Activity.scheduled_at
+    format:           "in_person | digital | hybrid",
+    location:         "string | null",
+    stream_url:       "string | null",
+    start_at:         "ISO-8601",            // v10: renamed from scheduled_at
+    duration_minutes: "integer | null",      // v10: replaces capacity
   },
   permissions: { visibility: "tenant", required_level: 1 }
 }
@@ -1143,7 +1301,7 @@ Creating a gathering produces two objects atomically and links them with a Relat
 
 ```python
 # Step 1 — Create gathering Record
-# Step 2 — Create event Activity (feeds Calendar App)
+# Step 2 — Create event Activity with linked_record = gathering_record.id (feeds Calendar App)
 # Step 3 — Link Record → Activity via Relationship (aligns_with, directed)
 ```
 
@@ -1229,7 +1387,21 @@ class MembershipRequest(models.Model):
 
 **pastoral_note** — confidential steward note on a specific member. `record_class:'personal'` (steward-authored), `visibility:'private'`. Privacy-sensitive design required. Deferred to Phase 2.
 
-### 14.10 Community App DRF endpoints
+### 14.10 TenantInvitation model (v10 — Version 2.5)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | uuid | |
+| `tenant_id` | uuid | FK → Tenant |
+| `email` | string | Invitee email |
+| `invited_by` | uuid | FK → User |
+| `accepted_at` | datetime \| null | |
+| `status` | string | `"pending \| accepted \| declined \| expired"` |
+| `created_at` | ISO-8601 | |
+
+Scheduled for Version 2.5 migration. See Part 18 migration schedule.
+
+### 14.11 Community App DRF endpoints
 
 ```
 # Member directory
@@ -1243,14 +1415,13 @@ PATCH  /api/permissions/{id}/
 GET    /api/records/?record_family=community&record_type=announcement&tenant_id={id}
 POST   /api/records/
 PATCH  /api/records/{id}/
-GET    /api/records/?record_family=community&record_type=gathering&tenant_id={id}
 
-# Activities (gathering dual-write)
+# Gathering — dual write
 POST   /api/activities/
 PATCH  /api/activities/{id}/
-
-# Relationships
 POST   /api/relationships/
+
+GET    /api/records/?record_family=community&record_type=gathering&tenant_id={id}
 
 # Upcoming gatherings (Calendar endpoint)
 GET    /api/calendar/events/?source_app=community&tenant_id={id}&from={ISO}&to={ISO}
@@ -1275,8 +1446,6 @@ GET    /api/community/health/
 ---
 
 ## Part 15 — Governance App Engine (Data Patterns & Contracts)
-
-*(New in v9)*
 
 The Governance App owns **no models**. It is a UI and coordination layer over the Records Engine.
 
@@ -1317,13 +1486,12 @@ Six HRS attributes applicable to Reference Library record types (`class`, `princ
 
 ```js
 custom_fields: {
-  // HRS classification attributes (all optional)
-  complexity:            "string | null",  // e.g. "foundational", "advanced"
-  relationship_position: "string | null",  // e.g. "central", "peripheral"
-  position:              "string | null",  // structural position in the HRS
-  direction:             "string | null",  // e.g. "inward", "outward", "bilateral"
-  speed:                 "string | null",  // e.g. "progressive", "immediate"
-  emotional_tone:        "string | null",  // e.g. "declarative", "invitational"
+  complexity:            "string | null",
+  relationship_position: "string | null",
+  position:              "string | null",
+  direction:             "string | null",
+  speed:                 "string | null",
+  emotional_tone:        "string | null",
 }
 ```
 
@@ -1397,8 +1565,6 @@ Full graph visualisation is deferred post-MVP.
 
 ### 15.7 Keys Library — Key Record pattern
 
-Key Records are personal, private records forming an operator's interpretive symbol library.
-
 ```js
 Record {
   record_class:   "personal",
@@ -1407,7 +1573,7 @@ Record {
   title:          "string",    // the symbol or term (e.g. "Lion", "Water", "North")
   content:        "string",    // the operator's personal interpretation / meaning
   summary:        "string | null",
-  tenant_id:      null,        // personal records have no tenant
+  tenant_id:      null,
   created_by:     "uuid",
   status:         "active | archived",
   metadata: {
@@ -1434,17 +1600,13 @@ The version history of a governance record is traversable via `previous_version_
 # 1. Start with current record (may have previous_version_id set)
 # 2. Walk backward: GET /api/records/{previous_version_id}/ until null
 # 3. Walk forward: GET /api/records/?previous_version_id={record_id}
-#    (finds the record that superseded this one, if any)
 
 # Rendered as a timeline:
 #   v1 [locked, superseded] → v2 [locked, superseded] → v3 [active]
 #   Each entry: version number, title, locked_at date, locked_by display_name
-#   Click on earlier version → opens that version in read-only detail view
 ```
 
 ### 15.9 Journal → Governance linkage pattern
-
-The Spirit Journal and Dream Journal (`record_family: "journal"`) are the input instruments that feed the Keys Library and Mandate branch.
 
 ```python
 # Journal entry → Key Record link
@@ -1470,12 +1632,11 @@ Relationship {
 
 ### 15.10 Governance App DRF endpoints
 
-The Governance App uses existing platform endpoints. No new DRF ViewSets are introduced.
-
 ```
 # Reference Library browse
 GET  /api/records/?record_family=governance&record_class=governance&record_type={type}&tenant_id={handbook_id}
 GET  /api/records/{id}/
+GET  /api/records/{id}/related/   (v10 — Amendment 10.9)
 
 # Governance record create / edit / lifecycle
 POST   /api/records/
@@ -1523,7 +1684,119 @@ GET    /api/governance/health/
 
 ---
 
-## Deferred (Post-MVP)
+## Part 16 — Notifications (v10)
+
+### 16.1 Notification model
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | uuid | |
+| `user` | FK → User | |
+| `notification_type` | string | `"announcement \| task_assigned \| certification_confirmed \| induction_completed \| level_advanced \| gathering_scheduled"` |
+| `source_app` | string | `"community \| learn \| activity \| governance"` |
+| `source_record_id` | uuid \| null | |
+| `source_activity_id` | uuid \| null | |
+| `message` | text | |
+| `is_read` | boolean | Default `False` |
+| `created_at` | datetime | `auto_now_add=True` |
+
+### 16.2 Notification trigger points
+
+| Event | Email? |
+|-------|--------|
+| Announcement created | No |
+| Task `assigned_to` set | No |
+| Certification confirmed | Yes (via Brevo) |
+| Induction placement confirmed | Yes (via Brevo) |
+| Record locked (Governance) | No |
+
+### 16.3 Notification endpoints
+
+```
+GET  /api/notifications/
+GET  /api/notifications/unread-count/
+POST /api/notifications/{id}/read/
+POST /api/notifications/read-all/
+```
+
+---
+
+## Part 17 — Delta Sync API (v10)
+
+For Flutter mobile client. Uses existing `updated_at` fields — no model changes required.
+
+```
+GET /api/sync/changes/?since={iso_timestamp}
+```
+
+**Response:**
+
+```json
+{
+  "since":         "ISO-8601",
+  "retrieved_at":  "ISO-8601",
+  "has_more":      false,
+  "records":       [],
+  "activities":    [],
+  "notifications": []
+}
+```
+
+Max 500 items per type per call. Paginate using `since=` + last `updated_at` when `has_more: true`.
+
+**Implementation:** New file `core/views/sync.py` — `SyncChangesView(APIView)`. New URL: `path('api/sync/changes/', ...)` in `ics_project/urls.py`.
+
+---
+
+## Part 18 — Migration Schedule
+
+| When | App | Change |
+|------|-----|--------|
+| Pre-Build (done) | `activity` | `Activity.linked_record = FK(records.Record, SET_NULL, null=True)` |
+| Pre-Build (done) | `records` | `Relationship.metadata = JSONField(default=dict)` |
+| Before V2.1 G1 | `tenants` | `Tenant.tier` choices: add `"induction"` |
+| Before V2.1 G2 | `accounts` | Add `induction_enrolled_at`, `induction_completed_at`, `induction_pathway` to User |
+| Before V2.1 G2 | `accounts` | Add profile registration fields to UserProfile (`full_name`, `address`, `country`, `id_number` encrypted, `age`, `gender`, `occupation`, `education`, `born_again`) |
+| Before V2.3 | `accounts` | Add `fcm_token` to User |
+| Version 2.3 | `records` | `Relationship.relationship_type` choices: add `"community_ref"` |
+| Version 2.5 | `tenants` | Add `coordinator_user` FK, `community_theme`, `area_of_operation`, `logo` ImageField |
+| Version 2.5 | `community` | New `TenantInvitation` model |
+
+---
+
+## Part 19 — API Versioning Strategy
+
+Current state: all endpoints at `/api/` (unversioned) — acceptable during development.
+
+Before first mobile production release: all endpoints move to `/api/v1/`. The `v1` prefix is then frozen — breaking changes require `/api/v2/`.
+
+**Breaking change:** removing a field, changing a field type, changing URL, changing HTTP method, changing auth requirement.
+
+**Not a breaking change:** adding new optional fields.
+
+---
+
+## Part 20 — Complete Endpoint Reference
+
+| App | Endpoints |
+|-----|-----------|
+| Auth | `POST /api/auth/register/` `POST /api/auth/login/` `POST /api/auth/logout/` `GET/PATCH /api/auth/me/` |
+| Records | `GET/POST /api/records/` `GET/PATCH/DELETE /api/records/{id}/` `GET /api/records/{id}/related/` |
+| Relationships | `GET/POST /api/relationships/` `GET/PUT/DELETE /api/relationships/{id}/` |
+| Activities | `GET/POST /api/activities/` `GET/PATCH/DELETE /api/activities/{id}/` `GET /api/activities/{id}/log/` |
+| Bible | `GET /api/bible/health/` `GET /api/bible/translations/` `GET /api/bible/books/` `GET /api/bible/verse-context/{id}/` `GET /api/bible/verses/` |
+| Learn | `GET /api/learn/health/` `GET /api/learn/programmes/{id}/curriculum/` `GET /api/learn/certifications/queue/` `POST /api/learn/certifications/{id}/confirm/` |
+| Calendar | `GET /api/calendar/events/` `GET /api/calendar/health/` |
+| Paraclete | `GET /api/paraclete/digest/` `GET /api/paraclete/reminders/` `GET /api/paraclete/prompt/` `GET /api/paraclete/suggest/{id}/` `POST /api/paraclete/respond/` |
+| Notifications | `GET /api/notifications/` `GET /api/notifications/unread-count/` `POST /api/notifications/{id}/read/` `POST /api/notifications/read-all/` |
+| Sync | `GET /api/sync/changes/?since={iso_timestamp}` |
+| Permissions | `GET /api/permissions/` `POST /api/permissions/` `PATCH /api/permissions/{id}/` |
+| Community | `GET /api/community/health/` |
+| Governance | `GET /api/governance/health/` |
+
+---
+
+## Deferred (Post-MVP / Future Versions)
 
 ### Platform-wide
 
@@ -1533,7 +1806,7 @@ GET    /api/governance/health/
 - In-service Display app
 - Donations feature
 - Advanced Paraclete AI features (pattern detection, auto-linking)
-- Push notifications (mobile)
+- User-defined custom journal record types (planned V2+ feature)
 - `assigned_to_tenant_id` on Activity (collective/network assignment)
 - Custom RRULE recurrence UI (Activity App)
 
@@ -1552,6 +1825,7 @@ GET    /api/governance/health/
 - Record events in aggregation (programme milestones, governance calendars)
 - iCal export
 - Subscription feed for external calendar apps
+- Full month/week grid view (Phase 3)
 
 ### Activity App
 
@@ -1573,7 +1847,7 @@ GET    /api/governance/health/
 
 ### Community App
 
-- `MembershipRequest` model UI (model stubbed in MVP — Part 14.8)
+- `MembershipRequest` model UI (model stubbed — Part 14.8)
 - Induction training gate (Learn App integration)
 - `report` record type (Part 14.9)
 - `pastoral_note` record type (Part 14.9)
