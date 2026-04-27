@@ -5,7 +5,7 @@ from django.db import models
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     display_name = models.CharField(max_length=100, blank=True)
-    avatar_url = models.URLField(blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     competence_level = models.IntegerField(default=0)
     # 0 = seeker, 1-5 = formation levels per KGS
     status = models.CharField(
@@ -31,6 +31,10 @@ class User(AbstractUser):
 
     class Meta:
         db_table = 'accounts_user'
+
+    @property
+    def avatar_url(self):
+        return self.avatar.url if self.avatar else None
 
     def __str__(self):
         return self.email

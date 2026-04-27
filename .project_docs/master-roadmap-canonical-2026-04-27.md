@@ -14,6 +14,7 @@
 ## How to Read This Document
 
 Every phase has four things:
+
 - **What it builds** — the specific features and files
 - **Entry requirement** — what must be complete before this phase starts
 - **Exit criteria** — how you know the phase is done
@@ -28,6 +29,7 @@ Phases are numbered. Within a phase, tasks are lettered. Do not skip phases. Do 
 **What Ichebo is:** A multitenancy web platform and mobile app for Christian organisations to manage governance, discipleship, and ministry operations — the digital twin of the Kingdom Governance System (KGS) framework.
 
 **Two client surfaces:**
+
 - **Web app** (Django templates + HTMX) — the operator surface for desktop/tablet. Stewards, Coordinators, Level 4+, Level 5. Complex workflows: content authorship, governance, community management, certification review.
 - **Mobile app** (Flutter + DRF API) — the primary surface for all users on their phones. Level 0 inductees through Level 5 architects. Everyday use: lessons, activities, community, Bible reading.
 
@@ -76,6 +78,7 @@ One app per git commit — never mix app work across a single commit
 ## The Six Platform Apps — Full Feature Inventory
 
 ### Bible App
+
 | Feature | Version |
 |---------|---------|
 | Scripture reader (KJV, ASV, WEB) | ✅ MVP |
@@ -92,6 +95,7 @@ One app per git commit — never mix app work across a single commit
 | Cross-reference chains | Version 3+ |
 
 ### Learn App
+
 | Feature | Version |
 |---------|---------|
 | Content authorship (Level 4+) | ✅ MVP |
@@ -113,6 +117,7 @@ One app per git commit — never mix app work across a single commit
 | Offline lesson caching | Version 3+ |
 
 ### Activity App
+
 | Feature | Version |
 |---------|---------|
 | Activity Engine (models, signals, DRF) | ✅ MVP |
@@ -126,6 +131,7 @@ One app per git commit — never mix app work across a single commit
 | Cross-tenant campaign assignment | Version 3+ |
 
 ### Community App
+
 | Feature | Version |
 |---------|---------|
 | Member directory | Version 2 |
@@ -140,6 +146,7 @@ One app per git commit — never mix app work across a single commit
 | Pastoral assignment model | Version 3+ |
 
 ### Governance App
+
 | Feature | Version |
 |---------|---------|
 | Reference Library (Level 3+ read) | ✅ MVP (lite) |
@@ -151,6 +158,7 @@ One app per git commit — never mix app work across a single commit
 | Level 4 tenant-scoped governance records | Version 3+ |
 
 ### Video / Live App
+
 | Feature | Version |
 |---------|---------|
 | URL video embed (YouTube, Vimeo, direct .mp4) in lessons | Version 2 |
@@ -184,6 +192,7 @@ LAYER 6 — VERSION 3: SCALE           (future — Redis, Docker, AI, advanced f
 **What was built:** Hetzner VPS provisioned (Ubuntu 22.04), SSH key authentication, UFW firewall, non-root deploy user (`ics`), domain pointed to server IP, basic server hardening.
 
 **Key file locations established:**
+
 ```
 /home/ics/ics/backend/          App code (git repo)
 /home/ics/ics/backend/.env      Secrets (never committed)
@@ -199,11 +208,13 @@ LAYER 6 — VERSION 3: SCALE           (future — Redis, Docker, AI, advanced f
 1. SSH into VPS (Ubuntu 22.04)
 2. Update packages: `sudo apt update && sudo apt upgrade -y`
 3. Install dependencies:
+
 ```bash
 sudo apt install -y python3.10 python3.10-venv python3-pip postgresql postgresql-contrib nginx git
 ```
+
 4. Create deploy user: `sudo adduser ics && sudo usermod -aG sudo ics`
-5. Switch to deploy user: `su - ics`
+2. Switch to deploy user: `su - ics`
 
 ### Task 0.2 — PostgreSQL database
 
@@ -211,6 +222,7 @@ sudo apt install -y python3.10 python3.10-venv python3-pip postgresql postgresql
 sudo systemctl start postgresql && sudo systemctl enable postgresql
 sudo -u postgres psql
 ```
+
 ```sql
 CREATE DATABASE ics_db;
 CREATE USER ics_user WITH PASSWORD 'your-strong-password';
@@ -220,11 +232,13 @@ ALTER ROLE ics_user SET timezone TO 'UTC';
 GRANT ALL PRIVILEGES ON DATABASE ics_db TO ics_user;
 \q
 ```
+
 Test: `psql -U ics_user -d ics_db -h localhost`
 
 ### Task 0.3 — Django project scaffold
 
 **Files created:**
+
 ```
 ~/ics/requirements.txt
 ~/ics/ics_project/settings/base.py
@@ -233,6 +247,7 @@ Test: `psql -U ics_user -d ics_db -h localhost`
 ```
 
 Key settings in `base.py`:
+
 ```python
 from decouple import config
 
@@ -297,6 +312,7 @@ CORS_ALLOWED_ORIGINS = config(
 ```
 
 `.env` file (project root, mode 600):
+
 ```
 SECRET_KEY=generate-a-long-random-string-here
 DEBUG=True
@@ -314,6 +330,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:8001,https://your-domain.com
 ### Task 0.4 — Health check endpoint
 
 **Files:**
+
 - Create: `~/ics/core/views.py`
 - Create: `~/ics/core/urls.py`
 - Modify: `~/ics/ics_project/urls.py`
@@ -356,6 +373,7 @@ urlpatterns = [
 ### Task 0.5 — Nginx + Gunicorn (production) ✅ COMPLETE
 
 **`gunicorn.conf.py`** (project root):
+
 ```python
 bind = "127.0.0.1:8001"
 workers = 3
@@ -365,6 +383,7 @@ errorlog  = "/var/log/gunicorn/ics_error.log"
 ```
 
 **`/etc/nginx/sites-available/ics`:**
+
 ```nginx
 server {
     listen 80;
@@ -400,6 +419,7 @@ server {
 ```
 
 **Deployment steps (run in order):**
+
 ```bash
 # 1. Create log/cache directories
 sudo mkdir -p /var/log/gunicorn /var/log/ics /var/cache/ics
@@ -435,6 +455,7 @@ curl https://your-domain.com/api/health/
 ```
 
 **Systemd service** (`/etc/systemd/system/ics.service`):
+
 ```ini
 [Unit]
 Description=ICS Gunicorn Service
@@ -471,6 +492,7 @@ sudo systemctl start ics
 ### Task 1.1 — Accounts app + custom User model ✅
 
 **Files:**
+
 - `accounts/models.py`
 - `accounts/forms.py`
 - `accounts/views.py`
@@ -490,6 +512,7 @@ Django session auth for templates + DRF token auth for mobile (both active). `Se
 ### Task 1.2 — Tenants app + materialised path ✅
 
 **Files:**
+
 - `tenants/models.py`
 - `tenants/serializers.py`
 - `tenants/views.py`
@@ -504,6 +527,7 @@ Handbook tenant at `/global/handbook/` created by management command on first de
 ### Task 1.3 — HTMX shell — base.html + nav components ✅
 
 **Files:**
+
 - `templates/base.html`
 - `templates/base_partial.html`
 - `templates/components/_navbar.html`
@@ -514,6 +538,7 @@ Handbook tenant at `/global/handbook/` created by management command on first de
 - `templates/components/_empty_state.html`
 
 **JS load order (locked — do not reorder):**
+
 ```html
 <!-- In <head> -->
 <script src="{% static 'js/htmx.min.js' %}" defer></script>
@@ -524,6 +549,7 @@ Handbook tenant at `/global/handbook/` created by management command on first de
 ```
 
 **CSRF wiring for HTMX** (in `base.html`, once only):
+
 ```html
 <script>
   document.addEventListener('htmx:configRequest', (e) => {
@@ -547,6 +573,7 @@ Smoke test: navbar renders, app drawer opens/closes, theme toggle works, `@login
 ### Task 2.1 — Records Django app + models ✅
 
 **Files:**
+
 - `records/models.py` — `Record`, `Relationship`
 - `records/serializers.py`
 - `records/views.py` (DRF ViewSets)
@@ -560,6 +587,7 @@ Smoke test: navbar renders, app drawer opens/closes, theme toggle works, `@login
 ### Task 2.2 — Records Django template views + HTMX partials ✅
 
 **Files:**
+
 - `records/template_views.py`
 - `templates/records/list.html`
 - `templates/records/_list.html` (HTMX partial)
@@ -571,6 +599,7 @@ Smoke test: navbar renders, app drawer opens/closes, theme toggle works, `@login
 - `templates/components/_record_card.html`
 
 **`HX-Request` header detection pattern** (used across all apps):
+
 ```python
 def get_template_names(self):
     if self.request.headers.get('HX-Request'):
@@ -591,6 +620,7 @@ def get_template_names(self):
 ### Task 3.1 — Activity Django app + models ✅
 
 **Files:**
+
 - `activity/models.py` — `Activity`, `ActivityLog`
 - `activity/serializers.py`
 - `activity/views.py` (DRF ViewSets)
@@ -601,6 +631,7 @@ def get_template_names(self):
 Activity types: `task | habit | goal | event | campaign | project | programme | reminder | skill`.
 
 **Endpoints:**
+
 ```
 GET    /api/activities/
 POST   /api/activities/
@@ -617,6 +648,7 @@ GET    /api/activity/health/
 ### Task 3.2 — Activity Django template views + HTMX partials ✅
 
 **Files:**
+
 - `activity/template_views.py`
 - `templates/activity/list.html`
 - `templates/activity/_list.html` (HTMX partial)
@@ -637,6 +669,7 @@ GET    /api/activity/health/
 **Deferred to Version 3+:** Licensed translations (NIV/ESV/NLT — require publisher licensing agreements and fees), African language translations, audio Bible.
 
 **Endpoints:**
+
 ```
 GET  /api/bible/translations/
 GET  /api/bible/books/
@@ -847,16 +880,19 @@ GET  /api/community/health/
 ### Three surfaces
 
 **Reference Library (Level 3+ read, Level 5 write)**
+
 - Record types: `class`, `principle`, `concept`, `divine_pattern`
 - Tenant scope: Handbook only
 - Shared, objective, HRS-produced knowledge
 
 **Mandate Branch (Level 4+ read, Level 5 write)**
+
 - Record types: `mandate`, `statement`, `framework`, `narrative`, `subject`, `entity`, `protocol`, `procedure`, `programme`
 - Tenant scope: Handbook only
 - Directional governance documents
 
 **Keys Library (owner only, Level 3+)**
+
 - Record type: `key`
 - Tenant scope: null (personal records)
 - Private interpretive symbol library
@@ -1035,6 +1071,7 @@ GET /api/paraclete/health/
 Dashboard calls `paraclete.service.build_digest()` via direct Python import (not HTTP). Role-aware widgets. Tenant-aware.
 
 **Files:**
+
 - `dashboard/views.py`
 - `dashboard/urls.py`
 - `templates/dashboard/index.html`
@@ -1138,6 +1175,7 @@ curl -I https://your-domain.com/
 ---
 
 # LAYER 3 — Stabilisation
+
 # (Required before any Version 2 feature work begins)
 
 ## Phase S.1 — Infrastructure Additions
@@ -1149,9 +1187,11 @@ curl -I https://your-domain.com/
 **Why Brevo:** Free tier gives 300 emails/day, no credit card required, reliable delivery, simple SMTP setup. Running your own SMTP server requires managing IP reputation, SPF/DKIM/DMARC records, bounce handling, and spam blacklist monitoring — not appropriate for a sole developer.
 
 **Setup:**
+
 1. Create account at brevo.com (free)
 2. Go to SMTP & API → SMTP settings → generate credentials
 3. Add to `.env`:
+
 ```
 EMAIL_HOST=smtp-relay.brevo.com
 EMAIL_PORT=587
@@ -1160,7 +1200,9 @@ EMAIL_HOST_USER=your-brevo-login@email.com
 EMAIL_HOST_PASSWORD=your-brevo-smtp-key
 DEFAULT_FROM_EMAIL=noreply@your-domain.com
 ```
+
 4. Add to `settings/base.py`:
+
 ```python
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST')
@@ -1170,7 +1212,9 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 ```
+
 5. Test:
+
 ```bash
 python manage.py shell
 >>> from django.core.mail import send_mail
@@ -1184,6 +1228,7 @@ python manage.py shell
 **Why MinIO:** Profile avatars and tenant logos need real file storage. MinIO runs locally on your Hetzner VPS, is S3-compatible (boto3/django-storages), and costs nothing beyond VPS disk space. If you later move to AWS S3, you change three environment variables and zero code.
 
 **Install on VPS:**
+
 ```bash
 wget https://dl.min.io/server/minio/release/linux-amd64/minio
 chmod +x minio
@@ -1197,11 +1242,130 @@ sudo systemctl enable minio
 sudo systemctl start minio
 ```
 
+> **Note:** The `minio-user` is a dedicated system service account (created with `-r`, no login shell).
+> It is separate from your VPS login user (`scepter`). MinIO runs as `minio-user` and owns `/data/minio`;
+> your Django process runs as `scepter`. No changes needed to either account.
+
+**If `sudo systemctl enable minio` fails** with "Unit file minio.service does not exist", create the service and environment files first:
+
+```bash
+# 1. Environment file
+sudo nano /etc/default/minio
+```
+
+```bash
+
+# Ensure that you create your Root user and password
+MINIO_VOLUMES="/data/minio"
+MINIO_ROOT_USER=your_access_key_here
+MINIO_ROOT_PASSWORD=your_secret_key_here
+MINIO_OPTS="--address :9000 --console-address :9001"
+
+```
+
+```bash
+# 2. Systemd service file
+sudo nano /etc/systemd/system/minio.service
+```
+
+```ini
+[Unit]
+Description=MinIO Object Storage
+Documentation=https://docs.min.io
+Wants=network-online.target
+After=network-online.target
+AssertFileIsExecutable=/usr/local/bin/minio
+
+[Service]
+WorkingDirectory=/data/minio
+User=minio-user
+Group=minio-user
+EnvironmentFile=/etc/default/minio
+ExecStartPre=/bin/bash -c "if [ -z \"${MINIO_VOLUMES}\" ]; then echo \"Variable MINIO_VOLUMES not set in /etc/default/minio\"; exit 1; fi"
+ExecStart=/usr/local/bin/minio server $MINIO_OPTS $MINIO_VOLUMES
+Restart=always
+RestartSec=5
+LimitNOFILE=65536
+TasksMax=infinity
+TimeoutStopSec=infinity
+SendSIGKILL=no
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+# 3. Enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable minio
+sudo systemctl start minio
+sudo systemctl status minio
+```
+
 **MinIO buckets to create:**
+
 - `ics-media` — public read (avatars, logos)
 - `ics-private` — private (attachments, presigned URLs)
 
+
+```bash
+
+# Refresh Minio
+sudo systemctl restart minio
+
+# Install the MinIO client
+wget https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x mc
+sudo mv mc /usr/local/bin/
+
+# Point it at your local MinIO
+mc alias set local http://localhost:9000 your_access_key your_secret_key
+
+
+
+# Create the buckets
+mc mb local/ics-media
+mc mb local/ics-private
+
+# Make ics-media publicly readable
+mc anonymous set download local/ics-media
+
+
+```
+
+Think of them as the MinIO admin account:
+
+
+|Variable|What to put|Example|
+|---|---|---|
+|`MINIO_ROOT_USER`|Any username you choose (min 3 chars)|`icsadmin`|
+|`MINIO_ROOT_PASSWORD`|Any strong password you choose (min 8 chars)|`SuperSecret123!`|
+
+These become:
+
+- The login for the MinIO web console at `:9001`
+- The `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` you put in your Django `.env`
+
+**So pick them once, write them down, and use the same values in your `.env`:**
+
+```bash
+# /etc/default/minio
+MINIO_ROOT_USER=icsadmin
+MINIO_ROOT_PASSWORD=your-strong-password-here
+```
+
+```bash
+# .env (Django)
+MINIO_ACCESS_KEY=icsadmin
+MINIO_SECRET_KEY=your-strong-password-here
+```
+
+They only live on your server — never commit them to git.
+
+
+
 **Django settings:**
+
 ```python
 # requirements.txt: add django-storages[s3] boto3 Pillow
 STORAGES = {"default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"}}
@@ -1214,6 +1378,7 @@ MEDIA_URL = config('MEDIA_URL')                        # e.g. https://your-domai
 ```
 
 **Model updates:**
+
 ```python
 # accounts/models.py
 avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
@@ -1265,6 +1430,7 @@ crontab -e
 **What this is:** During MVP build sessions, view code was written for apps that the roadmap marks as Pending. This code must be audited against the locked system design documents before Version 2 is built on top of it.
 
 **Process for each app:**
+
 1. Open the app's locked system design document
 2. Compare existing views against spec'd URL routes, data patterns, access gates, HTMX partial patterns
 3. Mark each view: ✅ Conforms | ⚠️ Needs adjustment | ❌ Rewrite required
@@ -1282,6 +1448,7 @@ crontab -e
 | Notifications | `notifications/` | `2026-04-10-ics-profile-settings-notifications-spec.docx` |
 
 **Also confirm during audit:**
+
 - Django version in production is 4.2 LTS (not 5.x)
 - `competence_level` write path is isolated to `POST /api/learn/certifications/{id}/confirm/` only — confirmed via `learn/services.py::confirm_certification_record()`
 - `Activity.linked_record` FK exists (data contract v10 Amendment 10.4)
@@ -1385,13 +1552,16 @@ Before building any Induction views, run these migrations in order:
 ```
 
 **CRITICAL — `id_number` encryption:**
+
 ```bash
 pip install django-encrypted-model-fields
 ```
+
 ```python
 from encrypted_model_fields.fields import EncryptedCharField
 id_number = EncryptedCharField(max_length=100, blank=True, null=True)
 ```
+
 Store `FIELD_ENCRYPTION_KEY` in `.env`. Never return `id_number` in any API response without an explicit Level 4+ admin endpoint.
 
 ### V2.2.2 — Induction Tenant Seed
@@ -1414,6 +1584,7 @@ Cannot be deleted or renamed via normal UI flows. Enforce at view layer: check `
 ### V2.2.3 — Sign-up & Profile Registration (Three-Step Flow)
 
 **Step 1 — Sign-up:**
+
 - Email + password
 - Email verification via Brevo
 - User created: `status: "seeker"`, no competence level, no tenant assignment
@@ -1422,6 +1593,7 @@ Cannot be deleted or renamed via normal UI flows. Enforce at view layer: check `
 Collects: Full Name, Email (read-only), Address, Country, ID/Passport Number (encrypted), Age, Gender, Occupation, Education/Qualification, Born Again (Yes/No), Entrant type ("I am already part of a church or faith community" → Reconditioning | "I am new to this or exploring" → Beginners).
 
 **Step 3 — Induction Placement:**
+
 - `UserPermission` created: `tenant_path="/global/induction/"`, `level=0`, `role="seeker"`, `is_active=True`
 - `user.induction_enrolled_at` set
 - `user.induction_pathway` set from entrant type
@@ -1429,6 +1601,7 @@ Collects: Full Name, Email (read-only), Address, Country, ID/Passport Number (en
 - User redirected to Induction Dashboard
 
 **Django template routes:**
+
 ```
 GET  /accounts/register/              Sign-up form
 POST /accounts/register/              Create user, send verification email
@@ -1452,6 +1625,7 @@ Community Programme enrolment triggered on Outer Court completion via Django sig
 ### V2.2.5 — Induction Completion & Tenant Placement
 
 **Flow:**
+
 1. User completes Community Programme (Inner Court)
 2. `learn/signals.py` creates draft `certification` Record: `metadata.context: "induction_completion"`, `metadata.target_level: 1`
 3. Induction Coordinator (Level 3+ in Induction Tenant) opens induction review queue
@@ -1467,6 +1641,7 @@ Community Programme enrolment triggered on Outer Court completion via Django sig
    - Sends email notification via Brevo
 
 **Django template routes:**
+
 ```
 GET  /learn/induction/review/                  Coordinator: pending completions list
 GET  /learn/induction/review/{user_id}/        Coordinator: individual review
@@ -1487,21 +1662,25 @@ GET  /accounts/formation/                      User: post-placement welcome
 ### V2.3.1 — Formation Dashboard
 
 **Level badge in navbar:**
+
 - Visual badge showing current level (0=grey, 1=green, 2=blue, 3=purple, 4=orange, 5=red)
 - Click → modal showing next level requirements
 
 **"Your Formation Journey" card on dashboard:**
+
 - Current competence level with KGS name (e.g. "Foundational Disciple — Level 1")
 - Active qualification programme with progress bar
 - Next level: which programme must be completed and estimated time
 - Pathway affiliation
 
 **Formation history view:**
+
 - Timeline of level advancements
 - Data source: `CertificationConfirmation` records
 - Each entry: from level, to level, date, confirming steward name
 
 **Django template routes:**
+
 ```
 GET  /accounts/formation/              Full formation history
 GET  /learn/htmx/formation-card/       HTMX dashboard card partial
@@ -1522,11 +1701,13 @@ APP_LEVEL_REQUIREMENTS = {
 ```
 
 **Drawer behaviour:**
+
 - Available apps: rendered normally, clickable
 - Locked apps: lock icon + "Requires Level X" tooltip
 - Click on locked app: modal — "To access Governance, you need Level 3. Complete the Diploma Programme to advance."
 
 **Files:**
+
 - `accounts/context_processors.py` — expose `user_level` to all templates
 - `templates/partials/app_drawer.html` — conditional rendering by level
 - `templates/partials/_app_locked_modal.html` — info modal
@@ -1644,6 +1825,7 @@ New Django app: `video_live/`
 Broadcast schedule stored as `Activity (activity_type: "event")` + `Gathering` dual-write (same pattern as Community App). `stream_url` on Gathering carries the live stream URL.
 
 **Scheduler logic:**
+
 - Events with `start_at` and `duration_minutes` form the programme grid
 - "Now playing" detection: current time falls within `start_at` + `duration_minutes`
 - Upcoming events: next 7 days, ordered by `start_at`
@@ -1660,6 +1842,7 @@ GET  /video/watch/{event_id}/          Individual event player (live or VOD)
 ```
 
 **Player logic:**
+
 - YouTube/Vimeo URLs → `<iframe>` embed (reuses `core/utils/video.py` from V2.1)
 - Direct `.mp4` URLs → `<video>` tag
 
@@ -1682,6 +1865,7 @@ GET  /video/watch/{event_id}/          Individual event player (live or VOD)
 ### V2.M.1 — Flutter Project Setup
 
 **Prerequisites:**
+
 - Flutter SDK (stable channel) — flutter.dev
 - Android Studio (Android SDK + emulator)
 - Android device for physical testing (recommended)
@@ -1694,6 +1878,7 @@ flutter run
 ```
 
 **Key packages (`pubspec.yaml`):**
+
 ```yaml
 dependencies:
   flutter:
@@ -1720,6 +1905,7 @@ dependencies:
 5. DRF validates token and returns user data
 
 **`GET /api/auth/me/` response shape:**
+
 ```json
 {
   "id":                    "uuid",
@@ -1760,6 +1946,7 @@ GoRouter(
 ### V2.M.4 — Offline SQLite Cache + Delta Sync
 
 **Django backend — new endpoint:**
+
 ```python
 # core/views/sync.py — SyncChangesView
 # GET /api/sync/changes/?since=2026-05-01T00:00:00Z
@@ -1770,6 +1957,7 @@ GoRouter(
 ```
 
 **Flutter — sqflite local database:**
+
 - First launch: full sync (since a very old date)
 - Subsequent launches: delta sync (since last sync timestamp)
 - Write operations: save locally + queue to backend
@@ -1780,12 +1968,14 @@ GoRouter(
 ### V2.M.5 — Push Notifications (FCM)
 
 **Setup:**
+
 1. Create Firebase project at console.firebase.google.com
 2. Add Android app (use Flutter app's package name)
 3. Download `google-services.json` → place in `android/app/`
 4. Flutter sends `PATCH /api/auth/me/` with `{"fcm_token": "<token>"}` on each login
 
 **Django push helper:**
+
 ```python
 # notifications/fcm.py
 import requests
@@ -1859,6 +2049,7 @@ Do not build any of these until Version 2 is complete and in real-world use.
 ## Deferred Items — Complete Reference
 
 ### Platform-wide
+
 - Full `RecordPermission` table (fine-grained per-user permissions)
 - `CustomFieldSchema` formal validation system
 - Donations feature
@@ -1867,42 +2058,50 @@ Do not build any of these until Version 2 is complete and in real-world use.
 - User-defined custom journal record types — Version 3+
 
 ### Bible App
+
 - Reading plans, verse highlights, scripture search
 - Licensed translations (NIV/ESV/NLT)
 - African language translations, audio Bible, cross-reference chains
 
 ### Learn App
+
 - Rich text editor for authorship
 - Quiz auto-grading, assignment peer review
 - Learning analytics dashboard, offline lesson caching
 
 ### Activity App
+
 - Full calendar grid UI, habit streak visualisation
 - Ministry analytics, cross-tenant campaign assignment
 - RRULE custom recurrence builder
 
 ### Community App
+
 - Pastoral notes (privacy design required)
 - Attendance tracking (privacy-sensitive)
 - Community analytics dashboard, collective-level gathering visibility
 - Pastoral assignment model
 
 ### Governance App
+
 - Full HRS graph visualisation
 - Level 4 tenant-scoped governance records
 - Governance App Phase 2
 - `calendar` record type (registered in family, Phase 2 only)
 
 ### Notifications
+
 - Real-time delivery (Django Channels + WebSockets) — Version 3
 - Push notification to iOS — when iOS app is built
 
 ### Paraclete
+
 - AI-assisted pattern detection (LLM) — Version 3
 - Link suggestion engine — Version 3
 - Prophetic prompt generation (LLM) — Version 3
 
 ### Infrastructure
+
 - Docker Compose — Version 3
 - Redis + Celery — Version 3
 - iOS app — Version 3

@@ -48,7 +48,7 @@ class Tenant(models.Model):
     is_collective = models.BooleanField(default=False)
 
     description = models.TextField(blank=True, null=True)
-    logo_url = models.URLField(blank=True, null=True)
+    logo = models.ImageField(upload_to='logos/', blank=True, null=True)
 
     # Location (JSON field — PostgreSQL)
     location = models.JSONField(default=dict, blank=True)
@@ -74,6 +74,10 @@ class Tenant(models.Model):
             for i in range(len(parts) - 1)
         ]
         return Tenant.objects.filter(path__in=ancestor_paths)
+
+    @property
+    def logo_url(self):
+        return self.logo.url if self.logo else None
 
     def __str__(self):
         return f"{self.name} ({self.path})"
