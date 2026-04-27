@@ -1362,8 +1362,6 @@ MINIO_SECRET_KEY=your-strong-password-here
 
 They only live on your server — never commit them to git.
 
-
-
 **Django settings:**
 
 ```python
@@ -1399,10 +1397,20 @@ def logo_url(self):
 
 ### S.1.3 — Database Backups
 
+The roadmap script runs as the `ics` user and your VPS user is `scepter`. Here's what to run on the server, adapted to your actual setup:
+
+**1. Create the backup directory and script:**
+
 ```bash
-# /home/ics/backup.sh
+mkdir -p /home/scepter/backups
+nano /home/scepter/backup.sh
+```
+
+Paste this:
+
+```bash
 #!/bin/bash
-BACKUP_DIR="/home/ics/backups"
+BACKUP_DIR="/home/scepter/backups"
 DATE=$(date +%Y%m%d_%H%M%S)
 mkdir -p $BACKUP_DIR
 pg_dump -U ics_user ics_db | gzip > $BACKUP_DIR/ics_backup_$DATE.sql.gz
@@ -1410,11 +1418,45 @@ find $BACKUP_DIR -name "*.sql.gz" -mtime +7 -delete
 echo "Backup complete: ics_backup_$DATE.sql.gz"
 ```
 
+**2. Make it executable:**
+
 ```bash
-# Schedule via cron
+chmod +x /home/scepter/backup.sh
+```
+
+**3. Test it once manually:**
+
+```bash
+sed -i 's/pg_dump -U/pg_dump -h localhost -U/' /home/scepter/backup.sh
+/home/scepter/backup.sh
+ls -lh /home/scepter/backups/
+
+```
+
+You should see a `.sql.gz` file. If `pg_dump` asks for a password, you need to create a `.pgpass` file:
+
+```bash
+echo 'localhost:5432:ics_db:your_db_password' > ~/.pgpass
+chmod 600 ~/.pgpass
+```
+
+**4. Schedule the cron (runs at 2am daily):**
+
+```bash
 crontab -e
-# Add:
-0 2 * * * /home/ics/backup.sh >> /var/log/ics/backup.log 2>&1
+```
+
+Add this line:
+
+```
+0 2 * * * /home/scepter/backup.sh >> /var/log/ics/backup.log 2>&1
+```
+
+Make sure the log directory exists:
+
+```bash
+sudo mkdir -p /var/log/ics
+sudo chown scepter:scepter /var/log/ics
 ```
 
 **Weekly manual step:** Download a backup copy to your laptop. Never rely solely on server-side backups.
