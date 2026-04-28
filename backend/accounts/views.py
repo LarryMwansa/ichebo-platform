@@ -379,6 +379,22 @@ class ProfileSetupView(LoginRequiredMixin, View):
 
         user.save(update_fields=['display_name', 'induction_pathway', 'induction_enrolled_at'])
 
+        # Enrol user in the Induction Programme
+        from records.models import Record
+        from learn.services import enrol_in_programme, EnrolmentError
+        induction_programme = Record.objects.filter(
+            record_family='learning',
+            record_type='induction',
+            status='active',
+            origin='system',
+            deleted_at__isnull=True,
+        ).first()
+        if induction_programme:
+            try:
+                enrol_in_programme(user, induction_programme, tenant=induction_tenant)
+            except EnrolmentError:
+                pass  # Already enrolled — safe to ignore on re-submit
+
         return redirect('accounts:welcome')
 
 
