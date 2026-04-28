@@ -1788,11 +1788,213 @@ def user_level(request):
 
 ---
 
-## Phase V2.4 — Notifications (Full)
+## Phase V2.4 — Agency Tenant Seed & Service Order Foundation
 
-**Entry requirement:** V2.3 complete. All trigger sources now built.
+**Entry requirement:** V2.3 complete.
 
-### Notification model
+This phase has no UI. It is purely seed data — management commands that establish the constitutional structure of the Kingdom Governance System in the database. All subsequent phases (dashboard, self-service, notifications) depend on this structure existing.
+
+### V2.4.1 — Seed: Prime Tenancy
+
+The Prime Tenancy is the apex governing body. It already exists in the database as the root tenant. This step confirms and documents its canonical form:
+
+```
+slug:   "prime"
+tier:   "global"
+path:   "/global/"
+name:   "Prime Tenancy"
+```
+
+No management command needed if already seeded. Verify with `Tenant.objects.get(slug='prime')`.
+
+### V2.4.2 — Seed: 6 Agency Tenants (Service Domains)
+
+Each Service Domain is represented as a tenant under the Prime Tenancy. These are constitutional — they cannot be created, renamed, or deleted via the self-service UI.
+
+```python
+AGENCY_TENANTS = [
+    {"slug": "apostolic-ministry",       "name": "Apostolic & Spiritual Ministry",   "tier": "global"},
+    {"slug": "leadership-governance",    "name": "Leadership & Governance Support",  "tier": "global"},
+    {"slug": "formation-teaching",       "name": "Formation & Teaching",             "tier": "global"},
+    {"slug": "mission-outreach",         "name": "Mission & Outreach",               "tier": "global"},
+    {"slug": "community-life-care",      "name": "Community Life & Care",            "tier": "global"},
+    {"slug": "operations-stewardship",   "name": "Operations & Stewardship",         "tier": "global"},
+]
+# All have path: "/global/<slug>/" and parent: Prime Tenancy
+```
+
+**Management command:** `python manage.py seed_agency_tenants`
+
+### V2.4.3 — Seed: 24 Service Orders (Fixed Controlled Vocabulary)
+
+The 24 Orders are pre-seeded as a `ServiceOrder` model. They are the only valid values for `UserPermission.metadata.service_order`. They cannot be created or modified through any UI — changes require a migration.
+
+```python
+# tenants/models.py  (new model)
+class ServiceOrder(models.Model):
+    id           = UUIDField(primary_key=True, default=uuid.uuid4)
+    slug         = CharField(max_length=80, unique=True)
+    name         = CharField(max_length=120)
+    domain       = CharField(max_length=80)   # Service Domain name
+    office       = CharField(max_length=120)  # Administrative Office name
+    order_number = PositiveSmallIntegerField(unique=True)  # 1–24
+    is_active    = BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order_number']
+```
+
+The 24 orders (seeded via `python manage.py seed_service_orders`):
+
+| # | Domain | Administrative Office | Order |
+| --- | --- | --- | --- |
+| 1 | Apostolic & Spiritual Ministry | Office of Apostolic Stewardship | Order of Apostolic Service |
+| 2 | Apostolic & Spiritual Ministry | Office of Prophetic Discernment | Order of Prophetic Ministry |
+| 3 | Apostolic & Spiritual Ministry | Office of Prophetic Discernment | Order of Teaching and Doctrine |
+| 4 | Apostolic & Spiritual Ministry | Office of Prophetic Discernment | Order of Prayer and Intercession |
+| 5 | Leadership & Governance Support | Office of Governance and Policy | Order of Governance Support |
+| 6 | Leadership & Governance Support | Office of Strategic Development | Order of Strategic Coordination |
+| 7 | Leadership & Governance Support | Office of Strategic Development | Order of Leadership Assistance |
+| 8 | Leadership & Governance Support | Office of Strategic Development | Order of Communication and Alignment |
+| 9 | Formation & Teaching | Office of Discipleship Formation | Order of Discipleship Facilitation |
+| 10 | Formation & Teaching | Office of Leadership Development | Order of Training and Instruction |
+| 11 | Formation & Teaching | Office of Leadership Development | Order of Mentorship and Coaching |
+| 12 | Formation & Teaching | Office of Leadership Development | Order of Curriculum Development |
+| 13 | Mission & Outreach | Office of Learning and Qualifications | Order of Evangelism |
+| 14 | Mission & Outreach | Office of Ministry Programmes | Order of Mission Teams |
+| 15 | Mission & Outreach | Office of Ministry Programmes | Order of Community Outreach |
+| 16 | Mission & Outreach | Office of Ministry Programmes | Order of Expansion and Planting |
+| 17 | Community Life & Care | Office of Mission Mobilisation | Order of Pastoral Care |
+| 18 | Community Life & Care | Office of Community Networks | Order of Community Building |
+| 19 | Community Life & Care | Office of Community Networks | Order of Hospitality and Welcome |
+| 20 | Community Life & Care | Office of Community Networks | Order of Welfare and Support |
+| 21 | Operations & Stewardship | Office of Operations and Administration | Order of Administration |
+| 22 | Operations & Stewardship | Office of Resource Stewardship | Order of Resource Management |
+| 23 | Operations & Stewardship | Office of Resource Stewardship | Order of Logistics and Events |
+| 24 | Operations & Stewardship | Office of Resource Stewardship | Order of Media and Communication |
+
+### V2.4.4 — Formation & Teaching Authority Rule (Documented)
+
+The Formation & Teaching agency tenant (Orders 9–12) holds authority over all onboarding, induction, and placement decisions. This rule is enforced in code, not merely policy:
+
+**Rule 1 — Induction is the canonical onboarding path.**
+New people join through induction. The invitation flow (V2.5) is for lateral transfers of existing Level 1+ members only, not for onboarding new people.
+
+**Rule 2 — Invitation accept enforces Level 1+.**
+`TenantInvitation.accept()` checks `user.competence_level >= 1`. If Level 0, the request is rejected with a message directing the person to complete induction first.
+
+**Rule 3 — Executive Privilege.**
+If the Formation & Teaching agency tenant has no active Level 3+ steward assigned, the Prime Tenancy may act on its behalf for induction confirmation and placement. Implemented as: `htmx_induction_confirm` checks for an active Formation & Teaching steward; if none exists, falls back to accepting any Level 5 user (Prime Tenancy authority).
+
+**Commits:**
+
+```
+git commit -m "feat: seed agency tenants — 6 service domain tenants under Prime"
+git commit -m "feat: seed service orders — 24 constitutional orders, ServiceOrder model"
+```
+
+---
+
+## Phase V2.5 — Steward Management Dashboard & Tenant Self-Service
+
+**Entry requirement:** V2.4 complete (agency tenants and service orders seeded).
+
+A web-based management surface for stewards — no Django admin required for day-to-day tenant operations. Level 3+ stewards manage their own community tenants. Agency stewards manage their domain. Prime Tenancy has full oversight.
+
+### V2.5.1 — Extend Tenant Model
+
+```python
+# tenants/models.py
+coordinator_user  = ForeignKey(User, on_delete=SET_NULL, null=True, blank=True,
+                               related_name='coordinating_tenants')
+community_theme   = CharField(max_length=100, blank=True)   # e.g. "Education", "Healthcare"
+area_of_operation = TextField(blank=True)
+is_agency         = BooleanField(default=False)  # True for the 6 constitutional agency tenants
+```
+
+Agency tenants (`is_agency=True`) are excluded from the self-service create/edit/delete UI — they are read-only outside of migrations.
+
+### V2.5.2 — TenantInvitation Model
+
+```python
+# tenants/models.py
+class TenantInvitation(models.Model):
+    id          = UUIDField(primary_key=True, default=uuid.uuid4)
+    tenant      = ForeignKey(Tenant, on_delete=CASCADE, related_name='invitations')
+    email       = EmailField()
+    invited_by  = ForeignKey(User, on_delete=SET_NULL, null=True, related_name='sent_invitations')
+    token       = CharField(max_length=64, unique=True)  # urlsafe_token for accept link
+    status      = CharField(max_length=20,
+                            choices=[('pending','Pending'),('accepted','Accepted'),
+                                     ('declined','Declined'),('expired','Expired')],
+                            default='pending')
+    accepted_at = DateTimeField(null=True, blank=True)
+    expires_at  = DateTimeField()   # 7 days from created_at
+    created_at  = DateTimeField(auto_now_add=True)
+```
+
+**Accept logic (service function `tenants/service.py::accept_invitation`):**
+
+1. Check `invitation.status == 'pending'` and `invitation.expires_at > now()`
+2. Resolve user by email — must be a registered account
+3. Check `user.competence_level >= 1` — if Level 0, reject: *"Complete the Induction Programme before joining a community."*
+4. Create `UserPermission(user, tenant, level=1, role='member', is_active=True)`
+5. Set `invitation.status = 'accepted'`, `invitation.accepted_at = now()`
+
+### V2.5.3 — Steward Dashboard Routes
+
+```
+GET  /steward/                              Dashboard home (tenant list, pending invitations, member counts)
+GET  /steward/tenants/create/              Create new tenant (Level 3+)
+GET  /steward/tenants/<slug>/              Tenant detail — members, invitations, service orders
+POST /steward/tenants/<slug>/invite/       Send TenantInvitation (email via Brevo)
+GET  /steward/tenants/<slug>/members/      Member roster
+POST /steward/tenants/<slug>/members/<id>/role/    Assign role + service order + shepherd
+GET  /steward/tenants/<slug>/invitations/  Pending/accepted/expired invitations list
+DELETE /steward/tenants/<slug>/members/<id>/       Remove member (UserPermission.is_active=False)
+
+# Accept link (no login required — token auth)
+GET  /steward/invite/accept/<token>/       Accept invitation page
+POST /steward/invite/accept/<token>/       Confirm acceptance → calls accept_invitation()
+```
+
+### V2.5.4 — Tenant Creation (Level 3+)
+
+Form fields: name, slug, tier (`church_node | church_collective | district | provincial | national | regional | continental`), parent tenant (dropdown of tenants the steward belongs to), description, location (country / province / city), logo (MinIO `ics-media` bucket).
+
+Agency tenants (`is_agency=True`) do not appear in the tier dropdown — they cannot be created via this form.
+
+### V2.5.5 — Member Management
+
+- Invite existing Level 1+ members by email
+- Assign roles: Coordinator, Shepherd, Net Caster, Net Mender, Member
+- Assign service order (dropdown from `ServiceOrder` table — 24 entries)
+- Assign shepherd (`UserPermission.metadata.shepherd_id`)
+- Remove member (sets `UserPermission.is_active=False`, does not delete)
+
+### V2.5.6 — Multi-Tenant Content Scoping
+
+- Governance records filtered by user's active tenant(s)
+- Learn content filtered by user's active tenant(s)
+- Handbook visible to Level 4+ across all tenants
+- Induction Tenant: Level 0 sees induction content only (`metadata.source_app == "induction"`)
+- Users in multiple tenants see merged content from all their active tenants
+
+**Commits:**
+
+```
+git commit -m "feat: tenant model extensions + TenantInvitation model"
+git commit -m "feat: steward dashboard — tenant creation, member management, invitation flow"
+git commit -m "feat: multi-tenant content scoping"
+```
+
+---
+
+## Phase V2.6 — Notifications (Full)
+
+**Entry requirement:** V2.5 complete. All trigger sources (tenant events, induction, community, activity) now built.
+
+### V2.6.1 — Notification Model
 
 ```python
 class Notification(models.Model):
@@ -1800,8 +2002,9 @@ class Notification(models.Model):
     user                = ForeignKey(User, on_delete=CASCADE, related_name='notifications')
     notification_type   = CharField(max_length=50)
     # Types: announcement | task_assigned | certification_confirmed |
-    #        induction_completed | level_advanced | gathering_scheduled
-    source_app          = CharField(max_length=50)  # community | learn | activity | governance
+    #        induction_completed | level_advanced | gathering_scheduled |
+    #        tenant_invitation | member_added | member_removed
+    source_app          = CharField(max_length=50)  # community | learn | activity | governance | tenants
     source_record_id    = UUIDField(null=True, blank=True)
     source_activity_id  = UUIDField(null=True, blank=True)
     message             = TextField()
@@ -1809,21 +2012,23 @@ class Notification(models.Model):
     created_at          = DateTimeField(auto_now_add=True)
 ```
 
-### Trigger points (Django signals)
+### V2.6.2 — Trigger Points (Django Signals)
 
 - Community App: `announcement` created → notify all tenant members
 - Activity App: task `assigned_to` set → notify assignee
 - Learn App: `certifications/confirm/` → notify learner (level advanced)
 - Induction: placement confirmed → notify user (welcome to community)
 - Governance App: record `locked` → notify Level 4+ in scope
+- Tenants: `TenantInvitation` created → notify invited user (in-app + email)
+- Tenants: member added/removed → notify affected user
 
-### Delivery
+### V2.6.3 — Delivery
 
 - **In-app:** HTMX polling at 60-second intervals (`hx-trigger="every 60s"`) — no WebSockets in Version 2
-- **Email:** Brevo SMTP for `certification_confirmed` and `level_advanced` events only (highest value). Other types in-app only.
+- **Email:** Brevo SMTP for `certification_confirmed`, `level_advanced`, and `tenant_invitation` events. Other types in-app only.
 - **Push (mobile):** FCM via `notifications/fcm.py::send_push()` — see Phase V2.M.5
 
-### Django template routes
+### V2.6.4 — Notification Routes
 
 ```
 GET  /notifications/                         Notifications list (paginated)
@@ -1837,48 +2042,9 @@ POST /api/notifications/read-all/            Mark all as read
 
 ---
 
-## Phase V2.5 — Tenant Self-Service
+## Phase V2.7 — Video / Live App
 
-**Entry requirement:** V2.4 complete.
-
-### V2.5.1 — Tenant Creation (Level 3+)
-
-- `/tenants/create/` form: name, slug, tier, parent tenant, description, location (country/province/city), logo (uploaded to MinIO `ics-media` bucket)
-- `TenantInvitation` model: `tenant`, `email`, `invited_by`, `accepted_at`, `status` (`pending | accepted | declined | expired`)
-- Invitation workflow: invite → email (Brevo) → accept link → `UserPermission` created
-- Tenant hierarchy correctly reflected in materialised path
-
-### V2.5.2 — Member Management
-
-- Invite users by email
-- Assign roles: Coordinator, Shepherd, Net Caster, Net Mender, Member
-- Assign service orders (`UserPermission.metadata.service_order`)
-- Assign shepherd (`UserPermission.metadata.shepherd_id`)
-
-### V2.5.3 — Extend Tenant model
-
-```python
-# tenants/models.py
-coordinator_user  = ForeignKey(User, on_delete=SET_NULL, null=True, related_name='coordinating_tenants')
-community_theme   = CharField(max_length=100, blank=True)   # e.g. "Education", "Healthcare"
-area_of_operation = TextField(blank=True)
-```
-
-### V2.5.4 — Multi-Tenant Content Scoping
-
-- Governance records filtered by user's tenant(s)
-- Learn content filtered by user's tenant(s)
-- Handbook visible to Level 4+ across all tenants
-- Induction Tenant: Level 0 sees induction content only (`metadata.source_app == "induction"`)
-- Users in multiple tenants see content from all their tenants
-
-**Commit:** `git commit -m "feat: tenant self-service — creation, invitations, member management, content scoping"`
-
----
-
-## Phase V2.6 — Video / Live App
-
-**Entry requirement:** V2.5 complete. Learn App operational (V2.1).
+**Entry requirement:** V2.6 (Notifications) complete. Learn App operational (V2.1).
 
 **Architecture:** URL-based video only. No self-hosting, no MinIO video bucket, no ffmpeg (ADR-007).
 
@@ -2204,9 +2370,10 @@ Do not build any of these until Version 2 is complete and in real-world use.
 | V2.1 | V2 | Learn: Programmes + Video Embed | 1 |
 | V2.2 | V2 | Induction System | 2–3 |
 | V2.3 | V2 | Formation UI + App Drawer Gating | 1 |
-| V2.4 | V2 | Notifications (Full) | 1 |
-| V2.5 | V2 | Tenant Self-Service + Content Scoping | 2 |
-| V2.6 | V2 | Video / Live App | 2 |
+| V2.4 | V2 | Agency Tenant Seed + Service Orders | 0.5 |
+| V2.5 | V2 | Steward Dashboard + Tenant Self-Service | 2 |
+| V2.6 | V2 | Notifications (Full) | 1 |
+| V2.7 | V2 | Video / Live App | 2 |
 | V2.M | V2 | Flutter Mobile App (parallel) | 8–12 |
 | V3+ | V3 | Scale, AI, iOS, advanced features | TBD |
 
@@ -2225,9 +2392,10 @@ main                        ← production (always deployable)
    ├─ v2-learn-formation    ← V2.1 programmes + video
    ├─ v2-induction          ← V2.2 induction system
    ├─ v2-formation-ui       ← V2.3 dashboard + drawer
-   ├─ v2-notifications      ← V2.4 full notifications
-   ├─ v2-tenants            ← V2.5 tenant self-service
-   └─ v2-video              ← V2.6 live video app
+   ├─ v2-agency-seed        ← V2.4 agency tenants + service orders
+   ├─ v2-steward-dashboard  ← V2.5 steward dashboard + tenant self-service
+   ├─ v2-notifications      ← V2.6 full notifications
+   └─ v2-video              ← V2.7 live video app
 
 ichebo-mobile (separate repo)
    └─ main                  ← Android production

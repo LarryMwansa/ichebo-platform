@@ -51,6 +51,8 @@ class Tenant(models.Model):
     description = models.TextField(blank=True, null=True)
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)
 
+    is_agency = models.BooleanField(default=False)
+
     # Location (JSON field — PostgreSQL)
     location = models.JSONField(default=dict, blank=True)
     settings_data = models.JSONField(default=dict, blank=True)
@@ -129,3 +131,20 @@ class UserPermission(models.Model):
     class Meta:
         db_table = 'tenants_userpermission'
         unique_together = [['tenant', 'user', 'role']]
+
+
+class ServiceOrder(models.Model):
+    id           = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    slug         = models.CharField(max_length=80, unique=True)
+    name         = models.CharField(max_length=120)
+    domain       = models.CharField(max_length=120)
+    office       = models.CharField(max_length=120)
+    order_number = models.PositiveSmallIntegerField(unique=True)
+    is_active    = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'tenants_serviceorder'
+        ordering = ['order_number']
+
+    def __str__(self):
+        return f"{self.order_number}. {self.name}"
