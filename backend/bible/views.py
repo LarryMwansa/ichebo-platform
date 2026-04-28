@@ -5,7 +5,8 @@ from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from .services import (
     get_user_translation, get_chapter_verses, get_all_books,
-    get_book_chapters, get_chapter_note_verse_numbers
+    get_book_chapters, get_chapter_note_verse_numbers,
+    save_reading_position, get_reading_position,
 )
 from .models import BibleBook, BibleTranslation
 
@@ -20,6 +21,12 @@ class BibleReaderView(LoginRequiredMixin, View):
     """
 
     def get(self, request, book_code=DEFAULT_BOOK, chapter=DEFAULT_CHAPTER):
+        # If user landed on the bare /bible/ URL, resume from their last position
+        if book_code == DEFAULT_BOOK and chapter == DEFAULT_CHAPTER:
+            position = get_reading_position(request.user)
+            if position:
+                book_code, chapter = position
+
         translation = get_user_translation(request.user)
         books = get_all_books()
         book = BibleBook.objects.filter(code=book_code).first()
@@ -70,6 +77,8 @@ def htmx_chapter(request):
     if not verses.exists():
         chapter = DEFAULT_CHAPTER
         verses = get_chapter_verses(translation, book_code, chapter)
+
+    save_reading_position(request.user, book_code, chapter)
 
     personal_noted, tenant_noted = get_chapter_note_verse_numbers(
         request.user, translation, book_code, chapter
@@ -526,6 +535,7 @@ def htmx_set_translation(request):
     if translation:
         request.user.preferred_bible_translation = translation
         request.user.save(update_fields=['preferred_bible_translation'])
+        save_reading_position(request.user, book_code, chapter)
 
     verses = get_chapter_verses(translation, book_code, chapter)
     personal_noted, tenant_noted = get_chapter_note_verse_numbers(

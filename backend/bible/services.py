@@ -7,10 +7,31 @@ from .models import BibleTranslation, BibleBook, BibleVerse
 
 def get_user_translation(user):
     """Return the user's preferred translation, falling back to system default."""
-    pref = getattr(user, 'preferred_bible_translation', None)
-    if pref:
-        return pref
+    pref_id = getattr(user, 'preferred_bible_translation_id', None)
+    if pref_id:
+        translation = BibleTranslation.objects.filter(pk=pref_id, is_public=True).first()
+        if translation:
+            return translation
     return BibleTranslation.objects.filter(is_default=True).first()
+
+
+def save_reading_position(user, book_code, chapter):
+    """Persist the user's last-read book and chapter to their preferences JSONField."""
+    prefs = user.preferences or {}
+    prefs['bible_last_book'] = book_code
+    prefs['bible_last_chapter'] = chapter
+    user.preferences = prefs
+    user.save(update_fields=['preferences'])
+
+
+def get_reading_position(user):
+    """Return (book_code, chapter) from the user's last saved position, or None."""
+    prefs = user.preferences or {}
+    book = prefs.get('bible_last_book')
+    chapter = prefs.get('bible_last_chapter')
+    if book and chapter:
+        return book, int(chapter)
+    return None
 
 
 def get_chapter_verses(translation, book_code, chapter):
