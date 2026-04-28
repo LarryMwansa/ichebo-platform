@@ -43,6 +43,6 @@ urlpatterns = [
     path('notifications/', include('notifications.template_urls', namespace='notifications')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', accounts_views.RegisterView.as_view(), name='register_ui'),
-    path('accounts/', include(accounts_template_urlpatterns)),
+    path('accounts/', include((accounts_template_urlpatterns, 'accounts'))),
     path('', include('dashboard.urls', namespace='dashboard')),
 ]

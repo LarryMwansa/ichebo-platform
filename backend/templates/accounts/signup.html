@@ -1,0 +1,54 @@
+{% extends "base_auth.html" %}
+{% block title %}Create Account{% endblock %}
+{% block content %}
+<div class="auth-card">
+
+  <div class="auth-card__brand">
+    <div class="auth-card__logo">ICS</div>
+    <div class="auth-card__tagline">Integrated Community System</div>
+  </div>
+
+  <h1>Create Account</h1>
+  <p class="auth-subtitle">Begin your journey with the Kingdom Growth System.</p>
+
+  {% if form.non_field_errors %}
+  <div class="auth-errors">
+    {% for error in form.non_field_errors %}
+      <span>{{ error }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="auth-field">
+      <label for="{{ form.email.id_for_label }}">Email address</label>
+      {{ form.email }}
+      {% if form.email.errors %}
+        <span class="auth-field__error">{{ form.email.errors|join:", " }}</span>
+      {% endif %}
+    </div>
+
+    <div class="auth-field">
+      <label for="{{ form.password.id_for_label }}">Password <span class="auth-field__hint">(minimum 8 characters)</span></label>
+      {{ form.password }}
+      {% if form.password.errors %}
+        <span class="auth-field__error">{{ form.password.errors|join:", " }}</span>
+      {% endif %}
+    </div>
+
+    <div class="auth-field">
+      <label for="{{ form.password_confirm.id_for_label }}">Confirm password</label>
+      {{ form.password_confirm }}
+      {% if form.password_confirm.errors %}
+        <span class="auth-field__error">{{ form.password_confirm.errors|join:", " }}</span>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="auth-btn">Create Account</button>
+  </form>
+
+  <p class="auth-footer">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+</div>
+{% endblock %}

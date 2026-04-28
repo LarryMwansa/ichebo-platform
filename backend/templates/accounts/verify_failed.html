@@ -1,0 +1,22 @@
+{% extends "base_auth.html" %}
+{% block title %}Verification Failed{% endblock %}
+{% block content %}
+<div class="auth-card auth-card--centered">
+
+  <div class="auth-card__brand">
+    <div class="auth-card__logo">ICS</div>
+  </div>
+
+  <div class="auth-icon-wrap">
+    <span class="material-symbols-outlined auth-icon auth-icon--error">error_outline</span>
+  </div>
+
+  <h1>Link expired or invalid</h1>
+  <p class="auth-subtitle">This verification link has expired or has already been used.</p>
+  <p class="auth-body">Verification links are valid for 24 hours and can only be used once.</p>
+
+  <a href="{% url 'accounts:signup' %}" class="auth-btn" style="display:block;text-align:center;margin-top:1.5rem;">Create a new account</a>
+
+  <p class="auth-footer">Already verified? <a href="{% url 'login' %}">Sign in</a></p>
+</div>
+{% endblock %}

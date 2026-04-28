@@ -18,4 +18,9 @@ template_urlpatterns = [
     path('htmx/profile/display-name/', views.htmx_display_name_edit, name='htmx-display-name'),
     path('htmx/settings/theme/', views.htmx_settings_theme, name='htmx-theme'),
     path('htmx/settings/region/', views.htmx_settings_region, name='htmx-region'),
+    # G2 — Registration flow
+    path('signup/', views.SignUpView.as_view(), name='signup'),
+    path('verify-email/<str:token>/', views.VerifyEmailView.as_view(), name='verify-email'),
+    path('profile-setup/', views.ProfileSetupView.as_view(), name='profile-setup'),
+    path('welcome/', views.WelcomeView.as_view(), name='welcome'),
 ]

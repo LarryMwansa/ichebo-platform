@@ -1,0 +1,182 @@
+{% extends "base_auth.html" %}
+{% load static %}
+{% block title %}Welcome to ICS{% endblock %}
+
+{% block extra_css %}
+<style>
+  .welcome-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: var(--bg);
+    text-align: center;
+  }
+  .welcome-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    max-width: 480px;
+    width: 100%;
+  }
+  .welcome-logo {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+  }
+  .welcome-icon {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+  }
+  .welcome-card h1 {
+    font-size: 1.7rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+  }
+  .welcome-card .welcome-sub {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin: 0 0 2rem;
+  }
+  .kmn-reveal {
+    background: var(--hover);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin: 0 0 2rem;
+  }
+  .kmn-reveal__label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+  .kmn-reveal__number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: var(--primary);
+    font-family: monospace;
+  }
+  .kmn-reveal__hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+  .welcome-steps {
+    text-align: left;
+    margin: 0 0 2rem;
+  }
+  .welcome-steps__title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+  .welcome-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+  .welcome-step:last-child { border-bottom: none; }
+  .welcome-step__num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .welcome-step__text strong {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.1rem;
+  }
+  .welcome-step__text span {
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+  .welcome-cta {
+    display: block;
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .welcome-cta:hover { opacity: 0.88; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="welcome-shell">
+  <div class="welcome-card">
+
+    <div class="welcome-logo">ICS</div>
+
+    <span class="material-symbols-outlined welcome-icon">celebration</span>
+
+    <h1>Welcome{% if profile and profile.full_name %}, {{ profile.full_name|truncatechars:25 }}{% endif %}!</h1>
+    <p class="welcome-sub">Your account is ready. You have been placed in the Induction programme.</p>
+
+    {% if member_number %}
+    <div class="kmn-reveal">
+      <div class="kmn-reveal__label">Your Kingdom Member Number</div>
+      <div class="kmn-reveal__number">{{ member_number }}</div>
+      <div class="kmn-reveal__hint">Keep this safe — it is your unique identifier across the Kingdom Growth System.</div>
+    </div>
+    {% endif %}
+
+    <div class="welcome-steps">
+      <div class="welcome-steps__title">What happens next</div>
+      <div class="welcome-step">
+        <div class="welcome-step__num">1</div>
+        <div class="welcome-step__text">
+          <strong>Induction Programme</strong>
+          <span>You are enrolled in the 12-week Induction. Complete lessons at your own pace.</span>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step__num">2</div>
+        <div class="welcome-step__text">
+          <strong>Steward Review</strong>
+          <span>A steward will review your profile and formally confirm your placement.</span>
+        </div>
+      </div>
+      <div class="welcome-step">
+        <div class="welcome-step__num">3</div>
+        <div class="welcome-step__text">
+          <strong>Level 1 — Formation</strong>
+          <span>Upon completion you advance into the Formation track of the Kingdom Growth System.</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="{% url 'dashboard:index' %}" class="welcome-cta">Go to Dashboard</a>
+
+  </div>
+</div>
+{% endblock %}

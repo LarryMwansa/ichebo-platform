@@ -1,6 +1,8 @@
 import uuid
+import secrets
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 from encrypted_model_fields.fields import EncryptedCharField
 
 
@@ -147,3 +149,36 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f'Profile({self.user.email})'
+
+
+class EmailVerificationToken(models.Model):
+    """Single-use token emailed to new users to verify their address."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='verification_tokens')
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'accounts_email_verification_token'
+
+    @classmethod
+    def create_for_user(cls, user):
+        token_str = secrets.token_urlsafe(48)
+        return cls.objects.create(
+            user=user,
+            token=token_str,
+            expires_at=timezone.now() + timezone.timedelta(hours=24),
+        )
+
+    @property
+    def is_valid(self):
+        return self.used_at is None and timezone.now() < self.expires_at
+
+    def consume(self):
+        self.used_at = timezone.now()
+        self.save(update_fields=['used_at'])
+
+    def __str__(self):
+        return f'VerifyToken({self.user.email})'
