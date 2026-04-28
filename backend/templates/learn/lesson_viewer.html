@@ -2,9 +2,13 @@
 
 {% block learn_content %}
 <div class="lesson-viewer">
-  {% if course %}
-    <a href="{% url 'learn:learn-programme' course.id %}" class="btn-touch" style="margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px;">
-      <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back</span> Back to Course
+  {% if programme %}
+    <a href="{% url 'learn:learn-programme' programme.id %}" class="btn-touch" style="margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px;">
+      <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back</span> Back to Programme
+    </a>
+  {% elif course %}
+    <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px;">
+      <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back</span> Back to Catalogue
     </a>
   {% endif %}
   <span class="lesson-type-tag">{{ lesson.record_type }}</span>

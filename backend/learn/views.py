@@ -44,12 +44,13 @@ def my_learning(request):
     active_qualification = None
     if enrolments.exists():
         first = enrolments.first()
-        active_pathway = (first.metadata or {}).get('kgs_pathway', first.kgs_pathway)
         prog_id = (first.metadata or {}).get('programme_record_id')
         if prog_id:
             try:
                 prog = Record.objects.get(id=prog_id)
-                active_qualification = (prog.metadata or {}).get('qualification', prog.title)
+                pathways = (prog.custom_fields or {}).get('kgs_pathways', [])
+                active_pathway = pathways[0] if pathways else None
+                active_qualification = (prog.custom_fields or {}).get('kgs_qualification', prog.title)
             except Record.DoesNotExist:
                 pass
 
@@ -150,6 +151,7 @@ def lesson_viewer(request, lesson_id):
         from_record_id=lesson_id, relationship_type='part_of'
     ).first()
     course = None
+    programme = None
     siblings = []
     if parent_rel:
         course = Record.objects.filter(id=parent_rel.to_record_id).first()
@@ -161,21 +163,31 @@ def lesson_viewer(request, lesson_id):
                 id__in=sibling_ids,
                 status__in=['active', 'locked']
             ).order_by('created_at'))
+            # Resolve the parent programme for the back link
+            prog_rel = Relationship.objects.filter(
+                from_record_id=course.id, relationship_type='part_of'
+            ).first()
+            if prog_rel:
+                programme = Record.objects.filter(
+                    id=prog_rel.to_record_id, record_type='programme'
+                ).first()
 
     current_index = next((i for i, s in enumerate(siblings) if s.id == lesson.id), 0)
     prev_lesson = siblings[current_index - 1] if current_index > 0 else None
     next_lesson = siblings[current_index + 1] if current_index < len(siblings) - 1 else None
 
-    # Check if already completed
+    # Check if already completed via the task Activity tree
     is_completed = Activity.objects.filter(
         assigned_to=request.user,
+        activity_type='task',
         status='completed',
-        metadata__lesson_record_id=str(lesson_id)
+        linked_record_id=lesson_id,
     ).exists()
 
     return render(request, 'learn/lesson_viewer.html', {
         'lesson': lesson,
         'course': course,
+        'programme': programme,
         'prev_lesson': prev_lesson,
         'next_lesson': next_lesson,
         'is_completed': is_completed,
@@ -529,78 +541,70 @@ def _recalculate_programme_progress(user, lesson_id):
 
 @login_required
 def htmx_enrol(request, programme_id):
-    """HTMX POST: creates enrolment Activity, returns confirmation fragment."""
+    """HTMX POST: creates enrolment Activity tree, returns confirmation fragment."""
     if request.method != 'POST':
         return HttpResponse(status=405)
 
-    user = request.user
-    if _user_level(user) < 1:
-        return HttpResponse(
-            '<span class="lock-indicator">Enrolment requires Level 1 or above.</span>',
-            status=403
-        )
+    from .services import enrol_in_programme, EnrolmentError
 
     programme = get_object_or_404(Record, id=programme_id, record_type='programme')
 
-    # Prevent duplicate enrolment
-    if Activity.objects.filter(
-        activity_type='programme', assigned_to=user,
-        metadata__programme_record_id=str(programme_id)
-    ).exists():
-        return HttpResponse('<span class="enrolled-badge">Already Enrolled</span>')
+    try:
+        enrol_in_programme(request.user, programme)
+    except EnrolmentError as exc:
+        already = 'already enrolled' in str(exc).lower()
+        if already:
+            return HttpResponse(
+                '<div class="status-badge status-badge--active" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;">'
+                '<span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>'
+                'Active Enrolment'
+                '</div>'
+            )
+        return HttpResponse(
+            f'<span style="color:var(--error);font-size:13px;">{exc}</span>',
+            status=400,
+        )
 
-    Activity.objects.create(
-        activity_type='programme',
-        title=f'Enrolment — {programme.title}',
-        assigned_to=user,
-        created_by=user,
-        status='in_progress',
-        progress=0,
-        kgs_pathway='learning',
-        metadata={
-            'source_app': 'learn',
-            'programme_record_id': str(programme_id),
-        }
+    return HttpResponse(
+        '<div class="status-badge status-badge--active" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;">'
+        '<span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>'
+        'Enrolled ✓'
+        '</div>'
     )
-    return HttpResponse('<span class="enrolled-badge">Enrolled ✓</span>')
 
 
 @login_required
 def htmx_complete_lesson(request, lesson_id):
-    """HTMX POST: marks lesson Activity complete (creates if absent), recalculates programme progress."""
+    """HTMX POST: marks lesson task Activity complete, recalculates programme progress."""
     if request.method != 'POST':
         return HttpResponse(status=405)
 
-    lesson = get_object_or_404(
-        Record, id=lesson_id,
-        record_type__in=['lesson', 'assignment', 'quiz'],
-    )
+    from .services import complete_lesson, EnrolmentError
 
-    existing = Activity.objects.filter(
-        metadata__lesson_record_id=str(lesson_id),
+    task_activity = Activity.objects.filter(
+        activity_type='task',
         assigned_to=request.user,
+        linked_record_id=lesson_id,
+        deleted_at__isnull=True,
     ).first()
 
-    if existing:
-        existing.status = 'completed'
-        existing.progress = 100
-        existing.save(update_fields=['status', 'progress'])
-    else:
-        Activity.objects.create(
-            activity_type='lesson',
-            title=f'Lesson — {lesson.title}',
-            assigned_to=request.user,
-            created_by=request.user,
-            status='completed',
-            progress=100,
-            kgs_pathway='learning',
-            metadata={'source_app': 'learn', 'lesson_record_id': str(lesson_id)},
+    if not task_activity:
+        return HttpResponse(
+            '<span style="color:var(--muted);font-size:13px;">Enrol in this programme to track progress.</span>'
         )
 
-    _recalculate_programme_progress(request.user, lesson_id)
+    try:
+        complete_lesson(request.user, task_activity)
+    except EnrolmentError as exc:
+        return HttpResponse(
+            f'<span style="color:var(--error);font-size:13px;">{exc}</span>',
+            status=400,
+        )
 
     return HttpResponse(
-        '<button class="btn-primary complete-btn" disabled>✓ Completed</button>'
+        '<button class="btn-touch" style="background:#2e7d32;color:#fff;" disabled>'
+        '✓ Completed'
+        '</button>'
     )
 
 

@@ -15,10 +15,10 @@
 
   <div class="list-group" style="margin-top: 12px;">
     {% for programme in programmes %}
-    <a href="{% if not programme.is_locked %}{% url 'learn:learn-programme' programme.id %}{% else %}{% url 'learn:learn-locked' %}{% endif %}" 
+    <a href="{% url 'learn:learn-programme' programme.id %}"
        class="list-item {% if programme.is_locked %}locked{% endif %}"
        style="{% if programme.is_locked %}opacity: 0.7;{% endif %}">
-      
+
       <div class="list-item__icon" style="background: var(--hover); color: {% if programme.is_locked %}var(--muted){% else %}var(--primary){% endif %};">
         <span class="material-symbols-outlined">
           {% if programme.is_locked %}lock{% else %}school{% endif %}
@@ -28,12 +28,12 @@
       <div class="list-item__content">
         <div class="list-item__title" style="font-weight: 700;">{{ programme.title }}</div>
         <div class="list-item__meta" style="display: flex; gap: 8px; align-items: center;">
-          <span class="badge-unit badge-unit--primary">{{ programme.metadata.qualification|default:"Mission" }}</span>
-          <span class="badge-unit" style="background: var(--hover); color: var(--muted);">{{ programme.metadata.duration_years|default:"?" }} Year{{ programme.metadata.duration_years|pluralize }}</span>
+          <span class="badge-unit badge-unit--primary">{{ programme.custom_fields.kgs_qualification|default:"Programme" }}</span>
+          <span class="badge-unit" style="background: var(--hover); color: var(--muted);">{{ programme.custom_fields.duration|default:"" }}</span>
         </div>
         {% if programme.is_locked %}
         <div class="list-item__meta" style="color: #ef4444; font-weight: 600; font-size: 11px; margin-top: 4px;">
-           Requires Level {{ programme.permissions_data.required_level|default:1 }}
+          Requires Level {{ programme.permissions_data.required_level|default:1 }}
         </div>
         {% endif %}
       </div>

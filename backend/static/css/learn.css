@@ -114,6 +114,93 @@
 
 .lesson-body p { margin-bottom: 1.5rem; }
 
+/* ── Lesson Viewer shell ──────────────────────────────────── */
+.lesson-viewer {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 6rem;
+}
+
+.lesson-type-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--hover);
+  color: var(--muted);
+  border-radius: 4px;
+  padding: 3px 8px;
+  margin-bottom: 8px;
+}
+
+.lesson-content {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text);
+  margin: 1.5rem 0 2rem;
+}
+
+.lesson-content p { margin-bottom: 1.25rem; }
+
+.lesson-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+
+/* ── Certification cards ──────────────────────────────────── */
+.cert-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.cert-card.confirmed {
+  border-color: #16a34a;
+  background: color-mix(in srgb, #16a34a 8%, var(--card));
+}
+
+.cert-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0 12px;
+}
+
+/* ── Status / enrolment badges ────────────────────────────── */
+.enrolled-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.lock-indicator {
+  font-size: 13px;
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* ── Review queue cards ───────────────────────────────────── */
+.review-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
 /* ── Authorship Tools ──────────────────────────────────────── */
 .author-action-row {
     display: flex;

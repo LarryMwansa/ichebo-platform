@@ -11,9 +11,9 @@
     </div>
     <h1 class="explore-title">{{ programme.title }}</h1>
     <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
-      <span class="badge-unit badge-unit--primary">{{ programme.metadata.qualification|default:"Qualification" }}</span>
-      <span class="badge-unit">MT Level {{ programme.permissions_data.required_level|default:1 }}</span>
-      <span class="badge-unit" style="background: var(--hover); color: var(--muted);">{{ programme.metadata.duration_years|default:"?" }} Year{{ programme.metadata.duration_years|pluralize }}</span>
+      <span class="badge-unit badge-unit--primary">{{ programme.custom_fields.kgs_qualification|default:"Programme" }}</span>
+      <span class="badge-unit">Level {{ programme.permissions_data.required_level|default:1 }}</span>
+      <span class="badge-unit" style="background: var(--hover); color: var(--muted);">{{ programme.custom_fields.duration|default:"" }}</span>
     </div>
   </header>
 
