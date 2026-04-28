@@ -20,7 +20,7 @@
     <span class="material-symbols-outlined" style="color:var(--muted);font-size:1rem;flex-shrink:0">chevron_right</span>
   </div>
   <div class="event-card__meta">
-    {{ event.scheduled_at|date:"D d M · H:i" }} · {{ event._duration }} min
+    {{ event.scheduled_at|date:"D d M · H:i" }} · {{ event.duration }} min
   </div>
 </a>
 {% endfor %}

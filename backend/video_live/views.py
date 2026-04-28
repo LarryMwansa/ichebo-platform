@@ -19,6 +19,7 @@ def _event_qs():
 
 
 def _annotate_event(event):
+    """Return a plain dict safe for Django templates (no underscore attributes)."""
     meta = event.metadata or {}
     stream_url = meta.get('stream_url', '')
     duration = int(meta.get('duration_minutes', 60))
@@ -31,13 +32,18 @@ def _annotate_event(event):
         is_live = start <= now <= end
         is_past = now > end
 
-    event._stream_url = stream_url
-    event._embed_url = get_embed_url(stream_url)
-    event._embed_type = get_embed_type(stream_url)
-    event._duration = duration
-    event._is_live = is_live
-    event._is_past = is_past
-    return event
+    return {
+        'id':          event.id,
+        'title':       event.title,
+        'description': event.description,
+        'scheduled_at': event.scheduled_at,
+        'stream_url':  stream_url,
+        'embed_url':   get_embed_url(stream_url),
+        'embed_type':  get_embed_type(stream_url),
+        'duration':    duration,
+        'is_live':     is_live,
+        'is_past':     is_past,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -114,8 +120,8 @@ def video_vod(request):
 
 @login_required
 def video_watch(request, event_id):
-    event = get_object_or_404(Activity, id=event_id, activity_type='event', deleted_at__isnull=True)
-    _annotate_event(event)
+    activity = get_object_or_404(Activity, id=event_id, activity_type='event', deleted_at__isnull=True)
+    event = _annotate_event(activity)
     return render(request, 'video_live/watch.html', {'event': event})
 
 
@@ -128,9 +134,7 @@ def video_manage(request):
     if request.user.competence_level < 3:
         return redirect('video_live:home')
 
-    events = list(_event_qs().order_by('-scheduled_at')[:30])
-    for e in events:
-        _annotate_event(e)
+    events = [_annotate_event(e) for e in _event_qs().order_by('-scheduled_at')[:30]]
 
     error = None
     if request.method == 'POST':

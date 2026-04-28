@@ -13,7 +13,7 @@
     <span class="material-symbols-outlined" style="font-size:1.1rem;color:var(--muted)">play_circle</span>
     <div class="event-card__title" style="font-size:0.9rem">{{ event.title }}</div>
   </div>
-  <div class="event-card__meta">{{ event.scheduled_at|date:"d M Y" }} · {{ event._duration }} min</div>
+  <div class="event-card__meta">{{ event.scheduled_at|date:"d M Y" }} · {{ event.duration }} min</div>
 </a>
 {% endfor %}
 </div>

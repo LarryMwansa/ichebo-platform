@@ -43,9 +43,9 @@
   <div style="flex:1">
     <div class="event-card__title" style="font-size:0.9rem">{{ event.title }}</div>
     <div class="event-card__meta">
-      {{ event.scheduled_at|date:"d M Y · H:i" }} · {{ event._duration }} min
-      {% if event._is_live %}<span class="live-badge" style="margin-left:0.4rem"><span class="live-dot"></span>Live</span>{% endif %}
-      {% if event._is_past %}<span style="color:var(--success);font-size:0.75rem;margin-left:0.4rem">Past</span>{% endif %}
+      {{ event.scheduled_at|date:"d M Y · H:i" }} · {{ event.duration }} min
+      {% if event.is_live %}<span class="live-badge" style="margin-left:0.4rem"><span class="live-dot"></span>Live</span>{% endif %}
+      {% if event.is_past %}<span style="color:var(--success);font-size:0.75rem;margin-left:0.4rem">Past</span>{% endif %}
     </div>
   </div>
   <a href="{% url 'video_live:watch' event.id %}" style="color:var(--primary);font-size:0.82rem;text-decoration:none;flex-shrink:0">View</a>

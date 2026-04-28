@@ -7,33 +7,33 @@
   <span class="material-symbols-outlined" style="font-size:1rem">arrow_back</span> Back
 </a>
 
-{% if event._is_live %}
+{% if event.is_live %}
 <div style="margin-bottom:0.75rem">
   <span class="live-badge"><span class="live-dot"></span>Live Now</span>
 </div>
 {% endif %}
 
 <div class="video-embed-wrap">
-  {% if event._embed_type == 'mp4' %}
-  <video controls {% if event._is_live %}autoplay{% endif %}>
-    <source src="{{ event._stream_url }}" type="video/mp4">
+  {% if event.embed_type == 'mp4' %}
+  <video controls {% if event.is_live %}autoplay{% endif %}>
+    <source src="{{ event.stream_url }}" type="video/mp4">
   </video>
-  {% elif event._embed_type in 'youtube vimeo' %}
-  <iframe src="{{ event._embed_url }}"
+  {% elif event.embed_type in 'youtube vimeo' %}
+  <iframe src="{{ event.embed_url }}"
           allowfullscreen
           allow="autoplay; encrypted-media; picture-in-picture">
   </iframe>
   {% else %}
   <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#fff;font-size:0.9rem;padding:1rem;text-align:center">
-    Stream unavailable. <a href="{{ event._stream_url }}" target="_blank" style="color:#fff;margin-left:0.25rem">Open directly →</a>
+    Stream unavailable. <a href="{{ event.stream_url }}" target="_blank" style="color:#fff;margin-left:0.25rem">Open directly →</a>
   </div>
   {% endif %}
 </div>
 
 <h1 style="font-size:1.1rem;font-weight:700;margin-bottom:0.25rem">{{ event.title }}</h1>
 <div style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem">
-  {{ event.scheduled_at|date:"l, d M Y · H:i" }} · {{ event._duration }} min
-  {% if event._is_past %} · <span style="color:var(--success)">Recording</span>{% endif %}
+  {{ event.scheduled_at|date:"l, d M Y · H:i" }} · {{ event.duration }} min
+  {% if event.is_past %} · <span style="color:var(--success)">Recording</span>{% endif %}
 </div>
 {% if event.description %}
 <p style="font-size:0.9rem;color:var(--muted)">{{ event.description }}</p>
