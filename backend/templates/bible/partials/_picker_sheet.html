@@ -1,16 +1,6 @@
 <div id="drawerBack" hx-swap-oob="innerHTML"></div>
 <div id="drawerTitle" hx-swap-oob="innerHTML">Select Passage</div>
-<div id="drawerActions" hx-swap-oob="innerHTML">
-  <button hx-get="{% url 'bible:versions' %}?book_code={{ book.code }}&chapter={{ chapter }}"
-          hx-target="#drawerContent"
-          hx-swap="innerHTML"
-          class="btn-touch"
-          style="display: flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 8px; background: var(--hover); border: 1px solid var(--border); color: var(--text); font-size: 12px; font-weight: 700; letter-spacing: 0.04em;">
-    <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">menu_book</span>
-    {{ translation.code }}
-    <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted);">expand_more</span>
-  </button>
-</div>
+<div id="drawerActions" hx-swap-oob="innerHTML"></div>
 
 <div class="bible-picker-steps" style="height: 60vh; display: flex; flex-direction: column; margin: -20px; overflow: hidden; position: relative;">
 
