@@ -54,13 +54,13 @@ def _annotate_event(event):
 def video_home(request):
     now = timezone.now()
     events = [_annotate_event(e) for e in _event_qs()]
-    live = [e for e in events if e._is_live]
+    live = [e for e in events if e['is_live']]
     upcoming = [
         e for e in events
-        if not e._is_live and not e._is_past
-        and e.scheduled_at and e.scheduled_at <= now + timezone.timedelta(days=7)
+        if not e['is_live'] and not e['is_past']
+        and e['scheduled_at'] and e['scheduled_at'] <= now + timezone.timedelta(days=7)
     ]
-    recent_vod = [e for e in events if e._is_past][:6]
+    recent_vod = [e for e in events if e['is_past']][:6]
 
     return render(request, 'video_live/home.html', {
         'live': live,
@@ -77,7 +77,7 @@ def video_home(request):
 @login_required
 def video_live_view(request):
     events = [_annotate_event(e) for e in _event_qs()]
-    live = [e for e in events if e._is_live]
+    live = [e for e in events if e['is_live']]
 
     if request.headers.get('HX-Request'):
         return render(request, 'video_live/_live_player.html', {'live': live})
@@ -93,9 +93,10 @@ def video_live_view(request):
 def video_schedule(request):
     now = timezone.now()
     cutoff = now + timezone.timedelta(days=7)
+    all_events = [_annotate_event(e) for e in _event_qs()]
     upcoming = [
-        _annotate_event(e) for e in _event_qs()
-        if e.scheduled_at and now <= e.scheduled_at <= cutoff
+        e for e in all_events
+        if e['scheduled_at'] and now <= e['scheduled_at'] <= cutoff
     ]
     return render(request, 'video_live/schedule.html', {
         'upcoming': upcoming,
@@ -110,7 +111,7 @@ def video_schedule(request):
 @login_required
 def video_vod(request):
     all_events = [_annotate_event(e) for e in _event_qs()]
-    vod = [e for e in all_events if e._is_past]
+    vod = [e for e in all_events if e['is_past']]
     return render(request, 'video_live/vod.html', {'vod': vod})
 
 
