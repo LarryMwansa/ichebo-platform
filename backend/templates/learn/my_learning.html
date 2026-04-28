@@ -94,10 +94,18 @@
   {% endif %}
 
   {% if request.user.competence_level >= 5 %}
+  <a href="{% url 'learn:learn-induction-review' %}" class="list-item">
+    <div class="list-item__icon"><span class="material-symbols-outlined">how_to_reg</span></div>
+    <div class="list-item__content">
+      <div class="list-item__title">Induction Review</div>
+      <div class="list-item__meta">Confirm inductees and advance to Level 1</div>
+    </div>
+    <span class="material-symbols-outlined">chevron_right</span>
+  </a>
   <a href="{% url 'learn:learn-review' %}" class="list-item">
     <div class="list-item__icon"><span class="material-symbols-outlined">approval_delegation</span></div>
     <div class="list-item__content">
-      <div class="list-item__title">Review Queue</div>
+      <div class="list-item__title">Content Review Queue</div>
       <div class="list-item__meta">Final oversight and publication approval</div>
     </div>
     <span class="material-symbols-outlined">chevron_right</span>

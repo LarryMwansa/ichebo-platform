@@ -481,6 +481,164 @@ def review_queue(request):
     return render(request, 'learn/review_queue.html', {'items': items})
 
 
+# ── G4 — Induction Review Queue (Level 5) ────────────────────────────────────
+
+@login_required
+def induction_review_queue(request):
+    if _user_level(request.user) < 5:
+        return redirect('learn:learn-home')
+
+    from django.contrib.auth import get_user_model
+    from tenants.models import UserPermission, Tenant
+    User = get_user_model()
+
+    # All users currently in the Induction Tenant
+    induction_perm_ids = UserPermission.objects.filter(
+        tenant__tier='induction',
+        is_active=True,
+    ).values_list('user_id', flat=True)
+
+    inductees = User.objects.filter(id__in=induction_perm_ids).order_by('induction_enrolled_at')
+
+    # Attach progress data to each inductee
+    induction_programme = Record.objects.filter(
+        record_family='learning',
+        record_type='induction',
+        status='active',
+        origin='system',
+        deleted_at__isnull=True,
+    ).first()
+
+    for inductee in inductees:
+        enrolment = Activity.objects.filter(
+            activity_type='programme',
+            assigned_to=inductee,
+            linked_record=induction_programme,
+            deleted_at__isnull=True,
+        ).first() if induction_programme else None
+
+        inductee.enrolment = enrolment
+        inductee.progress = enrolment.progress if enrolment else 0
+        inductee.enrolment_status = enrolment.status if enrolment else 'not_enrolled'
+
+        # Count completed lessons
+        if enrolment:
+            total = Activity.objects.filter(
+                activity_type='task',
+                assigned_to=inductee,
+                parent_activity__parent_activity=enrolment,
+                deleted_at__isnull=True,
+            ).count()
+            done = Activity.objects.filter(
+                activity_type='task',
+                assigned_to=inductee,
+                parent_activity__parent_activity=enrolment,
+                status='completed',
+                deleted_at__isnull=True,
+            ).count()
+            inductee.lessons_done = done
+            inductee.lessons_total = total
+        else:
+            inductee.lessons_done = 0
+            inductee.lessons_total = 0
+
+        # Check if already has a pending induction cert
+        inductee.cert_pending = Record.objects.filter(
+            record_type='certification',
+            status='draft',
+            metadata__context='induction_completion',
+            metadata__learner_id=str(inductee.id),
+            deleted_at__isnull=True,
+        ).first()
+
+    placement_tenants = Tenant.objects.filter(
+        status='active',
+    ).exclude(tier__in=['induction', 'handbook']).order_by('name')
+
+    return render(request, 'learn/induction_review_queue.html', {
+        'inductees': inductees,
+        'placement_tenants': placement_tenants,
+        'induction_programme': induction_programme,
+    })
+
+
+@login_required
+def htmx_induction_confirm(request, user_id):
+    """HTMX POST: steward confirms induction completion → advances learner to Level 1."""
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    if _user_level(request.user) < 5:
+        return HttpResponse('<p class="form-error">Permission denied.</p>', status=403)
+
+    from django.contrib.auth import get_user_model
+    from tenants.models import Tenant
+    from .services import confirm_certification_record, CertificationError
+    User = get_user_model()
+
+    learner = get_object_or_404(User, id=user_id)
+    notes = request.POST.get('notes', '').strip()
+    placement_tenant_id = request.POST.get('placement_tenant_id', '').strip() or None
+
+    # Find or create the induction certification record for this learner
+    cert = Record.objects.filter(
+        record_type='certification',
+        status='draft',
+        metadata__context='induction_completion',
+        metadata__learner_id=str(learner.id),
+        deleted_at__isnull=True,
+    ).first()
+
+    if not cert:
+        cert = Record.objects.create(
+            created_by=request.user,
+            tenant=None,
+            record_class='organizational',
+            record_family='learning',
+            record_type='certification',
+            origin='system',
+            title=f'Induction Completion — {learner.display_name or learner.email}',
+            summary=f'Induction programme completed by {learner.email}. Confirmed by steward.',
+            status='draft',
+            metadata={
+                'context': 'induction_completion',
+                'learner_id': str(learner.id),
+                'target_level': 1,
+                'source_app': 'learn',
+            },
+            permissions_data={
+                'required_level': 5,
+                'visibility': 'steward',
+            },
+        )
+
+    try:
+        confirmation = confirm_certification_record(
+            cert_record=cert,
+            confirmed_by=request.user,
+            notes=notes,
+            placement_tenant_id=placement_tenant_id,
+        )
+    except CertificationError as exc:
+        return HttpResponse(
+            f'<div class="induction-card" id="inductee-{user_id}">'
+            f'<p class="form-error">{exc}</p></div>',
+            status=400,
+        )
+
+    profile = getattr(learner, 'profile', None)
+    name = (profile.full_name if profile else None) or learner.display_name or learner.email
+    return HttpResponse(
+        f'<div class="induction-card induction-card--confirmed" id="inductee-{user_id}">'
+        f'<span class="material-symbols-outlined" style="color:var(--success);font-size:1.5rem">verified</span>'
+        f'<div>'
+        f'<strong>{name}</strong> confirmed — '
+        f'Level {confirmation.previous_competence_level} → Level {confirmation.new_competence_level}'
+        f'</div>'
+        f'</div>'
+    )
+
+
 # ── HTMX Partial Views ────────────────────────────────────────────────────────
 
 def _recalculate_programme_progress(user, lesson_id):
