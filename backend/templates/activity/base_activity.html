@@ -7,6 +7,20 @@
 
 {% block content %}
 <div class="activity-shell">
+  <nav class="accounts-tab-row" style="border-bottom: 1px solid var(--border); padding: 0 1rem;">
+    <a href="{% url 'activity:activity-home' %}"
+       class="accounts-tab {% if request.resolver_match.url_name == 'activity-home' %}accounts-tab--active{% endif %}">
+      Personal
+    </a>
+    <a href="{% url 'activity:ministry' %}"
+       class="accounts-tab {% if request.resolver_match.url_name == 'ministry' %}accounts-tab--active{% endif %}">
+      Ministry
+    </a>
+    <a href="{% url 'activity:calendar' %}"
+       class="accounts-tab {% if request.resolver_match.url_name == 'calendar' %}accounts-tab--active{% endif %}">
+      Calendar
+    </a>
+  </nav>
   <div class="activity-content">
     {% block activity_content %}{% endblock %}
   </div>

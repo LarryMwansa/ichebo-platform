@@ -13,6 +13,7 @@ def _user_level(user):
 
 PERSONAL_TYPES = ['task', 'habit', 'goal', 'reminder', 'skill']
 ALL_TYPES = ['task', 'habit', 'goal', 'event', 'campaign', 'project', 'reminder', 'skill']
+MINISTRY_TYPES = ['campaign', 'project', 'task', 'event']
 
 TYPE_LABELS = {
     'task': 'Tasks', 'habit': 'Habits', 'goal': 'Goals',
@@ -259,6 +260,53 @@ def htmx_activity_list(request):
     return render(request, 'activity/partials/activity_list.html', {
         'activities':  qs,
         'active_type': activity_type,
+    })
+
+
+@login_required
+def ministry(request):
+    user = request.user
+    active_type = request.GET.get('type', '')
+    assigned_tab = request.GET.get('tab', 'all')  # 'all' or 'mine'
+
+    qs = Activity.objects.filter(
+        deleted_at__isnull=True,
+        activity_type__in=MINISTRY_TYPES,
+        status__in=['pending', 'in_progress'],
+    ).order_by('due_at', '-created_at')
+
+    if assigned_tab == 'mine':
+        qs = qs.filter(assigned_to=user)
+
+    if active_type and active_type in MINISTRY_TYPES:
+        qs = qs.filter(activity_type=active_type)
+
+    ministry_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in MINISTRY_TYPES]
+
+    return render(request, 'activity/ministry.html', {
+        'activities': qs,
+        'active_type': active_type,
+        'assigned_tab': assigned_tab,
+        'ministry_types': ministry_types,
+        'user_level': _user_level(user),
+        'now': timezone.now(),
+    })
+
+
+@login_required
+def calendar_view(request):
+    user = request.user
+
+    qs = Activity.objects.filter(
+        assigned_to=user,
+        deleted_at__isnull=True,
+        due_at__isnull=False,
+    ).exclude(activity_type__in=['programme', 'lesson']).order_by('due_at')
+
+    return render(request, 'activity/calendar_view.html', {
+        'activities': qs,
+        'user_level': _user_level(user),
+        'now': timezone.now(),
     })
 
 

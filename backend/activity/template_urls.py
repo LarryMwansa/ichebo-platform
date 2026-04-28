@@ -5,6 +5,8 @@ app_name = 'activity'
 
 urlpatterns = [
     path('', views.my_activities, name='activity-home'),
+    path('ministry/', views.ministry, name='ministry'),
+    path('calendar/', views.calendar_view, name='calendar'),
     path('<uuid:activity_id>/', views.activity_detail, name='activity-detail'),
 
     # HTMX partials

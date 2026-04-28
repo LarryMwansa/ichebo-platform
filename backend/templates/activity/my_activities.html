@@ -3,23 +3,24 @@
 {% block activity_content %}
 
 <div class="activity-page">
-  <header class="explore-header">
-    <h1 class="explore-title">Activity</h1>
-    <p class="explore-subtitle">Timeline, habits & focus pathways</p>
+  <header class="explore-header" style="margin-bottom: 0;">
+    <h1 class="explore-title">Personal</h1>
   </header>
 
-  <nav class="accounts-tab-row" style="margin: 0 -1rem 1.5rem; border-top: 1px solid var(--border);">
+  <div style="display: flex; gap: 8px; overflow-x: auto; padding: 0.75rem 0 1rem; scrollbar-width: none; -webkit-overflow-scrolling: touch; flex-wrap: nowrap;">
     <a href="{% url 'activity:activity-home' %}"
-       class="accounts-tab {% if not active_type %}accounts-tab--active{% endif %}">
+       style="flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
+              {% if not active_type %}background: var(--primary); color: #fff;{% else %}background: var(--hover); color: var(--muted);{% endif %}">
       All
     </a>
     {% for slug, label in activity_types %}
     <a href="{% url 'activity:activity-home' %}?type={{ slug }}"
-       class="accounts-tab {% if active_type == slug %}accounts-tab--active{% endif %}">
+       style="flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
+              {% if active_type == slug %}background: var(--primary); color: #fff;{% else %}background: var(--hover); color: var(--muted);{% endif %}">
       {{ label }}
     </a>
     {% endfor %}
-  </nav>
+  </div>
 
 <!-- Overdue -->
 <div class="activity-group" id="group-overdue" {% if not overdue %}style="display:none;"{% endif %}>
