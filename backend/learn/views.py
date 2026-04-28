@@ -612,6 +612,53 @@ def htmx_complete_lesson(request, lesson_id):
 
 
 @login_required
+def htmx_submit_assessment(request, lesson_id):
+    """HTMX POST: saves quiz/assignment submission, then marks lesson complete."""
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    from .services import complete_lesson, EnrolmentError
+
+    task_activity = Activity.objects.filter(
+        activity_type='task',
+        assigned_to=request.user,
+        linked_record_id=lesson_id,
+        deleted_at__isnull=True,
+    ).first()
+
+    if not task_activity:
+        return HttpResponse(
+            '<span style="color:var(--muted);font-size:13px;">Enrol in this programme to submit.</span>'
+        )
+
+    # Collect submission: single textarea (assignment) or multiple q_* fields (quiz)
+    submission_data = {}
+    for key, value in request.POST.items():
+        if key.startswith('q_') or key == 'submission':
+            submission_data[key] = value
+
+    # Persist to task Activity metadata
+    meta = task_activity.metadata or {}
+    meta['submission'] = submission_data
+    task_activity.metadata = meta
+    task_activity.save(update_fields=['metadata'])
+
+    try:
+        complete_lesson(request.user, task_activity)
+    except EnrolmentError as exc:
+        return HttpResponse(
+            f'<span style="color:var(--error);font-size:13px;">{exc}</span>',
+            status=400,
+        )
+
+    return HttpResponse(
+        '<button class="btn-touch" style="background:#2e7d32;color:#fff;" disabled>'
+        '✓ Submitted &amp; Completed'
+        '</button>'
+    )
+
+
+@login_required
 def htmx_confirm_cert(request, cert_id):
     """HTMX POST: steward confirms certification, advances competence_level."""
     if request.method != 'POST':

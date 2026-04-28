@@ -29,6 +29,8 @@ urlpatterns = [
     path('htmx/enrol/<uuid:programme_id>/', views.htmx_enrol, name='htmx-enrol'),
     path('htmx/complete-lesson/<uuid:lesson_id>/',
          views.htmx_complete_lesson, name='htmx-complete-lesson'),
+    path('htmx/submit-assessment/<uuid:lesson_id>/',
+         views.htmx_submit_assessment, name='htmx-submit-assessment'),
     path('htmx/confirm-cert/<uuid:cert_id>/',
          views.htmx_confirm_cert, name='htmx-confirm-cert'),
     path('htmx/approve-content/<uuid:record_id>/',

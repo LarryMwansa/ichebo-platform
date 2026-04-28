@@ -1,4 +1,4 @@
-<form hx-post="{% url 'learn:htmx-complete-lesson' lesson.id %}"
+<form hx-post="{% url 'learn:htmx-submit-assessment' lesson.id %}"
       hx-target="#complete-section"
       hx-swap="outerHTML">
   {% csrf_token %}
