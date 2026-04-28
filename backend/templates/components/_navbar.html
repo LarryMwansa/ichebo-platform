@@ -33,6 +33,17 @@
       </button>
     </div>
 
+    <!-- Level badge -->
+    {% if user.is_authenticated %}
+    <div class="nav-right-item">
+      <a href="{% url 'accounts:formation-history' %}"
+         class="level-badge {{ user_level_colour }}"
+         title="{{ user_level_name }} — Level {{ user_level }}">
+        {{ user_level }}
+      </a>
+    </div>
+    {% endif %}
+
     <!-- Profile Avatar (lightweight: Settings + Logout only) -->
     <div class="nav-right-item">
       {% if user.is_authenticated %}

@@ -94,6 +94,14 @@
     </div>
   </section>
 
+  {# Formation Journey card — all levels #}
+  <section class="dash-section"
+           hx-get="{% url 'accounts:htmx-formation-card' %}"
+           hx-trigger="load"
+           hx-swap="innerHTML">
+    <div class="dash-widget" style="min-height:80px"></div>
+  </section>
+
   {% if digest.competence_level >= 1 %}
   
   {# 3. Action Items (Consolidated Overdue/Today) #}
@@ -163,11 +171,15 @@
   {% endif %}
 
   {% else %}
-  {# Seeker (Level 0) state #}
-  <div class="dash-widget dash-seeker-gate">
-    <p>Your journey begins here.</p>
-    <a href="{% url 'community:community-home' %}" class="btn-touch btn-primary">Begin Induction &rarr;</a>
-  </div>
+  {# Seeker (Level 0) state — formation card + induction prompt #}
+  <section class="dash-section"
+           hx-get="{% url 'accounts:htmx-formation-card' %}"
+           hx-trigger="load"
+           hx-swap="innerHTML">
+    <div class="dash-widget" style="text-align:center;padding:1.5rem">
+      <span class="material-symbols-outlined" style="font-size:2rem;color:var(--border)">sync</span>
+    </div>
+  </section>
   {% endif %}
 
 </div>

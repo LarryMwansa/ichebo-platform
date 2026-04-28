@@ -23,4 +23,7 @@ template_urlpatterns = [
     path('verify-email/<str:token>/', views.VerifyEmailView.as_view(), name='verify-email'),
     path('profile-setup/', views.ProfileSetupView.as_view(), name='profile-setup'),
     path('welcome/', views.WelcomeView.as_view(), name='welcome'),
+    # H1 — Formation
+    path('formation/', views.FormationHistoryView.as_view(), name='formation-history'),
+    path('htmx/formation-card/', views.htmx_formation_card, name='htmx-formation-card'),
 ]

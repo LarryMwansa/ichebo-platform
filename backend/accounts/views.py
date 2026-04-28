@@ -410,3 +410,72 @@ class WelcomeView(LoginRequiredMixin, View):
             'profile': profile,
             'member_number': profile.member_number if profile else None,
         })
+
+
+# ---------------------------------------------------------------------------
+# H1 — Formation history & dashboard card
+# ---------------------------------------------------------------------------
+
+NEXT_PROGRAMME = {
+    0: ('New Life Programme',    'Certificate',  '1 year'),
+    1: ('Foundation Programme',  'Diploma',      '3 years'),
+    2: ('Leaders Programme',     'Degree',       '6–12 months'),
+    3: ('Builders Programme',    'Masters',      '6–12 months'),
+    4: ("Architect's Programme", 'Doctorate',    '2 years'),
+}
+
+
+class FormationHistoryView(LoginRequiredMixin, View):
+    """Full formation history — timeline of level advancements."""
+
+    login_url = '/accounts/login/'
+
+    def get(self, request):
+        from learn.models import CertificationConfirmation
+        from activity.models import Activity
+
+        user = request.user
+        level = user.competence_level
+
+        history = CertificationConfirmation.objects.filter(
+            learner_id=user.id,
+        ).order_by('confirmed_at').select_related('confirmed_by')
+
+        active_enrolment = Activity.objects.filter(
+            activity_type='programme',
+            assigned_to=user,
+            status__in=['pending', 'in_progress'],
+            deleted_at__isnull=True,
+        ).select_related('linked_record').first()
+
+        next_prog = NEXT_PROGRAMME.get(level)
+
+        return render(request, 'accounts/formation_history.html', {
+            'history': history,
+            'active_enrolment': active_enrolment,
+            'next_programme': next_prog,
+        })
+
+
+@login_required
+def htmx_formation_card(request):
+    """HTMX GET: formation card partial for the dashboard."""
+    from learn.models import CertificationConfirmation
+    from activity.models import Activity
+
+    user = request.user
+    level = user.competence_level
+
+    active_enrolment = Activity.objects.filter(
+        activity_type='programme',
+        assigned_to=user,
+        status__in=['pending', 'in_progress'],
+        deleted_at__isnull=True,
+    ).select_related('linked_record').first()
+
+    next_prog = NEXT_PROGRAMME.get(level)
+
+    return render(request, 'accounts/_formation_card.html', {
+        'active_enrolment': active_enrolment,
+        'next_programme': next_prog,
+    })

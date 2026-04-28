@@ -318,3 +318,71 @@
     align-self: flex-end;
   }
 }
+
+/* ── Formation card ─────────────────────────────────────────── */
+.formation-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.formation-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+.formation-card__level-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.formation-card__level-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.formation-card__programme {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.formation-card__prog-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.formation-card__prog-meta {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.formation-progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.formation-progress-bar__fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+.formation-card__next {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border);
+}
+.formation-card__link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}

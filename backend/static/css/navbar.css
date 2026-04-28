@@ -319,3 +319,26 @@ body.dark .theme-icon-moon {
   justify-content: center;
   border: 2px solid var(--bg);
 }
+/* ── Level badge ─────────────────────────────────────────────── */
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.level-badge:hover { transform: scale(1.1); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.level-grey   { background: #9ca3af; }
+.level-green  { background: #16a34a; }
+.level-blue   { background: #2563eb; }
+.level-purple { background: #7c3aed; }
+.level-orange { background: #ea580c; }
+.level-red    { background: #dc2626; }
