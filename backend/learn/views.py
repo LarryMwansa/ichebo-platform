@@ -69,12 +69,15 @@ def my_learning(request):
 @login_required
 def catalogue(request):
     user_level = _user_level(request.user)
-    programmes = Record.objects.filter(
-        record_family='learning',
-        record_type='programme',
-        status='active',
-        deleted_at__isnull=True,
-    ).order_by('created_at')
+    programmes = sorted(
+        Record.objects.filter(
+            record_family='learning',
+            record_type='programme',
+            status='active',
+            deleted_at__isnull=True,
+        ),
+        key=lambda p: p.permissions_data.get('required_level', 1)
+    )
 
     for p in programmes:
         p.is_locked = user_level < (p.permissions_data.get('required_level', 1))
