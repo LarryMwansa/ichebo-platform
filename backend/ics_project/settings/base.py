@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'governance',
     'notifications',
     'paraclete',
+    'video_live',
     'encrypted_model_fields',
 ]
 

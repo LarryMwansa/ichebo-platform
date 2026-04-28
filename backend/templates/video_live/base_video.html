@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+.video-shell { max-width: 800px; margin: 0 auto; padding: 1.25rem 1rem 5rem; }
+.video-nav { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.video-nav a { font-size: 0.82rem; font-weight: 600; color: var(--muted); text-decoration: none; padding: 0.3rem 0.75rem; border-radius: 20px; border: 1px solid var(--border); transition: all 0.15s; }
+.video-nav a:hover, .video-nav a.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.video-section-title { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+.event-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; text-decoration: none; color: inherit; }
+.event-card--live { border-left: 3px solid var(--error); }
+.event-card--link:hover { border-color: var(--primary); }
+.event-card__title { font-weight: 700; font-size: 0.95rem; }
+.event-card__meta { font-size: 0.8rem; color: var(--muted); }
+.live-badge { display: inline-flex; align-items: center; gap: 0.3rem; background: var(--error); color: #fff; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: pulse 1.2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.video-embed-wrap { position: relative; padding-top: 56.25%; border-radius: 10px; overflow: hidden; background: #000; margin-bottom: 1rem; }
+.video-embed-wrap iframe, .video-embed-wrap video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+.vod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.75rem; }
+.manage-form { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; }
+.manage-form label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-bottom: 0.25rem; margin-top: 0.9rem; }
+.manage-form label:first-of-type { margin-top: 0; }
+.manage-form input, .manage-form textarea, .manage-form select { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 0.9rem; box-sizing: border-box; }
+.manage-form textarea { resize: vertical; min-height: 70px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="video-shell">
+  <nav class="video-nav">
+    <a href="{% url 'video_live:home' %}" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>Home</a>
+    <a href="{% url 'video_live:live' %}" {% if request.resolver_match.url_name == 'live' %}class="active"{% endif %}>Live</a>
+    <a href="{% url 'video_live:schedule' %}" {% if request.resolver_match.url_name == 'schedule' %}class="active"{% endif %}>Schedule</a>
+    <a href="{% url 'video_live:vod' %}" {% if request.resolver_match.url_name == 'vod' %}class="active"{% endif %}>Recordings</a>
+    {% if can_manage %}<a href="{% url 'video_live:manage' %}" {% if request.resolver_match.url_name == 'manage' %}class="active"{% endif %}>Manage</a>{% endif %}
+  </nav>
+  {% block video_content %}{% endblock %}
+</div>
+{% endblock %}

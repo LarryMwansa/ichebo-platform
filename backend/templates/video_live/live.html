@@ -1,0 +1,13 @@
+{% extends "video_live/base_video.html" %}
+
+{% block title %}Live{% endblock %}
+
+{% block video_content %}
+<div id="live-player"
+     hx-get="{% url 'video_live:live' %}"
+     hx-trigger="every 60s"
+     hx-swap="innerHTML"
+     hx-target="#live-player">
+  {% include "video_live/_live_player.html" %}
+</div>
+{% endblock %}

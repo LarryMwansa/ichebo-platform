@@ -139,6 +139,13 @@
   </div>
   {% endif %}
 
+  <a href="{% url 'video_live:home' %}" class="launcher-item">
+    <div class="launcher-icon icon-red">
+      <span class="material-symbols-outlined">live_tv</span>
+    </div>
+    <span class="launcher-label">Video</span>
+  </a>
+
   {# Always visible #}
   <a href="{% url 'accounts:settings' %}" class="launcher-item">
     <div class="launcher-icon icon-slate">

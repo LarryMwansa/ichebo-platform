@@ -1,0 +1,28 @@
+{% if live %}
+{% with event=live.0 %}
+<div class="event-card event-card--live" style="margin-bottom:1rem">
+  <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
+    <span class="live-badge"><span class="live-dot"></span>Live Now</span>
+    <span style="font-size:0.82rem;color:var(--muted)">{{ event.scheduled_at|date:"H:i" }} · {{ event._duration }} min</span>
+  </div>
+  <div class="video-embed-wrap">
+    {% if event._embed_type == 'mp4' %}
+    <video controls autoplay>
+      <source src="{{ event._stream_url }}" type="video/mp4">
+    </video>
+    {% else %}
+    <iframe src="{{ event._embed_url }}" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    {% endif %}
+  </div>
+  <div class="event-card__title">{{ event.title }}</div>
+  {% if event.description %}<div class="event-card__meta">{{ event.description }}</div>{% endif %}
+</div>
+{% endwith %}
+{% else %}
+<div style="text-align:center;padding:3rem 1rem;color:var(--muted)">
+  <span class="material-symbols-outlined" style="font-size:2.5rem;display:block;margin-bottom:0.5rem">live_tv</span>
+  <p style="font-weight:600;color:var(--text);margin-bottom:0.25rem">No live stream right now</p>
+  <p style="font-size:0.85rem">Check the schedule for upcoming broadcasts.</p>
+  <a href="{% url 'video_live:schedule' %}" style="font-size:0.85rem;color:var(--primary)">View Schedule →</a>
+</div>
+{% endif %}

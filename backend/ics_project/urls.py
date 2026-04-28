@@ -45,4 +45,5 @@ urlpatterns = [
     path('accounts/register/', accounts_views.RegisterView.as_view(), name='register_ui'),
     path('accounts/', include((accounts_template_urlpatterns, 'accounts'))),
     path('', include('dashboard.urls', namespace='dashboard')),
+    path('video/', include('video_live.urls', namespace='video_live')),
 ]
