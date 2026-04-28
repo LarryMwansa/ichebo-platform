@@ -13,15 +13,20 @@ from django.utils import timezone
 
 class Notification(models.Model):
     NOTIFICATION_TYPES = [
-        ('membership_approved', 'Membership Approved'),
-        ('membership_denied', 'Membership Denied'),
-        ('activity_assigned', 'Activity Assigned'),
-        ('activity_completed', 'Activity Completed'),
-        ('lesson_completed', 'Lesson Completed'),
+        ('membership_approved',  'Membership Approved'),
+        ('membership_denied',    'Membership Denied'),
+        ('activity_assigned',    'Activity Assigned'),
+        ('activity_completed',   'Activity Completed'),
+        ('lesson_completed',     'Lesson Completed'),
         ('certification_earned', 'Certification Earned'),
-        ('announcement', 'Community Announcement'),
-        ('mandate_published', 'Mandate Published'),
-        ('system', 'System'),
+        ('level_advanced',       'Level Advanced'),
+        ('induction_completed',  'Induction Completed'),
+        ('announcement',         'Community Announcement'),
+        ('mandate_published',    'Mandate Published'),
+        ('tenant_invitation',    'Community Invitation'),
+        ('member_added',         'Added to Community'),
+        ('member_removed',       'Removed from Community'),
+        ('system',               'System'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

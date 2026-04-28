@@ -258,6 +258,16 @@ def confirm_certification_record(cert_record, confirmed_by, notes='', placement_
 
         if context == 'induction_completion':
             _handle_induction_placement(learner, new_level, placement_tenant_id)
+            # Store placement tenant name on cert record metadata for signal
+            if placement_tenant_id:
+                from tenants.models import Tenant as _Tenant
+                try:
+                    _pt = _Tenant.objects.get(id=placement_tenant_id)
+                    metadata['placement_tenant_name'] = _pt.name
+                    cert_record.metadata = metadata
+                    cert_record.save(update_fields=['metadata', 'updated_at'])
+                except _Tenant.DoesNotExist:
+                    pass
 
         return CertificationConfirmation.objects.create(
             certification_record_id=cert_record.id,

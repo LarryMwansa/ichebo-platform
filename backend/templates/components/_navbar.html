@@ -19,7 +19,7 @@
         <span class="material-symbols-outlined">notifications</span>
         <span id="notif-badge" class="notif-badge"
               hx-get="{% url 'notifications-api:unread-badge' %}"
-              hx-trigger="load"
+              hx-trigger="load, every 60s"
               hx-swap="outerHTML"
               style="display:none;"></span>
       </a>

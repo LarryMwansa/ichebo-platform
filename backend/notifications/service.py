@@ -1,31 +1,23 @@
 """
 notifications/service.py
 
-Utility functions for creating Notification records.
+Utility functions for creating Notification records and sending email.
 Called by signal handlers — never by views directly.
 All functions are fire-and-forget; errors are logged, never raised.
 """
 import logging
 
+from django.conf import settings
+from django.core.mail import send_mail
+
 logger = logging.getLogger(__name__)
+
+# Types that also trigger a Brevo email
+EMAIL_TYPES = {'level_advanced', 'certification_earned', 'tenant_invitation', 'induction_completed'}
 
 
 def create_notification(user, notification_type, title, body='', data=None):
-    """
-    Create a Notification for `user`.
-
-    Args:
-        user: accounts.User instance
-        notification_type: str — must match Notification.NOTIFICATION_TYPES choices
-        title: str — short summary shown in notification list
-        body: str — optional longer description
-        data: dict — optional extra metadata (record_id, url, tenant_name, etc.)
-
-    Returns:
-        Notification instance, or None on error.
-    """
     from .models import Notification
-
     try:
         n = Notification.objects.create(
             user=user,
@@ -34,18 +26,42 @@ def create_notification(user, notification_type, title, body='', data=None):
             body=body,
             data=data or {},
         )
+        if notification_type in EMAIL_TYPES:
+            _send_email(user, title, body, data or {})
         return n
     except Exception:
         logger.exception(
             'Failed to create notification type=%s for user=%s',
-            notification_type,
-            user.pk,
+            notification_type, user.pk,
         )
         return None
 
 
+def _send_email(user, title, body, data):
+    recipient = user.email
+    if not recipient:
+        return
+    try:
+        action_url = data.get('url', '')
+        message = body
+        if action_url:
+            message += f'\n\n{action_url}'
+        send_mail(
+            subject=title,
+            message=message,
+            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@ichebo.com'),
+            recipient_list=[recipient],
+            fail_silently=True,
+        )
+    except Exception:
+        logger.exception('Failed to send email to %s', recipient)
+
+
+# ---------------------------------------------------------------------------
+# Existing handlers
+# ---------------------------------------------------------------------------
+
 def notify_membership_approved(membership_request):
-    """Called when a steward approves a MembershipRequest."""
     create_notification(
         user=membership_request.user,
         notification_type='membership_approved',
@@ -60,7 +76,6 @@ def notify_membership_approved(membership_request):
 
 
 def notify_membership_denied(membership_request):
-    """Called when a steward denies a MembershipRequest."""
     create_notification(
         user=membership_request.user,
         notification_type='membership_denied',
@@ -74,7 +89,6 @@ def notify_membership_denied(membership_request):
 
 
 def notify_certification_earned(user, programme_title, cert_record_id=None):
-    """Called from learn signal when a user earns a certification."""
     create_notification(
         user=user,
         notification_type='certification_earned',
@@ -89,11 +103,10 @@ def notify_certification_earned(user, programme_title, cert_record_id=None):
 
 
 def notify_activity_assigned(activity):
-    """Called when an activity is assigned to a user by someone else."""
     if not activity.assigned_to:
         return
     if activity.assigned_to == activity.created_by:
-        return  # self-assigned — no notification needed
+        return
     create_notification(
         user=activity.assigned_to,
         notification_type='activity_assigned',
@@ -103,5 +116,106 @@ def notify_activity_assigned(activity):
             'activity_id': str(activity.id),
             'activity_type': activity.activity_type,
             'due_at': activity.due_at.isoformat() if activity.due_at else None,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# V2.5 — Level advancement & induction
+# ---------------------------------------------------------------------------
+
+def notify_level_advanced(user, previous_level, new_level, confirmed_by=None):
+    from accounts.context_processors import LEVEL_NAMES
+    new_name = LEVEL_NAMES.get(new_level, f'Level {new_level}')
+    confirmer = confirmed_by.display_name if confirmed_by and hasattr(confirmed_by, 'display_name') else 'a steward'
+    create_notification(
+        user=user,
+        notification_type='level_advanced',
+        title=f'You have advanced to {new_name} — Level {new_level}',
+        body=f'Confirmed by {confirmer}. Your formation journey continues — keep going.',
+        data={
+            'previous_level': previous_level,
+            'new_level': new_level,
+            'url': '/accounts/formation/',
+        },
+    )
+
+
+def notify_induction_completed(user, placement_tenant_name):
+    create_notification(
+        user=user,
+        notification_type='induction_completed',
+        title='Induction complete — welcome to the community!',
+        body=f'You have been placed in {placement_tenant_name}. Your journey as a Foundational Disciple begins now.',
+        data={
+            'placement_tenant': placement_tenant_name,
+            'url': '/accounts/formation/',
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# V2.5 — Tenant invitation & membership
+# ---------------------------------------------------------------------------
+
+def notify_tenant_invitation(email, tenant, invited_by, token):
+    from accounts.models import User
+    try:
+        user = User.objects.get(email__iexact=email)
+    except User.DoesNotExist:
+        # Not a registered user yet — email only, no in-app notification
+        _send_email(
+            type('obj', (object,), {'email': email})(),
+            title=f"You've been invited to join {tenant.name}",
+            body=(
+                f"{invited_by.display_name if hasattr(invited_by, 'display_name') else invited_by.email} "
+                f"has invited you to join {tenant.name} on the Ichebo platform.\n\n"
+                f"Accept your invitation at: /tenants/invite/accept/{token}/"
+            ),
+            data={'url': f'/tenants/invite/accept/{token}/'},
+        )
+        return
+
+    accept_url = f'/tenants/invite/accept/{token}/'
+    create_notification(
+        user=user,
+        notification_type='tenant_invitation',
+        title=f"You've been invited to join {tenant.name}",
+        body=(
+            f"{invited_by.display_name if hasattr(invited_by, 'display_name') else invited_by.email} "
+            f"has invited you to join this community."
+        ),
+        data={
+            'tenant_id': str(tenant.id),
+            'tenant_name': tenant.name,
+            'token': token,
+            'url': accept_url,
+        },
+    )
+
+
+def notify_member_added(user, tenant):
+    create_notification(
+        user=user,
+        notification_type='member_added',
+        title=f'You are now a member of {tenant.name}',
+        body='Your membership has been confirmed. Welcome to the community.',
+        data={
+            'tenant_id': str(tenant.id),
+            'tenant_name': tenant.name,
+            'url': '/community/',
+        },
+    )
+
+
+def notify_member_removed(user, tenant):
+    create_notification(
+        user=user,
+        notification_type='member_removed',
+        title=f'You have been removed from {tenant.name}',
+        body='Your membership in this community has ended. Contact the steward for more information.',
+        data={
+            'tenant_id': str(tenant.id),
+            'tenant_name': tenant.name,
         },
     )

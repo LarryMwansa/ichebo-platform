@@ -3,11 +3,16 @@ notifications/signals.py
 
 Signal receivers that trigger Notification creation.
 Connected in NotificationsConfig.ready() via notifications/apps.py.
-
 All receivers import lazily to avoid circular imports.
 """
 from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
+
+# Custom signal fired by tenants/service.py after invitation created
+invitation_sent = Signal()  # kwargs: tenant, email, invited_by, token
+
+# Custom signal fired by tenants/service.py after member removed
+member_removed_signal = Signal()  # kwargs: user, tenant
 
 
 # ---------------------------------------------------------------------------
@@ -16,12 +21,9 @@ from django.dispatch import receiver
 
 @receiver(post_save, sender='community.MembershipRequest')
 def on_membership_request_reviewed(sender, instance, created, **kwargs):
-    """Fire a notification when a pending request is approved or denied."""
     if created:
-        return  # Submission itself doesn't trigger a notification
-
+        return
     from notifications.service import notify_membership_approved, notify_membership_denied
-
     if instance.status == 'approved':
         notify_membership_approved(instance)
     elif instance.status == 'denied':
@@ -29,43 +31,99 @@ def on_membership_request_reviewed(sender, instance, created, **kwargs):
 
 
 # ---------------------------------------------------------------------------
-# Activity — new assignment (assigned_to differs from created_by)
+# Activity — new assignment
 # ---------------------------------------------------------------------------
 
 @receiver(post_save, sender='activity.Activity')
 def on_activity_assigned(sender, instance, created, **kwargs):
-    """Notify the assignee when a new activity is created for them by someone else."""
     if not created:
         return
-
     from notifications.service import notify_activity_assigned
     notify_activity_assigned(instance)
 
 
 # ---------------------------------------------------------------------------
-# Learn — certification earned
-# (The Learn app's post_save signal on Enrolment already creates Certification;
-#  we hook into Certification's post_save here.)
+# Learn — certification earned / level advanced
 # ---------------------------------------------------------------------------
 
 @receiver(post_save, sender='learn.CertificationConfirmation')
-def on_certification_created(sender, instance, created, **kwargs):
-    """Notify the learner when a new CertificationConfirmation record is created."""
+def on_certification_confirmed(sender, instance, created, **kwargs):
     if not created:
         return
 
-    from notifications.service import notify_certification_earned
+    from accounts.models import User
+    from notifications.service import notify_certification_earned, notify_level_advanced, notify_induction_completed
 
-    programme_title = ''
-    cert_record_id = None
+    try:
+        learner = User.objects.get(id=instance.learner_id)
+    except User.DoesNotExist:
+        return
 
-    # CertificationConfirmation links to a Record (the programme) via record FK
-    if hasattr(instance, 'record') and instance.record:
-        programme_title = instance.record.title
-        cert_record_id = instance.record.id
+    # Resolve the cert Record for title and metadata
+    programme_title = 'Programme'
+    cert_record = None
+    try:
+        from records.models import Record
+        cert_record = Record.objects.get(id=instance.certification_record_id)
+        programme_title = cert_record.title or programme_title
+    except Exception:
+        pass
 
     notify_certification_earned(
-        user=instance.user,
-        programme_title=programme_title or 'Programme',
-        cert_record_id=cert_record_id,
+        user=learner,
+        programme_title=programme_title,
+        cert_record_id=instance.certification_record_id,
     )
+
+    if (instance.new_competence_level or 0) > (instance.previous_competence_level or 0):
+        notify_level_advanced(
+            user=learner,
+            previous_level=instance.previous_competence_level,
+            new_level=instance.new_competence_level,
+            confirmed_by=instance.confirmed_by,
+        )
+
+    if cert_record:
+        rec_meta = cert_record.metadata or {}
+        if rec_meta.get('context') == 'induction_completion':
+            placement_tenant = rec_meta.get('placement_tenant_name', 'your community')
+            notify_induction_completed(user=learner, placement_tenant_name=placement_tenant)
+
+
+# ---------------------------------------------------------------------------
+# Tenants — invitation sent
+# ---------------------------------------------------------------------------
+
+@receiver(invitation_sent)
+def on_invitation_sent(sender, tenant, email, invited_by, token, **kwargs):
+    from notifications.service import notify_tenant_invitation
+    notify_tenant_invitation(email=email, tenant=tenant, invited_by=invited_by, token=token)
+
+
+# ---------------------------------------------------------------------------
+# Tenants — UserPermission created (member added via invitation accept)
+# ---------------------------------------------------------------------------
+
+@receiver(post_save, sender='tenants.TenantInvitation')
+def on_invitation_accepted(sender, instance, created, **kwargs):
+    if created:
+        return
+    if instance.status != 'accepted':
+        return
+    from accounts.models import User
+    from notifications.service import notify_member_added
+    try:
+        user = User.objects.get(email__iexact=instance.email)
+        notify_member_added(user=user, tenant=instance.tenant)
+    except User.DoesNotExist:
+        pass
+
+
+# ---------------------------------------------------------------------------
+# Tenants — member removed
+# ---------------------------------------------------------------------------
+
+@receiver(member_removed_signal)
+def on_member_removed(sender, user, tenant, **kwargs):
+    from notifications.service import notify_member_removed
+    notify_member_removed(user=user, tenant=tenant)

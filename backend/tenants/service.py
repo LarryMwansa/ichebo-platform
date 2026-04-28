@@ -7,7 +7,7 @@ class InvitationError(Exception):
 
 
 def send_invitation(tenant, email, invited_by):
-    """Create a TenantInvitation for an email address. Caller handles email delivery."""
+    """Create a TenantInvitation for an email address and fire the invitation_sent signal."""
     if UserPermission.objects.filter(
         tenant=tenant, user__email=email, is_active=True
     ).exists():
@@ -19,11 +19,22 @@ def send_invitation(tenant, email, invited_by):
     if existing and not existing.is_expired:
         raise InvitationError("A pending invitation for this email already exists.")
 
-    return TenantInvitation.objects.create(
+    invitation = TenantInvitation.objects.create(
         tenant=tenant,
         email=email,
         invited_by=invited_by,
     )
+
+    from notifications.signals import invitation_sent
+    invitation_sent.send(
+        sender=TenantInvitation,
+        tenant=tenant,
+        email=email,
+        invited_by=invited_by,
+        token=invitation.token,
+    )
+
+    return invitation
 
 
 def accept_invitation(token, user):
@@ -80,11 +91,14 @@ def accept_invitation(token, user):
 
 
 def remove_member(tenant, user, removed_by):
-    """Deactivate a member's UserPermission. Does not delete the record."""
+    """Deactivate a member's UserPermission and notify the removed user."""
     perms = UserPermission.objects.filter(tenant=tenant, user=user, is_active=True)
     if not perms.exists():
         raise InvitationError("This user is not an active member of this community.")
     perms.update(is_active=False)
+
+    from notifications.signals import member_removed_signal
+    member_removed_signal.send(sender=UserPermission, user=user, tenant=tenant)
 
 
 def has_domain_steward(agency_tenant):
