@@ -418,6 +418,7 @@ def bible_picker_view(request):
         'chapters': list(chapters),
         'all_chapters': all_chapters,
         'back_url': back_url,
+        'translation': get_user_translation(request.user),
     }
 
     if request.headers.get('HX-Request'):
