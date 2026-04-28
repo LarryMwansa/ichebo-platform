@@ -5,6 +5,7 @@ from django.conf import settings
 class Tenant(models.Model):
     TIER_CHOICES = [
         ('handbook', 'Handbook'),
+        ('induction', 'Induction'),
         ('church_node', 'Church Node'),
         ('church_collective', 'Church Collective'),
         ('district', 'District'),

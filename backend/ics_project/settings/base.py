@@ -19,6 +19,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 
+# Field-level encryption key (django-encrypted-model-fields)
+# Used to encrypt id_number / passport on UserProfile. Never commit this value.
+FIELD_ENCRYPTION_KEY = config('FIELD_ENCRYPTION_KEY')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
@@ -52,6 +56,7 @@ INSTALLED_APPS = [
     'governance',
     'notifications',
     'paraclete',
+    'encrypted_model_fields',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

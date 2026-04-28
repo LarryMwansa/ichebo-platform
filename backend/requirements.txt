@@ -14,3 +14,4 @@ firebase-admin==6.6.0
 django-storages[s3]==1.14.4
 boto3==1.35.99
 Pillow==11.1.0
+django-encrypted-model-fields==0.6.5

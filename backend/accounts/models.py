@@ -1,6 +1,8 @@
 import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from encrypted_model_fields.fields import EncryptedCharField
+
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -29,6 +31,15 @@ class User(AbstractUser):
     preferences = models.JSONField(default=dict, blank=True)
     fcm_token = models.CharField(max_length=255, blank=True, null=True)
 
+    # Induction tracking (v10 Amendment 10.2)
+    induction_enrolled_at = models.DateTimeField(null=True, blank=True)
+    induction_completed_at = models.DateTimeField(null=True, blank=True)
+    induction_pathway = models.CharField(
+        max_length=20,
+        null=True, blank=True,
+        choices=[('reconditioning', 'Reconditioning'), ('beginners', 'Beginners')],
+    )
+
     class Meta:
         db_table = 'accounts_user'
 
@@ -38,3 +49,101 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class UserProfile(models.Model):
+    TITLE_CHOICES = [
+        ('mr', 'Mr'), ('mrs', 'Mrs'), ('ms', 'Ms'), ('miss', 'Miss'),
+        ('dr', 'Dr'), ('prof', 'Prof'), ('rev', 'Rev'), ('pastor', 'Pastor'),
+    ]
+    GENDER_CHOICES = [
+        ('male', 'Male'), ('female', 'Female'),
+    ]
+    MARITAL_CHOICES = [
+        ('single', 'Single'), ('married', 'Married'),
+        ('divorced', 'Divorced'), ('widowed', 'Widowed'),
+    ]
+
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name='profile', primary_key=True
+    )
+
+    # --- Personal Details ---
+    title = models.CharField(max_length=10, choices=TITLE_CHOICES, blank=True)
+    full_name = models.CharField(max_length=255, blank=True)
+    phone_number = models.CharField(max_length=30, blank=True)
+    address = models.TextField(blank=True)
+    country = models.CharField(max_length=2, blank=True)        # ISO 3166-1 alpha-2
+    id_number = EncryptedCharField(max_length=100, blank=True, null=True)  # ENCRYPTED
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True)
+    marital_status = models.CharField(max_length=10, choices=MARITAL_CHOICES, blank=True)
+
+    # KGS Member Number — auto-assigned on profile completion
+    # Format: KMN-{ISO2}-{YYYY}-{NNNNN}  e.g. KMN-ZA-2026-00001
+    member_number = models.CharField(max_length=30, unique=True, null=True, blank=True)
+
+    # --- Qualifications, Gifts & Skills ---
+    occupation = models.CharField(max_length=255, blank=True)
+    education = models.TextField(blank=True)
+    interests = models.TextField(blank=True)
+    gifts_skills = models.TextField(blank=True)
+
+    # --- Existing Christian Section ---
+    accepted_christ = models.BooleanField(null=True)
+    church_member = models.BooleanField(null=True)
+    church_name = models.CharField(max_length=255, blank=True)
+    referee_1_name = models.CharField(max_length=255, blank=True)
+    referee_2_name = models.CharField(max_length=255, blank=True)
+    # Referee letters — stored in MinIO ics-private bucket
+    referee_letter_1 = models.FileField(upload_to='referee-letters/', blank=True, null=True)
+    referee_letter_2 = models.FileField(upload_to='referee-letters/', blank=True, null=True)
+
+    # --- Consent ---
+    terms_accepted = models.BooleanField(default=False)
+    terms_accepted_at = models.DateTimeField(null=True, blank=True)
+
+    # --- Bio (existing field for profile page) ---
+    bio = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'accounts_userprofile'
+
+    @property
+    def age(self):
+        if not self.date_of_birth:
+            return None
+        from django.utils import timezone
+        today = timezone.now().date()
+        dob = self.date_of_birth
+        return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
+    def assign_member_number(self):
+        """Generate and save KMN if not already assigned."""
+        if self.member_number:
+            return
+        from django.utils import timezone
+        year = timezone.now().year
+        country = (self.country or 'XX').upper()
+        prefix = f'KMN-{country}-{year}-'
+        last = (
+            UserProfile.objects
+            .filter(member_number__startswith=prefix)
+            .order_by('member_number')
+            .values_list('member_number', flat=True)
+            .last()
+        )
+        seq = 1
+        if last:
+            try:
+                seq = int(last.split('-')[-1]) + 1
+            except (ValueError, IndexError):
+                pass
+        self.member_number = f'{prefix}{seq:05d}'
+        self.save(update_fields=['member_number'])
+
+    def __str__(self):
+        return f'Profile({self.user.email})'
