@@ -151,12 +151,9 @@ TIMEZONE_CHOICES = [
 
 class SettingsView(LoginRequiredMixin, View):
     def get(self, request):
-        from bible.models import BibleTranslation
-        translations = BibleTranslation.objects.filter(is_public=True)
         context = {
             'profile_user': request.user,
             'timezone_choices': TIMEZONE_CHOICES,
-            'translations': translations,
         }
         return render(request, 'accounts/settings.html', context)
 
