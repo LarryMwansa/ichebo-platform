@@ -4,14 +4,17 @@
 
 /* 🌙 DARK MODE */
 body.dark {
-    --bg: #121212;
-    --bg-alpha: rgba(18, 18, 18, 0.85);
-    --card: #1e1e1e;
-    --text: #f5f5f5;
-    --muted: #aaa;
-    --border: rgba(255, 255, 255, 0.08);
-    --shadow: rgba(0, 0, 0, 0.5);
-    --hover: #2a2a2a;
+    --bg:           #0e0e0e;
+    --bg-alpha:     rgba(14, 14, 14, 0.92);
+    --card:         #1a1a1a;
+    --card-2:       #2d2d2d;
+    --text:         #f5f3f0;
+    --muted:        #9a9a9a;
+    --muted-light:  #6b6b6b;
+    --border:       rgba(255, 255, 255, 0.08);
+    --border-dark:  rgba(255, 255, 255, 0.12);
+    --shadow:       rgba(0, 0, 0, 0.5);
+    --hover:        #2d2d2d;
     --primary-alpha: rgba(175, 50, 54, 0.25);
 
     /* Semantic colors — dark mode overrides */

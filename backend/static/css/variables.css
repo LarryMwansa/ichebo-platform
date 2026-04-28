@@ -1,77 +1,89 @@
-/* Variable of Design Tokens */
+/* ICS Platform Design Tokens — aligned with ichebo.online brand */
 
 /* @link https://utopia.fyi/type/calculator?c=320,18,1.2,1920,20,1.25,8,4,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
 
 :root {
 
-    /* Color Variables */
-    --bg: #ffffff;
-    --bg-alpha: rgba(255, 255, 255, 0.75);
-    --card: #f8f9fa;
-    --border: #e9ecef;
-    --muted: #6c757d;
-    --hover: #f1f3f5;
-    --shadow: rgba(0, 0, 0, 0.05);
-    --primary: #af3236;
-    --primary-alpha: rgba(175, 50, 54, 0.15);
-    --text: #1a1a1a;
-
-    --secondary-light: #185abc;
+    /* ── Brand Colours ── */
+    --primary:        #af3236;
+    --primary-dark:   #8c2a2d;
+    --primary-light:  rgba(175, 50, 54, 0.12);
+    --primary-alpha:  rgba(175, 50, 54, 0.15);
+    --primary-tint:   #fff8f8;
+    --secondary:      #185abc;
     --secondary-dark: #0c397b;
 
-    --section-bg: #242424;
-    --section-bg2: #213547;
+    /* ── Surface Colours (light mode) ── */
+    --bg:       #ffffff;
+    --bg-alpha: rgba(255, 255, 255, 0.75);
+    --card:     #f5f3f0;   /* --stone from website */
+    --card-2:   #ece9e4;   /* --stone-2 from website */
+    --hover:    #ece9e4;
 
-    --link: #646cff;
-    --link-hover: #535bf2;
+    /* ── Ink (dark surfaces) ── */
+    --ink:       #0e0e0e;
+    --ink-2:     #1a1a1a;
+    --ink-light: #2d2d2d;
 
-    --button: #535bf2;
-    --button-hover: #4048c7;
-    --primary-button: #af3236;
-    --primary-button-hover: #8c2a2d;
-    --button-secondary: #1a1a1a;
-    --button-secondary-hover: #333333;
-    --button-text: #fffeff;
+    /* ── Text ── */
+    --text:        #1a1a1a;
+    --muted:       #6b6b6b;
+    --muted-light: #9a9a9a;
 
-    /* Semantic Colors (Info, Success, Error, Warning) */
-    --info: #0c5c9e;
-    --info-light: #e3f2fd;
-    --info-dark: #1e40af;
-    --success: #16a34a;
+    /* ── Borders & Shadows ── */
+    --border:      rgba(0, 0, 0, 0.08);
+    --border-dark: rgba(255, 255, 255, 0.12);
+    --shadow:      rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.12);
+    --shadow-lg:   0 24px 64px rgba(0, 0, 0, 0.2);
+
+    /* ── Section surfaces ── */
+    --section-bg:  #0e0e0e;   /* --ink: dark teaching/hero sections */
+    --section-bg2: #1a1a1a;   /* --ink-2: secondary dark sections */
+
+    /* ── Semantic Colours ── */
+    --info:         #0c5c9e;
+    --info-light:   #e3f2fd;
+    --info-dark:    #1e40af;
+    --success:      #16a34a;
     --success-light: #dcfce7;
     --success-dark: #166534;
-    --error: #dc2626;
-    --error-light: #fee2e2;
-    --error-dark: #991b1b;
+    --error:        #dc2626;
+    --error-light:  #fee2e2;
+    --error-dark:   #991b1b;
     --error-border: #fca5a5;
-    --warning: #ca8a04;
+    --warning:      #ca8a04;
     --warning-light: #fef3c7;
     --warning-dark: #92400e;
 
-    /* Accent Colors */
-    --accent-indigo: #6366f1;
-    --accent-purple: #7e22ce;
-    --accent-rose: #9d174d;
+    /* ── Accent Colours (app-level) ── */
+    --accent-indigo:     #6366f1;
+    --accent-purple:     #7e22ce;
+    --accent-rose:       #9d174d;
     --accent-rose-light: #fce7f3;
-    --accent-event: #5b21b6;
+    --accent-event:      #5b21b6;
     --accent-event-light: #ede9fe;
-    --primary-tint: #fff8f8;
 
-    /* Shadows */
-    --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.12);
+    /* ── Button tokens ── */
+    --primary-button:       #af3236;
+    --primary-button-hover: #8c2a2d;
+    --button-secondary:     #1a1a1a;
+    --button-secondary-hover: #2d2d2d;
+    --button-text:          #ffffff;
 
-    /* Typography Variables */
-    --font-family-base: "Roboto", system-ui, sans-serif;
-    --line-height-base: 1.5;
+    /* ── Typography ── */
+    --ff-display:      'Playfair Display', Georgia, serif;
+    --ff-body:         'Inter', system-ui, sans-serif;
+    --font-family-base: var(--ff-body);
+    --line-height-base: 1.6;
     --font-weight-regular: 400;
-    --font-weight-medium: 500;
-    --font-weight-bold: 700;
-    --font-weight-black: 800;
+    --font-weight-medium:  500;
+    --font-weight-bold:    700;
+    --font-weight-black:   800;
 
-    /* Apply token values as defaults so UA controls and components inherit them */
     color-scheme: light dark;
-    color: var(--foreground);
-    background-color: var(--background);
+    color: var(--text);
+    background-color: var(--bg);
 
 
 
@@ -131,9 +143,17 @@
     --tracking-widest: 0.1em;
 
 
-    /* === Transitions === */
+    /* ── Motion ── */
+    --transition:       0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast:  0.15s ease;
+    --transition-slow:  0.5s ease;
 
-    --transition: 0.4s;
+    /* ── Border radius ── */
+    --radius-s:  3px;   /* buttons */
+    --radius-m:  4px;   /* cards */
+    --radius-l:  6px;   /* icon boxes */
+    --radius-xl: 12px;  /* elevated surfaces */
+    --radius-pill: 999px;
 }
 
 
