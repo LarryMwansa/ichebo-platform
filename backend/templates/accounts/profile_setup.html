@@ -1,195 +1,6 @@
-{% extends "base_auth.html" %}
+{% extends "base_setup.html" %}
 {% load static %}
 {% block title %}Profile Setup{% endblock %}
-
-{% block extra_css %}
-<style>
-  .setup-shell {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1rem 4rem;
-    background: var(--bg);
-  }
-  .setup-header {
-    text-align: center;
-    margin-bottom: 2rem;
-    max-width: 560px;
-    width: 100%;
-  }
-  .setup-header__logo {
-    font-size: 1.1rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    color: var(--primary);
-    margin-bottom: 0.5rem;
-  }
-  .setup-header h1 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin: 0 0 0.4rem;
-  }
-  .setup-header p {
-    font-size: 0.9rem;
-    color: var(--muted);
-    margin: 0;
-  }
-  .setup-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem;
-    max-width: 560px;
-    width: 100%;
-  }
-  .setup-section-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--primary);
-    margin: 0 0 1.25rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .setup-section-title:not(:first-child) {
-    margin-top: 2rem;
-  }
-  .setup-field {
-    margin-bottom: 1.1rem;
-  }
-  .setup-field label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 0.35rem;
-  }
-  .setup-field input,
-  .setup-field select,
-  .setup-field textarea {
-    width: 100%;
-    padding: 0.6rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 0.9rem;
-    box-sizing: border-box;
-    appearance: none;
-  }
-  .setup-field input:focus,
-  .setup-field select:focus,
-  .setup-field textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
-  }
-  .setup-field textarea { resize: vertical; }
-  .setup-field__hint {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-top: 0.3rem;
-  }
-  .setup-field__error {
-    font-size: 0.78rem;
-    color: var(--danger, #e53e3e);
-    margin-top: 0.3rem;
-    display: block;
-  }
-  .setup-field--row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-  }
-  .setup-radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .setup-radio-group label {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-size: 0.88rem;
-    font-weight: 400;
-    cursor: pointer;
-    padding: 0.55rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    transition: border-color 0.15s, background 0.15s;
-  }
-  .setup-radio-group label:has(input:checked) {
-    border-color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 8%, transparent);
-    font-weight: 600;
-  }
-  .setup-radio-group input[type="radio"] {
-    width: auto;
-    accent-color: var(--primary);
-  }
-  .setup-inline-radios {
-    display: flex;
-    gap: 0.5rem;
-  }
-  .setup-inline-radios label {
-    flex: 1;
-    justify-content: center;
-  }
-  .setup-terms {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-start;
-    padding: 1rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--hover);
-    margin-top: 2rem;
-  }
-  .setup-terms input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-    margin-top: 1px;
-    accent-color: var(--primary);
-  }
-  .setup-terms label {
-    font-size: 0.85rem;
-    color: var(--text);
-    cursor: pointer;
-  }
-  .setup-submit {
-    display: block;
-    width: 100%;
-    padding: 0.85rem;
-    margin-top: 1.5rem;
-    background: var(--primary);
-    color: #fff;
-    font-size: 0.95rem;
-    font-weight: 700;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .setup-submit:hover { opacity: 0.88; }
-  .setup-file-hint {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-top: 0.3rem;
-  }
-  .non-field-errors {
-    background: color-mix(in srgb, var(--danger, #e53e3e) 10%, transparent);
-    border: 1px solid var(--danger, #e53e3e);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 1.25rem;
-    font-size: 0.85rem;
-    color: var(--danger, #e53e3e);
-  }
-</style>
-{% endblock %}
 
 {% block content %}
 <div class="setup-shell">
@@ -203,7 +14,7 @@
   <div class="setup-card">
 
     {% if form.non_field_errors %}
-    <div class="non-field-errors">
+    <div class="setup-errors">
       {% for error in form.non_field_errors %}{{ error }}{% endfor %}
     </div>
     {% endif %}
@@ -211,10 +22,10 @@
     <form method="post" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
 
-      <!-- Section 1: Personal Details -->
+      <!-- ── Section 1: Personal Details ──────────────────────── -->
       <p class="setup-section-title">Personal Details</p>
 
-      <div class="setup-field--row">
+      <div class="setup-field-row">
         <div class="setup-field">
           <label for="{{ form.title.id_for_label }}">Title</label>
           {{ form.title }}
@@ -228,12 +39,12 @@
       </div>
 
       <div class="setup-field">
-        <label for="{{ form.full_name.id_for_label }}">Full names <span style="color:var(--danger,#e53e3e)">*</span></label>
+        <label for="{{ form.full_name.id_for_label }}">Full names <span class="setup-field--required">*</span></label>
         {{ form.full_name }}
         {% if form.full_name.errors %}<span class="setup-field__error">{{ form.full_name.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field--row">
+      <div class="setup-field-row">
         <div class="setup-field">
           <label for="{{ form.date_of_birth.id_for_label }}">Date of birth</label>
           {{ form.date_of_birth }}
@@ -253,7 +64,7 @@
       </div>
 
       <div class="setup-field">
-        <label for="{{ form.country.id_for_label }}">Country <span style="color:var(--danger,#e53e3e)">*</span></label>
+        <label for="{{ form.country.id_for_label }}">Country <span class="setup-field--required">*</span></label>
         {{ form.country }}
         {% if form.country.errors %}<span class="setup-field__error">{{ form.country.errors|join:", " }}</span>{% endif %}
       </div>
@@ -267,11 +78,11 @@
       <div class="setup-field">
         <label for="{{ form.id_number.id_for_label }}">{{ form.id_number.label }}</label>
         {{ form.id_number }}
-        <p class="setup-field__hint">{{ form.id_number.help_text }}</p>
+        <span class="setup-field__hint">{{ form.id_number.help_text }}</span>
         {% if form.id_number.errors %}<span class="setup-field__error">{{ form.id_number.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <!-- Section 2: Qualifications, Gifts & Skills -->
+      <!-- ── Section 2: Qualifications, Gifts & Skills ─────────── -->
       <p class="setup-section-title">Qualifications, Gifts &amp; Skills</p>
 
       <div class="setup-field">
@@ -295,21 +106,18 @@
       <div class="setup-field">
         <label for="{{ form.gifts_skills.id_for_label }}">{{ form.gifts_skills.label }}</label>
         {{ form.gifts_skills }}
-        <p class="setup-field__hint">{{ form.gifts_skills.help_text }}</p>
+        <span class="setup-field__hint">{{ form.gifts_skills.help_text }}</span>
         {% if form.gifts_skills.errors %}<span class="setup-field__error">{{ form.gifts_skills.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <!-- Section 3: Faith Background -->
+      <!-- ── Section 3: Faith Background ──────────────────────── -->
       <p class="setup-section-title">Faith Background</p>
 
       <div class="setup-field">
-        <label>{{ form.induction_pathway.label }} <span style="color:var(--danger,#e53e3e)">*</span></label>
+        <label>{{ form.induction_pathway.label }} <span class="setup-field--required">*</span></label>
         <div class="setup-radio-group">
           {% for choice in form.induction_pathway %}
-            <label>
-              {{ choice.tag }}
-              {{ choice.choice_label }}
-            </label>
+            <label>{{ choice.tag }} {{ choice.choice_label }}</label>
           {% endfor %}
         </div>
         {% if form.induction_pathway.errors %}<span class="setup-field__error">{{ form.induction_pathway.errors|join:", " }}</span>{% endif %}
@@ -319,10 +127,7 @@
         <label>{{ form.accepted_christ.label }}</label>
         <div class="setup-radio-group setup-inline-radios">
           {% for choice in form.accepted_christ %}
-            <label>
-              {{ choice.tag }}
-              {{ choice.choice_label }}
-            </label>
+            <label>{{ choice.tag }} {{ choice.choice_label }}</label>
           {% endfor %}
         </div>
         {% if form.accepted_christ.errors %}<span class="setup-field__error">{{ form.accepted_christ.errors|join:", " }}</span>{% endif %}
@@ -332,10 +137,7 @@
         <label>{{ form.church_member.label }}</label>
         <div class="setup-radio-group setup-inline-radios">
           {% for choice in form.church_member %}
-            <label>
-              {{ choice.tag }}
-              {{ choice.choice_label }}
-            </label>
+            <label>{{ choice.tag }} {{ choice.choice_label }}</label>
           {% endfor %}
         </div>
         {% if form.church_member.errors %}<span class="setup-field__error">{{ form.church_member.errors|join:", " }}</span>{% endif %}
@@ -347,7 +149,7 @@
         {% if form.church_name.errors %}<span class="setup-field__error">{{ form.church_name.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field--row">
+      <div class="setup-field-row">
         <div class="setup-field">
           <label for="{{ form.referee_1_name.id_for_label }}">{{ form.referee_1_name.label }}</label>
           {{ form.referee_1_name }}
@@ -360,18 +162,26 @@
         </div>
       </div>
 
-      <div class="setup-field--row">
+      <div class="setup-field-row">
         <div class="setup-field">
           <label for="{{ form.referee_letter_1.id_for_label }}">{{ form.referee_letter_1.label }}</label>
           {{ form.referee_letter_1 }}
-          <p class="setup-file-hint">{{ form.referee_letter_1.help_text }}</p>
-          {% if form.referee_letter_1.errors %}<span class="setup-field__error">{{ form.referee_letter_1.errors|join:", " }}</span>{% endif %}
+          <span class="setup-field__hint">{{ form.referee_letter_1.help_text }}</span>
+          {% if require_uploads %}
+            {% if form.referee_letter_1.errors %}<span class="setup-field__error">{{ form.referee_letter_1.errors|join:", " }}</span>{% endif %}
+          {% else %}
+            <span class="setup-dev-notice">Optional in dev mode</span>
+          {% endif %}
         </div>
         <div class="setup-field">
           <label for="{{ form.referee_letter_2.id_for_label }}">{{ form.referee_letter_2.label }}</label>
           {{ form.referee_letter_2 }}
-          <p class="setup-file-hint">{{ form.referee_letter_2.help_text }}</p>
-          {% if form.referee_letter_2.errors %}<span class="setup-field__error">{{ form.referee_letter_2.errors|join:", " }}</span>{% endif %}
+          <span class="setup-field__hint">{{ form.referee_letter_2.help_text }}</span>
+          {% if require_uploads %}
+            {% if form.referee_letter_2.errors %}<span class="setup-field__error">{{ form.referee_letter_2.errors|join:", " }}</span>{% endif %}
+          {% else %}
+            <span class="setup-dev-notice">Optional in dev mode</span>
+          {% endif %}
         </div>
       </div>
 

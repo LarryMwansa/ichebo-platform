@@ -100,7 +100,7 @@ def update_fcm_token(request):
 class RegisterView(FormView):
     template_name = 'registration/register.html'
     form_class = RegisterForm
-    success_url = reverse_lazy('community:my-community')
+    success_url = reverse_lazy('community:community-home')
 
     def form_valid(self, form):
         user = form.save(commit=False)
@@ -301,16 +301,21 @@ class ProfileSetupView(LoginRequiredMixin, View):
 
     login_url = '/accounts/login/'
 
+    def _ctx(self, form):
+        return {
+            'form': form,
+            'require_uploads': getattr(django_settings, 'REQUIRE_REFEREE_UPLOADS', False),
+        }
+
     def get(self, request):
-        # Already completed profile setup — skip to welcome
         if hasattr(request.user, 'profile') and request.user.profile.terms_accepted:
             return redirect('accounts:welcome')
-        return render(request, 'accounts/profile_setup.html', {'form': ProfileSetupForm()})
+        return render(request, 'accounts/profile_setup.html', self._ctx(ProfileSetupForm()))
 
     def post(self, request):
         form = ProfileSetupForm(request.POST, request.FILES)
         if not form.is_valid():
-            return render(request, 'accounts/profile_setup.html', {'form': form})
+            return render(request, 'accounts/profile_setup.html', self._ctx(form))
 
         cd = form.cleaned_data
         user = request.user

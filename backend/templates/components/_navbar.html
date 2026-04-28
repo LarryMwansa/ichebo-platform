@@ -55,7 +55,7 @@
           </div>
         </div>
         <div class="profile-menu-items">
-          <a href="{% url 'settings' %}" role="menuitem">
+          <a href="{% url 'accounts:settings' %}" role="menuitem">
             <span class="material-symbols-outlined">settings</span> Settings
           </a>
           <form method="post" action="{% url 'logout' %}" class="logout-form">

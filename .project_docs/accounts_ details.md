@@ -43,3 +43,15 @@ DB_PORT=5432
 CORS_ALLOWED_ORIGINS=https://app.ichebo.online
 
 ```
+
+
+
+Test user
+
+larrypmwansa@gmail.com
+
+Promise4kipa
+
+Kingdom Member Number: 
+
+KMN-ZA-2026-00001

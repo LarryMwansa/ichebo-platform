@@ -1,12 +1,13 @@
 <!-- community/partials/membership_request_form.html -->
 <!-- Phase 1: tenant picker — selecting a community triggers orientation check -->
-<div class="membership-request-form" id="membership-request-form">
-  <div class="section-heading">Select a Community</div>
+<div class="membership-request-form" id="membership-request-form" style="text-align:left">
+  <div class="section-heading" style="text-align:left">Select a Community</div>
 
   {% if tenants %}
-  <div class="form-field">
-    <label for="tenant-select">Community</label>
+  <div style="display:flex;flex-direction:column;gap:0.4rem;margin-top:0.75rem">
+    <label for="tenant-select" style="font-size:0.8125rem;font-weight:600;color:var(--muted)">Community</label>
     <select id="tenant-select" name="tenant_id"
+            style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:0.9375rem;font-family:inherit;appearance:none;cursor:pointer"
             hx-get="{% url 'community:htmx-orientation-check' %}"
             hx-target="#orientation-check-area"
             hx-swap="innerHTML"
@@ -14,9 +15,7 @@
             hx-include="[name='tenant_id']">
       <option value="">— Choose a community —</option>
       {% for tenant in tenants %}
-      <option value="{{ tenant.id }}">{{ tenant.name }}
-        {% if tenant.tier != 'church_node' %}({{ tenant.get_tier_display }}){% endif %}
-      </option>
+      <option value="{{ tenant.id }}">{{ tenant.name }}{% if tenant.tier != 'church_node' %} ({{ tenant.get_tier_display }}){% endif %}</option>
       {% endfor %}
     </select>
   </div>

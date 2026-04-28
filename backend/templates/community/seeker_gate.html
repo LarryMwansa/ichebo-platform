@@ -1,10 +1,10 @@
 {% extends "community/base_community.html" %}
 
 {% block community_content %}
-<div class="empty-state" style="text-align:left;padding-bottom:0">
+<div class="empty-state" style="padding-bottom:0">
   <p style="font-size:32px;margin-bottom:12px">🌱</p>
-  <p style="font-weight:600;color:var(--text)">Welcome — you are at the beginning of the pathway.</p>
-  <p style="margin-top:8px;color:var(--text-secondary)">
+  <p style="font-weight:700;color:var(--text);font-size:1rem">Welcome — you are at the beginning of the pathway.</p>
+  <p style="margin-top:8px;color:var(--muted);max-width:480px;line-height:1.6">
     Complete the platform induction, then submit a request to join a community.
     A steward will review your request and, on approval, issue your
     Induction Certification — the first step on the Kingdom Governance pathway.
@@ -12,7 +12,7 @@
 </div>
 
 <!-- Phase 1: tenant picker loads here -->
-<div style="margin-top:1.5rem"
+<div style="margin-top:1.5rem;max-width:480px;margin-left:auto;margin-right:auto;width:100%"
      id="membership-request-area"
      hx-get="{% url 'community:htmx-membership-request' %}"
      hx-trigger="load"
@@ -21,5 +21,5 @@
 </div>
 
 <!-- Phase 2: orientation / request form swaps into here after tenant selection -->
-<div id="orientation-check-area" style="margin-top:1rem"></div>
+<div id="orientation-check-area" style="margin-top:1rem;max-width:480px;margin-left:auto;margin-right:auto;width:100%"></div>
 {% endblock %}

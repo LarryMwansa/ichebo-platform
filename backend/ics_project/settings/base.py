@@ -26,6 +26,10 @@ FIELD_ENCRYPTION_KEY = config('FIELD_ENCRYPTION_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
+# Set to False in dev to allow profile setup without referee letter uploads.
+# Flip to True in production once MinIO is configured.
+REQUIRE_REFEREE_UPLOADS = config('REQUIRE_REFEREE_UPLOADS', default=False, cast=bool)
+
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
