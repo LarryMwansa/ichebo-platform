@@ -1,6 +1,8 @@
 import uuid
+import secrets
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 class Tenant(models.Model):
     TIER_CHOICES = [
@@ -52,6 +54,10 @@ class Tenant(models.Model):
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)
 
     is_agency = models.BooleanField(default=False)
+    coordinator_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='coordinating_tenants'
+    )
 
     # Location (JSON field — PostgreSQL)
     location = models.JSONField(default=dict, blank=True)
@@ -131,6 +137,46 @@ class UserPermission(models.Model):
     class Meta:
         db_table = 'tenants_userpermission'
         unique_together = [['tenant', 'user', 'role']]
+
+
+class TenantInvitation(models.Model):
+    STATUS_CHOICES = [
+        ('pending',  'Pending'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+        ('expired',  'Expired'),
+    ]
+
+    id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tenant     = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='invitations')
+    email      = models.EmailField()
+    invited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, related_name='sent_invitations'
+    )
+    token      = models.CharField(max_length=64, unique=True)
+    status     = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    expires_at  = models.DateTimeField()
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'tenants_tenantinvitation'
+        ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = secrets.token_urlsafe(48)
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timezone.timedelta(days=7)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_expired(self):
+        return self.status == 'pending' and timezone.now() > self.expires_at
+
+    def __str__(self):
+        return f"Invitation({self.email} → {self.tenant.name}, {self.status})"
 
 
 class ServiceOrder(models.Model):

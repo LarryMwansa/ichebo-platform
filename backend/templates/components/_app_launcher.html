@@ -115,8 +115,15 @@
   </div>
   {% endif %}
 
-  {# Level 3+ Governance #}
+  {# Level 3+ Steward Dashboard + Governance #}
   {% if user_level >= 3 %}
+  <a href="{% url 'tenants:steward-dashboard' %}" class="launcher-item">
+    <div class="launcher-icon icon-orange">
+      <span class="material-symbols-outlined">admin_panel_settings</span>
+    </div>
+    <span class="launcher-label">Steward</span>
+  </a>
+
   <a href="{% url 'governance:home' %}" class="launcher-item">
     <div class="launcher-icon icon-purple">
       <span class="material-symbols-outlined">account_balance</span>

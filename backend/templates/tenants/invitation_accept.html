@@ -1,0 +1,34 @@
+{% extends "base_auth.html" %}
+
+{% block auth_title %}You've been invited{% endblock %}
+
+{% block auth_body %}
+<div style="text-align:center;margin-bottom:1.5rem">
+  <span class="material-symbols-outlined" style="font-size:2.5rem;color:var(--primary)">group_add</span>
+  <h2 style="margin:0.5rem 0 0.25rem;font-size:1.2rem;font-weight:700">Join {{ invitation.tenant.name }}</h2>
+  <p style="color:var(--muted);font-size:0.88rem;margin:0">
+    You've been invited to join this community by {{ invitation.invited_by.display_name|default:invitation.invited_by.email }}.
+  </p>
+</div>
+
+{% if user_authenticated %}
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-primary" style="width:100%;padding:0.7rem;font-size:1rem">
+    Accept Invitation
+  </button>
+</form>
+{% else %}
+<p style="font-size:0.88rem;color:var(--muted);text-align:center;margin-bottom:1rem">
+  You need to be logged in to accept this invitation.
+</p>
+<a href="/accounts/login/?next=/tenants/invite/accept/{{ invitation.token }}/"
+   class="btn btn-primary" style="display:block;text-align:center;padding:0.7rem">
+  Log in to Accept
+</a>
+<a href="/accounts/signup/?next=/tenants/invite/accept/{{ invitation.token }}/"
+   style="display:block;text-align:center;margin-top:0.75rem;font-size:0.88rem;color:var(--muted)">
+  No account? Register first
+</a>
+{% endif %}
+{% endblock %}

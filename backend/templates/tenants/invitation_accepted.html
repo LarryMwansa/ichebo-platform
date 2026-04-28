@@ -1,0 +1,19 @@
+{% extends "base_auth.html" %}
+
+{% block auth_title %}Welcome!{% endblock %}
+
+{% block auth_body %}
+<div style="text-align:center">
+  <span class="material-symbols-outlined" style="font-size:2.5rem;color:var(--success)">check_circle</span>
+  <h2 style="margin:0.5rem 0 0.25rem;font-size:1.2rem;font-weight:700">You've joined {{ tenant.name }}</h2>
+  <p style="color:var(--muted);font-size:0.88rem;margin:0 0 1.5rem">
+    You are now an active member of this community.
+  </p>
+  <a href="{% url 'community:community-home' %}" class="btn btn-primary" style="display:block;text-align:center;padding:0.65rem">
+    Go to Community
+  </a>
+  <a href="{% url 'dashboard:index' %}" style="display:block;text-align:center;margin-top:0.75rem;font-size:0.88rem;color:var(--muted)">
+    Back to Dashboard
+  </a>
+</div>
+{% endblock %}
