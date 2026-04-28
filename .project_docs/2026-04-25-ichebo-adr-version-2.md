@@ -190,3 +190,65 @@ Currently, Activity links to Records via loose metadata keys (`metadata['program
 - Bundled with data contract v10
 
 ### ADR Status: Approved — Version 2 Phase 1
+
+---
+
+## ADR-011: Qualification Programme Structure — KGS Names, Six Levels, and Induction as Course
+
+### Context
+
+The roadmap and data contract (v10, Part 12.3–12.4) described five qualification programmes using generic academic names (Certificate → Doctorate) and three separate induction programmes (Reconditioning Programme, Beginners Programme, Community Programme) seeded as standalone `record_type: "programme"` records. Review of the authoritative KGS documents — `Oveview_Main Learning Programmes.md`, `Pathways Competence Levels Qualification Programmes, and Roles.md`, and `kingdom-governance-system_v1.md` — reveals these as placeholders that do not reflect the KGS formation architecture.
+
+### Decision
+
+**1. Six programmes, not five.** Level 0 is a real formation level with its own programme record. The full set is:
+
+| Level | Programme Name                                            | KGS Qualification     | Duration                      |
+| ----- | --------------------------------------------------------- | --------------------- | ----------------------------- |
+| 0     | New Life Programme (entry via Induction Training course)  | Certificate (Entrant) | 12 weeks (Induction) + 1 year |
+| 1     | New Life Programme                                        | Certificate           | 1 year                        |
+| 2     | Foundation Programme                                      | Diploma               | 3 years                       |
+| 3     | Leaders Programme                                         | Degree                | 6–12 months                   |
+| 4     | Builders Programme                                        | Masters               | 6–12 months                   |
+| 5     | Architect's Programme                                     | Doctorate             | 2 years                       |
+
+All five named programmes (Levels 1–5) are seeded as system Records (`record_family: "learning"`, `record_type: "programme"`, `origin: "system"`). Level 0 entry is handled through the Induction Training course within the New Life Programme.
+
+**2. Induction Training is a course, not a programme.** The three previously specified standalone induction programmes (Reconditioning Programme, Beginners Programme, Community Programme) are retired as separate records. They are replaced by a single course record — `Induction Training` — seeded as `record_type: "course"` and linked to the New Life Programme via `Relationship (part_of)`. Its four modules are seeded as `record_type: "lesson"` records:
+
+| Lesson                                                | Covers                       |
+| ----------------------------------------------------- | ---------------------------- |
+| Keys To the Kingdom                                   | Beginners pathway foundation |
+| Repentance & Reformation                              | Reconditioning pathway       |
+| Community Programme                                   | Sceptre Community life       |
+| The Secret of Living a Fulfilled Life (HAL Beginners) | Practical formation          |
+
+All entrant types (existing believers and newcomers) complete all four lessons. The `induction_pathway` field on User records background only — it does not gate individual lessons.
+
+**3. KGS programme names replace academic placeholders.** "Certificate", "Diploma", "Degree", "Masters", "Doctorate" were interim labels. The canonical KGS names above are used in all UI display, seed data, and documentation from V2.1 onward.
+
+**4. Pathways are multi-valued per programme.** Each programme record carries `custom_fields.kgs_pathways` (array) rather than a single pathway value:
+
+| Programme             | kgs_pathways                                                |
+| --------------------- | ----------------------------------------------------------- |
+| New Life Programme    | `["new_life", "community_life", "learning"]`                |
+| Foundation Programme  | `["spiritual_formation", "service", "mission", "learning"]` |
+| Leaders Programme     | `["leadership", "service", "learning"]`                     |
+| Builders Programme    | `["leadership", "apostolic_stewardship"]`                   |
+| Architect's Programme | `["leadership", "apostolic_stewardship"]`                   |
+
+**5. Curriculum is open — not locked at seed time.** Seeded programme and course records are created with `status: "active"` but are not locked governance records. Level 4+ authors can add courses and lessons to any programme post-seed. Level 5 locks governance records — learning content follows its own lifecycle (`draft → active`), not the governance lifecycle. The seed commands establish structure; they do not freeze it.
+
+**6. The 24 Service Orders are the controlled vocabulary for `UserPermission.metadata.service_order`.** No model change required. The 24 Order names (from `Pathways Competence Levels Qualification Programmes, and Roles.md`) are referenced as the valid values. UI dropdowns built in V2.3+.
+
+**7. The 12 Administrative Offices are deferred to V2.5+.** They are modelled as Agency-level tenants (`/global/agency/{office-slug}/`) under the existing tenant hierarchy. No new models required. This is a seed data and tenant creation task, not an architectural change.
+
+### Consequences
+
+- `seed_programmes` management command updated to seed 5 named programmes (Levels 1–5) with KGS names and multi-pathway tags
+- `seed_induction_course` management command created: seeds Induction Training course + 4 lessons inside New Life Programme
+- Data contract v10 Part 12.3 and 12.4 superseded by this ADR for programme names and induction structure
+- No model changes required — existing `Record`, `Relationship`, and `Activity` models support this fully
+- `induction_pathway` on User is retained as background metadata (not a content gate)
+
+### ADR Status: Approved — Version 2 Phase V2.1

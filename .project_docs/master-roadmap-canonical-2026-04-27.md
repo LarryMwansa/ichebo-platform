@@ -1504,33 +1504,57 @@ sudo chown scepter:scepter /var/log/ics
 
 **Entry requirement:** S.1 + S.2 complete. This is the most important phase in Version 2. The Induction System depends on it. Do not start Induction until Learn is complete and tested.
 
+**ADR reference:** ADR-011 governs all programme names, induction structure, and curriculum extensibility decisions in this phase.
+
 ### V2.1.1 — Five Qualification Programmes (Seeded)
 
 ```python
 # python manage.py seed_programmes
 ```
 
-| Programme | Level | Duration | Prerequisites |
-|-----------|-------|----------|---------------|
-| Certificate | 1 | 1 year | None |
-| Diploma | 2 | 3 years | Certificate |
-| Degree | 3 | 4 years | Diploma |
-| Masters | 4 | 4–5 years | Degree |
-| Doctorate | 5 | 7 years | Masters |
+| Level | Programme Name        | KGS Qualification | Pathways                                              | Duration    | Prerequisites       |
+| ----- | --------------------- | ----------------- | ----------------------------------------------------- | ----------- | ------------------- |
+| 1     | New Life Programme    | Certificate       | New Life; Community Life; Learning & Qualification    | 1 year      | Induction Training  |
+| 2     | Foundation Programme  | Diploma           | Spiritual Formation; Service; Mission; Learning       | 3 years     | New Life Programme  |
+| 3     | Leaders Programme     | Degree            | Leadership; Service; Learning & Qualification         | 6–12 months | Foundation Programme|
+| 4     | Builders Programme    | Masters           | Leadership; Apostolic Stewardship                     | 6–12 months | Leaders Programme   |
+| 5     | Architect's Programme | Doctorate         | Leadership; Apostolic Stewardship                     | 2 years     | Builders Programme  |
 
-Seeded as system Records (`record_family: "learning"`, `record_type: "programme"`, `origin: "system"`).
+Seeded as system Records (`record_family: "learning"`, `record_type: "programme"`, `origin: "system"`). Each record carries `custom_fields.kgs_pathways` (array of pathway slugs) and `custom_fields.kgs_qualification` (display label).
 
-### V2.1.2 — Three Induction Programmes (Seeded, Induction Tenant scope)
+**Curriculum is open.** Seeded records are `status: "active"` but not locked. Level 4+ authors can add courses and lessons to any programme after seeding. The seed command establishes structure — it does not freeze it.
+
+### V2.1.2 — Induction Training Course (Seeded inside New Life Programme)
+
+> **Supersedes:** The previous spec of three standalone induction programmes (Reconditioning Programme, Beginners Programme, Community Programme). See ADR-011.
 
 ```python
-# python manage.py seed_induction_programmes
+# python manage.py seed_induction_course
 ```
 
-| Programme | Entrant type | Court |
-|-----------|-------------|-------|
-| Reconditioning Programme | Existing believers | Outer Court |
-| Beginners Programme | Kingdom-curious newcomers | Outer Court |
-| Community Programme | All inductees | Inner Court (auto-enrolled on Outer Court completion) |
+Induction Training is a `record_type: "course"` seeded inside the New Life Programme via `Relationship (part_of)`. It is the entry point for all Level 0 entrants — both existing believers and newcomers complete all four lessons.
+
+| Lesson                                                | What it covers                |
+| ----------------------------------------------------- | ----------------------------- |
+| Keys To the Kingdom                                   | Beginners pathway foundation  |
+| Repentance & Reformation                              | Reconditioning pathway        |
+| Community Programme                                   | Sceptre Community life        |
+| The Secret of Living a Fulfilled Life (HAL Beginners) | Practical formation           |
+
+`induction_pathway` on the User model records the entrant's background (`"reconditioning"` or `"beginners"`) for context and reporting — it does not gate individual lessons. All lessons are required for all entrants.
+
+**Structure:**
+
+```text
+Record (programme)  →  New Life Programme          [Level 1, origin: system]
+  Record (course)   →  Induction Training           [part_of → New Life Programme]
+    Record (lesson) →  Keys To the Kingdom
+    Record (lesson) →  Repentance & Reformation
+    Record (lesson) →  Community Programme
+    Record (lesson) →  The Secret of Living a Fulfilled Life
+  Record (course)   →  What the Bible Says About... [further New Life courses — authored post-seed]
+  ...
+```
 
 ### V2.1.3 — URL Video Embed Player
 

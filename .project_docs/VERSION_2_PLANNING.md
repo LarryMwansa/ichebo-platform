@@ -5,6 +5,7 @@
 > **Status:** Revised — grounded in KGS framework, Sceptre Community Programme concept note, and Chizola's onboarding direction
 >
 > **v2.0 Changes from v1.0:**
+>
 > - Induction system redesigned to reflect the 12-week Level 0 Induction Tenant model
 > - Learn App (F1–F11 qualification framework) moved into Version 2 as a foundational dependency
 > - Competence advancement changed from automated lesson counting to steward-governed programme completion
@@ -26,41 +27,54 @@
 
 Before reading the phases, this architecture must be understood. Every feature in Version 2 is in service of this structure.
 
-```
-KGS Layer
-  └── Apostles Programme (7-year mission container)
-        └── Qualification Programmes: Certificate → Diploma → Degree → Masters → Doctorate
+> **ADR-011 governs all programme names, induction structure, and curriculum decisions.** Read it before coding anything in this section.
 
+### KGS Programme Stack (canonical — ADR-011)
+
+| Level | Programme Name        | KGS Qualification | Pathways                                           | Duration    |
+| ----- | --------------------- | ----------------- | -------------------------------------------------- | ----------- |
+| 0     | (Induction Training)  | Certificate entry | New Life; Community Life                           | 12 weeks    |
+| 1     | New Life Programme    | Certificate       | New Life; Community Life; Learning & Qualification | 1 year      |
+| 2     | Foundation Programme  | Diploma           | Spiritual Formation; Service; Mission; Learning    | 3 years     |
+| 3     | Leaders Programme     | Degree            | Leadership; Service; Learning & Qualification      | 6–12 months |
+| 4     | Builders Programme    | Masters           | Leadership; Apostolic Stewardship                  | 6–12 months |
+| 5     | Architect's Programme | Doctorate         | Leadership; Apostolic Stewardship                  | 2 years     |
+
+**Induction Training** is a `record_type: "course"` inside New Life Programme — not a standalone programme. All four lessons are required for all entrant types:
+
+- Keys To the Kingdom *(Beginners foundation)*
+- Repentance & Reformation *(Reconditioning pathway)*
+- Community Programme *(Sceptre Community life)*
+- The Secret of Living a Fulfilled Life — HAL Beginners *(Practical formation)*
+
+`induction_pathway` on the User model records background (`"reconditioning"` / `"beginners"`) for context only — it does not gate individual lessons.
+
+```text
 Platform Layer
   └── Induction Tenant (Level 0 — 12 weeks)
-        ├── Outer Court: Reconditioning Programme (existing believers)
-        ├── Outer Court: Beginners Programme (kingdom-curious newcomers)
-        └── Inner Court: Community Programme (how a Sceptre Community operates)
-              └── Assessment: gifting, skills, capacity, placement readiness
-                    └── ✓ Induction Complete → Geographic tenant placement → Level 1
+        └── New Life Programme → Induction Training course (all 4 lessons)
+              └── ✓ Complete + Steward confirms → Geographic tenant placement → Level 1
 
   └── Home Tenant (Level 1+)
-        └── Certificate Programme (Learn App — 1 year)
+        └── New Life Programme (Certificate — 1 year)
               └── ✓ Complete + Steward confirms → Level 2
-        └── Diploma Programme (Learn App — 3 years)
+        └── Foundation Programme (Diploma — 3 years)
               └── ✓ Complete + Steward confirms → Level 3
-        └── [Degree / Masters / Doctorate continue the pattern]
+        └── Leaders / Builders / Architect's continue the pattern → Levels 4, 5
 ```
 
-**Two entrant types (both enter through the same Induction Tenant):**
+**Curriculum is open.** Seeded programme and course records are `status: "active"` but not locked. Level 4+ authors add courses and lessons post-seed. The seed establishes structure — it does not freeze it.
 
-| Entrant | Background | Induction Programme |
-|---------|------------|---------------------|
-| Existing believer | Church background, needs reorientation to KGS decentralised model | Reconditioning Programme |
-| Kingdom-curious | New to faith or new to this movement | Beginners Programme |
+**The 24 Service Orders** (from KGS Service Domains) are the controlled vocabulary for `UserPermission.metadata.service_order`. No model change needed — stored as free text now, dropdown UI in V2.3+.
 
-Both complete the Community Programme (Inner Court) before placement.
+**The 12 Administrative Offices** are deferred to V2.5+, modelled as Agency-level tenants under `/global/agency/`.
 
 ---
 
 ## Phase 1 (Version 2.0) — Learn App Foundation
 
 ### Why first?
+
 Induction requires course delivery. The 12-week Induction Tenant cannot run without the Learn App's ability to serve programmes, courses, and lessons. This is the foundational infrastructure. All other phases sit on it.
 
 The Learn App was designed with the full qualification framework (F1–F11) in the existing system design document. Version 2 builds it in full, not as a subset.
@@ -83,38 +97,44 @@ The learning stack as defined in the Learn App system design:
 - `part_of` Relationship graph: lesson → course → programme
 - `Relationship.type: "tracks"` linking progress Activities to content Records
 
-**Five Qualification Programmes (seeded as system records):**
+**Five Qualification Programmes (seeded as system records via `seed_programmes`):**
 
-| Programme | Competence Level | Duration | Prerequisites |
-|-----------|-----------------|----------|---------------|
-| Certificate | Level 1 | 1 year | None |
-| Diploma | Level 2 | 3 years | Certificate |
-| Degree | Level 3 | 4 years | Diploma + Certificate |
-| Masters | Level 4 | 4–5 years | Degree + all prior |
-| Doctorate | Level 5 | 7 years total | Masters + all prior |
+| Level | Programme Name        | KGS Qualification | Duration    | Prerequisites        |
+| ----- | --------------------- | ----------------- | ----------- | -------------------- |
+| 1     | New Life Programme    | Certificate       | 1 year      | Induction Training   |
+| 2     | Foundation Programme  | Diploma           | 3 years     | New Life Programme   |
+| 3     | Leaders Programme     | Degree            | 6–12 months | Foundation Programme |
+| 4     | Builders Programme    | Masters           | 6–12 months | Leaders Programme    |
+| 5     | Architect's Programme | Doctorate         | 2 years     | Builders Programme   |
+
+Each programme record carries `custom_fields.kgs_pathways` (array) and `custom_fields.kgs_qualification` (display label).
 
 **Eight KGS Pathways surfaced per programme:**
 
-| Pathway                  | Programmes                                       |
-| ------------------------ | ------------------------------------------------ |
-| New Life                 | Certificate                                      |
-| Community Life           | Certificate                                      |
-| Learning & Qualification | Certificate, Diploma, Degree, Masters, Doctorate |
-| Spiritual Formation      | Diploma                                          |
-| Service                  | Diploma                                          |
-| Mission                  | Diploma                                          |
-| Leadership               | Degree, Masters, Doctorate                       |
-| Apostolic Stewardship    | Masters, Doctorate                               |
+| Pathway                  | Programmes                                                       |
+| ------------------------ | ---------------------------------------------------------------- |
+| New Life                 | New Life Programme                                               |
+| Community Life           | New Life Programme                                               |
+| Learning & Qualification | New Life, Foundation, Leaders, Builders, Architect's             |
+| Spiritual Formation      | Foundation Programme                                             |
+| Service                  | Foundation Programme, Leaders Programme                          |
+| Mission                  | Foundation Programme                                             |
+| Leadership               | Leaders Programme, Builders Programme, Architect's Programme     |
+| Apostolic Stewardship    | Builders Programme, Architect's Programme                        |
 
-**Induction Tenant programmes (seeded separately, Level 0 scope):**
+**Induction Training course (seeded via `seed_induction_course`, inside New Life Programme):**
 
-| Programme | Entrant type | Court |
-|-----------|-------------|-------|
-| Reconditioning Programme | Existing believers | Outer Court |
-| Beginners Programme | Kingdom-curious | Outer Court |
-| Community Programme | All inductees | Inner Court |
+| Lesson                                                | Covers                        |
+| ----------------------------------------------------- | ----------------------------- |
+| Keys To the Kingdom                                   | Beginners pathway foundation  |
+| Repentance & Reformation                              | Reconditioning pathway        |
+| Community Programme                                   | Sceptre Community life        |
+| The Secret of Living a Fulfilled Life (HAL Beginners) | Practical formation           |
+
+All four lessons required for all entrant types. `induction_pathway` on User is background metadata only.
 
 **Files to create / modify:**
+
 - `learn/models.py` — `CertificationConfirmation` model
 - `learn/serializers.py` — full DRF serializers for all learning record types
 - `learn/views.py` — DRF ViewSets: Programme, Course, Lesson, Assessment, Certification
@@ -124,6 +144,7 @@ The learning stack as defined in the Learn App system design:
 - Database migration: `CertificationConfirmation` table
 
 **Acceptance criteria:**
+
 - All five qualification programmes can be seeded and retrieved via API
 - Courses and lessons can be authored and linked via `part_of` Relationships
 - Enrolment creates a programme Activity with nested course and lesson Activities
@@ -151,6 +172,7 @@ The learning stack as defined in the Learn App system design:
 - **F11 — My Learning Dashboard:** Active enrolments, certifications, formation summary.
 
 **Views:**
+
 - `GET /learn/` — My Learning Dashboard
 - `GET /learn/catalogue/` — Programme catalogue
 - `GET /learn/programme/{id}/` — Programme detail
@@ -163,6 +185,7 @@ The learning stack as defined in the Learn App system design:
 - `POST /learn/htmx/certification/{id}/confirm/` — Confirm certification
 
 **Files to create:**
+
 - `templates/learn/dashboard.html`
 - `templates/learn/catalogue.html`
 - `templates/learn/programme_detail.html`
@@ -177,6 +200,7 @@ The learning stack as defined in the Learn App system design:
 - `templates/learn/handbook_review.html` (Level 5)
 
 **Acceptance criteria:**
+
 - Seeker (Level 0b) can browse catalogue but cannot enrol
 - Member (Level 1+) can enrol and track progress
 - Level 4+ can author content
@@ -270,6 +294,7 @@ When building:
 ## Phase 2 (Version 2.1) — Induction System
 
 ### Why second?
+
 With the Learn App operational, the Induction Tenant can be built properly — as a real 12-week formation environment served by real courses, not a placeholder form flow. Induction is the true entry point of the platform.
 
 ---
@@ -282,6 +307,7 @@ With the Learn App operational, the Induction Tenant can be built properly — a
 The Induction Tenant is the "Outer Court of the Gentiles" — the preparatory space where every new entrant is received, oriented, and formed before being placed in their long-term community. It is not a community in the KGS sense; it is an onboarding environment.
 
 **Tenant definition:**
+
 ```python
 InductionTenant = {
   name: "Induction",
@@ -299,18 +325,21 @@ InductionTenant = {
 ```
 
 **Data model changes:**
+
 - Add `"induction"` to `Tenant.tier` enum
 - Add `induction_enrolled_at` to `User` model
 - Add `induction_completed_at` to `User` model
 - Add `induction_pathway` field to `User` or `UserProfile`: `"reconditioning" | "beginners" | null`
 
 **Files to create / modify:**
+
 - `tenants/models.py` — add `"induction"` to tier choices
 - `accounts/models.py` — add induction fields
 - `tenants/management/commands/seed_induction_tenant.py` — seed command
 - Database migration
 
 **Acceptance criteria:**
+
 - Induction Tenant exists at `/global/induction/` with correct tier
 - Cannot be deleted, renamed, or modified via normal UI flows
 - All new users automatically placed here on first login (see G2)
@@ -324,12 +353,14 @@ InductionTenant = {
 **Three-step flow:**
 
 **Step 1 — Sign-up:**
+
 - Email + password registration (standard Django auth)
 - Email verification
 - No competence level assigned
 - User status: `"seeker"`
 
 **Step 2 — Profile Registration:**
+
 - Full profile: name, location (country/province/city), phone, date of birth
 - Entrant type selection: "I am already part of a church or faith community" (Reconditioning) vs "I am new to this and exploring" (Beginners)
 - Gifting, skills, occupation, capacity fields (initial self-assessment — used for eventual placement)
@@ -337,12 +368,14 @@ InductionTenant = {
 - Saved to `UserProfile`
 
 **Step 3 — Tenant Placement (Induction):**
+
 - `UserPermission` row created: `tenant_path = "/global/induction/"`, `level = 0`, `role = "seeker"`, `is_active = True`
 - `induction_enrolled_at` set on User
 - `induction_pathway` set based on entrant type selection
 - User redirected to Induction Dashboard
 
 **Views:**
+
 - `GET /accounts/register/` — sign-up form
 - `POST /accounts/register/` — create user, send verification email
 - `GET /accounts/verify-email/{token}/` — verify, redirect to profile
@@ -351,6 +384,7 @@ InductionTenant = {
 - `GET /accounts/welcome/` — induction welcome / orientation
 
 **Files to create / modify:**
+
 - `accounts/views.py` — registration, profile setup views
 - `accounts/forms.py` — RegistrationForm, ProfileSetupForm
 - `templates/accounts/register.html`
@@ -358,6 +392,7 @@ InductionTenant = {
 - `templates/accounts/welcome.html`
 
 **Acceptance criteria:**
+
 - New user completes registration → profile → placed in Induction Tenant in one uninterrupted flow
 - Entrant type drives which induction programme they are enrolled in (G3)
 - User sees Induction Dashboard on first login thereafter
@@ -370,14 +405,15 @@ InductionTenant = {
 
 **Enrolment logic (triggered by G2 placement):**
 
-| Entrant type | Outer Court programme | Inner Court programme |
-|---|---|---|
-| Reconditioning | Reconditioning Programme | Community Programme |
-| Beginners | Beginners Programme | Community Programme |
+| Entrant type   | Outer Court programme    | Inner Court programme |
+| -------------- | ------------------------ | --------------------- |
+| Reconditioning | Reconditioning Programme | Community Programme   |
+| Beginners      | Beginners Programme      | Community Programme   |
 
 Both are enrolled in sequence. Community Programme enrolment is triggered on completion of their Outer Court programme.
 
 **12-week structure:**
+
 - Weeks 1–6: Outer Court (Reconditioning or Beginners Programme)
 - Weeks 7–12: Inner Court (Community Programme)
 - Final week: Gifting and placement readiness assessment
@@ -385,17 +421,20 @@ Both are enrolled in sequence. Community Programme enrolment is triggered on com
 This is implemented entirely via the Learn App (L1–L2). The induction system calls the enrolment service with the appropriate programme IDs.
 
 **Induction Dashboard (surface within the Learn App for induction-tenanted users):**
+
 - Current programme with progress
 - Weeks remaining estimate
 - Orientation materials (static content or first lesson of Beginners/Reconditioning)
 - Upcoming induction gatherings (Community App integration — later)
 
 **Files to create / modify:**
+
 - `learn/service.py` — `enrol_induction_programmes(user, pathway)` function
 - `accounts/views.py` — call enrolment service on profile setup completion
 - `templates/learn/induction_dashboard.html`
 
 **Acceptance criteria:**
+
 - Every new user is automatically enrolled in the correct Outer Court programme
 - Completing Outer Court triggers Community Programme enrolment
 - Induction Dashboard shows correct programme and progress
@@ -423,17 +462,20 @@ This is implemented entirely via the Learn App (L1–L2). The induction system c
    - Logs to ActivityLog: "Induction completed — placed in {tenant}"
 
 **Placement assignment:**
+
 - Steward selects the appropriate geographic tenant from the tenant directory during confirmation
 - Matching logic: user's location (country/province/city from profile) narrows the tenant list
 - Steward makes the final placement decision
 
 **Views:**
+
 - `GET /learn/induction/review/` — steward: list of users pending induction confirmation
 - `GET /learn/induction/review/{user_id}/` — steward: individual review with profile + progress
 - `POST /learn/htmx/induction/confirm/{user_id}/` — steward confirms, select placement tenant
 - `GET /accounts/formation/` — user: post-placement welcome and Level 1 orientation
 
 **Files to create / modify:**
+
 - `learn/views.py` — induction review views
 - `templates/learn/induction_review_queue.html`
 - `templates/learn/induction_review_detail.html`
@@ -441,6 +483,7 @@ This is implemented entirely via the Learn App (L1–L2). The induction system c
 - `templates/accounts/formation.html`
 
 **Acceptance criteria:**
+
 - Steward can see all users pending induction confirmation
 - Steward can review profile + programme completion data
 - Confirming placement sets Level 1, deactivates Induction Tenant permission, creates home tenant permission
@@ -449,6 +492,7 @@ This is implemented entirely via the Learn App (L1–L2). The induction system c
 ---
 
 ### Summary: Phase 2 (G1–G4)
+
 - **Commits:** 4 (Induction Tenant seed, sign-up + profile, programme enrolment, completion + placement)
 - **Effort:** ~35% of Version 2 velocity
 - **Dependencies:** Requires Phase 1 (Learn App must exist for induction programmes to run)
@@ -458,6 +502,7 @@ This is implemented entirely via the Learn App (L1–L2). The induction system c
 ## Phase 3 (Version 2.2) — Competence Level UI & Formation Dashboard
 
 ### Why third?
+
 Once users are being inducted and placed, the formation journey needs to be visible to them. This phase surfaces that journey in the UI and connects the Learn App's competence advancement to the user's profile and community.
 
 ---
@@ -467,6 +512,7 @@ Once users are being inducted and placed, the formation journey needs to be visi
 **Goal:** Users see their current level, active programme, progress toward the next level, and their formation history.
 
 **Features:**
+
 - Level badge in navbar (current level — visual: coloured badge 1–5)
 - "Your Formation Journey" card on dashboard:
   - Current competence level with KGS name (e.g. "Foundational Disciple")
@@ -477,20 +523,24 @@ Once users are being inducted and placed, the formation journey needs to be visi
 - "Level up requirements" modal (on level badge click)
 
 **Data sources:**
+
 - `User.competence_level` for current level
 - `CertificationConfirmation` records for history
 - Active `activity_type: "programme"` Activity for current enrolment
 
 **Views:**
+
 - `GET /accounts/formation/` — full formation history
 - `GET /learn/htmx/formation-card/` — HTMX dashboard card partial
 
 **Files to create / modify:**
+
 - `templates/accounts/_formation_card.html` (HTMX partial)
 - `templates/accounts/formation_history.html`
 - `accounts/views.py` — formation_detail view
 
 **Acceptance criteria:**
+
 - Member sees current level, active programme progress, and next level requirement
 - Dashboard card updates via HTMX without full page reload
 - Formation history shows accurate timeline
@@ -503,27 +553,30 @@ Once users are being inducted and placed, the formation journey needs to be visi
 
 **Access levels per app:**
 
-| App | Minimum level | Notes |
-|-----|-------------|-------|
-| Bible | 0b (Seeker) | Always accessible |
-| Learn | 0b (Seeker) | Browse only; enrol at Level 1 |
-| Activity | 1 | Full access at Level 1 |
-| Community | 1 | My Community at Level 1; Management at Level 3 |
-| Governance | 3 | Reference Library at Level 3; Mandate at Level 4 |
-| Paraclete | 1 | Level 1+ |
+| App        | Minimum level | Notes                                            |
+| ---------- | ------------- | ------------------------------------------------ |
+| Bible      | 0b (Seeker)   | Always accessible                                |
+| Learn      | 0b (Seeker)   | Browse only; enrol at Level 1                    |
+| Activity   | 1             | Full access at Level 1                           |
+| Community  | 1             | My Community at Level 1; Management at Level 3   |
+| Governance | 3             | Reference Library at Level 3; Mandate at Level 4 |
+| Paraclete  | 1             | Level 1+                                         |
 
 **Drawer behaviour:**
+
 - Available apps: rendered normally, clickable
 - Locked apps: shown with lock icon and tooltip "Requires Level X"
 - Click on locked app: modal explaining requirement + "Here is what you need to do"
 
 **Files to create / modify:**
+
 - `templates/partials/app_drawer.html` — conditional rendering
 - `templates/partials/_app_locked_modal.html` — info modal
 - `frontend/settings.py` — `APP_LEVEL_REQUIREMENTS` dict or equivalent
 - `accounts/context_processors.py` — expose level to all templates
 
 **Acceptance criteria:**
+
 - Drawer correctly shows/hides apps by level for all 6 level states
 - Locked state is clear and informative, not punishing
 - User sees a path to unlock (points to Learn App)
@@ -531,6 +584,7 @@ Once users are being inducted and placed, the formation journey needs to be visi
 ---
 
 ### Summary: Phase 3 (H1–H2)
+
 - **Commits:** 2 (formation dashboard, drawer gating)
 - **Effort:** ~15% of Version 2 velocity
 - **Dependencies:** Requires Phase 2 (users must have levels from induction)
@@ -540,6 +594,7 @@ Once users are being inducted and placed, the formation journey needs to be visi
 ## Phase 4 (Version 2.3) — Tenant Self-Service & Hierarchy
 
 ### Why fourth?
+
 Once users are being inducted, placed, and progressing in their formation, the platform needs to support the growth of the network: new tenants being created, communities forming collectives, and members joining via invitation.
 
 ---
@@ -549,6 +604,7 @@ Once users are being inducted, placed, and progressing in their formation, the p
 **Goal:** Stewards can create new Sceptre Community tenants, set their position in the hierarchy, and manage their members.
 
 **Features:**
+
 - `/tenants/create/` form (Level 3+ only): name, slug, tier, parent tenant, description, location, logo
 - Tenant dashboard at `/tenants/{slug}/`
 - Settings panel: name, description, logo, visibility
@@ -556,6 +612,7 @@ Once users are being inducted, placed, and progressing in their formation, the p
 - `TenantInvitation` model: tenant, email, invited_by, accepted_at, status
 
 **Acceptance criteria:**
+
 - Level 3+ can create tenants with correct tier and parent path
 - Invitations work end-to-end (invite → email → accept → UserPermission created)
 - Tenant hierarchy correctly reflected in materialized path
@@ -567,10 +624,12 @@ Once users are being inducted, placed, and progressing in their formation, the p
 **Goal:** Governance and Learn content respects tenant boundaries. Users see only content from their tenant(s).
 
 **Features:**
+
 - Governance records filtered by user's tenant(s)
 - Learn content filtered by user's tenant(s) (Handbook-governed content visible to Level 4+ across all tenants)
 
 **Acceptance criteria:**
+
 - Users only see content from their tenant scope
 - Level 5 has cross-tenant visibility where appropriate
 - Filters apply consistently across all content surfaces
@@ -578,6 +637,7 @@ Once users are being inducted, placed, and progressing in their formation, the p
 ---
 
 ### Summary: Phase 4 (I1–I2)
+
 - **Commits:** 2 (tenant management, multi-tenant content)
 - **Effort:** ~10% of Version 2 velocity
 - **Dependencies:** Requires Phase 2 (users need levels and home tenants for tenant creation to be meaningful)
@@ -586,7 +646,7 @@ Once users are being inducted, placed, and progressing in their formation, the p
 
 ## Implementation Roadmap
 
-```
+```text
 MVP (COMPLETE — 6c43ce9)
 
 Version 2.0 — Learn App Foundation
@@ -612,12 +672,12 @@ Version 2.3 — Tenant Self-Service
 
 ## Effort Estimation
 
-| Phase | Features | Commits | Weeks* | Notes |
-|-------|----------|---------|--------|-------|
-| 2.0 | Learn App (L1–L2) | 2 | 3–4 | Largest single build — full qualification framework |
-| 2.1 | Induction (G1–G4) | 4 | 2–3 | Depends on Phase 2.0 |
-| 2.2 | Formation UI (H1–H2) | 2 | 1 | Mostly template work |
-| 2.3 | Tenants (I1–I2) | 2 | 2 | Model additions + UI |
+| Phase | Features             | Commits | Weeks* | Notes                                                |
+| ----- | -------------------- | ------- | ------ | ---------------------------------------------------- |
+| 2.0   | Learn App (L1–L2)    | 2       | 3–4    | Largest single build — full qualification framework  |
+| 2.1   | Induction (G1–G4)    | 4       | 2–3    | Depends on Phase 2.0                                 |
+| 2.2   | Formation UI (H1–H2) | 2       | 1      | Mostly template work                                 |
+| 2.3   | Tenants (I1–I2)      | 2       | 2      | Model additions + UI                                 |
 
 *Estimates assume 1 developer, daily testing, minimal QA
 
@@ -626,23 +686,27 @@ Version 2.3 — Tenant Self-Service
 ## Success Metrics
 
 ### After Phase 2.0 (Learn App)
+
 - All five qualification programmes browsable and enrollable
 - Lesson completion and progress tracking working end-to-end
 - Steward can confirm certifications, advancing competence level
 - Level 4+ can author content; Level 5 can approve it
 
 ### After Phase 2.1 (Induction)
+
 - Every new user lands in the Induction Tenant automatically
 - Reconditioning and Beginners pathways serve different programmes
 - Steward can confirm induction completion and place users in their home tenant
 - No user enters a community without completing induction
 
 ### After Phase 2.2 (Formation UI)
+
 - Users can see their level, programme, and progress at a glance
 - App drawer correctly reflects access by level
 - Users understand the path to unlock new apps
 
 ### After Phase 2.3 (Tenants)
+
 - New Sceptre Communities can be established digitally
 - Tenant hierarchy grows through Level 3+ steward action
 - Content scoping works correctly across tenants
@@ -652,7 +716,7 @@ Version 2.3 — Tenant Self-Service
 ## Risk & Mitigation
 
 | Risk | Impact | Mitigation |
-|------|--------|-----------|
+| ---- | ------ | ---------- |
 | Learn App is larger than expected | High | System design already locked (v2). Build against that spec. Do not scope-creep in this phase. |
 | Induction programme content not ready when system is built | Medium | System must be built first. Content (lessons, assignments) is authored by Level 4+ after the app exists. Seed with placeholder content. |
 | Profile registration fields unclear (gifting/skills) | Medium | Chizola to confirm exact fields before G2 build begins. Mark as decision required. |
@@ -672,7 +736,7 @@ Version 2.3 — Tenant Self-Service
 
 ## Branch Structure
 
-```
+```text
 main                      ← production
 ├─ mvp                    ← MVP complete (6c43ce9) [frozen]
 └─ version-2              ← all v2 work branches from here
@@ -711,6 +775,47 @@ main                      ← production
    - Beginners Programme: structure and placeholder lessons
    - Community Programme: structure and placeholder lessons
    - *Full lesson content authored by Level 4+ users once platform is live*
+
+---
+
+## V2.1 Build Assignments
+
+Concrete task checklist for the first build sprint. Branches and acceptance criteria are defined in L1–L4 and G1–G4 above.
+
+### Phase 2.0 — Learn App (branch: `version-2-l1`, `version-2-l2`)
+
+- [ ] Create `learn/` Django app with `CertificationConfirmation` model and migration
+- [ ] Write `learn/serializers.py` — Programme, Course, Lesson, Assessment, Certification
+- [ ] Write `learn/views.py` — DRF ViewSets for all learning record types
+- [ ] Write `learn/urls.py` — API routing under `/api/learn/`
+- [ ] Write `learn/service.py` — enrolment logic, prerequisite checks, certification trigger
+- [ ] Write `learn/signals.py` — programme completion → draft certification Record
+- [ ] Write `seed_programmes` management command — seeds 5 KGS-named programmes (Levels 1–5) with `kgs_pathways` and `kgs_qualification` in `custom_fields`
+- [ ] Write `seed_induction_course` management command — seeds Induction Training course + 4 lessons inside New Life Programme
+- [ ] Build Learn App UI (L2): catalogue, enrolment, lesson viewer, certification queue, authorship forms
+- [ ] Build video embed utility (`core/utils/video.py`) + `templates/video/_player.html` partial
+- [ ] Register `CertificationConfirmation` in `learn/admin.py` (L3 carry-forward)
+- [ ] Add `htmx_submit_assessment` view + URL (L3 carry-forward)
+- [ ] Add `htmx_settings_bible` view + URL in `accounts/` (L4 carry-forward)
+- [ ] Add `ministry()` and `calendar_view()` views + URLs in `activity/` (L4 carry-forward)
+
+### Phase 2.1 — Induction System (branch: `version-2-g1` … `version-2-g4`)
+
+- [ ] Add `"induction"` to `Tenant.tier` choices + migration (G1)
+- [ ] Add `induction_enrolled_at`, `induction_completed_at`, `induction_pathway` to `User` + migration (G1)
+- [ ] Write `seed_induction_tenant` management command (G1)
+- [ ] Build registration + email verification views (G2)
+- [ ] Build profile setup form — entrant type, location, gifting/skills fields (G2, pending Chizola field confirmation)
+- [ ] Wire G2 completion to auto-place user in Induction Tenant via `UserPermission` (G2)
+- [ ] Write `enrol_induction_programmes(user, pathway)` in `learn/service.py` (G3)
+- [ ] Build Induction Dashboard template (G3)
+- [ ] Build steward induction review queue and detail views (G4)
+- [ ] Extend `certifications/confirm/` endpoint for `context == "induction_completion"` placement logic (G4)
+
+### Pre-build gates (before coding starts)
+
+- [ ] Chizola confirms profile registration fields (G2 blocker)
+- [ ] Data Contract v10 amendment produced and approved (covers Induction tier, User induction fields, `community_ref` relationship type, `Activity.linked_record` FK)
 
 ---
 
