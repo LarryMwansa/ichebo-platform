@@ -122,7 +122,7 @@
 
       {# Paraclete — Level 5 only #}
       {% if user.competence_level >= 5 %}
-      <a href="{% url 'paraclete-api:paraclete-digest' %}"
+      <a href="{% url 'dashboard:index' %}#divine-intel"
          class="ws-sidebar__nav-item {% if active_app == 'paraclete' %}active{% endif %}"
          aria-current="{% if active_app == 'paraclete' %}page{% endif %}">
         <span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>
