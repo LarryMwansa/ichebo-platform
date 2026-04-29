@@ -1,6 +1,6 @@
 <!-- _display_name_edit.html — inline edit form for display name -->
 <form class="inline-edit-form"
-      hx-post="{% url 'htmx-display-name' %}"
+      hx-post="{% url 'accounts:htmx-display-name' %}"
       hx-target="#display-name-field"
       hx-swap="innerHTML">
   {% csrf_token %}
@@ -12,7 +12,7 @@
          autofocus>
   <button type="submit" class="btn-inline-save">Save</button>
   <button type="button" class="btn-inline-cancel"
-          hx-get="{% url 'htmx-display-name' %}?show=1"
+          hx-get="{% url 'accounts:htmx-display-name' %}?show=1"
           hx-target="#display-name-field"
           hx-swap="innerHTML">Cancel</button>
 </form>

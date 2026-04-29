@@ -2,7 +2,7 @@
   <span class="profile-row-value">{{ profile_user.display_name|default:"—" }}</span>
   <button class="profile-row-action"
           aria-label="Edit display name"
-          hx-get="{% url 'htmx-display-name' %}"
+          hx-get="{% url 'accounts:htmx-display-name' %}"
           hx-target="#display-name-field"
           hx-swap="innerHTML"
           style="background: none; border: none; cursor: pointer; color: var(--primary); display: flex;">

@@ -3,7 +3,7 @@
 <div class="settings-section" id="region">
   <div class="settings-section-header">Language &amp; Region</div>
   <form class="settings-section-body"
-        hx-post="{% url 'htmx-region' %}"
+        hx-post="{% url 'accounts:htmx-region' %}"
         hx-target="#region-confirm"
         hx-swap="innerHTML">
     {% csrf_token %}
