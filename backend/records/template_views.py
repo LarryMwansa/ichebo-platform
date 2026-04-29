@@ -35,6 +35,8 @@ def my_records(request):
         'records': records,
         'record_types': JOURNAL_RECORD_TYPES,
         'active_type': record_type,
+        'active_app': 'records',
+        'ws_page_title': 'Records',
     }
 
     if request.headers.get('HX-Request') and not request.GET.get('full'):

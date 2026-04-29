@@ -1,5 +1,70 @@
 {% extends "activity/base_activity.html" %}
 
+
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="ws-page-header">
+      <h2 class="ws-page-title">Personal Activity</h2>
+      <button class="ws-btn ws-btn--primary"
+              hx-get="{% url 'activity:htmx-create' %}"
+              hx-target="#drawerInner"
+              hx-swap="innerHTML"
+              onclick="window.ICSDrawer && window.ICSDrawer.open('New Activity')">
+        <span class="material-symbols-outlined">add</span>
+        New Activity
+      </button>
+    </div>
+
+    <div class="ws-toolbar">
+      <a href="{% url 'activity:activity-home' %}"
+         class="ws-filter-pill {% if not active_type %}ws-filter-pill active{% endif %}">All</a>
+      {% for slug, label in activity_types %}
+      <a href="{% url 'activity:activity-home' %}?type={{ slug }}"
+         class="ws-filter-pill {% if active_type == slug %}ws-filter-pill active{% endif %}">
+        {{ label }}
+      </a>
+      {% endfor %}
+    </div>
+
+    {% if overdue %}
+    <div class="ws-feed-section">
+      <div class="label-caps" style="color: var(--danger); margin-bottom: var(--space-xs);">Overdue</div>
+      <div class="list-group" id="activity-list-overdue">
+        {% for activity in overdue %}{% include "activity/partials/activity_card.html" %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if due_today %}
+    <div class="ws-feed-section">
+      <div class="label-caps" style="margin-bottom: var(--space-xs);">Due Today</div>
+      <div class="list-group" id="activity-list-today">
+        {% for activity in due_today %}{% include "activity/partials/activity_card.html" %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="ws-feed-section">
+      <div class="label-caps" style="margin-bottom: var(--space-xs);">Upcoming</div>
+      <div class="list-group" id="activity-list-upcoming">
+        {% for activity in upcoming %}{% include "activity/partials/activity_card.html" %}{% endfor %}
+        {% if not upcoming and not overdue and not due_today %}
+        <div class="ws-empty-state">
+          <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">event_busy</span>
+          <p style="color: var(--muted);">No active missions. Start a new one.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+
 {% block activity_content %}
 
 <div class="activity-page">

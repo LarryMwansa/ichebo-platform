@@ -27,6 +27,40 @@
 </style>
 {% endblock %}
 
+
+{# ── WORKSPACE tab bar ── #}
+{% block ws_tabs %}
+<div class="ws-tab-row">
+  <a href="{% url 'video_live:home' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+    Home
+  </a>
+  <a href="{% url 'video_live:live' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'live' %}active{% endif %}">
+    Live
+  </a>
+  <a href="{% url 'video_live:schedule' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'schedule' %}active{% endif %}">
+    Schedule
+  </a>
+  <a href="{% url 'video_live:vod' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'vod' %}active{% endif %}">
+    Recordings
+  </a>
+  {% if can_manage %}
+  <a href="{% url 'video_live:manage' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'manage' %}active{% endif %}">
+    Manage
+  </a>
+  {% endif %}
+</div>
+{% endblock %}
+
+{# ws_content — overridden per sub-template #}
+{% block ws_content %}{% endblock %}
+
+
+{# ── MOBILE — unchanged ── #}
 {% block content %}
 <div class="video-shell">
   <nav class="video-nav">

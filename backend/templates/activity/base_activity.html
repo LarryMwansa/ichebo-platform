@@ -5,6 +5,30 @@
   <link rel="stylesheet" href="{% static 'css/activity.css' %}">
 {% endblock %}
 
+
+{# ── WORKSPACE tab bar — renders on desktop below topbar ── #}
+{% block ws_tabs %}
+<div class="ws-tab-row">
+  <a href="{% url 'activity:activity-home' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'activity-home' %}active{% endif %}">
+    Personal
+  </a>
+  <a href="{% url 'activity:ministry' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'ministry' %}active{% endif %}">
+    Ministry
+  </a>
+  <a href="{% url 'activity:calendar' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'calendar' %}active{% endif %}">
+    Calendar
+  </a>
+</div>
+{% endblock %}
+
+{# ws_content — overridden per sub-template with full-page layout #}
+{% block ws_content %}{% endblock %}
+
+
+{# ── MOBILE — unchanged ── #}
 {% block content %}
 <div class="activity-shell">
   <nav class="accounts-tab-row" style="border-bottom: 1px solid var(--border); padding: 0 1rem;">

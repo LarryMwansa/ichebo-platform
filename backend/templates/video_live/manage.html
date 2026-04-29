@@ -2,6 +2,75 @@
 
 {% block title %}Manage Broadcasts{% endblock %}
 
+
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="ws-page-header">
+      <h2 class="ws-page-title">Manage Broadcasts</h2>
+    </div>
+
+    {% if error %}
+    <div style="background: var(--error-muted, #fde8e8); border: 1px solid var(--error); border-radius: 6px; padding: 0.65rem 1rem; color: var(--error); font-size: var(--fz--1); margin-bottom: var(--space-m);">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    <div class="manage-form" style="max-width: 600px;">
+      <div class="label-caps" style="margin-bottom: var(--space-s);">Schedule a Broadcast</div>
+      <form method="post">
+        {% csrf_token %}
+        <label for="ws_id_title">Title *</label>
+        <input type="text" id="ws_id_title" name="title" required placeholder="e.g. Sunday Service — 4 May">
+        <label for="ws_id_stream_url">Stream URL * <span style="font-weight: 400; color: var(--muted);">(YouTube, Vimeo, or .mp4)</span></label>
+        <input type="url" id="ws_id_stream_url" name="stream_url" required placeholder="https://youtube.com/watch?v=...">
+        <label for="ws_id_scheduled_at">Date &amp; Time *</label>
+        <input type="datetime-local" id="ws_id_scheduled_at" name="scheduled_at" required>
+        <label for="ws_id_duration">Duration (minutes)</label>
+        <input type="number" id="ws_id_duration" name="duration_minutes" value="60" min="5" max="480">
+        <label for="ws_id_description">Description <span style="font-weight: 400;">(optional)</span></label>
+        <textarea id="ws_id_description" name="description" placeholder="Brief description of this broadcast…"></textarea>
+        <div style="margin-top: var(--space-m);">
+          <button type="submit" class="ws-btn ws-btn--primary">Schedule Broadcast</button>
+        </div>
+      </form>
+    </div>
+
+    {% if events %}
+    <div class="ws-feed-section">
+      <div class="label-caps" style="margin-bottom: var(--space-xs);">All Broadcasts</div>
+      <div class="list-group">
+        {% for event in events %}
+        <div class="list-item">
+          <div class="list-item__content">
+            <div class="list-item__title">{{ event.title }}</div>
+            <div class="list-item__meta">
+              {{ event.scheduled_at|date:"d M Y · H:i" }} · {{ event.duration }} min
+              {% if event.is_live %}<span class="live-badge" style="margin-left: 6px;"><span class="live-dot"></span>Live</span>{% endif %}
+              {% if event.is_past %}<span style="color: var(--success); font-size: 0.75rem; margin-left: 6px;">Past</span>{% endif %}
+            </div>
+          </div>
+          <div style="display: flex; gap: var(--space-xs); align-items: center; flex-shrink: 0;">
+            <a href="{% url 'video_live:watch' event.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2);">View</a>
+            <form method="post" action="{% url 'video_live:delete-event' event.id %}"
+                  onsubmit="return confirm('Delete {{ event.title }}?')" style="margin: 0;">
+              {% csrf_token %}
+              <button type="submit" class="ws-btn" style="background: none; color: var(--error); font-size: var(--fz--2); border: 1px solid var(--error);">Delete</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+
+
 {% block video_content %}
 <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem">Schedule a Broadcast</h2>
 

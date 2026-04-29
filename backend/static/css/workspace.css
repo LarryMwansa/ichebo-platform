@@ -1299,6 +1299,59 @@ body.dark .ws-list-panel__search input { color: #f5f3f0; }
   gap: var(--space-xs);
 }
 
+/* Inner content wrapper — constrains width, provides padding */
+.ws-full-page-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-l) var(--space-l) var(--space-3xl);
+}
+
+/* Feed section — labelled group of items within a full-page view */
+.ws-feed-section {
+  margin-bottom: var(--space-l);
+}
+
+/* Empty state — centred placeholder when a list is empty */
+.ws-empty-state {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-m);
+  color: var(--muted);
+}
+
+/* Workspace button — consistent CTA style for ws_content areas */
+.ws-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 var(--space-s);
+  border-radius: var(--radius-s);
+  font-size: var(--fz--1);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color 0.12s, background 0.12s;
+}
+.ws-btn:hover { border-color: var(--primary); color: var(--primary); }
+.ws-btn .material-symbols-outlined { font-size: 16px; }
+
+.ws-btn--primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.ws-btn--primary:hover { background: var(--primary-dark, var(--primary)); opacity: 0.9; color: #fff; }
+
+.ws-btn--secondary {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+.ws-btn--secondary:hover { border-color: var(--primary); color: var(--primary); }
+
 /* Dark mode — full page */
 body.dark .ws-filter-pill {
   background: rgba(255, 255, 255, 0.05);
@@ -1316,6 +1369,21 @@ body.dark .ws-filter-pill.active {
   border-color: var(--primary);
   color: var(--primary);
 }
+
+body.dark .ws-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+body.dark .ws-btn:hover { border-color: var(--primary); color: var(--primary); }
+body.dark .ws-btn--primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+body.dark .ws-btn--primary:hover { opacity: 0.9; color: #fff; }
+body.dark .ws-btn--secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+}
+body.dark .ws-btn--secondary:hover { border-color: var(--primary); color: var(--primary); }
 
 
 /* ─── DASHBOARD-SPECIFIC COMPONENTS ──────────────────────────

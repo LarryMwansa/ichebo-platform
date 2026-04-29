@@ -67,6 +67,8 @@ def video_home(request):
         'upcoming': upcoming,
         'recent_vod': recent_vod,
         'can_manage': request.user.competence_level >= 3,
+        'active_app': 'video',
+        'ws_page_title': 'Video',
     })
 
 
@@ -101,6 +103,8 @@ def video_schedule(request):
     return render(request, 'video_live/schedule.html', {
         'upcoming': upcoming,
         'can_manage': request.user.competence_level >= 3,
+        'active_app': 'video',
+        'ws_page_title': 'Video',
     })
 
 
@@ -112,7 +116,11 @@ def video_schedule(request):
 def video_vod(request):
     all_events = [_annotate_event(e) for e in _event_qs()]
     vod = [e for e in all_events if e['is_past']]
-    return render(request, 'video_live/vod.html', {'vod': vod})
+    return render(request, 'video_live/vod.html', {
+        'vod': vod,
+        'active_app': 'video',
+        'ws_page_title': 'Video',
+    })
 
 
 # ---------------------------------------------------------------------------
@@ -177,6 +185,9 @@ def video_manage(request):
     return render(request, 'video_live/manage.html', {
         'events': events,
         'error': error,
+        'can_manage': True,
+        'active_app': 'video',
+        'ws_page_title': 'Video',
     })
 
 

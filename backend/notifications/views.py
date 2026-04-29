@@ -106,4 +106,6 @@ class NotificationListView(LoginRequiredMixin, View):
         return render(request, 'notifications/notifications.html', {
             'notifications': notifications,
             'unread_count': unread,
+            'active_app': 'notifications',
+            'ws_page_title': 'Notifications',
         })

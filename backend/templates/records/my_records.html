@@ -8,6 +8,42 @@
   </div>
 {% endblock %}
 
+
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="ws-page-header">
+      <h2 class="ws-page-title">My Journal</h2>
+      <button class="ws-btn ws-btn--primary"
+              hx-get="{% url 'records:records-create' %}"
+              hx-target="#ws-panel-inner"
+              hx-swap="innerHTML"
+              onclick="document.getElementById('ws-panel').classList.add('open')">
+        <span class="material-symbols-outlined">add</span>
+        New Entry
+      </button>
+    </div>
+
+    <div class="ws-toolbar">
+      <a href="{% url 'records:records-home' %}"
+         class="ws-filter-pill {% if not active_type %}ws-filter-pill active{% endif %}">All</a>
+      {% for value, label in record_types %}
+      <a href="{% url 'records:records-home' %}?type={{ value }}"
+         class="ws-filter-pill {% if active_type == value %}ws-filter-pill active{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </div>
+
+    <div id="ws-record-list" class="ws-feed">
+      {% include "records/partials/record_list.html" %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+
 {% block records_content %}
 
 <div class="records-header">

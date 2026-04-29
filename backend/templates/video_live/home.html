@@ -2,6 +2,79 @@
 
 {% block title %}Video{% endblock %}
 
+
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="ws-page-header">
+      <h2 class="ws-page-title">Video</h2>
+      {% if can_manage %}
+      <a href="{% url 'video_live:manage' %}" class="ws-btn ws-btn--primary">
+        <span class="material-symbols-outlined">add</span>
+        Schedule Broadcast
+      </a>
+      {% endif %}
+    </div>
+
+    {% if live %}
+    <div class="ws-feed-section">
+      <div class="label-caps" style="margin-bottom: var(--space-xs);">
+        <span class="live-badge" style="vertical-align: middle; margin-right: 6px;"><span class="live-dot"></span>Live Now</span>
+      </div>
+      {% include "video_live/_live_player.html" %}
+    </div>
+    {% endif %}
+
+    {% if upcoming %}
+    <div class="ws-feed-section">
+      <div class="label-caps" style="margin-bottom: var(--space-xs);">Coming Up</div>
+      <div class="list-group">
+        {% for event in upcoming %}
+        <a href="{% url 'video_live:watch' event.id %}" class="list-item" style="text-decoration: none; color: inherit;">
+          <div class="list-item__content">
+            <div class="list-item__title">{{ event.title }}</div>
+            <div class="list-item__meta">{{ event.scheduled_at|date:"D d M · H:i" }} · {{ event.duration }} min</div>
+          </div>
+          <div class="list-item__action"><span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">chevron_right</span></div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if recent_vod %}
+    <div class="ws-feed-section">
+      <div class="label-caps" style="margin-bottom: var(--space-xs);">Recent Recordings</div>
+      <div class="vod-grid">
+        {% for event in recent_vod %}
+        <a href="{% url 'video_live:watch' event.id %}" class="event-card event-card--link">
+          <div class="event-card__title" style="font-size: 0.88rem;">{{ event.title }}</div>
+          <div class="event-card__meta">{{ event.scheduled_at|date:"d M Y" }}</div>
+        </a>
+        {% endfor %}
+      </div>
+      <a href="{% url 'video_live:vod' %}" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; display: inline-block; margin-top: var(--space-xs);">All recordings →</a>
+    </div>
+    {% endif %}
+
+    {% if not live and not upcoming and not recent_vod %}
+    <div class="ws-empty-state">
+      <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">live_tv</span>
+      <p style="font-weight: 600; color: var(--text); margin-bottom: 4px;">No broadcasts yet</p>
+      <p style="color: var(--muted); font-size: var(--fz--1);">Check back soon for live streams and recordings.</p>
+      {% if can_manage %}
+      <a href="{% url 'video_live:manage' %}" class="ws-btn ws-btn--primary" style="margin-top: var(--space-s);">Schedule a Broadcast</a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+
+
 {% block video_content %}
 
 {% if live %}

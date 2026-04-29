@@ -1,5 +1,76 @@
 {% extends "learn/base_learn.html" %}
 
+
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="ws-page-header">
+      <h2 class="ws-page-title">My Learning</h2>
+      <a href="{% url 'learn:learn-catalogue' %}" class="ws-btn ws-btn--secondary">
+        <span class="material-symbols-outlined">apps</span>
+        Catalogue
+      </a>
+    </div>
+
+    {% if active_pathway %}
+    <div style="margin-bottom: var(--space-m);">
+      <span class="badge-unit badge-unit--primary">{{ active_pathway|title }}</span>
+      {% if active_qualification %}
+      <span class="label-caps" style="margin-bottom: 0; font-size: 10px; margin-left: var(--space-2xs);">{{ active_qualification }} Pathway</span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if enrolments %}
+    <div class="ws-feed-section">
+      <div class="label-caps" style="margin-bottom: var(--space-xs);">Active Programmes</div>
+      <div class="list-group">
+        {% for enrolment in enrolments %}
+        <a href="{% if enrolment.metadata.programme_record_id %}{% url 'learn:learn-programme' enrolment.metadata.programme_record_id %}{% else %}#{% endif %}"
+           class="list-item" style="flex-direction: column; align-items: stretch; gap: 10px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div class="list-item__title" style="white-space: normal; line-height: 1.5; font-weight: 700;">{{ enrolment.title }}</div>
+            <span class="badge-unit badge-unit--primary" style="flex-shrink: 0;">{{ enrolment.progress|default:0 }}%</span>
+          </div>
+          <div class="learn-progress-track" style="height: 6px; border-radius: 3px;">
+            <div class="learn-progress-fill" style="width: {{ enrolment.progress|default:0 }}%;"></div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="ws-empty-state">
+      <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">school</span>
+      <p style="color: var(--muted);">No active enrolments. Browse the catalogue to get started.</p>
+      <a href="{% url 'learn:learn-catalogue' %}" class="ws-btn ws-btn--primary" style="margin-top: var(--space-s);">Browse Catalogue</a>
+    </div>
+    {% endif %}
+
+    {% if certifications %}
+    <div class="ws-feed-section">
+      <div class="label-caps" style="margin-bottom: var(--space-xs);">Certifications</div>
+      <div class="list-group">
+        {% for cert in certifications %}
+        <div class="list-item">
+          <div class="list-item__icon" style="color: var(--primary);"><span class="material-symbols-outlined">workspace_premium</span></div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ cert.title }}</div>
+            <div class="list-item__meta">{{ cert.created_at|date:"d M Y" }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+
+
 {% block learn_content %}
 
 <div class="learn-page">

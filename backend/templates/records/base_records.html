@@ -5,10 +5,24 @@
   <link rel="stylesheet" href="{% static 'css/records.css' %}?v=2">
 {% endblock %}
 
+
+{# ── WORKSPACE tab bar ── #}
+{% block ws_tabs %}
+<div class="ws-tab-row">
+  <a href="{% url 'records:records-home' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'records-home' %}active{% endif %}">
+    My Journal
+  </a>
+</div>
+{% endblock %}
+
+{# ws_content — overridden per sub-template #}
+{% block ws_content %}{% endblock %}
+
+
+{# ── MOBILE — unchanged ── #}
 {% block content %}
 <div class="records-shell">
-
-  <!-- Content pane -->
 
   <div class="records-content">
     {% block records_content %}{% endblock %}

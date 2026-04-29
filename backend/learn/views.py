@@ -61,6 +61,8 @@ def my_learning(request):
         'active_pathway': active_pathway,
         'active_qualification': active_qualification,
         'user_level': level,
+        'active_app': 'formation',
+        'ws_page_title': 'Learn',
     })
 
 
@@ -85,6 +87,8 @@ def catalogue(request):
     return render(request, 'learn/catalogue.html', {
         'programmes': programmes,
         'user_level': user_level,
+        'active_app': 'formation',
+        'ws_page_title': 'Learn',
     })
 
 
@@ -212,6 +216,8 @@ def certification_queue_view(request):
 
     return render(request, 'learn/certification_queue.html', {
         'certifications': certifications,
+        'active_app': 'formation',
+        'ws_page_title': 'Learn',
     })
 
 
@@ -241,6 +247,8 @@ def authorship(request):
     return render(request, 'learn/authorship.html', {
         'user_records': user_records,
         'by_type': by_type,
+        'active_app': 'formation',
+        'ws_page_title': 'Learn',
     })
 
 
@@ -478,7 +486,11 @@ def review_queue(request):
             if parent_rel:
                 item.parent_programme = Record.objects.filter(id=parent_rel.to_record_id).first()
 
-    return render(request, 'learn/review_queue.html', {'items': items})
+    return render(request, 'learn/review_queue.html', {
+        'items': items,
+        'active_app': 'formation',
+        'ws_page_title': 'Learn',
+    })
 
 
 # ── G4 — Induction Review Queue (Level 5) ────────────────────────────────────
@@ -559,6 +571,8 @@ def induction_review_queue(request):
         'inductees': inductees,
         'placement_tenants': placement_tenants,
         'induction_programme': induction_programme,
+        'active_app': 'formation',
+        'ws_page_title': 'Learn',
     })
 
 

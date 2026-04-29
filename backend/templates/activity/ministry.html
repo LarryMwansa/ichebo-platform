@@ -1,5 +1,76 @@
 {% extends "activity/base_activity.html" %}
 
+
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="ws-page-header">
+      <h2 class="ws-page-title">Ministry</h2>
+    </div>
+
+    <div class="ws-toolbar">
+      <a href="{% url 'activity:ministry' %}"
+         class="ws-filter-pill {% if not active_type and assigned_tab == 'all' %}ws-filter-pill active{% endif %}">All</a>
+      <a href="{% url 'activity:ministry' %}?tab=mine"
+         class="ws-filter-pill {% if assigned_tab == 'mine' and not active_type %}ws-filter-pill active{% endif %}">Assigned to Me</a>
+      {% for slug, label in ministry_types %}
+      <a href="{% url 'activity:ministry' %}?type={{ slug }}"
+         class="ws-filter-pill {% if active_type == slug %}ws-filter-pill active{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </div>
+
+    <div class="ws-feed">
+      {% if activities %}
+      <div class="list-group">
+        {% for activity in activities %}
+        <div class="list-item activity-item" id="ws-activity-{{ activity.id }}"
+             hx-get="{% url 'activity:activity-detail' activity.id %}"
+             hx-target="#ws-content"
+             hx-push-url="true"
+             style="cursor: pointer;">
+          <div class="list-item__icon">
+            <span class="status-badge
+              {% if activity.due_at and activity.due_at < now %}status-badge--danger
+              {% elif activity.due_at and activity.due_at.date == now.date %}status-badge--active
+              {% else %}status-badge--muted{% endif %}">
+              {{ activity.activity_type|slice:":3"|upper }}
+            </span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title" style="font-weight: 700;">{{ activity.title }}</div>
+            <div class="list-item__meta" style="display: flex; align-items: center; gap: 8px;">
+              {% if activity.assigned_to %}
+              <span style="font-size: 11px; color: var(--muted);">{{ activity.assigned_to.display_name|default:activity.assigned_to.email }}</span>
+              {% endif %}
+              {% if activity.due_at %}
+              <span class="activity-due {% if activity.due_at < now %}activity-due--overdue{% endif %}" style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
+                {{ activity.due_at|date:"d M Y" }}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="list-item__action">
+            <span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">chevron_right</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="ws-empty-state">
+        <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">campaign</span>
+        <p style="color: var(--muted);">No ministry activities found.</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+
 {% block activity_content %}
 
 <div class="activity-page">

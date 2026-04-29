@@ -5,18 +5,49 @@
   <link rel="stylesheet" href="{% static 'css/learn.css' %}">
 {% endblock %}
 
+
+{# ── WORKSPACE tab bar ── #}
+{% block ws_tabs %}
+<div class="ws-tab-row">
+  <a href="{% url 'learn:learn-home' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'learn-home' %}active{% endif %}">
+    My Learning
+  </a>
+  <a href="{% url 'learn:learn-catalogue' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'learn-catalogue' %}active{% endif %}">
+    Catalogue
+  </a>
+  <a href="{% url 'learn:learn-cert-queue' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'learn-cert-queue' %}active{% endif %}">
+    Certifications
+  </a>
+  {% if request.user.competence_level >= 4 %}
+  <a href="{% url 'learn:learn-author' %}"
+     class="ws-tab {% if 'author' in request.resolver_match.url_name %}active{% endif %}">
+    Authorship
+  </a>
+  {% endif %}
+  {% if request.user.competence_level >= 5 %}
+  <a href="{% url 'learn:learn-review' %}"
+     class="ws-tab {% if 'review' in request.resolver_match.url_name %}active{% endif %}">
+    Review Queue
+  </a>
+  <a href="{% url 'learn:learn-induction-review' %}"
+     class="ws-tab {% if 'induction-review' in request.resolver_match.url_name %}active{% endif %}">
+    Induction
+  </a>
+  {% endif %}
+</div>
+{% endblock %}
+
+{# ws_content — overridden per sub-template #}
+{% block ws_content %}{% endblock %}
+
+
+{# ── MOBILE — unchanged ── #}
 {% block content %}
 <div class="learn-shell">
 
-  {# ── PAGE HERO ──────────────────────────────────────────
-     Every Learn page gets the editorial dark hero treatment.
-     The child template sets:
-       learn_hero_label   — the red eyebrow label (e.g. "Formation")
-       learn_hero_title   — the display heading (HTML allowed for <em>)
-       learn_hero_sub     — optional subtitle text
-       learn_hero_watermark — optional data-watermark ghost text
-     Override the entire block to remove it on specific pages.
-  ────────────────────────────────────────────────────────── #}
   {% block learn_hero %}
   <div class="page-hero {% block learn_hero_watermark_class %}{% endblock %}"
        {% block learn_hero_watermark_attr %}{% endblock %}>
@@ -33,7 +64,6 @@
   </div>
   {% endblock %}
 
-  {# ── PAGE CONTENT ── #}
   <div class="learn-content">
     {% block learn_content %}{% endblock %}
   </div>

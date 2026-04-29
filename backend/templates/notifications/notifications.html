@@ -3,6 +3,29 @@
 
 {% block title %}Notifications{% endblock %}
 
+
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="ws-page-header">
+      <h2 class="ws-page-title">Notifications</h2>
+      {% if unread_count %}
+      <span class="badge-unit badge-unit--primary" style="font-size: var(--fz--2);">
+        {{ unread_count }} unread
+      </span>
+      {% endif %}
+    </div>
+
+    {% include "notifications/_notification_list.html" %}
+
+  </div>
+</div>
+{% endblock %}
+
+
+{# ── MOBILE — unchanged ── #}
 {% block content %}
 <div style="max-width:640px;margin:0 auto;padding:1.25rem 1rem 5rem;">
 

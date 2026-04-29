@@ -82,6 +82,8 @@ def my_activities(request):
         'active_type':   active_type,
         'activity_types': activity_types,
         'user_level':    _user_level(user),
+        'active_app':    'activity',
+        'ws_page_title': 'Activity',
     })
 
 
@@ -290,6 +292,8 @@ def ministry(request):
         'ministry_types': ministry_types,
         'user_level': _user_level(user),
         'now': timezone.now(),
+        'active_app': 'activity',
+        'ws_page_title': 'Activity',
     })
 
 
@@ -307,6 +311,8 @@ def calendar_view(request):
         'activities': qs,
         'user_level': _user_level(user),
         'now': timezone.now(),
+        'active_app': 'activity',
+        'ws_page_title': 'Activity',
     })
 
 
