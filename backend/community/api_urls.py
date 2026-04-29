@@ -4,5 +4,6 @@ from . import api_views
 app_name = 'community-api'
 
 urlpatterns = [
-    path('health/', api_views.community_health, name='community-health'),
+    path('health/',  api_views.community_health,         name='community-health'),
+    path('members/', api_views.MemberListView.as_view(), name='community-members'),
 ]
