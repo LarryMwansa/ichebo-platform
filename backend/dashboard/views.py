@@ -8,7 +8,11 @@ from paraclete.service import build_digest
 @login_required
 def index(request):
     digest = build_digest(request.user)
-    return render(request, 'dashboard/index.html', {'digest': digest})
+    return render(request, 'dashboard/index.html', {
+        'digest': digest,
+        'active_app': 'dashboard',
+        'ws_page_title': 'Dashboard',
+    })
 
 
 @login_required

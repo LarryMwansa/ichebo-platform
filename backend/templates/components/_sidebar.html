@@ -1,16 +1,4 @@
-{# components/_sidebar.html
-   Desktop workspace sidebar — renders at ≥ 1024px only.
-   CSS handles display:none below breakpoint.
-
-   Context variables expected:
-     user                — the request.user object
-     active_app          — string matching a nav item key,
-                           e.g. "dashboard", "community", "governance",
-                           "formation", "activity", "bible", "video"
-                           Set this in your views or context processor.
-
-   Path: backend/templates/components/_sidebar.html
-#}
+{# components/_sidebar.html — Desktop workspace sidebar. active_app context var controls active highlight. #}
 
 <aside class="ws-sidebar" aria-label="Workspace navigation">
 

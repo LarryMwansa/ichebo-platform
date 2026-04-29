@@ -28,10 +28,7 @@
   <script src="/static/js/htmx.min.js" defer></script>
   <script src="/static/js/storage.js"></script>
 
-  {# ── Workspace activation — Level 3+ desktop only ──
-     Adds .ws-active to <body> when viewport ≥ 1024px.
-     Runs synchronously before paint to prevent layout flash.
-  ── #}
+  {# Workspace activation — Level 3+ desktop only. Adds .ws-active to <body> when viewport ≥ 1024px. Runs synchronously before paint to prevent layout flash. #}
   {% if user.is_authenticated and user.competence_level >= 3 %}
   <script>
     (function () {
@@ -66,21 +63,14 @@
     <div class="htmx-progress-inner"></div>
   </div>
 
-  {# ══════════════════════════════════════
-     MOBILE SHELL (all users < 1024px,
-     and Level 0–2 always)
-     Hidden at ≥ 1024px via ws-active CSS.
-  ══════════════════════════════════════ #}
+  {# MOBILE SHELL (all users < 1024px, and Level 0–2 always) Hidden at ≥ 1024px via ws-active CSS. #}
   {% block navbar %}
     {% include "components/_navbar.html" %}
   {% endblock %}
 
   {% include "components/_app_drawer.html" %}
 
-  {# ══════════════════════════════════════
-     DESKTOP WORKSPACE (Level 3+, ≥ 1024px)
-     aria-hidden toggled by inline script.
-  ══════════════════════════════════════ #}
+  {# DESKTOP WORKSPACE (Level 3+, ≥ 1024px) aria-hidden toggled by inline script. #}
   {% if user.is_authenticated and user.competence_level >= 3 %}
   <div class="ws-layout" id="ws-layout" aria-hidden="true">
 
@@ -109,9 +99,7 @@
   </div>{# /ws-layout #}
   {% endif %}
 
-  {# ══════════════════════════════════════
-     MOBILE MAIN (shown when not ws-active)
-  ══════════════════════════════════════ #}
+  {# MOBILE MAIN (shown when not ws-active) #}
   <main id="main-content"
         class="ics-main"
         role="main"

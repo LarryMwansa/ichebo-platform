@@ -8,7 +8,7 @@
 {% block content %}
 <div class="learn-shell">
 
-  <!-- {# ── PAGE HERO ──────────────────────────────────────────
+  {# ── PAGE HERO ──────────────────────────────────────────
      Every Learn page gets the editorial dark hero treatment.
      The child template sets:
        learn_hero_label   — the red eyebrow label (e.g. "Formation")
@@ -16,7 +16,7 @@
        learn_hero_sub     — optional subtitle text
        learn_hero_watermark — optional data-watermark ghost text
      Override the entire block to remove it on specific pages.
-  ────────────────────────────────────────────────────────── #} -->
+  ────────────────────────────────────────────────────────── #}
   {% block learn_hero %}
   <div class="page-hero {% block learn_hero_watermark_class %}{% endblock %}"
        {% block learn_hero_watermark_attr %}{% endblock %}>

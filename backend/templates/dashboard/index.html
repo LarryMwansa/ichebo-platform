@@ -8,6 +8,149 @@
 <link rel="stylesheet" href="{% static 'css/records.css' %}?v=2">
 {% endblock %}
 
+{% block ws_content %}
+<div class="ws-page-header">
+  <div class="ws-page-header__left">
+    <h1 class="ws-page-title">{{ user.display_name|default:user.email }}</h1>
+    <p class="ws-page-subtitle">{{ user.status|title }} &middot; Level {{ user.competence_level }} &middot; {{ digest.generated_at|slice:":10" }}</p>
+  </div>
+</div>
+
+<div class="dashboard">
+
+  <section class="dash-hero dash-hero--paraclete">
+    <div class="dash-hero__label">Divine Intel</div>
+    <div class="dash-hero__prompt">
+      <span class="material-symbols-outlined dash-hero__icon">auto_awesome</span>
+      <blockquote class="dash-prompt">{{ digest.discipline_prompt }}</blockquote>
+    </div>
+    {% if digest.prompt_pathway %}
+    <div class="dash-hero__pathway">{{ digest.prompt_pathway|title|cut:"_" }} Pathway</div>
+    {% endif %}
+    {% if digest.suggestions %}
+    <div class="dash-hero__suggestions">
+      {% for s in digest.suggestions %}
+        {% if "/records/" in s.action_url and "dar" in s.action_url %}
+        <button class="dash-suggestion-pill"
+                hx-get="{% url 'records:htmx-create' %}?record_type=dar"
+                hx-target="#drawerInner"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer.open('Daily Activity Report')">
+          <span class="material-symbols-outlined">bolt</span>
+          <span>{{ s.text }}</span>
+        </button>
+        {% else %}
+        <a href="{{ s.action_url|default:'#' }}" class="dash-suggestion-pill">
+          <span class="material-symbols-outlined">{% if s.priority == 1 %}priority_high{% else %}bolt{% endif %}</span>
+          <span>{{ s.text }}</span>
+        </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="dash-section">
+    <div class="dash-widget dash-widget--dar {% if not digest.dar_today %}dash-widget--pending{% endif %}">
+      <div class="dash-widget__label">Daily Briefing</div>
+      <div class="dash-dar-content">
+        <div class="dash-dar-status">
+          {% if digest.dar_today %}
+            <span class="material-symbols-outlined" style="color: var(--success); font-size: 28px;">check_circle</span>
+            <div class="dash-dar-text"><strong>DAR Completed</strong><span>{{ digest.dar_today.title }}</span></div>
+          {% else %}
+            <span class="material-symbols-outlined" style="color: var(--warning); font-size: 28px;">pending_actions</span>
+            <div class="dash-dar-text"><strong>DAR MANDATORY</strong><span>Submission required for discipline record.</span></div>
+          {% endif %}
+        </div>
+        <div class="dash-dar-actions">
+          {% if digest.dar_today %}
+            <a class="btn-touch btn-outline-sm" href="{{ digest.dar_today.url }}">View</a>
+          {% else %}
+            <button class="btn-touch btn-primary-sm"
+                    hx-get="{% url 'records:htmx-create' %}?record_type=dar"
+                    hx-target="#drawerInner"
+                    hx-swap="innerHTML"
+                    onclick="window.ICSDrawer.open('Daily Activity Report')">
+              Write &rarr;
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dash-section"
+           hx-get="{% url 'accounts:htmx-formation-card' %}"
+           hx-trigger="load"
+           hx-swap="innerHTML">
+    <div class="dash-widget" style="min-height:80px"></div>
+  </section>
+
+  {% if digest.competence_level >= 1 %}
+  {% if digest.overdue_items or digest.due_today %}
+  <section class="dash-section">
+    <div class="dash-widget {% if digest.overdue_items %}dash-widget--danger{% endif %}">
+      <div class="dash-widget__label">Immediate Missions</div>
+      <div class="list-group">
+        {% for item in digest.overdue_items %}
+        <div class="list-item">
+          <div class="list-item__icon"><span class="status-badge status-badge--danger">{{ item.activity_type|slice:":3"|upper }}</span></div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ item.title }}</div>
+            <div class="list-item__meta" style="color: var(--error);">Overdue</div>
+          </div>
+        </div>
+        {% endfor %}
+        {% for item in digest.due_today %}
+        <div class="list-item">
+          <div class="list-item__icon"><span class="status-badge status-badge--active">{{ item.activity_type|slice:":3"|upper }}</span></div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ item.title }}</div>
+            <div class="list-item__meta">Today</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <a href="/activity/" class="dash-widget__cta">View Full Timeline &rarr;</a>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="dash-grid">
+    <div class="dash-widget dash-widget--stat">
+      <div class="dash-stat-value">{{ digest.pending_count }}</div>
+      <div class="dash-stat-label">Pending Units</div>
+    </div>
+    {% if digest.competence_level >= 3 %}
+    <div class="dash-widget dash-widget--stat dash-widget--team">
+      <div class="dash-stat-value">{{ digest.team_pending_count|default:0 }}</div>
+      <div class="dash-stat-label">Team Support</div>
+    </div>
+    {% endif %}
+  </section>
+
+  {% if digest.habit_streaks %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Active Streaks</div>
+      <div class="dash-streak-strip">
+        {% for h in digest.habit_streaks %}
+        <div class="dash-streak-pill">
+          <span class="dash-streak-val">{{ h.streak }}d</span>
+          <span class="dash-streak-title">{{ h.title }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% endif %}
+
+</div>
+{% endblock %}
+
 {% block content %}
 
 <div class="dashboard">

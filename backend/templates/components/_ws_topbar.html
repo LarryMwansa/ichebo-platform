@@ -1,18 +1,4 @@
-{# components/_ws_topbar.html
-   Desktop workspace topbar — 56px bar above the main content area.
-   Carries breadcrumb, optional search, and right actions.
-
-   Context variables:
-     ws_breadcrumb_links  — list of dicts: [{"label": "Community", "url": "/community/"}]
-                            Last item is treated as the current page (no link).
-                            If not set, renders just the app name.
-     ws_page_title        — string, used for the final breadcrumb segment.
-                            Falls back to the block title if not set.
-     ws_show_search       — boolean, shows the search input (default True).
-     user                 — request.user
-
-   Path: backend/templates/components/_ws_topbar.html
-#}
+{# components/_ws_topbar.html — Desktop workspace topbar. Context: ws_breadcrumb_links, ws_page_title, ws_show_search. #}
 
 <div class="ws-topbar" role="banner">
 

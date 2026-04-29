@@ -20,10 +20,6 @@
      This handles any edge cases after full JS load.
   ────────────────────────────────────────────────────────── */
   function syncWsActive() {
-    const eligible = document.body.classList.contains('ws-eligible') ||
-                     document.body.classList.contains('ws-active');
-    if (!eligible) return;
-
     const isDesktop = window.innerWidth >= 1024;
     const layout = document.getElementById('ws-layout');
     const main = document.getElementById('main-content');
