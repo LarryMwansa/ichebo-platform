@@ -100,11 +100,8 @@
       <div class="ws-content" id="ws-content">
         <div class="ws-content__inner">
           <div id="ws-toast-container" aria-live="polite" aria-atomic="true"></div>
-          {# Desktop content — child templates fill this block #}
-          {% block ws_content %}
-            {# Fallback: mirror mobile content in desktop view #}
-            {% block content %}{% endblock %}
-          {% endblock %}
+          {# Desktop content — child templates override ws_content; falls through to main content #}
+          {% block ws_content %}{% endblock %}
         </div>
       </div>
 

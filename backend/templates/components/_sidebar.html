@@ -15,7 +15,7 @@
 <aside class="ws-sidebar" aria-label="Workspace navigation">
 
   {# ── Logo ── #}
-  <a href="{% url 'core:dashboard' %}" class="ws-sidebar__logo" aria-label="Ichebo — Dashboard">
+  <a href="{% url 'dashboard:index' %}" class="ws-sidebar__logo" aria-label="Ichebo — Dashboard">
 
     {# ICS SVG mark — inline so fill is controlled by CSS #}
     <svg class="ws-sidebar__logo-mark"
@@ -72,14 +72,14 @@
     <div class="ws-sidebar__section">
       <span class="ws-sidebar__section-label">Workspace</span>
 
-      <a href="{% url 'core:dashboard' %}"
+      <a href="{% url 'dashboard:index' %}"
          class="ws-sidebar__nav-item {% if active_app == 'dashboard' %}active{% endif %}"
          aria-current="{% if active_app == 'dashboard' %}page{% endif %}">
         <span class="material-symbols-outlined" aria-hidden="true">dashboard</span>
         Dashboard
       </a>
 
-      <a href="{% url 'community:home' %}"
+      <a href="{% url 'community:community-home' %}"
          class="ws-sidebar__nav-item {% if active_app == 'community' %}active{% endif %}"
          aria-current="{% if active_app == 'community' %}page{% endif %}">
         <span class="material-symbols-outlined" aria-hidden="true">groups</span>
@@ -102,7 +102,7 @@
         Formation
       </a>
 
-      <a href="{% url 'activity:home' %}"
+      <a href="{% url 'activity:activity-home' %}"
          class="ws-sidebar__nav-item {% if active_app == 'activity' %}active{% endif %}"
          aria-current="{% if active_app == 'activity' %}page{% endif %}">
         <span class="material-symbols-outlined" aria-hidden="true">task_alt</span>
@@ -118,14 +118,14 @@
     <div class="ws-sidebar__section">
       <span class="ws-sidebar__section-label">Content</span>
 
-      <a href="{% url 'bible:home' %}"
+      <a href="{% url 'bible:reader' %}"
          class="ws-sidebar__nav-item {% if active_app == 'bible' %}active{% endif %}"
          aria-current="{% if active_app == 'bible' %}page{% endif %}">
         <span class="material-symbols-outlined" aria-hidden="true">menu_book</span>
         Bible
       </a>
 
-      <a href="{% url 'video:home' %}"
+      <a href="{% url 'video_live:home' %}"
          class="ws-sidebar__nav-item {% if active_app == 'video' %}active{% endif %}"
          aria-current="{% if active_app == 'video' %}page{% endif %}">
         <span class="material-symbols-outlined" aria-hidden="true">live_tv</span>
@@ -134,7 +134,7 @@
 
       {# Paraclete — Level 5 only #}
       {% if user.competence_level >= 5 %}
-      <a href="{% url 'paraclete:home' %}"
+      <a href="{% url 'paraclete-api:paraclete-digest' %}"
          class="ws-sidebar__nav-item {% if active_app == 'paraclete' %}active{% endif %}"
          aria-current="{% if active_app == 'paraclete' %}page{% endif %}">
         <span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>

@@ -20,7 +20,7 @@
   <nav class="ws-topbar__breadcrumb" aria-label="Page breadcrumb">
 
     {# Home / workspace root #}
-    <a href="{% url 'core:dashboard' %}">Workspace</a>
+    <a href="{% url 'dashboard:index' %}">Workspace</a>
 
     {% if ws_breadcrumb_links %}
       {% for crumb in ws_breadcrumb_links %}
