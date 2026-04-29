@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>{% block title %}Ichebo{% endblock %} — Platform</title>
+
+  {# ── Design system — load order is fixed; do not reorder ── #}
+  {# 1. Tokens #}
+  <link rel="stylesheet" href="/static/css/variables.css">
+  {# 2. Base reset + font import #}
+  <link rel="stylesheet" href="/static/css/global.css">
+  {# 3. Shared utilities, layout, components #}
+  <link rel="stylesheet" href="/static/css/main.css">
+  {# 4. Theme (dark mode overrides — must come after main) #}
+  <link rel="stylesheet" href="/static/css/theme.css">
+  {# 5. Navigation chrome #}
+  <link rel="stylesheet" href="/static/css/navbar.css">
+  <link rel="stylesheet" href="/static/css/app-drawer.css">
+  <link rel="stylesheet" href="/static/css/bottom_bar.css">
+  <link rel="stylesheet" href="/static/css/dashboard-tabs.css">
+  <link rel="stylesheet" href="/static/css/accounts.css">
+
+  {# ── Fonts — preconnect must precede stylesheet load ── #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  {# Material Symbols icon font #}
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
+  {# App-level CSS loaded per-page via extra_css block #}
+  {% block extra_css %}{% endblock %}
+
+  {# ── HTMX — deferred, but declared early ── #}
+  <script src="/static/js/htmx.min.js" defer></script>
+
+  {# ── Theme init — must run before body renders to prevent flash ── #}
+  <script src="/static/js/storage.js"></script>
+</head>
+<body class="ics-shell {% block immersive %}{% endblock %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+  {# Global HTMX progress indicator #}
+  <div class="htmx-progress-bar" aria-hidden="true">
+    <div class="htmx-progress-inner"></div>
+  </div>
+
+  {# ── TOP NAVBAR ── #}
+  {% block navbar %}
+    {% include "components/_navbar.html" %}
+  {% endblock %}
+
+  {# ── APP DRAWER (slide-up launcher) ── #}
+  {% include "components/_app_drawer.html" %}
+
+  {# ── MAIN CONTENT ── #}
+  <main id="main-content" class="ics-main" role="main" aria-label="Main content">
+    {# Toast notifications injected here by HTMX response headers #}
+    <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    {% block content %}{% endblock %}
+  </main>
+
+  {# ── FLOATING ACTION BUTTON ── #}
+  {% include "components/_fab.html" %}
+
+  {# ── BOTTOM NAV ── #}
+  {% include "components/_bottom_nav.html" %}
+
+  {# ── Shell JS ── #}
+  <script src="/static/js/navbar.js" defer></script>
+
+  {# App-level JS loaded per-page #}
+  {% block extra_js %}{% endblock %}
+
+</body>
+</html>

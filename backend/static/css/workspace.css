@@ -1,0 +1,947 @@
+/* =========================
+   workspace.css — Ichebo Platform Desktop Workspace
+   Path: backend/static/css/workspace.css
+
+   Desktop workspace layout for Level 3–5 stewards and coordinators.
+   Activates at ≥ 1024px. Below 768px gracefully degrades to the
+   existing mobile shell (navbar + bottom nav) — no regressions.
+
+   Load order in base.html: after app-drawer.css, before page-specific CSS.
+   ========================= */
+
+
+/* ─── WORKSPACE BREAKPOINT GUARD ─────────────────────────────
+   All workspace chrome is gated to ≥ 1024px.
+   Below that, the existing mobile shell takes over.
+────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1023px) {
+  .ws-sidebar,
+  .ws-topbar { display: none !important; }
+}
+
+
+/* ─── ROOT LAYOUT ─────────────────────────────────────────────
+   The .ics-shell gets .ws-active added by JS (workspace-init.js)
+   when the user is Level 3+ and viewport ≥ 1024px.
+   This switches the shell from mobile stack to sidebar layout.
+────────────────────────────────────────────────────────────── */
+
+@media (min-width: 1024px) {
+
+  /* Override the mobile shell's default layout */
+  body.ws-active {
+    overflow: hidden; /* Prevent double scrollbars — sidebar scrolls, main scrolls */
+  }
+
+  body.ws-active .ics-main {
+    /* Remove mobile-first constraints */
+    max-width: none;
+    margin-inline: 0;
+    padding-inline: 0;
+    padding-bottom: 0;      /* Remove bottom nav padding */
+    overflow-y: auto;
+    height: calc(100vh - 56px); /* 56px = ws-topbar height */
+  }
+
+  /* Hide mobile-only chrome */
+  body.ws-active .navbar { display: none; }
+  body.ws-active .bottom-bar { display: none; }
+  body.ws-active .fab { display: none; }
+
+  /* The workspace wrapper — full viewport */
+  .ws-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--card); /* Stone #F5F3F0 — main content background */
+  }
+
+}
+
+
+/* ─── SIDEBAR ─────────────────────────────────────────────────
+   Fixed left panel. Ink dark background (#0E0E0E).
+   Mirrors the dark hero sections on ichebo.online.
+   Width: 240px fixed. Does not shrink or scroll horizontally.
+────────────────────────────────────────────────────────────── */
+
+.ws-sidebar {
+  width: 240px;
+  min-width: 240px;
+  height: 100vh;
+  background: var(--ink);           /* #0E0E0E */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ── Sidebar Logo area ── */
+.ws-sidebar__logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.ws-sidebar__logo-mark {
+  height: 20px;
+  width: auto;
+  fill: #f5f3f0;
+  flex-shrink: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.ws-sidebar__logo:hover .ws-sidebar__logo-mark {
+  opacity: 0.8;
+}
+
+.ws-sidebar__wordmark {
+  font-family: var(--ff-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* ── Sidebar scroll area ── */
+.ws-sidebar__scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  padding-bottom: var(--space-m);
+}
+
+.ws-sidebar__scroll::-webkit-scrollbar { display: none; }
+
+/* ── Nav section ── */
+.ws-sidebar__section {
+  padding: var(--space-s) var(--space-xs) var(--space-2xs);
+}
+
+.ws-sidebar__section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+  padding: 0 var(--space-2xs);
+  margin-bottom: var(--space-2xs);
+  display: block;
+}
+
+/* ── Nav item ── */
+.ws-sidebar__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px var(--space-2xs);
+  border-radius: var(--radius-s);   /* 4px — editorial sharpness */
+  font-size: var(--fz--1);          /* 14px */
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  position: relative;
+  transition: color var(--transition-fast),
+              background var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--ff-body);
+}
+
+.ws-sidebar__nav-item .material-symbols-outlined {
+  font-size: 18px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.35);
+  transition: color var(--transition-fast);
+}
+
+/* Hover state */
+.ws-sidebar__nav-item:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ws-sidebar__nav-item:hover .material-symbols-outlined {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Active state — the left red rule (signature pattern from ichebo.online) */
+.ws-sidebar__nav-item.active {
+  color: #ffffff;
+  background: rgba(175, 50, 54, 0.14);
+}
+
+.ws-sidebar__nav-item.active .material-symbols-outlined {
+  color: var(--primary);
+}
+
+.ws-sidebar__nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Nav item badge — notification count */
+.ws-sidebar__nav-badge {
+  margin-left: auto;
+  background: var(--primary);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  flex-shrink: 0;
+}
+
+/* ── Sidebar divider ── */
+.ws-sidebar__divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: var(--space-2xs) var(--space-xs);
+}
+
+/* ── Sidebar bottom user block ── */
+.ws-sidebar__user {
+  padding: var(--space-xs) var(--space-s);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+  cursor: pointer;
+}
+
+.ws-sidebar__user:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ws-sidebar__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.ws-sidebar__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ws-sidebar__user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ws-sidebar__user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.ws-sidebar__user-role {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  margin-top: 1px;
+}
+
+.ws-sidebar__level-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+
+/* ─── WORKSPACE BODY ──────────────────────────────────────────
+   The right area — topbar + scrollable main content.
+────────────────────────────────────────────────────────────── */
+
+.ws-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0; /* Prevent flex blowout */
+}
+
+
+/* ─── TOPBAR ──────────────────────────────────────────────────
+   56px fixed bar above the main content area.
+   Carries: breadcrumb / page title + right actions.
+   Does NOT span the sidebar (sidebar has its own logo).
+────────────────────────────────────────────────────────────── */
+
+.ws-topbar {
+  height: 56px;
+  background: var(--bg);            /* White in light, #0E0E0E in dark */
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-m);
+  flex-shrink: 0;
+  gap: var(--space-s);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* Breadcrumb */
+.ws-topbar__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fz--2);
+  color: var(--muted);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ws-topbar__breadcrumb a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.ws-topbar__breadcrumb a:hover { color: var(--text); }
+
+.ws-topbar__breadcrumb-sep {
+  color: rgba(0, 0, 0, 0.2);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.ws-topbar__current {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Topbar right actions */
+.ws-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  flex-shrink: 0;
+}
+
+/* Topbar icon button */
+.ws-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-m);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition-fast),
+              color var(--transition-fast),
+              border-color var(--transition-fast);
+  font-size: 18px;
+}
+
+.ws-icon-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* Topbar primary CTA button */
+.ws-topbar__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  height: 36px;
+  padding: 0 var(--space-s);
+  background: var(--primary);
+  color: #fff;
+  border-radius: var(--radius-s);
+  font-size: var(--fz--1);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: var(--ff-body);
+  transition: background var(--transition-fast);
+  white-space: nowrap;
+}
+
+.ws-topbar__cta:hover { background: var(--primary-dark); }
+.ws-topbar__cta .material-symbols-outlined { font-size: 16px; }
+
+/* Topbar search */
+.ws-topbar__search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: 0 12px;
+  height: 36px;
+  width: 220px;
+  transition: border-color var(--transition-fast),
+              width var(--transition);
+}
+
+.ws-topbar__search:focus-within {
+  border-color: var(--primary);
+  width: 280px;
+}
+
+.ws-topbar__search .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.ws-topbar__search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: var(--fz--1);
+  color: var(--text);
+  font-family: var(--ff-body);
+  outline: none;
+  min-width: 0;
+}
+
+.ws-topbar__search input::placeholder { color: var(--muted-light); }
+
+
+/* ─── MAIN CONTENT AREA ───────────────────────────────────────
+   The scrollable content zone. Stone (#F5F3F0) background.
+   Content column is constrained to 960px for readability
+   but the background fills the full available width.
+────────────────────────────────────────────────────────────── */
+
+.ws-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--card);
+  scrollbar-width: thin;
+  scrollbar-color: var(--stone-2, #ece9e4) transparent;
+}
+
+.ws-content::-webkit-scrollbar { width: 6px; }
+.ws-content::-webkit-scrollbar-track { background: transparent; }
+.ws-content::-webkit-scrollbar-thumb {
+  background: var(--card-2);
+  border-radius: var(--radius-pill);
+}
+
+/* Content inner — the actual content column */
+.ws-content__inner {
+  max-width: 960px;
+  margin-inline: auto;
+  padding: var(--space-l) var(--space-l) var(--space-3xl);
+}
+
+/* ── Page header (inside ws-content) ── */
+.ws-page-header {
+  margin-bottom: var(--space-l);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-m);
+  flex-wrap: wrap;
+}
+
+.ws-page-header__left { flex: 1; min-width: 0; }
+
+.ws-page-title {
+  font-family: var(--ff-display);
+  font-size: clamp(var(--fz-3), 3vw, var(--fz-4));  /* 24–32px */
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+
+.ws-page-title em {
+  font-style: italic;
+  color: var(--primary);
+}
+
+.ws-page-subtitle {
+  font-size: var(--fz--1);
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.ws-page-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  flex-shrink: 0;
+}
+
+
+/* ─── RIGHT PANEL (optional) ──────────────────────────────────
+   Slide-in right panel for record detail, member profile, etc.
+   Hidden by default. Toggled via JS adding .ws-panel--open.
+────────────────────────────────────────────────────────────── */
+
+.ws-panel {
+  width: 320px;
+  min-width: 320px;
+  max-width: 320px;
+  height: 100%;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateX(100%);
+  transition: transform var(--transition);
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 60;
+}
+
+/* At very wide screens (≥ 1400px), right panel is always visible */
+@media (min-width: 1400px) {
+  .ws-panel {
+    position: static;
+    transform: none;
+  }
+}
+
+.ws-panel--open {
+  transform: translateX(0);
+}
+
+.ws-panel__header {
+  height: 56px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-s);
+  flex-shrink: 0;
+}
+
+.ws-panel__title {
+  font-size: var(--fz-0);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ws-panel__close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-m);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 20px;
+  transition: background var(--transition-fast);
+}
+
+.ws-panel__close:hover { background: var(--hover); }
+
+.ws-panel__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-m);
+}
+
+
+/* ─── WORKSPACE COMPONENT LIBRARY ────────────────────────────
+   Components specific to the desktop workspace.
+   General components (cards, badges, buttons) are in main.css.
+────────────────────────────────────────────────────────────── */
+
+/* ── Stat cards (dashboard metrics) ── */
+.ws-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-s);
+  margin-bottom: var(--space-l);
+}
+
+.ws-stat-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: var(--space-s) var(--space-s) var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+
+.ws-stat-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-card);
+}
+
+/* Optional left accent colour on stat card */
+.ws-stat-card--accent {
+  border-left: 3px solid var(--primary);
+  padding-left: calc(var(--space-s) - 3px);
+}
+
+.ws-stat-card--success { border-left: 3px solid var(--success); padding-left: calc(var(--space-s) - 3px); }
+.ws-stat-card--warning { border-left: 3px solid var(--warning); padding-left: calc(var(--space-s) - 3px); }
+.ws-stat-card--info    { border-left: 3px solid var(--secondary); padding-left: calc(var(--space-s) - 3px); }
+
+.ws-stat-card__label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--muted);
+}
+
+.ws-stat-card__value {
+  font-family: var(--ff-display);
+  font-size: var(--fz-4);          /* 32px */
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.ws-stat-card__sub {
+  font-size: var(--fz--2);
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ── Section header row (label + action) ── */
+.ws-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s);
+  margin-bottom: var(--space-s);
+  flex-wrap: wrap;
+}
+
+.ws-section-header__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.ws-section-title {
+  font-family: var(--ff-display);
+  font-size: var(--fz-2);           /* 20px */
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.ws-section-action {
+  font-size: var(--fz--2);
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity var(--transition-fast);
+}
+
+.ws-section-action:hover { opacity: 0.75; }
+.ws-section-action .material-symbols-outlined { font-size: 14px; }
+
+/* ── Data table ── */
+.ws-table-wrap {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  margin-bottom: var(--space-m);
+}
+
+.ws-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fz--1);
+}
+
+.ws-table thead {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.ws-table th {
+  padding: var(--space-2xs) var(--space-s);
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.ws-table th:first-child { padding-left: var(--space-s); }
+.ws-table th:last-child { padding-right: var(--space-s); }
+
+.ws-table td {
+  padding: var(--space-xs) var(--space-s);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.ws-table td:first-child { padding-left: var(--space-s); }
+.ws-table td:last-child { padding-right: var(--space-s); }
+
+.ws-table tbody tr:last-child td { border-bottom: none; }
+
+.ws-table tbody tr {
+  transition: background var(--transition-fast);
+  cursor: default;
+}
+
+.ws-table tbody tr:hover { background: var(--card); }
+
+.ws-table tbody tr.ws-row--clickable { cursor: pointer; }
+
+/* Table cell variants */
+.ws-td-muted { color: var(--muted); }
+.ws-td-primary { color: var(--primary); font-weight: 600; }
+.ws-td-mono {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: var(--fz--2);
+  color: var(--muted);
+}
+
+/* Table empty row */
+.ws-table-empty {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-m);
+  color: var(--muted);
+  font-size: var(--fz--1);
+}
+
+/* ── Workspace card (wider than mobile card) ── */
+.ws-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: var(--space-m);
+  margin-bottom: var(--space-s);
+}
+
+.ws-card--accent {
+  border-left: 3px solid var(--primary);
+  padding-left: calc(var(--space-m) - 3px);
+}
+
+/* ── Two column layout within ws-content ── */
+.ws-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-m);
+  margin-bottom: var(--space-m);
+}
+
+.ws-cols--3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.ws-cols--sidebar {
+  grid-template-columns: 1fr 300px;
+}
+
+/* ── Tab row (workspace-specific, sits below topbar) ── */
+.ws-tab-row {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+
+.ws-tab-row::-webkit-scrollbar { display: none; }
+
+.ws-tab {
+  flex-shrink: 0;
+  padding: var(--space-xs) var(--space-s);
+  font-size: var(--fz--1);
+  font-weight: 500;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: var(--ff-body);
+  white-space: nowrap;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  outline: none;
+}
+
+.ws-tab.active,
+.ws-tab[aria-selected="true"] {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* ── Inline label-tag for workspace (matches ichebo.online) ── */
+.ws-label-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: var(--space-2xs);
+}
+
+.ws-label-tag::before {
+  content: '';
+  width: 16px;
+  height: 2px;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+
+
+/* ─── DARK MODE OVERRIDES ─────────────────────────────────────
+   The sidebar is already --ink so stays the same.
+   Main content area, topbar, and cards shift.
+────────────────────────────────────────────────────────────── */
+
+body.dark .ws-topbar {
+  background: var(--ink-2);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark .ws-content {
+  background: var(--ink);
+}
+
+body.dark .ws-stat-card,
+body.dark .ws-card,
+body.dark .ws-table-wrap {
+  background: var(--ink-2);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark .ws-table thead {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark .ws-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+body.dark .ws-table td {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark .ws-tab-row {
+  background: var(--ink-2);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark .ws-page-title { color: #f5f3f0; }
+body.dark .ws-section-title { color: #f5f3f0; }
+
+body.dark .ws-icon-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+body.dark .ws-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+body.dark .ws-topbar__search {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark .ws-topbar__search input { color: #f5f3f0; }
+
+body.dark .ws-topbar__breadcrumb-sep {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark .ws-panel {
+  background: var(--ink-2);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark .ws-panel__header {
+  border-color: rgba(255, 255, 255, 0.06);
+}

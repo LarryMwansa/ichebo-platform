@@ -1,0 +1,134 @@
+{# components/_ws_topbar.html
+   Desktop workspace topbar — 56px bar above the main content area.
+   Carries breadcrumb, optional search, and right actions.
+
+   Context variables:
+     ws_breadcrumb_links  — list of dicts: [{"label": "Community", "url": "/community/"}]
+                            Last item is treated as the current page (no link).
+                            If not set, renders just the app name.
+     ws_page_title        — string, used for the final breadcrumb segment.
+                            Falls back to the block title if not set.
+     ws_show_search       — boolean, shows the search input (default True).
+     user                 — request.user
+
+   Path: backend/templates/components/_ws_topbar.html
+#}
+
+<div class="ws-topbar" role="banner">
+
+  {# ── Left: breadcrumb ── #}
+  <nav class="ws-topbar__breadcrumb" aria-label="Page breadcrumb">
+
+    {# Home / workspace root #}
+    <a href="{% url 'core:dashboard' %}">Workspace</a>
+
+    {% if ws_breadcrumb_links %}
+      {% for crumb in ws_breadcrumb_links %}
+        <span class="ws-topbar__breadcrumb-sep" aria-hidden="true">·</span>
+        {% if not forloop.last %}
+          <a href="{{ crumb.url }}">{{ crumb.label }}</a>
+        {% else %}
+          <span class="ws-topbar__current">{{ crumb.label }}</span>
+        {% endif %}
+      {% endfor %}
+    {% elif ws_page_title %}
+      <span class="ws-topbar__breadcrumb-sep" aria-hidden="true">·</span>
+      <span class="ws-topbar__current">{{ ws_page_title }}</span>
+    {% endif %}
+
+  </nav>
+
+  {# ── Right: actions ── #}
+  <div class="ws-topbar__actions">
+
+    {# Search — hidden if ws_show_search is explicitly False #}
+    {% if ws_show_search != False %}
+    <div class="ws-topbar__search" role="search">
+      <span class="material-symbols-outlined" aria-hidden="true">search</span>
+      <input type="search"
+             placeholder="Search…"
+             aria-label="Search workspace"
+             id="ws-search-input"
+             autocomplete="off">
+    </div>
+    {% endif %}
+
+    {# Notifications #}
+    <div class="nav-right-item" style="position:relative">
+      <button class="ws-icon-btn"
+              aria-label="Notifications{% if unread_count %} — {{ unread_count }} unread{% endif %}"
+              hx-get="{% url 'notifications:list' %}"
+              hx-target="#ws-content"
+              hx-push-url="true">
+        <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+      </button>
+      {% if unread_count %}
+      <span class="notif-badge" aria-hidden="true">{{ unread_count }}</span>
+      {% endif %}
+    </div>
+
+    {# Theme toggle #}
+    <button class="ws-icon-btn theme-toggle"
+            aria-label="Toggle dark mode"
+            id="themeToggle">
+      <span class="material-symbols-outlined theme-icon-sun" aria-hidden="true">light_mode</span>
+      <span class="material-symbols-outlined theme-icon-moon" aria-hidden="true">dark_mode</span>
+    </button>
+
+    {# Primary page action — set via block ws_topbar_cta in child templates #}
+    {% block ws_topbar_cta %}{% endblock %}
+
+    {# Profile avatar — links to profile menu (reuses existing dropdown logic) #}
+    {% if user.is_authenticated %}
+    <div class="nav-right-item profile" style="position:relative">
+      <button class="profile-avatar-btn"
+              id="profileMenuBtn"
+              aria-label="Open profile menu"
+              aria-expanded="false"
+              aria-controls="profileMenu">
+        {% if user.avatar_url %}
+          <img src="{{ user.avatar_url }}" alt="{{ user.display_name }}">
+        {% else %}
+          <div class="avatar-placeholder" aria-hidden="true">
+            {{ user.display_name|first|upper }}
+          </div>
+        {% endif %}
+      </button>
+
+      {# Profile dropdown — same as mobile navbar #}
+      <div class="profile-menu" id="profileMenu" role="menu" aria-hidden="true">
+        <div class="profile-header">
+          <div class="profile-avatar-large" aria-hidden="true">
+            {{ user.display_name|first|upper }}
+          </div>
+          <div class="profile-identity">
+            <strong>{{ user.display_name }}</strong>
+            <small>{{ user.email }}</small>
+          </div>
+        </div>
+        <div class="profile-menu-items" role="none">
+          <a href="{% url 'accounts:profile' %}" role="menuitem">
+            <span class="material-symbols-outlined" aria-hidden="true">person</span>
+            Profile
+          </a>
+          <a href="{% url 'accounts:settings' %}" role="menuitem">
+            <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+            Settings
+          </a>
+        </div>
+        <div role="none" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px">
+          <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
+            {% csrf_token %}
+            <button class="logout-btn" type="submit" role="menuitem">
+              <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+              Sign out
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+</div>
