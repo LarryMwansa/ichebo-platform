@@ -19,11 +19,6 @@
     z-index: 1000;
 }
 
-@media (min-width: 800px) {
-    .bottom-bar {
-        display: none;
-    }
-}
 
 /* Nav Item */
 .nav-item {

@@ -1,0 +1,182 @@
+<!-- {# components/_navbar.html
+   Top navigation bar for the Ichebo Platform.
+   SVG logo is inline — no external image request, correct colour in dark mode.
+   Adjust nav-right items to match your actual views and user context.
+#} -->
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+
+  {# ── LEFT — Logo + optional back button ── #}
+  <div class="nav-left">
+
+    {# Back button — shown only when a page sets block navbar_back #}
+    {% block navbar_back %}{% endblock %}
+
+    <a href="{% url 'dashboard:index' %}" class="logo-link" aria-label="Ichebo — Go to dashboard">
+      <div class="logo-container">
+
+        {# ICS SVG logo mark — inline so fill responds to CSS colour tokens #}
+        <svg class="logo-svg" viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg"
+             aria-hidden="true" focusable="false">
+          <polygon fill-rule="evenodd"
+            points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15
+                    285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15
+                    250.08 576.15 250.08 406.42 0 406.42 0 997.27
+                    370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42
+                    491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04
+                    455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26
+                    455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69
+                    455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69
+                    92.18 342.42 285.83 342.42"/>
+          <path d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/>
+          <path d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67
+                   c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48
+                   c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08
+                   v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08
+                   v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58
+                   -21.17,15.56-53.36,23.33-96.55,23.33h-335.67
+                   c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58
+                   V338.91Z"/>
+          <path d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08
+                   h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5
+                   c0-6.03-3.03-9.06-9.08-9.06h-198.28
+                   c-85.53,0-128.3-32.83-128.3-98.5v-308.45
+                   c0-65.66,42.77-98.48,128.3-98.48h335.67
+                   c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47
+                   c0-6.05-3.03-9.08-9.08-9.08h-60.91
+                   c-6.05,0-9.06,3.03-9.06,9.08v98.48
+                   c0,6.06,3.02,9.08,9.06,9.08h198.3
+                   c43.19,0,75.38,7.78,96.55,23.33
+                   c21.16,15.56,31.75,39.75,31.75,72.58v312.33
+                   c0,32.84-10.59,57.03-31.75,72.58
+                   -21.17,15.56-53.36,23.33-96.55,23.33h-335.67
+                   c-43.2,0-75.39-7.77-96.55-23.33
+                   -21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/>
+        </svg>
+
+        {# Wordmark — visible on desktop only (controlled in navbar.css) #}
+        <span class="logo-wordmark" aria-hidden="true">Ichebo</span>
+
+      </div>
+    </a>
+
+    {# Optional page title — set in templates that want a centre title #}
+    {% block navbar_title %}{% endblock %}
+
+  </div>
+
+  {# ── RIGHT — actions ── #}
+  <div class="nav-right">
+
+    {# App drawer toggle #}
+    <div class="nav-right-item">
+      <button class="icon-btn"
+              id="drawerToggle"
+              aria-label="Open app menu"
+              aria-expanded="false"
+              aria-controls="appDrawer">
+        <span class="material-symbols-outlined" aria-hidden="true">apps</span>
+      </button>
+    </div>
+
+    {# Notifications #}
+    {% if user.is_authenticated %}
+    <div class="nav-right-item">
+      <button class="icon-btn"
+              aria-label="Notifications{% if unread_count %} ({{ unread_count }} unread){% endif %}"
+              hx-get="{% url 'notifications:list' %}"
+              hx-target="#main-content"
+              hx-push-url="true">
+        <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+        {% if unread_count %}
+        <span class="notif-badge" aria-hidden="true">{{ unread_count }}</span>
+        {% endif %}
+      </button>
+    </div>
+    {% endif %}
+
+    {# Level badge + profile menu #}
+    {% if user.is_authenticated %}
+    <div class="nav-right-item profile">
+
+      {# Level badge — colour driven by competence_level #}
+      {% with level=user.competence_level %}
+      <button class="level-badge
+                     {% if level == 0 %}level-grey
+                     {% elif level == 1 %}level-green
+                     {% elif level == 2 %}level-blue
+                     {% elif level == 3 %}level-purple
+                     {% elif level == 4 %}level-orange
+                     {% else %}level-red{% endif %}"
+              aria-label="Your formation level: {{ level }}"
+              id="levelBadgeBtn"
+              aria-expanded="false"
+              aria-controls="profileMenu">
+        {{ level }}
+      </button>
+      {% endwith %}
+
+      {# Avatar button #}
+      <button class="profile-avatar-btn"
+              id="profileMenuBtn"
+              aria-label="Open profile menu"
+              aria-expanded="false"
+              aria-controls="profileMenu">
+        {% if user.avatar_url %}
+          <img src="{{ user.avatar_url }}" alt="{{ user.display_name }}">
+        {% else %}
+          <div class="avatar-placeholder" aria-hidden="true">
+            {{ user.display_name|first|upper }}
+          </div>
+        {% endif %}
+      </button>
+
+      {# Profile dropdown #}
+      <div class="profile-menu" id="profileMenu" role="menu" aria-hidden="true">
+        <div class="profile-header">
+          <div class="profile-avatar-large" aria-hidden="true">
+            {{ user.display_name|first|upper }}
+          </div>
+          <div class="profile-identity">
+            <strong>{{ user.display_name }}</strong>
+            <small>{{ user.email }}</small>
+          </div>
+        </div>
+        <div class="profile-menu-items" role="none">
+          <a href="{% url 'accounts:profile' %}" role="menuitem">
+            <span class="material-symbols-outlined" aria-hidden="true">person</span>
+            Profile
+          </a>
+          <a href="{% url 'accounts:settings' %}" role="menuitem">
+            <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+            Settings
+          </a>
+          {# Theme toggle — JS in navbar.js handles the dark class #}
+          <button class="icon-btn theme-toggle" role="menuitem"
+                  aria-label="Toggle dark mode" id="themeToggle">
+            <span class="material-symbols-outlined theme-icon-sun" aria-hidden="true">light_mode</span>
+            <span class="material-symbols-outlined theme-icon-moon" aria-hidden="true">dark_mode</span>
+            <span style="font-size:var(--fz--1);font-weight:500;color:var(--text);margin-left:4px">Theme</span>
+          </button>
+        </div>
+        <div role="none" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px">
+          <form class="logout-form" method="post" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button class="logout-btn" type="submit" role="menuitem">
+              <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+              Sign out
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+    {% else %}
+    <a href="{% url 'accounts:login' %}" class="btn-touch btn-primary"
+       style="min-height:38px;padding:0 var(--space-s);font-size:var(--fz--1);">
+      Sign in
+    </a>
+    {% endif %}
+
+  </div>
+
+</nav>

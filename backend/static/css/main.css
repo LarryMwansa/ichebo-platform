@@ -1,28 +1,26 @@
 /* =========================
-   MAIN CONTENT
+   MAIN.CSS — ICS Platform
+   Layout utilities + shared component library.
+   Aligned with ichebo.online editorial design language.
+   Load order: variables → global → main → theme → navbar → app
 ========================= */
 
+/* ─── LAYOUT ─────────────────────────────────────────────── */
 
 .main {
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
-   place-items: center;
-   min-width: 320px;
-   min-height: calc(-100% + 126px);;
-   max-width: 1280px;
-   margin: 0 auto;
-   padding: 2rem;
-   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 320px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
-
-/* LAYOUT STYLES */
-
-
 .section {
-  padding-block: 6rem 3rem;
+  padding-block: 4rem 2.5rem;
 }
 
 .container {
@@ -37,7 +35,6 @@
   align-items: center;
   justify-content: center;
 }
-
 
 .section-header {
   display: flex;
@@ -57,99 +54,129 @@
   overflow: hidden;
 }
 
-/* HEADINGS & TITLES */
+/* ─── PAGE HERO ───────────────────────────────────────────
+   Editorial dark header used at the top of every major
+   app section (Bible, Learn, Community, Governance, etc.)
+   Mirrors the dark hero sections on ichebo.online.
+   Usage: wrap the first block of a page in .page-hero
+─────────────────────────────────────────────────────────── */
 
-.title-small {
-  font-family: inherit;
-  font-size: clamp(1.75rem, 4vw, 2.35rem);
-  font-weight: 700;
-  line-height: 1.25;
-}
-.title-medium {
-  font-family: inherit;
-  font-size: clamp(2.15rem, 5vw, 3.15rem);
-  font-weight: 700;
-  line-height: 1.15;
-}
-.title-large {
-  font-family: inherit;
-  font-size: clamp(2.65rem, 6vw, 4rem);
-  font-weight: 700;
-  line-height: 1.15;
+.page-hero {
+  background: var(--ink);
+  padding: var(--space-l) var(--space-s) var(--space-m);
+  margin: calc(-1 * var(--space-s)) calc(-1 * var(--space-s)) var(--space-m);
+  position: relative;
+  overflow: hidden;
 }
 
-.title {
-  font-family: inherit;
-  font-size: 4.5rem;
+/* Subtle red left rule — the website's signature vertical line */
+.page-hero::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--primary) 25%,
+    var(--primary) 75%,
+    transparent
+  );
+  opacity: 0.7;
+}
+
+/* Ghost large text watermark — optional, add .page-hero--watermark */
+.page-hero--watermark::after {
+  content: attr(data-watermark);
+  position: absolute;
+  right: -0.5rem;
+  bottom: -1rem;
+  font-family: var(--ff-display);
+  font-size: clamp(5rem, 18vw, 9rem);
+  font-weight: 900;
+  color: rgba(175, 50, 54, 0.07);
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.page-hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
+}
+
+.page-hero__eyebrow-line {
+  width: 20px;
+  height: 2px;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+
+.page-hero__label {
+  font-size: 11px;
   font-weight: 700;
-  line-height: 1.25;
-  text-wrap: balance;
-  letter-spacing: -0.05rem;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.paragraph {
-  font-family: inherit;
-  line-height: 1.5;
-  max-width: 50ch;
-  height: auto;
-  text-wrap: pretty;
-  word-wrap: break-word;
-}
-
-.text-small {
-  font-family: inherit;
-  font-size: 0.85rem;
-  line-height: 1.5;
-}
-.text-base {
-  font-family: inherit;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-.text-medium {
-  font-family: inherit;
-  font-size: 1.15rem;
-  line-height: 1.5;
-}
-.text-large {
-  font-family: inherit;
-  font-size: 1.3rem;
-  line-height: 1.5;
-}
-.text-upper {
+  letter-spacing: var(--tracking-widest);
   text-transform: uppercase;
-}
-.text-lower {
-  text-transform: lowercase;
-}
-.text-capital {
-  text-transform: capitalize;
+  color: var(--primary);
 }
 
-.font-light {
-  font-weight: 300;
+.page-hero__title {
+  font-family: var(--ff-display);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: var(--space-xs);
+  text-wrap: balance;
 }
-.font-normal {
-  font-weight: 400;
+
+.page-hero__title em {
+  font-style: italic;
+  color: var(--primary);
 }
-.font-medium {
-  font-weight: 500;
+
+.page-hero__sub {
+  font-size: var(--fz--1);
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.7;
+  max-width: 48ch;
 }
-.font-semi {
-  font-weight: 600;
-}
-.font-bold {
+
+/* ─── LABEL TAG ───────────────────────────────────────────
+   The "—— LABEL TEXT" pattern from ichebo.online.
+   Use for section eyebrows within light content areas.
+─────────────────────────────────────────────────────────── */
+
+.label-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: 11px;
   font-weight: 700;
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--primary);
 }
 
-/* =========================
-   STANDARD UI COMPONENTS 
-========================= */
+.label-tag::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 2px;
+  background: var(--primary);
+  flex-shrink: 0;
+}
 
-/* 1. Typography Extensions */
+/* ─── LABEL CAPS (existing — kept) ───────────────────────── */
+
 .label-caps {
-  font-size: 11px; /* strict for small caps legibility */
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--muted);
@@ -157,34 +184,143 @@
   margin-bottom: var(--space-2xs);
 }
 
-/* 2. List Item Pattern (Dense, edge-to-edge on mobile) */
+/* ─── HEADINGS & DISPLAY TITLES ─────────────────────────── */
+
+.title-display {
+  font-family: var(--ff-display);
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.title-small {
+  font-family: var(--ff-display);
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.title-medium {
+  font-family: var(--ff-display);
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.12;
+}
+
+.title-large {
+  font-family: var(--ff-display);
+  font-size: clamp(2.2rem, 6vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.paragraph {
+  font-family: var(--ff-body);
+  line-height: 1.7;
+  max-width: 52ch;
+  text-wrap: pretty;
+  word-wrap: break-word;
+}
+
+/* Text size utilities */
+.text-small  { font-size: var(--fz--1); line-height: 1.5; }
+.text-base   { font-size: var(--fz-0);  line-height: 1.6; }
+.text-medium { font-size: var(--fz-1);  line-height: 1.5; }
+.text-large  { font-size: var(--fz-2);  line-height: 1.4; }
+
+.text-upper   { text-transform: uppercase; }
+.text-lower   { text-transform: lowercase; }
+.text-capital { text-transform: capitalize; }
+
+.font-light  { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semi   { font-weight: 600; }
+.font-bold   { font-weight: 700; }
+
+/* ─── EDITORIAL SECTION DIVIDER ─────────────────────────── */
+
+/* Thin red top-border used on light stone sections on the website */
+.section-accent {
+  position: relative;
+}
+.section-accent::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(to right, var(--primary), transparent);
+}
+
+/* ─── CARDS ──────────────────────────────────────────────── */
+
+/* Base app card — tightened radius (12px → closer to website feel) */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);   /* 12px */
+  padding: var(--space-s);
+  transition: background var(--transition-fast),
+              border-color var(--transition-fast),
+              transform var(--transition-fast);
+}
+
+.card:hover {
+  background: var(--hover);
+}
+
+.card--interactive {
+  cursor: pointer;
+}
+.card--interactive:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+/* Editorial card — used for dark-ink content areas within the app */
+.card-dark {
+  background: var(--ink-2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-l);
+  padding: var(--space-s);
+  color: #ffffff;
+}
+
+/* Card with left accent border — from ichebo.online aside-card pattern */
+.card-accent {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-s) var(--radius-s) 0;
+  padding: var(--space-s) var(--space-s) var(--space-s) calc(var(--space-s) - 3px);
+}
+
+/* ─── LIST ITEMS ─────────────────────────────────────────── */
+
 .list-group {
   display: flex;
   flex-direction: column;
   background: var(--card);
-  border-radius: 12px;
+  border-radius: var(--radius-l);
   overflow: hidden;
   border: 1px solid var(--border);
 }
 
-/* 1. List Item Pattern (Dense, edge-to-edge on mobile) */
 .list-item {
   display: flex;
   align-items: center;
   gap: var(--space-s);
-  padding: var(--space-s) var(--space-s);
+  padding: var(--space-s);
   border-bottom: 1px solid var(--border);
   background: var(--card);
-  transition: background 0.2s;
+  transition: background var(--transition-fast);
 }
 
-.list-item:hover {
-  background: var(--hover);
-}
-
-.list-item:last-child {
-  border-bottom: none;
-}
+.list-item:hover { background: var(--hover); }
+.list-item:last-child { border-bottom: none; }
 
 .list-item__icon {
   flex-shrink: 0;
@@ -193,14 +329,14 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: var(--radius-m);
   background: var(--bg);
   color: var(--muted);
 }
 
 .list-item__content {
   flex: 1;
-  min-width: 0; /* allows truncation */
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -227,25 +363,22 @@
   color: var(--muted);
 }
 
-/* 3. Semantic Badges */
+/* ─── BADGES ─────────────────────────────────────────────── */
+
 .badge-unit {
   font-size: 10px;
   font-weight: var(--font-weight-black);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
   background: var(--hover);
   color: var(--muted);
 }
 
 .badge-unit--primary {
-  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  background: var(--primary-light);
   color: var(--primary);
-}
-
-.badge-unit {
-  padding: 2px 8px;
 }
 
 .status-badge {
@@ -253,7 +386,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-3xs) var(--space-2xs);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 10px;
   font-weight: var(--font-weight-black);
   text-transform: uppercase;
@@ -261,29 +394,73 @@
   white-space: nowrap;
 }
 
-.status-badge--active    { background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success); }
-.status-badge--danger    { background: color-mix(in srgb, var(--error) 12%, transparent); color: var(--error); }
-.status-badge--warning   { background: color-mix(in srgb, var(--warning) 12%, transparent); color: var(--warning); }
-.status-badge--seeker    { background: color-mix(in srgb, var(--info) 12%, transparent); color: var(--info); }
-.status-badge--muted     { background: var(--hover); color: var(--muted); }
+.status-badge--active  { background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success); }
+.status-badge--danger  { background: color-mix(in srgb, var(--error)   12%, transparent); color: var(--error); }
+.status-badge--warning { background: color-mix(in srgb, var(--warning) 12%, transparent); color: var(--warning); }
+.status-badge--seeker  { background: color-mix(in srgb, var(--info)    12%, transparent); color: var(--info); }
+.status-badge--muted   { background: var(--hover); color: var(--muted); }
 
+/* ─── BUTTONS ────────────────────────────────────────────── */
 
-/* 3. Touch Targets (Forms & Buttons) */
+/* Base touch target — 48px min height, non-negotiable */
 .btn-touch {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px; /* Strict mobile tap target size */
+  gap: var(--space-2xs);
+  min-height: 48px;
   padding: 0 var(--space-m);
-  border-radius: 12px;
+  border-radius: var(--radius-l);
+  font-family: var(--ff-body);
   font-size: var(--fz-0);
   font-weight: var(--font-weight-medium);
-  transition: transform 0.1s, opacity 0.2s;
+  letter-spacing: 0.02em;
+  transition: transform var(--transition-fast),
+              background var(--transition-fast),
+              opacity var(--transition-fast);
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+  outline: none;
 }
 
-.btn-touch:active {
-  transform: scale(0.98);
+.btn-touch:active { transform: scale(0.98); }
+
+/* Variants */
+.btn-primary {
+  background: var(--primary);
+  color: #ffffff;
 }
+.btn-primary:hover { background: var(--primary-dark); }
+
+.btn-secondary {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--hover); }
+
+.btn-danger {
+  background: var(--error);
+  color: #ffffff;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--primary);
+  padding-inline: 0;
+}
+.btn-ghost:hover { opacity: 0.8; }
+
+/* Disabled state — all variants */
+.btn-touch:disabled,
+.btn-touch[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ─── FORMS ──────────────────────────────────────────────── */
 
 .form-input-touch {
   display: block;
@@ -291,40 +468,152 @@
   max-width: 100%;
   min-height: 48px;
   padding: 0 var(--space-s);
-  border-radius: 10px;
+  border-radius: var(--radius-m);
   border: 1px solid var(--border);
-  background: var(--card); /* Ensure contrast */
+  background: var(--card);
   color: var(--text);
-  font-family: inherit;
-  font-size: 16px; 
-  transition: border-color 0.2s;
+  font-family: var(--ff-body);
+  font-size: 16px;   /* strict — prevents iOS Safari zoom */
+  transition: border-color var(--transition-fast),
+              background var(--transition-fast);
   box-sizing: border-box;
 }
 
-/* Specific Select Restore — Avoiding appearance:none for reliability */
 select.form-input-touch {
   cursor: pointer;
   padding-right: var(--space-s);
 }
 
 .form-input-touch option {
-  background-color: var(--bg); /* Fallback for white */
-  color: var(--text); /* Fallback for dark text */
+  background-color: var(--bg);
+  color: var(--text);
 }
 
-/* Maintain dark mode for options if needed */
 body.dark .form-input-touch option {
-  background-color: #2d2d2d;
-  color: #ffffff;
+  background-color: #1a1a1a;
+  color: #f5f3f0;
 }
 
 .form-input-touch:focus {
   outline: none;
   border-color: var(--primary);
-  background: var(--card);
+  background: var(--bg);
 }
 
-/* Global HTMX Progress Bar */
+.form-input-touch.error {
+  border-color: var(--error);
+}
+
+.form-error-message {
+  font-size: var(--fz--2);
+  color: var(--error);
+  margin-top: var(--space-3xs);
+}
+
+/* Form group */
+.record-form-group {
+  margin-bottom: var(--space-m);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3xs);
+}
+
+.record-drawer-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ─── TABS ───────────────────────────────────────────────── */
+
+.tab-row {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  position: sticky;
+  top: 56px;   /* navbar height */
+  z-index: 10;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-row::-webkit-scrollbar { display: none; }
+
+.tab {
+  flex-shrink: 0;
+  padding: 12px var(--space-s);
+  font-size: var(--fz--1);
+  font-weight: var(--font-weight-medium);
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  white-space: nowrap;
+  cursor: pointer;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  outline: none;
+  font-family: var(--ff-body);
+}
+
+.tab.active,
+.tab[aria-selected="true"] {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* ─── PROGRESS BAR ───────────────────────────────────────── */
+
+.progress-bar-wrap {
+  height: 6px;
+  background: var(--hover);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: var(--radius-pill);
+  transition: width 0.6s ease;
+}
+
+/* ─── EMPTY STATE ────────────────────────────────────────── */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-2xl) var(--space-l);
+  gap: var(--space-s);
+}
+
+.empty-state__icon {
+  font-size: 48px;
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+.empty-state__title {
+  font-family: var(--ff-display);
+  font-size: var(--fz-2);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.empty-state__message {
+  font-size: var(--fz--1);
+  color: var(--muted);
+  max-width: 36ch;
+  line-height: 1.65;
+}
+
+/* ─── HTMX PROGRESS BAR ─────────────────────────────────── */
+
 .htmx-progress-bar {
   position: fixed;
   top: 0;
@@ -344,41 +633,34 @@ body.dark .form-input-touch option {
   box-shadow: 0 0 8px var(--primary);
 }
 
-.htmx-loading .htmx-progress-bar {
-  opacity: 1;
-}
+.htmx-loading .htmx-progress-bar { opacity: 1; }
 
 .htmx-loading .htmx-progress-inner {
   width: 100%;
   transition: width 2s cubic-bezier(0.1, 0.05, 0, 1);
 }
 
-/* Immersive Shell (Hide Navigation Chrome) */
+/* ─── IMMERSIVE SHELL ────────────────────────────────────── */
+
 .ics-shell--immersive .navbar,
-.ics-shell--immersive .bottom-bar {
-  display: none;
-}
+.ics-shell--immersive .bottom-bar { display: none; }
 
 .ics-shell--immersive .ics-main {
   padding-top: 0;
   padding-bottom: 0;
 }
 
-/* Immersive mode also hides FAB */
-.ics-shell--immersive .fab {
-  display: none;
-}
+.ics-shell--immersive .fab { display: none; }
 
-/* =========================
-   FLOATING ACTION BUTTON
-========================= */
+/* ─── FAB ────────────────────────────────────────────────── */
+
 .fab {
   position: fixed;
   bottom: 84px;
   right: 20px;
   width: 56px;
   height: 56px;
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   background: var(--primary);
   color: #fff;
   border: none;
@@ -386,50 +668,40 @@ body.dark .form-input-touch option {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 20px rgba(175, 50, 54, 0.35);
   z-index: 900;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.2s ease;
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .fab:hover {
-  transform: scale(1.08);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+  transform: scale(1.06);
+  box-shadow: 0 8px 28px rgba(175, 50, 54, 0.45);
 }
 
-.fab:active {
-  transform: scale(0.95);
-}
+.fab:active { transform: scale(0.95); }
 
 .fab-icon {
   font-size: 28px;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.fab.active .fab-icon {
-  transform: rotate(45deg);
-}
+.fab.active .fab-icon { transform: rotate(45deg); }
 
 @media (min-width: 800px) {
-  .fab {
-    bottom: 32px;
-    right: 32px;
-  }
+  .fab { bottom: 32px; right: 32px; }
 }
 
-/* =========================
-   EXPLORE PAGE
-========================= */
+/* ─── EXPLORE PAGE ───────────────────────────────────────── */
+
 .explore-page {
-  padding: 16px;
+  padding: var(--space-s);
   padding-bottom: 80px;
 }
 
-.explore-header {
-  margin-bottom: 20px;
-}
+.explore-header { margin-bottom: 20px; }
 
 .explore-title {
+  font-family: var(--ff-display);
   font-size: var(--fz-3);
   font-weight: 800;
   letter-spacing: var(--tracking-m);
@@ -448,7 +720,7 @@ body.dark .form-input-touch option {
   gap: 12px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-l);
   padding: 12px 16px;
   margin-bottom: 24px;
 }
@@ -460,11 +732,10 @@ body.dark .form-input-touch option {
   font-size: var(--fz--1);
   color: var(--text);
   outline: none;
+  font-family: var(--ff-body);
 }
 
-.explore-section {
-  margin-bottom: 24px;
-}
+.explore-section { margin-bottom: 24px; }
 
 .explore-card {
   display: flex;
@@ -473,40 +744,28 @@ body.dark .form-input-touch option {
   padding: 12px 16px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-l);
   text-decoration: none;
   color: var(--text);
   margin-bottom: 8px;
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
-.explore-card:active {
-  transform: scale(0.98);
-}
+.explore-card:active { transform: scale(0.98); }
 
 .explore-card-icon {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: var(--radius-m);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.explore-card-icon .material-symbols-outlined {
-  font-size: 24px;
-}
-
-.explore-card-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.explore-card-title {
-  font-size: var(--fz--1);
-  font-weight: 600;
-}
+.explore-card-icon .material-symbols-outlined { font-size: 24px; }
+.explore-card-content { flex: 1; min-width: 0; }
+.explore-card-title   { font-size: var(--fz--1); font-weight: 600; }
 
 .explore-card-desc {
   font-size: 12px;
@@ -520,11 +779,10 @@ body.dark .form-input-touch option {
   flex-shrink: 0;
 }
 
-/* =========================
-   YOU PAGE
-========================= */
+/* ─── YOU / PROFILE PAGE ─────────────────────────────────── */
+
 .you-page {
-  padding: 16px;
+  padding: var(--space-s);
   padding-bottom: 80px;
 }
 
@@ -538,7 +796,7 @@ body.dark .form-input-touch option {
 .you-avatar {
   width: 64px;
   height: 64px;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   background: var(--primary);
   display: flex;
   align-items: center;
@@ -547,11 +805,7 @@ body.dark .form-input-touch option {
   flex-shrink: 0;
 }
 
-.you-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+.you-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .you-avatar-letter {
   font-size: 28px;
@@ -560,6 +814,7 @@ body.dark .form-input-touch option {
 }
 
 .you-name {
+  font-family: var(--ff-display);
   font-size: var(--fz-2);
   font-weight: var(--font-weight-black);
   letter-spacing: var(--tracking-m);
@@ -575,7 +830,7 @@ body.dark .form-input-touch option {
 .you-formation {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-l);
   padding: 16px;
   margin-bottom: 24px;
 }
@@ -594,22 +849,20 @@ body.dark .form-input-touch option {
 }
 
 .you-progress-bar {
-  height: 8px;
+  height: 6px;
   background: var(--hover);
-  border-radius: 4px;
+  border-radius: var(--radius-pill);
   overflow: hidden;
 }
 
 .you-progress-fill {
   height: 100%;
   background: var(--primary);
-  border-radius: 4px;
+  border-radius: var(--radius-pill);
   transition: width 0.6s ease;
 }
 
-.you-section {
-  margin-bottom: 24px;
-}
+.you-section { margin-bottom: 24px; }
 
 .you-stat-grid {
   display: grid;
@@ -620,12 +873,13 @@ body.dark .form-input-touch option {
 .you-stat-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-l);
   padding: 16px 12px;
   text-align: center;
 }
 
 .you-stat-value {
+  font-family: var(--ff-display);
   font-size: var(--fz-3);
   font-weight: var(--font-weight-black);
   color: var(--text);
@@ -639,14 +893,11 @@ body.dark .form-input-touch option {
   margin-top: 4px;
 }
 
-.you-gifts {
-  margin-top: 16px;
-}
-
 .you-gift-list {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  margin-top: 16px;
 }
 
 .you-gift-tag {
@@ -654,26 +905,7 @@ body.dark .form-input-touch option {
   padding: 4px 12px;
   background: var(--primary-alpha);
   color: var(--primary);
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 600;
 }
-
-/* 4. Form Layout Utilities */
-.record-drawer-form {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 100%;
-}
-
-.record-form-group {
-    margin-bottom: var(--space-m);
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-}
-
-
-

@@ -1,0 +1,166 @@
+/* ICS Platform Design Tokens — aligned with ichebo.online brand */
+
+/* @link https://utopia.fyi/type/calculator?c=320,18,1.2,1920,20,1.25,8,4,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+
+:root {
+
+    /* ── Brand Colours ── */
+    --primary:        #af3236;
+    --primary-dark:   #8c2a2d;
+    --primary-light:  rgba(175, 50, 54, 0.12);
+    --primary-alpha:  rgba(175, 50, 54, 0.15);
+    --primary-tint:   #fff8f8;
+    --secondary:      #185abc;
+    --secondary-dark: #0c397b;
+
+    /* ── Surface Colours (light mode) ── */
+    --bg:       #ffffff;
+    --bg-alpha: rgba(255, 255, 255, 0.75);
+    --card:     #f5f3f0;   /* --stone from website */
+    --card-2:   #ece9e4;   /* --stone-2 from website */
+    --hover:    #ece9e4;
+
+    /* ── Ink (dark surfaces) ── */
+    --ink:       #0e0e0e;
+    --ink-2:     #1a1a1a;
+    --ink-light: #2d2d2d;
+
+    /* ── Text ── */
+    --text:        #1a1a1a;
+    --muted:       #6b6b6b;
+    --muted-light: #9a9a9a;
+
+    /* ── Borders & Shadows ── */
+    --border:      rgba(0, 0, 0, 0.08);
+    --border-dark: rgba(255, 255, 255, 0.12);
+    --shadow:      rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.12);
+    --shadow-lg:   0 24px 64px rgba(0, 0, 0, 0.2);
+
+    /* ── Section surfaces ── */
+    --section-bg:  #0e0e0e;   /* --ink: dark teaching/hero sections */
+    --section-bg2: #1a1a1a;   /* --ink-2: secondary dark sections */
+
+    /* ── Semantic Colours ── */
+    --info:         #0c5c9e;
+    --info-light:   #e3f2fd;
+    --info-dark:    #1e40af;
+    --success:      #16a34a;
+    --success-light: #dcfce7;
+    --success-dark: #166534;
+    --error:        #dc2626;
+    --error-light:  #fee2e2;
+    --error-dark:   #991b1b;
+    --error-border: #fca5a5;
+    --warning:      #ca8a04;
+    --warning-light: #fef3c7;
+    --warning-dark: #92400e;
+
+    /* ── Accent Colours (app-level) ── */
+    --accent-indigo:     #6366f1;
+    --accent-purple:     #7e22ce;
+    --accent-rose:       #9d174d;
+    --accent-rose-light: #fce7f3;
+    --accent-event:      #5b21b6;
+    --accent-event-light: #ede9fe;
+
+    /* ── Button tokens ── */
+    --primary-button:       #af3236;
+    --primary-button-hover: #8c2a2d;
+    --button-secondary:     #1a1a1a;
+    --button-secondary-hover: #2d2d2d;
+    --button-text:          #ffffff;
+
+    /* ── Typography ── */
+    --ff-display:      'Playfair Display', Georgia, serif;
+    --ff-body:         'Inter', system-ui, sans-serif;
+    --font-family-base: var(--ff-body);
+    --line-height-base: 1.6;
+    --font-weight-regular: 400;
+    --font-weight-medium:  500;
+    --font-weight-bold:    700;
+    --font-weight-black:   800;
+
+    color-scheme: light dark;
+    color: var(--text);
+    background-color: var(--bg);
+
+
+
+    /* === Font Sizes Variable (Strict Scale) === */
+    --fz--4: 0.625rem;  /* 10px */
+    --fz--3: 0.6875rem; /* 11px */
+    --fz--2: 0.75rem;   /* 12px - Caption */
+    --fz--1: 0.875rem;  /* 14px - Body Small */
+    --fz-0: 1rem;       /* 16px - Body Base */
+    --fz-1: 1.125rem;   /* 18px - Subtitle */
+    --fz-2: 1.25rem;    /* 20px - Title Small */
+    --fz-3: 1.5rem;     /* 24px - Title Medium */
+    --fz-4: 2rem;       /* 32px - Title Large */
+    --fz-5: 2.5rem;     /* 40px - Display Small */
+    --fz-6: 3rem;       /* 48px - Display Medium */
+    --fz-7: 4rem;       /* 64px - Display Large */
+    --fz-8: 5rem;       /* 80px */
+
+    /* === Spaces Variables (Strict 8px Grid) === */
+    --space-3xs: 0.25rem; /* 4px */
+    --space-2xs: 0.5rem;  /* 8px */
+    --space-xs: 0.75rem;  /* 12px */
+    --space-s: 1rem;      /* 16px */
+    --space-m: 1.5rem;    /* 24px */
+    --space-l: 2rem;      /* 32px */
+    --space-xl: 3rem;     /* 48px */
+    --space-2xl: 4rem;    /* 64px */
+    --space-3xl: 6rem;    /* 96px */
+
+    /* One-up pairs (Mapped to the larger strict value for consistency) */
+    --space-3xs-2xs: 0.5rem;
+    --space-2xs-xs: 0.75rem;
+    --space-xs-s: 1rem;
+    --space-s-m: 1.5rem;
+    --space-m-l: 2rem;
+    --space-l-xl: 3rem;
+    --space-xl-2xl: 4rem;
+    --space-2xl-3xl: 6rem;
+
+    /* Custom pairs */
+    /* Space s-l: 18px → 40px */
+    --space-s-l: clamp(1.125rem, 0.85rem + 1.375vw, 2.5rem);
+
+    /* ==== letter spacing ====*/
+
+    --tracking: -0.05ch;
+    --tracking-s: -0.075ch;
+    --tracking-m: -0.1ch;
+    --tracking-l: -0.125ch;
+    --tracking-xl: -0.15ch;
+    --tracking-2xl: -0.175ch;
+    --tracking-3xl: -0.2ch;
+
+    /* Positive tracking — expanded labels, badges, caps */
+    --tracking-wide: 0.05em;
+    --tracking-wider: 0.08em;
+    --tracking-widest: 0.1em;
+
+
+    /* ── Motion ── */
+    --transition:       0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast:  0.15s ease;
+    --transition-slow:  0.5s ease;
+
+    /* ── Border radius ── */
+    --radius-s:  3px;   /* buttons */
+    --radius-m:  4px;   /* cards */
+    --radius-l:  6px;   /* icon boxes */
+    --radius-xl: 12px;  /* elevated surfaces */
+    --radius-pill: 999px;
+}
+
+
+/* base typography usage */
+html,
+body {
+    font-family: var(--font-family-base);
+    line-height: var(--line-height-base);
+    font-weight: var(--font-weight-regular);
+}
