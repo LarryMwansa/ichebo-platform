@@ -1,5 +1,25 @@
 {% extends "community/base_community.html" %}
 
+{% block ws_community_list %}
+{# Profile loaded in detail panel — list panel shows back nav to directory #}
+<a href="{% url 'community:community-members' %}"
+   class="ws-list-item"
+   hx-get="{% url 'community:community-members' %}"
+   hx-target="#ws-list-content"
+   hx-push-url="true">
+  <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+  <div class="ws-list-item__title">Back to Directory</div>
+</a>
+<div class="ws-sidebar__divider"></div>
+<div style="padding: var(--space-xs) var(--space-s);">
+  <div class="ws-sidebar__avatar" style="background: var(--primary-light); color: var(--primary); width:48px; height:48px; font-size:20px; margin-bottom: var(--space-xs);">
+    {{ member_user.display_name|first|upper }}
+  </div>
+  <div style="font-size: var(--fz-0); font-weight: 700; color: var(--text);">{{ member_user.display_name|default:member_user.email }}</div>
+  <div style="font-size: var(--fz--2); color: var(--muted); margin-top: 2px;">{{ level_label }} · {{ stage_info.1 }}</div>
+</div>
+{% endblock %}
+
 {% block community_content %}
 
 <!-- Profile Header -->

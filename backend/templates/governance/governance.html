@@ -1,17 +1,101 @@
-{% extends base_template %}
+{% extends "base.html" %}
 {% load static %}
 
+{% block title %}Governance{% endblock %}
+
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/governance.css' %}">
+<link rel="stylesheet" href="{% static 'css/governance.css' %}">
 {% endblock %}
+
+
+{# ═══════════════════════════════════════════════════════════
+   WORKSPACE LAYOUT — Level 3+ Sceptre Stewards, desktop only.
+   Uses ws-layout--master-detail pattern from workspace.css.
+   List panel: branch nav + record list (HTMX target #ws-list-content)
+   Detail panel: record content (HTMX target #ws-detail)
+   ═══════════════════════════════════════════════════════════ #}
+
+{% block ws_content %}
+<div class="ws-layout--master-detail">
+  <div class="ws-master-detail">
+
+    {# ── List panel ── #}
+    <div class="ws-list-panel">
+
+      {# Branch nav header #}
+      <div class="ws-list-panel__header">
+        <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Prophet's Handbook</div>
+
+        {# Branch tabs: Reference / Mandate / Keys #}
+        <div style="display: flex; flex-direction: column; gap: var(--space-3xs);">
+          <a href="{% url 'governance:reference-home' %}"
+             class="ws-list-item {% if active_branch == 'library' or not active_branch %}active{% endif %}"
+             hx-get="{% url 'governance:reference-home' %}"
+             hx-target="#ws-list-content"
+             hx-push-url="true">
+            <span class="material-symbols-outlined" style="font-size:16px; flex-shrink:0;">library_books</span>
+            <div>
+              <div class="ws-list-item__title">Reference Library</div>
+              <div class="ws-list-item__meta">Apostolic properties</div>
+            </div>
+          </a>
+
+          {% if request.user.competence_level >= 4 %}
+          <a href="{% url 'governance:mandate-home' %}"
+             class="ws-list-item {% if active_branch == 'mandate' %}active{% endif %}"
+             hx-get="{% url 'governance:mandate-home' %}"
+             hx-target="#ws-list-content"
+             hx-push-url="true">
+            <span class="material-symbols-outlined" style="font-size:16px; flex-shrink:0;">gavel</span>
+            <div>
+              <div class="ws-list-item__title">Mandate</div>
+              <div class="ws-list-item__meta">Governance documents</div>
+            </div>
+          </a>
+          {% endif %}
+
+          <a href="{% url 'governance:keys-list' %}"
+             class="ws-list-item {% if active_branch == 'keys' %}active{% endif %}"
+             hx-get="{% url 'governance:keys-list' %}"
+             hx-target="#ws-list-content"
+             hx-push-url="true">
+            <span class="material-symbols-outlined" style="font-size:16px; flex-shrink:0;">key</span>
+            <div>
+              <div class="ws-list-item__title">My Keys</div>
+              <div class="ws-list-item__meta">Personal symbol mappings</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      {# Scrollable list content — HTMX target #}
+      <div class="ws-list-panel__scroll" id="ws-list-content">
+        {% include partial_tpl %}
+      </div>
+
+    </div>{# /ws-list-panel #}
+
+    {# ── Detail panel ── #}
+    <div class="ws-detail-panel" id="ws-detail">
+      <div class="ws-detail-empty">
+        <span class="material-symbols-outlined">menu_book</span>
+        <span class="ws-detail-empty__label">Select a record to read</span>
+      </div>
+    </div>
+
+  </div>{# /ws-master-detail #}
+</div>{# /ws-layout--master-detail #}
+{% endblock %}
+
+
+{# ═══════════════════════════════════════════════════════════
+   MOBILE LAYOUT — unchanged, mobile shell only.
+   ═══════════════════════════════════════════════════════════ #}
 
 {% block content %}
 <div class="gov-shell">
-
-  <!-- Content pane — HTMX target -->
   <div id="governance-content" class="gov-content">
     {% include partial_tpl %}
   </div>
-
 </div>
 {% endblock %}

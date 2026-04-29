@@ -32,6 +32,10 @@ def _shell_or_partial(request, partial_template, context, shell_template='govern
     if _htmx(request):
         return render(request, partial_template, context)
     context['partial_tpl'] = partial_template
+    context.setdefault('active_app', 'governance')
+    context.setdefault('ws_page_title', 'Governance')
+    context.setdefault('detail_target', '#ws-detail')
+    context.setdefault('list_target', '#ws-list-content')
     return render(request, shell_template, context)
 
 
@@ -56,6 +60,7 @@ def governance_home(request):
     return _shell_or_partial(request, 'governance/_home.html', {
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
+        'active_branch': 'library',
     })
 
 

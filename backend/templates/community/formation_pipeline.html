@@ -1,5 +1,40 @@
 {% extends "community/base_community.html" %}
 
+{% block ws_community_list %}
+<div style="padding: var(--space-xs) var(--space-s) var(--space-2xs);">
+  <div class="ws-label-tag">Formation Pipeline</div>
+  <div style="font-size: var(--fz--2); color: var(--muted);">{{ total }} total member{{ total|pluralize }}</div>
+</div>
+
+{% for col in pipeline_display %}
+{% if col.count %}
+<div style="padding: var(--space-2xs) var(--space-s) 0;">
+  <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-widest); color: var(--muted); margin-bottom: var(--space-3xs);">
+    {{ col.label }} <span style="color: var(--primary); margin-left: 4px;">{{ col.count }}</span>
+  </div>
+</div>
+{% for m in col.members|slice:":6" %}
+<a href="{% url 'community:community-member-profile' m.user.id %}"
+   class="ws-list-item"
+   hx-get="{% url 'community:community-member-profile' m.user.id %}"
+   hx-target="#ws-detail"
+   hx-push-url="true">
+  <div class="ws-sidebar__avatar" style="background: var(--primary-light); color: var(--primary); width:28px; height:28px; font-size:11px; flex-shrink:0;">
+    {{ m.user.display_name|first|upper|default:"?" }}
+  </div>
+  <div style="flex:1; min-width:0;">
+    <div class="ws-list-item__title">{{ m.user.display_name|default:m.user.email }}</div>
+  </div>
+</a>
+{% endfor %}
+{% if col.count > 6 %}
+<div style="padding: var(--space-3xs) var(--space-s); font-size: var(--fz--2); color: var(--muted);">+{{ col.count|add:"-6" }} more</div>
+{% endif %}
+<div class="ws-sidebar__divider"></div>
+{% endif %}
+{% endfor %}
+{% endblock %}
+
 {% block community_content %}
 
 <div class="community-header">

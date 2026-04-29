@@ -177,11 +177,14 @@ def management_home(request):
         )
 
     return render(request, 'community/management.html', {
-        'primary_perm':  primary_perm,
-        'scope_tenant':  scope_tenant,
-        'member_count':  member_count,
-        'announcements': announcements,
-        'gatherings':    gatherings,
+        'primary_perm':        primary_perm,
+        'scope_tenant':        scope_tenant,
+        'member_count':        member_count,
+        'announcements':       announcements,
+        'gatherings':          gatherings,
+        'active_app':          'community',
+        'ws_page_title':       'Community',
+        'active_community_tab': 'management',
     })
 
 
@@ -207,16 +210,19 @@ def member_directory(request):
     })[:50]
 
     return render(request, 'community/member_directory.html', {
-        'members':       members,
-        'scope_tenant':  scope_tenant,
-        'filter_order':  filter_order,
-        'filter_level':  filter_level,
-        'search_q':      search_q,
-        'order_choices': KGS_SERVICE_ORDER_CHOICES,
+        'members':             members,
+        'scope_tenant':        scope_tenant,
+        'filter_order':        filter_order,
+        'filter_level':        filter_level,
+        'search_q':            search_q,
+        'order_choices':       KGS_SERVICE_ORDER_CHOICES,
         'level_choices': [
             (0, 'Seeker'), (1, 'Member'), (2, 'Disciple'),
             (3, 'Steward'), (4, 'Senior Steward'), (5, 'Architect')
         ],
+        'active_app':          'community',
+        'ws_page_title':       'Members',
+        'active_community_tab': 'members',
     })
 
 
@@ -250,8 +256,11 @@ def formation_pipeline(request):
     ]
 
     return render(request, 'community/formation_pipeline.html', {
-        'pipeline_display': pipeline_display,
-        'total': len(all_members),
+        'pipeline_display':    pipeline_display,
+        'total':               len(all_members),
+        'active_app':          'community',
+        'ws_page_title':       'Pipeline',
+        'active_community_tab': 'pipeline',
     })
 
 
@@ -306,15 +315,20 @@ def member_profile(request, member_id):
     level_label = KGS_COMPETENCE_LABELS.get(level, f'Level {level}')
     stage_info = KGS_PARTICIPATION_STAGES.get(level, ('Member', 'Formation'))
 
+    is_htmx = bool(request.headers.get('HX-Request'))
     return render(request, 'community/member_profile.html', {
-        'member_perm':    member_perm,
-        'member_user':    member_user,
-        'gifts':          gifts,
-        'certifications': certifications,
-        'shepherds':      shepherds,
-        'order_choices':  KGS_SERVICE_ORDER_CHOICES,
-        'level_label':    level_label,
-        'stage_info':     stage_info,
+        'member_perm':         member_perm,
+        'member_user':         member_user,
+        'gifts':               gifts,
+        'certifications':      certifications,
+        'shepherds':           shepherds,
+        'order_choices':       KGS_SERVICE_ORDER_CHOICES,
+        'level_label':         level_label,
+        'stage_info':          stage_info,
+        'active_app':          'community',
+        'ws_page_title':       member_user.display_name or member_user.email,
+        'active_community_tab': 'members',
+        'is_htmx':             is_htmx,
     })
 
 

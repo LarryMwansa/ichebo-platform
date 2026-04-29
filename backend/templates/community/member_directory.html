@@ -1,5 +1,71 @@
 {% extends "community/base_community.html" %}
 
+{% block ws_community_list %}
+<div style="padding: var(--space-xs) var(--space-s);">
+
+  <div class="ws-list-panel__search" style="margin-bottom: var(--space-xs);">
+    <span class="material-symbols-outlined">search</span>
+    <input type="search" placeholder="Search members…"
+           name="q" value="{{ search_q }}"
+           hx-get="{% url 'community:htmx-member-search' %}?ws=1"
+           hx-trigger="keyup changed delay:400ms"
+           hx-target="#ws-member-list"
+           hx-swap="innerHTML">
+  </div>
+
+  <div style="display: flex; gap: var(--space-2xs); margin-bottom: var(--space-xs);">
+    <select name="level"
+            hx-get="{% url 'community:htmx-member-search' %}?ws=1"
+            hx-trigger="change"
+            hx-target="#ws-member-list"
+            hx-swap="innerHTML"
+            hx-include="[name='q'],[name='order']"
+            class="form-input-touch" style="flex:1; height:32px; font-size:var(--fz--2); padding: 0 var(--space-xs);">
+      <option value="">All Levels</option>
+      {% for val, label in level_choices %}
+      <option value="{{ val }}" {% if filter_level == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="order"
+            hx-get="{% url 'community:htmx-member-search' %}?ws=1"
+            hx-trigger="change"
+            hx-target="#ws-member-list"
+            hx-swap="innerHTML"
+            hx-include="[name='q'],[name='level']"
+            class="form-input-touch" style="flex:1; height:32px; font-size:var(--fz--2); padding: 0 var(--space-xs);">
+      <option value="">All Orders</option>
+      {% for val, label in order_choices %}
+      <option value="{{ val }}" {% if filter_order == val %}selected{% endif %}>{{ val }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+</div>
+
+<div id="ws-member-list">
+  {% for m in members %}
+  <a href="{% url 'community:community-member-profile' m.user.id %}"
+     class="ws-list-item"
+     hx-get="{% url 'community:community-member-profile' m.user.id %}"
+     hx-target="#ws-detail"
+     hx-push-url="true">
+    <div class="ws-sidebar__avatar" style="background: var(--primary-light); color: var(--primary); width:32px; height:32px; font-size:13px;">
+      {{ m.user.display_name|first|upper|default:"?" }}
+    </div>
+    <div style="flex:1; min-width:0;">
+      <div class="ws-list-item__title">{{ m.user.display_name|default:m.user.email }}</div>
+      <div class="ws-list-item__meta">L{{ m.level|default:0 }}{% if m.metadata.service_order %} · {{ m.metadata.service_order }}{% endif %}</div>
+    </div>
+  </a>
+  {% empty %}
+  <div class="ws-detail-empty" style="min-height:120px;">
+    <span class="material-symbols-outlined">search_off</span>
+    <span class="ws-detail-empty__label">No members found</span>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
 {% block community_content %}
 
 <div class="community-header">

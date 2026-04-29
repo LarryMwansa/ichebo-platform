@@ -1,5 +1,49 @@
 {% extends "community/base_community.html" %}
 
+{% block ws_community_list %}
+
+{# Pending membership requests #}
+<div style="padding: var(--space-xs) var(--space-s);">
+  <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Membership Requests</div>
+  <div id="ws-membership-requests"
+       hx-get="{% url 'community:htmx-pending-requests' %}"
+       hx-trigger="load"
+       hx-swap="innerHTML">
+    <div style="padding: var(--space-s); color: var(--muted); font-size: var(--fz--1);">Loading…</div>
+  </div>
+</div>
+
+<div class="ws-sidebar__divider"></div>
+
+{# Management nav links #}
+<a href="{% url 'community:community-members' %}"
+   class="ws-list-item"
+   hx-get="{% url 'community:community-members' %}"
+   hx-target="#ws-list-content"
+   hx-push-url="true">
+  <span class="material-symbols-outlined" style="font-size:16px;">groups</span>
+  <div>
+    <div class="ws-list-item__title">{{ member_count }} Members</div>
+    <div class="ws-list-item__meta">View full directory</div>
+  </div>
+  <span class="material-symbols-outlined" style="font-size:16px; color:var(--border); margin-left:auto;">chevron_right</span>
+</a>
+
+<a href="{% url 'community:community-pipeline' %}"
+   class="ws-list-item"
+   hx-get="{% url 'community:community-pipeline' %}"
+   hx-target="#ws-list-content"
+   hx-push-url="true">
+  <span class="material-symbols-outlined" style="font-size:16px;">analytics</span>
+  <div>
+    <div class="ws-list-item__title">Formation Pipeline</div>
+    <div class="ws-list-item__meta">Track member progress</div>
+  </div>
+  <span class="material-symbols-outlined" style="font-size:16px; color:var(--border); margin-left:auto;">chevron_right</span>
+</a>
+
+{% endblock %}
+
 {% block community_content %}
 
 <div class="community-header">

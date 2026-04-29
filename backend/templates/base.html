@@ -90,8 +90,15 @@
       <div class="ws-content" id="ws-content">
         <div class="ws-content__inner">
           <div id="ws-toast-container" aria-live="polite" aria-atomic="true"></div>
-          {# Desktop content — child templates override ws_content; falls through to main content #}
           {% block ws_content %}{% endblock %}
+        </div>
+      </div>
+
+      {# Detail panel — HTMX target for master-detail layouts. Hidden until loaded. #}
+      <div class="ws-detail-panel" id="ws-detail" aria-live="polite">
+        <div class="ws-detail-empty">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span class="ws-detail-empty__label">Select an item to view details</span>
         </div>
       </div>
 
