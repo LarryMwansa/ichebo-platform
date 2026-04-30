@@ -1,10 +1,10 @@
-<div class="list-group">
+<div class="ws-list-group">
   {% for record in records %}
     {% include "records/partials/record_card.html" %}
   {% empty %}
     <div style="text-align: center; padding: 4rem 1rem; color: var(--muted);">
-      <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.1; margin-bottom: 1rem;">history_edu</span>
-      <p>No journal entries found in this category.</p>
+      <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.1; margin-bottom: 1rem;">history_edu</span>
+      <p style="font-size: 13px;">No journal entries found</p>
     </div>
   {% endfor %}
 </div>

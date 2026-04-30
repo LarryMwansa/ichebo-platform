@@ -1,74 +1,71 @@
-<!-- Mandate branch record list -->
-<div class="gov-detail-header">
-  <div class="label-caps"
-       hx-get="{% url 'governance:mandate-home' %}"
-       hx-target="#governance-content"
-       hx-push-url="true"
-       style="cursor: pointer; color: var(--gov-accent);">
-    Mandate {% if type_label %}&rsaquo; {{ type_label }}{% endif %}
-  </div>
+<div class="ws-list-panel__content">
+  <div style="padding: var(--space-m) var(--space-m) 0;">
+    <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Protocol Mandate</div>
+    <h3 style="font-family: var(--ff-serif); font-size: 1.25rem; margin-bottom: var(--space-m);">{{ type_label }}</h3>
 
-  <h2 class="gov-list-title">{{ type_label }}</h2>
-</div>
+    {# Compact Filter Tabs #}
+    <div style="display: flex; gap: 8px; margin-bottom: var(--space-m); overflow-x: auto; padding-bottom: 4px;">
+      <a href="{% url 'governance:mandate-home' %}"
+         class="ws-btn ws-btn--secondary {% if not record_type %}active{% endif %}"
+         hx-get="{% url 'governance:mandate-home' %}"
+         hx-target="#ws-list-content"
+         style="font-size: 11px; padding: 4px 10px; flex-shrink: 0;">
+        All
+      </a>
+      {% for slug, label in mandate_types.items %}
+      <a href="{% url 'governance:mandate-list' slug %}"
+         class="ws-btn ws-btn--secondary {% if slug == record_type %}active{% endif %}"
+         hx-get="{% url 'governance:mandate-list' slug %}"
+         hx-target="#ws-list-content"
+         style="font-size: 11px; padding: 4px 10px; flex-shrink: 0;">
+        {{ label }}
+      </a>
+      {% endfor %}
+    </div>
 
-<!-- Type navigation (Horizontal tabs) -->
-<nav class="accounts-tab-row" style="margin: 0 -1rem 2rem; border-top: 1px solid var(--border);">
-  <a href="{% url 'governance:mandate-home' %}"
-     class="accounts-tab {% if not record_type %}accounts-tab--active{% endif %}"
-     hx-get="{% url 'governance:mandate-home' %}"
-     hx-target="#governance-content"
-     hx-push-url="true">
-    All
-  </a>
-  {% for slug, label in mandate_types.items %}
-  <a href="{% url 'governance:mandate-list' slug %}"
-     class="accounts-tab {% if slug == record_type %}accounts-tab--active{% endif %}"
-     hx-get="{% url 'governance:mandate-list' slug %}"
-     hx-target="#governance-content"
-     hx-push-url="true">
-    {{ label }}
-  </a>
-  {% endfor %}
-</nav>
-
-<!-- Search -->
-<div style="margin-bottom: var(--space-s);">
-  <input type="text" name="q" value="{{ search }}"
-         placeholder="Search {{ type_label|lower }}…"
-         class="form-input-touch"
-         hx-get="{% url 'governance:mandate-list' record_type %}"
-         hx-trigger="keyup changed delay:300ms"
-         hx-target="#mandate-record-list"
-         hx-swap="innerHTML">
-</div>
-
-<div id="mandate-record-list" class="list-group">
-{% for record in records %}
-<a href="{% url 'governance:mandate-detail' record.id %}"
-   class="list-item"
-   hx-get="{% url 'governance:mandate-detail' record.id %}"
-   hx-target="{{ detail_target|default:'#governance-content' }}"
-   hx-push-url="true">
-  <div class="list-item__content">
-    <div class="list-item__title">{{ record.title }}</div>
-    {% if record.summary %}
-      <div class="list-item__meta">{{ record.summary|truncatechars:100 }}</div>
-    {% endif %}
-    <div class="list-item__meta" style="margin-top: 4px;">
-      <span class="badge-unit {% if record.status == 'active' %}badge-unit--primary{% endif %}">{{ record.status }}</span>
-      {% if record.version %}
-        <span class="badge-unit">v{{ record.version }}</span>
-      {% endif %}
+    {# Search #}
+    <div style="margin-bottom: var(--space-m);">
+      <div style="position: relative;">
+        <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--muted);">search</span>
+        <input type="text" name="q" value="{{ search }}"
+               placeholder="Search {{ type_label|lower }}…"
+               style="width: 100%; padding: 8px 12px 8px 36px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 13px;"
+               hx-get="{% url 'governance:mandate-list' record_type %}"
+               hx-trigger="keyup changed delay:300ms"
+               hx-target="#mandate-record-list"
+               hx-swap="innerHTML">
+      </div>
     </div>
   </div>
-  <div class="list-item__action">
-    <span class="material-symbols-outlined">chevron_right</span>
+
+  <div id="mandate-record-list" class="ws-list-group">
+  {% for record in records %}
+  <a href="{% url 'governance:mandate-detail' record.id %}"
+     class="ws-list-item"
+     hx-get="{% url 'governance:mandate-detail' record.id %}"
+     hx-target="#ws-detail"
+     hx-push-url="true">
+    <div class="ws-list-item__content">
+      <div class="ws-list-item__title">{{ record.title }}</div>
+      {% if record.summary %}
+        <div class="ws-list-item__meta">{{ record.summary|truncatechars:60 }}</div>
+      {% endif %}
+      <div class="ws-list-item__meta" style="margin-top: 4px;">
+        <span class="badge-unit {% if record.status == 'active' %}badge-unit--primary{% endif %}" style="font-size: 10px;">{{ record.status }}</span>
+        {% if record.version %}
+          <span class="badge-unit" style="font-size: 10px;">v{{ record.version }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="ws-list-item__action">
+      <span class="material-symbols-outlined" style="font-size: 18px; opacity: 0.3;">chevron_right</span>
+    </div>
+  </a>
+  {% empty %}
+  <div style="padding: 3rem 1rem; text-align: center; color: var(--muted);">
+    <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.1; display: block; margin-bottom: 1rem;">search_off</span>
+    <p style="font-size: 13px;">No mandates found</p>
   </div>
-</a>
-{% empty %}
-<div class="empty-state" style="text-align: center; padding: 3rem 1rem; color: var(--muted);">
-  <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.1; margin-bottom: 1rem;">search_off</span>
-  <p>No records found.</p>
-</div>
-{% endfor %}
+  {% endfor %}
+  </div>
 </div>

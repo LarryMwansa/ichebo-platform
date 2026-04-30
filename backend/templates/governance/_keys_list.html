@@ -1,52 +1,46 @@
-<div class="nav-left" id="nav-left-content" hx-swap-oob="true">
-  <a href="{% url 'dashboard:index' %}" class="logo-link">
-     <div class="logo-container">🏛️ <span class="logo-text">ICS</span></div>
+<div class="ws-list-panel__content">
+  <div style="padding: var(--space-m) var(--space-m) 0;">
+    <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Personal Library</div>
+    <h3 style="font-family: var(--ff-serif); font-size: 1.25rem; margin-bottom: var(--space-m);">Symbol Keys</h3>
+
+    {# Search #}
+    <div style="margin-bottom: var(--space-m);">
+      <div style="position: relative;">
+        <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--muted);">search</span>
+        <input type="text" name="q" value="{{ search }}"
+               placeholder="Search your keys…"
+               style="width: 100%; padding: 8px 12px 8px 36px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 13px;"
+               hx-get="{% url 'governance:keys-list' %}"
+               hx-trigger="keyup changed delay:300ms"
+               hx-target="#keys-list"
+               hx-swap="innerHTML">
+      </div>
+    </div>
+  </div>
+
+  <div id="keys-list" class="ws-list-group">
+  {% for key in keys %}
+  <a href="{% url 'governance:keys-detail' key.id %}"
+     class="ws-list-item"
+     hx-get="{% url 'governance:keys-detail' key.id %}"
+     hx-target="#ws-detail"
+     hx-push-url="true">
+    <div class="ws-list-item__icon" style="font-size: 1.25rem; opacity: 1;">
+      {% if key.custom_fields.symbol %}{{ key.custom_fields.symbol }}{% else %}🔑{% endif %}
+    </div>
+    <div class="ws-list-item__content">
+      <div class="ws-list-item__title">{{ key.title }}</div>
+      <div class="ws-list-item__meta">{{ key.updated_at|date:"d M Y" }}</div>
+    </div>
+    <div class="ws-list-item__action">
+      <span class="material-symbols-outlined" style="font-size: 18px; opacity: 0.3;">chevron_right</span>
+    </div>
   </a>
-</div>
-
-<!-- My Keys list -->
-<div class="gov-list-header">
-  <div>
-    <div class="gov-branch-label">My Keys</div>
-    <h2 class="gov-list-title">Personal Symbol Library</h2>
+  {% empty %}
+  <div style="padding: 3rem 1rem; text-align: center; color: var(--muted);">
+    <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.1; display: block; margin-bottom: 1rem;">key_off</span>
+    <p style="font-size: 13px;">No keys found</p>
   </div>
-</div>
-
-<input type="text" name="q" value="{{ search }}"
-       placeholder="Search your keys…"
-       class="form-input-touch"
-       style="margin-bottom: 1rem;"
-       hx-get="{% url 'governance:keys-list' %}"
-       hx-trigger="keyup changed delay:300ms"
-       hx-target="#keys-list"
-       hx-swap="innerHTML">
-
-<div id="keys-list" class="list-group">
-{% for key in keys %}
-<a href="{% url 'governance:keys-detail' key.id %}"
-   class="list-item" style="text-decoration:none;"
-   hx-get="{% url 'governance:keys-detail' key.id %}"
-   hx-target="#governance-content"
-   hx-push-url="true">
-  <div class="list-item__icon" style="font-size: 1.25rem;">
-    {% if key.custom_fields.symbol %}{{ key.custom_fields.symbol }}{% else %}🔑{% endif %}
+  {% endfor %}
   </div>
-  <div class="list-item__content">
-    <div class="list-item__title">{{ key.title }}</div>
-    <div class="list-item__meta">{{ key.content|default:""|truncatechars:80 }}</div>
-    <div class="list-item__meta">{{ key.created_at|date:"d M Y" }}</div>
-  </div>
-  <div class="list-item__action">
-    <span class="material-symbols-outlined">chevron_right</span>
-  </div>
-</a>
-{% empty %}
-<div class="gov-empty">
-  <p>Your Keys Library is empty.</p>
-  <p style="margin-top:8px;font-size:13px;max-width:320px;margin-inline:auto">
-    Key Records link symbols from your dreams and journal to their spiritual meanings.
-    Create your first Key to begin your personal reference library.
-  </p>
-</div>
-{% endfor %}
 </div>

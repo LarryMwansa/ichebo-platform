@@ -1,48 +1,72 @@
-<div class="nav-left" id="nav-left-content" hx-swap-oob="true">
-  <a href="{% url 'governance:keys-list' %}" 
-     hx-get="{% url 'governance:keys-list' %}" 
-     hx-target="#governance-content" 
-     hx-push-url="true"
-     class="btn-touch" aria-label="Back">
-    <span class="material-symbols-outlined">arrow_back</span>
-  </a>
-  <span class="nav-title">{{ record.title|truncatechars:20 }}</span>
-</div>
+<div class="ws-detail-panel__inner">
+  <div class="ws-detail-header">
+    <div class="ws-detail-header__left">
+      <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Prophet's Handbook &rsaquo; Personal Keys</div>
+      <h2 class="ws-page-title">{{ record.title }}</h2>
+    </div>
+    <div class="ws-detail-header__actions">
+      <span class="badge b-muted">{{ record.status|upper }}</span>
+    </div>
+  </div>
 
-<!-- Key detail -->
-<div class="gov-detail-header" style="justify-content: flex-end;">
-  <span class="status-badge status-badge--{{ record.status }}">{{ record.status|title }}</span>
-</div>
+  <div class="ws-detail-body">
+    <div class="ws-detail-main">
+      {% if record.custom_fields.symbol %}
+      <div style="font-size: 4rem; margin-bottom: var(--space-m); line-height: 1; color: var(--primary);">
+        {{ record.custom_fields.symbol }}
+      </div>
+      {% endif %}
 
-{% if record.custom_fields.symbol %}
-<div class="gov-key-symbol gov-key-symbol--large">{{ record.custom_fields.symbol }}</div>
-{% endif %}
+      <div class="ws-editorial-content" style="font-family: var(--ff-serif); font-size: 1.15rem; line-height: 1.8; color: var(--text);">
+        {{ record.content|linebreaks }}
+      </div>
 
-<h2 class="gov-detail-title">{{ record.title }}</h2>
+      {# Linked Records #}
+      <div style="margin-top: var(--space-xl); border-top: 1px solid var(--border); padding-top: var(--space-l);">
+        <div class="label-caps" style="margin-bottom: var(--space-s);">Symbolic Mappings</div>
+        <div id="ws-linked-records"
+             hx-get="{% url 'governance:htmx-linked-records' record.id %}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+          <div style="color: var(--muted); font-size: 13px;">Analyzing mappings…</div>
+        </div>
+      </div>
+    </div>
 
-{% if record.content %}
-<div class="gov-content-body">{{ record.content|linebreaks }}</div>
-{% endif %}
+    <aside class="ws-detail-sidebar">
+      <div class="ws-sidebar-block">
+        <div class="label-caps">Key Metadata</div>
+        <div class="ws-sidebar-data">
+          <div class="ws-data-row">
+            <span class="ws-data-label">Identity</span>
+            <span class="ws-data-value">{{ record.id|truncatechars:8 }}</span>
+          </div>
+          <div class="ws-data-row">
+            <span class="ws-data-label">Mapping</span>
+            <span class="ws-data-value">{{ record.custom_fields.symbol|default:"None" }}</span>
+          </div>
+        </div>
+      </div>
 
-{% if record.custom_fields.source_context %}
-<div class="gov-panel">
-  <div class="gov-panel-label">Source Context</div>
-  <p style="font-size:13px;color:var(--text)">{{ record.custom_fields.source_context }}</p>
-</div>
-{% endif %}
+      {% if record.custom_fields.source_context %}
+      <div class="ws-sidebar-block">
+        <div class="label-caps">Source Context</div>
+        <div style="font-size: 12px; color: var(--text); line-height: 1.5;">
+          {{ record.custom_fields.source_context }}
+        </div>
+      </div>
+      {% endif %}
 
-<div class="gov-action-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0;">
-  <a href="{% url 'governance:htmx-record-edit' record.id %}"
-     class="btn-touch" style="background: var(--gov-accent); color: #fff; text-decoration: none;"
-     hx-get="{% url 'governance:htmx-record-edit' record.id %}"
-     hx-target="#governance-content"
-     hx-push-url="true">Edit</a>
-</div>
-
-<!-- Linked Records panel -->
-<div id="linked-records-panel"
-     hx-get="{% url 'governance:htmx-linked-records' record.id %}"
-     hx-trigger="load"
-     hx-swap="innerHTML">
-  <div class="gov-loading">Loading linked records…</div>
+      <div class="ws-sidebar-block">
+        <div class="label-caps">Actions</div>
+        <button class="ws-btn ws-btn--secondary" style="width: 100%;"
+                hx-get="{% url 'governance:htmx-record-edit' record.id %}"
+                hx-target="#drawerContent"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer.open('Edit Key')">
+          Edit Key
+        </button>
+      </div>
+    </aside>
+  </div>
 </div>

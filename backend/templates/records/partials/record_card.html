@@ -1,41 +1,24 @@
-<div class="list-item" id="record-{{ record.id }}" 
-     hx-swap-oob="afterbegin:#record-list"
-     hx-get="{% url 'records:records-detail' record.id %}" 
-     hx-target="#main-content" 
-     hx-push-url="true"
-     style="cursor: pointer;">
-  
-  <div class="list-item__content">
-    <div class="list-item__title">{{ record.title }}</div>
-    {% if record.content %}
-      <div class="list-item__meta" style="margin-top: 4px; line-height: 1.4;">
-        {{ record.content|truncatechars:120 }}
-      </div>
-    {% endif %}
-    <div class="list-item__meta" style="margin-top: 8px;">
-      <span class="badge-unit badge--{{ record.record_type }}">
+<div class="ws-list-item" id="record-{{ record.id }}"
+     hx-get="{% url 'records:records-detail' record.id %}"
+     hx-target="#ws-detail"
+     hx-push-url="true">
+
+  <div class="ws-list-item__content">
+    <div class="ws-list-item__title">{{ record.title }}</div>
+    <div class="ws-list-item__meta" style="margin-top: 4px;">
+      <span class="badge-unit badge--{{ record.record_type }}" style="font-size: 10px;">
         {{ record.get_record_type_display|default:record.record_type|title }}
       </span>
-      <span class="badge-unit" style="background: var(--hover); color: var(--muted);">
-        {{ record.updated_at|date:"d M Y" }}
-      </span>
+      <span style="opacity: 0.5; font-size: 11px; margin-left: 8px;">{{ record.updated_at|date:"d M" }}</span>
     </div>
   </div>
 
-  <div class="list-item__action" onclick="event.stopPropagation();" style="display: flex; gap: 4px;">
-    <button class="btn-touch" style="padding: 8px;"
+  <div class="ws-list-item__action" onclick="event.stopPropagation();">
+    <button class="ws-btn ws-btn--secondary" style="padding: 4px;"
             hx-get="{% url 'records:htmx-edit' record.id %}"
-            hx-target="#drawerContent"
-            hx-swap="innerHTML"
-            onclick="window.ICSDrawer.open('Edit Entry')">
-      <span class="material-symbols-outlined">edit</span>
-    </button>
-    <button class="btn-touch" style="padding: 8px; color: var(--error);"
-            hx-post="{% url 'records:htmx-delete' record.id %}"
-            hx-target="#record-{{ record.id }}"
-            hx-swap="outerHTML swap:1s"
-            hx-confirm="Delete this entry?">
-      <span class="material-symbols-outlined">delete</span>
+            hx-target="#ws-detail"
+            hx-swap="innerHTML">
+      <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
     </button>
   </div>
 </div>

@@ -11,39 +11,59 @@
 
 {# ── WORKSPACE layout ── #}
 {% block ws_content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner">
+<div class="ws-layout--master-detail">
+  <div class="ws-master-detail">
 
-    <div class="ws-page-header">
-      <div class="ws-page-header__left">
-        <h2 class="ws-page-title">My <em>Journal</em></h2>
-        <p class="ws-page-subtitle">Prayers, reflections, and spiritual records.</p>
-      </div>
-      <div class="ws-page-header__actions">
-        <button class="ws-topbar__cta"
+    {# ── List Panel (Master) ── #}
+    <div class="ws-list-panel">
+      <div class="ws-list-panel__header">
+        <div class="ws-label-tag" style="margin-bottom: var(--space-xs); opacity: 0.7;">Personal Registry</div>
+        <h2 class="ws-page-title" style="font-size: 1.25rem; margin-bottom: var(--space-m);">My <em>Journal</em></h2>
+
+        {# Creation CTA #}
+        <button class="ws-btn ws-btn--primary" style="width: 100%; margin-bottom: var(--space-m);"
                 hx-get="{% url 'records:records-create' %}"
-                hx-target="#ws-panel-inner"
-                hx-swap="innerHTML"
-                onclick="document.getElementById('ws-panel').classList.add('open')">
+                hx-target="#ws-detail"
+                hx-swap="innerHTML">
           <span class="material-symbols-outlined">add</span>
           New Entry
         </button>
+
+        {# Filter Tabs #}
+        <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px;">
+          <a href="{% url 'records:records-home' %}"
+             class="ws-btn ws-btn--secondary {% if not active_type %}active{% endif %}"
+             hx-get="{% url 'records:records-home' %}"
+             hx-target="#ws-record-list"
+             style="font-size: 11px; padding: 4px 10px; flex-shrink: 0;">
+            All
+          </a>
+          {% for value, label in record_types %}
+          <a href="{% url 'records:records-home' %}?type={{ value }}"
+             class="ws-btn ws-btn--secondary {% if active_type == value %}active{% endif %}"
+             hx-get="{% url 'records:records-home' %}?type={{ value }}"
+             hx-target="#ws-record-list"
+             style="font-size: 11px; padding: 4px 10px; flex-shrink: 0;">
+            {{ label }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="ws-list-panel__scroll" id="ws-record-list">
+        {% include "records/partials/record_list.html" %}
       </div>
     </div>
 
-    <div class="ws-toolbar">
-      <div class="ws-toolbar__left">
-        <a href="{% url 'records:records-home' %}"
-           class="ws-filter-pill {% if not active_type %}active{% endif %}">All</a>
-        {% for value, label in record_types %}
-        <a href="{% url 'records:records-home' %}?type={{ value }}"
-           class="ws-filter-pill {% if active_type == value %}active{% endif %}">{{ label }}</a>
-        {% endfor %}
+    {# ── Detail Panel (Detail) ── #}
+    <div class="ws-detail-panel" id="ws-detail">
+      <div class="ws-detail-empty">
+        <div class="ws-detail-empty__icon">
+          <span class="material-symbols-outlined" style="font-size: 3rem; opacity: 0.15;">history_edu</span>
+        </div>
+        <h3 style="font-family: var(--ff-serif); font-size: 1.5rem; margin-bottom: 0.5rem; opacity: 0.4;">My Records</h3>
+        <p style="color: var(--muted); font-size: 0.9rem; max-width: 240px;">Select a journal entry to read or create a new one to begin.</p>
       </div>
-    </div>
-
-    <div id="ws-record-list" class="ws-feed">
-      {% include "records/partials/record_list.html" %}
     </div>
 
   </div>
