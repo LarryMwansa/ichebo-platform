@@ -1,6 +1,77 @@
 {% extends "learn/base_learn.html" %}
 
-{% block learn_content %}
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="ws-page-header">
+      <div class="ws-page-header__left">
+        <h2 class="ws-page-title">Content <em>Review</em></h2>
+        <p class="ws-page-subtitle">Approve or return submitted formation content for publication.</p>
+      </div>
+    </div>
+
+    {% if items %}
+    <div class="ws-feed">
+      <div class="list-group">
+        {% for item in items %}
+        <div class="list-item" id="ws-review-{{ item.id }}" style="flex-direction: column; align-items: stretch; gap: var(--space-m);">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: var(--space-s);">
+              <div class="list-item__icon" style="color: var(--primary);">
+                <span class="material-symbols-outlined">
+                  {% if item.record_type == 'programme' %}account_balance
+                  {% elif item.record_type == 'course' %}menu_book
+                  {% else %}draw{% endif %}
+                </span>
+              </div>
+              <div class="list-item__content">
+                <div class="list-item__title" style="font-weight: 700;">{{ item.title }}</div>
+                <div class="list-item__meta">
+                  <span class="badge-unit badge-unit--primary">{{ item.record_type }}</span>
+                  &nbsp;·&nbsp;Submitted by {{ item.author_display }}
+                </div>
+              </div>
+            </div>
+            <span style="font-size: 12px; color: var(--muted);">{{ item.updated_at|date:"d M, H:i" }}</span>
+          </div>
+
+          {% if item.content %}
+          <div style="font-size: 14px; line-height: 1.6; color: var(--text); padding: var(--space-m); background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-m); border-left: 3px solid var(--primary);">
+            {{ item.content|truncatechars:400 }}
+          </div>
+          {% endif %}
+
+          <div style="display: flex; gap: var(--space-xs); justify-content: flex-end;">
+            <button class="ws-btn ws-btn--secondary"
+                    hx-post="{% url 'learn:htmx-return-content' item.id %}"
+                    hx-target="#ws-review-{{ item.id }}"
+                    hx-swap="outerHTML swap:1s">
+              Return to Author
+            </button>
+            <button class="ws-btn ws-btn--primary"
+                    hx-post="{% url 'learn:htmx-approve-content' item.id %}"
+                    hx-target="#ws-review-{{ item.id }}"
+                    hx-swap="outerHTML swap:1s">
+              Approve for Publication
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="ws-empty-state">
+      <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">check_circle</span>
+      <p style="color: var(--muted);">Review queue is empty. All submitted content has been processed.</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+
 <div class="learn-header">
   <h1 class="title-small">Content Review Queue</h1>
   <p class="explore-subtitle">Approve or return submitted learning content</p>

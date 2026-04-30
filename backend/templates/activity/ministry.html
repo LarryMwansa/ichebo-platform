@@ -7,18 +7,33 @@
   <div class="ws-full-page-inner">
 
     <div class="ws-page-header">
-      <h2 class="ws-page-title">Ministry</h2>
+      <div class="ws-page-header__left">
+        <h2 class="ws-page-title">Ministry <em>Missions</em></h2>
+        <p class="ws-page-subtitle">Collaborative activities, community projects, and public campaigns.</p>
+      </div>
+      <div class="ws-page-header__actions">
+        <button class="ws-topbar__cta"
+                hx-get="{% url 'activity:htmx-create' %}?ministry=1"
+                hx-target="#drawerInner"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer && window.ICSDrawer.open('New Ministry Activity')">
+          <span class="material-symbols-outlined">campaign</span>
+          Initiate Mission
+        </button>
+      </div>
     </div>
 
     <div class="ws-toolbar">
-      <a href="{% url 'activity:ministry' %}"
-         class="ws-filter-pill {% if not active_type and assigned_tab == 'all' %}ws-filter-pill active{% endif %}">All</a>
-      <a href="{% url 'activity:ministry' %}?tab=mine"
-         class="ws-filter-pill {% if assigned_tab == 'mine' and not active_type %}ws-filter-pill active{% endif %}">Assigned to Me</a>
-      {% for slug, label in ministry_types %}
-      <a href="{% url 'activity:ministry' %}?type={{ slug }}"
-         class="ws-filter-pill {% if active_type == slug %}ws-filter-pill active{% endif %}">{{ label }}</a>
-      {% endfor %}
+      <div class="ws-toolbar__left">
+        <a href="{% url 'activity:ministry' %}"
+           class="ws-filter-pill {% if not active_type and assigned_tab == 'all' %}active{% endif %}">All</a>
+        <a href="{% url 'activity:ministry' %}?tab=mine"
+           class="ws-filter-pill {% if assigned_tab == 'mine' and not active_type %}active{% endif %}">Assigned to Me</a>
+        {% for slug, label in ministry_types %}
+        <a href="{% url 'activity:ministry' %}?type={{ slug }}"
+           class="ws-filter-pill {% if active_type == slug %}active{% endif %}">{{ label }}</a>
+        {% endfor %}
+      </div>
     </div>
 
     <div class="ws-feed">

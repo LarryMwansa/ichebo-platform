@@ -1,6 +1,56 @@
 {% extends "records/base_records.html" %}
 
-{% block nav_left %}
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner" style="max-width: 800px; margin: 0 auto;">
+
+    <div class="ws-page-header">
+      <div class="ws-page-header__left">
+        <a href="{% url 'records:records-home' %}" class="ws-back-btn" hx-get="{% url 'records:records-home' %}" hx-target="#ws-content" hx-push-url="true">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div>
+          <h2 class="ws-page-title">{{ record.title }}</h2>
+          <p class="ws-page-subtitle">
+            {{ record.get_record_type_display|default:record.record_type|title }} &nbsp;·&nbsp;
+            {{ record.updated_at|date:"d M Y, H:i" }}
+          </p>
+        </div>
+      </div>
+      <div class="ws-page-header__actions">
+        {% if record.created_by == request.user %}
+        <button class="ws-btn ws-btn--secondary"
+                hx-get="{% url 'records:htmx-edit' record.id %}"
+                hx-target="#drawerContent"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer.open('Edit Entry')">
+          Edit
+        </button>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="ws-record-body" style="background: var(--card); padding: var(--space-xl); border: 1px solid var(--border); border-radius: var(--radius-m); margin-bottom: var(--space-xl);">
+      <div style="font-family: var(--ff-serif); font-size: 1.15rem; line-height: 1.8; color: var(--text);">
+        {{ record.content|linebreaks }}
+      </div>
+    </div>
+
+    <div class="ws-feed-section">
+      <div class="label-caps" style="margin-bottom: var(--space-s);">Linked Connections</div>
+      <div id="ws-linked-records"
+           hx-get="{% url 'records:htmx-linked-records' record.id %}"
+           hx-trigger="load"
+           hx-swap="innerHTML">
+        <div style="color: var(--muted); font-size: 13px;">Seeking connections…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
   {% if request.htmx %}
     <div class="nav-left" id="nav-left-content" hx-swap-oob="true">
       <a href="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'records:records-home' %}{% endif %}" 

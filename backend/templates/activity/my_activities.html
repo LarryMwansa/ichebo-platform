@@ -7,26 +7,33 @@
   <div class="ws-full-page-inner">
 
     <div class="ws-page-header">
-      <h2 class="ws-page-title">Personal Activity</h2>
-      <button class="ws-btn ws-btn--primary"
-              hx-get="{% url 'activity:htmx-create' %}"
-              hx-target="#drawerInner"
-              hx-swap="innerHTML"
-              onclick="window.ICSDrawer && window.ICSDrawer.open('New Activity')">
-        <span class="material-symbols-outlined">add</span>
-        New Activity
-      </button>
+      <div class="ws-page-header__left">
+        <h2 class="ws-page-title">Personal <em>Activity</em></h2>
+        <p class="ws-page-subtitle">Your active missions, habits, and spiritual disciplines.</p>
+      </div>
+      <div class="ws-page-header__actions">
+        <button class="ws-topbar__cta"
+                hx-get="{% url 'activity:htmx-create' %}"
+                hx-target="#drawerInner"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer && window.ICSDrawer.open('New Activity')">
+          <span class="material-symbols-outlined">add</span>
+          New Activity
+        </button>
+      </div>
     </div>
 
     <div class="ws-toolbar">
-      <a href="{% url 'activity:activity-home' %}"
-         class="ws-filter-pill {% if not active_type %}ws-filter-pill active{% endif %}">All</a>
-      {% for slug, label in activity_types %}
-      <a href="{% url 'activity:activity-home' %}?type={{ slug }}"
-         class="ws-filter-pill {% if active_type == slug %}ws-filter-pill active{% endif %}">
-        {{ label }}
-      </a>
-      {% endfor %}
+      <div class="ws-toolbar__left">
+        <a href="{% url 'activity:activity-home' %}"
+           class="ws-filter-pill {% if not active_type %}active{% endif %}">All</a>
+        {% for slug, label in activity_types %}
+        <a href="{% url 'activity:activity-home' %}?type={{ slug }}"
+           class="ws-filter-pill {% if active_type == slug %}active{% endif %}">
+          {{ label }}
+        </a>
+        {% endfor %}
+      </div>
     </div>
 
     {% if overdue %}

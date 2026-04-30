@@ -7,11 +7,16 @@
   <div class="ws-full-page-inner">
 
     <div class="ws-page-header">
-      <h2 class="ws-page-title">My Learning</h2>
-      <a href="{% url 'learn:learn-catalogue' %}" class="ws-btn ws-btn--secondary">
-        <span class="material-symbols-outlined">apps</span>
-        Catalogue
-      </a>
+      <div class="ws-page-header__left">
+        <h2 class="ws-page-title">My <em>Learning</em></h2>
+        <p class="ws-page-subtitle">Your formation pathway, enrolled programmes, and certifications.</p>
+      </div>
+      <div class="ws-page-header__actions">
+        <a href="{% url 'learn:learn-catalogue' %}" class="ws-topbar__cta">
+          <span class="material-symbols-outlined">apps</span>
+          Catalogue
+        </a>
+      </div>
     </div>
 
     {% if active_pathway %}

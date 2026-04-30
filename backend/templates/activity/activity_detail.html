@@ -1,7 +1,101 @@
 {% extends "activity/base_activity.html" %}
 {% load static %}
 
-{% block nav_left %}
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner" style="max-width: 800px; margin: 0 auto;">
+
+    <div class="ws-page-header">
+      <div class="ws-page-header__left">
+        <a href="{% url 'activity:activity-home' %}" class="ws-back-btn" hx-get="{% url 'activity:activity-home' %}" hx-target="#ws-content" hx-push-url="true">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div>
+          <h2 class="ws-page-title">{{ activity.title }}</h2>
+          <p class="ws-page-subtitle">
+            {{ activity.get_activity_type_display|default:activity.activity_type|title }} &nbsp;·&nbsp;
+            {% if activity.due_at %}Due {{ activity.due_at|date:"d M Y" }}{% else %}No due date{% endif %}
+          </p>
+        </div>
+      </div>
+      <div class="ws-page-header__actions">
+        <div style="display: flex; gap: var(--space-xs);">
+          {% if activity.status != 'completed' %}
+          <button class="ws-btn ws-btn--primary"
+                  hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=detail"
+                  hx-target="#ws-content"
+                  hx-push-url="true">
+            Complete
+          </button>
+          {% endif %}
+          <button class="ws-btn ws-btn--secondary"
+                  hx-get="{% url 'activity:htmx-edit' activity.id %}"
+                  hx-target="#drawerInner"
+                  hx-swap="innerHTML"
+                  onclick="window.ICSDrawer.open('Edit Activity')">
+            Edit
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ws-feed-section" style="background: var(--card); padding: var(--space-xl); border: 1px solid var(--border); border-radius: var(--radius-m); margin-bottom: var(--space-xl);">
+      {% if activity.description %}
+      <div style="font-size: 1.1rem; line-height: 1.7; color: var(--text); margin-bottom: var(--space-l);">
+        {{ activity.description|linebreaks }}
+      </div>
+      {% endif %}
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-m); border-top: 1px solid var(--border); padding-top: var(--space-l);">
+        <div>
+          <label class="label-caps" style="font-size: 10px; margin-bottom: 4px; display: block;">Status</label>
+          <span class="badge {% if activity.status == 'completed' %}b-success{% else %}b-warning{% endif %}">{{ activity.status|title }}</span>
+        </div>
+        {% if activity.recurrence != 'none' %}
+        <div>
+          <label class="label-caps" style="font-size: 10px; margin-bottom: 4px; display: block;">Recurrence</label>
+          <span style="font-weight: 700; font-size: 13px;">{{ activity.recurrence|title }}</span>
+        </div>
+        {% endif %}
+        {% if activity.kgs_pathway %}
+        <div>
+          <label class="label-caps" style="font-size: 10px; margin-bottom: 4px; display: block;">Pathway</label>
+          <span style="font-weight: 700; font-size: 13px;">{{ activity.kgs_pathway|title|cut:"_" }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="ws-feed-section">
+      <div class="label-caps" style="margin-bottom: var(--space-s);">Linked Context</div>
+      {% if activity.linked_record %}
+      <div class="list-item" style="cursor: pointer;"
+           hx-get="{% url 'records:records-detail' activity.linked_record.id %}"
+           hx-target="#ws-content"
+           hx-push-url="true">
+        <div class="list-item__icon">
+          <span class="material-symbols-outlined">description</span>
+        </div>
+        <div class="list-item__content">
+          <div class="list-item__title" style="font-weight: 700;">{{ activity.linked_record.title }}</div>
+          <div class="list-item__meta">{{ activity.linked_record.record_type|title }} · {{ activity.linked_record.record_family|title }}</div>
+        </div>
+        <div class="list-item__action">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+      </div>
+      {% else %}
+      <div class="ws-empty-state" style="padding: var(--space-l); border: 1px dashed var(--border);">
+        <p style="font-size: 13px; color: var(--muted);">No primary record linked to this activity.</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
   {% if request.htmx %}
     <div class="nav-left" id="nav-left-content" hx-swap-oob="true">
       <a href="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'activity:activity-home' %}{% endif %}" 

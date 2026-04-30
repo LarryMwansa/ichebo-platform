@@ -9,13 +9,18 @@
   <div class="ws-full-page-inner">
 
     <div class="ws-page-header">
-      <h2 class="ws-page-title">Video</h2>
-      {% if can_manage %}
-      <a href="{% url 'video_live:manage' %}" class="ws-btn ws-btn--primary">
-        <span class="material-symbols-outlined">add</span>
-        Schedule Broadcast
-      </a>
-      {% endif %}
+      <div class="ws-page-header__left">
+        <h2 class="ws-page-title">Video & <em>Live</em></h2>
+        <p class="ws-page-subtitle">Broadcasting the Kingdom. Live sessions and archived recordings.</p>
+      </div>
+      <div class="ws-page-header__actions">
+        {% if can_manage %}
+        <a href="{% url 'video_live:manage' %}" class="ws-topbar__cta">
+          <span class="material-symbols-outlined">add</span>
+          Schedule Broadcast
+        </a>
+        {% endif %}
+      </div>
     </div>
 
     {% if live %}

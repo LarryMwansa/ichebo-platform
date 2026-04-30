@@ -15,24 +15,31 @@
   <div class="ws-full-page-inner">
 
     <div class="ws-page-header">
-      <h2 class="ws-page-title">My Journal</h2>
-      <button class="ws-btn ws-btn--primary"
-              hx-get="{% url 'records:records-create' %}"
-              hx-target="#ws-panel-inner"
-              hx-swap="innerHTML"
-              onclick="document.getElementById('ws-panel').classList.add('open')">
-        <span class="material-symbols-outlined">add</span>
-        New Entry
-      </button>
+      <div class="ws-page-header__left">
+        <h2 class="ws-page-title">My <em>Journal</em></h2>
+        <p class="ws-page-subtitle">Prayers, reflections, and spiritual records.</p>
+      </div>
+      <div class="ws-page-header__actions">
+        <button class="ws-topbar__cta"
+                hx-get="{% url 'records:records-create' %}"
+                hx-target="#ws-panel-inner"
+                hx-swap="innerHTML"
+                onclick="document.getElementById('ws-panel').classList.add('open')">
+          <span class="material-symbols-outlined">add</span>
+          New Entry
+        </button>
+      </div>
     </div>
 
     <div class="ws-toolbar">
-      <a href="{% url 'records:records-home' %}"
-         class="ws-filter-pill {% if not active_type %}ws-filter-pill active{% endif %}">All</a>
-      {% for value, label in record_types %}
-      <a href="{% url 'records:records-home' %}?type={{ value }}"
-         class="ws-filter-pill {% if active_type == value %}ws-filter-pill active{% endif %}">{{ label }}</a>
-      {% endfor %}
+      <div class="ws-toolbar__left">
+        <a href="{% url 'records:records-home' %}"
+           class="ws-filter-pill {% if not active_type %}active{% endif %}">All</a>
+        {% for value, label in record_types %}
+        <a href="{% url 'records:records-home' %}?type={{ value }}"
+           class="ws-filter-pill {% if active_type == value %}active{% endif %}">{{ label }}</a>
+        {% endfor %}
+      </div>
     </div>
 
     <div id="ws-record-list" class="ws-feed">

@@ -10,12 +10,17 @@
   <div class="ws-full-page-inner">
 
     <div class="ws-page-header">
-      <h2 class="ws-page-title">Notifications</h2>
-      {% if unread_count %}
-      <span class="badge-unit badge-unit--primary" style="font-size: var(--fz--2);">
-        {{ unread_count }} unread
-      </span>
-      {% endif %}
+      <div class="ws-page-header__left">
+        <h2 class="ws-page-title">Notifications</h2>
+        <p class="ws-page-subtitle">Stay updated on community activities and governance alerts.</p>
+      </div>
+      <div class="ws-page-header__actions">
+        {% if unread_count %}
+        <span class="badge-unit badge-unit--primary" style="font-size: var(--fz--2);">
+          {{ unread_count }} unread
+        </span>
+        {% endif %}
+      </div>
     </div>
 
     {% include "notifications/_notification_list.html" %}

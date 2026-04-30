@@ -1,7 +1,100 @@
 {% extends "learn/base_learn.html" %}
 {% load static %}
 
-{% block learn_content %}
+{# ── WORKSPACE layout ── #}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="ws-page-header">
+      <div class="ws-page-header__left">
+        <h2 class="ws-page-title">Induction <em>Review</em></h2>
+        <p class="ws-page-subtitle">Confirm inductees who have completed the formation and advance them to Level 1.</p>
+      </div>
+    </div>
+
+    {% if inductees %}
+    <div class="ws-feed">
+      <div class="list-group">
+        {% for inductee in inductees %}
+        {% with profile=inductee.profile %}
+        <div class="list-item" id="ws-inductee-{{ inductee.id }}" style="flex-direction: column; align-items: stretch; gap: var(--space-m);">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: var(--space-s);">
+              <div class="list-item__icon" style="color: var(--primary);">
+                <span class="material-symbols-outlined">person</span>
+              </div>
+              <div class="list-item__content">
+                <div class="list-item__title" style="font-weight: 700;">
+                  {{ profile.full_name|default:inductee.display_name|default:inductee.email }}
+                </div>
+                <div class="list-item__meta">
+                  {{ inductee.email }}
+                  {% if profile and profile.member_number %} &nbsp;·&nbsp; <span style="font-family: monospace; font-weight: 700;">{{ profile.member_number }}</span>{% endif %}
+                </div>
+              </div>
+            </div>
+            <div>
+              {% if inductee.enrolment_status == 'completed' %}
+                <span class="badge b-success">Complete</span>
+              {% elif inductee.enrolment_status == 'in_progress' %}
+                <span class="badge b-info">In Progress</span>
+              {% else %}
+                <span class="badge b-muted">Not Started</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="ws-induction-progress" style="display: flex; align-items: center; gap: var(--space-s);">
+            <div style="flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;">
+              <div style="height: 100%; width: {{ inductee.progress }}%; background: var(--primary);"></div>
+            </div>
+            <span style="font-size: 11px; font-weight: 700; color: var(--muted);">{{ inductee.lessons_done }}/{{ inductee.lessons_total }} UNITS</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-s);">
+            <div>
+              <label class="label-caps" style="font-size: 10px; margin-bottom: 4px; display: block;">Placement Community</label>
+              <select name="placement_tenant_id" id="ws-placement-{{ inductee.id }}" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg);">
+                <option value="">— None / Keep in Induction —</option>
+                {% for tenant in placement_tenants %}
+                  <option value="{{ tenant.id }}">{{ tenant.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label class="label-caps" style="font-size: 10px; margin-bottom: 4px; display: block;">Steward Notes</label>
+              <input type="text" name="notes" id="ws-notes-{{ inductee.id }}" placeholder="Optional notes..." style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg);">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end;">
+            <button class="ws-btn ws-btn--primary"
+                    hx-post="{% url 'learn:htmx-induction-confirm' inductee.id %}"
+                    hx-target="#ws-inductee-{{ inductee.id }}"
+                    hx-swap="outerHTML"
+                    hx-include="#ws-notes-{{ inductee.id }}, #ws-placement-{{ inductee.id }}"
+                    hx-confirm="Confirm induction completion for {{ profile.full_name|default:inductee.email }}?">
+              <span class="material-symbols-outlined">how_to_reg</span>
+              Confirm & Advance to Level 1
+            </button>
+          </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="ws-empty-state">
+      <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">group</span>
+      <p style="color: var(--muted);">No active inductees at the moment.</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+
 <div class="learn-header">
   <h2>Induction Review</h2>
   <p class="explore-subtitle">Confirm inductees who have completed the programme and advance them to Level 1.</p>
@@ -99,7 +192,7 @@
     outline: none;
     border-color: var(--primary);
   }
-  .induction-card__actions textarea { resize: vertical; rows: 2; }
+  .induction-card__actions textarea { resize: vertical; }
   .induction-btn-row {
     display: flex;
     gap: 0.5rem;

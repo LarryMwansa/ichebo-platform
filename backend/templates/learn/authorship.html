@@ -7,11 +7,19 @@
   <div class="ws-full-page-inner">
 
     <div class="ws-page-header">
-      <h2 class="ws-page-title">Authorship</h2>
-      <div style="display: flex; gap: var(--space-xs);">
-        <a href="{% url 'learn:learn-author-programme' %}" class="ws-btn ws-btn--secondary">New Programme</a>
-        <a href="{% url 'learn:learn-author-course' %}" class="ws-btn ws-btn--secondary">New Course</a>
-        <a href="{% url 'learn:learn-author-lesson' %}" class="ws-btn ws-btn--primary">New Lesson</a>
+      <div class="ws-page-header__left">
+        <h2 class="ws-page-title">Curriculum <em>Authorship</em></h2>
+        <p class="ws-page-subtitle">Draft and manage formation programmes, courses, and lessons.</p>
+      </div>
+      <div class="ws-page-header__actions">
+        <div style="display: flex; gap: var(--space-xs);">
+          <a href="{% url 'learn:learn-author-programme' %}" class="ws-btn ws-btn--secondary">New Programme</a>
+          <a href="{% url 'learn:learn-author-course' %}" class="ws-btn ws-btn--secondary">New Course</a>
+          <a href="{% url 'learn:learn-author-lesson' %}" class="ws-topbar__cta">
+            <span class="material-symbols-outlined">add</span>
+            New Lesson
+          </a>
+        </div>
       </div>
     </div>
 
@@ -19,27 +27,39 @@
     <div class="ws-feed">
       <div class="list-group">
         {% for record in user_records %}
-        <div class="list-item" style="align-items: flex-start; flex-direction: column; gap: var(--space-xs);">
-          <div style="display: flex; align-items: center; gap: var(--space-xs); width: 100%; min-width: 0;">
-            <span class="badge-unit badge-unit--primary">{{ record.record_type }}</span>
-            <span class="list-item__title" style="flex: 1;">{{ record.title }}</span>
-            {% if record.status == 'submitted' %}
-              <span class="status-badge status-badge--seeker">Awaiting Review</span>
-            {% else %}
-              <span class="status-badge status-badge--warning">Draft</span>
-            {% endif %}
-          </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: var(--space-s);">
-            <span class="list-item__meta">Updated {{ record.updated_at|date:"d M, H:i" }}</span>
-            <div style="display: flex; gap: var(--space-2xs);">
-              {% if record.record_type == 'programme' %}
-                <a href="{% url 'learn:learn-author-programme-edit' record.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2);">Edit</a>
-              {% elif record.record_type == 'course' %}
-                <a href="{% url 'learn:learn-author-course-edit' record.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2);">Edit</a>
-              {% elif record.record_type in 'lesson,assignment,quiz' %}
-                <a href="{% url 'learn:learn-author-lesson-edit' record.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2);">Edit</a>
+        <div class="list-item" style="flex-direction: column; align-items: stretch; gap: var(--space-xs);">
+          <div style="display: flex; align-items: center; gap: var(--space-s);">
+            <div class="list-item__icon" style="color: var(--primary);">
+              <span class="material-symbols-outlined">
+                {% if record.record_type == 'programme' %}account_balance
+                {% elif record.record_type == 'course' %}menu_book
+                {% else %}draw{% endif %}
+              </span>
+            </div>
+            <div class="list-item__content">
+              <div class="list-item__title" style="font-weight: 700;">{{ record.title }}</div>
+              <div class="list-item__meta">
+                <span class="badge-unit badge-unit--primary">{{ record.record_type }}</span>
+                &nbsp;·&nbsp;Updated {{ record.updated_at|date:"d M, H:i" }}
+              </div>
+            </div>
+            <div class="list-item__action">
+              {% if record.status == 'submitted' %}
+                <span class="badge b-info">Awaiting Review</span>
+              {% else %}
+                <span class="badge b-warning">Draft</span>
               {% endif %}
             </div>
+          </div>
+          
+          <div style="padding-left: 52px; display: flex; gap: var(--space-2xs);">
+            {% if record.record_type == 'programme' %}
+              <a href="{% url 'learn:learn-author-programme-edit' record.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2); padding: 4px 12px;">Edit Programme</a>
+            {% elif record.record_type == 'course' %}
+              <a href="{% url 'learn:learn-author-course-edit' record.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2); padding: 4px 12px;">Edit Course</a>
+            {% elif record.record_type in 'lesson,assignment,quiz' %}
+              <a href="{% url 'learn:learn-author-lesson-edit' record.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2); padding: 4px 12px;">Edit Lesson</a>
+            {% endif %}
           </div>
         </div>
         {% endfor %}
