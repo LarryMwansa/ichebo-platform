@@ -78,20 +78,25 @@
   });
 
 
-  /* ── 4. SEARCH SHORTCUT ────────────────────────────────────
-     Press / to focus the workspace search input.
+  /* ── 4. GLOBAL SEARCH & COMMAND PALETTE ───────────────────
+     Press / or CMD+K to open the global search overlay.
   ────────────────────────────────────────────────────────── */
   document.addEventListener('keydown', function (e) {
     if (!document.body.classList.contains('ws-active')) return;
-    if (e.key !== '/') return;
 
-    // Don't intercept if user is typing in an input
+    // Detect / or CMD+K / CTRL+K
+    const isSearchTrigger = e.key === '/' || ((e.metaKey || e.ctrlKey) && e.key === 'k');
+    if (!isSearchTrigger) return;
+
+    // Don't intercept if user is typing in an input (unless it's the CMD+K shortcut)
     var tag = document.activeElement.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+    if (isInput && e.key === '/') return;
 
     e.preventDefault();
-    var searchInput = document.getElementById('ws-search-input');
-    if (searchInput) searchInput.focus();
+    if (window.openGlobalSearch) {
+      window.openGlobalSearch();
+    }
   });
 
 
@@ -174,5 +179,32 @@
       sessionStorage.setItem('ws_sidebar_scroll', sidebarScroll.scrollTop);
     });
   }
+
+  /* ── 8. GLOBAL NAVIGATION SHORTCUTS ───────────────────────
+     ALT + J: Journal
+     ALT + G: Governance
+     ALT + L: Learning
+     ALT + H: Home (Dashboard)
+  ────────────────────────────────────────────────────────── */
+  document.addEventListener('keydown', function (e) {
+    if (!document.body.classList.contains('ws-active')) return;
+    if (!e.altKey) return;
+
+    const shortcuts = {
+      'j': '/records/my/',
+      'g': '/governance/',
+      'l': '/learn/',
+      'h': '/dashboard/'
+    };
+
+    const targetUrl = shortcuts[e.key.toLowerCase()];
+    if (targetUrl) {
+      e.preventDefault();
+      htmx.ajax('GET', targetUrl, {
+        target: '#ws-content',
+        pushUrl: true
+      });
+    }
+  });
 
 })();

@@ -546,3 +546,53 @@ def htmx_journal_search(request):
         'results': results,
         'query':   q,
     })
+
+@login_required
+def htmx_global_search(request):
+    """HTMX GET: global command-center search across multiple registries."""
+    if _level(request.user) < 3:
+        return HttpResponse('', status=403)
+
+    q = request.GET.get('q', '').strip()
+    
+    if not q:
+        # Suggested commands for the Command Palette
+        suggestions = [
+            {'title': 'New Journal Entry', 'icon': 'add', 'url': '/records/htmx/create/', 'target': '#ws-detail'},
+            {'title': 'Jump to Reference Library', 'icon': 'library_books', 'url': '/governance/reference/', 'target': '#ws-content'},
+            {'title': 'Jump to Mandate Branch', 'icon': 'gavel', 'url': '/governance/mandate/', 'target': '#ws-content'},
+            {'title': 'My Identity Profile', 'icon': 'person', 'url': '/accounts/profile/', 'target': '#ws-content'},
+        ]
+        return render(request, 'governance/_global_search_results.html', {
+            'suggestions': suggestions,
+            'is_empty': True
+        })
+
+    # 1. Governance Registry
+    gov_results = Record.objects.filter(
+        record_family='governance',
+        deleted_at__isnull=True,
+        title__icontains=q
+    ).order_by('-updated_at')[:5]
+
+    # 2. Personal Journal
+    journal_results = Record.objects.filter(
+        created_by=request.user,
+        record_family='journal',
+        deleted_at__isnull=True,
+        title__icontains=q
+    ).order_by('-updated_at')[:5]
+
+    # 3. People (Coordinators) — Use accounts.User model
+    from accounts.models import User
+    people_results = User.objects.filter(
+        is_active=True,
+        display_name__icontains=q
+    )[:3]
+
+    return render(request, 'governance/_global_search_results.html', {
+        'q': q,
+        'gov': gov_results,
+        'journal': journal_results,
+        'people': people_results,
+    })

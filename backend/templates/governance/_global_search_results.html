@@ -1,0 +1,92 @@
+{% if is_empty %}
+  <div class="ws-search-group">
+    <div class="ws-search-group-label">Suggested Commands</div>
+    {% for s in suggestions %}
+    <div class="ws-search-item"
+       onclick="closeGlobalSearch()"
+       hx-get="{{ s.url }}"
+       hx-target="{{ s.target }}"
+       {% if s.target == '#ws-content' %}hx-push-url="true"{% endif %}>
+      <div class="ws-search-item__icon">
+        <span class="material-symbols-outlined">{{ s.icon }}</span>
+      </div>
+      <div class="ws-search-item__content">
+        <div class="ws-search-item__title">{{ s.title }}</div>
+        <div class="ws-search-item__meta">Quick Action</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+{% elif gov or journal or people %}
+  
+  {# 1. Governance results #}
+  {% if gov %}
+  <div class="ws-search-group">
+    <div class="ws-search-group-label">Apostolic Registry</div>
+    {% for r in gov %}
+    <a href="{% if r.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' r.id %}{% else %}{% url 'governance:mandate-detail' r.id %}{% endif %}"
+       class="ws-search-item"
+       onclick="closeGlobalSearch()"
+       hx-get="{% if r.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' r.id %}{% else %}{% url 'governance:mandate-detail' r.id %}{% endif %}"
+       hx-target="#ws-detail"
+       hx-push-url="true">
+      <div class="ws-search-item__icon">
+        <span class="material-symbols-outlined">gavel</span>
+      </div>
+      <div class="ws-search-item__content">
+        <div class="ws-search-item__title">{{ r.title }}</div>
+        <div class="ws-search-item__meta">{{ r.record_type|title }}&nbsp;·&nbsp;v{{ r.version }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# 2. Journal results #}
+  {% if journal %}
+  <div class="ws-search-group">
+    <div class="ws-search-group-label">My Records</div>
+    {% for r in journal %}
+    <a href="{% url 'records:records-detail' r.id %}"
+       class="ws-search-item"
+       onclick="closeGlobalSearch()"
+       hx-get="{% url 'records:records-detail' r.id %}"
+       hx-target="#ws-detail"
+       hx-push-url="true">
+      <div class="ws-search-item__icon">
+        <span class="material-symbols-outlined">history_edu</span>
+      </div>
+      <div class="ws-search-item__content">
+        <div class="ws-search-item__title">{{ r.title }}</div>
+        <div class="ws-search-item__meta">{{ r.get_record_type_display|default:r.record_type|title }}&nbsp;·&nbsp;{{ r.updated_at|date:"d M" }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# 3. People results #}
+  {% if people %}
+  <div class="ws-search-group">
+    <div class="ws-search-group-label">Coordinators & Stewards</div>
+    {% for p in people %}
+    <div class="ws-search-item">
+      <div class="ws-search-item__icon" style="background: var(--primary); color: #fff;">
+        {{ p.display_name|default:p.email|slice:":1"|upper }}
+      </div>
+      <div class="ws-search-item__content">
+        <div class="ws-search-item__title">{{ p.display_name|default:p.email }}</div>
+        <div class="ws-search-item__meta">Level {{ p.competence_level }}&nbsp;·&nbsp;Apostolic Worker</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+{% else %}
+  <div style="padding: 3rem 2rem; text-align: center; color: var(--muted);">
+    <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.15; display: block; margin-bottom: 1rem;">search_off</span>
+    <p style="font-size: 14px;">No registry entries matching "<strong>{{ q }}</strong>"</p>
+  </div>
+{% endif %}
