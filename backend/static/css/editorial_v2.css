@@ -1,0 +1,105 @@
+/**
+ * Editorial Chassis (v2) — Typography and Writing Environment
+ * Used for Governance, Records, and Reports.
+ */
+
+.editorial-stage {
+  --canvas-bg: var(--bg);
+  --paper-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+
+/* ── The Writing Canvas ── */
+.editorial-canvas {
+  background: var(--canvas-bg);
+  min-height: 100%;
+  box-shadow: var(--paper-shadow);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: var(--space-xl) var(--space-xl) var(--space-4xl);
+  position: relative;
+  margin-top: var(--space-m);
+}
+
+/* ── Typography ── */
+.editorial-title {
+  font-family: var(--ff-display);
+  font-size: var(--fz-4);
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: var(--space-s);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.editorial-meta {
+  font-size: var(--fz--2);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  margin-bottom: var(--space-l);
+  display: flex;
+  gap: var(--space-m);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--space-s);
+}
+
+.editorial-body {
+  font-family: var(--ff-body);
+  font-size: var(--fz-0);
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.editorial-body h2 {
+  font-family: var(--ff-display);
+  font-size: var(--fz-2);
+  margin-top: var(--space-xl);
+  margin-bottom: var(--space-s);
+  color: var(--text);
+}
+
+/* ── Formatting Toolbar ── */
+.editorial-toolbar {
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-2xs) var(--space-s);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  z-index: 20;
+  margin: 0 calc(-1 * var(--space-xl)) var(--space-l);
+  border-radius: var(--radius-m) var(--radius-m) 0 0;
+}
+
+.editorial-toolbar__btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: var(--radius-s);
+  transition: all var(--transition-fast);
+}
+
+.editorial-toolbar__btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.editorial-toolbar__btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.editorial-toolbar__divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  margin: 0 4px;
+}
