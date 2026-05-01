@@ -1,0 +1,36 @@
+{# templates/activity/partials/activity_intel.html #}
+<div class="ws-options-section">
+    <div class="ws-label-tag">Field Intel</div>
+    
+    <div class="ws-stat-grid" style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="ws-stat-card" style="background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
+            <div class="ws-stat-card__label" style="color: var(--muted); font-size: 10px;">Active</div>
+            <div class="ws-stat-card__value" style="color: var(--ink-bg); font-size: 20px;">{{ upcoming.count|add:due_today.count }}</div>
+        </div>
+        <div class="ws-stat-card" style="background: {% if overdue %}#fff0f0{% else %}var(--stone-bg){% endif %}; border: 1px solid rgba(0,0,0,0.05);">
+            <div class="ws-stat-card__label" style="color: {% if overdue %}var(--accent-red){% else %}var(--muted){% endif %}; font-size: 10px;">Overdue</div>
+            <div class="ws-stat-card__value" style="color: {% if overdue %}var(--accent-red){% else %}var(--ink-bg){% endif %}; font-size: 20px;">{{ overdue.count }}</div>
+        </div>
+    </div>
+
+    <div class="ws-sidebar__divider" style="margin: 20px 0;"></div>
+
+    <div class="ws-label-tag">Momentum</div>
+    <div class="ws-stat-card" style="margin-top: 12px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
+        <div class="ws-stat-card__label">Daily Compliance</div>
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+            <div class="ws-stat-card__value" style="color: var(--ink-bg);">85%</div>
+            <div style="font-size: 10px; color: #27ae60; font-weight: 700;">+2%</div>
+        </div>
+        <div class="ws-progress-bar" style="margin-top: 10px; height: 4px; background: rgba(0,0,0,0.05); border-radius: 2px;">
+            <div class="ws-progress-bar__fill" style="width: 85%; height: 100%; background: var(--accent-red); border-radius: 2px;"></div>
+        </div>
+    </div>
+
+    <div class="ws-sidebar__divider" style="margin: 20px 0;"></div>
+
+    <div class="ws-label-tag">Guidelines</div>
+    <p style="font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6;">
+        Missions require <strong>L3 Stewardship</strong> for closure. Habits are self-attested and contribute to your overall competence level.
+    </p>
+</div>

@@ -1,212 +1,105 @@
-{% extends "learn/base_learn.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 
+{% block title %}Formation Hub — Ichebo{% endblock %}
 
-{# ── WORKSPACE layout ── #}
-{% block ws_content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner">
-
-    <div class="ws-page-header">
-      <div class="ws-page-header__left">
-        <h2 class="ws-page-title">My <em>Learning</em></h2>
-        <p class="ws-page-subtitle">Your formation pathway, enrolled programmes, and certifications.</p>
-      </div>
-      <div class="ws-page-header__actions">
-        <a href="{% url 'learn:learn-catalogue' %}" class="ws-topbar__cta">
-          <span class="material-symbols-outlined">apps</span>
-          Catalogue
-        </a>
-      </div>
-    </div>
-
-    {% if active_pathway %}
-    <div style="margin-bottom: var(--space-m);">
-      <span class="badge-unit badge-unit--primary">{{ active_pathway|title }}</span>
-      {% if active_qualification %}
-      <span class="label-caps" style="margin-bottom: 0; font-size: 10px; margin-left: var(--space-2xs);">{{ active_qualification }} Pathway</span>
-      {% endif %}
-    </div>
-    {% endif %}
-
-    {% if enrolments %}
-    <div class="ws-feed-section">
-      <div class="label-caps" style="margin-bottom: var(--space-xs);">Active Programmes</div>
-      <div class="list-group">
-        {% for enrolment in enrolments %}
-        <a href="{% if enrolment.metadata.programme_record_id %}{% url 'learn:learn-programme' enrolment.metadata.programme_record_id %}{% else %}#{% endif %}"
-           class="list-item" style="flex-direction: column; align-items: stretch; gap: 10px; padding: 14px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div class="list-item__title" style="white-space: normal; line-height: 1.5; font-weight: 700;">{{ enrolment.title }}</div>
-            <span class="badge-unit badge-unit--primary" style="flex-shrink: 0;">{{ enrolment.progress|default:0 }}%</span>
-          </div>
-          <div class="learn-progress-track" style="height: 6px; border-radius: 3px;">
-            <div class="learn-progress-fill" style="width: {{ enrolment.progress|default:0 }}%;"></div>
-          </div>
-        </a>
-        {% endfor %}
-      </div>
-    </div>
-    {% else %}
-    <div class="ws-empty-state">
-      <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">school</span>
-      <p style="color: var(--muted);">No active enrolments. Browse the catalogue to get started.</p>
-      <a href="{% url 'learn:learn-catalogue' %}" class="ws-btn ws-btn--primary" style="margin-top: var(--space-s);">Browse Catalogue</a>
-    </div>
-    {% endif %}
-
-    {% if certifications %}
-    <div class="ws-feed-section">
-      <div class="label-caps" style="margin-bottom: var(--space-xs);">Certifications</div>
-      <div class="list-group">
-        {% for cert in certifications %}
-        <div class="list-item">
-          <div class="list-item__icon" style="color: var(--primary);"><span class="material-symbols-outlined">workspace_premium</span></div>
-          <div class="list-item__content">
-            <div class="list-item__title">{{ cert.title }}</div>
-            <div class="list-item__meta">{{ cert.created_at|date:"d M Y" }}</div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
-  </div>
-</div>
+{# Zone 2: Academic Navigator #}
+{% block context_header %}Formation Ops{% endblock %}
+{% block context_content %}
+    {% include "learn/partials/learn_sidebar.html" %}
 {% endblock %}
 
-
-{% block learn_content %}
-
-<div class="learn-page">
-  <header class="explore-header">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-      <div>
-        <h1 class="explore-title">Learn</h1>
-        <p class="explore-subtitle">Programmes, certifications & curriculum</p>
-      </div>
-      <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch btn-sm btn-secondary" style="min-height: 40px; padding: 0 12px;">
-        <span class="material-symbols-outlined" style="font-size: 20px;">apps</span>
-        Catalogue
-      </a>
+{# Zone 3: The Sovereign Classroom #}
+{% block ws_content %}
+<div class="formation-hub-v2">
+    
+    <div class="ws-page-header" style="margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 8px; color: var(--accent-red);">Spiritual Formation</div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <h1 class="ws-page-title" style="font-size: 36px; margin: 0;">My <em>Learning</em></h1>
+            <a href="{% url 'learn:learn-catalogue' %}" class="ws-topbar__cta" style="text-decoration: none;">
+                <span class="material-symbols-outlined">apps</span>
+                Browse Catalogue
+            </a>
+        </div>
     </div>
-  </header>
 
-  {% if active_pathway %}
-  <div class="learn-pathway-chip" style="margin-bottom: 24px;">
-    <span class="badge-unit badge-unit--primary">{{ active_pathway|title }}</span>
-    {% if active_qualification %}
-    <span class="label-caps" style="margin-bottom:0; font-size: 10px;">{{ active_qualification }} Pathway</span>
+    {# Active Pathway Context #}
+    {% if active_pathway %}
+    <div class="ws-card-v2" style="background: var(--ink-bg); color: #fff; border-radius: 12px; padding: 25px; margin-bottom: 40px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <div class="ws-label-tag" style="background: rgba(255,255,255,0.1); color: #fff; border: none; margin-bottom: 8px;">Active Pathway</div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;">{{ active_qualification|default:active_pathway|title }}</div>
+        </div>
+        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2;">school</span>
+    </div>
     {% endif %}
-  </div>
-  {% endif %}
 
-<!-- Active enrolments -->
-<div class="learn-section">
-  <div class="label-caps" style="color: var(--primary); margin-bottom: 12px; padding-left: 4px;">Active Programmes</div>
-  <div class="list-group">
-    {% for enrolment in enrolments %}
-    <a href="{% if enrolment.metadata.programme_record_id %}{% url 'learn:learn-programme' enrolment.metadata.programme_record_id %}{% else %}#{% endif %}" 
-       class="list-item" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 16px;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <div class="list-item__title" style="white-space: normal; line-height: 1.5; font-weight: 700; font-size: 15px;">{{ enrolment.title }}</div>
-        <span class="badge-unit badge-unit--primary" style="flex-shrink: 0;">{{ enrolment.progress|default:0 }}%</span>
-      </div>
-      <div class="learn-progress-track" style="height: 6px; border-radius: 3px;">
-        <div class="learn-progress-fill" style="width: {{ enrolment.progress|default:0 }}%;"></div>
-      </div>
-    </a>
-    {% empty %}
-    <div class="empty-state">
-      <span class="material-symbols-outlined" style="font-size: 40px; opacity: 0.2; margin-bottom: 16px;">school</span>
-      <p>No active enrolments.</p>
-      <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch btn-primary" style="margin-top: 12px;">Explore Catalogue</a>
-    </div>
-    {% endfor %}
-  </div>
-
-  {% if pending_certifications %}
-    <div class="label-caps" style="margin: 24px 0 12px 4px;">Awaiting Certification</div>
-    <div class="list-group">
-      {% for cert in pending_certifications %}
-      <div class="list-item">
-        <div class="list-item__icon"><span class="material-symbols-outlined">hourglass_empty</span></div>
-        <div class="list-item__content">
-          <div class="list-item__title">{{ cert.title }}</div>
-          <div class="list-item__meta">Submitted for review</div>
+    {# Active Programmes Grid #}
+    <div class="ws-label-tag" style="margin-bottom: 20px;">Active Programmes</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+        {% for enrolment in enrolments %}
+        <a href="{% if enrolment.metadata.programme_record_id %}{% url 'learn:learn-programme' enrolment.metadata.programme_record_id %}{% else %}#{% endif %}" 
+           class="ws-stat-card enrolment-card" 
+           style="text-decoration: none; padding: 25px; background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; display: block;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <div style="font-weight: 700; color: var(--ink-bg); font-size: 16px; line-height: 1.4;">{{ enrolment.title }}</div>
+                <div style="font-weight: 800; color: var(--accent-red); font-size: 14px;">{{ enrolment.progress|default:0 }}%</div>
+            </div>
+            <div class="progress-track-v2" style="height: 4px; background: rgba(0,0,0,0.05); border-radius: 2px;">
+                <div style="height: 100%; width: {{ enrolment.progress|default:0 }}%; background: var(--accent-red); border-radius: 2px;"></div>
+            </div>
+            <div style="margin-top: 15px; font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                {% if enrolment.progress == 100 %}Awaiting Certification{% else %}In Progress{% endif %}
+            </div>
+        </a>
+        {% empty %}
+        <div class="ws-empty-state" style="grid-column: 1 / -1; padding: 60px 0;">
+            <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.1;">school</span>
+            <p style="color: var(--muted); margin-top: 15px;">No active enrolments. Your formation awaits.</p>
         </div>
-        <div class="list-item__action">
-          <span class="badge-unit" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">REVIEW</span>
+        {% endfor %}
+    </div>
+
+</div>
+
+<style>
+.formation-hub-v2 {
+    padding: 40px 0;
+}
+.enrolment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+    border-color: rgba(0,0,0,0.1) !important;
+}
+</style>
+{% endblock %}
+
+{# Zone 4: Competence Inventory #}
+{% block ws_options %}
+<div class="ws-options-section">
+    <div class="ws-label-tag">Competence Inventory</div>
+    
+    <div class="ws-stat-card" style="margin-top: 15px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
+        <div class="ws-stat-card__label">Earned Credentials</div>
+        <div class="ws-stat-card__value" style="color: var(--ink-bg);">{{ certifications.count|default:0 }}</div>
+    </div>
+
+    <div class="ws-sidebar__divider" style="margin: 30px 0;"></div>
+
+    <div class="ws-label-tag">Certifications</div>
+    <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 15px;">
+        {% for cert in certifications %}
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <span class="material-symbols-outlined" style="color: var(--accent-red); font-size: 20px;">workspace_premium</span>
+            <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--ink-bg);">{{ cert.title }}</div>
+                <div style="font-size: 11px; color: var(--muted);">Issued {{ cert.created_at|date:"M Y" }}</div>
+            </div>
         </div>
-      </div>
-      {% endfor %}
+        {% empty %}
+        <div style="font-size: 12px; color: var(--muted); font-style: italic;">No certifications yet attained.</div>
+        {% endfor %}
     </div>
-  {% endif %}
 </div>
-
-<!-- Management Section (Role-Based) -->
-{% if request.user.competence_level >= 3 %}
-<div class="list-group" style="margin-top: 2rem;">
-  <div class="dash-widget__label" style="padding-left:16px;">Stewardship & Authorship</div>
-  
-  <a href="{% url 'learn:learn-cert-queue' %}" class="list-item">
-    <div class="list-item__icon"><span class="material-symbols-outlined">verified</span></div>
-    <div class="list-item__content">
-      <div class="list-item__title">Certification Queue</div>
-      <div class="list-item__meta">Review student completion requests</div>
-    </div>
-    <span class="material-symbols-outlined">chevron_right</span>
-  </a>
-
-  {% if request.user.competence_level >= 4 %}
-  <a href="{% url 'learn:learn-author' %}" class="list-item">
-    <div class="list-item__icon"><span class="material-symbols-outlined">edit_square</span></div>
-    <div class="list-item__content">
-      <div class="list-item__title">Curriculum Authoring</div>
-      <div class="list-item__meta">Draft and publish lessons & programmes</div>
-    </div>
-    <span class="material-symbols-outlined">chevron_right</span>
-  </a>
-  {% endif %}
-
-  {% if request.user.competence_level >= 5 %}
-  <a href="{% url 'learn:learn-induction-review' %}" class="list-item">
-    <div class="list-item__icon"><span class="material-symbols-outlined">how_to_reg</span></div>
-    <div class="list-item__content">
-      <div class="list-item__title">Induction Review</div>
-      <div class="list-item__meta">Confirm inductees and advance to Level 1</div>
-    </div>
-    <span class="material-symbols-outlined">chevron_right</span>
-  </a>
-  <a href="{% url 'learn:learn-review' %}" class="list-item">
-    <div class="list-item__icon"><span class="material-symbols-outlined">approval_delegation</span></div>
-    <div class="list-item__content">
-      <div class="list-item__title">Content Review Queue</div>
-      <div class="list-item__meta">Final oversight and publication approval</div>
-    </div>
-    <span class="material-symbols-outlined">chevron_right</span>
-  </a>
-  {% endif %}
-</div>
-{% endif %}
-
-<!-- Completed -->
-{% if certifications %}
-<div class="list-group" style="margin-top: 2rem;">
-  <div class="dash-widget__label" style="padding-left:16px;">Certifications Earned</div>
-  {% for cert in certifications %}
-  <div class="list-item">
-    <div class="list-item__icon" style="color: var(--primary);"><span class="material-symbols-outlined">workspace_premium</span></div>
-    <div class="list-item__content">
-      <div class="list-item__title">{{ cert.title }}</div>
-      <div class="list-item__meta">Awarded on {{ cert.created_at|date:"d M Y" }}</div>
-    </div>
-    <div class="list-item__action">
-      <span class="badge-unit" style="background: #f0fdf4; color: #166534;">ENACTED</span>
-    </div>
-  </div>
-  {% endfor %}
-</div>
-{% endif %}
-
 {% endblock %}

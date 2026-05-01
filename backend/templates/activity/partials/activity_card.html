@@ -1,49 +1,46 @@
-<div class="list-item activity-item" id="activity-{{ activity.id }}" 
-     hx-swap-oob="afterbegin:#activity-list-upcoming"
+<div class="ws-stat-card timeline-card" id="activity-{{ activity.id }}" 
      hx-get="{% url 'activity:activity-detail' activity.id %}"
-     hx-target="#main-content"
+     hx-target="#main-stage"
+     hx-select="#main-stage"
      hx-push-url="true"
-     style="cursor: pointer;">
-  <div class="list-item__icon">
-    <span class="status-badge 
-      {% if activity.due_at and activity.due_at < now %}status-badge--danger
-      {% elif activity.due_at and activity.due_at.date == now.date %}status-badge--active
-      {% elif activity.activity_type == 'reminder' %}status-badge--warning
-      {% else %}status-badge--muted{% endif %}">
-      {{ activity.activity_type|slice:":3"|upper }}
+     style="cursor: pointer; background: #fff; border: 1px solid rgba(0,0,0,0.05); padding: 16px; display: flex; align-items: center; gap: 15px; border-radius: 8px; transition: transform 0.2s, box-shadow 0.2s;">
+  
+  <div class="card-momentum-icon">
+    <span class="material-symbols-outlined" style="font-size: 24px; color: {% if activity.activity_type == 'habit' %}#2ecc71{% elif activity.activity_type == 'mission' %}var(--accent-red){% else %}var(--muted){% endif %};">
+        {% if activity.activity_type == 'habit' %}sync{% elif activity.activity_type == 'mission' %}rocket_launch{% else %}task_alt{% endif %}
     </span>
   </div>
 
-  <div class="list-item__content">
-    <div class="list-item__title" style="font-weight: 700;">{{ activity.title }}</div>
-    <div class="list-item__meta" style="display: flex; align-items: center; gap: 8px;">
-      {% if activity.due_at %}
-      <span class="activity-due {% if activity.due_at < now %}activity-due--overdue{% endif %}" style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
-        <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
-        {{ activity.due_at|date:"d M" }}
-      </span>
-      {% endif %}
-      {% if activity.recurrence != 'none' %}
-      <span class="badge-unit" style="font-size: 9px;"><span class="material-symbols-outlined" style="font-size: 10px;">sync</span> {{ activity.recurrence }}</span>
-      {% endif %}
+  <div style="flex: 1; overflow: hidden;">
+    <div style="font-size: 14px; font-weight: 700; color: var(--ink-bg); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        {{ activity.title }}
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--muted); font-weight: 500;">
+        {% if activity.due_at %}
+            <span style="display: flex; align-items: center; gap: 4px; {% if activity.due_at < now %}color: var(--accent-red);{% endif %}">
+                <span class="material-symbols-outlined" style="font-size: 14px;">event</span>
+                {{ activity.due_at|date:"d M" }}
+            </span>
+        {% endif %}
+        <span class="ws-label-tag" style="padding: 2px 6px; font-size: 9px; opacity: 0.8;">{{ activity.get_activity_type_display }}</span>
     </div>
   </div>
 
-  <div class="activity-actions" onclick="event.stopPropagation();">
-    <button class="activity-action-btn activity-action-btn--complete"
+  <div class="activity-actions" style="display: flex; gap: 8px;" onclick="event.stopPropagation();">
+    <button class="ws-icon-btn" 
             hx-post="{% url 'activity:htmx-complete' activity.id %}"
             hx-target="#activity-{{ activity.id }}"
             hx-swap="outerHTML"
             title="Mark Done">
       <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
     </button>
-    <button class="activity-action-btn"
-            hx-get="{% url 'activity:htmx-edit' activity.id %}"
-            hx-target="#drawerInner"
-            hx-swap="innerHTML"
-            onclick="window.ICSDrawer.open('Edit Activity')"
-            title="Edit">
-      <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
-    </button>
   </div>
 </div>
+
+<style>
+.timeline-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    border-color: rgba(0,0,0,0.1) !important;
+}
+</style>

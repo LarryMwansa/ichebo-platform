@@ -15,137 +15,131 @@
    Completely separate from the mobile content block below.
    ═══════════════════════════════════════════════════════════ #}
 
+{% block title %}Steward Dashboard — Ichebo{% endblock %}
+
+{# Zone 2: Steward Actions #}
+{% block context_header %}Strategic Actions{% endblock %}
 {% block context_content %}
-<div class="ws-list-panel__header" style="padding: 0; border-bottom: none;">
-  <div class="ws-label-tag">Steward Actions</div>
-  <div class="ws-feed" style="margin-top: var(--space-s);">
-    <button class="ws-btn ws-btn--primary" style="width: 100%; justify-content: flex-start;"
-            hx-get="{% url 'records:htmx-create' %}?record_type=dar"
-            hx-target="#drawerInner"
-            hx-swap="innerHTML"
-            onclick="window.ICSDrawer.open('Daily Activity Report')">
-      <span class="material-symbols-outlined">edit_note</span>
-      Write DAR
-    </button>
-  </div>
-</div>
-
-<div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
-
-<div class="ws-label-tag">Local Files</div>
-<div class="ws-feed" style="margin-top: var(--space-s); opacity: 0.5;">
-  <div class="ws-list-item" style="border: none; padding: var(--space-xs) 0;">
-    <span class="material-symbols-outlined">draft</span>
-    <div class="ws-list-item__title">No local drafts</div>
-  </div>
-</div>
+    {% include "dashboard/partials/dashboard_sidebar.html" %}
 {% endblock %}
 
+{# Zone 3: The Command Stage #}
 {% block ws_content %}
-<div class="ws-layout--grid">
-
-  {# ── Page header ── #}
-  <div class="ws-page-header">
-    <div class="ws-page-header__left">
-      <div class="ws-label-tag">Apostolic Steward</div>
-      <h1 class="ws-page-title">{{ user.display_name|default:user.email }}</h1>
-      <p class="ws-page-subtitle">{{ user.status|title }} &middot; Level {{ user.competence_level }}</p>
-    </div>
-  </div>
-
-  {# ── Stat strip ── #}
-  <div class="ws-grid-stats">
-    <div class="ws-stat-card {% if digest.dar_today %}ws-stat-card--success{% else %}ws-stat-card--warning{% endif %}">
-      <div class="ws-stat-card__label">Daily Report</div>
-      <div class="ws-stat-card__value">
-        {% if digest.dar_today %}Done{% else %}Pending{% endif %}
-      </div>
-      <div class="ws-stat-card__sub">
-        {% if digest.dar_today %}{{ digest.dar_today.title|truncatechars:28 }}{% else %}Required today{% endif %}
-      </div>
+<div class="dashboard-v2">
+    
+    <div class="ws-page-header" style="margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 8px; color: var(--accent-red);">Apostolic Overview</div>
+        <h1 class="ws-page-title" style="font-size: 36px; margin: 0;">Grace & Peace, <em>{{ user.display_name|default:user.first_name }}</em></h1>
     </div>
 
-    <div class="ws-stat-card">
-      <div class="ws-stat-card__label">Pending Units</div>
-      <div class="ws-stat-card__value">{{ digest.pending_count }}</div>
-      <div class="ws-stat-card__sub">Active assignments</div>
-    </div>
-
-    {% if digest.overdue_items %}
-    <div class="ws-stat-card ws-stat-card--danger">
-      <div class="ws-stat-card__label">Overdue</div>
-      <div class="ws-stat-card__value">{{ digest.overdue_items|length }}</div>
-      <div class="ws-stat-card__sub">Action required</div>
-    </div>
-    {% endif %}
-  </div>
-
-  {# ── Primary two-column grid ── #}
-  <div class="ws-grid-primary">
-    <div class="ws-grid-left">
-      {# Divine Intel — Paraclete prompt #}
-      <div class="ws-dash-intel">
-        <div class="ws-label-tag">Divine Intel</div>
-        <div class="ws-dash-intel__body">
-          <span class="material-symbols-outlined ws-dash-intel__icon">auto_awesome</span>
-          <blockquote class="ws-dash-intel__prompt">{{ digest.discipline_prompt }}</blockquote>
+    {# 1. Status Grid #}
+    <div class="ws-stat-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px;">
+        <div class="ws-stat-card {% if digest.dar_today %}status-done{% else %}status-pending{% endif %}" style="background: #fff; border: 1px solid rgba(0,0,0,0.05); padding: 20px; border-radius: 8px;">
+            <div class="ws-stat-card__label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px;">Daily Briefing</div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span class="material-symbols-outlined" style="font-size: 32px; color: {% if digest.dar_today %}#2ecc71{% else %}var(--accent-red){% endif %};">
+                    {% if digest.dar_today %}check_circle{% else %}pending_actions{% endif %}
+                </span>
+                <div>
+                    <div class="ws-stat-card__value" style="font-size: 20px; color: var(--ink-bg);">{% if digest.dar_today %}Report Filed{% else %}Mandatory DAR{% endif %}</div>
+                    <div style="font-size: 11px; color: var(--muted);">{% if digest.dar_today %}Submission received{% else %}Action required today{% endif %}</div>
+                </div>
+            </div>
         </div>
+
+        <div class="ws-stat-card" style="background: #fff; border: 1px solid rgba(0,0,0,0.05); padding: 20px; border-radius: 8px;">
+            <div class="ws-stat-card__label" style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px;">Kingdom Momentum</div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span class="material-symbols-outlined" style="font-size: 32px; color: var(--accent-red);">rocket_launch</span>
+                <div>
+                    <div class="ws-stat-card__value" style="font-size: 20px; color: var(--ink-bg);">{{ digest.pending_count }} Active Units</div>
+                    <div style="font-size: 11px; color: var(--muted);">Assigned to your steward ID</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# 2. Divine Intel Hero #}
+    <div class="ws-dash-intel-v2" style="background: var(--ink-bg); color: #fff; border-radius: 12px; padding: 40px; margin-bottom: 40px; position: relative; overflow: hidden;">
+        <div style="position: absolute; right: -20px; top: -20px; font-size: 200px; opacity: 0.05; color: #fff;">
+            <span class="material-symbols-outlined" style="font-size: 200px;">auto_awesome</span>
+        </div>
+        
+        <div class="ws-label-tag" style="background: var(--accent-red); color: #fff; border: none; margin-bottom: 20px;">Divine Intel</div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 28px; line-height: 1.4; margin-bottom: 25px; font-weight: 700; position: relative; z-index: 1;">
+            "{{ digest.discipline_prompt }}"
+        </h2>
+        
         {% if digest.suggestions %}
-        <div class="ws-dash-intel__actions">
-          {% for s in digest.suggestions %}
-            <a href="{{ s.action_url|default:'#' }}" class="ws-filter-pill">
-              <span class="material-symbols-outlined">bolt</span>
-              {{ s.text }}
-            </a>
-          {% endfor %}
+        <div style="display: flex; gap: 12px; position: relative; z-index: 1;">
+            {% for s in digest.suggestions %}
+                <a href="{{ s.action_url|default:'#' }}" class="ws-btn" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 12px; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">bolt</span>
+                    {{ s.text }}
+                </a>
+            {% endfor %}
         </div>
         {% endif %}
-      </div>
-
-      {# Immediate Missions ── #}
-      {% if digest.overdue_items or digest.due_today %}
-      <div class="ws-card" style="margin-top: var(--space-m);">
-        <div class="ws-section-header">
-          <span class="ws-section-title">Immediate Missions</span>
-        </div>
-        <div class="ws-feed">
-          {% for item in digest.overdue_items %}
-          <div class="ws-list-item">
-            <span class="status-badge status-badge--danger">{{ item.activity_type|slice:":3"|upper }}</span>
-            <div class="ws-list-item__title">{{ item.title }}</div>
-          </div>
-          {% endfor %}
-          {% for item in digest.due_today %}
-          <div class="ws-list-item">
-            <span class="status-badge status-badge--active">{{ item.activity_type|slice:":3"|upper }}</span>
-            <div class="ws-list-item__title">{{ item.title }}</div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
     </div>
-  </div>
+
+    {# 3. Immediate Missions #}
+    <div class="ws-card-v2" style="background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 30px;">
+        <div class="ws-label-tag" style="margin-bottom: 20px;">Priority Missions</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            {% for item in digest.overdue_items %}
+                <div class="ws-stat-card" style="padding: 15px; background: #fffafb; border: 1px solid #fee; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="material-symbols-outlined" style="color: var(--accent-red);">priority_high</span>
+                        <div style="font-size: 14px; font-weight: 700; color: var(--ink-bg);">{{ item.title }}</div>
+                    </div>
+                    <div class="ws-label-tag" style="color: var(--accent-red); border-color: var(--accent-red);">OVERDUE</div>
+                </div>
+            {% empty %}
+                <div class="ws-empty-state" style="padding: 20px 0;">
+                    <span class="material-symbols-outlined" style="font-size: 24px; opacity: 0.1;">done_all</span>
+                    <p style="font-size: 11px; color: var(--muted); margin-top: 10px;">No critical mission alerts.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 
 </div>
+
+<style>
+.dashboard-v2 {
+    padding: 40px 0;
+}
+.ws-btn:hover {
+    background: rgba(255,255,255,0.2) !important;
+}
+</style>
 {% endblock %}
 
+{# Zone 4: Support & Community #}
 {% block ws_options %}
-<div class="ws-section-header" style="margin-bottom: var(--space-m);">
-  <span class="label-caps">Team Support</span>
+<div class="ws-options-section">
+    <div class="ws-label-tag">Team Vitals</div>
+    
+    <div class="ws-stat-card" style="margin-top: 15px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
+        <div class="ws-stat-card__label">Team Support</div>
+        <div class="ws-stat-card__value" style="color: var(--ink-bg);">{{ digest.team_pending_count|default:0 }}</div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 5px;">Awaiting shepherd response</div>
+    </div>
+
+    <div class="ws-sidebar__divider" style="margin: 30px 0;"></div>
+
+    <div class="ws-label-tag">Recent Activity</div>
+    <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; gap: 10px; font-size: 12px;">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: #2ecc71;">check_circle</span>
+            <div style="color: var(--muted);">Journal entry secured.</div>
+        </div>
+        <div style="display: flex; gap: 10px; font-size: 12px;">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: #3498db;">info</span>
+            <div style="color: var(--muted);">Stewardship level 4 attained.</div>
+        </div>
+    </div>
 </div>
-{% if digest.team_pending_count %}
-  <div class="ws-stat-card ws-stat-card--info">
-    <div class="ws-stat-card__label">Pending Support</div>
-    <div class="ws-stat-card__value">{{ digest.team_pending_count }}</div>
-    <div class="ws-stat-card__sub">Members needing attention</div>
-  </div>
-{% else %}
-  <div class="ws-empty-state">
-    <span class="material-symbols-outlined">done_all</span>
-    <p>No team support requests</p>
-  </div>
-{% endif %}
 {% endblock %}
 
 {# ═══════════════════════════════════════════════════════════

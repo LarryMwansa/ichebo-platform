@@ -1,0 +1,44 @@
+{# templates/activity/partials/activity_sidebar.html #}
+<div class="ics-explorer">
+    
+    {# Strategic Filters #}
+    <div class="explorer-section">
+        <div class="explorer-header">
+            <span class="material-symbols-outlined">filter_list</span>
+            <span class="label-caps">Strategic Filters</span>
+        </div>
+        <div class="explorer-list">
+            <a href="{% url 'activity:activity-home' %}" class="explorer-item {% if not active_type %}active{% endif %}">
+                <span class="material-symbols-outlined explorer-icon">all_inclusive</span>
+                <span class="explorer-name">All Activity</span>
+            </a>
+            {% for slug, label in activity_types %}
+                <a href="{% url 'activity:activity-home' %}?type={{ slug }}" class="explorer-item {% if active_type == slug %}active{% endif %}">
+                    <span class="material-symbols-outlined explorer-icon">
+                        {% if slug == 'habit' %}sync{% elif slug == 'mission' %}rocket_launch{% elif slug == 'goal' %}emoji_events{% else %}task_alt{% endif %}
+                    </span>
+                    <span class="explorer-name">{{ label }}</span>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# Calendar Context #}
+    <div class="explorer-section" style="margin-top: 20px;">
+        <div class="explorer-header">
+            <span class="material-symbols-outlined">calendar_month</span>
+            <span class="label-caps">Time Context</span>
+        </div>
+        <div class="explorer-list">
+            <a href="{% url 'activity:calendar-view' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">calendar_view_month</span>
+                <span class="explorer-name">Calendar Grid</span>
+            </a>
+            <a href="{% url 'activity:ministry' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">campaign</span>
+                <span class="explorer-name">Ministry Hub</span>
+            </a>
+        </div>
+    </div>
+
+</div>

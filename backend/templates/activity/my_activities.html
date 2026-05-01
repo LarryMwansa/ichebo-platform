@@ -1,70 +1,104 @@
-{% extends "activity/base_activity.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 
+{% block title %}Activity Timeline — Ichebo{% endblock %}
 
-{# ── WORKSPACE layout ── #}
+{# Zone 2: Strategic Filters #}
+{% block context_header %}Tactical Intel{% endblock %}
+{% block context_content %}
+    {% include "activity/partials/activity_sidebar.html" %}
+{% endblock %}
+
+{# Zone 3: The Sovereign Timeline #}
 {% block ws_content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner">
-
-    <div class="ws-page-header">
-      <div class="ws-page-header__left">
-        <h2 class="ws-page-title">Personal <em>Activity</em></h2>
-        <p class="ws-page-subtitle">Your active missions, habits, and spiritual disciplines.</p>
-      </div>
-      <div class="ws-page-header__actions">
-        <a href="{% url 'governance:desk' %}?family=activity" class="ws-topbar__cta" style="text-decoration: none;">
-          <span class="material-symbols-outlined">add</span>
-          New Activity
-        </a>
-      </div>
+<div class="activity-timeline-v2">
+    
+    <div class="ws-page-header" style="margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 8px; color: var(--accent-red);">Kingdom Momentum</div>
+        <h1 class="ws-page-title" style="font-size: 36px; margin: 0;">Personal <em>Activity</em></h1>
     </div>
 
-    <div class="ws-toolbar">
-      <div class="ws-toolbar__left">
-        <a href="{% url 'activity:activity-home' %}"
-           class="ws-filter-pill {% if not active_type %}active{% endif %}">All</a>
-        {% for slug, label in activity_types %}
-        <a href="{% url 'activity:activity-home' %}?type={{ slug }}"
-           class="ws-filter-pill {% if active_type == slug %}active{% endif %}">
-          {{ label }}
-        </a>
-        {% endfor %}
-      </div>
-    </div>
-
-    {% if overdue %}
-    <div class="ws-feed-section">
-      <div class="label-caps" style="color: var(--danger); margin-bottom: var(--space-xs);">Overdue</div>
-      <div class="list-group" id="activity-list-overdue">
-        {% for activity in overdue %}{% include "activity/partials/activity_card.html" %}{% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
-    {% if due_today %}
-    <div class="ws-feed-section">
-      <div class="label-caps" style="margin-bottom: var(--space-xs);">Due Today</div>
-      <div class="list-group" id="activity-list-today">
-        {% for activity in due_today %}{% include "activity/partials/activity_card.html" %}{% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
-    <div class="ws-feed-section">
-      <div class="label-caps" style="margin-bottom: var(--space-xs);">Upcoming</div>
-      <div class="list-group" id="activity-list-upcoming">
-        {% for activity in upcoming %}{% include "activity/partials/activity_card.html" %}{% endfor %}
-        {% if not upcoming and not overdue and not due_today %}
-        <div class="ws-empty-state">
-          <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">event_busy</span>
-          <p style="color: var(--muted);">No active missions. Start a new one.</p>
+    {# The Momentum Axis #}
+    <div class="momentum-axis" style="position: relative; padding-left: 40px; border-left: 2px solid rgba(0,0,0,0.05); margin-left: 10px;">
+        
+        {% if overdue %}
+        <div class="timeline-segment">
+            <div class="segment-label-caps" style="color: var(--accent-red); margin-bottom: 20px;">Overdue Mandates</div>
+            <div class="timeline-items">
+                {% for activity in overdue %}
+                    {% include "activity/partials/activity_card.html" %}
+                {% endfor %}
+            </div>
         </div>
+        <div style="height: 40px;"></div>
         {% endif %}
-      </div>
-    </div>
 
-  </div>
+        {% if due_today %}
+        <div class="timeline-segment">
+            <div class="segment-label-caps" style="margin-bottom: 20px;">Due Today</div>
+            <div class="timeline-items">
+                {% for activity in due_today %}
+                    {% include "activity/partials/activity_card.html" %}
+                {% endfor %}
+            </div>
+        </div>
+        <div style="height: 40px;"></div>
+        {% endif %}
+
+        <div class="timeline-segment">
+            <div class="segment-label-caps" style="margin-bottom: 20px;">Upcoming Horizon</div>
+            <div class="timeline-items">
+                {% for activity in upcoming %}
+                    {% include "activity/partials/activity_card.html" %}
+                {% endfor %}
+                {% if not upcoming and not overdue and not due_today %}
+                    <div class="ws-empty-state">
+                        <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.1;">event_busy</span>
+                        <p style="color: var(--muted); margin-top: 10px;">The horizon is clear. Start a mission.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+.activity-timeline-v2 {
+    padding: 40px 0;
+    max-width: 800px;
+}
+.segment-label-caps {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0.7;
+}
+.timeline-items {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+/* Connect cards to axis */
+.timeline-items > * {
+    position: relative;
+}
+.timeline-items > *::before {
+    content: '';
+    position: absolute;
+    left: -42px;
+    top: 24px;
+    width: 12px;
+    height: 2px;
+    background: rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}
+
+{# Zone 4: Ministry Vitals #}
+{% block ws_options %}
+    {% include "activity/partials/activity_intel.html" %}
 {% endblock %}
 
 

@@ -1,64 +1,79 @@
-{% extends "workspace/records/base.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
-{# ── MAIN STAGE: The Editorial Desk ── #}
-{% block records_content %}
-    {% if is_desk %}
-        {% include "workspace/records/partials/editorial_form.html" %}
-    {% else %}
-        <div class="ws-page-header" style="padding: var(--space-m) var(--space-m) 0;">
-            <div class="ws-page-header__left">
-                <div class="ws-label-tag">Steward Registry</div>
-                <h1 class="ws-page-title">My <em>Journal</em></h1>
-            </div>
-            <div class="ws-page-header__actions">
-                <a href="{% url 'governance:desk' %}" class="ws-topbar__cta" style="text-decoration: none;">
-                    <span class="material-symbols-outlined">add</span>
-                    New Record
-                </a>
-            </div>
-        </div>
+{% block title %}Registry Archive — Ichebo{% endblock %}
 
-        <div class="ws-content__inner" style="padding-top: var(--space-m);">
-            {# Filter Tabs #}
-            <div style="display: flex; gap: 8px; margin-bottom: var(--space-l); overflow-x: auto; padding-bottom: 4px;">
-                <a href="{% url 'records:records-home' %}"
-                   class="ws-icon-btn {% if not active_type %}active{% endif %}"
-                   style="width: auto; padding: 0 var(--space-s); font-size: 12px; font-weight: 600;">
-                    All
-                </a>
-                {% for value, label in record_types %}
-                <a href="{% url 'records:records-home' %}?type={{ value }}"
-                   class="ws-icon-btn {% if active_type == value %}active{% endif %}"
-                   style="width: auto; padding: 0 var(--space-s); font-size: 12px; font-weight: 600;">
-                    {{ label }}
-                </a>
-                {% endfor %}
-            </div>
-
-            {# The Registry Grid #}
-            <div id="record-list" class="ws-stat-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
-                {% include "records/partials/record_list.html" %}
-            </div>
-        </div>
-    {% endif %}
+{# Zone 2: Registry Explorer #}
+{% block context_header %}Registry Browser{% endblock %}
+{% block context_content %}
+    {% include "workspace/records/partials/records_sidebar.html" %}
 {% endblock %}
 
+{# Zone 3: The Authoritative Archive #}
+{% block ws_content %}
+<div class="registry-archive-v2">
+    
+    <div class="ws-page-header" style="margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 8px; color: var(--accent-red);">Permanent Record</div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <h1 class="ws-page-title" style="font-size: 36px; margin: 0;">Steward <em>Registry</em></h1>
+            <a href="{% url 'governance:desk' %}" class="ws-topbar__cta" style="text-decoration: none; background: var(--accent-red);">
+                <span class="material-symbols-outlined">add</span>
+                New Entry
+            </a>
+        </div>
+    </div>
+
+    {# The Registry Grid #}
+    <div id="record-list" class="ws-stat-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+        {% include "records/partials/record_list.html" %}
+    </div>
+
+    {% if not records %}
+        <div class="ws-empty-state" style="margin-top: 60px;">
+            <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.1;">inventory_2</span>
+            <p style="color: var(--muted); margin-top: 15px;">The registry is silent. Begin your first draft at The Desk.</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.registry-archive-v2 {
+    padding: 40px 0;
+}
+/* Ensure record cards look premium on Stone */
+.ws-stat-card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.ws-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+</style>
+{% endblock %}
+
+{# Zone 4: Registry Vitals #}
 {% block ws_options %}
     <div class="ws-options-section">
         <div class="ws-label-tag">Registry Stats</div>
-        <div class="ws-stat-card" style="margin-top: var(--space-s);">
+        <div class="ws-stat-card" style="margin-top: 15px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
             <div class="ws-stat-card__label">Total Entries</div>
-            <div class="ws-stat-card__value">{{ records.count|default:0 }}</div>
+            <div class="ws-stat-card__value" style="color: var(--ink-bg);">{{ records.count|default:0 }}</div>
+        </div>
+        <div class="ws-stat-card" style="margin-top: 10px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
+            <div class="ws-stat-card__label">Storage Utilization</div>
+            <div class="ws-stat-card__value" style="color: var(--ink-bg); font-size: 14px;">2.4 MB / 500 MB</div>
         </div>
     </div>
     
-    <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+    <div class="ws-sidebar__divider" style="margin: 30px 0;"></div>
     
     <div class="ws-options-section">
-        <div class="ws-label-tag">Guidelines</div>
-        <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s); line-height: 1.5;">
-            Journal entries are private by default. Use 'Governance Acts' for records intended for council review.
+        <div class="ws-label-tag">Archival Guidelines</div>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 15px; line-height: 1.6;">
+            The Registry is the permanent memory of the platform. Journals are private, while Acts are subject to apostolic review.
         </p>
     </div>
 {% endblock %}

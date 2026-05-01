@@ -1,141 +1,125 @@
-{% extends "community/base_community.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 {% load core_tags %}
 
-{% block community_content %}
+{% block title %}Community Hub — Ichebo{% endblock %}
 
-{% if not primary_perm %}
-<div class="empty-state">
-  <span class="material-symbols-outlined" style="font-size: 48px; color: var(--muted); margin-bottom: 16px;">diversity_4</span>
-  <p>You are not yet part of a community.</p>
-  <p style="margin-top:8px;font-size:12px; color: var(--muted);">
-    Contact a steward to be added to your local Sceptre Community node.
-  </p>
-</div>
-{% else %}
+{# Zone 2: Shepherding Ops #}
+{% block context_header %}Community Ops{% endblock %}
+{% block context_content %}
+    {% include "community/partials/community_sidebar.html" %}
+{% endblock %}
 
-<!-- Community Identity -->
-<div class="community-header">
-  <div class="community-avatar">
-    <span class="material-symbols-outlined">account_balance</span>
-  </div>
-  <div class="community-info">
-    <div class="community-name">{{ primary_perm.tenant.name|default:"My Community" }}</div>
-    <div class="community-tier">
-      <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">hub</span>
-      {{ primary_perm.tenant.tier|default:"Church Node"|title }}
-    </div>
-  </div>
-</div>
-
-<!-- Formation & Integration Progress -->
-<div class="formation-track">
-  <div class="formation-status">
-    <div>
-      <div class="label-caps" style="margin-bottom: 4px;">Formation Stage</div>
-      <div class="formation-level">{{ level_label }}</div>
-    </div>
-    <div class="badge-unit badge-unit--primary" style="margin-bottom: 4px;">
-      {{ participation_stage }}
-    </div>
-  </div>
-  <div class="formation-steps">
-    {% for step in participation_steps %}
-    <div class="formation-step {% if step <= level %}active{% endif %}"></div>
-    {% endfor %}
-  </div>
-</div>
-
-<!-- Contextual Stats / Info -->
-<div class="stat-grid">
-  {% if shepherd %}
-  <div class="stat-item">
-    <div class="stat-item__label">Shepherd</div>
-    <div class="stat-item__value">{{ shepherd.display_name|default:shepherd.email }}</div>
-  </div>
-  {% endif %}
-
-  {% if service_order %}
-  <div class="stat-item">
-    <div class="stat-item__label">Service Placement</div>
-    <div class="stat-item__value">{{ service_order }}</div>
-  </div>
-  {% endif %}
-
-  <div class="stat-item" style="grid-column: span 2;">
-     <div class="stat-item__label">Spiritual Gifts</div>
-     <div style="display: flex; justify-content: space-between; align-items: center;">
-       <div class="stat-item__value">{{ gifts_count }} Active Gift{{ gifts_count|pluralize }}</div>
-       <span class="material-symbols-outlined" style="color: var(--primary);">auto_awesome</span>
-     </div>
-  </div>
-</div>
-
-<!-- Upcoming Gatherings -->
-<div class="section-header">
-  <div class="label-caps">Upcoming Gatherings</div>
-  <a href="{% url 'community:community-gatherings' %}" class="btn-touch btn-sm" style="color: var(--primary);">View All</a>
-</div>
-
-{% if upcoming_gatherings %}
-  {% for gathering in upcoming_gatherings %}
-  <div class="gathering-card">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-      <div class="gathering-title">{{ gathering.title }}</div>
-      {% with format=gathering.custom_fields.format|default:"in_person" %}
-      <span class="gathering-format-badge format-{{ format }}">
-        {{ format|replace:"_, "|title }}
-      </span>
-      {% endwith %}
-    </div>
+{# Zone 3: The Formation Stage #}
+{% block ws_content %}
+<div class="community-hub-v2">
     
-    <div class="gathering-meta">
-      <span class="material-symbols-outlined" style="font-size: 16px;">calendar_today</span>
-      {{ gathering.scheduled_at|date:"D, d M · H:i" }}
+    <div class="ws-page-header" style="margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 8px; color: var(--accent-red);">Kingdom Node</div>
+        <h1 class="ws-page-title" style="font-size: 36px; margin: 0;">{{ primary_perm.tenant.name|default:"My <em>Community</em>" }}</h1>
     </div>
+
+    {# 1. Formation Track (High Density) #}
+    <div class="ws-card-v2" style="background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 30px; margin-bottom: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px;">
+            <div class="ws-label-tag">Personal Formation</div>
+            <div style="font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink-bg);">{{ level_label }}</div>
+        </div>
+        
+        <div class="formation-steps-v2" style="display: flex; gap: 8px; margin-bottom: 15px;">
+            {% for step in participation_steps %}
+                <div style="flex: 1; height: 6px; background: {% if step <= level %}var(--accent-red){% else %}rgba(0,0,0,0.05){% endif %}; border-radius: 3px;"></div>
+            {% endfor %}
+        </div>
+        <div style="font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+            Stage: {{ participation_stage }}
+        </div>
+    </div>
+
+    {# 2. Two-Column Pulse #}
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px;">
+        
+        {# Announcements #}
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 20px;">Announcements</div>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                {% for ann in announcements %}
+                <div class="ws-stat-card" style="padding: 20px; background: #fff; border: 1px solid rgba(0,0,0,0.05);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <div style="font-weight: 700; color: var(--ink-bg);">{{ ann.title }}</div>
+                        <div style="font-size: 11px; color: var(--muted);">{{ ann.created_at|date:"d M" }}</div>
+                    </div>
+                    <div style="font-size: 13px; color: var(--muted); line-height: 1.6;">{{ ann.content|truncatechars:200 }}</div>
+                </div>
+                {% empty %}
+                <div class="ws-empty-state" style="padding: 40px 0;">
+                    <span class="material-symbols-outlined" style="opacity: 0.1;">campaign</span>
+                    <p style="font-size: 11px; color: var(--muted); margin-top: 10px;">No active community bulletins.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# Upcoming Gatherings #}
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 20px;">Gatherings</div>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                {% for gathering in upcoming_gatherings %}
+                <div class="ws-stat-card" style="padding: 20px; background: #fff; border: 1px solid rgba(0,0,0,0.05);">
+                    <div style="font-weight: 700; color: var(--ink-bg); margin-bottom: 10px;">{{ gathering.title }}</div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); margin-bottom: 5px;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">calendar_today</span>
+                        {{ gathering.scheduled_at|date:"D, d M · H:i" }}
+                    </div>
+                    {% if gathering.custom_fields.location %}
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted);">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span>
+                        {{ gathering.custom_fields.location }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.community-hub-v2 {
+    padding: 40px 0;
+}
+</style>
+{% endblock %}
+
+{# Zone 4: Steward Context #}
+{% block ws_options %}
+<div class="ws-options-section">
+    <div class="ws-label-tag">Shepherding Context</div>
     
-    {% if gathering.custom_fields.location %}
-    <div class="gathering-meta">
-      <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span>
-      {{ gathering.custom_fields.location }}
+    {% if shepherd %}
+    <div class="ws-stat-card" style="margin-top: 15px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
+        <div class="ws-stat-card__label">Assigned Shepherd</div>
+        <div class="ws-stat-card__value" style="color: var(--ink-bg); font-size: 16px;">{{ shepherd.display_name|default:shepherd.email }}</div>
     </div>
     {% endif %}
 
-    {% if gathering.custom_fields.stream_url %}
-    <a href="{{ gathering.custom_fields.stream_url }}" target="_blank" class="btn-touch" style="margin-top: 12px; background: var(--hover); color: var(--primary); justify-content: center; width: 100%;">
-      <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 8px;">videocam</span>
-      Join Online
-    </a>
-    {% endif %}
-  </div>
-  {% endfor %}
-{% else %}
-  <div class="empty-state" style="padding: 32px 0;">
-    <p>No gatherings scheduled in the next 30 days.</p>
-  </div>
-{% endif %}
-
-<!-- Announcements -->
-<div class="section-header" style="margin-top: var(--space-l);">
-  <div class="label-caps">Announcements</div>
-</div>
-
-<div class="list-group">
-  {% if announcements %}
-    {% for ann in announcements %}
-    <div class="list-item" style="flex-direction: column; align-items: stretch; padding: 16px;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-        <div class="list-item__title" style="white-space: normal; line-height: 1.4;">{{ ann.title }}</div>
-        <div class="list-item__meta">{{ ann.created_at|date:"d M" }}</div>
-      </div>
-      <div class="list-item__meta" style="white-space: normal; line-height: 1.5; margin-top: 4px;">
-        {{ ann.content|truncatechars:140 }}
-      </div>
+    {% if service_order %}
+    <div class="ws-stat-card" style="margin-top: 10px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
+        <div class="ws-stat-card__label">Service Placement</div>
+        <div class="ws-stat-card__value" style="color: var(--ink-bg); font-size: 16px;">{{ service_order }}</div>
     </div>
-    {% endfor %}
-  {% else %}
-    <div class="empty-state" style="padding: 24px 0;">No announcements yet.</div>
-  {% endif %}
-</div>
+    {% endif %}
 
-{% endif %}
+    <div class="ws-sidebar__divider" style="margin: 30px 0;"></div>
+
+    <div class="ws-label-tag">Spiritual Inventory</div>
+    <div class="ws-stat-card" style="margin-top: 15px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
+        <div class="ws-stat-card__label">Active Gifts</div>
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+            <div class="ws-stat-card__value" style="color: var(--ink-bg);">{{ gifts_count }}</div>
+            <div style="font-size: 11px; color: var(--muted);">Verified by council</div>
+        </div>
+    </div>
+</div>
 {% endblock %}

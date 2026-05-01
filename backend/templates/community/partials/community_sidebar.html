@@ -1,0 +1,44 @@
+{# templates/community/partials/community_sidebar.html #}
+<div class="ics-explorer">
+    
+    {# Community Operations #}
+    <div class="explorer-section">
+        <div class="explorer-header">
+            <span class="material-symbols-outlined">groups</span>
+            <span class="label-caps">Shepherding Ops</span>
+        </div>
+        <div class="explorer-list">
+            <a href="{% url 'community:community-home' %}" class="explorer-item active">
+                <span class="material-symbols-outlined explorer-icon">hub</span>
+                <span class="explorer-name">Community Hub</span>
+            </a>
+            <a href="{% url 'community:member-directory' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">badge</span>
+                <span class="explorer-name">Member Directory</span>
+            </a>
+            <a href="{% url 'community:formation-pipeline' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">account_tree</span>
+                <span class="explorer-name">Formation Pipeline</span>
+            </a>
+        </div>
+    </div>
+
+    {# Gathering Context #}
+    <div class="explorer-section" style="margin-top: 20px;">
+        <div class="explorer-header">
+            <span class="material-symbols-outlined">event_seat</span>
+            <span class="label-caps">Gatherings</span>
+        </div>
+        <div class="explorer-list">
+            <a href="{% url 'community:community-gatherings' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">event_available</span>
+                <span class="explorer-name">Upcoming Events</span>
+            </a>
+            <a href="{% url 'community:community-management' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">settings_account_box</span>
+                <span class="explorer-name">Management</span>
+            </a>
+        </div>
+    </div>
+
+</div>

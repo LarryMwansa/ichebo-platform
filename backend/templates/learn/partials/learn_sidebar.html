@@ -1,0 +1,54 @@
+{# templates/learn/partials/learn_sidebar.html #}
+<div class="ics-explorer">
+    
+    {# Learner Context #}
+    <div class="explorer-section">
+        <div class="explorer-header">
+            <span class="material-symbols-outlined">school</span>
+            <span class="label-caps">Formation Hub</span>
+        </div>
+        <div class="explorer-list">
+            <a href="{% url 'learn:learn-home' %}" class="explorer-item active">
+                <span class="material-symbols-outlined explorer-icon">home_storage</span>
+                <span class="explorer-name">My Learning</span>
+            </a>
+            <a href="{% url 'learn:learn-catalogue' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">apps</span>
+                <span class="explorer-name">Programme Catalogue</span>
+            </a>
+        </div>
+    </div>
+
+    {# Stewardship Operations (Level 3+) #}
+    {% if user.competence_level >= 3 %}
+    <div class="explorer-section" style="margin-top: 20px;">
+        <div class="explorer-header">
+            <span class="material-symbols-outlined">verified</span>
+            <span class="label-caps">Educational Oversight</span>
+        </div>
+        <div class="explorer-list">
+            <a href="{% url 'learn:learn-cert-queue' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">fact_check</span>
+                <span class="explorer-name">Certification Queue</span>
+            </a>
+            {% if user.competence_level >= 4 %}
+            <a href="{% url 'learn:learn-author' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">edit_square</span>
+                <span class="explorer-name">Curriculum Authoring</span>
+            </a>
+            {% endif %}
+            {% if user.competence_level >= 5 %}
+            <a href="{% url 'learn:learn-induction-review' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">how_to_reg</span>
+                <span class="explorer-name">Induction Review</span>
+            </a>
+            <a href="{% url 'learn:learn-review' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">approval_delegation</span>
+                <span class="explorer-name">Content Review</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
