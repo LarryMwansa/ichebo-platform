@@ -51,7 +51,7 @@ section {
   overflow: hidden;
 }
 
-main, .ics-main {
+.ics-main {
     padding-bottom: 90px;
 }
 
