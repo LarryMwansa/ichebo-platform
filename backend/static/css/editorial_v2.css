@@ -89,11 +89,24 @@
   padding: 0 var(--space-s);
   font-size: 11px;
   height: 32px;
-  background: var(--bg-card);
+  background: var(--card); /* Stone in light, Card in dark */
   border: 1px solid var(--border);
   border-radius: var(--radius-s);
   color: var(--text);
   cursor: pointer;
+  outline: none;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.editorial-type-picker:hover {
+  background: var(--bg-hover);
+  border-color: var(--muted-light);
+}
+
+.editorial-type-picker option {
+  background: var(--bg);
+  color: var(--text);
 }
 
 .editorial-status {
