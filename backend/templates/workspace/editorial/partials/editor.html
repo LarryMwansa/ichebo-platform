@@ -1,20 +1,5 @@
 {# templates/workspace/editorial/partials/editor.html — Unified Editorial Desk #}
-<div class="editorial-canvas">
-    <div class="editorial-toolbar" style="padding-top: 40px; margin-bottom: 90px;">
-        {% include "workspace/editorial/partials/command_dial.html" %}
-        
-        <div class="editorial-toolbar__actions" style="padding: 12px 16px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--surface-1);">
-            <span id="save-status" class="editorial-status">Desk Ready</span>
-            <button class="editorial-btn editorial-btn--primary" 
-                    hx-post="{{ save_url }}" 
-                    hx-include="#editorial-form"
-                    hx-target="#editorial-stage">
-                <span class="material-symbols-outlined">save</span>
-                Save to Registry
-            </button>
-        </div>
-    </div>
-
+<div class="editorial-canvas" style="padding-top: 60px;">
     <div class="editorial-workspace">
         <form id="editorial-form" class="editorial-form">
             <input type="hidden" name="record_type" id="hidden-record-type" value="{{ record.record_type|default:active_type }}">

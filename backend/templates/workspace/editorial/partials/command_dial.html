@@ -1,95 +1,88 @@
 {# templates/workspace/editorial/partials/command_dial.html #}
-<div class="command-dial">
-    <!-- Tier 1: The Family Dial (Primary Selection) -->
-    <div class="dial-container dial-primary">
-        <div class="dial-label">Registry Family</div>
-        <div class="dial-segments" id="dial-family-segments">
-            <button type="button" class="dial-segment active" data-family="journal" onclick="updateDial('journal')">Journal</button>
-            <button type="button" class="dial-segment" data-family="governance" onclick="updateDial('governance')">Governance</button>
-            <button type="button" class="dial-segment" data-family="activity" onclick="updateDial('activity')">Activity</button>
-            <button type="button" class="dial-segment" data-family="missions" onclick="updateDial('missions')">Missions</button>
+<div class="apostolic-dial-stack">
+    <!-- Category Switch -->
+    <div class="dial-group">
+        <label class="dial-group-label">Registry Origin</label>
+        <div class="apple-switch apple-switch--vertical" id="family-dial">
+            <div class="apple-switch__pill" id="family-pill"></div>
+            <button type="button" class="apple-switch__btn active" data-family="journal" onclick="updateFamily(this, 'journal')">Journal</button>
+            <button type="button" class="apple-switch__btn" data-family="governance" onclick="updateFamily(this, 'governance')">Governance</button>
+            <button type="button" class="apple-switch__btn" data-family="activity" onclick="updateFamily(this, 'activity')">Activity</button>
+            <button type="button" class="apple-switch__btn" data-family="missions" onclick="updateFamily(this, 'missions')">Missions</button>
         </div>
-        <div class="dial-needle" id="family-needle"></div>
     </div>
 
-    <!-- Tier 2: The Type Dial (Contextual Selection) -->
-    <div class="dial-container dial-secondary">
-        <div class="dial-label" id="type-dial-label">Record Type</div>
-        <div class="dial-segments" id="dial-type-segments">
-            <!-- Dynamically populated by JS -->
+    <!-- Type Switch -->
+    <div class="dial-group" style="margin-top: 24px;">
+        <label class="dial-group-label">Record Type</label>
+        <div class="apple-switch apple-switch--vertical" id="type-dial">
+            <div class="apple-switch__pill" id="type-pill"></div>
+            <div id="type-options-container" style="display: flex; flex-direction: column; width: 100%;">
+                <!-- Populated by JS -->
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-.command-dial {
-    display: flex;
-    flex-direction: column;
-    background: var(--surface-1);
-    border-bottom: 1px solid var(--border-subtle);
-    z-index: 10;
+.apostolic-dial-stack {
+    padding: 12px 4px;
 }
 
-.dial-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 12px 16px;
-}
-
-.dial-container.dial-primary {
-    background: var(--surface-1);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.dial-container.dial-secondary {
-    background: var(--surface-2);
-    padding: 8px 16px;
-}
-
-.dial-label {
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
+.dial-group-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
     color: var(--muted);
-    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    padding-left: 8px;
 }
 
-.dial-segments {
+/* Apple-style Segmented Control (Vertical) */
+.apple-switch {
+    position: relative;
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
 }
 
-.dial-segment {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
-    color: var(--text-muted);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 6px 14px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+.apple-switch__pill {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 7px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-.dial-segment:hover {
-    background: rgba(255,255,255,0.08);
-    color: var(--text-main);
-}
-
-.dial-segment.active {
-    background: var(--accent-red);
-    border-color: var(--accent-red);
-    color: white;
-    box-shadow: 0 2px 8px rgba(185, 28, 28, 0.3);
-}
-
-.dial-secondary .dial-segment.active {
+.apple-switch__btn {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 36px;
     background: transparent;
-    color: var(--accent-red);
-    border-color: var(--accent-red);
-    box-shadow: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    padding: 0 12px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.apple-switch__btn.active {
+    color: var(--text-main);
 }
 </style>
 
@@ -117,53 +110,78 @@ const DIAL_MAP = {
     ]
 };
 
-function updateDial(family) {
-    // Update Family Dial UI
-    document.querySelectorAll('.dial-primary .dial-segment').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.family === family);
+function updateFamily(btn, family) {
+    // UI Update
+    const container = btn.parentElement;
+    const buttons = container.querySelectorAll('.apple-switch__btn');
+    const pill = container.querySelector('.apple-switch__pill');
+    
+    buttons.forEach((b, idx) => {
+        b.classList.toggle('active', b === btn);
+        if (b === btn) {
+            pill.style.transform = `translateY(${idx * 36}px)`;
+        }
     });
 
-    // Update Type Dial UI
-    const container = document.getElementById('dial-type-segments');
+    // Update Types
+    const typeContainer = document.getElementById('type-options-container');
     const types = DIAL_MAP[family] || [];
     
-    container.innerHTML = types.map(t => `
-        <button type="button" class="dial-segment" data-type="${t.val}" onclick="selectType('${t.val}', '${family}')">
+    typeContainer.innerHTML = types.map((t, idx) => `
+        <button type="button" class="apple-switch__btn ${idx === 0 ? 'active' : ''}" 
+                data-type="${t.val}" 
+                onclick="updateType(this, '${t.val}', '${family}')">
             ${t.label}
         </button>
     `).join('');
 
-    // Default select first type
-    if (types.length > 0) {
-        selectType(types[0].val, family);
-    }
+    // Reset Type Pill
+    const typePill = document.getElementById('type-pill');
+    if (typePill) typePill.style.transform = 'translateY(0)';
 
-    // Update hidden fields in form
+    // Form Update
     const form = document.getElementById('editorial-form');
     if (form) {
-        const familyInput = form.querySelector('[name="record_family"]') || Object.assign(document.createElement('input'), {type: 'hidden', name: 'record_family'});
-        familyInput.value = family;
-        form.appendChild(familyInput);
+        let fInput = form.querySelector('[name="record_family"]');
+        if (!fInput) {
+            fInput = document.createElement('input');
+            fInput.type = 'hidden'; fInput.name = 'record_family';
+            form.appendChild(fInput);
+        }
+        fInput.value = family;
+        updateType(typeContainer.children[0], types[0].val, family);
     }
 }
 
-function selectType(type, family) {
-    document.querySelectorAll('.dial-secondary .dial-segment').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.type === type);
+function updateType(btn, type, family) {
+    const container = btn.parentElement;
+    const buttons = container.querySelectorAll('.apple-switch__btn');
+    const pill = document.getElementById('type-pill');
+    
+    buttons.forEach((b, idx) => {
+        b.classList.toggle('active', b === btn);
+        if (b === btn) {
+            pill.style.transform = `translateY(${idx * 36}px)`;
+        }
     });
 
     const form = document.getElementById('editorial-form');
     if (form) {
-        const typeInput = form.querySelector('[name="record_type"]') || Object.assign(document.createElement('input'), {type: 'hidden', name: 'record_type'});
-        typeInput.value = type;
-        form.appendChild(typeInput);
+        let tInput = form.querySelector('[name="record_type"]');
+        if (!tInput) {
+            tInput = document.createElement('input');
+            tInput.type = 'hidden'; tInput.name = 'record_type';
+            form.appendChild(tInput);
+        }
+        tInput.value = type;
         
-        // Update the "Registry Hub" label in the hub title if applicable
         const status = document.getElementById('save-status');
         if (status) status.textContent = `Drafting ${family.charAt(0).toUpperCase() + family.slice(1)}`;
     }
 }
 
-// Init
-document.addEventListener('DOMContentLoaded', () => updateDial('journal'));
+document.addEventListener('DOMContentLoaded', () => {
+    const defaultBtn = document.querySelector('[data-family="journal"]');
+    if (defaultBtn) updateFamily(defaultBtn, 'journal');
+});
 </script>
