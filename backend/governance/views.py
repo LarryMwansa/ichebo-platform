@@ -109,8 +109,10 @@ def library_list(request, record_type):
         'search':        search,
         'tag_filter':    tag_filter,
         'library_types': LIBRARY_TYPE_LABELS,
+        'mandate_types': MANDATE_TYPE_LABELS,
         'is_level5':     _level(request.user) >= 5,
-    })
+        'active_branch': 'library',
+    }, shell_template='workspace/governance/list_view.html')
 
 
 @login_required
@@ -166,9 +168,11 @@ def mandate_list(request, record_type):
         'record_type':   record_type,
         'type_label':    MANDATE_TYPE_LABELS.get(record_type, record_type.title()),
         'search':        search,
+        'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
         'is_level5':     _level(request.user) >= 5,
-    })
+        'active_branch': 'mandate',
+    }, shell_template='workspace/governance/list_view.html')
 
 
 @login_required
@@ -207,9 +211,12 @@ def keys_list(request):
     keys = get_key_records(request.user, search=search)
 
     return _shell_or_partial(request, 'governance/_keys_list.html', {
-        'keys':   keys,
-        'search': search,
-    })
+        'records': keys, # Rename for consistency with other lists
+        'search':  search,
+        'active_branch': 'keys',
+        'library_types': LIBRARY_TYPE_LABELS,
+        'mandate_types': MANDATE_TYPE_LABELS,
+    }, shell_template='workspace/governance/list_view.html')
 
 
 @login_required
