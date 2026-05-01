@@ -48,10 +48,73 @@
 
     <!-- Activity Specific Fields -->
     <div id="fields-activity" class="dynamic-field-group" style="display: none;">
-        <div class="ws-label-tag">Stewardship Tracking</div>
+        <div class="ws-label-tag">Activity Stewardship</div>
         <div class="ws-stat-card" style="margin-top: 12px;">
-            <div class="ws-stat-card__label">Target Date</div>
-            <input type="date" name="target_date" class="ws-input-clean">
+            <div class="ws-stat-card__label">Due Date</div>
+            <input type="date" name="due_at" class="ws-input-clean">
+        </div>
+        <div class="ws-stat-card" style="margin-top: 8px;">
+            <div class="ws-stat-card__label">Recurrence</div>
+            <select name="recurrence" class="ws-select-capsule">
+                <option value="none">No recurrence</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+        </div>
+        <div class="ws-stat-card" style="margin-top: 8px;">
+            <div class="ws-stat-card__label">KGS Pathway</div>
+            <select name="kgs_pathway" class="ws-select-capsule">
+                <option value="">None (General)</option>
+                <option value="new_life">New Life</option>
+                <option value="spiritual_formation">Spiritual Formation</option>
+                <option value="community_life">Community Life</option>
+                <option value="service">Service</option>
+                <option value="leadership">Leadership</option>
+                <option value="learning">Learning</option>
+                <option value="mission">Mission</option>
+                <option value="apostolic_stewardship">Apostolic Stewardship</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Community Specific Fields -->
+    <div id="fields-community" class="dynamic-field-group" style="display: none;">
+        <div class="ws-label-tag">Gathering Details</div>
+        <div class="ws-stat-card" style="margin-top: 12px;">
+            <div class="ws-stat-card__label">Scheduled At</div>
+            <input type="datetime-local" name="scheduled_at" class="ws-input-clean">
+        </div>
+        <div class="ws-stat-card" style="margin-top: 8px;">
+            <div class="ws-stat-card__label">Format</div>
+            <select name="format" class="ws-select-capsule">
+                <option value="in_person">In Person</option>
+                <option value="digital">Digital</option>
+                <option value="hybrid">Hybrid</option>
+            </select>
+        </div>
+        <div class="ws-stat-card" style="margin-top: 8px;">
+            <div class="ws-stat-card__label">Location</div>
+            <input type="text" name="location" placeholder="Venue or Link" class="ws-input-clean">
+        </div>
+    </div>
+
+    <!-- Learning Specific Fields -->
+    <div id="fields-learning" class="dynamic-field-group" style="display: none;">
+        <div class="ws-label-tag">Curriculum Stats</div>
+        <div class="ws-stat-card" style="margin-top: 12px;">
+            <div class="ws-stat-card__label">Qualification</div>
+            <select name="qualification" class="ws-select-capsule">
+                <option value="Certificate">Certificate</option>
+                <option value="Diploma">Diploma</option>
+                <option value="Degree">Degree</option>
+                <option value="Masters">Masters</option>
+                <option value="Doctorate">Doctorate</option>
+            </select>
+        </div>
+        <div class="ws-stat-card" style="margin-top: 8px;">
+            <div class="ws-stat-card__label">Duration (Yrs)</div>
+            <input type="number" name="duration_years" min="1" max="10" value="1" class="ws-input-clean">
         </div>
     </div>
 </div>

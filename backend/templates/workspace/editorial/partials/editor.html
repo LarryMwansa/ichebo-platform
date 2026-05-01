@@ -79,12 +79,20 @@
 .CodeMirror-selected { background: rgba(255, 255, 255, 0.1) !important; }
 .CodeMirror-cursor { border-left: 2px solid var(--accent-red) !important; }
 
-/* Real-time rendering styles */
-.cm-header-1 { font-size: 2em; color: var(--text-main); font-weight: 700; }
-.cm-header-2 { font-size: 1.5em; color: var(--text-main); font-weight: 600; }
-.cm-bold { font-weight: 700; color: var(--text-main); }
-.cm-italic { font-style: italic; }
-.cm-quote { color: var(--muted); font-style: italic; border-left: 2px solid var(--border-subtle); padding-left: 8px; }
+/* Real-time rendering styles — Force visibility in Dark Mode */
+.cm-header-1 { font-size: 2.4em !important; color: var(--text-main) !important; font-weight: 700 !important; line-height: 1.2 !important; }
+.cm-header-2 { font-size: 1.8em !important; color: var(--text-main) !important; font-weight: 600 !important; }
+.cm-header-3 { font-size: 1.4em !important; color: var(--text-main) !important; font-weight: 600 !important; }
+.cm-bold { font-weight: 700 !important; color: var(--accent-red) !important; }
+.cm-italic { font-style: italic !important; color: var(--text-main) !important; }
+.cm-quote { color: var(--muted) !important; font-style: italic !important; border-left: 3px solid var(--accent-red) !important; padding-left: 12px !important; }
+.cm-link { color: var(--accent-red) !important; text-decoration: underline !important; }
+.cm-url { color: var(--muted) !important; font-size: 0.9em !important; }
+.cm-variable-2 { color: var(--text-main) !important; } /* Lists */
+.cm-comment { background: rgba(255,255,255,0.05); border-radius: 2px; } /* Code blocks */
+
+/* Hide the raw markdown symbols when not focused? No, let's keep them visible but subtle */
+.cm-formatting { color: var(--muted) !important; opacity: 0.5; }
 </style>
 
 <script>
