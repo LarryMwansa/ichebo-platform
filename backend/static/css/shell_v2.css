@@ -8,15 +8,17 @@
   --sidebar-w: 64px;
   --context-w: 240px;
   --options-w: 300px;
-  
+
   /* State Variables (controlled by shell_v2.js) */
-  --context-state: 1; /* 1 = open, 0 = collapsed */
-  --options-state: 0; /* 0 = hidden by default */
-  
+  --context-state: 1;
+  /* 1 = open, 0 = collapsed */
+  --options-state: 0;
+  /* 0 = hidden by default */
+
   /* Computed Widths */
   --actual-context-w: calc(var(--context-w) * var(--context-state));
   --actual-options-w: calc(var(--options-w) * var(--options-state));
-  
+
   /* Surface Transitions */
   --shell-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -24,16 +26,15 @@
 /* ── Shell Container ────────────────────────────────────────── */
 .ics-shell {
   display: grid;
-  grid-template-columns: 
-    var(--sidebar-w) 
-    var(--actual-context-w) 
-    1fr 
-    var(--actual-options-w);
-  grid-template-rows: 1fr; /* Topbar is now part of the stage */
+  grid-template-columns:
+    var(--sidebar-w) var(--actual-context-w) 1fr var(--actual-options-w);
+  grid-template-rows: 1fr;
+  /* Topbar is now part of the stage */
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: var(--ink); /* Base background is dark */
+  background: var(--ink);
+  /* Base background is dark */
   transition: grid-template-columns var(--shell-transition);
 }
 
@@ -65,12 +66,14 @@ html:not(.dark) .ics-sidebar {
 }
 
 .ics-logo {
-  filter: invert(1); /* Default for dark mode if logo is black */
+  filter: invert(1);
+  /* Default for dark mode if logo is black */
   transition: filter var(--transition-fast);
 }
 
 html:not(.dark) .ics-logo {
-  filter: none; /* Light mode uses original black/dark logo */
+  filter: none;
+  /* Light mode uses original black/dark logo */
 }
 
 .ics-sidebar__nav {
@@ -169,14 +172,16 @@ html:not(.dark) .ics-context-bar__header {
 .ics-stage {
   grid-column: 3;
   grid-row: 1 / -1;
-  background: var(--card); /* Stone */
+  background: var(--card);
+  /* Stone */
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  box-shadow: -4px 0 12px rgba(0,0,0,0.05);
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.05);
   border-left: 1px solid var(--border);
-  min-width: 480px; /* Prevent being squeezed out */
+  min-width: 480px;
+  /* Prevent being squeezed out */
 }
 
 .ics-stage__topbar {
@@ -252,7 +257,7 @@ html:not(.dark) .ics-context-bar__header {
 .ics-stage__content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-xl) 0;
+  /* padding: var(--space-xl) 0; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -269,7 +274,8 @@ html:not(.dark) .ics-context-bar__header {
 .ics-options-bar {
   grid-column: 4;
   grid-row: 1 / -1;
-  background: var(--card-2); /* Stone 2 */
+  background: var(--card-2);
+  /* Stone 2 */
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -286,7 +292,8 @@ html:not(.dark) .ics-context-bar__header {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border);
-  background: var(--card); /* Contrast with Stone 2 */
+  background: var(--card);
+  /* Contrast with Stone 2 */
 }
 
 .ics-options-bar__content {
@@ -352,7 +359,7 @@ html:not(.dark) .ics-context-bar__header {
   color: #fff;
   font-weight: 800;
   flex-shrink: 0;
-  border: 1.5px solid rgba(255,255,255,0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
 }
 
 .ws-sidebar__avatar {
@@ -380,5 +387,10 @@ html:not(.dark) .ics-context-bar__header {
 }
 
 /* ── Utils ── */
-.u-text-ink { color: var(--ink); }
-.u-text-stone { color: var(--card); }
+.u-text-ink {
+  color: var(--ink);
+}
+
+.u-text-stone {
+  color: var(--card);
+}
