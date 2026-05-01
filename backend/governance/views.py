@@ -27,15 +27,26 @@ def _htmx(request):
     return bool(request.headers.get('HX-Request'))
 
 
-def _shell_or_partial(request, partial_template, context, shell_template='governance/governance.html'):
-    """Return partial HTML for HTMX requests, full shell for browser navigation."""
+def _shell_or_partial(request, partial_template, context, shell_template='workspace/governance/home.html'):
+    """Return partial HTML for HTMX requests, full shell for desktop workspace."""
     if _htmx(request):
         return render(request, partial_template, context)
+    
+    # Use workspace templates for desktop, fall back to mobile shell if needed
     context['partial_tpl'] = partial_template
     context.setdefault('active_app', 'governance')
     context.setdefault('ws_page_title', 'Governance')
-    context.setdefault('detail_target', '#ws-detail')
-    context.setdefault('list_target', '#ws-list-content')
+    
+    # Add metadata for sidebar/options bar
+    from .services import HRS_COMPLEXITY_CHOICES, HRS_POLARITY_CHOICES, HRS_POSITION_CHOICES, HRS_DIRECTION_CHOICES, HRS_SPEED_CHOICES
+    context.update({
+        'complexity_opts': HRS_COMPLEXITY_CHOICES,
+        'polarity_opts':   HRS_POLARITY_CHOICES,
+        'position_opts':   HRS_POSITION_CHOICES,
+        'direction_opts':  HRS_DIRECTION_CHOICES,
+        'speed_opts':      HRS_SPEED_CHOICES,
+    })
+    
     return render(request, shell_template, context)
 
 
@@ -122,7 +133,9 @@ def library_detail(request, record_id):
         'via_record':  via_record,
         'library_types': LIBRARY_TYPE_LABELS,
         'is_level5':   _level(request.user) >= 5,
-    })
+        'active_branch': 'library',
+        'record_type': record.record_type,
+    }, shell_template='workspace/governance/record_detail.html')
 
 
 # ── Mandate branch ─────────────────────────────────────────────────────────────
@@ -178,7 +191,9 @@ def mandate_detail(request, record_id):
         'via_record':    via_record,
         'mandate_types': MANDATE_TYPE_LABELS,
         'is_level5':     _level(request.user) >= 5,
-    })
+        'active_branch': 'mandate',
+        'record_type': record.record_type,
+    }, shell_template='workspace/governance/record_detail.html')
 
 
 # ── My Keys ────────────────────────────────────────────────────────────────────
@@ -336,7 +351,8 @@ def htmx_record_create(request):
     record_type   = request.GET.get('record_type', 'key')
     record_family = request.GET.get('record_family', 'reference')
 
-    return render(request, 'governance/_record_form.html', {
+    # Workspace detection — use the new editorial desk if requested via full shell or workspace path
+    return render(request, 'workspace/governance/editorial_form.html', {
         'record':           None,
         'record_type':      record_type,
         'record_family':    record_family,
@@ -349,6 +365,7 @@ def htmx_record_create(request):
         'speed_opts':       HRS_SPEED_CHOICES,
         'is_level5':        level >= 5,
         'allowed_families': allowed_families,
+        'active_branch':    'library' if record_type in LIBRARY_TYPES else 'mandate',
     })
 
 
@@ -385,7 +402,7 @@ def htmx_record_edit(request, record_id):
             if record.record_type in LIBRARY_TYPES \
             else redirect('governance:mandate-detail', record_id=record.id)
 
-    return render(request, 'governance/_record_form.html', {
+    return render(request, 'workspace/governance/editorial_form.html', {
         'record':          record,
         'record_type':     record.record_type,
         'record_family':   record.record_family,
@@ -397,6 +414,7 @@ def htmx_record_edit(request, record_id):
         'direction_opts':  HRS_DIRECTION_CHOICES,
         'speed_opts':      HRS_SPEED_CHOICES,
         'is_level5':       True,
+        'active_branch':   'library' if record.record_type in LIBRARY_TYPES else 'mandate',
     })
 
 

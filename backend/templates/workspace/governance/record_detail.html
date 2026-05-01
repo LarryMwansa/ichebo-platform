@@ -1,0 +1,90 @@
+{% extends "workspace/governance/base.html" %}
+{% load static %}
+
+{% block governance_content %}
+    <div class="editorial-stage">
+        {# ── Published View Header ── #}
+        <div class="ws-page-header" style="padding: var(--space-m) var(--space-4xl);">
+            <div class="ws-page-header__left">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="ws-label-tag">{{ record.get_record_type_display|upper }}</div>
+                    {% if record.status == 'locked' %}
+                    <span class="material-symbols-outlined" style="font-size: 16px; color: var(--muted);">lock</span>
+                    {% endif %}
+                </div>
+                <h1 class="editorial-title" style="margin-top: 8px;">{{ record.title }}</h1>
+            </div>
+            <div class="ws-page-header__actions">
+                {% if is_level5 and record.status != 'locked' %}
+                <button class="ws-topbar__cta"
+                        hx-get="{% url 'governance:htmx-record-edit' record.id %}"
+                        hx-target="#main-content"
+                        hx-push-url="true">
+                    <span class="material-symbols-outlined">edit_note</span>
+                    Edit Decree
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ── The Reading Canvas ── #}
+        <div class="editorial-canvas" style="box-shadow: none; border: none; background: transparent;">
+            <div class="editorial-body">
+                {% if record.summary %}
+                <div style="font-family: var(--ff-display); font-size: 18px; line-height: 1.6; color: var(--muted); margin-bottom: var(--space-xl); padding-left: var(--space-m); border-left: 2px solid var(--border);">
+                    {{ record.summary }}
+                </div>
+                {% endif %}
+                
+                <div class="published-content">
+                    {{ record.content|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ws_options %}
+    {# ── Options Bar: Stewardship Attributes ── #}
+    <div class="ws-options-section">
+        <div class="ws-label-tag">Stewardship Attributes</div>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: var(--space-m);">
+            {% with cf=record.custom_fields %}
+            <div class="ws-stat-card">
+                <div class="ws-stat-card__label">Complexity</div>
+                <div class="ws-stat-card__value" style="font-size: 14px;">{{ cf.complexity|default:"Not Defined" }}</div>
+            </div>
+            <div class="ws-stat-card">
+                <div class="ws-stat-card__label">Relationship Polarity</div>
+                <div class="ws-stat-card__value" style="font-size: 14px;">{{ cf.polarity|title|default:"Not Defined" }}</div>
+            </div>
+            <div class="ws-stat-card">
+                <div class="ws-stat-card__label">Direction & Speed</div>
+                <div class="ws-stat-card__value" style="font-size: 14px;">
+                    {{ cf.direction|title|default:"—" }} / {{ cf.speed|title|default:"—" }}
+                </div>
+            </div>
+            <div class="ws-stat-card">
+                <div class="ws-stat-card__label">Emotional Tone</div>
+                <div class="ws-stat-card__value" style="font-size: 14px;">{{ cf.emotional_tone|default:"Neutral" }}</div>
+            </div>
+            {% if cf.symbol %}
+            <div class="ws-stat-card">
+                <div class="ws-stat-card__label">Prophetic Symbol</div>
+                <div class="ws-stat-card__value" style="font-size: 18px;">{{ cf.symbol }}</div>
+            </div>
+            {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+
+    <div class="ws-options-section">
+        <div class="ws-label-tag">Relationships</div>
+        <div id="linked-records-area" hx-get="{% url 'governance:htmx-linked-records' record.id %}" hx-trigger="load">
+            <div class="ws-empty-state" style="padding: var(--space-m); font-size: 12px;">Mapping connections...</div>
+        </div>
+    </div>
+{% endblock %}
