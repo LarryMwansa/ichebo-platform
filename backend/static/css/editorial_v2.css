@@ -6,7 +6,8 @@
 .editorial-stage {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 64px); /* Subtract topbar height */
+  height: calc(100vh - 64px);
+  /* Subtract topbar height */
   overflow: hidden;
   background: var(--bg);
 }
@@ -25,6 +26,7 @@
   max-width: 800px;
   margin: 0 auto;
   min-height: 100%;
+  padding: 100px;
 }
 
 /* ── Typography ── */
@@ -70,7 +72,7 @@
   height: 56px;
   z-index: 100;
   width: 100%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .editorial-toolbar__group--center {
