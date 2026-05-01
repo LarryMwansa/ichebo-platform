@@ -1,7 +1,6 @@
-{% extends "records/base_records.html" %}
+{% extends "workspace/records/base.html" %}
 {% load static %}
 
-{# ── MAIN STAGE: The Registry Feed ── #}
 {% block records_content %}
 <div class="ws-page-header" style="padding: var(--space-m) var(--space-m) 0;">
     <div class="ws-page-header__left">
@@ -43,7 +42,6 @@
 </div>
 {% endblock %}
 
-{# ── OPTIONS BAR: Global Metrics ── #}
 {% block ws_options %}
     <div class="ws-options-section">
         <div class="ws-label-tag">Registry Stats</div>

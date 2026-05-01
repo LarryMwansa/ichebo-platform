@@ -42,7 +42,7 @@ def my_records(request):
     if request.headers.get('HX-Request') and not request.GET.get('full'):
         return render(request, 'records/partials/record_list.html', context)
 
-    return render(request, 'records/my_records.html', context)
+    return render(request, 'workspace/records/my_records.html', context)
 
 
 # ── Record detail ─────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ def record_detail(request, record_id):
     if via_id:
         via_record = Record.objects.filter(id=via_id).first()
 
-    return render(request, 'records/record_detail.html', {
+    return render(request, 'workspace/records/record_detail.html', {
         'record': record,
         'via_record': via_record,
     })

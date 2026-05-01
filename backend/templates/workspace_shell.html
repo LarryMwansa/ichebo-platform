@@ -39,6 +39,11 @@
                    title="Dashboard">
                     <span class="material-symbols-outlined">dashboard</span>
                 </a>
+                <a href="{% url 'records:records-home' %}" 
+                   class="ics-sidebar__item {% if active_app == 'records' %}active{% endif %}"
+                   title="Records & Journal">
+                    <span class="material-symbols-outlined">history_edu</span>
+                </a>
                 <a href="{% url 'governance:home' %}" 
                    class="ics-sidebar__item {% if active_app == 'governance' %}active{% endif %}"
                    title="Governance">

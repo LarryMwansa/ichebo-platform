@@ -1,0 +1,41 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
+{% endblock %}
+
+{# ── CONTEXT BAR: Navigation ── #}
+{% block context_header %}
+    Records & Journal
+{% endblock %}
+
+{% block context_content %}
+    <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Journals</div>
+    
+    <nav class="ics-sidebar__nav" style="width: 100%;">
+            <a href="{% url 'records:records-home' %}" 
+               class="ics-sidebar__item {% if not active_type %}active{% endif %}" 
+               style="width: 100%; justify-content: flex-start; padding: 0 var(--space-s); gap: 10px;">
+                <span class="material-symbols-outlined">description</span>
+                <span style="font-size: 13px;">My Journal</span>
+            </a>
+            <a href="#" class="ics-sidebar__item" 
+               style="width: 100%; justify-content: flex-start; padding: 0 var(--space-s); gap: 10px; opacity: 0.5;">
+                <span class="material-symbols-outlined">folder</span>
+                <span style="font-size: 13px;">Governance Acts</span>
+            </a>
+        </nav>
+
+        <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+        
+        <div class="ws-label-tag">Recent Drafts</div>
+        <div class="ws_detail-empty" style="padding: var(--space-s); font-size: 12px; color: var(--muted);">
+            No local drafts found.
+        </div>
+{% endblock %}
+
+{# ── MAIN STAGE ── #}
+{% block ws_content %}
+    {% block records_content %}{% endblock %}
+{% endblock %}
