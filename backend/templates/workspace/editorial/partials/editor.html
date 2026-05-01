@@ -1,0 +1,42 @@
+{# templates/workspace/editorial/partials/editor.html — Unified Editorial Desk #}
+<div class="editorial-canvas">
+    <div class="editorial-toolbar">
+        <div class="editorial-toolbar__left">
+            <select name="record_type" id="record-type" class="editorial-type-picker" style="background: var(--surface-2); color: var(--text-main); border: 1px solid var(--border-subtle);">
+                {% for value, label in record_types %}
+                <option value="{{ value }}" {% if record.record_type == value or active_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <span id="save-status" class="editorial-status">Desk Ready</span>
+        </div>
+        <div class="editorial-toolbar__right">
+            <button class="editorial-btn editorial-btn--primary" 
+                    hx-post="{{ save_url }}" 
+                    hx-include="#editorial-form"
+                    hx-target="#editorial-stage">
+                <span class="material-symbols-outlined">save</span>
+                Save
+            </button>
+        </div>
+    </div>
+
+    <div class="editorial-workspace">
+        <form id="editorial-form" class="editorial-form">
+            <input type="hidden" name="record_type" id="hidden-record-type" value="{{ record.record_type|default:active_type }}">
+            <input type="text" name="title" class="editorial-title-input" 
+                   placeholder="Untitled Record..." value="{{ record.title|default:'' }}">
+            
+            <textarea name="content" id="editorial-editor" class="editorial-editor-textarea editorial-body"
+                placeholder="Begin writing... The word is alive.">{{ record.content|default:'' }}</textarea>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Sync record type picker
+    document.getElementById('record-type').addEventListener('change', function () {
+        document.getElementById('hidden-record-type').value = this.value;
+    });
+
+    // Auto-save logic could be added here later
+</script>

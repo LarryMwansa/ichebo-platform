@@ -1,0 +1,40 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
+{% endblock %}
+
+{# ── CONTEXT BAR (LEFT) ── #}
+{% block context_header %}
+    {% block hub_context_title %}Editorial Hub{% endblock %}
+{% endblock %}
+
+{% block context_content %}
+    {% block hub_context_nav %}{% endblock %}
+{% endblock %}
+
+{# ── MAIN STAGE (CENTER) ── #}
+{% block ws_content %}
+    <div id="editorial-stage" class="editorial-stage">
+        {% block hub_stage %}
+            {# Default empty state or the common editor #}
+            <div class="ws-empty-state">
+                <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2;">edit_note</span>
+                <p>Select a record or create a new one to begin drafting.</p>
+            </div>
+        {% endblock %}
+    </div>
+{% endblock %}
+
+{# ── OPTIONS BAR (RIGHT) ── #}
+{% block ws_options %}
+    <div id="editorial-options">
+        {% block hub_options %}
+            <div class="ws-label-tag">Stewardship Control</div>
+            <p style="font-size: 12px; color: var(--muted); margin-top: 12px;">
+                Select a record to view its relations and metadata.
+            </p>
+        {% endblock %}
+    </div>
+{% endblock %}

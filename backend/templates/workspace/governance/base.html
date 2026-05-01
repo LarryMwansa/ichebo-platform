@@ -1,20 +1,9 @@
-{% extends "workspace_shell.html" %}
+{% extends "workspace/editorial/hub.html" %}
 {% load static %}
 
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
-{% endblock %}
+{% block hub_context_title %}Governance Hub{% endblock %}
 
-{% block breadcrumb %}
-    <span class="ws-topbar__breadcrumb-item">Workspace</span>
-    <span class="ws-topbar__breadcrumb-sep">/</span>
-    <span class="ws-topbar__breadcrumb-item active">Governance</span>
-{% endblock %}
-
-{# ── CONTEXT BAR: Governance Navigation ── #}
-{% block context_header %}Governance{% endblock %}
-
-{% block context_content %}
+{% block hub_context_nav %}
     <div class="ws-sidebar__section">
         <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Registers</div>
         <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -61,7 +50,10 @@
     </div>
 {% endblock %}
 
-{# ── MAIN STAGE ── #}
-{% block ws_content %}
+{% block hub_stage %}
     {% block governance_content %}{% endblock %}
+{% endblock %}
+
+{% block hub_options %}
+    {% block ws_options %}{% endblock %}
 {% endblock %}

@@ -1,16 +1,9 @@
-{% extends "workspace_shell.html" %}
+{% extends "workspace/editorial/hub.html" %}
 {% load static %}
 
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
-{% endblock %}
+{% block hub_context_title %}Records & Journal{% endblock %}
 
-{# ── CONTEXT BAR: Navigation ── #}
-{% block context_header %}
-    Records & Journal
-{% endblock %}
-
-{% block context_content %}
+{% block hub_context_nav %}
     <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Journals</div>
     
     <nav class="ics-sidebar__nav" style="width: 100%;">
@@ -20,8 +13,8 @@
                 <span class="material-symbols-outlined">description</span>
                 <span style="font-size: 13px;">My Journal</span>
             </a>
-            <a href="#" class="ics-sidebar__item" 
-               style="width: 100%; justify-content: flex-start; padding: 0 var(--space-s); gap: 10px; opacity: 0.5;">
+            <a href="{% url 'governance:home' %}" class="ics-sidebar__item" 
+               style="width: 100%; justify-content: flex-start; padding: 0 var(--space-s); gap: 10px;">
                 <span class="material-symbols-outlined">folder</span>
                 <span style="font-size: 13px;">Governance Acts</span>
             </a>
@@ -37,7 +30,10 @@
         </div>
 {% endblock %}
 
-{# ── MAIN STAGE ── #}
-{% block ws_content %}
+{% block hub_stage %}
     {% block records_content %}{% endblock %}
+{% endblock %}
+
+{% block hub_options %}
+    {% block ws_options %}{% endblock %}
 {% endblock %}

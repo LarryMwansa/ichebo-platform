@@ -36,37 +36,37 @@
             <nav class="ics-sidebar__nav">
                 <a href="{% url 'dashboard:index' %}" 
                    class="ics-sidebar__item {% if active_app == 'dashboard' %}active{% endif %}"
-                   title="Dashboard">
+                   title="Dashboard" hx-boost="false">
                     <span class="material-symbols-outlined">dashboard</span>
                 </a>
                 <a href="{% url 'records:records-home' %}" 
                    class="ics-sidebar__item {% if active_app == 'records' %}active{% endif %}"
-                   title="Records & Journal">
+                   title="Records & Journal" hx-boost="false">
                     <span class="material-symbols-outlined">history_edu</span>
                 </a>
                 <a href="{% url 'governance:home' %}" 
                    class="ics-sidebar__item {% if active_app == 'governance' %}active{% endif %}"
-                   title="Governance">
+                   title="Governance" hx-boost="false">
                     <span class="material-symbols-outlined">gavel</span>
                 </a>
                 <a href="{% url 'community:community-home' %}" 
                    class="ics-sidebar__item {% if active_app == 'community' %}active{% endif %}"
-                   title="Community">
+                   title="Community" hx-boost="false">
                     <span class="material-symbols-outlined">groups</span>
                 </a>
                 <a href="{% url 'learn:learn-home' %}" 
                    class="ics-sidebar__item {% if active_app == 'formation' %}active{% endif %}"
-                   title="Formation">
+                   title="Formation" hx-boost="false">
                     <span class="material-symbols-outlined">school</span>
                 </a>
                 <a href="{% url 'activity:activity-home' %}" 
                    class="ics-sidebar__item {% if active_app == 'activity' %}active{% endif %}"
-                   title="Activity">
+                   title="Activity" hx-boost="false">
                     <span class="material-symbols-outlined">task_alt</span>
                 </a>
                 <a href="{% url 'bible:reader' %}" 
                    class="ics-sidebar__item {% if active_app == 'bible' %}active{% endif %}"
-                   title="Bible Reader">
+                   title="Bible Reader" hx-boost="false">
                     <span class="material-symbols-outlined">menu_book</span>
                 </a>
             </nav>
