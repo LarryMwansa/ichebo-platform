@@ -35,7 +35,7 @@ urlpatterns = [
     path('api/learn/', include('learn.api_urls')),
     path('learn/', include('learn.urls', namespace='learn')),
     path('', include('community.urls', namespace='community')),
-    path('', include('governance.urls', namespace='governance')),
+    path('governance/', include('governance.urls', namespace='governance')),
     path('api/calendar/', include('calendar_app.urls', namespace='calendar-api')),
     path('calendar/', include('calendar_app.template_urls', namespace='calendar')),
     path('api/', include('notifications.urls', namespace='notifications-api')),

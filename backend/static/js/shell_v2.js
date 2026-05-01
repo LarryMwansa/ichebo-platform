@@ -49,11 +49,13 @@ const WorkspaceUI = {
 
     // Update Stage Toggles
     if (contextToggle) {
-        contextToggle.querySelector('.material-symbols-outlined').textContent = this.state.contextOpen ? 'menu_open' : 'menu';
+        const icon = contextToggle.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = 'dock_to_right';
         contextToggle.classList.toggle('active', this.state.contextOpen);
     }
     if (optionsToggle) {
-        optionsToggle.querySelector('.material-symbols-outlined').textContent = this.state.optionsOpen ? 'dock_to_right' : 'info';
+        const icon = optionsToggle.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = 'dock_to_right';
         optionsToggle.classList.toggle('active', this.state.optionsOpen);
     }
 
