@@ -1,0 +1,99 @@
+{# templates/workspace/editorial/partials/dynamic_options.html #}
+<div id="dynamic-stewardship-panel">
+    <!-- Common Fields (Always Visible) -->
+    <div class="ws-options-section">
+        <div class="ws-label-tag">Registry Status</div>
+        <select name="status" class="ws-select-capsule" style="width: 100%; margin-top: 8px;">
+            <option value="draft">Draft</option>
+            <option value="active" selected>Active</option>
+            <option value="archived">Archived</option>
+        </select>
+    </div>
+
+    <div class="ws-sidebar__divider"></div>
+
+    <!-- Governance Specific Fields -->
+    <div id="fields-governance" class="dynamic-field-group" style="display: none;">
+        <div class="ws-label-tag">Governance Metadata</div>
+        <div class="ws-stat-card" style="margin-top: 12px;">
+            <div class="ws-stat-card__label">Record Class</div>
+            <select name="record_class" class="ws-select-capsule" style="background: transparent; color: var(--text-main); border: none; padding: 0;">
+                <option value="personal">Personal</option>
+                <option value="organizational">Organizational</option>
+                <option value="governance" selected>Apostolic Decree</option>
+            </select>
+        </div>
+        <div class="ws-stat-card" style="margin-top: 8px;">
+            <div class="ws-stat-card__label">Version Control</div>
+            <input type="number" name="version" value="1" style="background: transparent; color: var(--text-main); border: none; width: 40px;">
+        </div>
+    </div>
+
+    <!-- Missions Specific Fields -->
+    <div id="fields-missions" class="dynamic-field-group" style="display: none;">
+        <div class="ws-label-tag">Field Intel</div>
+        <div class="ws-stat-card" style="margin-top: 12px;">
+            <div class="ws-stat-card__label">Deployment Area</div>
+            <input type="text" name="location" placeholder="e.g. Lusaka, Zambia" class="ws-input-clean">
+        </div>
+        <div class="ws-stat-card" style="margin-top: 8px;">
+            <div class="ws-stat-card__label">Intel Level</div>
+            <select name="intel_level" class="ws-select-capsule">
+                <option value="1">Routine</option>
+                <option value="2">Urgent</option>
+                <option value="3">Critical</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Activity Specific Fields -->
+    <div id="fields-activity" class="dynamic-field-group" style="display: none;">
+        <div class="ws-label-tag">Stewardship Tracking</div>
+        <div class="ws-stat-card" style="margin-top: 12px;">
+            <div class="ws-stat-card__label">Target Date</div>
+            <input type="date" name="target_date" class="ws-input-clean">
+        </div>
+    </div>
+</div>
+
+<style>
+.ws-select-capsule {
+    background: var(--surface-3);
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    padding: 6px 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    outline: none;
+}
+
+.ws-input-clean {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 13px;
+    width: 100%;
+    outline: none;
+}
+
+.ws-input-clean::placeholder {
+    color: var(--muted);
+}
+</style>
+
+<script>
+    document.body.addEventListener('dialChanged', (e) => {
+        const family = e.detail.family;
+        
+        // Hide all dynamic groups
+        document.querySelectorAll('.dynamic-field-group').forEach(group => {
+            group.style.display = 'none';
+        });
+
+        // Show the active one
+        const activeGroup = document.getElementById(`fields-${family}`);
+        if (activeGroup) {
+            activeGroup.style.display = 'block';
+        }
+    });
+</script>

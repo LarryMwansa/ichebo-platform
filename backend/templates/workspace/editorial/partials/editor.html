@@ -1,16 +1,45 @@
 {# templates/workspace/editorial/partials/editor.html — Unified Editorial Desk #}
-<div class="editorial-canvas" style="padding-top: 60px;">
-    <div class="editorial-workspace">
-        <form id="editorial-form" class="editorial-form">
+{% include "workspace/editorial/partials/context_menu.html" %}
+
+<div class="editorial-canvas" style="padding-top: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; background: var(--surface-bg);">
+    
+    <!-- Heading Hero: Design System Standard -->
+    <div class="editorial-hero" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 8px;">Apostolic Drafting</div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <h1 class="ws-page-title" style="margin: 0; font-size: 32px;" id="hero-title">New <em>Record</em></h1>
+            <div id="hero-breadcrumb" style="font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">chevron_right</span>
+                <span id="hero-family-label">Journal</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="editorial-workspace" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); flex: 1;">
+        <form id="editorial-form" class="editorial-form" style="display: flex; flex-direction: column; gap: 20px; height: 100%;">
+            <input type="hidden" name="record_family" id="hidden-record-family" value="journal">
             <input type="hidden" name="record_type" id="hidden-record-type" value="{{ record.record_type|default:active_type }}">
+            
             <input type="text" name="title" class="editorial-title-input" 
-                   placeholder="Untitled Record..." value="{{ record.title|default:'' }}">
+                   style="font-size: 28px; font-weight: 700; border: none; background: transparent; color: var(--text-main); outline: none; width: 100%;"
+                   placeholder="Untitled Record..." value="{{ record.title|default:'' }}"
+                   oninput="document.getElementById('hero-title').innerHTML = this.value || 'New <em>Record</em>'">
             
             <textarea name="content" id="editorial-editor" class="editorial-editor-textarea editorial-body"
-                placeholder="Begin writing... The word is alive.">{{ record.content|default:'' }}</textarea>
+                style="flex: 1; border: none; background: transparent; color: var(--text-main); outline: none; font-size: 16px; line-height: 1.8; resize: none; min-height: 500px;"
+                placeholder="Begin writing... The word is alive. Right-click for tools.">{{ record.content|default:'' }}</textarea>
         </form>
     </div>
 </div>
+
+<script>
+    // Sync hero with dial
+    document.body.addEventListener('dialChanged', (e) => {
+        const family = e.detail.family;
+        const type = e.detail.type;
+        document.getElementById('hero-family-label').textContent = family.charAt(0).toUpperCase() + family.slice(1);
+    });
+</script>
 
 <script>
     // Sync record type picker

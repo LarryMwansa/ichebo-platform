@@ -89,24 +89,34 @@
 <script>
 const DIAL_MAP = {
     'journal': [
+        {val: 'note', label: 'General Note'},
         {val: 'prayer', label: 'Prayer'},
         {val: 'spirit', label: 'Spirit'},
         {val: 'dream', label: 'Dream'},
-        {val: 'note', label: 'General Note'}
+        {val: 'dar', label: 'Activity Report'}
     ],
     'governance': [
         {val: 'decree', label: 'Decree'},
         {val: 'protocol', label: 'Protocol'},
         {val: 'ordinance', label: 'Ordinance'},
-        {val: 'mandate', label: 'Mandate'}
+        {val: 'mandate', label: 'Mandate'},
+        {val: 'class', label: 'Class Definition'},
+        {val: 'principle', label: 'Principle'},
+        {val: 'concept', label: 'Concept'},
+        {val: 'pattern', label: 'Divine Pattern'}
     ],
     'activity': [
-        {val: 'dar', label: 'Activity Report'},
-        {val: 'task', label: 'Steward Task'}
+        {val: 'task', label: 'Steward Task'},
+        {val: 'dar', label: 'Daily Activity'}
     ],
     'missions': [
         {val: 'report', label: 'Mission Report'},
-        {val: 'prophetic', label: 'Prophetic Intel'}
+        {val: 'prophetic', label: 'Prophetic Intel'},
+        {val: 'intel', label: 'General Intel'}
+    ],
+    'learning': [
+        {val: 'course', label: 'Curriculum'},
+        {val: 'session', label: 'Session Note'}
     ]
 };
 
@@ -142,13 +152,19 @@ function updateFamily(btn, family) {
     // Form Update
     const form = document.getElementById('editorial-form');
     if (form) {
-        let fInput = form.querySelector('[name="record_family"]');
+        let fInput = document.getElementById('hidden-record-family') || form.querySelector('[name="record_family"]');
         if (!fInput) {
             fInput = document.createElement('input');
-            fInput.type = 'hidden'; fInput.name = 'record_family';
+            fInput.type = 'hidden'; fInput.name = 'record_family'; fInput.id = 'hidden-record-family';
             form.appendChild(fInput);
         }
         fInput.value = family;
+        
+        // Emit global event for Hero and Options Bar
+        document.body.dispatchEvent(new CustomEvent('dialChanged', {
+            detail: { family: family, type: DIAL_MAP[family][0].val }
+        }));
+
         updateType(typeContainer.children[0], types[0].val, family);
     }
 }
@@ -167,13 +183,18 @@ function updateType(btn, type, family) {
 
     const form = document.getElementById('editorial-form');
     if (form) {
-        let tInput = form.querySelector('[name="record_type"]');
+        let tInput = document.getElementById('hidden-record-type') || form.querySelector('[name="record_type"]');
         if (!tInput) {
             tInput = document.createElement('input');
-            tInput.type = 'hidden'; tInput.name = 'record_type';
+            tInput.type = 'hidden'; tInput.name = 'record_type'; tInput.id = 'hidden-record-type';
             form.appendChild(tInput);
         }
         tInput.value = type;
+        
+        // Emit specific type change
+        document.body.dispatchEvent(new CustomEvent('dialChanged', {
+            detail: { family: family, type: type }
+        }));
         
         const status = document.getElementById('save-status');
         if (status) status.textContent = `Drafting ${family.charAt(0).toUpperCase() + family.slice(1)}`;
