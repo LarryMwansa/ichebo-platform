@@ -11,9 +11,8 @@
 /* ── The Writing Canvas ── */
 .editorial-canvas {
   background: var(--canvas-bg);
-  /* min-height: 100%; */
-  height: fit-content;
-  padding: var(--space-xl) var(--space-4xl) 0;
+  min-height: 100%;
+  padding: var(--space-l);
   position: relative;
   max-width: 900px;
   margin: 0 auto;
@@ -140,12 +139,14 @@
 
 .editorial-editor-textarea {
   width: 100%;
-  min-height: 80vh; /* Occupy full stage length */
+  min-height: 80vh;
+  /* Occupy full stage length */
   border: none;
   background: transparent;
   outline: none;
   resize: none;
-  padding-bottom: var(--space-4xl); /* Safe space at bottom */
+  padding-bottom: var(--space-4xl);
+  /* Safe space at bottom */
 }
 
 .editorial-toolbar__btn .material-symbols-outlined {

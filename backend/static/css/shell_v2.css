@@ -261,7 +261,7 @@ html:not(.dark) .ics-context-bar__header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-m) 0;
+  /* padding: var(--space-m) 0; */
 }
 
 /* The Document Canvas */
