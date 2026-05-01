@@ -1,16 +1,21 @@
 {# workspace/records/partials/editorial_form.html #}
-{# A standalone editorial surface for the Triple-Panel Stage #}
+{% load static %}
 
 <div class="editorial-stage">
-    <form class="editorial-canvas" 
-          id="editorial-form"
-          hx-post="{% url 'records:htmx-create' %}"
-          hx-target="#main-content"
-          hx-push-url="true">
-        {% csrf_token %}
-        
-        {# 1. Formatting Toolbar #}
-        <div class="editorial-toolbar">
+    {# 1. Full-Width Sticky Toolbar #}
+    <div class="editorial-toolbar">
+        {# Left: Context Actions #}
+        <div style="display: flex; align-items: center; gap: var(--space-s);">
+            <select name="record_type" id="record-type" class="ws-icon-btn" style="width: auto; padding: 0 var(--space-s); font-size: 11px; height: 32px; border: 1px solid var(--border);">
+                {% for value, label in record_types %}
+                <option value="{{ value }}" {% if value == active_type %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <span id="save-status" style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600;">Desk Ready</span>
+        </div>
+
+        {# Center: Formatting Tools #}
+        <div class="editorial-toolbar__group--center">
             <button type="button" class="editorial-toolbar__btn" title="Bold"><span class="material-symbols-outlined">format_bold</span></button>
             <button type="button" class="editorial-toolbar__btn" title="Italic"><span class="material-symbols-outlined">format_italic</span></button>
             <div class="editorial-toolbar__divider"></div>
@@ -19,41 +24,50 @@
             <div class="editorial-toolbar__divider"></div>
             <button type="button" class="editorial-toolbar__btn" title="Quote"><span class="material-symbols-outlined">format_quote</span></button>
             <button type="button" class="editorial-toolbar__btn" title="Link"><span class="material-symbols-outlined">link</span></button>
-            
-            <div style="margin-left: auto; display: flex; align-items: center; gap: var(--space-s);">
-                <div id="save-status" style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">Desk Ready</div>
-                <button type="submit" class="ws-topbar__cta" style="padding: 0 var(--space-m);">
-                    Save Record
-                </button>
-            </div>
         </div>
 
-        {# 2. Title & Type #}
-        <div style="margin-bottom: var(--space-m);">
-            <div style="display: flex; align-items: center; gap: var(--space-s); margin-bottom: 8px;">
-                <select name="record_type" id="record-type" class="ws-icon-btn" style="width: auto; padding: 0 var(--space-s); font-size: 11px;">
-                    {% for value, label in record_types %}
-                    <option value="{{ value }}" {% if value == active_type %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-                <span style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">Draft Mode</span>
-            </div>
+        {# Right: Save Actions #}
+        <div style="margin-left: auto; display: flex; align-items: center; gap: var(--space-s);">
+            <button type="button" class="ws-icon-btn" title="Writing Assistant">
+                <span class="material-symbols-outlined" style="font-size: 18px;">auto_fix</span>
+            </button>
+            <button type="submit" form="editorial-form" class="ws-topbar__cta" style="padding: 0 var(--space-m); height: 36px; border-radius: 6px;">
+                Save Record
+            </button>
+        </div>
+    </div>
+
+    {# 2. The Writing Canvas #}
+    <div class="editorial-canvas">
+        <form id="editorial-form"
+              hx-post="{% url 'records:htmx-create' %}"
+              hx-target="#main-content"
+              hx-push-url="true">
+            {% csrf_token %}
             
+            <input type="hidden" name="record_type" id="hidden-record-type" value="{{ active_type }}">
+
             <input type="text" name="title" id="record-title" 
                    value="{{ record.title|default:'' }}"
                    placeholder="Give your record a title..." 
                    class="editorial-title" 
                    style="width: 100%; border: none; background: transparent; outline: none;" 
                    required autofocus autofill="off">
-        </div>
 
-        {# 3. The Markdown Editor #}
-        <textarea name="content" id="editorial-editor" 
-                  class="editorial-body" 
-                  placeholder="Begin writing... The word is alive."
-                  style="width: 100%; min-height: 60vh; border: none; background: transparent; outline: none; resize: none;">{{ record.content|default:'' }}</textarea>
-    </form>
+            <textarea name="content" id="editorial-editor" 
+                      class="editorial-body" 
+                      placeholder="Begin writing... The word is alive."
+                      style="width: 100%; min-height: 70vh; border: none; background: transparent; outline: none; resize: none;">{{ record.content|default:'' }}</textarea>
+        </form>
+    </div>
 </div>
+
+{# Sync record type picker #}
+<script>
+    document.getElementById('record-type').addEventListener('change', function() {
+        document.getElementById('hidden-record-type').value = this.value;
+    });
+</script>
 
 {# Re-init Editorial logic after HTMX swap #}
 <script src="{% static 'js/editorial_v2.js' %}"></script>
