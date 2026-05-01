@@ -33,12 +33,12 @@
     }
 
     /* Dark Mode Sovereign Shift */
-    html.dark :root {
-        --stone-bg: #111111;
-        --stone-2: #161616;
-        --text-ink: #F5F3F0;
-        --text-muted-ink: #9a9a9a;
-        --border-ink: rgba(255,255,255,0.08);
+    .dark, [data-theme="dark"] {
+        --stone-bg: #111111 !important;
+        --stone-2: #161616 !important;
+        --text-ink: #F5F3F0 !important;
+        --text-muted-ink: #9a9a9a !important;
+        --border-ink: rgba(255,255,255,0.1) !important;
     }
 
     .ics-sidebar {
@@ -64,7 +64,7 @@
         height: 60%;
         width: 3px;
         background: var(--accent-red);
-        box-shadow: 0 0-10px var(--accent-red);
+        box-shadow: 0 0 10px var(--accent-red);
     }
 
     .ics-context-bar {
@@ -82,12 +82,10 @@
     .ics-stage {
         background: var(--stone-bg);
         color: var(--text-ink);
-        transition: background 0.3s ease, color 0.3s ease;
     }
 
     .ics-stage__topbar {
         background: var(--stone-bg);
-        backdrop-filter: blur(20px);
         border-bottom: 1px solid var(--border-ink);
     }
 
