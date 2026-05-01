@@ -15,38 +15,38 @@
     
     <div class="obsidian-menu__section">
         <div class="obsidian-menu__item has-submenu">
-            <span class="material-symbols-outlined">format_ink_high</span>
-            Format
+            <span class="material-symbols-outlined">format_paint</span>
+            <span>Format</span>
             <span class="material-symbols-outlined arrow">chevron_right</span>
             <div class="obsidian-submenu">
-                <div class="obsidian-menu__item" onclick="applyStyle('**')"><span class="material-symbols-outlined">format_bold</span> Bold</div>
-                <div class="obsidian-menu__item" onclick="applyStyle('_')"><span class="material-symbols-outlined">format_italic</span> Italic</div>
-                <div class="obsidian-menu__item" onclick="applyStyle('~~')"><span class="material-symbols-outlined">strikethrough_s</span> Strikethrough</div>
-                <div class="obsidian-menu__item" onclick="applyStyle('==')"><span class="material-symbols-outlined">format_color_fill</span> Highlight</div>
+                <div class="obsidian-menu__item" onclick="applyStyle('**')"><span class="material-symbols-outlined">format_bold</span> <span>Bold</span></div>
+                <div class="obsidian-menu__item" onclick="applyStyle('_')"><span class="material-symbols-outlined">format_italic</span> <span>Italic</span></div>
+                <div class="obsidian-menu__item" onclick="applyStyle('~~')"><span class="material-symbols-outlined">strikethrough_s</span> <span>Strikethrough</span></div>
+                <div class="obsidian-menu__item" onclick="applyStyle('==')"><span class="material-symbols-outlined">format_color_fill</span> <span>Highlight</span></div>
             </div>
         </div>
         <div class="obsidian-menu__item has-submenu">
-            <span class="material-symbols-outlined">format_paragraph</span>
-            Paragraph
+            <span class="material-symbols-outlined">format_align_left</span>
+            <span>Paragraph</span>
             <span class="material-symbols-outlined arrow">chevron_right</span>
             <div class="obsidian-submenu">
-                <div class="obsidian-menu__item" onclick="applyBlock('# ')">Heading 1</div>
-                <div class="obsidian-menu__item" onclick="applyBlock('## ')">Heading 2</div>
-                <div class="obsidian-menu__item" onclick="applyBlock('### ')">Heading 3</div>
+                <div class="obsidian-menu__item" onclick="applyBlock('# ')"><span>Heading 1</span></div>
+                <div class="obsidian-menu__item" onclick="applyBlock('## ')"><span>Heading 2</span></div>
+                <div class="obsidian-menu__item" onclick="applyBlock('### ')"><span>Heading 3</span></div>
                 <div class="obsidian-menu__divider"></div>
-                <div class="obsidian-menu__item" onclick="applyBlock('- ')">Bullet list</div>
-                <div class="obsidian-menu__item" onclick="applyBlock('1. ')">Numbered list</div>
-                <div class="obsidian-menu__item" onclick="applyBlock('> ')">Quote</div>
+                <div class="obsidian-menu__item" onclick="applyBlock('- ')"><span>Bullet list</span></div>
+                <div class="obsidian-menu__item" onclick="applyBlock('1. ')"><span>Numbered list</span></div>
+                <div class="obsidian-menu__item" onclick="applyBlock('> ')"><span>Quote</span></div>
             </div>
         </div>
         <div class="obsidian-menu__item has-submenu">
             <span class="material-symbols-outlined">add_box</span>
-            Insert
+            <span>Insert</span>
             <span class="material-symbols-outlined arrow">chevron_right</span>
             <div class="obsidian-submenu">
-                <div class="obsidian-menu__item" onclick="insertFormat('table')"><span class="material-symbols-outlined">table_chart</span> Table</div>
-                <div class="obsidian-menu__item" onclick="insertFormat('callout')"><span class="material-symbols-outlined">info</span> Callout</div>
-                <div class="obsidian-menu__item" onclick="insertFormat('hr')"><span class="material-symbols-outlined">horizontal_rule</span> Horizontal rule</div>
+                <div class="obsidian-menu__item" onclick="insertFormat('table')"><span class="material-symbols-outlined">table_chart</span> <span>Table</span></div>
+                <div class="obsidian-menu__item" onclick="insertFormat('callout')"><span class="material-symbols-outlined">info</span> <span>Callout</span></div>
+                <div class="obsidian-menu__item" onclick="insertFormat('hr')"><span class="material-symbols-outlined">horizontal_rule</span> <span>Horizontal rule</span></div>
             </div>
         </div>
     </div>
@@ -152,30 +152,21 @@
     });
 
     function applyStyle(symbol) {
-        const start = targetEditor.selectionStart;
-        const end = targetEditor.selectionEnd;
-        const text = targetEditor.value;
-        const selected = text.substring(start, end);
-        const before = text.substring(0, start);
-        const after = text.substring(end);
-        
-        targetEditor.value = `${before}${symbol}${selected}${symbol}${after}`;
-        targetEditor.focus();
+        if (symbol === '**') simplemde.toggleBold();
+        else if (symbol === '_') simplemde.toggleItalic();
+        else if (symbol === '~~') simplemde.toggleStrikethrough();
+        else {
+            const cm = simplemde.codemirror;
+            const selected = cm.getSelection();
+            cm.replaceSelection(`${symbol}${selected}${symbol}`);
+        }
     }
 
     function applyBlock(symbol) {
-        const start = targetEditor.selectionStart;
-        const text = targetEditor.value;
-        const before = text.substring(0, start);
-        const after = text.substring(start);
-        
-        // Find start of line
-        const lineStart = before.lastIndexOf('\n') + 1;
-        const preLine = text.substring(0, lineStart);
-        const postLine = text.substring(lineStart);
-        
-        targetEditor.value = `${preLine}${symbol}${postLine}`;
-        targetEditor.focus();
+        const cm = simplemde.codemirror;
+        const cursor = cm.getCursor();
+        const line = cm.getLine(cursor.line);
+        cm.replaceRange(symbol, {line: cursor.line, ch: 0});
     }
 
     function insertFormat(type) {
@@ -186,14 +177,11 @@
             'callout': '\n> [!NOTE]\n> Content here\n',
             'hr': '\n---\n'
         };
-        insertAtCursor(formats[type] || '');
+        const val = formats[type] || '';
+        simplemde.codemirror.replaceSelection(val);
     }
 
     function insertAtCursor(val) {
-        const start = targetEditor.selectionStart;
-        const end = targetEditor.selectionEnd;
-        const text = targetEditor.value;
-        targetEditor.value = text.substring(0, start) + val + text.substring(end);
-        targetEditor.focus();
+        simplemde.codemirror.replaceSelection(val);
     }
 </script>

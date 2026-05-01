@@ -26,20 +26,61 @@
                    oninput="document.getElementById('hero-title').innerHTML = this.value || 'New <em>Record</em>'">
             
             <textarea name="content" id="editorial-editor" class="editorial-editor-textarea editorial-body"
-                style="flex: 1; border: none; background: transparent; color: var(--text-main); outline: none; font-size: 16px; line-height: 1.8; resize: none; min-height: 500px;"
                 placeholder="Begin writing... The word is alive. Right-click for tools.">{{ record.content|default:'' }}</textarea>
         </form>
     </div>
 </div>
 
 <script>
+    // Initialize SimpleMDE (Obsidian-style)
+    var simplemde = new SimpleMDE({ 
+        element: document.getElementById("editorial-editor"),
+        spellChecker: false,
+        status: false,
+        toolbar: false, // We use the right-click menu instead
+        placeholder: "Begin writing... The word is alive. Right-click for tools.",
+        shortcuts: {
+            "toggleBold": "Cmd-B",
+            "toggleItalic": "Cmd-I",
+        }
+    });
+
+    // Sync with HTMX: SimpleMDE needs to update the hidden textarea before HTMX post
+    simplemde.codemirror.on("change", function(){
+        document.getElementById("editorial-editor").value = simplemde.value();
+    });
+
     // Sync hero with dial
     document.body.addEventListener('dialChanged', (e) => {
         const family = e.detail.family;
         const type = e.detail.type;
-        document.getElementById('hero-family-label').textContent = family.charAt(0).toUpperCase() + family.slice(1);
+        const heroFamily = document.getElementById('hero-family-label');
+        if (heroFamily) heroFamily.textContent = family.charAt(0).toUpperCase() + family.slice(1);
     });
 </script>
+
+<style>
+/* Integrate SimpleMDE with ICS Dark Theme */
+.CodeMirror {
+    background: transparent !important;
+    color: var(--text-main) !important;
+    border: none !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 16px !important;
+    line-height: 1.8 !important;
+    height: auto !important;
+    min-height: 600px !important;
+}
+
+.editor-preview-side, .editor-preview {
+    background: var(--surface-bg) !important;
+    color: var(--text-main) !important;
+}
+
+.CodeMirror-cursor {
+    border-left: 2px solid var(--accent-red) !important;
+}
+</style>
 
 <script>
     // Sync record type picker

@@ -1,38 +1,49 @@
 {% extends "workspace/records/base.html" %}
 {% load static %}
 
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 {% block records_content %}
 <div class="editorial-stage">
-    <div class="editorial-canvas">
+    <div class="editorial-canvas" style="padding-top: 40px; display: flex; flex-direction: column; align-items: center;">
         
-        {# 1. Formatting Toolbar #}
-        <div class="editorial-toolbar">
-            <button class="editorial-toolbar__btn" title="Bold"><span class="material-symbols-outlined">format_bold</span></button>
-            <button class="editorial-toolbar__btn" title="Italic"><span class="material-symbols-outlined">format_italic</span></button>
-            <div class="editorial-toolbar__divider"></div>
-            <button class="editorial-toolbar__btn" title="Heading 1"><span class="material-symbols-outlined">format_h1</span></button>
-            <button class="editorial-toolbar__btn" title="Heading 2"><span class="material-symbols-outlined">format_h2</span></button>
-            <div class="editorial-toolbar__divider"></div>
-            <button class="editorial-toolbar__btn" title="Quote"><span class="material-symbols-outlined">format_quote</span></button>
-            <button class="editorial-toolbar__btn" title="Link"><span class="material-symbols-outlined">link</span></button>
-            <div class="editorial-toolbar__divider"></div>
-            <button class="editorial-toolbar__btn" style="margin-left: auto;" title="Print"><span class="material-symbols-outlined">print</span></button>
+        {# 1. Record Header #}
+        <div class="editorial-hero" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); margin-bottom: 30px;">
+            <div class="ws-label-tag" style="margin-bottom: 8px;">Registry Archive</div>
+            <h1 class="editorial-title" style="font-size: 32px; margin: 0 0 12px 0;">{{ record.title }}</h1>
+            <div class="editorial-meta" style="display: flex; gap: 12px; font-size: 13px; color: var(--muted);">
+                <span class="ws-tag-outline">{{ record.get_record_type_display|default:record.record_type|title }}</span>
+                <span>·</span>
+                <span>{{ record.updated_at|date:"d M Y" }}</span>
+            </div>
         </div>
 
-        {# 2. Title & Meta #}
-        <h1 class="editorial-title">{{ record.title }}</h1>
-        <div class="editorial-meta">
-            <span>{{ record.get_record_type_display|default:record.record_type|title }}</span>
-            <span>·</span>
-            <span>{{ record.updated_at|date:"d M Y" }}</span>
-        </div>
-
-        {# 3. The Body #}
-        <div class="editorial-body">
-            {{ record.content|linebreaks }}
+        {# 2. The Markdown Body #}
+        <div class="editorial-workspace" style="width: 100%; max-width: 900px; padding: 0 var(--space-m);">
+            <div id="markdown-viewer" class="editorial-body" style="font-size: 16px; line-height: 1.8; color: var(--text-main);">
+                {{ record.content|default:"" }}
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const viewer = document.getElementById('markdown-viewer');
+        if (viewer) {
+            viewer.innerHTML = marked.parse(viewer.textContent.trim());
+        }
+    });
+</script>
+
+<style>
+.editorial-body h1 { font-size: 2em; margin: 1em 0 0.5em; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.3em; }
+.editorial-body h2 { font-size: 1.5em; margin: 1em 0 0.5em; }
+.editorial-body p { margin-bottom: 1.2em; }
+.editorial-body ul, .editorial-body ol { margin-bottom: 1.2em; padding-left: 2em; }
+.editorial-body blockquote { border-left: 4px solid var(--border-subtle); padding-left: 1em; color: var(--muted); font-style: italic; margin: 1.5em 0; }
+.editorial-body code { background: var(--surface-3); padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+</style>
 {% endblock %}
 
 {% block ws_options %}
