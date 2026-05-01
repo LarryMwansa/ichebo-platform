@@ -79,23 +79,28 @@
       {# Optional tab bar below topbar #}
       {% block ws_tabs %}{% endblock %}
 
-      {# Scrollable content area #}
-      <div class="ws-content" id="ws-content">
-        <div class="ws-content__inner">
-          <div id="ws-toast-container" aria-live="polite" aria-atomic="true"></div>
-          {% block ws_content %}{% endblock %}
-        </div>
-      </div>
-
-      {# Detail panel — HTMX target for master-detail layouts. Hidden until loaded. #}
-      <div class="ws-detail-panel" id="ws-detail" aria-live="polite">
-        <div class="ws-detail-empty">
-          <div class="ws-detail-empty__icon">
-            <span class="material-symbols-outlined" style="font-size: 3rem; opacity: 0.1;">dock_to_left</span>
+      {# Main container — switches between full-page and side-by-side layouts #}
+      <div class="ws-main-container">
+        {# Scrollable content area (Master List) #}
+        <div class="ws-content" id="ws-content">
+          <div class="ws-content__inner">
+            <div id="ws-toast-container" aria-live="polite" aria-atomic="true"></div>
+            {% block ws_content %}{% endblock %}
           </div>
-          <p class="ws-detail-empty__label">Select an item to view details</p>
         </div>
-      </div>
+
+        {# Detail panel (Detail Preview) — Hidden by default in GRID/FULL-PAGE layouts #}
+        <div class="ws-detail-panel" id="ws-detail" aria-live="polite">
+          {% block ws_detail %}
+          <div class="ws-detail-empty">
+            <div class="ws-detail-empty__icon">
+              <span class="material-symbols-outlined">dock_to_left</span>
+            </div>
+            <p class="ws-detail-empty__label">Select an item to view details</p>
+          </div>
+          {% endblock %}
+        </div>
+      </div>{# /ws-main-container #}
     </div>{# /ws-body #}
     {% include "components/_search_overlay.html" %}
   </div>{# /ws-layout #}

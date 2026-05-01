@@ -313,7 +313,34 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-width: 0; /* Prevent flex blowout */
+  min-width: 0;
+}
+
+.ws-main-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Hide detail panel globally by default */
+.ws-detail-panel {
+  display: none;
+  width: 400px;
+  min-width: 400px;
+  border-left: 1px solid var(--border);
+  background: var(--card);
+  overflow-y: auto;
+}
+
+/* Enable detail panel only for master-detail layouts */
+.ws-layout--master-detail .ws-detail-panel {
+  display: block;
+}
+
+/* Master-detail pages use full-bleed content on the left */
+.ws-layout--master-detail .ws-content {
+  flex: 1;
 }
 
 

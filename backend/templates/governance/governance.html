@@ -82,19 +82,18 @@
 
     </div>{# /ws-list-panel #}
 
-    {# ── Detail panel ── #}
-    <div class="ws-detail-panel" id="ws-detail">
-      <div class="ws-detail-empty">
-        <div class="ws-detail-empty__icon">
-          <span class="material-symbols-outlined" style="font-size: 3rem; opacity: 0.15;">menu_book</span>
-        </div>
-        <h3 style="font-family: var(--ff-serif); font-size: 1.5rem; margin-bottom: 0.5rem; opacity: 0.4;">Select a Record</h3>
-        <p style="color: var(--muted); font-size: 0.9rem; max-width: 240px;">Choose a mandate or library property from the list to begin exploration.</p>
-      </div>
-    </div>
-
   </div>{# /ws-master-detail #}
 </div>{# /ws-layout--master-detail #}
+{% endblock %}
+
+{% block ws_detail %}
+<div class="ws-detail-empty">
+  <div class="ws-detail-empty__icon">
+    <span class="material-symbols-outlined" style="font-size: 3rem; opacity: 0.15;">menu_book</span>
+  </div>
+  <h3 style="font-family: var(--ff-serif); font-size: 1.5rem; margin-bottom: 0.5rem; opacity: 0.4;">Select a Record</h3>
+  <p style="color: var(--muted); font-size: 0.9rem; max-width: 240px;">Choose a mandate or library property from the list to begin exploration.</p>
+</div>
 {% endblock %}
 
 
