@@ -39,26 +39,28 @@
 
     {# 2. The Writing Canvas #}
     <div class="editorial-canvas">
-        <form id="editorial-form"
-              hx-post="{% url 'records:htmx-create' %}"
-              hx-target="#main-content"
-              hx-push-url="true">
-            {% csrf_token %}
-            
-            <input type="hidden" name="record_type" id="hidden-record-type" value="{{ active_type }}">
+        <div class="editorial-canvas-inner">
+            <form id="editorial-form"
+                  hx-post="{% url 'records:htmx-create' %}"
+                  hx-target="#main-content"
+                  hx-push-url="true">
+                {% csrf_token %}
+                
+                <input type="hidden" name="record_type" id="hidden-record-type" value="{{ active_type }}">
 
-            <input type="text" name="title" id="record-title" 
-                   value="{{ record.title|default:'' }}"
-                   placeholder="Give your record a title..." 
-                   class="editorial-title" 
-                   style="width: 100%; border: none; background: transparent; outline: none;" 
-                   required autofocus autofill="off">
+                <input type="text" name="title" id="record-title" 
+                       value="{{ record.title|default:'' }}"
+                       placeholder="Give your record a title..." 
+                       class="editorial-title" 
+                       style="width: 100%; border: none; background: transparent; outline: none;" 
+                       required autofocus autofill="off">
 
-            <textarea name="content" id="editorial-editor" 
-                      class="editorial-body" 
-                      placeholder="Begin writing... The word is alive."
-                      style="width: 100%; min-height: 70vh; border: none; background: transparent; outline: none; resize: none;">{{ record.content|default:'' }}</textarea>
-        </form>
+                <textarea name="content" id="editorial-editor" 
+                          class="editorial-body" 
+                          placeholder="Begin writing... The word is alive."
+                          style="width: 100%; min-height: 80vh; border: none; background: transparent; outline: none; resize: none;">{{ record.content|default:'' }}</textarea>
+            </form>
+        </div>
     </div>
 </div>
 

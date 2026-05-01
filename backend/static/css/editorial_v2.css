@@ -4,18 +4,27 @@
  */
 
 .editorial-stage {
-  --canvas-bg: var(--bg);
-  --paper-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 64px); /* Subtract topbar height */
+  overflow: hidden;
+  background: var(--bg);
 }
 
 /* ── The Writing Canvas ── */
 .editorial-canvas {
+  flex: 1;
+  overflow-y: auto;
   background: var(--canvas-bg);
-  min-height: 100%;
-  padding: var(--space-xl) var(--space-4xl);
+  padding: var(--space-4xl) var(--space-4xl);
   position: relative;
-  max-width: 900px;
+  scrollbar-gutter: stable;
+}
+
+.editorial-canvas-inner {
+  max-width: 800px;
   margin: 0 auto;
+  min-height: 100%;
 }
 
 /* ── Typography ── */
