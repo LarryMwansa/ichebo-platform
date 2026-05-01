@@ -1,9 +1,9 @@
+{# templates/activity/my_activities.html #}
 {% extends "workspace_shell.html" %}
-{% load static %}
 
-{% block title %}Activity Timeline — Ichebo{% endblock %}
+{% block title %}Activity Hub — Ichebo{% endblock %}
 
-{# Zone 2: Strategic Filters #}
+{# Zone 2: Tactical Navigator #}
 {% block context_header %}Tactical Intel{% endblock %}
 {% block context_content %}
     {% include "activity/partials/activity_sidebar.html" %}
@@ -11,52 +11,48 @@
 
 {# Zone 3: The Sovereign Timeline #}
 {% block ws_content %}
-<div class="activity-timeline-v2">
+<div class="sovereign-timeline">
     
-    <div class="ws-page-header" style="margin-bottom: 40px;">
-        <div class="ws-label-tag" style="margin-bottom: 8px; color: var(--accent-red);">Kingdom Momentum</div>
-        <h1 class="ws-page-title" style="font-size: 36px; margin: 0;">Personal <em>Activity</em></h1>
+    {# Header Section #}
+    <div class="ws-page-header" style="margin-bottom: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red); font-weight: 800;">KINGDOM MOMENTUM</div>
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 48px; margin: 0; line-height: 1; font-weight: 900; color: var(--ink-bg);">
+                Personal <span style="font-style: italic; color: var(--accent-red);">Activity</span>
+            </h1>
+        </div>
     </div>
 
-    {# The Momentum Axis #}
-    <div class="momentum-axis" style="position: relative; padding-left: 40px; border-left: 2px solid rgba(0,0,0,0.05); margin-left: 10px;">
+    {# The Timeline Container #}
+    <div class="timeline-axis-container" style="position: relative; padding-left: 40px;">
         
+        {# Vertical Momentum Axis #}
+        <div class="momentum-line" style="position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: linear-gradient(to bottom, var(--accent-red) 0%, rgba(0,0,0,0.05) 100%);"></div>
+
+        {# 1. Overdue Section #}
         {% if overdue %}
-        <div class="timeline-segment">
-            <div class="segment-label-caps" style="color: var(--accent-red); margin-bottom: 20px;">Overdue Mandates</div>
-            <div class="timeline-items">
+        <div class="timeline-section" style="margin-bottom: 60px;">
+            <div class="timeline-dot" style="position: absolute; left: -4px; top: 10px; width: 9px; height: 9px; background: var(--accent-red); border-radius: 50%; box-shadow: 0 0 10px var(--accent-red);"></div>
+            <div class="ws-label-tag" style="margin-bottom: 25px; color: var(--accent-red); opacity: 0.8; font-size: 11px;">OVERDUE MANDATES</div>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
                 {% for activity in overdue %}
-                    {% include "activity/partials/activity_card.html" %}
+                    {% include "activity/partials/activity_card.html" with activity=activity is_overdue=True %}
                 {% endfor %}
             </div>
         </div>
-        <div style="height: 40px;"></div>
         {% endif %}
 
-        {% if due_today %}
-        <div class="timeline-segment">
-            <div class="segment-label-caps" style="margin-bottom: 20px;">Due Today</div>
-            <div class="timeline-items">
+        {# 2. Today / Upcoming Section #}
+        <div class="timeline-section">
+            <div class="timeline-dot" style="position: absolute; left: -4px; top: 10px; width: 9px; height: 9px; background: var(--muted); border-radius: 50%;"></div>
+            <div class="ws-label-tag" style="margin-bottom: 25px; color: var(--muted); opacity: 0.8; font-size: 11px;">UPCOMING HORIZON</div>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
                 {% for activity in due_today %}
-                    {% include "activity/partials/activity_card.html" %}
+                    {% include "activity/partials/activity_card.html" with activity=activity %}
                 {% endfor %}
-            </div>
-        </div>
-        <div style="height: 40px;"></div>
-        {% endif %}
-
-        <div class="timeline-segment">
-            <div class="segment-label-caps" style="margin-bottom: 20px;">Upcoming Horizon</div>
-            <div class="timeline-items">
                 {% for activity in upcoming %}
-                    {% include "activity/partials/activity_card.html" %}
-                {% endfor %}
-                {% if not upcoming and not overdue and not due_today %}
-                    <div class="ws-empty-state">
-                        <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.1;">event_busy</span>
-                        <p style="color: var(--muted); margin-top: 10px;">The horizon is clear. Start a mission.</p>
-                    </div>
-                {% endif %}
             </div>
         </div>
     </div>

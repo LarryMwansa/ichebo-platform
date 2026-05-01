@@ -3,42 +3,84 @@
     
     {# Strategic Filters #}
     <div class="explorer-section">
-        <div class="explorer-header">
-            <span class="material-symbols-outlined">filter_list</span>
-            <span class="label-caps">Strategic Filters</span>
+        <div class="explorer-header" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; margin-bottom: 12px; opacity: 0.7;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">analytics</span>
+            <span class="label-caps" style="font-size: 10px; letter-spacing: 1.5px;">Strategic Filters</span>
         </div>
-        <div class="explorer-list">
+        <div class="explorer-list" style="display: flex; flex-direction: column; gap: 2px;">
             <a href="{% url 'activity:activity-home' %}" class="explorer-item {% if not active_type %}active{% endif %}">
                 <span class="material-symbols-outlined explorer-icon">all_inclusive</span>
                 <span class="explorer-name">All Activity</span>
             </a>
-            {% for slug, label in activity_types %}
-                <a href="{% url 'activity:activity-home' %}?type={{ slug }}" class="explorer-item {% if active_type == slug %}active{% endif %}">
-                    <span class="material-symbols-outlined explorer-icon">
-                        {% if slug == 'habit' %}sync{% elif slug == 'mission' %}rocket_launch{% elif slug == 'goal' %}emoji_events{% else %}task_alt{% endif %}
-                    </span>
-                    <span class="explorer-name">{{ label }}</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 0 8px;">
+                <a href="{% url 'activity:activity-home' %}?type=task" class="explorer-item {% if active_type == 'task' %}active{% endif %}" style="padding: 8px 12px;">
+                    <span class="material-symbols-outlined explorer-icon" style="font-size: 18px;">check_circle</span>
+                    <span class="explorer-name" style="font-size: 12px;">Tasks</span>
                 </a>
-            {% endfor %}
+                <a href="{% url 'activity:activity-home' %}?type=habit" class="explorer-item {% if active_type == 'habit' %}active{% endif %}" style="padding: 8px 12px;">
+                    <span class="material-symbols-outlined explorer-icon" style="font-size: 18px;">autorenew</span>
+                    <span class="explorer-name" style="font-size: 12px;">Habits</span>
+                </a>
+                <a href="{% url 'activity:activity-home' %}?type=goal" class="explorer-item {% if active_type == 'goal' %}active{% endif %}" style="padding: 8px 12px;">
+                    <span class="material-symbols-outlined explorer-icon" style="font-size: 18px;">trophy</span>
+                    <span class="explorer-name" style="font-size: 12px;">Goals</span>
+                </a>
+                <a href="{% url 'activity:activity-home' %}?type=event" class="explorer-item {% if active_type == 'event' %}active{% endif %}" style="padding: 8px 12px;">
+                    <span class="material-symbols-outlined explorer-icon" style="font-size: 18px;">calendar_today</span>
+                    <span class="explorer-name" style="font-size: 12px;">Events</span>
+                </a>
+            </div>
         </div>
     </div>
 
-    {# Calendar Context #}
-    <div class="explorer-section" style="margin-top: 20px;">
-        <div class="explorer-header">
-            <span class="material-symbols-outlined">calendar_month</span>
-            <span class="label-caps">Time Context</span>
+    {# Time Context #}
+    <div class="explorer-section" style="margin-top: 30px;">
+        <div class="explorer-header" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; margin-bottom: 12px; opacity: 0.7;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">schedule</span>
+            <span class="label-caps" style="font-size: 10px; letter-spacing: 1.5px;">Time Context</span>
         </div>
-        <div class="explorer-list">
+        <div class="explorer-list" style="display: flex; flex-direction: column; gap: 2px;">
             <a href="{% url 'activity:calendar' %}" class="explorer-item">
                 <span class="material-symbols-outlined explorer-icon">calendar_view_month</span>
                 <span class="explorer-name">Calendar Grid</span>
             </a>
             <a href="{% url 'activity:ministry' %}" class="explorer-item">
-                <span class="material-symbols-outlined explorer-icon">campaign</span>
+                <span class="material-symbols-outlined explorer-icon">hub</span>
                 <span class="explorer-name">Ministry Hub</span>
             </a>
         </div>
     </div>
 
 </div>
+
+<style>
+.explorer-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: var(--muted);
+    border-radius: 6px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.explorer-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+}
+.explorer-item.active {
+    background: var(--accent-red);
+    color: #fff !important;
+}
+.explorer-item.active .explorer-icon {
+    color: #fff !important;
+}
+.explorer-icon {
+    font-size: 20px;
+    color: var(--accent-red);
+}
+.explorer-name {
+    font-size: 13px;
+    font-weight: 500;
+}
+</style>

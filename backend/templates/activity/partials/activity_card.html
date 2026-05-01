@@ -1,38 +1,22 @@
-<div class="ws-stat-card timeline-card" id="activity-{{ activity.id }}" 
+{# templates/activity/partials/activity_card.html #}
+<div class="activity-card-container" style="position: relative;" 
+     id="activity-{{ activity.id }}" 
      hx-get="{% url 'activity:activity-detail' activity.id %}"
      hx-target="#main-stage"
      hx-select="#main-stage"
-     hx-push-url="true"
-     style="cursor: pointer; background: #fff; border: 1px solid rgba(0,0,0,0.05); padding: 16px; display: flex; align-items: center; gap: 15px; border-radius: 8px; transition: transform 0.2s, box-shadow 0.2s;">
+     hx-push-url="true">
   
-  <div class="card-momentum-icon">
-    <span class="material-symbols-outlined" style="font-size: 24px; color: {% if activity.activity_type == 'habit' %}#2ecc71{% elif activity.activity_type == 'mission' %}var(--accent-red){% else %}var(--muted){% endif %};">
-        {% if activity.activity_type == 'habit' %}sync{% elif activity.activity_type == 'mission' %}rocket_launch{% else %}task_alt{% endif %}
-    </span>
-  </div>
+  {# Connection Node #}
+  <div class="timeline-node" style="position: absolute; left: -44px; top: 25px; width: 13px; height: 13px; background: var(--stone-bg); border: 2px solid {% if activity.due_at < now %}var(--accent-red){% else %}var(--muted){% endif %}; border-radius: 50%; z-index: 2;"></div>
 
-  <div style="flex: 1; overflow: hidden;">
-    <div style="font-size: 14px; font-weight: 700; color: var(--ink-bg); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-        {{ activity.title }}
-    </div>
-    <div style="display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--muted); font-weight: 500;">
-        {% if activity.due_at %}
-            <span style="display: flex; align-items: center; gap: 4px; {% if activity.due_at < now %}color: var(--accent-red);{% endif %}">
-                <span class="material-symbols-outlined" style="font-size: 14px;">event</span>
-                {{ activity.due_at|date:"d M" }}
+  <div class="ws-card-v2 activity-card" style="background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05); padding: 30px; border-radius: 12px; position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+    
+    <div style="display: flex; align-items: center; gap: 20px;">
+        {# Status Icon #}
+        <div class="status-icon-box" style="width: 40px; height: 40px; border-radius: 8px; background: rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: center; color: var(--muted);">
+            <span class="material-symbols-outlined" style="font-size: 20px;">
+                {% if activity.activity_type == 'task' %}task_alt{% elif activity.activity_type == 'habit' %}autorenew{% elif activity.activity_type == 'goal' %}trophy{% else %}event{% endif %}
             </span>
-        {% endif %}
-        <span class="ws-label-tag" style="padding: 2px 6px; font-size: 9px; opacity: 0.8;">{{ activity.get_activity_type_display }}</span>
-    </div>
-  </div>
-
-  <div class="activity-actions" style="display: flex; gap: 8px;" onclick="event.stopPropagation();">
-    <button class="ws-icon-btn" 
-            hx-post="{% url 'activity:htmx-complete' activity.id %}"
-            hx-target="#activity-{{ activity.id }}"
-            hx-swap="outerHTML"
-            title="Mark Done">
-      <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
     </button>
   </div>
 </div>
