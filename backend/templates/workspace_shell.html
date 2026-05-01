@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Workspace{% endblock %} — Ichebo</title>
+    
+    <!-- Design System: Playfair Display & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/shell_v2.css' %}?v=1">
+    
+    {% block extra_css %}{% endblock %}
+
+    <!-- HTMX -->
+    <script src="{% static 'js/htmx.min.js' %}" defer></script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+    <div class="ics-shell" id="ics-shell">
+        
+        <!-- Column 1: Primary Sidebar (Global Nav) -->
+        <aside class="ics-sidebar" aria-label="Global Navigation">
+            <a href="{% url 'dashboard:index' %}" class="ics-sidebar__logo">
+                <img src="{% static 'img/logo_mark_white.svg' %}" alt="ICS Logo" style="width: 100%;">
+            </a>
+
+            <nav class="ics-sidebar__nav">
+                <a href="{% url 'dashboard:index' %}" 
+                   class="ics-sidebar__item {% if active_app == 'dashboard' %}active{% endif %}"
+                   title="Dashboard">
+                    <span class="material-symbols-outlined">dashboard</span>
+                </a>
+                <a href="{% url 'governance:home' %}" 
+                   class="ics-sidebar__item {% if active_app == 'governance' %}active{% endif %}"
+                   title="Governance">
+                    <span class="material-symbols-outlined">gavel</span>
+                </a>
+                <a href="{% url 'community:community-home' %}" 
+                   class="ics-sidebar__item {% if active_app == 'community' %}active{% endif %}"
+                   title="Community">
+                    <span class="material-symbols-outlined">groups</span>
+                </a>
+                <a href="{% url 'learn:learn-home' %}" 
+                   class="ics-sidebar__item {% if active_app == 'formation' %}active{% endif %}"
+                   title="Formation">
+                    <span class="material-symbols-outlined">school</span>
+                </a>
+                <a href="{% url 'activity:activity-home' %}" 
+                   class="ics-sidebar__item {% if active_app == 'activity' %}active{% endif %}"
+                   title="Activity">
+                    <span class="material-symbols-outlined">task_alt</span>
+                </a>
+                <a href="{% url 'bible:reader' %}" 
+                   class="ics-sidebar__item {% if active_app == 'bible' %}active{% endif %}"
+                   title="Bible Reader">
+                    <span class="material-symbols-outlined">menu_book</span>
+                </a>
+            </nav>
+
+            <div style="margin-top: auto; display: flex; flex-direction: column; gap: var(--space-m);">
+                <a href="{% url 'accounts:profile' %}" class="ics-sidebar__item" title="Profile">
+                    <span class="material-symbols-outlined">person</span>
+                </a>
+                <a href="{% url 'accounts:settings' %}" class="ics-sidebar__item" title="Settings">
+                    <span class="material-symbols-outlined">settings</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Column 2: Context Bar (App Tools / Navigation) -->
+        <nav class="ics-context-bar" id="ics-context-bar" aria-label="App Context">
+            <header class="ics-context-bar__header">
+                {% block context_header %}
+                    {{ active_app|title }}
+                {% endblock %}
+            </header>
+            <div class="ics-context-bar__content">
+                {% block context_content %}
+                    <!-- App-specific tools and sub-navigation live here -->
+                {% endblock %}
+            </div>
+        </nav>
+
+        <!-- Column 3: The Stage (Main Editorial Workspace) -->
+        <main class="ics-stage" id="main-stage">
+            <header class="ics-stage__topbar">
+                <div style="display: flex; align-items: center; gap: var(--space-s);">
+                    <button class="ws-icon-btn" onclick="WorkspaceUI.toggleContext()" title="Toggle Context Bar (⌘+[ )">
+                        <span class="material-symbols-outlined">menu_open</span>
+                    </button>
+                    <div class="ws-topbar__breadcrumb">
+                        {% block breadcrumb %}
+                            <span class="ws-topbar__breadcrumb-item">Workspace</span>
+                        {% endblock %}
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: var(--space-s);">
+                    {% block stage_actions %}{% endblock %}
+                    <button class="ws-icon-btn" onclick="WorkspaceUI.toggleOptions()" title="Toggle Options (⌘+] )">
+                        <span class="material-symbols-outlined">dock_to_right</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="ics-stage__content">
+                <div class="ics-canvas">
+                    {% block ws_content %}{% endblock %}
+                </div>
+            </div>
+        </main>
+
+        <!-- Column 4: Options Bar (Metadata / Links / Relationships) -->
+        <aside class="ics-options-bar" id="ics-options-bar" aria-label="Metadata and Relationships">
+            <header class="ics-options-bar__header">
+                <span class="label-caps">Details & Relations</span>
+                <button class="ws-icon-btn" onclick="WorkspaceUI.toggleOptions()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </header>
+            <div class="ics-options-bar__content">
+                {% block ws_options %}
+                    <div class="ws-empty-state">
+                        <span class="material-symbols-outlined">info</span>
+                        <p>Select an element to view relationships</p>
+                    </div>
+                {% endblock %}
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="{% static 'js/shell_v2.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>
