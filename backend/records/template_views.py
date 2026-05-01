@@ -37,6 +37,7 @@ def my_records(request):
         'active_type': record_type,
         'active_app': 'records',
         'ws_page_title': 'Records',
+        'is_desk': True,  # Flag to render the desk by default
     }
 
     if request.headers.get('HX-Request') and not request.GET.get('full'):
@@ -93,9 +94,11 @@ def htmx_create_record(request):
             content=request.POST.get('content', '').strip(),
             metadata=metadata,
         )
-        response = render(request, 'records/partials/record_card.html', {'record': record})
-        response['HX-Trigger'] = 'recordCreated'
-        return response
+        # Transition to Detail view after save
+        return render(request, 'workspace/records/record_detail.html', {
+            'record': record,
+            'is_desk': False
+        })
 
     # GET — return the create form
     return render(request, 'workspace/records/partials/editorial_form.html', {

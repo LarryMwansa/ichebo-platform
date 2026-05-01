@@ -1,45 +1,50 @@
 {% extends "workspace/records/base.html" %}
 {% load static %}
 
+{# ── MAIN STAGE: The Editorial Desk ── #}
 {% block records_content %}
-<div class="ws-page-header" style="padding: var(--space-m) var(--space-m) 0;">
-    <div class="ws-page-header__left">
-        <div class="ws-label-tag">Steward Registry</div>
-        <h1 class="ws-page-title">My <em>Journal</em></h1>
-    </div>
-    <div class="ws-page-header__actions">
-        <button class="ws-topbar__cta"
-                hx-get="{% url 'records:htmx-create' %}"
-                hx-target="#main-content"
-                hx-push-url="true">
-            <span class="material-symbols-outlined">add</span>
-            New Record
-        </button>
-    </div>
-</div>
+    {% if is_desk %}
+        {% include "workspace/records/partials/editorial_form.html" %}
+    {% else %}
+        <div class="ws-page-header" style="padding: var(--space-m) var(--space-m) 0;">
+            <div class="ws-page-header__left">
+                <div class="ws-label-tag">Steward Registry</div>
+                <h1 class="ws-page-title">My <em>Journal</em></h1>
+            </div>
+            <div class="ws-page-header__actions">
+                <button class="ws-topbar__cta"
+                        hx-get="{% url 'records:htmx-create' %}"
+                        hx-target="#main-content"
+                        hx-push-url="true">
+                    <span class="material-symbols-outlined">add</span>
+                    New Record
+                </button>
+            </div>
+        </div>
 
-<div class="ws-content__inner" style="padding-top: var(--space-m);">
-    {# Filter Tabs (In-Stage) #}
-    <div style="display: flex; gap: 8px; margin-bottom: var(--space-l); overflow-x: auto; padding-bottom: 4px;">
-        <a href="{% url 'records:records-home' %}"
-           class="ws-icon-btn {% if not active_type %}active{% endif %}"
-           style="width: auto; padding: 0 var(--space-s); font-size: 12px; font-weight: 600;">
-            All
-        </a>
-        {% for value, label in record_types %}
-        <a href="{% url 'records:records-home' %}?type={{ value }}"
-           class="ws-icon-btn {% if active_type == value %}active{% endif %}"
-           style="width: auto; padding: 0 var(--space-s); font-size: 12px; font-weight: 600;">
-            {{ label }}
-        </a>
-        {% endfor %}
-    </div>
+        <div class="ws-content__inner" style="padding-top: var(--space-m);">
+            {# Filter Tabs #}
+            <div style="display: flex; gap: 8px; margin-bottom: var(--space-l); overflow-x: auto; padding-bottom: 4px;">
+                <a href="{% url 'records:records-home' %}"
+                   class="ws-icon-btn {% if not active_type %}active{% endif %}"
+                   style="width: auto; padding: 0 var(--space-s); font-size: 12px; font-weight: 600;">
+                    All
+                </a>
+                {% for value, label in record_types %}
+                <a href="{% url 'records:records-home' %}?type={{ value }}"
+                   class="ws-icon-btn {% if active_type == value %}active{% endif %}"
+                   style="width: auto; padding: 0 var(--space-s); font-size: 12px; font-weight: 600;">
+                    {{ label }}
+                </a>
+                {% endfor %}
+            </div>
 
-    {# The Registry Grid #}
-    <div id="record-list" class="ws-stat-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
-        {% include "records/partials/record_list.html" %}
-    </div>
-</div>
+            {# The Registry Grid #}
+            <div id="record-list" class="ws-stat-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+                {% include "records/partials/record_list.html" %}
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block ws_options %}

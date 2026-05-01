@@ -1,9 +1,9 @@
-{% extends "workspace/records/base.html" %}
-{% load static %}
+{# workspace/records/partials/editorial_form.html #}
+{# A standalone editorial surface for the Triple-Panel Stage #}
 
-{% block records_content %}
 <div class="editorial-stage">
     <form class="editorial-canvas" 
+          id="editorial-form"
           hx-post="{% url 'records:htmx-create' %}"
           hx-target="#main-content"
           hx-push-url="true">
@@ -21,21 +21,27 @@
             <button type="button" class="editorial-toolbar__btn" title="Link"><span class="material-symbols-outlined">link</span></button>
             
             <div style="margin-left: auto; display: flex; align-items: center; gap: var(--space-s);">
-                <div id="save-status" style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">Draft Saved</div>
+                <div id="save-status" style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">Desk Ready</div>
                 <button type="submit" class="ws-topbar__cta" style="padding: 0 var(--space-m);">
-                    Save & Publish
+                    Save Record
                 </button>
             </div>
         </div>
 
         {# 2. Title & Type #}
         <div style="margin-bottom: var(--space-m);">
-            <select name="record_type" id="record-type" class="ws-icon-btn" style="width: auto; padding: 0 var(--space-s); font-size: 11px; margin-bottom: 8px;">
-                {% for value, label in record_types %}
-                <option value="{{ value }}" {% if value == active_type %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-            <input type="text" name="title" id="record-title" placeholder="Record Title..." 
+            <div style="display: flex; align-items: center; gap: var(--space-s); margin-bottom: 8px;">
+                <select name="record_type" id="record-type" class="ws-icon-btn" style="width: auto; padding: 0 var(--space-s); font-size: 11px;">
+                    {% for value, label in record_types %}
+                    <option value="{{ value }}" {% if value == active_type %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <span style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">Draft Mode</span>
+            </div>
+            
+            <input type="text" name="title" id="record-title" 
+                   value="{{ record.title|default:'' }}"
+                   placeholder="Give your record a title..." 
                    class="editorial-title" 
                    style="width: 100%; border: none; background: transparent; outline: none;" 
                    required autofocus autofill="off">
@@ -44,28 +50,15 @@
         {# 3. The Markdown Editor #}
         <textarea name="content" id="editorial-editor" 
                   class="editorial-body" 
-                  placeholder="Begin drafting your record... Use Markdown or the toolbar above."
-                  style="width: 100%; min-height: 500px; border: none; background: transparent; outline: none; resize: vertical;"></textarea>
+                  placeholder="Begin writing... The word is alive."
+                  style="width: 100%; min-height: 60vh; border: none; background: transparent; outline: none; resize: none;">{{ record.content|default:'' }}</textarea>
     </form>
 </div>
 
+{# Re-init Editorial logic after HTMX swap #}
 <script src="{% static 'js/editorial_v2.js' %}"></script>
-{% endblock %}
-
-{% block ws_options %}
-    <div class="ws-options-section">
-        <div class="ws-label-tag">Draft Settings</div>
-        <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s); line-height: 1.5;">
-            Your draft is automatically saved to local storage every 3 seconds.
-        </p>
-    </div>
-    
-    <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
-    
-    <div class="ws-options-section">
-        <div class="ws-label-tag">References</div>
-        <div class="ws_detail-empty" style="padding: var(--space-s);">
-            Open the Bible sidecar tab for easy cross-referencing.
-        </div>
-    </div>
-{% endblock %}
+<script>
+    if (typeof EditorialUI !== 'undefined') {
+        EditorialUI.init();
+    }
+</script>
