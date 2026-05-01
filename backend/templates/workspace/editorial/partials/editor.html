@@ -32,23 +32,26 @@
 </div>
 
 <script>
-    // Initialize SimpleMDE (Obsidian-style)
-    var simplemde = new SimpleMDE({ 
+    // Initialize EasyMDE (Obsidian-style Live Preview)
+    var easymde = new EasyMDE({ 
         element: document.getElementById("editorial-editor"),
         spellChecker: false,
         status: false,
-        toolbar: false, // We use the right-click menu instead
+        toolbar: false,
+        forceSync: true,
         placeholder: "Begin writing... The word is alive. Right-click for tools.",
+        renderingConfig: {
+            singleLineBreaks: false,
+            codeSyntaxHighlighting: true,
+        },
         shortcuts: {
             "toggleBold": "Cmd-B",
             "toggleItalic": "Cmd-I",
         }
     });
 
-    // Sync with HTMX: SimpleMDE needs to update the hidden textarea before HTMX post
-    simplemde.codemirror.on("change", function(){
-        document.getElementById("editorial-editor").value = simplemde.value();
-    });
+    // Global reference for context menu
+    window.apostolicEditor = easymde;
 
     // Sync hero with dial
     document.body.addEventListener('dialChanged', (e) => {
@@ -60,7 +63,10 @@
 </script>
 
 <style>
-/* Integrate SimpleMDE with ICS Dark Theme */
+/* EasyMDE Dark Mode Integration */
+.EasyMDEContainer {
+    width: 100%;
+}
 .CodeMirror {
     background: transparent !important;
     color: var(--text-main) !important;
@@ -68,18 +74,17 @@
     font-family: 'Inter', sans-serif !important;
     font-size: 16px !important;
     line-height: 1.8 !important;
-    height: auto !important;
     min-height: 600px !important;
 }
+.CodeMirror-selected { background: rgba(255, 255, 255, 0.1) !important; }
+.CodeMirror-cursor { border-left: 2px solid var(--accent-red) !important; }
 
-.editor-preview-side, .editor-preview {
-    background: var(--surface-bg) !important;
-    color: var(--text-main) !important;
-}
-
-.CodeMirror-cursor {
-    border-left: 2px solid var(--accent-red) !important;
-}
+/* Real-time rendering styles */
+.cm-header-1 { font-size: 2em; color: var(--text-main); font-weight: 700; }
+.cm-header-2 { font-size: 1.5em; color: var(--text-main); font-weight: 600; }
+.cm-bold { font-weight: 700; color: var(--text-main); }
+.cm-italic { font-style: italic; }
+.cm-quote { color: var(--muted); font-style: italic; border-left: 2px solid var(--border-subtle); padding-left: 8px; }
 </style>
 
 <script>

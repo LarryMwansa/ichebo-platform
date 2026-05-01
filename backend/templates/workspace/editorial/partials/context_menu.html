@@ -152,20 +152,20 @@
     });
 
     function applyStyle(symbol) {
-        if (symbol === '**') simplemde.toggleBold();
-        else if (symbol === '_') simplemde.toggleItalic();
-        else if (symbol === '~~') simplemde.toggleStrikethrough();
+        const editor = window.apostolicEditor;
+        if (symbol === '**') editor.toggleBold();
+        else if (symbol === '_') editor.toggleItalic();
+        else if (symbol === '~~') editor.toggleStrikethrough();
         else {
-            const cm = simplemde.codemirror;
+            const cm = editor.codemirror;
             const selected = cm.getSelection();
             cm.replaceSelection(`${symbol}${selected}${symbol}`);
         }
     }
 
     function applyBlock(symbol) {
-        const cm = simplemde.codemirror;
+        const cm = window.apostolicEditor.codemirror;
         const cursor = cm.getCursor();
-        const line = cm.getLine(cursor.line);
         cm.replaceRange(symbol, {line: cursor.line, ch: 0});
     }
 
@@ -178,10 +178,10 @@
             'hr': '\n---\n'
         };
         const val = formats[type] || '';
-        simplemde.codemirror.replaceSelection(val);
+        window.apostolicEditor.codemirror.replaceSelection(val);
     }
 
     function insertAtCursor(val) {
-        simplemde.codemirror.replaceSelection(val);
+        window.apostolicEditor.codemirror.replaceSelection(val);
     }
 </script>
