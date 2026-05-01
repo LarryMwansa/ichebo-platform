@@ -34,27 +34,26 @@
     overflow: hidden; /* Prevent double scrollbars — sidebar scrolls, main scrolls */
   }
 
-  body.ws-active .ics-main {
-    /* Remove mobile-first constraints */
-    max-width: none;
-    margin-inline: 0;
-    padding-inline: 0;
-    padding-bottom: 0;      /* Remove bottom nav padding */
-    overflow-y: auto;
-    height: calc(100vh - 56px); /* 56px = ws-topbar height */
-  }
-
-  /* Hide mobile-only chrome */
-  body.ws-active .navbar { display: none; }
-  body.ws-active .bottom-bar { display: none; }
-  body.ws-active .fab { display: none; }
+  /* Hide mobile-only chrome and main content when workspace is active */
+  body.ws-active .ics-main { display: none !important; }
+  body.ws-active .navbar { display: none !important; }
+  body.ws-active .bottom-bar { display: none !important; }
+  body.ws-active .fab { display: none !important; }
 
   /* The workspace wrapper — full viewport */
   .ws-layout {
+    display: none; /* Hidden by default */
+  }
+
+  body.ws-active .ws-layout {
     display: flex;
     height: 100vh;
+    width: 100vw;
     overflow: hidden;
     background: var(--card); /* Stone #F5F3F0 — main content background */
+    position: fixed;
+    top: 0;
+    left: 0;
   }
 
 }

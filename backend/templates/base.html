@@ -33,19 +33,14 @@
   <script>
     (function () {
       function checkWs() {
-        if (window.innerWidth >= 1024) {
-          document.body.classList.add('ws-active');
-          var layout = document.getElementById('ws-layout');
-          if (layout) layout.removeAttribute('aria-hidden');
-          var main = document.getElementById('main-content');
-          if (main) main.setAttribute('aria-hidden', 'true');
-        } else {
-          document.body.classList.remove('ws-active');
-          var layout = document.getElementById('ws-layout');
-          if (layout) layout.setAttribute('aria-hidden', 'true');
-          var main = document.getElementById('main-content');
-          if (main) main.removeAttribute('aria-hidden');
-        }
+        var isDesktop = window.innerWidth >= 1024;
+        document.body.classList.toggle('ws-active', isDesktop);
+        
+        var layout = document.getElementById('ws-layout');
+        var main = document.getElementById('main-content');
+        
+        if (layout) layout.setAttribute('aria-hidden', !isDesktop);
+        if (main) main.setAttribute('aria-hidden', isDesktop);
       }
       checkWs();
       window.addEventListener('resize', checkWs, { passive: true });
@@ -73,11 +68,9 @@
   {# DESKTOP WORKSPACE (Level 3+, ≥ 1024px) aria-hidden toggled by inline script. #}
   {% if user.is_authenticated and user.competence_level >= 3 %}
   <div class="ws-layout" id="ws-layout" aria-hidden="true">
-
     {% include "components/_sidebar.html" %}
 
     <div class="ws-body">
-
       {# Topbar — override per page via ws_topbar block #}
       {% block ws_topbar %}
         {% include "components/_ws_topbar.html" %}
@@ -97,11 +90,12 @@
       {# Detail panel — HTMX target for master-detail layouts. Hidden until loaded. #}
       <div class="ws-detail-panel" id="ws-detail" aria-live="polite">
         <div class="ws-detail-empty">
-          <span class="material-symbols-outlined">arrow_back</span>
-          <span class="ws-detail-empty__label">Select an item to view details</span>
+          <div class="ws-detail-empty__icon">
+            <span class="material-symbols-outlined" style="font-size: 3rem; opacity: 0.1;">dock_to_left</span>
+          </div>
+          <p class="ws-detail-empty__label">Select an item to view details</p>
         </div>
       </div>
-
     </div>{# /ws-body #}
     {% include "components/_search_overlay.html" %}
   </div>{# /ws-layout #}
