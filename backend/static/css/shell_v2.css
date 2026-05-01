@@ -49,12 +49,28 @@
   padding: var(--space-s) 0;
   z-index: 100;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background var(--shell-transition), color var(--shell-transition);
+}
+
+html:not(.dark) .ics-sidebar {
+  background: var(--card-2);
+  color: var(--text);
+  border-right: 1px solid var(--border);
 }
 
 .ics-sidebar__logo {
   width: 32px;
   height: 32px;
   margin-bottom: var(--space-l);
+}
+
+.ics-logo {
+  filter: invert(1); /* Default for dark mode if logo is black */
+  transition: filter var(--transition-fast);
+}
+
+html:not(.dark) .ics-logo {
+  filter: none; /* Light mode uses original black/dark logo */
 }
 
 .ics-sidebar__nav {
@@ -76,9 +92,18 @@
   position: relative;
 }
 
+html:not(.dark) .ics-sidebar__item {
+  color: var(--muted);
+}
+
 .ics-sidebar__item:hover {
   color: #fff;
   background: rgba(255, 255, 255, 0.05);
+}
+
+html:not(.dark) .ics-sidebar__item:hover {
+  color: var(--text);
+  background: var(--hover);
 }
 
 .ics-sidebar__item.active {
@@ -107,8 +132,13 @@
   flex-direction: column;
   overflow: hidden;
   z-index: 90;
-  transition: opacity var(--shell-transition);
+  transition: all var(--shell-transition);
   opacity: var(--context-state);
+}
+
+html:not(.dark) .ics-context-bar {
+  background: var(--card);
+  border-right: 1px solid var(--border);
 }
 
 .ics-context-bar__header {
@@ -122,6 +152,11 @@
   font-weight: 700;
   font-size: var(--fz-0);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+html:not(.dark) .ics-context-bar__header {
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
 }
 
 .ics-context-bar__content {
