@@ -12,14 +12,10 @@
         <p class="ws-page-subtitle">Your active missions, habits, and spiritual disciplines.</p>
       </div>
       <div class="ws-page-header__actions">
-        <button class="ws-topbar__cta"
-                hx-get="{% url 'activity:htmx-create' %}"
-                hx-target="#drawerInner"
-                hx-swap="innerHTML"
-                onclick="window.ICSDrawer && window.ICSDrawer.open('New Activity')">
+        <a href="{% url 'governance:desk' %}?family=activity" class="ws-topbar__cta" style="text-decoration: none;">
           <span class="material-symbols-outlined">add</span>
           New Activity
-        </button>
+        </a>
       </div>
     </div>
 
@@ -128,13 +124,9 @@
 <div class="empty-state">
   <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2; margin-bottom: 20px; display: block;">event_busy</span>
   <p>No active missions or habits found.</p>
-  <button class="btn-touch btn-primary" style="margin-top: 16px;"
-          hx-get="{% url 'activity:htmx-create' %}"
-          hx-target="#drawerInner"
-          hx-swap="innerHTML"
-          onclick="window.ICSDrawer.open('New Activity')">
+  <a href="{% url 'governance:desk' %}?family=activity" class="btn-touch btn-primary" style="margin-top: 16px; text-decoration: none;">
     Start a Mission
-  </button>
+  </a>
 </div>
 {% endif %}
 

@@ -1,23 +1,90 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from records.models import Record
+from activity.models import Activity
 
 @login_required
 def universal_desk(request, record_id=None):
-    """
-    The Universal Desk — A single entry point for all ICS drafting.
-    """
+    """The Universal Desk — A single entry point for all ICS drafting."""
     record = None
     if record_id:
         record = Record.objects.filter(id=record_id, created_by=request.user).first()
     
+    # Context-aware initialization
+    initial_family = request.GET.get('family', 'journal')
+    initial_type = request.GET.get('type', 'note')
+    
+    if record:
+        initial_family = record.record_family
+        initial_type = record.record_type
+
     context = {
         'active_app': 'desk',
         'ws_page_title': 'The Desk',
         'record': record,
-        'active_type': record.record_type if record else 'note',
-        'save_url': '/records/htmx/create/' if not record else f'/records/htmx/record/{record.id}/edit/',
+        'active_family': initial_family,
+        'active_type': initial_type,
+        'save_url': '/governance/desk/save/',
         'is_desk': True,
     }
-    
     return render(request, 'workspace/editorial/desk_view.html', context)
+
+@login_required
+def universal_save(request):
+    """The Central Traffic Controller for all Desk saves"""
+    if request.method != 'POST':
+        return HttpResponse("Method not allowed", status=405)
+
+    family = request.POST.get('record_family', 'journal')
+    rtype = request.POST.get('record_type', 'note')
+    title = request.POST.get('title', 'Untitled').strip()
+    content = request.POST.get('content', '').strip()
+
+    # 1. Handle Activity Family
+    if family == 'activity':
+        activity = Activity.objects.create(
+            created_by=request.user,
+            activity_type=rtype,
+            title=title,
+            description=content,
+            due_at=request.POST.get('due_at') or None,
+            recurrence=request.POST.get('recurrence', 'none'),
+            kgs_pathway=request.POST.get('kgs_pathway', ''),
+            status='pending'
+        )
+        return HttpResponse(f'<div class="ws-alert ws-alert--success">Activity "{title}" Saved to Registry</div>')
+
+    # 2. Handle Governance Family
+    elif family == 'governance':
+        rclass = request.POST.get('record_class', 'governance')
+        version = request.POST.get('version', 1)
+        record = Record.objects.create(
+            created_by=request.user,
+            record_class=rclass,
+            record_family='governance',
+            record_type=rtype,
+            title=title,
+            content=content,
+            version=version,
+            status='draft'
+        )
+        return HttpResponse(f'''
+            <div class="ws-alert ws-alert--success">
+                <span class="material-symbols-outlined">gavel</span>
+                Governance {rtype.title()} Saved as Draft (v{version})
+            </div>
+        ''')
+
+    # 3. Handle Journal Family (Default)
+    else:
+        record = Record.objects.create(
+            created_by=request.user,
+            record_class='personal',
+            record_family='journal',
+            record_type=rtype,
+            title=title,
+            content=content,
+            status='active'
+        )
+        return HttpResponse(f'<div class="ws-alert ws-alert--success">Journal entry saved to Registry</div>')

@@ -7,6 +7,7 @@ urlpatterns = [
     # ── Workspace Shell Views ────────────────────────────────────────────────
     path('', views.governance_home, name='home'),
     path('desk/', desk_views.universal_desk, name='desk'),
+    path('desk/save/', desk_views.universal_save, name='save'),
     path('desk/<uuid:record_id>/', desk_views.universal_desk, name='desk-edit'),
     
     # ── Library ──────────────────────────────────────────────────────────────
