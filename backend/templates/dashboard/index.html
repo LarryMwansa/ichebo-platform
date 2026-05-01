@@ -15,25 +15,41 @@
    Completely separate from the mobile content block below.
    ═══════════════════════════════════════════════════════════ #}
 
+{% block context_content %}
+<div class="ws-list-panel__header" style="padding: 0; border-bottom: none;">
+  <div class="ws-label-tag">Steward Actions</div>
+  <div class="ws-feed" style="margin-top: var(--space-s);">
+    <button class="ws-btn ws-btn--primary" style="width: 100%; justify-content: flex-start;"
+            hx-get="{% url 'records:htmx-create' %}?record_type=dar"
+            hx-target="#drawerInner"
+            hx-swap="innerHTML"
+            onclick="window.ICSDrawer.open('Daily Activity Report')">
+      <span class="material-symbols-outlined">edit_note</span>
+      Write DAR
+    </button>
+  </div>
+</div>
+
+<div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+
+<div class="ws-label-tag">Local Files</div>
+<div class="ws-feed" style="margin-top: var(--space-s); opacity: 0.5;">
+  <div class="ws-list-item" style="border: none; padding: var(--space-xs) 0;">
+    <span class="material-symbols-outlined">draft</span>
+    <div class="ws-list-item__title">No local drafts</div>
+  </div>
+</div>
+{% endblock %}
+
 {% block ws_content %}
 <div class="ws-layout--grid">
 
   {# ── Page header ── #}
   <div class="ws-page-header">
     <div class="ws-page-header__left">
-      <div class="ws-label-tag">Workspace</div>
+      <div class="ws-label-tag">Apostolic Steward</div>
       <h1 class="ws-page-title">{{ user.display_name|default:user.email }}</h1>
-      <p class="ws-page-subtitle">{{ user.status|title }} &middot; Level {{ user.competence_level }} &middot; {{ digest.generated_at|slice:":10" }}</p>
-    </div>
-    <div class="ws-page-header__actions">
-      <button class="ws-topbar__cta"
-              hx-get="{% url 'records:htmx-create' %}?record_type=dar"
-              hx-target="#drawerInner"
-              hx-swap="innerHTML"
-              onclick="window.ICSDrawer.open('Daily Activity Report')">
-        <span class="material-symbols-outlined">edit_note</span>
-        Write DAR
-      </button>
+      <p class="ws-page-subtitle">{{ user.status|title }} &middot; Level {{ user.competence_level }}</p>
     </div>
   </div>
 
@@ -41,7 +57,7 @@
   <div class="ws-grid-stats">
     <div class="ws-stat-card {% if digest.dar_today %}ws-stat-card--success{% else %}ws-stat-card--warning{% endif %}">
       <div class="ws-stat-card__label">Daily Report</div>
-      <div class="ws-stat-card__value" style="font-size: var(--fz-2); color: {% if digest.dar_today %}var(--success){% else %}var(--warning){% endif %};">
+      <div class="ws-stat-card__value">
         {% if digest.dar_today %}Done{% else %}Pending{% endif %}
       </div>
       <div class="ws-stat-card__sub">
@@ -49,35 +65,24 @@
       </div>
     </div>
 
-    <div class="ws-stat-card {% if digest.overdue_items %}ws-stat-card--accent{% endif %}">
+    <div class="ws-stat-card">
       <div class="ws-stat-card__label">Pending Units</div>
       <div class="ws-stat-card__value">{{ digest.pending_count }}</div>
       <div class="ws-stat-card__sub">Active assignments</div>
     </div>
 
     {% if digest.overdue_items %}
-    <div class="ws-stat-card" style="border-left: 3px solid var(--error); padding-left: calc(var(--space-s) - 3px);">
+    <div class="ws-stat-card ws-stat-card--danger">
       <div class="ws-stat-card__label">Overdue</div>
-      <div class="ws-stat-card__value" style="color: var(--error);">{{ digest.overdue_items|length }}</div>
-      <div class="ws-stat-card__sub">Require immediate action</div>
-    </div>
-    {% endif %}
-
-    {% if digest.competence_level >= 3 %}
-    <div class="ws-stat-card ws-stat-card--info">
-      <div class="ws-stat-card__label">Team Support</div>
-      <div class="ws-stat-card__value">{{ digest.team_pending_count|default:0 }}</div>
-      <div class="ws-stat-card__sub">Members needing attention</div>
+      <div class="ws-stat-card__value">{{ digest.overdue_items|length }}</div>
+      <div class="ws-stat-card__sub">Action required</div>
     </div>
     {% endif %}
   </div>
 
   {# ── Primary two-column grid ── #}
   <div class="ws-grid-primary">
-
-    {# LEFT COLUMN — main workspace content #}
     <div class="ws-grid-left">
-
       {# Divine Intel — Paraclete prompt #}
       <div class="ws-dash-intel">
         <div class="ws-label-tag">Divine Intel</div>
@@ -85,75 +90,63 @@
           <span class="material-symbols-outlined ws-dash-intel__icon">auto_awesome</span>
           <blockquote class="ws-dash-intel__prompt">{{ digest.discipline_prompt }}</blockquote>
         </div>
-        {% if digest.prompt_pathway %}
-        <div class="ws-dash-intel__pathway">
-          {{ digest.prompt_pathway|title|cut:"_" }} Pathway
-        </div>
-        {% endif %}
         {% if digest.suggestions %}
         <div class="ws-dash-intel__actions">
           {% for s in digest.suggestions %}
-            {% if "/records/" in s.action_url and "dar" in s.action_url %}
-            <button class="ws-filter-pill active"
-                    hx-get="{% url 'records:htmx-create' %}?record_type=dar"
-                    hx-target="#drawerInner"
-                    hx-swap="innerHTML"
-                    onclick="window.ICSDrawer.open('Daily Activity Report')">
+            <a href="{{ s.action_url|default:'#' }}" class="ws-filter-pill">
               <span class="material-symbols-outlined">bolt</span>
               {{ s.text }}
-            </button>
-            {% else %}
-            <a href="{{ s.action_url|default:'#' }}" class="ws-filter-pill">
-              <span class="material-symbols-outlined">{% if s.priority == 1 %}priority_high{% else %}bolt{% endif %}</span>
-              {{ s.text }}
             </a>
-            {% endif %}
           {% endfor %}
         </div>
         {% endif %}
       </div>
 
-      {# Immediate Missions — overdue + due today #}
+      {# Immediate Missions ── #}
       {% if digest.overdue_items or digest.due_today %}
-      <div class="ws-card {% if digest.overdue_items %}ws-card--accent{% endif %}" style="margin-top: var(--space-m);">
+      <div class="ws-card" style="margin-top: var(--space-m);">
         <div class="ws-section-header">
-          <div class="ws-section-header__left">
-            <span class="ws-section-title" style="font-size: var(--fz-1);">Immediate Missions</span>
-            {% if digest.overdue_items %}
-            <span class="status-badge status-badge--danger">{{ digest.overdue_items|length }} overdue</span>
-            {% endif %}
-          </div>
-          <a href="{% url 'activity:activity-home' %}" class="ws-section-action">
-            Full timeline
-            <span class="material-symbols-outlined">arrow_forward</span>
-          </a>
+          <span class="ws-section-title">Immediate Missions</span>
         </div>
         <div class="ws-feed">
           {% for item in digest.overdue_items %}
-          <div class="ws-list-item" style="border-radius: var(--radius-s); border: 1px solid var(--border);">
-            <div>
-              <span class="status-badge status-badge--danger">{{ item.activity_type|slice:":3"|upper }}</span>
-            </div>
-            <div style="flex:1; min-width:0;">
-              <div class="ws-list-item__title">{{ item.title }}</div>
-              <div class="ws-list-item__meta" style="color: var(--error);">Overdue</div>
-            </div>
+          <div class="ws-list-item">
+            <span class="status-badge status-badge--danger">{{ item.activity_type|slice:":3"|upper }}</span>
+            <div class="ws-list-item__title">{{ item.title }}</div>
           </div>
           {% endfor %}
           {% for item in digest.due_today %}
-          <div class="ws-list-item" style="border-radius: var(--radius-s); border: 1px solid var(--border);">
-            <div>
-              <span class="status-badge status-badge--active">{{ item.activity_type|slice:":3"|upper }}</span>
-            </div>
-            <div style="flex:1; min-width:0;">
-              <div class="ws-list-item__title">{{ item.title }}</div>
-              <div class="ws-list-item__meta">Due today</div>
-            </div>
+          <div class="ws-list-item">
+            <span class="status-badge status-badge--active">{{ item.activity_type|slice:":3"|upper }}</span>
+            <div class="ws-list-item__title">{{ item.title }}</div>
           </div>
           {% endfor %}
         </div>
       </div>
       {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div class="ws-section-header" style="margin-bottom: var(--space-m);">
+  <span class="label-caps">Team Support</span>
+</div>
+{% if digest.team_pending_count %}
+  <div class="ws-stat-card ws-stat-card--info">
+    <div class="ws-stat-card__label">Pending Support</div>
+    <div class="ws-stat-card__value">{{ digest.team_pending_count }}</div>
+    <div class="ws-stat-card__sub">Members needing attention</div>
+  </div>
+{% else %}
+  <div class="ws-empty-state">
+    <span class="material-symbols-outlined">done_all</span>
+    <p>No team support requests</p>
+  </div>
+{% endif %}
+{% endblock %}
 
       {# Habit streaks #}
       {% if digest.habit_streaks %}
