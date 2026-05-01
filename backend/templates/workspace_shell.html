@@ -23,12 +23,22 @@
     /* Apostolic Design Tokens - Phase 8 */
     :root {
         --ink-bg: #0E0E0E;
-        --ink-2: #1A1A1A;
+        --ink-2: #161616;
         --stone-bg: #F5F3F0;
         --stone-2: #ECE9E4;
         --accent-red: #ff4757;
         --text-ink: #1A1A1A;
         --text-muted-ink: #636e72;
+        --border-ink: rgba(0,0,0,0.05);
+    }
+
+    /* Dark Mode Sovereign Shift */
+    html.dark :root {
+        --stone-bg: #111111;
+        --stone-2: #161616;
+        --text-ink: #F5F3F0;
+        --text-muted-ink: #9a9a9a;
+        --border-ink: rgba(255,255,255,0.08);
     }
 
     .ics-sidebar {
@@ -54,7 +64,7 @@
         height: 60%;
         width: 3px;
         background: var(--accent-red);
-        box-shadow: 0 0 10px var(--accent-red);
+        box-shadow: 0 0-10px var(--accent-red);
     }
 
     .ics-context-bar {
@@ -68,15 +78,17 @@
         letter-spacing: 0.5px;
     }
 
-    /* The Stage: Stone Aesthetic */
+    /* The Stage: Sovereign Shift Aesthetic */
     .ics-stage {
         background: var(--stone-bg);
+        color: var(--text-ink);
+        transition: background 0.3s ease, color 0.3s ease;
     }
 
     .ics-stage__topbar {
-        background: rgba(245, 243, 240, 0.8);
+        background: var(--stone-bg);
         backdrop-filter: blur(20px);
-        border-bottom: 1px solid rgba(0,0,0,0.05);
+        border-bottom: 1px solid var(--border-ink);
     }
 
     .ws-page-title, .editorial-title, .explore-title {
@@ -87,7 +99,8 @@
 
     .ics-options-bar {
         background: var(--stone-2);
-        border-left: 1px solid rgba(0,0,0,0.05);
+        border-left: 1px solid var(--border-ink);
+        color: var(--text-ink);
     }
 </style>
 {% endblock %}
