@@ -188,6 +188,41 @@ html:not(.dark) .ics-context-bar__header {
   padding: 0 var(--space-s);
   background: var(--bg);
   z-index: 10;
+  gap: var(--space-m);
+}
+
+.ws-topbar__search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: 0 12px;
+  height: 36px;
+  width: 200px;
+  transition: all var(--transition);
+}
+
+.ws-topbar__search:focus-within {
+  width: 300px;
+  border-color: var(--primary);
+  background: var(--bg);
+  box-shadow: 0 0 0 3px var(--primary-alpha);
+}
+
+.ws-topbar__search input {
+  border: none;
+  background: transparent;
+  font-size: var(--fz--1);
+  color: var(--text);
+  width: 100%;
+  outline: none;
+}
+
+.ws-topbar__search .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--muted);
 }
 
 .ws-icon-btn {
@@ -258,6 +293,42 @@ html:not(.dark) .ics-context-bar__header {
   flex: 1;
   overflow-y: auto;
   padding: var(--space-m);
+}
+
+/* Level Badge & Avatar Utils */
+.ws-sidebar__level-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 800;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,0.2);
+}
+
+.ws-sidebar__avatar {
+  border-radius: 50%;
+  background: var(--card-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-weight: 700;
+  color: var(--text);
+  border: 1px solid var(--border);
+  transition: transform var(--transition-fast);
+}
+
+.ws-sidebar__avatar:hover {
+  transform: scale(1.05);
+  border-color: var(--primary);
+}
+
+.ws-sidebar__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* ── Utils ── */

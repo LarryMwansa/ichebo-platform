@@ -66,13 +66,7 @@
                 </a>
             </nav>
 
-            <div style="margin-top: auto; display: flex; flex-direction: column; gap: var(--space-m);">
-                <button class="ics-sidebar__item" id="ics-theme-toggle" onclick="WorkspaceUI.toggleTheme()" title="Toggle Light/Dark Mode">
-                    <span class="material-symbols-outlined">contrast</span>
-                </button>
-                <a href="{% url 'accounts:profile' %}" class="ics-sidebar__item" title="Profile">
-                    <span class="material-symbols-outlined">person</span>
-                </a>
+            <div style="margin-top: auto; display: flex; flex-direction: column; gap: var(--space-m); padding-bottom: var(--space-m);">
                 <a href="{% url 'accounts:settings' %}" class="ics-sidebar__item" title="Settings">
                     <span class="material-symbols-outlined">settings</span>
                 </a>
@@ -113,7 +107,41 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: var(--space-s);">
-                    {% block stage_actions %}{% endblock %}
+                    
+                    {# Search Bar #}
+                    <div class="ws-topbar__search">
+                        <span class="material-symbols-outlined">search</span>
+                        <input type="text" placeholder="Search workspace..." aria-label="Search">
+                    </div>
+
+                    {# Notifications #}
+                    <button class="ws-icon-btn" title="Notifications">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+
+                    {# Theme Toggle #}
+                    <button class="ws-icon-btn" id="ics-theme-toggle" onclick="WorkspaceUI.toggleTheme()" title="Toggle Theme">
+                        <span class="material-symbols-outlined">contrast</span>
+                    </button>
+
+                    <div style="width: 1px; height: 24px; background: var(--border); margin: 0 var(--space-3xs);"></div>
+
+                    {# Level Badge #}
+                    <div class="ws-sidebar__level-dot" 
+                         style="background: var(--level-{{ user.competence_level|default:0 }}); width: 24px; height: 24px; font-size: 10px;"
+                         title="Level {{ user.competence_level }} Steward">
+                        {{ user.competence_level|default:0 }}
+                    </div>
+
+                    {# Profile Avatar #}
+                    <a href="{% url 'accounts:profile' %}" class="ws-sidebar__avatar" style="width: 32px; height: 32px; margin: 0;">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="{{ user.display_name }}">
+                        {% else %}
+                            {{ user.display_name|slice:":1"|upper|default:user.email|slice:":1"|upper }}
+                        {% endif %}
+                    </a>
+
                     <button class="ws-icon-btn" id="ics-options-toggle" onclick="WorkspaceUI.toggleOptions()" title="Toggle Options (⌘+] )">
                         <span class="material-symbols-outlined">dock_to_right</span>
                     </button>
