@@ -1,0 +1,161 @@
+{# templates/workspace/editorial/partials/command_dial.html #}
+<div class="command-dial">
+    <!-- Tier 1: The Family Dial (Primary Selection) -->
+    <div class="dial-container dial-primary">
+        <div class="dial-label">Registry Family</div>
+        <div class="dial-segments" id="dial-family-segments">
+            <button type="button" class="dial-segment active" data-family="journal" onclick="updateDial('journal')">Journal</button>
+            <button type="button" class="dial-segment" data-family="governance" onclick="updateDial('governance')">Governance</button>
+            <button type="button" class="dial-segment" data-family="activity" onclick="updateDial('activity')">Activity</button>
+            <button type="button" class="dial-segment" data-family="missions" onclick="updateDial('missions')">Missions</button>
+        </div>
+        <div class="dial-needle" id="family-needle"></div>
+    </div>
+
+    <!-- Tier 2: The Type Dial (Contextual Selection) -->
+    <div class="dial-container dial-secondary">
+        <div class="dial-label" id="type-dial-label">Record Type</div>
+        <div class="dial-segments" id="dial-type-segments">
+            <!-- Dynamically populated by JS -->
+        </div>
+    </div>
+</div>
+
+<style>
+.command-dial {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    background: var(--surface-1);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.dial-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+}
+
+.dial-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.dial-segments {
+    display: flex;
+    background: var(--surface-2);
+    border-radius: 4px;
+    padding: 2px;
+    gap: 2px;
+}
+
+.dial-segment {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.dial-segment:hover {
+    color: var(--text-main);
+    background: rgba(255,255,255,0.05);
+}
+
+.dial-segment.active {
+    background: var(--accent-red);
+    color: white;
+}
+
+.dial-secondary .dial-segment.active {
+    background: var(--surface-3);
+    color: var(--accent-red);
+    box-shadow: inset 0 0 0 1px var(--accent-red);
+}
+</style>
+
+<script>
+const DIAL_MAP = {
+    'journal': [
+        {val: 'prayer', label: 'Prayer'},
+        {val: 'spirit', label: 'Spirit'},
+        {val: 'dream', label: 'Dream'},
+        {val: 'note', label: 'General Note'}
+    ],
+    'governance': [
+        {val: 'decree', label: 'Decree'},
+        {val: 'protocol', label: 'Protocol'},
+        {val: 'ordinance', label: 'Ordinance'},
+        {val: 'mandate', label: 'Mandate'}
+    ],
+    'activity': [
+        {val: 'dar', label: 'Activity Report'},
+        {val: 'task', label: 'Steward Task'}
+    ],
+    'missions': [
+        {val: 'report', label: 'Mission Report'},
+        {val: 'prophetic', label: 'Prophetic Intel'}
+    ]
+};
+
+function updateDial(family) {
+    // Update Family Dial UI
+    document.querySelectorAll('.dial-primary .dial-segment').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.family === family);
+    });
+
+    // Update Type Dial UI
+    const container = document.getElementById('dial-type-segments');
+    const types = DIAL_MAP[family] || [];
+    
+    container.innerHTML = types.map(t => `
+        <button type="button" class="dial-segment" data-type="${t.val}" onclick="selectType('${t.val}', '${family}')">
+            ${t.label}
+        </button>
+    `).join('');
+
+    // Default select first type
+    if (types.length > 0) {
+        selectType(types[0].val, family);
+    }
+
+    // Update hidden fields in form
+    const form = document.getElementById('editorial-form');
+    if (form) {
+        const familyInput = form.querySelector('[name="record_family"]') || Object.assign(document.createElement('input'), {type: 'hidden', name: 'record_family'});
+        familyInput.value = family;
+        form.appendChild(familyInput);
+    }
+}
+
+function selectType(type, family) {
+    document.querySelectorAll('.dial-secondary .dial-segment').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.type === type);
+    });
+
+    const form = document.getElementById('editorial-form');
+    if (form) {
+        const typeInput = form.querySelector('[name="record_type"]') || Object.assign(document.createElement('input'), {type: 'hidden', name: 'record_type'});
+        typeInput.value = type;
+        form.appendChild(typeInput);
+        
+        // Update the "Registry Hub" label in the hub title if applicable
+        const status = document.getElementById('save-status');
+        if (status) status.textContent = `Drafting ${family.charAt(0).toUpperCase() + family.slice(1)}`;
+    }
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => updateDial('journal'));
+</script>

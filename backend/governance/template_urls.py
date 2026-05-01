@@ -1,11 +1,13 @@
 from django.urls import path
-from . import views
+from . import views, desk_views
 
 app_name = 'governance'
 
 urlpatterns = [
     # ── Workspace Shell Views ────────────────────────────────────────────────
     path('', views.governance_home, name='home'),
+    path('desk/', desk_views.universal_desk, name='desk'),
+    path('desk/<uuid:record_id>/', desk_views.universal_desk, name='desk-edit'),
     
     # ── Library ──────────────────────────────────────────────────────────────
     path('library/', views.library_home, name='library-home'),

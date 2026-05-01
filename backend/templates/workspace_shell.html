@@ -39,6 +39,11 @@
                    title="Dashboard" hx-boost="false">
                     <span class="material-symbols-outlined">dashboard</span>
                 </a>
+                <a href="{% url 'governance:desk' %}" 
+                   class="ics-sidebar__item {% if active_app == 'desk' %}active{% endif %}"
+                   title="The Desk" hx-boost="false">
+                    <span class="material-symbols-outlined">edit_note</span>
+                </a>
                 <a href="{% url 'records:records-home' %}" 
                    class="ics-sidebar__item {% if active_app == 'records' %}active{% endif %}"
                    title="Records & Journal" hx-boost="false">

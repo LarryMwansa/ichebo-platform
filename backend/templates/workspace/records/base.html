@@ -4,19 +4,19 @@
 {% block hub_context_title %}Records & Journal{% endblock %}
 
 {% block hub_context_nav %}
-    <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Journals</div>
+    <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Navigation</div>
     
     <nav class="ics-sidebar__nav" style="width: 100%;">
             <a href="{% url 'records:records-home' %}" 
-               class="ics-sidebar__item {% if not active_type %}active{% endif %}" 
+               class="ics-sidebar__item active" 
                style="width: 100%; justify-content: flex-start; padding: 0 var(--space-s); gap: 10px;">
-                <span class="material-symbols-outlined">description</span>
-                <span style="font-size: 13px;">My Journal</span>
+                <span class="material-symbols-outlined">history_edu</span>
+                <span style="font-size: 13px;">View Registry</span>
             </a>
-            <a href="{% url 'governance:home' %}" class="ics-sidebar__item" 
+            <a href="{% url 'dashboard:index' %}" class="ics-sidebar__item" 
                style="width: 100%; justify-content: flex-start; padding: 0 var(--space-s); gap: 10px;">
-                <span class="material-symbols-outlined">folder</span>
-                <span style="font-size: 13px;">Governance Acts</span>
+                <span class="material-symbols-outlined">dashboard</span>
+                <span style="font-size: 13px;">Command Center</span>
             </a>
         </nav>
 
