@@ -18,7 +18,7 @@
     <div class="ws-sidebar__section">
         <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Registers</div>
         <div style="display: flex; flex-direction: column; gap: 4px;">
-            <a href="{% url 'governance:library-home' %}" 
+            <a href="{% url 'governance:reference-home' %}" 
                class="ws-icon-btn {% if active_branch == 'library' %}active{% endif %}" 
                style="justify-content: flex-start; gap: 12px; padding: 0 12px; height: 40px; width: 100%;">
                 <span class="material-symbols-outlined" style="font-size: 20px;">library_books</span>
@@ -46,7 +46,7 @@
         <div style="display: flex; flex-direction: column; gap: 2px;">
             {% if active_branch == 'library' %}
                 {% for slug, label in library_types.items %}
-                <a href="{% url 'governance:library-list' slug %}" class="ws-nav-item {% if record_type == slug %}active{% endif %}" style="padding-left: 12px; height: 32px; font-size: 13px;">
+                <a href="{% url 'governance:reference-list' slug %}" class="ws-nav-item {% if record_type == slug %}active{% endif %}" style="padding-left: 12px; height: 32px; font-size: 13px;">
                     {{ label }}
                 </a>
                 {% endfor %}
