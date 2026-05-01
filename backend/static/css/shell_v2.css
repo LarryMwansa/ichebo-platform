@@ -18,7 +18,7 @@
   --actual-options-w: calc(var(--options-w) * var(--options-state));
   
   /* Surface Transitions */
-  --shell-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shell-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ── Shell Container ────────────────────────────────────────── */
@@ -29,16 +29,17 @@
     var(--actual-context-w) 
     1fr 
     var(--actual-options-w);
-  grid-template-rows: 56px 1fr;
+  grid-template-rows: 1fr; /* Topbar is now part of the stage */
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: var(--bg);
+  background: var(--ink); /* Base background is dark */
   transition: grid-template-columns var(--shell-transition);
 }
 
 /* ── Column 1: Primary Sidebar (Global Switcher) ────────────── */
 .ics-sidebar {
+  grid-column: 1;
   grid-row: 1 / -1;
   background: var(--ink);
   color: #fff;
@@ -47,6 +48,7 @@
   align-items: center;
   padding: var(--space-s) 0;
   z-index: 100;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .ics-sidebar__logo {
@@ -96,6 +98,7 @@
 
 /* ── Column 2: Context Bar (App Nav / Explorer) ─────────────── */
 .ics-context-bar {
+  grid-column: 2;
   grid-row: 1 / -1;
   background: var(--ink-2);
   border-right: 1px solid rgba(255, 255, 255, 0.05);
@@ -112,6 +115,7 @@
   padding: 0 var(--space-s);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   color: #fff;
   font-family: var(--ff-display);
   font-weight: 700;
@@ -127,11 +131,16 @@
 
 /* ── Column 3: The Stage (Main Working Area) ────────────────── */
 .ics-stage {
+  grid-column: 3;
+  grid-row: 1 / -1;
   background: var(--card); /* Stone */
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.05);
+  border-left: 1px solid var(--border);
+  min-width: 480px; /* Prevent being squeezed out */
 }
 
 .ics-stage__topbar {
@@ -140,9 +149,33 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-l);
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(8px);
+  padding: 0 var(--space-s);
+  background: var(--bg);
+  z-index: 10;
+}
+
+.ws-icon-btn {
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-s);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ws-icon-btn:hover {
+  background: var(--hover);
+  border-color: var(--muted-light);
+}
+
+.ws-icon-btn.active {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary-alpha);
 }
 
 .ics-stage__content {
@@ -157,12 +190,13 @@
 /* The Document Canvas */
 .ics-canvas {
   width: 100%;
-  max-width: 800px;
-  padding: 0 var(--space-l);
+  max-width: 900px;
+  padding: 0 var(--space-m);
 }
 
 /* ── Column 4: Options Bar (Metadata / Right Pane) ──────────── */
 .ics-options-bar {
+  grid-column: 4;
   grid-row: 1 / -1;
   background: var(--card-2); /* Stone 2 */
   border-left: 1px solid var(--border);
@@ -181,6 +215,7 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border);
+  background: var(--card); /* Contrast with Stone 2 */
 }
 
 .ics-options-bar__content {

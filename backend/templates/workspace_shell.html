@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +15,7 @@
     <!-- Core CSS -->
     <link rel="stylesheet" href="{% static 'css/variables.css' %}">
     <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/workspace.css' %}?v=1">
     <link rel="stylesheet" href="{% static 'css/shell_v2.css' %}?v=1">
     
     {% block extra_css %}{% endblock %}
@@ -78,9 +79,14 @@
         <!-- Column 2: Context Bar (App Tools / Navigation) -->
         <nav class="ics-context-bar" id="ics-context-bar" aria-label="App Context">
             <header class="ics-context-bar__header">
-                {% block context_header %}
-                    {{ active_app|title }}
-                {% endblock %}
+                <span>
+                    {% block context_header %}
+                        {{ active_app|title }}
+                    {% endblock %}
+                </span>
+                <button class="ws-icon-btn ws-icon-btn--dark" onclick="WorkspaceUI.toggleContext()" title="Collapse Context Bar">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">menu_open</span>
+                </button>
             </header>
             <div class="ics-context-bar__content">
                 {% block context_content %}
@@ -93,7 +99,7 @@
         <main class="ics-stage" id="main-stage">
             <header class="ics-stage__topbar">
                 <div style="display: flex; align-items: center; gap: var(--space-s);">
-                    <button class="ws-icon-btn" onclick="WorkspaceUI.toggleContext()" title="Toggle Context Bar (⌘+[ )">
+                    <button class="ws-icon-btn" id="ics-context-toggle" onclick="WorkspaceUI.toggleContext()" title="Toggle Context Bar (⌘+[ )">
                         <span class="material-symbols-outlined">menu_open</span>
                     </button>
                     <div class="ws-topbar__breadcrumb">
@@ -105,7 +111,7 @@
 
                 <div style="display: flex; align-items: center; gap: var(--space-s);">
                     {% block stage_actions %}{% endblock %}
-                    <button class="ws-icon-btn" onclick="WorkspaceUI.toggleOptions()" title="Toggle Options (⌘+] )">
+                    <button class="ws-icon-btn" id="ics-options-toggle" onclick="WorkspaceUI.toggleOptions()" title="Toggle Options (⌘+] )">
                         <span class="material-symbols-outlined">dock_to_right</span>
                     </button>
                 </div>

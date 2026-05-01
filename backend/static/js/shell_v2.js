@@ -37,12 +37,24 @@ const WorkspaceUI = {
     root.style.setProperty('--context-state', this.state.contextOpen ? '1' : '0');
     root.style.setProperty('--options-state', this.state.optionsOpen ? '1' : '0');
     
-    // Toggle aria-hidden for accessibility
+    // Toggle icons and visibility
     const contextBar = document.getElementById('ics-context-bar');
     const optionsBar = document.getElementById('ics-options-bar');
+    const contextToggle = document.getElementById('ics-context-toggle');
+    const optionsToggle = document.getElementById('ics-options-toggle');
     
     if (contextBar) contextBar.setAttribute('aria-hidden', !this.state.contextOpen);
     if (optionsBar) optionsBar.setAttribute('aria-hidden', !this.state.optionsOpen);
+
+    // Update Stage Toggles
+    if (contextToggle) {
+        contextToggle.querySelector('.material-symbols-outlined').textContent = this.state.contextOpen ? 'menu_open' : 'menu';
+        contextToggle.classList.toggle('active', this.state.contextOpen);
+    }
+    if (optionsToggle) {
+        optionsToggle.querySelector('.material-symbols-outlined').textContent = this.state.optionsOpen ? 'dock_to_right' : 'info';
+        optionsToggle.classList.toggle('active', this.state.optionsOpen);
+    }
   },
 
   toggleContext() {
