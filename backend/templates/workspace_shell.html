@@ -86,9 +86,6 @@
                         {{ active_app|title }}
                     {% endblock %}
                 </span>
-                <button class="ws-icon-btn ws-icon-btn--dark" onclick="WorkspaceUI.toggleContext()" title="Collapse Context Bar">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">menu_open</span>
-                </button>
             </header>
             <div class="ics-context-bar__content">
                 {% block context_content %}
@@ -102,7 +99,7 @@
             <header class="ics-stage__topbar">
                 <div style="display: flex; align-items: center; gap: var(--space-s);">
                     <button class="ws-icon-btn" id="ics-context-toggle" onclick="WorkspaceUI.toggleContext()" title="Toggle Context Bar (⌘+[ )">
-                        <span class="material-symbols-outlined">menu_open</span>
+                        <span class="material-symbols-outlined">dock_to_right</span>
                     </button>
                     <div class="ws-topbar__breadcrumb">
                         {% block breadcrumb %}
