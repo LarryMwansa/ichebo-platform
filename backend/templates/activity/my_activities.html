@@ -53,111 +53,31 @@
                     {% include "activity/partials/activity_card.html" with activity=activity %}
                 {% endfor %}
                 {% for activity in upcoming %}
+                    {% include "activity/partials/activity_card.html" with activity=activity %}
+                {% endfor %}
             </div>
         </div>
+
+        {# 3. Empty State #}
+        {% if not overdue and not due_today and not upcoming %}
+        <div class="ws-empty-state" style="padding: 100px 0; text-align: center;">
+            <span class="material-symbols-outlined" style="font-size: 64px; opacity: 0.05;">verified</span>
+            <p style="font-size: 14px; color: var(--muted); margin-top: 20px; font-weight: 500;">All mandates secured. You are in perfect momentum.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
 <style>
-.activity-timeline-v2 {
-    padding: 40px 0;
-    max-width: 800px;
-}
-.segment-label-caps {
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    opacity: 0.7;
-}
-.timeline-items {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-/* Connect cards to axis */
-.timeline-items > * {
-    position: relative;
-}
-.timeline-items > *::before {
-    content: '';
-    position: absolute;
-    left: -42px;
-    top: 24px;
-    width: 12px;
-    height: 2px;
-    background: rgba(0,0,0,0.1);
+.sovereign-timeline {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 0 100px 0;
 }
 </style>
 {% endblock %}
 
-{# Zone 4: Ministry Vitals #}
+{# Zone 4: Tactical Intel #}
 {% block ws_options %}
     {% include "activity/partials/activity_intel.html" %}
-{% endblock %}
-
-
-{% block activity_content %}
-
-<div class="activity-page">
-  <header class="explore-header" style="margin-bottom: 0;">
-    <h1 class="explore-title">Personal</h1>
-  </header>
-
-  <div style="display: flex; gap: 8px; overflow-x: auto; padding: 0.75rem 0 1rem; scrollbar-width: none; -webkit-overflow-scrolling: touch; flex-wrap: nowrap;">
-    <a href="{% url 'activity:activity-home' %}"
-       style="flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
-              {% if not active_type %}background: var(--primary); color: #fff;{% else %}background: var(--hover); color: var(--muted);{% endif %}">
-      All
-    </a>
-    {% for slug, label in activity_types %}
-    <a href="{% url 'activity:activity-home' %}?type={{ slug }}"
-       style="flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
-              {% if active_type == slug %}background: var(--primary); color: #fff;{% else %}background: var(--hover); color: var(--muted);{% endif %}">
-      {{ label }}
-    </a>
-    {% endfor %}
-  </div>
-
-<!-- Overdue -->
-<div class="activity-group" id="group-overdue" {% if not overdue %}style="display:none;"{% endif %}>
-  <div class="label-caps" style="color: var(--danger);">Overdue</div>
-  <div class="list-group" id="activity-list-overdue">
-    {% for activity in overdue %}
-      {% include "activity/partials/activity_card.html" %}
-    {% endfor %}
-  </div>
-</div>
-
-<!-- Due Today -->
-<div class="activity-group" id="group-today" {% if not due_today %}style="display:none;"{% endif %}>
-  <div class="label-caps">Due Today</div>
-  <div class="list-group" id="activity-list-today">
-    {% for activity in due_today %}
-      {% include "activity/partials/activity_card.html" %}
-    {% endfor %}
-  </div>
-</div>
-
-<!-- Upcoming -->
-<div class="activity-group" id="group-upcoming">
-  <div class="label-caps">Upcoming</div>
-  <div class="list-group" id="activity-list-upcoming">
-    {% for activity in upcoming %}
-      {% include "activity/partials/activity_card.html" %}
-    {% endfor %}
-  </div>
-</div>
-
-{% if not overdue and not due_today and not upcoming %}
-<div class="empty-state">
-  <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2; margin-bottom: 20px; display: block;">event_busy</span>
-  <p>No active missions or habits found.</p>
-  <a href="{% url 'governance:desk' %}?family=activity" class="btn-touch btn-primary" style="margin-top: 16px; text-decoration: none;">
-    Start a Mission
-  </a>
-</div>
-{% endif %}
-
 {% endblock %}
