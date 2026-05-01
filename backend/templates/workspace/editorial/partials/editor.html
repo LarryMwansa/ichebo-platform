@@ -1,33 +1,54 @@
 {# templates/workspace/editorial/partials/editor.html — Unified Editorial Desk #}
 {% include "workspace/editorial/partials/context_menu.html" %}
 
-<div class="editorial-canvas" style="padding-top: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; background: var(--surface-bg);">
+<div class="editorial-desk">
     
-    <!-- Heading Hero: Design System Standard -->
-    <div class="editorial-hero" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); margin-bottom: 40px;">
-        <div class="ws-label-tag" style="margin-bottom: 8px;">Apostolic Drafting</div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <h1 class="ws-page-title" style="margin: 0; font-size: 32px;" id="hero-title">New <em>Record</em></h1>
-            <div id="hero-breadcrumb" style="font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-outlined" style="font-size: 16px;">chevron_right</span>
-                <span id="hero-family-label">Journal</span>
+    {# 1. Minimalist Sticky Toolbar #}
+    <div class="editorial-sticky-toolbar" style="position: sticky; top: 0; background: var(--surface-bg); padding: 10px 0; border-bottom: 1px solid var(--border-color); z-index: 100;">
+        <div class="toolbar-inner" style="display: flex; gap: 15px; align-items: center; justify-content: center;">
+            <button onclick="window.apostolicEditor.toggleBold()"><b>B</b></button>
+            <button onclick="window.apostolicEditor.toggleItalic()"><i>I</i></button>
+            <div class="toolbar-divider"></div>
+            <button onclick="window.apostolicEditor.toggleHeading1()">H1</button>
+            <button onclick="window.apostolicEditor.toggleHeading2()">H2</button>
+            <div class="toolbar-status" id="draft-pulse">
+                <span class="status-text" id="draft-status" style="font-size: 12px; color: var(--muted);">Saved</span>
             </div>
         </div>
     </div>
 
-    <div class="editorial-workspace" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); flex: 1;">
-        <form id="editorial-form" class="editorial-form" style="display: flex; flex-direction: column; gap: 20px; height: 100%;">
-            <input type="hidden" name="record_family" id="hidden-record-family" value="journal">
-            <input type="hidden" name="record_type" id="hidden-record-type" value="{{ record.record_type|default:active_type }}">
-            
-            <input type="text" name="title" class="editorial-title-input" 
-                   style="font-size: 28px; font-weight: 700; border: none; background: transparent; color: var(--text-main); outline: none; width: 100%;"
-                   placeholder="Untitled Record..." value="{{ record.title|default:'' }}"
-                   oninput="document.getElementById('hero-title').innerHTML = this.value || 'New <em>Record</em>'">
-            
-            <textarea name="content" id="editorial-editor" class="editorial-editor-textarea editorial-body"
-                placeholder="Begin writing... The word is alive. Right-click for tools.">{{ record.content|default:'' }}</textarea>
-        </form>
+    <div class="editorial-canvas" style="padding-top: 40px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; background: var(--stone-bg);">
+        
+        <!-- Heading Hero: Design System Standard -->
+        <div class="editorial-hero" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); margin-bottom: 50px;">
+            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red); font-weight: 700;">Apostolic Drafting <span id="draft-status-hero" style="margin-left:15px; font-weight: 400; opacity: 0.6; font-family: 'Inter', sans-serif;"></span></div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <h1 class="ws-page-title" style="margin: 0; font-size: 36px; font-family: 'Playfair Display', serif; font-weight: 800; color: var(--ink-bg);" id="hero-title">New Record</h1>
+                <div id="hero-breadcrumb" style="font-size: 14px; color: var(--muted); display: flex; align-items: center; gap: 10px; font-family: 'Inter', sans-serif;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; opacity: 0.4;">chevron_right</span>
+                    <span id="hero-family-label" style="text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Journal</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="editorial-workspace" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); flex: 1;">
+            <form id="editorial-form" class="editorial-form" 
+                  style="display: flex; flex-direction: column; gap: 20px; height: 100%;"
+                  hx-post="{{ save_url }}" 
+                  hx-trigger="save-pulse"
+                  hx-swap="none">
+                <input type="hidden" name="record_family" id="hidden-record-family" value="journal">
+                <input type="hidden" name="record_type" id="hidden-record-type" value="{{ record.record_type|default:active_type }}">
+                
+                <input type="text" name="title" class="editorial-title-input" 
+                       style="font-size: 28px; font-weight: 700; border: none; background: transparent; color: var(--text-main); outline: none; width: 100%;"
+                       placeholder="Untitled Record..." value="{{ record.title|default:'' }}"
+                       oninput="document.getElementById('hero-title').innerHTML = this.value || 'New <em>Record</em>'">
+                
+                <textarea name="content" id="editorial-editor" class="editorial-editor-textarea editorial-body"
+                    placeholder="Begin writing... The word is alive. Right-click for tools.">{{ record.content|default:'' }}</textarea>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -96,10 +117,45 @@
 </style>
 
 <script>
-    // Sync record type picker
-    document.getElementById('record-type').addEventListener('change', function () {
-        document.getElementById('hidden-record-type').value = this.value;
+    // 1. Sync hidden inputs with Dial
+    document.body.addEventListener('dialChanged', (e) => {
+        document.getElementById('hidden-record-family').value = e.detail.family;
+        document.getElementById('hidden-record-type').value = e.detail.type;
+        document.getElementById('hero-type-label').textContent = e.detail.type.charAt(0).toUpperCase() + e.detail.type.slice(1);
     });
 
-    // Auto-save logic could be added here later
+    // 2. Debounced Auto-Save Pulse
+    let saveTimeout;
+    const statusHero = document.getElementById('draft-status-hero');
+    const statusToolbar = document.getElementById('draft-status');
+
+    function triggerSave() {
+        statusHero.textContent = 'Saving...';
+        statusToolbar.textContent = 'Saving...';
+        
+        // Ensure textarea is synced before HTMX takes over
+        document.getElementById('editorial-editor').value = window.apostolicEditor.value();
+        
+        // Trigger HTMX
+        htmx.trigger('#editorial-form', 'save-pulse');
+    }
+
+    window.apostolicEditor.codemirror.on('change', () => {
+        statusHero.textContent = 'Drafting...';
+        statusToolbar.textContent = 'Drafting...';
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(triggerSave, 2000); // 2 second debounce
+    });
+
+    // 3. HTMX Success Feedback
+    document.body.addEventListener('htmx:afterRequest', (e) => {
+        if (e.detail.elt.id === 'editorial-form') {
+            statusHero.textContent = 'Saved';
+            statusToolbar.textContent = 'Saved';
+            setTimeout(() => {
+                statusHero.textContent = '';
+                statusToolbar.textContent = 'Ready';
+            }, 3000);
+        }
+    });
 </script>

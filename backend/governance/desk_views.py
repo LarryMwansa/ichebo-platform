@@ -19,6 +19,17 @@ def universal_desk(request, record_id=None):
         initial_family = record.record_family
         initial_type = record.record_type
 
+    # Fetch Explorer Data
+    recent_records = Record.objects.filter(created_by=request.user).order_by('-updated_at')[:10]
+    journal_drafts = Record.objects.filter(created_by=request.user, record_family='journal').order_by('-updated_at')[:5]
+    gov_drafts = Record.objects.filter(created_by=request.user, record_family='governance').order_by('-updated_at')[:5]
+    active_missions = Activity.objects.filter(created_by=request.user, status='pending').order_by('-created_at')[:5]
+
+    # Fetch Relationships
+    current_relationships = []
+    if record:
+        current_relationships = record.outgoing_relationships.select_related('to_record', 'bible_verse').all()
+
     context = {
         'active_app': 'desk',
         'ws_page_title': 'The Desk',
@@ -27,6 +38,13 @@ def universal_desk(request, record_id=None):
         'active_type': initial_type,
         'save_url': '/governance/desk/save/',
         'is_desk': True,
+        # Explorer context
+        'recent_records': recent_records,
+        'journal_drafts': journal_drafts,
+        'gov_drafts': gov_drafts,
+        'active_missions': active_missions,
+        # Relationships context
+        'current_relationships': current_relationships,
     }
     return render(request, 'workspace/editorial/desk_view.html', context)
 

@@ -1,0 +1,166 @@
+{# templates/workspace/editorial/partials/file_explorer.html #}
+<div class="ics-explorer">
+    
+    {# Recent Documents #}
+    <div class="explorer-section">
+        <div class="explorer-header">
+            <span class="material-symbols-outlined">history</span>
+            <span class="label-caps">Recent</span>
+        </div>
+        <div class="explorer-list">
+            {% for rec in recent_records %}
+                <a href="{% url 'governance:desk-edit' rec.id %}" class="explorer-item {% if record.id == rec.id %}active{% endif %}">
+                    <span class="material-symbols-outlined explorer-icon">{{ rec.record_type|default:'note'|slice:":1" }}</span>
+                    <span class="explorer-name">{{ rec.title|default:'Untitled' }}</span>
+                </a>
+            {% empty %}
+                <div class="explorer-empty">No recent drafts</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# Kingdom Folders #}
+    <div class="explorer-section">
+        <div class="explorer-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="material-symbols-outlined">folder_open</span>
+            <span class="label-caps">Kingdom Folders</span>
+            <span class="material-symbols-outlined expand-icon">expand_more</span>
+        </div>
+        
+        <div class="explorer-group">
+            <div class="explorer-subgroup">
+                <div class="subgroup-label">Journals</div>
+                {% for draft in journal_drafts %}
+                <a href="{% url 'governance:desk-edit' draft.id %}" class="explorer-item">
+                    <span class="material-symbols-outlined explorer-icon">edit_square</span>
+                    <span class="explorer-name">{{ draft.title|default:'Draft' }}</span>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div class="explorer-subgroup">
+                <div class="subgroup-label">Governance</div>
+                {% for draft in gov_drafts %}
+                <a href="{% url 'governance:desk-edit' draft.id %}" class="explorer-item">
+                    <span class="material-symbols-outlined explorer-icon">gavel</span>
+                    <span class="explorer-name">{{ draft.title|default:'Act' }}</span>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div class="explorer-subgroup">
+                <div class="subgroup-label">Missions</div>
+                {% for mission in active_missions %}
+                <a href="{% url 'governance:desk' %}?family=activity&type={{ mission.activity_type }}" class="explorer-item">
+                    <span class="material-symbols-outlined explorer-icon">rocket_launch</span>
+                    <span class="explorer-name">{{ mission.title|default:'Task' }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+.ics-explorer {
+    padding: var(--space-s) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+}
+
+.explorer-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.explorer-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px var(--space-m);
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.explorer-header:hover {
+    color: #fff;
+}
+
+.explorer-header .label-caps {
+    font-size: 10px;
+    letter-spacing: 1px;
+    flex: 1;
+}
+
+.explorer-header .expand-icon {
+    font-size: 16px;
+}
+
+.explorer-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.explorer-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px var(--space-m);
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    font-size: 13px;
+    border-radius: 4px;
+    margin: 0 8px;
+    transition: all 0.2s;
+}
+
+.explorer-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+}
+
+.explorer-item.active {
+    background: rgba(255,255,255,0.08);
+    color: var(--accent-red);
+}
+
+.explorer-icon {
+    font-size: 16px;
+    opacity: 0.5;
+}
+
+.explorer-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.explorer-subgroup {
+    padding: 8px 0;
+}
+
+.subgroup-label {
+    padding: 4px calc(var(--space-m) + 24px);
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.explorer-empty {
+    padding: 8px var(--space-m);
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+}
+
+/* Collapsible Logic */
+.explorer-section.collapsed .explorer-group {
+    display: none;
+}
+.explorer-section.collapsed .expand-icon {
+    transform: rotate(-90deg);
+}
+</style>

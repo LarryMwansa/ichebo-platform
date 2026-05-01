@@ -18,7 +18,79 @@
     <link rel="stylesheet" href="{% static 'css/workspace.css' %}?v=1">
     <link rel="stylesheet" href="{% static 'css/shell_v2.css' %}?v=1">
     
-    {% block extra_css %}{% endblock %}
+    {% block extra_css %}
+<style>
+    /* Apostolic Design Tokens - Phase 8 */
+    :root {
+        --ink-bg: #0E0E0E;
+        --ink-2: #1A1A1A;
+        --stone-bg: #F5F3F0;
+        --stone-2: #ECE9E4;
+        --accent-red: #ff4757;
+        --text-ink: #1A1A1A;
+        --text-muted-ink: #636e72;
+    }
+
+    .ics-sidebar {
+        background: var(--ink-bg);
+        border-right: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .ics-sidebar__item {
+        position: relative;
+        color: rgba(255,255,255,0.4);
+        transition: all 0.2s ease;
+    }
+
+    .ics-sidebar__item:hover { color: #fff; }
+    .ics-sidebar__item.active { color: #fff; }
+
+    /* Rule of Left: 3px red rule for active state */
+    .ics-sidebar__item.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 20%;
+        height: 60%;
+        width: 3px;
+        background: var(--accent-red);
+        box-shadow: 0 0 10px var(--accent-red);
+    }
+
+    .ics-context-bar {
+        background: var(--ink-2);
+        border-right: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .ics-context-bar__header {
+        color: #fff;
+        font-family: 'Playfair Display', serif;
+        letter-spacing: 0.5px;
+    }
+
+    /* The Stage: Stone Aesthetic */
+    .ics-stage {
+        background: var(--stone-bg);
+    }
+
+    .ics-stage__topbar {
+        background: rgba(245, 243, 240, 0.8);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .ws-page-title, .editorial-title, .explore-title {
+        font-family: 'Playfair Display', serif !important;
+        font-weight: 800 !important;
+        color: var(--text-ink) !important;
+    }
+
+    .ics-options-bar {
+        background: var(--stone-2);
+        border-left: 1px solid rgba(0,0,0,0.05);
+    }
+</style>
+{% endblock %}
 
     <!-- HTMX -->
     <script src="{% static 'js/htmx.min.js' %}" defer></script>
