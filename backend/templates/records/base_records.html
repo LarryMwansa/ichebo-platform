@@ -1,32 +1,43 @@
-{% extends "base.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/records.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
 {% endblock %}
 
+{# ── CONTEXT BAR: Folders & Records Navigation ── #}
+{% block ws_context %}
+    <div class="ics-context-bar__header">
+        <span class="label-caps">Records & Journal</span>
+    </div>
+    
+    <div class="ics-context-bar__content">
+        <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Journals</div>
+        
+        <nav class="ics-sidebar__nav" style="width: 100%;">
+            <a href="{% url 'records:records-home' %}" 
+               class="ics-sidebar__item active" 
+               style="width: 100%; justify-content: flex-start; padding: 0 var(--space-s); gap: 10px;">
+                <span class="material-symbols-outlined">description</span>
+                <span style="font-size: 13px;">My Journal</span>
+            </a>
+            <a href="#" class="ics-sidebar__item" 
+               style="width: 100%; justify-content: flex-start; padding: 0 var(--space-s); gap: 10px; opacity: 0.5;">
+                <span class="material-symbols-outlined">folder</span>
+                <span style="font-size: 13px;">Governance Acts</span>
+            </a>
+        </nav>
 
-{# ── WORKSPACE tab bar ── #}
-{% block ws_tabs %}
-<div class="ws-tab-row">
-  <a href="{% url 'records:records-home' %}"
-     class="ws-tab {% if request.resolver_match.url_name == 'records-home' %}active{% endif %}">
-    My Journal
-  </a>
-</div>
+        <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+        
+        <div class="ws-label-tag">Recent Drafts</div>
+        <div class="ws_detail-empty" style="padding: var(--space-s); font-size: 12px; color: var(--muted);">
+            No local drafts found.
+        </div>
+    </div>
 {% endblock %}
 
-{# ws_content — overridden per sub-template #}
-{% block ws_content %}{% endblock %}
-
-
-{# ── MOBILE — unchanged ── #}
-{% block content %}
-<div class="records-shell">
-
-  <div class="records-content">
+{# ── MAIN STAGE: The Editorial Canvas ── #}
+{% block ws_content %}
     {% block records_content %}{% endblock %}
-  </div>
-
-</div>
 {% endblock %}
