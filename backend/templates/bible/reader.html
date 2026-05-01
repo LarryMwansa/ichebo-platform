@@ -4,6 +4,7 @@
 {% block title %}Bible · {{ book.name }} {{ chapter }}{% endblock %}
 
 {% block bible_topbar %}
+{% if not request.GET.view == 'sidecar' %}
 <div class="bible-topbar" style="height: 48px;">
   <div style="display: flex; align-items: center; gap: 4px;">
     <a href="{% url 'dashboard:index' %}" class="btn-touch" aria-label="Go Back" style="color: var(--text); border:none; background:transparent;">
@@ -30,6 +31,7 @@
     </button>
   </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -43,6 +45,7 @@
 {% endblock %}
 
 {% block bible_nav_strip %}
+{% if not request.GET.view == 'sidecar' %}
 <div class="bible-nav-strip">
   <button class="btn-touch"
           onclick="navChapter(-1)"
@@ -66,6 +69,7 @@
     <span class="material-symbols-outlined">chevron_right</span>
   </button>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}

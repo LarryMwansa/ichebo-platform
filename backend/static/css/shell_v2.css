@@ -292,7 +292,55 @@ html:not(.dark) .ics-context-bar__header {
 .ics-options-bar__content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-m);
+  position: relative;
+}
+
+/* ── Options Tabs ── */
+.ics-options-tabs {
+  display: flex;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 var(--space-xs);
+  gap: var(--space-xs);
+}
+
+.ics-options-tab {
+  padding: var(--space-xs) var(--space-2xs);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ics-options-tab:hover {
+  color: var(--text);
+}
+
+.ics-options-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.ws-options-pane {
+  display: none;
+  height: 100%;
+}
+
+.ws-options-pane.active {
+  display: block;
+}
+
+.ics-bible-sidecar {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: var(--bg);
 }
 
 /* Level Badge & Avatar Utils */

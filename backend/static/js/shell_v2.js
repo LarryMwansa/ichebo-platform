@@ -90,6 +90,17 @@ const WorkspaceUI = {
     this.saveState();
   },
 
+  switchOptionsTab(tabName) {
+    // Update Tab Buttons
+    document.querySelectorAll('.ics-options-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.id === `tab-${tabName}`);
+    });
+    // Update Panes
+    document.querySelectorAll('.ws-options-pane').forEach(pane => {
+        pane.classList.toggle('active', pane.id === `pane-${tabName}`);
+    });
+  },
+
   setFocusMode(active) {
     if (active) {
       this.state.contextOpen = false;

@@ -163,13 +163,32 @@
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </header>
+
+            <div class="ics-options-tabs">
+                <button class="ics-options-tab active" id="tab-relations" onclick="WorkspaceUI.switchOptionsTab('relations')">Relations</button>
+                <button class="ics-options-tab" id="tab-bible" onclick="WorkspaceUI.switchOptionsTab('bible')">Bible</button>
+            </div>
+
             <div class="ics-options-bar__content">
-                {% block ws_options %}
-                    <div class="ws-empty-state">
-                        <span class="material-symbols-outlined">info</span>
-                        <p>Select an element to view relationships</p>
+                {# Relations Pane #}
+                <div class="ws-options-pane active" id="pane-relations">
+                    <div style="padding: var(--space-m);">
+                        {% block ws_options %}
+                            <div class="ws-empty-state">
+                                <span class="material-symbols-outlined">info</span>
+                                <p>Select an element to view relationships</p>
+                            </div>
+                        {% endblock %}
                     </div>
-                {% endblock %}
+                </div>
+
+                {# Bible Sidecar Pane #}
+                <div class="ws-options-pane" id="pane-bible">
+                    <iframe src="{% url 'bible:reader' %}?view=sidecar" 
+                            class="ics-bible-sidecar" 
+                            loading="lazy"
+                            title="Bible Reference"></iframe>
+                </div>
             </div>
         </aside>
 

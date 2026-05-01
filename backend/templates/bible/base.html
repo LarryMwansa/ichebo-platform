@@ -30,7 +30,7 @@
   {# Theme init — must run before body renders to prevent flash #}
   <script src="/static/js/storage.js"></script>
 </head>
-<body class="ics-shell" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body class="ics-shell {% if request.GET.view == 'sidecar' %}ics-view--sidecar{% endif %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
   {# Bible topbar — app-level chrome #}
   {% block bible_topbar %}{% endblock %}
@@ -48,7 +48,9 @@
   {% block bible_nav_strip %}{% endblock %}
 
   {# Bottom navigation (shared primary nav) #}
-  {% include "components/_bottom_nav.html" %}
+  {% if not request.GET.view == 'sidecar' %}
+    {% include "components/_bottom_nav.html" %}
+  {% endif %}
 
   {# CSRF wiring for HTMX state-mutating requests #}
   <script>
