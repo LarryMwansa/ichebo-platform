@@ -1,0 +1,25 @@
+<!-- Search results list for link modal -->
+<div class="link-search-results">
+  {% if has_results %}
+    {% for record in results %}
+    <div class="search-result-item"
+         style="padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s;"
+         onclick="selectRecord('{{ record.id }}', '{{ record.title|escapejs }}')">
+      <div style="font-weight: 600; margin-bottom: 4px;">{{ record.title }}</div>
+      <div style="font-size: 12px; color: var(--muted); display: flex; gap: 12px;">
+        <span class="badge-unit badge-unit--sm" style="padding: 2px 6px; font-size: 11px;">{{ record.record_type }}</span>
+        <span style="opacity: 0.7;">{{ record.record_family }}</span>
+        <span style="opacity: 0.5;">by {{ record.created_by.display_name|default:record.created_by.email }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div style="padding: 2rem; text-align: center; color: var(--muted); font-size: 13px;">
+      {% if query %}
+        No records found matching "{{ query }}"
+      {% else %}
+        Start typing to search records
+      {% endif %}
+    </div>
+  {% endif %}
+</div>

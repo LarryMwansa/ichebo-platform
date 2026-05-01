@@ -1,0 +1,222 @@
+<!-- Link creation modal — hybrid search + filter -->
+<style>
+  .link-modal-overlay {
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; right: 0; bottom: 0; 
+    background: rgba(0,0,0,0.6); 
+    z-index: 1000; 
+    padding: 1rem;
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+  }
+  .link-modal-container {
+    background: var(--bg); 
+    border-radius: 16px; 
+    width: 100%;
+    max-width: 800px; 
+    height: 90vh; 
+    display: flex; 
+    flex-direction: column; 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .link-modal-body {
+    display: flex; 
+    flex: 1; 
+    overflow: hidden;
+    flex-direction: column; /* Stack by default (mobile) */
+  }
+  .link-modal-sidebar {
+    width: 100%; /* Full width on mobile */
+    padding: 1rem; 
+    border-bottom: 1px solid var(--border); 
+    background: var(--hover);
+    display: flex;
+    gap: 12px;
+  }
+  .link-modal-sidebar > div {
+    flex: 1;
+  }
+  .link-modal-main {
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden;
+  }
+
+  /* Desktop View */
+  @media (min-width: 600px) {
+    .link-modal-overlay {
+      padding: 2rem;
+    }
+    .link-modal-body {
+      flex-direction: row;
+    }
+    .link-modal-sidebar {
+      width: 200px;
+      flex-direction: column;
+      border-bottom: none;
+      border-right: 1px solid var(--border);
+      gap: 1.5rem;
+    }
+    .link-modal-sidebar > div {
+      flex: none;
+    }
+  }
+</style>
+
+<div id="link-modal" class="link-modal-overlay">
+  <div class="link-modal-container">
+
+    <!-- Header -->
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 700;">Link to Record</h2>
+      <button onclick="closeLinkModal()" style="background: var(--hover); border: none; font-size: 20px; cursor: pointer; color: var(--muted); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</button>
+    </div>
+
+    <!-- Content -->
+    <div class="link-modal-body">
+
+      <!-- Sidebar: Filters (Top on mobile, Left on desktop) -->
+      <div class="link-modal-sidebar">
+        <div>
+          <label style="display: block; font-size: 10px; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Family</label>
+          <select id="link-filter-family"
+                  class="form-input-touch"
+                  style="width: 100%; font-size: 13px; height: 40px;"
+                  onchange="updateLinkSearch()">
+            <option value="">All Families</option>
+            <option value="journal">Journal</option>
+            <option value="governance">Governance</option>
+            <option value="learning">Learning</option>
+            <option value="activity">Activity</option>
+            <option value="community">Community</option>
+            <option value="reference">Reference</option>
+            <option value="bible">Bible</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 10px; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Type</label>
+          <select id="link-filter-type"
+                  class="form-input-touch"
+                  style="width: 100%; font-size: 13px; height: 40px;"
+                  onchange="updateLinkSearch()">
+            <option value="">All Types</option>
+            <option value="principle">Principle</option>
+            <option value="class">Class</option>
+            <option value="mandate">Mandate</option>
+            <option value="lesson">Lesson</option>
+            <option value="quiz">Quiz</option>
+            <option value="programme">Programme</option>
+            <option value="prayer">Prayer</option>
+            <option value="spirit">Spirit</option>
+            <option value="dream">Dream</option>
+            <option value="note">Note</option>
+            <option value="task">Task</option>
+            <option value="goal">Goal</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Main: Search + Results -->
+      <div class="link-modal-main">
+
+        <!-- Search box -->
+        <div style="padding: 1rem; border-bottom: 1px solid var(--border); background: var(--bg);">
+          <div style="position: relative;">
+            <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--muted);">search</span>
+            <input type="text"
+                   id="link-search-input"
+                   placeholder="Search records by title..."
+                   class="form-input-touch"
+                   style="width: 100%; padding-left: 42px; border-radius: 12px;"
+                   oninput="updateLinkSearch()"
+                   onkeydown="if(event.key==='Escape') closeLinkModal()">
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="link-search-results"
+             style="flex: 1; overflow-y: auto;"
+             hx-get="{% url 'records:htmx-record-search' %}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+          <div style="padding: 3rem 2rem; text-align: center; color: var(--muted);">
+             <span class="material-symbols-outlined" style="font-size: 40px; opacity: 0.2; margin-bottom: 1rem;">manage_search</span>
+             <p style="margin: 0;">Loading records…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 12px; justify-content: flex-end; background: var(--bg);">
+      <button onclick="closeLinkModal()" class="btn-touch" style="background: var(--hover); border: 1px solid var(--border); color: var(--text); padding: 0 1.5rem;">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openLinkModal() {
+  document.getElementById('link-modal').style.display = 'flex';
+  document.getElementById('link-search-input').focus();
+  updateLinkSearch();
+}
+
+function closeLinkModal() {
+  document.getElementById('link-modal').style.display = 'none';
+}
+
+function updateLinkSearch() {
+  const query = document.getElementById('link-search-input').value;
+  const family = document.getElementById('link-filter-family').value;
+  const type = document.getElementById('link-filter-type').value;
+
+  const params = new URLSearchParams({
+    q: query,
+    family: family,
+    type: type,
+  });
+
+  htmx.ajax('GET', '{% url "records:htmx-record-search" %}?' + params.toString(), {
+    target: '#link-search-results',
+    swap: 'innerHTML'
+  });
+}
+
+// Default selectRecord handler (can be overridden)
+if (!window.selectRecord) {
+  window.selectRecord = function(recordId, recordTitle) {
+    const idInput = document.getElementById('to-record-id-input');
+    const titleSpan = document.getElementById('to-record-title');
+    
+    if (idInput) idInput.value = recordId;
+    if (titleSpan) titleSpan.textContent = recordTitle;
+    
+    closeLinkModal();
+    
+    const formSection = document.getElementById('link-form-section');
+    if (formSection) formSection.scrollIntoView({ behavior: 'smooth' });
+  };
+}
+
+// Global listener for closing modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('link-modal');
+    if (modal && modal.style.display === 'flex') {
+      closeLinkModal();
+    }
+  }
+});
+
+document.getElementById('link-modal')?.addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeLinkModal();
+  }
+});
+</script>

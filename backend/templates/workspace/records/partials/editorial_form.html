@@ -1,0 +1,71 @@
+{% extends "workspace/records/base.html" %}
+{% load static %}
+
+{% block records_content %}
+<div class="editorial-stage">
+    <form class="editorial-canvas" 
+          hx-post="{% url 'records:htmx-create' %}"
+          hx-target="#main-content"
+          hx-push-url="true">
+        {% csrf_token %}
+        
+        {# 1. Formatting Toolbar #}
+        <div class="editorial-toolbar">
+            <button type="button" class="editorial-toolbar__btn" title="Bold"><span class="material-symbols-outlined">format_bold</span></button>
+            <button type="button" class="editorial-toolbar__btn" title="Italic"><span class="material-symbols-outlined">format_italic</span></button>
+            <div class="editorial-toolbar__divider"></div>
+            <button type="button" class="editorial-toolbar__btn" title="Heading 1"><span class="material-symbols-outlined">format_h1</span></button>
+            <button type="button" class="editorial-toolbar__btn" title="Heading 2"><span class="material-symbols-outlined">format_h2</span></button>
+            <div class="editorial-toolbar__divider"></div>
+            <button type="button" class="editorial-toolbar__btn" title="Quote"><span class="material-symbols-outlined">format_quote</span></button>
+            <button type="button" class="editorial-toolbar__btn" title="Link"><span class="material-symbols-outlined">link</span></button>
+            
+            <div style="margin-left: auto; display: flex; align-items: center; gap: var(--space-s);">
+                <div id="save-status" style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">Draft Saved</div>
+                <button type="submit" class="ws-topbar__cta" style="padding: 0 var(--space-m);">
+                    Save & Publish
+                </button>
+            </div>
+        </div>
+
+        {# 2. Title & Type #}
+        <div style="margin-bottom: var(--space-m);">
+            <select name="record_type" id="record-type" class="ws-icon-btn" style="width: auto; padding: 0 var(--space-s); font-size: 11px; margin-bottom: 8px;">
+                {% for value, label in record_types %}
+                <option value="{{ value }}" {% if value == active_type %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="title" id="record-title" placeholder="Record Title..." 
+                   class="editorial-title" 
+                   style="width: 100%; border: none; background: transparent; outline: none;" 
+                   required autofocus autofill="off">
+        </div>
+
+        {# 3. The Markdown Editor #}
+        <textarea name="content" id="editorial-editor" 
+                  class="editorial-body" 
+                  placeholder="Begin drafting your record... Use Markdown or the toolbar above."
+                  style="width: 100%; min-height: 500px; border: none; background: transparent; outline: none; resize: vertical;"></textarea>
+    </form>
+</div>
+
+<script src="{% static 'js/editorial_v2.js' %}"></script>
+{% endblock %}
+
+{% block ws_options %}
+    <div class="ws-options-section">
+        <div class="ws-label-tag">Draft Settings</div>
+        <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s); line-height: 1.5;">
+            Your draft is automatically saved to local storage every 3 seconds.
+        </p>
+    </div>
+    
+    <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+    
+    <div class="ws-options-section">
+        <div class="ws-label-tag">References</div>
+        <div class="ws_detail-empty" style="padding: var(--space-s);">
+            Open the Bible sidecar tab for easy cross-referencing.
+        </div>
+    </div>
+{% endblock %}

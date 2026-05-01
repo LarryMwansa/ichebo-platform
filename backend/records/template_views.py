@@ -98,7 +98,7 @@ def htmx_create_record(request):
         return response
 
     # GET — return the create form
-    return render(request, 'records/partials/create_form.html', {
+    return render(request, 'workspace/records/partials/editorial_form.html', {
         'record_types': JOURNAL_RECORD_TYPES,
         'active_type': request.GET.get('record_type', 'note'),
     })
@@ -127,7 +127,7 @@ def htmx_edit_record(request, record_id):
         return render(request, 'records/partials/record_card.html', {'record': record})
 
     # GET — return edit form pre-populated
-    return render(request, 'records/partials/edit_form.html', {
+    return render(request, 'workspace/records/partials/editorial_form.html', {
         'record': record,
         'record_types': JOURNAL_RECORD_TYPES,
     })

@@ -1,0 +1,42 @@
+<div hx-swap-oob="innerHTML:#nav-left-content">
+  <div class="nav-left" style="display: none;"></div>
+</div>
+
+<form class="record-drawer-form"
+      hx-post="{% url 'records:htmx-create' %}"
+      hx-swap="none">
+  {% csrf_token %}
+
+  <div class="record-form-group">
+    <label class="label-caps" style="color: var(--muted); margin-bottom: 8px; display: block;">Entry Type</label>
+    <select name="record_type" class="form-input-touch" style="width: 100%;">
+      {% for value, label in record_types %}
+      <option value="{{ value }}" {% if value == active_type %}selected{% endif %}>
+        {{ label }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="record-form-group">
+    <label class="label-caps" style="color: var(--muted); margin-bottom: 8px; display: block;">Title</label>
+    <input type="text" name="title" placeholder="Entry title…"
+           class="form-input-touch" style="width: 100%;" required autofill="off">
+  </div>
+
+  <div class="record-form-group">
+    <label class="label-caps" style="color: var(--muted); margin-bottom: 8px; display: block;">Notes</label>
+    <textarea name="content" placeholder="Write your entry…"
+              class="form-input-touch" style="width: 100%; min-height: 160px;" rows="6"></textarea>
+  </div>
+
+  <div style="margin-top: 2rem; display: flex; gap: 8px;">
+    <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; flex: 2; font-weight: 600;">
+      Save Entry
+    </button>
+    <button type="button" class="btn-touch" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); flex: 1;"
+            onclick="window.ICSDrawer.close(); htmx.ajax('GET', '{% url 'records:records-home' %}', { target: '#main-content', swap: 'innerHTML', pushUrl: true });">
+      Cancel
+    </button>
+  </div>
+</form>
