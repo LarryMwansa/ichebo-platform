@@ -33,7 +33,7 @@
             <div class="ws-stat-grid" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
                 {% for record in records %}
                     <div class="ws-stat-card" 
-                         hx-get="{% if active_branch == 'keys' %}{% url 'governance:keys-detail' record.id %}{% elif active_branch == 'library' %}{% url 'governance:reference-detail' record.id %}{% else %}{% url 'governance:mandate-detail' record.id %}{% endif %}"
+                         hx-get="{% if active_branch == 'keys' %}{% url 'governance:keys-detail' record.id %}{% elif active_branch == 'library' %}{% url 'governance:library-detail' record.id %}{% else %}{% url 'governance:mandate-detail' record.id %}{% endif %}"
                          hx-target="#main-content"
                          hx-push-url="true"
                          style="cursor: pointer; position: relative; padding: var(--space-m);">

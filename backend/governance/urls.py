@@ -11,9 +11,9 @@ urlpatterns = [
     path('governance/', views.governance_home, name='home'),
 
     # ── Reference Library ────────────────────────────────────────────────────
-    path('governance/reference/', views.library_home, name='reference-home'),
-    path('governance/reference/<uuid:record_id>/', views.library_detail, name='reference-detail'),
-    path('governance/reference/<str:record_type>/', views.library_list, name='reference-list'),
+    path('governance/reference/', views.library_home, name='library-home'),
+    path('governance/reference/<uuid:record_id>/', views.library_detail, name='library-detail'),
+    path('governance/reference/<str:record_type>/', views.library_list, name='library-list'),
 
     # ── Mandate branch ───────────────────────────────────────────────────────
     path('governance/mandate/', views.mandate_home, name='mandate-home'),
