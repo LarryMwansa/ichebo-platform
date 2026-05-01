@@ -161,6 +161,21 @@
     --level-5: #dc2626;   /* Apostolic Steward — red */
 }
 
+
+/* ── Dark Mode Overrides ── */
+.dark {
+    --bg:       #0e0e0e;
+    --card:     #1a1a1a;
+    --card-2:   #2d2d2d;
+    --hover:    #2d2d2d;
+    --text:     #f5f3f0;
+    --muted:    #9a9a9a;
+    --border:   rgba(255, 255, 255, 0.08);
+    --shadow:   rgba(0, 0, 0, 0.4);
+    
+    color-scheme: dark;
+}
+
 /* ── Base typography ── */
 html,
 body {

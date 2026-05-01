@@ -88,12 +88,13 @@
 .ics-sidebar__item.active::before {
   content: '';
   position: absolute;
-  left: -12px;
-  top: 10px;
-  bottom: 10px;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
   width: 3px;
   background: var(--primary);
   border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 8px var(--primary);
 }
 
 /* ── Column 2: Context Bar (App Nav / Explorer) ─────────────── */

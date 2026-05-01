@@ -7,7 +7,8 @@ const WorkspaceUI = {
   state: {
     contextOpen: true,
     optionsOpen: false,
-    sidebarSlim: true, // v2 is always slim sidebar
+    sidebarSlim: true,
+    theme: 'dark', // Default to dark
   },
 
   init() {
@@ -55,6 +56,20 @@ const WorkspaceUI = {
         optionsToggle.querySelector('.material-symbols-outlined').textContent = this.state.optionsOpen ? 'dock_to_right' : 'info';
         optionsToggle.classList.toggle('active', this.state.optionsOpen);
     }
+
+    // Theme Management
+    if (this.state.theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+    
+    // Update Theme Toggle Icon
+    const themeBtn = document.getElementById('ics-theme-toggle');
+    if (themeBtn) {
+        themeBtn.querySelector('.material-symbols-outlined').textContent = 
+            this.state.theme === 'dark' ? 'light_mode' : 'dark_mode';
+    }
   },
 
   toggleContext() {
@@ -65,6 +80,12 @@ const WorkspaceUI = {
 
   toggleOptions() {
     this.state.optionsOpen = !this.state.optionsOpen;
+    this.applyState();
+    this.saveState();
+  },
+
+  toggleTheme() {
+    this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark';
     this.applyState();
     this.saveState();
   },
