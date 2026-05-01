@@ -5,13 +5,13 @@
     {# 1. Full-Width Sticky Toolbar #}
     <div class="editorial-toolbar">
         {# Left: Context Actions #}
-        <div style="display: flex; align-items: center; gap: var(--space-s);">
-            <select name="record_type" id="record-type" class="ws-icon-btn" style="width: auto; padding: 0 var(--space-s); font-size: 11px; height: 32px; border: 1px solid var(--border);">
+        <div class="editorial-toolbar__left">
+            <select name="record_type" id="record-type" class="editorial-type-picker">
                 {% for value, label in record_types %}
                 <option value="{{ value }}" {% if value == active_type %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
-            <span id="save-status" style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600;">Desk Ready</span>
+            <span id="save-status" class="editorial-status">Desk Ready</span>
         </div>
 
         {# Center: Formatting Tools #}
@@ -27,11 +27,11 @@
         </div>
 
         {# Right: Save Actions #}
-        <div style="margin-left: auto; display: flex; align-items: center; gap: var(--space-s);">
+        <div class="editorial-toolbar__right">
             <button type="button" class="ws-icon-btn" title="Writing Assistant">
                 <span class="material-symbols-outlined" style="font-size: 18px;">auto_fix</span>
             </button>
-            <button type="submit" form="editorial-form" class="ws-topbar__cta" style="padding: 0 var(--space-m); height: 36px; border-radius: 6px;">
+            <button type="submit" form="editorial-form" class="ws-topbar__cta editorial-save-btn">
                 Save Record
             </button>
         </div>
@@ -39,32 +39,23 @@
 
     {# 2. The Writing Canvas #}
     <div class="editorial-canvas">
-        <form id="editorial-form"
-              hx-post="{% url 'records:htmx-create' %}"
-              hx-target="#main-content"
-              hx-push-url="true">
+        <form id="editorial-form" hx-post="{% url 'records:htmx-create' %}" hx-target="#main-content" hx-push-url="true">
             {% csrf_token %}
-            
             <input type="hidden" name="record_type" id="hidden-record-type" value="{{ active_type }}">
 
-            <input type="text" name="title" id="record-title" 
-                   value="{{ record.title|default:'' }}"
-                   placeholder="Give your record a title..." 
-                   class="editorial-title" 
-                   style="width: 100%; border: none; background: transparent; outline: none;" 
-                   required autofocus autofill="off">
+            <input type="text" name="title" id="record-title" value="{{ record.title|default:'' }}"
+                placeholder="Give your record a title..." class="editorial-title-input editorial-title"
+                required autofocus autofill="off">
 
-            <textarea name="content" id="editorial-editor" 
-                      class="editorial-body" 
-                      placeholder="Begin writing... The word is alive."
-                      style="width: 100%; min-height: 70vh; border: none; background: transparent; outline: none; resize: none;">{{ record.content|default:'' }}</textarea>
+            <textarea name="content" id="editorial-editor" class="editorial-editor-textarea editorial-body"
+                placeholder="Begin writing... The word is alive.">{{ record.content|default:'' }}</textarea>
         </form>
     </div>
 </div>
 
 {# Sync record type picker #}
 <script>
-    document.getElementById('record-type').addEventListener('change', function() {
+    document.getElementById('record-type').addEventListener('change', function () {
         document.getElementById('hidden-record-type').value = this.value;
     });
 </script>

@@ -5,13 +5,14 @@
 
 .editorial-stage {
   --canvas-bg: var(--bg);
-  --paper-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  --paper-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
 /* ── The Writing Canvas ── */
 .editorial-canvas {
   background: var(--canvas-bg);
-  min-height: 100%;
+  /* min-height: 100%; */
+  height: fit-content;
   padding: var(--space-xl) var(--space-4xl) 0;
   position: relative;
   max-width: 900px;
@@ -61,7 +62,7 @@
   height: 56px;
   z-index: 100;
   width: 100%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .editorial-toolbar__group--center {
@@ -71,6 +72,43 @@
   display: flex;
   align-items: center;
   gap: var(--space-2xs);
+}
+
+.editorial-toolbar__left,
+.editorial-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+}
+
+.editorial-toolbar__right {
+  margin-left: auto;
+}
+
+.editorial-type-picker {
+  width: auto;
+  padding: 0 var(--space-s);
+  font-size: 11px;
+  height: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.editorial-status {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.editorial-save-btn {
+  padding: 0 var(--space-m);
+  height: 36px;
+  border-radius: 6px;
 }
 
 .editorial-toolbar__btn {
@@ -90,6 +128,24 @@
 .editorial-toolbar__btn:hover {
   background: var(--bg-hover);
   color: var(--text);
+}
+
+/* ── Form Inputs ── */
+.editorial-title-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+.editorial-editor-textarea {
+  width: 100%;
+  min-height: 80vh; /* Occupy full stage length */
+  border: none;
+  background: transparent;
+  outline: none;
+  resize: none;
+  padding-bottom: var(--space-4xl); /* Safe space at bottom */
 }
 
 .editorial-toolbar__btn .material-symbols-outlined {
