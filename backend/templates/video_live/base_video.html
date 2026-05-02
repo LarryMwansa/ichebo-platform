@@ -82,6 +82,6 @@
     <a href="{% url 'video_live:vod' %}" {% if request.resolver_match.url_name == 'vod' %}class="active"{% endif %}>Recordings</a>
     {% if can_manage %}<a href="{% url 'video_live:manage' %}" {% if request.resolver_match.url_name == 'manage' %}class="active"{% endif %}>Manage</a>{% endif %}
   </nav>
-  {% block video_content %}{% endblock %}
+  {% block mobile_video_content %}{% endblock %}
 </div>
 {% endblock %}
