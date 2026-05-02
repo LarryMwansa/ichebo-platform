@@ -1,6 +1,33 @@
 {% extends "workspace/governance/base.html" %}
 {% load static %}
 
+{% block context_content %}
+<div class="ws-context-section">
+    <div class="label-caps" style="padding: 0 var(--space-s); margin-bottom: var(--space-xs);">Local Drafts</div>
+    <div id="ws-recent-drafts">
+        <!-- Rendered by editorial_v2.js -->
+    </div>
+</div>
+
+<div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+
+<div class="ws-context-section">
+    <div class="label-caps" style="padding: 0 var(--space-s); margin-bottom: var(--space-xs);">Quick Actions</div>
+    <nav class="ics-context-nav">
+        <a href="{% url 'governance:htmx-record-create' %}?record_family=governance" class="ics-context-item">
+            <span class="material-symbols-outlined">add_circle</span>
+            New Handbook Act
+        </a>
+        <a href="{% url 'governance:htmx-record-create' %}?record_family=reference" class="ics-context-item">
+            <span class="material-symbols-outlined">key</span>
+            New Steward Key
+        </a>
+    </nav>
+</div>
+{% endblock %}
+
+{% block watermark %}EDITORIAL{% endblock %}
+
 {% block governance_content %}
 <div class="editorial-stage">
     {# 1. Full-Width Sticky Toolbar #}
@@ -36,6 +63,10 @@
             <div class="editorial-toolbar__divider"></div>
             <button type="button" class="editorial-toolbar__btn" title="Quote"><span class="material-symbols-outlined">format_quote</span></button>
             <button type="button" class="editorial-toolbar__btn" title="Link"><span class="material-symbols-outlined">link</span></button>
+            <div class="editorial-toolbar__divider"></div>
+            <button type="button" class="editorial-toolbar__btn" id="preview-toggle" onclick="EditorialUI.togglePreview()" title="Preview (⌘+P)">
+                <span class="material-symbols-outlined">visibility</span>
+            </button>
         </div>
 
         {# Right: Save Actions #}
@@ -70,6 +101,10 @@
 
             <textarea name="content" id="editorial-editor" class="editorial-editor-textarea editorial-body"
                 placeholder="Formal text of the act... Supports Markdown.">{{ record.content|default:'' }}</textarea>
+            
+            <div id="editorial-preview" class="editorial-preview-pane editorial-body" style="display: none;">
+                <!-- Rendered Markdown -->
+            </div>
             
             {# Hidden inputs for the side-panel metadata (synced via JS) #}
             <input type="hidden" name="tags" id="hidden-tags" value="{{ record.tags|join:', ' }}">

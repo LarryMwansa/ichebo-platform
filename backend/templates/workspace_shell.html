@@ -100,11 +100,39 @@
         border-left: 1px solid var(--border-ink);
         color: var(--text-ink);
     }
+
+    /* Ghost Watermark: Section identifier */
+    .ics-stage__content {
+        position: relative;
+    }
+
+    .ics-stage__content::after {
+        content: attr(data-watermark);
+        position: fixed;
+        right: 320px; /* Options bar width */
+        bottom: -20px;
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(5rem, 15vw, 12rem);
+        font-weight: 900;
+        color: var(--accent-red);
+        opacity: 0.05;
+        pointer-events: none;
+        user-select: none;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        z-index: 0;
+        transition: opacity var(--shell-transition);
+    }
+
+    .dark .ics-stage__content::after {
+        opacity: 0.03;
+    }
 </style>
 {% endblock %}
 
-    <!-- HTMX -->
+    <!-- HTMX & Markdown -->
     <script src="{% static 'js/htmx.min.js' %}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="{% block body_class %}{% endblock %}">
 
@@ -238,7 +266,7 @@
                 </div>
             </header>
 
-            <div class="ics-stage__content">
+            <div class="ics-stage__content" data-watermark="{% block watermark %}{{ active_app|upper }}{% endblock %}">
                 <div class="ics-canvas">
                     {% block ws_content %}{% endblock %}
                 </div>

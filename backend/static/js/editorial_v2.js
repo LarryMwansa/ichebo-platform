@@ -17,6 +17,7 @@ const EditorialUI = {
         this.setupShortcuts();
         this.setupAutoSave();
         this.renderDraftsList();
+        this.updatePreview(); // Initial render
     },
 
     // ── Formatting Logic ─────────────────────────────────────────────────────
@@ -70,8 +71,15 @@ const EditorialUI = {
         
         // Restore focus and selection
         this.editor.focus();
-        const newPos = start + prefix.length + selection.length + suffix.length;
-        this.editor.setSelectionRange(newPos, newPos);
+        const newPos = start + prefix.length + (selection.length > 0 ? selection.length : 0) + suffix.length;
+        
+        // If it's a link and no selection, put cursor inside the URL part
+        if (prefix === '[' && suffix === '](url)' && selection.length === 0) {
+            const linkPos = start + 3; // After '[' and before '](url)'
+            this.editor.setSelectionRange(linkPos, linkPos);
+        } else {
+            this.editor.setSelectionRange(newPos, newPos);
+        }
         
         this.triggerAutoSave();
     },
@@ -81,14 +89,40 @@ const EditorialUI = {
             if ((e.ctrlKey || e.metaKey)) {
                 if (e.key === 'b') { e.preventDefault(); this.handleAction('bold'); }
                 if (e.key === 'i') { e.preventDefault(); this.handleAction('italic'); }
+                if (e.key === 'p') { e.preventDefault(); this.togglePreview(); }
             }
         });
+    },
+
+    togglePreview() {
+        const preview = document.getElementById('editorial-preview');
+        const btn = document.getElementById('preview-toggle');
+        if (!preview || !this.editor) return;
+
+        const isVisible = preview.style.display !== 'none';
+        if (isVisible) {
+            preview.style.display = 'none';
+            this.editor.style.display = 'block';
+            if (btn) btn.classList.remove('active');
+        } else {
+            this.updatePreview();
+            preview.style.display = 'block';
+            this.editor.style.display = 'none';
+            if (btn) btn.classList.add('active');
+        }
+    },
+
+    updatePreview() {
+        const preview = document.getElementById('editorial-preview');
+        if (!preview || !this.editor || typeof marked === 'undefined') return;
+        preview.innerHTML = marked.parse(this.editor.value);
     },
 
     // ── Auto-Save Logic ──────────────────────────────────────────────────────
 
     setupAutoSave() {
         this.editor.addEventListener('input', () => {
+            this.updatePreview();
             this.triggerAutoSave();
         });
     },
@@ -116,6 +150,19 @@ const EditorialUI = {
         
         localStorage.setItem(this.draftsKey, JSON.stringify(uniqueDrafts));
         this.renderDraftsList();
+        
+        // Visual Feedback: Pulse the status label
+        const statusLabel = document.getElementById('save-status');
+        if (statusLabel) {
+            statusLabel.textContent = 'Draft Saved';
+            statusLabel.classList.remove('pulse');
+            void statusLabel.offsetWidth; // Trigger reflow
+            statusLabel.classList.add('pulse');
+            
+            setTimeout(() => {
+                statusLabel.textContent = 'Drafting Official Act';
+            }, 2000);
+        }
         
         console.log('Draft auto-saved to localStorage');
     },

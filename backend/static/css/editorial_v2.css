@@ -172,3 +172,100 @@
   background: var(--border);
   margin: 0 var(--space-xs);
 }
+/* ── Status Pulse ── */
+.editorial-status.pulse {
+  animation: save-pulse 1.5s ease;
+}
+
+@keyframes save-pulse {
+  0% { color: var(--muted); transform: scale(1); }
+  20% { color: var(--success); transform: scale(1.05); }
+  80% { color: var(--success); transform: scale(1.05); }
+  100% { color: var(--muted); transform: scale(1); }
+}
+
+/* ── Context Navigation ── */
+.ics-context-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.ics-context-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-s);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.ics-context-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.dark .ics-context-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ics-context-item .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--primary);
+}
+
+/* ── Draft Items (in Context Bar) ── */
+.ws-draft-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--primary) !important;
+}
+
+/* ── Preview Pane ── */
+.editorial-preview-pane {
+  width: 100%;
+  min-height: 80vh;
+  padding-bottom: var(--space-4xl);
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.editorial-preview-pane h1,
+.editorial-preview-pane h2,
+.editorial-preview-pane h3 {
+  font-family: var(--ff-display);
+  font-weight: 800;
+  margin-top: var(--space-l);
+  margin-bottom: var(--space-s);
+  color: var(--text);
+}
+
+.editorial-preview-pane h1 { font-size: var(--fz-3); }
+.editorial-preview-pane h2 { font-size: var(--fz-2); }
+.editorial-preview-pane h3 { font-size: var(--fz-1); }
+
+.editorial-preview-pane p {
+  margin-bottom: var(--space-m);
+}
+
+.editorial-preview-pane blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: var(--space-m);
+  font-style: italic;
+  color: var(--muted);
+  margin: var(--space-m) 0;
+}
+
+.editorial-preview-pane ul,
+.editorial-preview-pane ol {
+  margin-bottom: var(--space-m);
+  padding-left: var(--space-l);
+}
+
+.editorial-preview-pane li {
+  margin-bottom: var(--space-2xs);
+}
