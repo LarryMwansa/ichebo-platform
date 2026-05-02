@@ -1,38 +1,47 @@
-{% extends "base.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
 {% block title %}Formation Journey{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% block watermark %}SCRIPTURE{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Formation</span>
 {% endblock %}
 
-{% block content %}
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
 <div class="accounts-shell">
   <div class="accounts-content">
 
-    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
-      <span class="level-badge {{ user_level_colour }}" style="width:40px;height:40px;font-size:1rem">{{ user_level }}</span>
-      <div>
-        <h1 style="margin:0;font-size:1.25rem;font-weight:800">{{ user_level_name }}</h1>
-        <div style="font-size:0.8rem;color:var(--muted)">Level {{ user_level }} · Kingdom Growth System</div>
+    <div class="ws-page-header" style="margin-bottom: var(--space-l);">
+      <div class="label-tag" style="margin-bottom: var(--space-xs);">Kingdom Growth System</div>
+      <div style="display: flex; align-items: center; gap: var(--space-m);">
+        <div class="status-badge" style="width: 48px; height: 48px; font-size: var(--fz-2); display: flex; align-items: center; justify-content: center; background: var(--ink); border: 2px solid var(--primary); color: #fff; font-weight: 900;">
+          {{ user.competence_level }}
+        </div>
+        <div>
+          <h1 class="editorial-title" style="font-size: var(--fz-3); margin: 0;">{{ user_level_name }}</h1>
+          <p class="ws-page-subtitle">Level {{ user.competence_level }} Steward · Advancement Record</p>
+        </div>
       </div>
     </div>
 
     <!-- Active programme -->
     {% if active_enrolment %}
-    <div class="profile-card">
-      <div class="settings-section-header">Active Programme</div>
-      <div style="padding:0.5rem 0">
-        <div style="font-weight:700;font-size:0.9375rem;margin-bottom:0.5rem">{{ active_enrolment.title }}</div>
-        <div class="formation-progress-bar" style="margin-bottom:0.4rem">
-          <div class="formation-progress-bar__fill" style="width:{{ active_enrolment.progress }}%"></div>
+    <div class="ws-feed-section">
+      <div class="sd-section-title">Active Programme</div>
+      <div class="card" style="padding: var(--space-m);">
+        <div style="font-weight: 800; font-size: var(--fz-1); margin-bottom: var(--space-xs); color: var(--text);">{{ active_enrolment.title }}</div>
+        <div class="formation-progress-bar" style="background: var(--stone-2); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: var(--space-xs);">
+          <div class="formation-progress-bar__fill" style="width:{{ active_enrolment.progress }}%; background: var(--primary); height: 100%;"></div>
         </div>
-        <div style="font-size:0.78rem;color:var(--muted)">{{ active_enrolment.progress }}% complete</div>
+        <div style="font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em;">{{ active_enrolment.progress }}% complete</div>
         {% if active_enrolment.linked_record %}
-        <a href="{% url 'learn:learn-programme' active_enrolment.linked_record.id %}"
-           style="display:inline-block;margin-top:0.75rem;font-size:0.82rem;font-weight:600;color:var(--primary);text-decoration:none">
-          Continue programme →
+        <a href="{% url 'learn:learn-programme' active_enrolment.linked_record.id %}" class="btn-touch btn-touch--primary" style="margin-top: var(--space-m);">
+          Continue Programme
+          <span class="material-symbols-outlined">arrow_forward</span>
         </a>
         {% endif %}
       </div>
@@ -41,49 +50,46 @@
 
     <!-- Next level -->
     {% if next_programme %}
-    <div class="profile-card">
-      <div class="settings-section-header">Path to Level {{ user_level|add:1 }}</div>
-      <div style="padding:0.5rem 0;font-size:0.875rem">
-        Complete <strong>{{ next_programme.0 }}</strong>
-        ({{ next_programme.1 }}, ~{{ next_programme.2 }}) and receive steward confirmation
-        to advance to the next competence level.
+    <div class="ws-feed-section">
+      <div class="sd-section-title">Path to Level {{ user.competence_level|add:1 }}</div>
+      <div class="card-dark" style="padding: var(--space-m); background: var(--ink); border: none; color: rgba(255,255,255,0.8);">
+        <p style="margin: 0; font-size: var(--fz-0); line-height: 1.6;">
+            Complete <strong>{{ next_programme.0 }}</strong> ({{ next_programme.1 }}, ~{{ next_programme.2 }}) 
+            and receive steward confirmation to advance to the next competence level in the Apostolic Registry.
+        </p>
       </div>
     </div>
     {% endif %}
 
     <!-- History timeline -->
-    <div class="profile-card">
-      <div class="settings-section-header">Advancement History</div>
+    <div class="ws-feed-section" style="margin-top: var(--space-xl);">
+      <div class="sd-section-title">Advancement History</div>
       {% if history %}
-      <div style="display:flex;flex-direction:column;gap:0">
+      <div class="list-group">
         {% for entry in history %}
-        <div class="profile-row">
-          <div class="profile-row-left">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-              <span class="level-badge level-grey" style="width:22px;height:22px;font-size:0.65rem">{{ entry.previous_competence_level }}</span>
-              <span style="font-size:0.6rem;color:var(--muted)">↓</span>
-              <span class="level-badge {{ user_level_colour }}" style="width:22px;height:22px;font-size:0.65rem">{{ entry.new_competence_level }}</span>
-            </div>
-            <div>
-              <div style="font-size:0.875rem;font-weight:600">
-                Level {{ entry.previous_competence_level }} → Level {{ entry.new_competence_level }}
-              </div>
-              <div style="font-size:0.75rem;color:var(--muted)">
-                Confirmed by {{ entry.confirmed_by.display_name|default:entry.confirmed_by.email }}
-                {% if entry.notes %} · "{{ entry.notes|truncatechars:60 }}"{% endif %}
-              </div>
+        <div class="list-item">
+          <div class="list-item__icon" style="flex-direction: column; gap: 2px;">
+            <span class="status-badge status-badge--muted" style="width: 20px; height: 20px; font-size: 9px; display: flex; align-items: center; justify-content: center;">{{ entry.previous_competence_level }}</span>
+            <span class="material-symbols-outlined" style="font-size: 10px; opacity: 0.3;">arrow_downward</span>
+            <span class="status-badge status-badge--active" style="width: 20px; height: 20px; font-size: 9px; display: flex; align-items: center; justify-content: center;">{{ entry.new_competence_level }}</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title" style="font-weight: 800; font-size: var(--fz-0);">Level {{ entry.previous_competence_level }} → Level {{ entry.new_competence_level }}</div>
+            <div class="list-item__meta" style="font-size: 11px;">
+              Confirmed by {{ entry.confirmed_by.display_name|default:entry.confirmed_by.email }}
+              {% if entry.notes %} · "{{ entry.notes|truncatechars:60 }}"{% endif %}
             </div>
           </div>
-          <div style="font-size:0.78rem;color:var(--muted);white-space:nowrap">
+          <div class="list-item__action" style="font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em;">
             {{ entry.confirmed_at|date:"d M Y" }}
           </div>
         </div>
         {% endfor %}
       </div>
       {% else %}
-      <div class="empty-state" style="padding:1.5rem 0">
-        <p style="font-size:0.875rem">No advancements recorded yet.</p>
-        <p style="font-size:0.8rem;color:var(--muted)">Complete the Induction Programme and receive steward confirmation to begin your journey.</p>
+      <div class="ws-empty-state">
+        <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">history_edu</span>
+        <p style="color: var(--muted);">No advancements recorded yet.</p>
       </div>
       {% endif %}
     </div>

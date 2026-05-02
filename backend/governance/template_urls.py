@@ -29,4 +29,5 @@ urlpatterns = [
     path('htmx/record/<uuid:record_id>/edit/', views.htmx_record_edit, name='htmx-record-edit'),
     path('htmx/record/<uuid:record_id>/links/', views.htmx_linked_records, name='htmx-linked-records'),
     path('htmx/record/<uuid:record_id>/history/', views.htmx_version_history, name='htmx-version-history'),
+    path('htmx/global-search/', views.htmx_global_search, name='htmx-global-search'),
 ]
