@@ -198,14 +198,6 @@
                 </a>
             </nav>
 
-            <div style="margin-top: auto; display: flex; flex-direction: column; gap: var(--space-m); padding-bottom: var(--space-m);">
-                <a href="{% url 'notifications:list' %}" class="ics-sidebar__item {% if active_app == 'notifications' %}active{% endif %}" title="Alerts Center">
-                    <span class="material-symbols-outlined">notifications</span>
-                </a>
-                <a href="{% url 'accounts:settings' %}" class="ics-sidebar__item {% if active_app == 'accounts' %}active{% endif %}" title="Settings">
-                    <span class="material-symbols-outlined">settings</span>
-                </a>
-            </div>
         </aside>
 
         <!-- Column 2: Context Bar (App Tools / Navigation) -->
@@ -247,9 +239,9 @@
                     </div>
 
                     {# Notifications #}
-                    <button class="ws-icon-btn" title="Notifications">
+                    <a href="{% url 'notifications:list' %}" class="ws-icon-btn {% if active_app == 'notifications' %}active{% endif %}" title="Alerts Center">
                         <span class="material-symbols-outlined">notifications</span>
-                    </button>
+                    </a>
 
                     {# Theme Toggle #}
                     <button class="ws-icon-btn" id="ics-theme-toggle" onclick="WorkspaceUI.toggleTheme()" title="Toggle Theme">
@@ -272,6 +264,11 @@
                         {% else %}
                             {{ user.display_name|slice:":1"|upper|default:user.email|slice:":1"|upper }}
                         {% endif %}
+                    </a>
+
+                    {# Settings #}
+                    <a href="{% url 'accounts:settings' %}" class="ws-icon-btn {% if active_app == 'accounts' %}active{% endif %}" title="Institutional Settings">
+                        <span class="material-symbols-outlined">settings</span>
                     </a>
 
                     <button class="ws-icon-btn" id="ics-options-toggle" onclick="WorkspaceUI.toggleOptions()" title="Toggle Options (⌘+] )">
