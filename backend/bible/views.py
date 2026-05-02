@@ -52,6 +52,7 @@ class BibleReaderView(LoginRequiredMixin, View):
             'verses': verses,
             'personal_noted': personal_noted,
             'tenant_noted': tenant_noted,
+            'active_app': 'bible',
         }
         return render(request, 'bible/reader.html', context)
 

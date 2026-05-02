@@ -1,8 +1,51 @@
-{% extends "base.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
+
+{% block watermark %}ACTIVITY{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Activity Timeline</span>
+{% endblock %}
+
+{% block ws_content %}
+<div class="activity-shell" style="padding: var(--space-l) 0;">
+    {% block activity_content %}{% endblock %}
+</div>
+{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/activity.css' %}">
+  <style>
+    .ws-tab-row {
+        display: flex;
+        gap: var(--space-m);
+        margin-bottom: var(--space-m);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 2px;
+    }
+    .ws-tab {
+        font-family: var(--ff-body);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--muted);
+        text-decoration: none;
+        padding: var(--space-xs) 0;
+        position: relative;
+        transition: all var(--transition-fast);
+    }
+    .ws-tab.active {
+        color: var(--primary);
+    }
+    .ws-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--primary);
+    }
+  </style>
 {% endblock %}
 
 

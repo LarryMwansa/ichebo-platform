@@ -1,38 +1,15 @@
-{% extends "bible/base.html" %}
+{% extends "bible/base_v2.html" %}
 {% load static %}
 
 {% block title %}Bible · {{ book.name }} {{ chapter }}{% endblock %}
 
-{% block bible_topbar %}
-{% if not request.GET.view == 'sidecar' %}
-<div class="bible-topbar" style="height: 48px;">
-  <div style="display: flex; align-items: center; gap: 4px;">
-    <a href="{% url 'dashboard:index' %}" class="btn-touch" aria-label="Go Back" style="color: var(--text); border:none; background:transparent;">
-      <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
-    </a>
-    <div style="display: flex; align-items: baseline; gap: 6px;">
-      <div class="bible-topbar__title" style="font-size: 0.9rem; font-weight: 700; color: var(--text);">{{ book.name }} {{ chapter }}</div>
-      <div id="topbar-version-code" style="font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8;">{{ translation.code }}</div>
-    </div>
-  </div>
-
-  <div class="bible-topbar__right" style="display: flex; align-items: center; gap: 0;">
-    <button class="btn-touch" 
-            hx-get="{% url 'bible:htmx-search-sheet' %}"
-            hx-target="#drawerContent"
-            aria-label="Search" style="color: var(--muted); border:none; background:transparent; transform: scale(0.85);">
-      <span class="material-symbols-outlined">search</span>
-    </button>
-    <button class="btn-touch" 
-            hx-get="{% url 'bible:htmx-appearance' %}"
-            hx-target="#drawerContent"
-            aria-label="Appearance" style="color: var(--muted); border:none; background:transparent; transform: scale(0.85);">
-      <span class="material-symbols-outlined">tune</span>
-    </button>
-  </div>
-</div>
-{% endif %}
+{% block bible_breadcrumb %}
+    <span class="material-symbols-outlined" style="font-size: 16px; opacity: 0.5;">chevron_right</span>
+    <span class="ws-topbar__breadcrumb-item bible-topbar__title">{{ book.name }} {{ chapter }}</span>
+    <span class="status-badge" style="margin-left: var(--space-s); font-size: 9px;">{{ translation.code }}</span>
 {% endblock %}
+
+{% block bible_topbar %}{% endblock %}
 
 {% block content %}
 <div class="bible-reader-shell" id="reader-shell">

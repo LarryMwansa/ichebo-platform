@@ -1,26 +1,38 @@
 {% extends "tenants/base_tenants.html" %}
 
 {% block tenants_content %}
-<div class="tenants-header">
-  <h2>Steward Dashboard</h2>
-  {% if can_create %}
-  <a href="{% url 'tenants:create-tenant' %}" class="btn btn-primary" style="font-size:0.85rem;padding:0.4rem 0.9rem;">
-    + New Community
-  </a>
-  {% endif %}
+<div class="ws-page-header" style="margin-bottom: var(--space-l);">
+  <div class="label-tag" style="margin-bottom: var(--space-xs);">Institutional Hub</div>
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <h1 class="editorial-title" style="font-size: var(--fz-3); margin: 0;">Tenancy <em>Oversight</em></h1>
+    {% if can_create %}
+    <a href="{% url 'tenants:create-tenant' %}" class="btn-touch btn-touch--primary">
+      <span class="material-symbols-outlined">add_business</span>
+      New Community
+    </a>
+    {% endif %}
+  </div>
 </div>
 
-{% if my_tenants %}
-<div class="sd-section-title">My Communities</div>
+<div class="sd-section-title">Established Jurisdictions</div>
+<div class="list-group">
 {% for tenant in my_tenants %}
-<a href="{% url 'tenants:tenant-detail' tenant.id %}" class="tenant-card tenant-card--link">
-  <div>
-    <div class="tenant-card__name">{{ tenant.name }}</div>
-    <div class="tenant-card__meta">{{ tenant.get_tier_display }}{% if tenant.location.city %} · {{ tenant.location.city }}{% endif %}</div>
+<a href="{% url 'tenants:tenant-detail' tenant.id %}" class="list-item">
+  <div class="list-item__icon" style="color: var(--primary);">
+    <span class="material-symbols-outlined">account_balance</span>
   </div>
-  <span class="material-symbols-outlined" style="color:var(--muted);font-size:1.1rem">chevron_right</span>
+  <div class="list-item__content">
+    <div class="list-item__title" style="font-weight: 800; font-size: var(--fz-1);">{{ tenant.name }}</div>
+    <div class="list-item__meta" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">
+        {{ tenant.get_tier_display }}{% if tenant.location.city %} · {{ tenant.location.city }}{% endif %}
+    </div>
+  </div>
+  <div class="list-item__action">
+    <span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">arrow_forward_ios</span>
+  </div>
 </a>
 {% endfor %}
+</div>
 {% else %}
 <div class="empty-state" style="text-align:center;padding:2rem 1rem;">
   <p style="font-size:1.75rem;margin-bottom:0.5rem">🏛️</p>
@@ -49,23 +61,32 @@
 {% endif %}
 
 {% if agency_tenants %}
-<div class="sd-section-title" style="margin-top:1.5rem">Agency Tenants — Prime Oversight</div>
-<p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem">
-  Constitutional service domains. Staff stewards to transfer authority from Prime Tenancy.
-</p>
+<div class="sd-section-title" style="margin-top: var(--space-xl);">Agency Tenancy — Prime Oversight</div>
+<div class="card-dark" style="margin-bottom: var(--space-m); padding: var(--space-m); background: var(--ink); border: none;">
+  <div class="label-caps" style="color: var(--primary); margin-bottom: var(--space-xs); --primary: var(--accent-red);">Executive Oversight</div>
+  <p class="text-small" style="color: rgba(255,255,255,0.7); margin: 0; line-height: 1.5;">
+    Constitutional service domains. Staff stewards to transfer authority from Prime Tenancy. These units represent the foundational pillars of the KGS ecosystem.
+  </p>
+</div>
+
+<div class="list-group">
 {% for agency in agency_tenants %}
-<a href="{% url 'tenants:tenant-detail' agency.id %}" class="tenant-card tenant-card--link tenant-card--agency">
-  <div>
-    <div class="tenant-card__name">{{ agency.name }}</div>
-    <div class="tenant-card__meta">
-      {% with count=agency.permissions.filter.is_active|default:0 %}
-      Service Domain · {{ agency.permissions.count }} member{{ agency.permissions.count|pluralize }}
-      {% endwith %}
+<a href="{% url 'tenants:tenant-detail' agency.id %}" class="list-item" style="border-left: 4px solid var(--accent-red);">
+  <div class="list-item__icon" style="color: var(--accent-red);">
+    <span class="material-symbols-outlined">verified_user</span>
+  </div>
+  <div class="list-item__content">
+    <div class="list-item__title" style="font-weight: 800; font-size: var(--fz-1);">{{ agency.name }}</div>
+    <div class="list-item__meta" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">
+      Service Domain · {{ agency.permissions.count }} Commissioned Steward{{ agency.permissions.count|pluralize }}
     </div>
   </div>
-  <span class="material-symbols-outlined" style="color:var(--muted);font-size:1.1rem">chevron_right</span>
+  <div class="list-item__action">
+    <span class="status-badge status-badge--active">PRIME</span>
+  </div>
 </a>
 {% endfor %}
+</div>
 {% endif %}
 
 {% endblock %}

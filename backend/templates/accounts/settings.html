@@ -1,20 +1,28 @@
-{% extends "base.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
-{% block title %}Settings{% endblock %}
+{% block watermark %}SETTINGS{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Settings</span>
+{% endblock %}
+
+{% block ws_content %}
+<div class="ws-full-page-inner" style="padding: var(--space-l) 0;">
+    <div class="ws-page-header" style="margin-bottom: var(--space-l);">
+      <div class="ws-page-header__left">
+        <div class="label-tag" style="margin-bottom: var(--space-xs);">Configuration</div>
+        <h2 class="editorial-title" style="font-size: var(--fz-3); margin: 0;">Institutional <em>Settings</em></h2>
+      </div>
+    </div>
+
+    <div class="settings-v2-container">
+        {% include "accounts/_settings_appearance.html" %}
+        {% include "accounts/_settings_region.html" %}
+    </div>
+</div>
+{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
-{% endblock %}
-
-{% block content %}
-<div class="accounts-shell">
-
-  <div class="accounts-content">
-
-    {% include "accounts/_settings_appearance.html" %}
-    {% include "accounts/_settings_region.html" %}
-
-  </div>
-</div>
 {% endblock %}

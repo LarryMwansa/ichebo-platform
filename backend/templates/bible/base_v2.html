@@ -1,0 +1,69 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block watermark %}SCRIPTURE{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Bible Reader</span>
+    {% block bible_breadcrumb %}{% endblock %}
+{% endblock %}
+
+{% block ws_content %}
+    <div class="bible-v2-stage">
+        {% block content %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block ws_options %}
+    <div class="ws-options-section">
+        <div class="label-caps">Translation</div>
+        <div id="bible-version-selector">
+            <!-- versions here -->
+        </div>
+        
+        <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+        
+        <div class="label-caps">Study Tools</div>
+        <div id="bible-study-tools">
+            <button class="ics-context-item">
+                <span class="material-symbols-outlined">history</span>
+                Reading History
+            </button>
+            <button class="ics-context-item">
+                <span class="material-symbols-outlined">bookmarks</span>
+                Bookmarks
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bible-v2-stage {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: var(--space-xl) var(--space-m);
+    }
+    .bible-chapter-title {
+        font-family: var(--ff-display);
+        font-size: var(--fz-4);
+        font-weight: 800;
+        margin-bottom: var(--space-l);
+        color: var(--text);
+    }
+    .bible-verse {
+        font-family: var(--ff-body);
+        font-size: var(--fz-1);
+        line-height: 1.8;
+        margin-bottom: var(--space-xs);
+        color: var(--text);
+    }
+    .bible-verse-num {
+        font-weight: 800;
+        font-size: 0.7em;
+        color: var(--accent-red);
+        vertical-align: super;
+        margin-right: 0.4em;
+    }
+</style>
+{% endblock %}

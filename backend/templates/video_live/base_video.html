@@ -1,5 +1,17 @@
-{% extends "base.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
+
+{% block watermark %}BROADCAST{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Video & Live</span>
+{% endblock %}
+
+{% block ws_content %}
+<div class="video-shell-v2" style="padding: var(--space-l) 0;">
+    {% block video_content %}{% endblock %}
+</div>
+{% endblock %}
 
 {% block extra_css %}
 <style>
