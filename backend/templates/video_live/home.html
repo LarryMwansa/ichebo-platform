@@ -8,15 +8,13 @@
 <div class="ws-layout--full-page">
   <div class="ws-full-page-inner">
 
-    <div class="ws-page-header">
-      <div class="ws-page-header__left">
-        <h2 class="ws-page-title">Video & <em>Live</em></h2>
-        <p class="ws-page-subtitle">Broadcasting the Kingdom. Live sessions and archived recordings.</p>
-      </div>
-      <div class="ws-page-header__actions">
+    <div class="ws-page-header" style="margin-bottom: var(--space-l);">
+      <div class="label-tag" style="margin-bottom: var(--space-xs);">Broadcast Center</div>
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <h1 class="editorial-title" style="font-size: var(--fz-3); margin: 0;">Video & <em>Live</em></h1>
         {% if can_manage %}
-        <a href="{% url 'video_live:manage' %}" class="ws-topbar__cta">
-          <span class="material-symbols-outlined">add</span>
+        <a href="{% url 'video_live:manage' %}" class="btn-touch btn-touch--primary">
+          <span class="material-symbols-outlined">video_call</span>
           Schedule Broadcast
         </a>
         {% endif %}
@@ -34,15 +32,22 @@
 
     {% if upcoming %}
     <div class="ws-feed-section">
-      <div class="label-caps" style="margin-bottom: var(--space-xs);">Coming Up</div>
+      <div class="sd-section-title">Coming Up</div>
       <div class="list-group">
         {% for event in upcoming %}
-        <a href="{% url 'video_live:watch' event.id %}" class="list-item" style="text-decoration: none; color: inherit;">
-          <div class="list-item__content">
-            <div class="list-item__title">{{ event.title }}</div>
-            <div class="list-item__meta">{{ event.scheduled_at|date:"D d M · H:i" }} · {{ event.duration }} min</div>
+        <a href="{% url 'video_live:watch' event.id %}" class="list-item">
+          <div class="list-item__icon" style="color: var(--primary);">
+            <span class="material-symbols-outlined">schedule</span>
           </div>
-          <div class="list-item__action"><span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">chevron_right</span></div>
+          <div class="list-item__content">
+            <div class="list-item__title" style="font-weight: 700;">{{ event.title }}</div>
+            <div class="list-item__meta" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">
+                {{ event.scheduled_at|date:"D d M · H:i" }} · {{ event.duration }} min
+            </div>
+          </div>
+          <div class="list-item__action">
+            <span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">arrow_forward_ios</span>
+          </div>
         </a>
         {% endfor %}
       </div>
@@ -50,17 +55,23 @@
     {% endif %}
 
     {% if recent_vod %}
-    <div class="ws-feed-section">
-      <div class="label-caps" style="margin-bottom: var(--space-xs);">Recent Recordings</div>
-      <div class="vod-grid">
+    <div class="ws-feed-section" style="margin-top: var(--space-xl);">
+      <div class="sd-section-title">Recent Recordings</div>
+      <div class="vod-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-m);">
         {% for event in recent_vod %}
-        <a href="{% url 'video_live:watch' event.id %}" class="event-card event-card--link">
-          <div class="event-card__title" style="font-size: 0.88rem;">{{ event.title }}</div>
-          <div class="event-card__meta">{{ event.scheduled_at|date:"d M Y" }}</div>
+        <a href="{% url 'video_live:watch' event.id %}" class="card card-link" style="text-decoration: none;">
+          <div style="background: var(--ink); border-radius: var(--radius-s); aspect-ratio: 16/9; margin-bottom: var(--space-s); display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 48px; color: rgba(255,255,255,0.1);">play_circle</span>
+          </div>
+          <div class="list-item__title" style="font-weight: 800; font-size: var(--fz-0); margin-bottom: 4px; color: var(--text);">{{ event.title }}</div>
+          <div class="list-item__meta" style="font-size: 11px; text-transform: uppercase; color: var(--muted);">{{ event.scheduled_at|date:"d M Y" }}</div>
         </a>
         {% endfor %}
       </div>
-      <a href="{% url 'video_live:vod' %}" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; display: inline-block; margin-top: var(--space-xs);">All recordings →</a>
+      <a href="{% url 'video_live:vod' %}" class="btn-touch" style="margin-top: var(--space-m); font-size: 12px; height: 36px;">
+        View All recordings
+        <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+      </a>
     </div>
     {% endif %}
 
