@@ -186,10 +186,23 @@
                    title="Bible Reader" hx-boost="false">
                     <span class="material-symbols-outlined">menu_book</span>
                 </a>
+                <a href="{% url 'video_live:home' %}" 
+                   class="ics-sidebar__item {% if active_app == 'video' %}active{% endif %}"
+                   title="Video & Broadcast" hx-boost="false">
+                    <span class="material-symbols-outlined">live_tv</span>
+                </a>
+                <a href="{% url 'tenants:steward-dashboard' %}" 
+                   class="ics-sidebar__item {% if active_app == 'tenancy' %}active{% endif %}"
+                   title="Tenancy Hub" hx-boost="false">
+                    <span class="material-symbols-outlined">account_balance</span>
+                </a>
             </nav>
 
             <div style="margin-top: auto; display: flex; flex-direction: column; gap: var(--space-m); padding-bottom: var(--space-m);">
-                <a href="{% url 'accounts:settings' %}" class="ics-sidebar__item" title="Settings">
+                <a href="{% url 'notifications:list' %}" class="ics-sidebar__item {% if active_app == 'notifications' %}active{% endif %}" title="Alerts Center">
+                    <span class="material-symbols-outlined">notifications</span>
+                </a>
+                <a href="{% url 'accounts:settings' %}" class="ics-sidebar__item {% if active_app == 'accounts' %}active{% endif %}" title="Settings">
                     <span class="material-symbols-outlined">settings</span>
                 </a>
             </div>

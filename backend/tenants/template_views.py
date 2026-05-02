@@ -98,6 +98,7 @@ def steward_dashboard(request):
         'pending_invitations': pending_invitations,
         'can_create': level >= 3,
         'is_prime': level >= 5,
+        'active_app': 'tenancy',
     })
 
 
@@ -119,6 +120,7 @@ def my_tenants(request):
     return render(request, 'tenants/my_tenants.html', {
         'perms': perms,
         'can_create': can_create,
+        'active_app': 'tenancy',
     })
 
 
@@ -157,6 +159,7 @@ def tenant_detail(request, tenant_id):
         'service_orders': service_orders,
         'is_steward': is_steward,
         'can_invite': is_steward or level >= 5,
+        'active_app': 'tenancy',
     })
 
 
@@ -385,6 +388,7 @@ def create_tenant(request):
         'tier_choices': SELF_SERVICE_TIERS,
         'affiliation_choices': Tenant.AFFILIATION_CHOICES,
         'all_active_tenants': all_active_tenants,
+        'active_app': 'tenancy',
     })
 
 

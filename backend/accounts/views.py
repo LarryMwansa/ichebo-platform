@@ -138,6 +138,7 @@ class ProfileView(LoginRequiredMixin, View):
             'kgs_name': kgs_name,
             'platform_label': platform_label,
             'memberships': memberships,
+            'active_app': 'accounts',
         }
         return render(request, 'accounts/profile.html', context)
 
@@ -160,6 +161,7 @@ class SettingsView(LoginRequiredMixin, View):
         context = {
             'profile_user': request.user,
             'timezone_choices': TIMEZONE_CHOICES,
+            'active_app': 'accounts',
         }
         return render(request, 'accounts/settings.html', context)
 
