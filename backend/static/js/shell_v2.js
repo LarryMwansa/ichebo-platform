@@ -125,7 +125,7 @@ const WorkspaceUI = {
     const resultsContainer = document.getElementById('ws-global-search-results');
     const commands = [
         { title: 'Toggle Theme', meta: 'Switch Light/Dark mode', icon: 'contrast', action: () => this.toggleTheme() },
-        { title: 'Focus Mode', meta: 'Toggle sidebars for writing', icon: 'visibility_off', action: () => this.setFocusMode(true) },
+        { title: 'Focus Mode', meta: 'Toggle sidebars for writing', icon: 'visibility_off', action: () => this.setFocusMode() },
         { title: 'Open Desk', meta: 'Go to Editorial Desk', icon: 'draw', action: '/governance/desk/' },
         { title: 'Open Calendar', meta: 'View institutional schedule', icon: 'calendar_month', action: '/calendar/' },
         { title: 'Knowledge Graph', meta: 'Apostolic Web visualization', icon: 'hub', action: '/records/graph/' },
@@ -165,6 +165,23 @@ const WorkspaceUI = {
     document.querySelectorAll('.ws-options-pane').forEach(pane => {
         pane.classList.toggle('active', pane.id === `pane-${tabName}`);
     });
+  },
+
+  setFocusMode(active) {
+    if (active === undefined) {
+      const isCurrentlyFocus = !this.state.contextOpen && !this.state.optionsOpen;
+      active = !isCurrentlyFocus;
+    }
+
+    if (active) {
+      this.state.contextOpen = false;
+      this.state.optionsOpen = false;
+    } else {
+      this.state.contextOpen = true;
+      this.state.optionsOpen = false;
+    }
+    this.applyState();
+    this.saveState();
   },
 
   executeCommand(index) {
