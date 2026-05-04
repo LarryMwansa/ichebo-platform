@@ -40,9 +40,13 @@
             <span class="label-caps" style="font-size: 10px; letter-spacing: 1.5px;">Time Context</span>
         </div>
         <div class="explorer-list" style="display: flex; flex-direction: column; gap: 2px;">
-            <a href="{% url 'activity:calendar' %}" class="explorer-item">
+            <a href="{% url 'calendar:month' %}" class="explorer-item">
                 <span class="material-symbols-outlined explorer-icon">calendar_view_month</span>
-                <span class="explorer-name">Calendar Grid</span>
+                <span class="explorer-name">Institutional Grid</span>
+            </a>
+            <a href="{% url 'activity:calendar' %}" class="explorer-item">
+                <span class="material-symbols-outlined explorer-icon">view_timeline</span>
+                <span class="explorer-name">Timeline View</span>
             </a>
             <a href="{% url 'activity:ministry' %}" class="explorer-item">
                 <span class="material-symbols-outlined explorer-icon">hub</span>

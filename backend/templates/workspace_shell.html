@@ -181,6 +181,11 @@
                    title="Activity" hx-boost="false">
                     <span class="material-symbols-outlined">task_alt</span>
                 </a>
+                <a href="{% url 'calendar:month' %}" 
+                   class="ics-sidebar__item {% if active_app == 'calendar' %}active{% endif %}"
+                   title="Institutional Calendar" hx-boost="false">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                </a>
                 <a href="{% url 'bible:reader' %}" 
                    class="ics-sidebar__item {% if active_app == 'bible' %}active{% endif %}"
                    title="Bible Reader" hx-boost="false">
