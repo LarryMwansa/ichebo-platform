@@ -1,27 +1,37 @@
 {% extends "calendar/base_calendar.html" %}
 
 {% block cal_title %}{{ week_label }}{% endblock %}
+{% block cal_header_title %}{{ week_label|slice:":10" }} <em>{{ week_label|slice:"11:" }}</em>{% endblock %}
 
 {% block cal_nav %}
-<a class="cal-nav-btn"
-   href="{% url 'calendar:week' %}?date={{ prev_date }}"
-   hx-get="{% url 'calendar:week' %}?date={{ prev_date }}"
-   hx-target="#cal-body"
-   hx-push-url="true"
-   aria-label="Previous week">‹</a>
+<div style="display: flex; gap: 4px;">
+  <a class="btn-touch"
+     style="height: 32px; padding: 0 8px; min-width: 32px;"
+     href="{% url 'calendar:week' %}?date={{ prev_date }}"
+     hx-get="{% url 'calendar:week' %}?date={{ prev_date }}"
+     hx-target="#cal-body"
+     hx-push-url="true"
+     aria-label="Previous week">
+     <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
+  </a>
 
-<a class="cal-nav-btn cal-nav-btn--today"
-   href="{% url 'calendar:week' %}"
-   hx-get="{% url 'calendar:week' %}"
-   hx-target="#cal-body"
-   hx-push-url="true">Today</a>
+  <a class="btn-touch"
+     style="height: 32px; padding: 0 12px; font-size: 11px;"
+     href="{% url 'calendar:week' %}"
+     hx-get="{% url 'calendar:week' %}"
+     hx-target="#cal-body"
+     hx-push-url="true">Today</a>
 
-<a class="cal-nav-btn"
-   href="{% url 'calendar:week' %}?date={{ next_date }}"
-   hx-get="{% url 'calendar:week' %}?date={{ next_date }}"
-   hx-target="#cal-body"
-   hx-push-url="true"
-   aria-label="Next week">›</a>
+  <a class="btn-touch"
+     style="height: 32px; padding: 0 8px; min-width: 32px;"
+     href="{% url 'calendar:week' %}?date={{ next_date }}"
+     hx-get="{% url 'calendar:week' %}?date={{ next_date }}"
+     hx-target="#cal-body"
+     hx-push-url="true"
+     aria-label="Next week">
+     <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+  </a>
+</div>
 {% endblock %}
 
 {% block cal_body %}

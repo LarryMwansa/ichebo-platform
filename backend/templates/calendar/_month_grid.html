@@ -3,25 +3,19 @@
 {# Re-emit nav/title so HTMX swaps update them too #}
 <script>
   (function(){
-    var t = document.getElementById('cal-title');
-    if (t) t.textContent = '{{ month_name }} {{ year }}';
-    // Update prev/next hrefs on nav buttons
-    var btns = document.querySelectorAll('.cal-nav-btn');
-    if (btns.length === 3) {
-      var base = '{% url "calendar:month" %}';
-      btns[0].href = base + '?year={{ prev_year }}&month={{ prev_month }}';
-      btns[0].setAttribute('hx-get', btns[0].href);
-      btns[2].href = base + '?year={{ next_year }}&month={{ next_month }}';
-      btns[2].setAttribute('hx-get', btns[2].href);
-    }
+    var t = document.getElementById('cal-page-title');
+    if (t) t.innerHTML = '{{ month_name }} <em>{{ year }}</em>';
+    
+    var b = document.getElementById('cal-breadcrumb-title');
+    if (b) b.textContent = '{{ month_name }} {{ year }}';
   })();
 </script>
 
 <div class="cal-month">
   {# Day-of-week headers #}
-  <div class="cal-dow-row">
+  <div class="cal-dow-row" style="background: var(--stone-3); border-top: 1px solid var(--border);">
     {% for h in day_headers %}
-    <div class="cal-dow">{{ h }}</div>
+    <div class="cal-dow" style="font-family: var(--ff-body); font-weight: 800; color: var(--muted);">{{ h }}</div>
     {% endfor %}
   </div>
 
@@ -29,8 +23,11 @@
   {% for week in grid %}
   <div class="cal-week">
     {% for cell in week %}
-    <div class="cal-cell {% if not cell.in_month %}cal-cell--muted{% endif %} {% if cell.is_today %}cal-cell--today{% endif %}">
-      <div class="cal-cell__day">{{ cell.day }}</div>
+    <div class="cal-cell {% if not cell.in_month %}cal-cell--muted{% endif %} {% if cell.is_today %}cal-cell--today{% endif %}"
+         style="border-color: var(--border); background: {% if cell.is_today %}rgba(175, 50, 54, 0.05){% elif not cell.in_month %}var(--stone-2){% else %}var(--stone){% endif %};">
+      <div class="cal-cell__day" style="font-weight: {% if cell.is_today %}900{% else %}700{% endif %}; color: {% if cell.is_today %}var(--primary){% else %}var(--text){% endif %}; opacity: {% if not cell.in_month %}0.4{% else %}1{% endif %};">
+        {{ cell.day }}
+      </div>
       <div class="cal-cell__events">
         {% for ev in cell.events %}
         <div class="cal-pill cal-pill--{{ ev.activity_type }}" title="{{ ev.title }}">

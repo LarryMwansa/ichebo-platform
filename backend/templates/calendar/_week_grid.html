@@ -2,27 +2,22 @@
 
 <script>
   (function(){
-    var t = document.getElementById('cal-title');
-    if (t) t.textContent = '{{ week_label }}';
-    var btns = document.querySelectorAll('.cal-nav-btn');
-    if (btns.length === 3) {
-      var base = '{% url "calendar:week" %}';
-      btns[0].href = base + '?date={{ prev_date }}';
-      btns[0].setAttribute('hx-get', btns[0].href);
-      btns[2].href = base + '?date={{ next_date }}';
-      btns[2].setAttribute('hx-get', btns[2].href);
-    }
+    var t = document.getElementById('cal-page-title');
+    if (t) t.innerHTML = '{{ week_label|slice:":10" }} <em>{{ week_label|slice:"11:" }}</em>';
+    
+    var b = document.getElementById('cal-breadcrumb-title');
+    if (b) b.textContent = '{{ week_label }}';
   })();
 </script>
 
 <div class="cal-week-grid">
 
   {# Day header row #}
-  <div class="cal-wk-headers">
+  <div class="cal-wk-headers" style="background: var(--stone-3); border-top: 1px solid var(--border);">
     {% for wd in week_days %}
-    <div class="cal-wk-header {% if wd.is_today %}cal-wk-header--today{% endif %}">
-      <span class="cal-wk-header__dow">{{ wd.weekday_short }}</span>
-      <span class="cal-wk-header__num {% if wd.is_today %}cal-wk-header__num--today{% endif %}">
+    <div class="cal-wk-header {% if wd.is_today %}cal-wk-header--today{% endif %}" style="border-color: var(--border);">
+      <span class="cal-wk-header__dow" style="font-family: var(--ff-body); font-weight: 800; color: {% if wd.is_today %}var(--primary){% else %}var(--muted){% endif %};">{{ wd.weekday_short }}</span>
+      <span class="cal-wk-header__num {% if wd.is_today %}cal-wk-header__num--today{% endif %}" style="font-weight: 900;">
         {{ wd.day }}
       </span>
     </div>
@@ -32,7 +27,8 @@
   {# Day columns #}
   <div class="cal-wk-cols">
     {% for wd in week_days %}
-    <div class="cal-wk-col {% if wd.is_today %}cal-wk-col--today{% endif %}">
+    <div class="cal-wk-col {% if wd.is_today %}cal-wk-col--today{% endif %}"
+         style="border-color: var(--border); background: {% if wd.is_today %}rgba(175, 50, 54, 0.05){% else %}var(--stone){% endif %};">
       {% if wd.events %}
         {% for ev in wd.events %}
         <div class="cal-wk-event cal-wk-event--{{ ev.activity_type }}">

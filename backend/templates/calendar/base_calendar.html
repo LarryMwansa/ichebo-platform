@@ -1,42 +1,58 @@
-{% extends "base.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
 {% block title %}Calendar{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/calendar.css' %}">
+{% block watermark %}CALENDAR{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Calendar</span>
+    <span class="ws-topbar__breadcrumb-sep" aria-hidden="true">·</span>
+    <span class="ws-topbar__current" id="cal-breadcrumb-title">{% block cal_title %}{% endblock %}</span>
 {% endblock %}
 
-{% block content %}
-<div class="cal-shell">
-
-  {# ── Top bar ──────────────────────────────────────────────────────────── #}
-  <div class="cal-topbar">
-
-    {# View toggle #}
-    <div class="cal-view-toggle">
-      <a href="{% url 'calendar:month' %}{% if view == 'month' %}?year={{ year }}&month={{ month }}{% endif %}"
-         class="cal-toggle-btn {% if view == 'month' %}active{% endif %}">Month</a>
-      <a href="{% url 'calendar:week' %}{% if view == 'week' %}?date={{ monday|date:'Y-m-d' }}{% endif %}"
-         class="cal-toggle-btn {% if view == 'week' %}active{% endif %}">Week</a>
-    </div>
-
-    {# Title #}
-    <div class="cal-title" id="cal-title">
-      {% block cal_title %}{% endblock %}
-    </div>
-
-    {# Nav controls #}
-    <div class="cal-nav">
-      {% block cal_nav %}{% endblock %}
-    </div>
-
-  </div>
-
-  {# ── Grid body (HTMX target) ──────────────────────────────────────────── #}
-  <div id="cal-body">
-    {% block cal_body %}{% endblock %}
-  </div>
-
+{% block ws_tabs %}
+<div class="ws-tab-row">
+  <a href="{% url 'calendar:month' %}{% if view == 'month' %}?year={{ year }}&month={{ month }}{% endif %}"
+     class="ws-tab {% if view == 'month' %}active{% endif %}">
+    Month View
+  </a>
+  <a href="{% url 'calendar:week' %}{% if view == 'week' %}?date={{ monday|date:'Y-m-d' }}{% endif %}"
+     class="ws-tab {% if view == 'week' %}active{% endif %}">
+    Week View
+  </a>
 </div>
+{% endblock %}
+
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+    
+    <div class="ws-page-header" style="margin-bottom: var(--space-m);">
+      <div class="ws-page-header__left">
+        <div class="label-tag" style="margin-bottom: var(--space-xs);">Institutional Schedule</div>
+        <h1 class="editorial-title" style="font-size: var(--fz-3); margin: 0;" id="cal-page-title">
+          {% block cal_header_title %}{% endblock %}
+        </h1>
+      </div>
+      <div class="ws-page-header__actions cal-nav">
+        {% block cal_nav %}{% endblock %}
+      </div>
+    </div>
+
+    <div id="cal-body">
+      {% block cal_body %}{% endblock %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'cal-body') {
+        // Any post-swap logic if needed
+    }
+});
+</script>
 {% endblock %}

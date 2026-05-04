@@ -1,27 +1,37 @@
 {% extends "calendar/base_calendar.html" %}
 
 {% block cal_title %}{{ month_name }} {{ year }}{% endblock %}
+{% block cal_header_title %}{{ month_name }} <em>{{ year }}</em>{% endblock %}
 
 {% block cal_nav %}
-<a class="cal-nav-btn"
-   href="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}"
-   hx-get="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}"
-   hx-target="#cal-body"
-   hx-push-url="true"
-   aria-label="Previous month">‹</a>
+<div style="display: flex; gap: 4px;">
+  <a class="btn-touch"
+     style="height: 32px; padding: 0 8px; min-width: 32px;"
+     href="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}"
+     hx-get="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}"
+     hx-target="#cal-body"
+     hx-push-url="true"
+     aria-label="Previous month">
+     <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
+  </a>
 
-<a class="cal-nav-btn cal-nav-btn--today"
-   href="{% url 'calendar:month' %}"
-   hx-get="{% url 'calendar:month' %}"
-   hx-target="#cal-body"
-   hx-push-url="true">Today</a>
+  <a class="btn-touch"
+     style="height: 32px; padding: 0 12px; font-size: 11px;"
+     href="{% url 'calendar:month' %}"
+     hx-get="{% url 'calendar:month' %}"
+     hx-target="#cal-body"
+     hx-push-url="true">Today</a>
 
-<a class="cal-nav-btn"
-   href="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}"
-   hx-get="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}"
-   hx-target="#cal-body"
-   hx-push-url="true"
-   aria-label="Next month">›</a>
+  <a class="btn-touch"
+     style="height: 32px; padding: 0 8px; min-width: 32px;"
+     href="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}"
+     hx-get="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}"
+     hx-target="#cal-body"
+     hx-push-url="true"
+     aria-label="Next month">
+     <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+  </a>
+</div>
 {% endblock %}
 
 {% block cal_body %}
