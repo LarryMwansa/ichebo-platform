@@ -9,6 +9,7 @@
              class="ws-search-input"
              placeholder="Search mandates, journal, people or type a command..."
              autocomplete="off"
+             oninput="WorkspaceUI.handleSearchInput(this.value)"
              hx-get="{% url 'governance:htmx-global-search' %}"
              hx-trigger="keyup changed delay:200ms"
              hx-target="#ws-global-search-results"
@@ -155,11 +156,13 @@
     text-align: left;
     cursor: pointer;
     transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 }
 
-.ws-command-item:hover {
+.ws-command-item:hover, .ws-command-item.focused {
     background: rgba(255,255,255,0.05);
     border-color: var(--accent-red);
+    border-left-color: var(--accent-red);
 }
 
 .ws-command-item kbd {

@@ -97,9 +97,11 @@ const WorkspaceUI = {
     const input = document.getElementById('ws-global-search-input');
     if (overlay) {
         overlay.classList.add('active');
+        this.state.searchFocusIndex = -1; // Reset focus
         if (input) {
             input.value = '';
             input.focus();
+            this.handleSearchInput(input.value); // Show default
         }
     }
   },
@@ -111,32 +113,99 @@ const WorkspaceUI = {
     }
   },
 
-  switchOptionsTab(tabName) {
-    // Update Tab Buttons
-    document.querySelectorAll('.ics-options-tab').forEach(btn => {
-        btn.classList.toggle('active', btn.id === `tab-${tabName}`);
-    });
-    // Update Panes
-    document.querySelectorAll('.ws-options-pane').forEach(pane => {
-        pane.classList.toggle('active', pane.id === `pane-${tabName}`);
-    });
+  handleSearchInput(val) {
+    const resultsContainer = document.getElementById('ws-global-search-results');
+    if (val.startsWith('>')) {
+        this.renderCommandMode(val.slice(1).trim());
+    }
+    // HTMX handles the server search automatically via hx-get/hx-trigger
   },
 
-  setFocusMode(active) {
-    if (active) {
-      this.state.contextOpen = false;
-      this.state.optionsOpen = false;
-    } else {
-      this.state.contextOpen = true;
-      this.state.optionsOpen = false;
+  renderCommandMode(query) {
+    const resultsContainer = document.getElementById('ws-global-search-results');
+    const commands = [
+        { title: 'Toggle Theme', meta: 'Switch Light/Dark mode', icon: 'contrast', action: () => this.toggleTheme() },
+        { title: 'Focus Mode', meta: 'Toggle sidebars for writing', icon: 'visibility_off', action: () => this.setFocusMode(true) },
+        { title: 'Open Desk', meta: 'Go to Editorial Desk', icon: 'draw', action: () => window.location.href='/governance/desk/' },
+        { title: 'Open Calendar', meta: 'View institutional schedule', icon: 'calendar_month', action: () => window.location.href='/calendar/' },
+        { title: 'Knowledge Graph', meta: 'Apostolic Web visualization', icon: 'hub', action: () => window.location.href='/records/graph/' },
+    ];
+
+    const filtered = commands.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
+    
+    let html = `<div class="ws-search-group">
+        <div class="label-caps" style="padding: var(--space-s) var(--space-m); color: var(--accent-red);">System Command Mode</div>`;
+    
+    filtered.forEach((c, i) => {
+        html += `
+            <button class="ws-command-item command-mode-item" onclick="WorkspaceUI.executeCommand(${i})">
+                <span class="material-symbols-outlined">${c.icon}</span>
+                <div class="ws-command-item__info">
+                    <div class="ws-command-item__title">${c.title}</div>
+                    <div class="ws-command-item__meta">${c.meta}</div>
+                </div>
+                <kbd>↵</kbd>
+            </button>`;
+    });
+
+    if (filtered.length === 0) {
+        html += `<div style="padding: 20px; opacity: 0.5; font-size: 12px;">No system commands matching "${query}"</div>`;
     }
-    this.applyState();
-    this.saveState();
+
+    html += `</div>`;
+    resultsContainer.innerHTML = html;
+    this.state.activeCommands = filtered;
+    this.updateSearchFocus(0);
+  },
+
+  executeCommand(index) {
+    const cmd = this.state.activeCommands && this.state.activeCommands[index];
+    if (cmd) {
+        this.closeSearch();
+        cmd.action();
+    }
+  },
+
+  updateSearchFocus(newIndex) {
+    const items = document.querySelectorAll('.ws-command-item, .ws-search-group a');
+    if (items.length === 0) return;
+
+    // Boundary check
+    if (newIndex < 0) newIndex = items.length - 1;
+    if (newIndex >= items.length) newIndex = 0;
+
+    this.state.searchFocusIndex = newIndex;
+
+    items.forEach((item, i) => {
+        if (i === newIndex) {
+            item.classList.add('focused');
+            item.scrollIntoView({ block: 'nearest' });
+        } else {
+            item.classList.remove('focused');
+        }
+    });
   },
 
   bindEvents() {
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
+      const searchOverlay = document.getElementById('ws-search-overlay');
+      const isSearchOpen = searchOverlay && searchOverlay.classList.contains('active');
+
+      if (isSearchOpen) {
+          if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              this.updateSearchFocus(this.state.searchFocusIndex + 1);
+          } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              this.updateSearchFocus(this.state.searchFocusIndex - 1);
+          } else if (e.key === 'Enter') {
+              e.preventDefault();
+              const focusedItem = document.querySelector('.ws-command-item.focused, .ws-search-group a.focused');
+              if (focusedItem) focusedItem.click();
+          }
+      }
+
       // CMD/CTRL + [ -> Toggle Left Panel
       if ((e.metaKey || e.ctrlKey) && e.key === '[') {
         e.preventDefault();
