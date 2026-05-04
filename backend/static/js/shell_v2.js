@@ -126,9 +126,9 @@ const WorkspaceUI = {
     const commands = [
         { title: 'Toggle Theme', meta: 'Switch Light/Dark mode', icon: 'contrast', action: () => this.toggleTheme() },
         { title: 'Focus Mode', meta: 'Toggle sidebars for writing', icon: 'visibility_off', action: () => this.setFocusMode(true) },
-        { title: 'Open Desk', meta: 'Go to Editorial Desk', icon: 'draw', action: () => window.location.href='/governance/desk/' },
-        { title: 'Open Calendar', meta: 'View institutional schedule', icon: 'calendar_month', action: () => window.location.href='/calendar/' },
-        { title: 'Knowledge Graph', meta: 'Apostolic Web visualization', icon: 'hub', action: () => window.location.href='/records/graph/' },
+        { title: 'Open Desk', meta: 'Go to Editorial Desk', icon: 'draw', action: '/governance/desk/' },
+        { title: 'Open Calendar', meta: 'View institutional schedule', icon: 'calendar_month', action: '/calendar/' },
+        { title: 'Knowledge Graph', meta: 'Apostolic Web visualization', icon: 'hub', action: '/records/graph/' },
     ];
 
     const filtered = commands.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
@@ -158,11 +158,24 @@ const WorkspaceUI = {
     this.updateSearchFocus(0);
   },
 
+  switchOptionsTab(tabName) {
+    document.querySelectorAll('.ics-options-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.id === `tab-${tabName}`);
+    });
+    document.querySelectorAll('.ws-options-pane').forEach(pane => {
+        pane.classList.toggle('active', pane.id === `pane-${tabName}`);
+    });
+  },
+
   executeCommand(index) {
     const cmd = this.state.activeCommands && this.state.activeCommands[index];
     if (cmd) {
         this.closeSearch();
-        cmd.action();
+        if (typeof cmd.action === 'function') {
+            cmd.action();
+        } else if (typeof cmd.action === 'string') {
+            window.location.href = cmd.action;
+        }
     }
   },
 
@@ -241,7 +254,16 @@ const WorkspaceUI = {
         });
     }
 
-    // Handle HTMX events if needed
+    // Prevent HTMX search when in Command Mode (starting with '>')
+    document.addEventListener('htmx:beforeRequest', (e) => {
+      if (e.detail.target.id === 'ws-global-search-results') {
+          const input = document.getElementById('ws-global-search-input');
+          if (input && input.value.startsWith('>')) {
+              e.preventDefault(); // Stop HTMX from overwriting local command results
+          }
+      }
+    });
+
     document.addEventListener('htmx:afterOnLoad', () => {
       // Logic to run after partial content loads
     });
