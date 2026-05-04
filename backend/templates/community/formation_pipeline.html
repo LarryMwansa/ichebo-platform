@@ -1,77 +1,210 @@
 {% extends "community/base_community.html" %}
+{% load static %}
 
-{% block ws_community_list %}
-<div style="padding: var(--space-xs) var(--space-s) var(--space-2xs);">
-  <div class="ws-label-tag">Formation Pipeline</div>
-  <div style="font-size: var(--fz--2); color: var(--muted);">{{ total }} total member{{ total|pluralize }}</div>
-</div>
+{% block title %}Formation Pipeline — Community Management{% endblock %}
 
-{% for col in pipeline_display %}
-{% if col.count %}
-<div style="padding: var(--space-2xs) var(--space-s) 0;">
-  <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-widest); color: var(--muted); margin-bottom: var(--space-3xs);">
-    {{ col.label }} <span style="color: var(--primary); margin-left: 4px;">{{ col.count }}</span>
-  </div>
-</div>
-{% for m in col.members|slice:":6" %}
-<a href="{% url 'community:community-member-profile' m.user.id %}"
-   class="ws-list-item"
-   hx-get="{% url 'community:community-member-profile' m.user.id %}"
-   hx-target="#ws-detail"
-   hx-push-url="true">
-  <div class="ws-sidebar__avatar" style="background: var(--primary-light); color: var(--primary); width:28px; height:28px; font-size:11px; flex-shrink:0;">
-    {{ m.user.display_name|first|upper|default:"?" }}
-  </div>
-  <div style="flex:1; min-width:0;">
-    <div class="ws-list-item__title">{{ m.user.display_name|default:m.user.email }}</div>
-  </div>
-</a>
-{% endfor %}
-{% if col.count > 6 %}
-<div style="padding: var(--space-3xs) var(--space-s); font-size: var(--fz--2); color: var(--muted);">+{{ col.count|add:"-6" }} more</div>
-{% endif %}
-<div class="ws-sidebar__divider"></div>
-{% endif %}
-{% endfor %}
-{% endblock %}
-
-{% block community_content %}
-
-<div class="community-header">
-  <div class="community-avatar">
-    <span class="material-symbols-outlined">analytics</span>
-  </div>
-  <div class="community-info">
-    <div class="community-name">Formation Pipeline</div>
-    <div class="community-tier">{{ total }} Total Active Member{{ total|pluralize }}</div>
-  </div>
-</div>
-
-<div class="pipeline-scroll">
-  {% for col in pipeline_display %}
-  <div class="pipeline-lane">
-    <div class="pipeline-lane-header">
-      <div class="label-caps">{{ col.label }}</div>
-      <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px;">
-        <div class="formation-level" style="font-size: 24px;">{{ col.count }}</div>
-        <div class="label-caps" style="color: var(--muted); text-transform: lowercase;">members</div>
-      </div>
-    </div>
+{% block ws_content %}
+<div class="formation-pipeline-shell">
     
-    <div class="list-group" style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; min-height: 100px; padding: 4px;">
-      {% for m in col.members|slice:":8" %}
-        <a href="{% url 'community:community-member-profile' m.user.id %}" class="list-item" style="padding: 8px 12px; border: none; background: transparent;">
-          <div class="list-item__title" style="font-size: 13px;">{{ m.user.display_name|default:m.user.email }}</div>
-        </a>
-      {% endfor %}
-      {% if col.count > 8 %}
-        <div class="list-item__meta" style="padding: 8px 12px; text-align: center;">+{{ col.count|add:"-8" }} more</div>
-      {% endif %}
-      {% if col.count == 0 %}
-        <div class="empty-state" style="padding: 20px 0; font-size: 11px;">(Empty)</div>
-      {% endif %}
+    {# 1. Pipeline Header #}
+    <div class="pipeline-header">
+        <div>
+            <div class="label-caps" style="color: var(--accent-red); margin-bottom: 8px;">Institutional Formation</div>
+            <h1 class="ws-page-title" style="margin: 0; font-size: 32px;">Steward <span style="font-style: italic; color: var(--accent-red);">Pipeline</span></h1>
+        </div>
+        <div class="pipeline-stats">
+            <div class="stat-pill">
+                <span class="label-caps">Total Stewards</span>
+                <span class="stat-value">{{ total }}</span>
+            </div>
+            <div class="stat-pill">
+                <span class="label-caps">Active Formation</span>
+                <span class="stat-value">{{ pipeline_display.1.count|add:pipeline_display.2.count }}</span>
+            </div>
+        </div>
     </div>
-  </div>
-  {% endfor %}
+
+    {# 2. Pipeline Board #}
+    <div class="pipeline-board">
+        {% for col in pipeline_display %}
+        <div class="pipeline-column {% if col.level >= 3 %}column-senior{% endif %}">
+            <div class="column-header">
+                <div class="column-title">
+                    <span class="level-badge" style="background: var(--level-{{ col.level }});">{{ col.level }}</span>
+                    <div>
+                        <div class="label-caps" style="font-size: 10px;">{{ col.label }}</div>
+                        <div style="font-size: 11px; opacity: 0.5;">{{ col.stage }}</div>
+                    </div>
+                </div>
+                <div class="column-count">{{ col.count }}</div>
+            </div>
+
+            <div class="column-cards">
+                {% for m in col.members %}
+                <div class="member-card card-ink" 
+                     hx-get="{% url 'community:community-member-profile' m.user.id %}"
+                     hx-target="#ics-shell"
+                     hx-push-url="true"
+                     style="cursor: pointer;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="member-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: var(--stone-2); color: var(--text-ink); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; border: 1px solid var(--border-ink);">
+                            {{ m.user.display_name|first|upper|default:m.user.email|first|upper }}
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 13px; font-weight: 700; color: var(--text-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ m.user.display_name|default:m.user.email }}
+                            </div>
+                            <div style="font-size: 10px; opacity: 0.5; text-transform: uppercase;">
+                                {{ m.metadata.service_order|default:"Active Member" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="column-empty">
+                    <span class="material-symbols-outlined">person_off</span>
+                    <span>Zero</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
 </div>
+
+<style>
+    .formation-pipeline-shell {
+        height: calc(100vh - 64px);
+        display: flex;
+        flex-direction: column;
+        padding: 40px;
+        background: var(--stone-bg);
+    }
+
+    .pipeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 40px;
+    }
+
+    .pipeline-stats {
+        display: flex;
+        gap: 20px;
+    }
+
+    .stat-pill {
+        background: var(--stone-2);
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: 1px solid var(--border-ink);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .stat-value {
+        font-family: 'Playfair Display', serif;
+        font-size: 20px;
+        font-weight: 900;
+        color: var(--text-ink);
+    }
+
+    .pipeline-board {
+        flex: 1;
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        padding-bottom: 20px;
+    }
+
+    .pipeline-column {
+        min-width: 300px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: rgba(0,0,0,0.02);
+        border-radius: 16px;
+        border: 1px solid var(--border-ink);
+    }
+
+    .column-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-ink);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(0,0,0,0.02);
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+    }
+
+    .column-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .level-badge {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 900;
+        color: #fff;
+    }
+
+    .column-count {
+        font-size: 12px;
+        font-weight: 800;
+        opacity: 0.4;
+    }
+
+    .column-cards {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        overflow-y: auto;
+    }
+
+    .member-card {
+        background: #fff;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid var(--border-ink);
+        transition: all 0.2s ease;
+    }
+
+    .dark .member-card {
+        background: var(--ink-bg);
+    }
+
+    .member-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--accent-red);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .column-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 0;
+        opacity: 0.1;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 10px;
+    }
+
+    /* Scrollbar Styling */
+    .pipeline-board::-webkit-scrollbar { height: 6px; }
+    .pipeline-board::-webkit-scrollbar-track { background: transparent; }
+    .pipeline-board::-webkit-scrollbar-thumb { background: var(--border-ink); border-radius: 10px; }
+</style>
 {% endblock %}
