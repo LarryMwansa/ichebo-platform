@@ -153,8 +153,8 @@ const WorkspaceUI = {
         const isFocus = !this.state.contextOpen && !this.state.optionsOpen;
         this.setFocusMode(!isFocus);
       }
-      // CMD/CTRL + K -> Command Palette
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      // CMD/CTRL + / -> Command Palette
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
         e.preventDefault();
         this.openSearch();
       }

@@ -238,9 +238,9 @@
                 <div style="display: flex; align-items: center; gap: var(--space-s);">
                     
                     {# Search Bar #}
-                    <div class="ws-topbar__search">
+                    <div class="ws-topbar__search" onclick="window.WorkspaceUI.openSearch()" style="cursor: pointer;">
                         <span class="material-symbols-outlined">search</span>
-                        <input type="text" placeholder="Search workspace..." aria-label="Search">
+                        <input type="text" placeholder="Search ( / )" aria-label="Search" readonly>
                     </div>
 
                     {# Notifications #}
