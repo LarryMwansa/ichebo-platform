@@ -92,6 +92,25 @@ const WorkspaceUI = {
     this.saveState();
   },
 
+  openSearch() {
+    const overlay = document.getElementById('ws-search-overlay');
+    const input = document.getElementById('ws-global-search-input');
+    if (overlay) {
+        overlay.classList.add('active');
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
+    }
+  },
+
+  closeSearch() {
+    const overlay = document.getElementById('ws-search-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
+  },
+
   switchOptionsTab(tabName) {
     // Update Tab Buttons
     document.querySelectorAll('.ics-options-tab').forEach(btn => {
@@ -134,7 +153,24 @@ const WorkspaceUI = {
         const isFocus = !this.state.contextOpen && !this.state.optionsOpen;
         this.setFocusMode(!isFocus);
       }
+      // CMD/CTRL + K -> Command Palette
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        this.openSearch();
+      }
+      // ESC -> Close Search
+      if (e.key === 'Escape') {
+        this.closeSearch();
+      }
     });
+
+    // Close on click outside
+    const searchOverlay = document.getElementById('ws-search-overlay');
+    if (searchOverlay) {
+        searchOverlay.addEventListener('click', (e) => {
+            if (e.target === searchOverlay) this.closeSearch();
+        });
+    }
 
     // Handle HTMX events if needed
     document.addEventListener('htmx:afterOnLoad', () => {

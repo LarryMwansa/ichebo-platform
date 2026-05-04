@@ -1,21 +1,21 @@
 {% if is_empty %}
-  <div class="ws-search-group">
-    <div class="ws-search-group-label">Suggested Commands</div>
-    {% for s in suggestions %}
-    <div class="ws-search-item"
-       onclick="closeGlobalSearch()"
-       hx-get="{{ s.url }}"
-       hx-target="{{ s.target }}"
-       {% if s.target == '#ws-content' %}hx-push-url="true"{% endif %}>
-      <div class="ws-search-item__icon">
-        <span class="material-symbols-outlined">{{ s.icon }}</span>
+  <div class="ws-search-welcome">
+      <div class="label-caps" style="margin-bottom: var(--space-m); opacity: 0.5;">Quick Commands</div>
+      <div class="ws-command-grid">
+          {% for s in suggestions %}
+          <button class="ws-command-item" 
+                  onclick="window.WorkspaceUI.closeSearch()"
+                  hx-get="{{ s.url }}"
+                  hx-target="{{ s.target }}"
+                  {% if s.target == '#main-stage' %}hx-push-url="true"{% endif %}>
+              <span class="material-symbols-outlined">{{ s.icon }}</span>
+              <div class="ws-command-item__info">
+                  <div class="ws-command-item__title">{{ s.title }}</div>
+                  <div class="ws-command-item__meta">Quick Action</div>
+              </div>
+          </button>
+          {% endfor %}
       </div>
-      <div class="ws-search-item__content">
-        <div class="ws-search-item__title">{{ s.title }}</div>
-        <div class="ws-search-item__meta">Quick Action</div>
-      </div>
-    </div>
-    {% endfor %}
   </div>
 
 {% elif gov or journal or people %}
@@ -23,20 +23,19 @@
   {# 1. Governance results #}
   {% if gov %}
   <div class="ws-search-group">
-    <div class="ws-search-group-label">Apostolic Registry</div>
+    <div class="label-caps" style="padding: var(--space-s) var(--space-m); opacity: 0.5;">Apostolic Registry</div>
     {% for r in gov %}
     <a href="{% if r.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' r.id %}{% else %}{% url 'governance:mandate-detail' r.id %}{% endif %}"
-       class="ws-search-item"
-       onclick="closeGlobalSearch()"
+       class="ws-command-item"
+       style="border: none; background: transparent;"
+       onclick="window.WorkspaceUI.closeSearch()"
        hx-get="{% if r.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' r.id %}{% else %}{% url 'governance:mandate-detail' r.id %}{% endif %}"
-       hx-target="#ws-detail"
+       hx-target="#main-stage"
        hx-push-url="true">
-      <div class="ws-search-item__icon">
-        <span class="material-symbols-outlined">gavel</span>
-      </div>
-      <div class="ws-search-item__content">
-        <div class="ws-search-item__title">{{ r.title }}</div>
-        <div class="ws-search-item__meta">{{ r.record_type|title }}&nbsp;·&nbsp;v{{ r.version }}</div>
+      <span class="material-symbols-outlined" style="color: var(--accent-red);">gavel</span>
+      <div class="ws-command-item__info">
+        <div class="ws-command-item__title">{{ r.title }}</div>
+        <div class="ws-command-item__meta">{{ r.record_type|title }}&nbsp;·&nbsp;v{{ r.version }}</div>
       </div>
     </a>
     {% endfor %}
@@ -46,20 +45,19 @@
   {# 2. Journal results #}
   {% if journal %}
   <div class="ws-search-group">
-    <div class="ws-search-group-label">My Records</div>
+    <div class="label-caps" style="padding: var(--space-s) var(--space-m); opacity: 0.5;">My Records</div>
     {% for r in journal %}
     <a href="{% url 'records:records-detail' r.id %}"
-       class="ws-search-item"
-       onclick="closeGlobalSearch()"
+       class="ws-command-item"
+       style="border: none; background: transparent;"
+       onclick="window.WorkspaceUI.closeSearch()"
        hx-get="{% url 'records:records-detail' r.id %}"
-       hx-target="#ws-detail"
+       hx-target="#main-stage"
        hx-push-url="true">
-      <div class="ws-search-item__icon">
-        <span class="material-symbols-outlined">history_edu</span>
-      </div>
-      <div class="ws-search-item__content">
-        <div class="ws-search-item__title">{{ r.title }}</div>
-        <div class="ws-search-item__meta">{{ r.get_record_type_display|default:r.record_type|title }}&nbsp;·&nbsp;{{ r.updated_at|date:"d M" }}</div>
+      <span class="material-symbols-outlined" style="color: var(--accent-red);">history_edu</span>
+      <div class="ws-command-item__info">
+        <div class="ws-command-item__title">{{ r.title }}</div>
+        <div class="ws-command-item__meta">{{ r.get_record_type_display|default:r.record_type|title }}&nbsp;·&nbsp;{{ r.updated_at|date:"d M" }}</div>
       </div>
     </a>
     {% endfor %}
@@ -69,15 +67,15 @@
   {# 3. People results #}
   {% if people %}
   <div class="ws-search-group">
-    <div class="ws-search-group-label">Coordinators & Stewards</div>
+    <div class="label-caps" style="padding: var(--space-s) var(--space-m); opacity: 0.5;">Coordinators</div>
     {% for p in people %}
-    <div class="ws-search-item">
-      <div class="ws-search-item__icon" style="background: var(--primary); color: #fff;">
-        {{ p.display_name|default:p.email|slice:":1"|upper }}
+    <div class="ws-command-item" style="border: none; background: transparent;">
+      <div class="ws-sidebar__level-dot" style="background: var(--level-{{ p.competence_level|default:0 }}); width: 24px; height: 24px; font-size: 10px;">
+        {{ p.competence_level|default:0 }}
       </div>
-      <div class="ws-search-item__content">
-        <div class="ws-search-item__title">{{ p.display_name|default:p.email }}</div>
-        <div class="ws-search-item__meta">Level {{ p.competence_level }}&nbsp;·&nbsp;Apostolic Worker</div>
+      <div class="ws-command-item__info">
+        <div class="ws-command-item__title">{{ p.display_name|default:p.email }}</div>
+        <div class="ws-command-item__meta">Steward Level {{ p.competence_level }}</div>
       </div>
     </div>
     {% endfor %}
@@ -90,3 +88,16 @@
     <p style="font-size: 14px;">No registry entries matching "<strong>{{ q }}</strong>"</p>
   </div>
 {% endif %}
+
+<style>
+.ws-search-group {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: var(--space-s);
+}
+.ws-search-group:last-child {
+    border-bottom: none;
+}
+.ws-command-item:hover {
+    background: rgba(255,255,255,0.05) !important;
+}
+</style>

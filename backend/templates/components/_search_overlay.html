@@ -1,69 +1,211 @@
-<!-- Global Search Overlay — Premium command center -->
+<!-- Global Command Palette — Apostolic Editorial Center -->
 <div class="ws-search-overlay" id="ws-search-overlay">
-  <div class="ws-search-container">
+  <div class="ws-search-container card-dark">
     
     <div class="ws-search-header">
-      <span class="material-symbols-outlined">search</span>
+      <span class="material-symbols-outlined" style="color: var(--accent-red);">terminal</span>
       <input type="text" 
              id="ws-global-search-input"
              class="ws-search-input"
-             placeholder="Search mandates, journal, people..."
+             placeholder="Search mandates, journal, people or type a command..."
              autocomplete="off"
              hx-get="{% url 'governance:htmx-global-search' %}"
-             hx-trigger="keyup changed delay:300ms"
+             hx-trigger="keyup changed delay:200ms"
              hx-target="#ws-global-search-results"
              hx-swap="innerHTML">
-      <kbd style="font-size: 10px; color: var(--muted); opacity: 0.5;">ESC</kbd>
-    </div>
-
-    <div class="ws-search-results" id="ws-global-search-results">
-      <div style="padding: 2.5rem 2rem; text-align: center; color: var(--muted);">
-        <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.15; display: block; margin-bottom: 1rem;">manage_search</span>
-        <p style="font-size: 14px; opacity: 0.7;">Search mandates, records, and coordinators across the Apostolic Registry.</p>
-        
-        <div style="margin-top: 1.5rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">
-          <span style="font-size: 11px; opacity: 0.5; width: 100%; margin-bottom: 4px;">QUICK JUMPS</span>
-          <button class="ws-btn ws-btn--secondary" style="font-size: 11px; padding: 4px 10px;">Journal</button>
-          <button class="ws-btn ws-btn--secondary" style="font-size: 11px; padding: 4px 10px;">Reference Library</button>
-          <button class="ws-btn ws-btn--secondary" style="font-size: 11px; padding: 4px 10px;">Programme Mandates</button>
-        </div>
+      <div class="ws-search-kbd-hint">
+        <kbd>ESC</kbd>
       </div>
     </div>
 
+    <div class="ws-search-results" id="ws-global-search-results">
+        {# Default / Suggested Actions #}
+        <div class="ws-search-welcome">
+            <div class="label-caps" style="margin-bottom: var(--space-m); opacity: 0.5;">Quick Commands</div>
+            <div class="ws-command-grid">
+                <button class="ws-command-item" onclick="window.location.href='/governance/desk/'">
+                    <span class="material-symbols-outlined">edit_note</span>
+                    <div class="ws-command-item__info">
+                        <div class="ws-command-item__title">Editorial Desk</div>
+                        <div class="ws-command-item__meta">Draft new mandates</div>
+                    </div>
+                    <kbd>G D</kbd>
+                </button>
+                <button class="ws-command-item" onclick="window.location.href='/calendar/'">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    <div class="ws-command-item__info">
+                        <div class="ws-command-item__title">Calendar</div>
+                        <div class="ws-command-item__meta">View institutional schedule</div>
+                    </div>
+                    <kbd>G C</kbd>
+                </button>
+                <button class="ws-command-item" onclick="window.location.href='/records/'">
+                    <span class="material-symbols-outlined">history_edu</span>
+                    <div class="ws-command-item__info">
+                        <div class="ws-command-item__title">Journal</div>
+                        <div class="ws-command-item__meta">Open your records</div>
+                    </div>
+                    <kbd>G J</kbd>
+                </button>
+                <button class="ws-command-item" onclick="window.WorkspaceUI.toggleTheme()">
+                    <span class="material-symbols-outlined">contrast</span>
+                    <div class="ws-command-item__info">
+                        <div class="ws-command-item__title">Toggle Theme</div>
+                        <div class="ws-command-item__meta">Switch Light/Dark</div>
+                    </div>
+                    <kbd>T T</kbd>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="ws-search-footer">
-      <div><kbd>↑↓</kbd> to navigate</div>
-      <div><kbd>↵</kbd> to select</div>
-      <div><kbd>ESC</kbd> to close</div>
+      <div class="ws-search-footer__item"><kbd>↑↓</kbd> <span>Navigate</span></div>
+      <div class="ws-search-footer__item"><kbd>↵</kbd> <span>Execute</span></div>
+      <div class="ws-search-footer__item"><kbd>ESC</kbd> <span>Dismiss</span></div>
+      <div style="flex: 1;"></div>
+      <div class="ws-search-footer__brand">Ichebo Command Shell <span>v2.4</span></div>
     </div>
 
   </div>
 </div>
 
-<script>
-(function() {
-  const overlay = document.getElementById('ws-search-overlay');
-  const input = document.getElementById('ws-global-search-input');
+<style>
+.ws-search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    padding-top: 15vh;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
 
-  window.openGlobalSearch = function() {
-    overlay.classList.add('active');
-    input.focus();
-    input.value = '';
-  };
+.ws-search-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
 
-  window.closeGlobalSearch = function() {
-    overlay.classList.remove('active');
-    input.blur();
-  };
+.ws-search-container {
+    width: 100%;
+    max-width: 680px;
+    height: fit-content;
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+}
 
-  // Close on Escape or click outside
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && overlay.classList.contains('active')) {
-      closeGlobalSearch();
-    }
-  });
+.ws-search-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+    padding: var(--space-l);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
 
-  overlay.addEventListener('click', function(e) {
-    if (e.target === overlay) closeGlobalSearch();
-  });
-})();
-</script>
+.ws-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: var(--fz-1);
+    font-family: var(--ff-body);
+    font-weight: 500;
+}
+
+.ws-search-input:focus {
+    outline: none;
+}
+
+.ws-search-results {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-m);
+}
+
+.ws-search-welcome {
+    padding: var(--space-m);
+}
+
+.ws-command-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-s);
+}
+
+.ws-command-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+    padding: var(--space-m);
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: var(--radius-m);
+    color: #fff;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ws-command-item:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--accent-red);
+}
+
+.ws-command-item kbd {
+    margin-left: auto;
+    font-size: 9px;
+    opacity: 0.3;
+    background: rgba(255,255,255,0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.ws-command-item__info {
+    flex: 1;
+}
+
+.ws-command-item__title {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.ws-command-item__meta {
+    font-size: 11px;
+    opacity: 0.5;
+}
+
+.ws-search-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-l);
+    padding: var(--space-s) var(--space-l);
+    background: rgba(0,0,0,0.2);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+}
+
+.ws-search-footer kbd {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.6);
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin-right: 4px;
+}
+
+.ws-search-footer__brand span {
+    color: var(--accent-red);
+    font-weight: 800;
+}
+</style>
