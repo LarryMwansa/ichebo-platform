@@ -1,0 +1,50 @@
+{% extends "bible/base_sidecar.html" %}
+
+{% block content %}
+<div class="sidecar-nav">
+    <button class="sidecar-nav-btn" onclick="navChapter(-1)">
+        <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
+    </button>
+    <div style="font-weight: 800; font-size: 13px; font-family: 'Playfair Display', serif;">
+        {{ book.name }} {{ chapter }}
+    </div>
+    <button class="sidecar-nav-btn" onclick="navChapter(1)">
+        <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
+    </button>
+</div>
+
+<div id="bible-chapter"
+     data-book-code="{{ book.code }}"
+     data-chapter="{{ chapter }}">
+  {% include "bible/_chapter.html" %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  async function navChapter(offset) {
+    const chapterDiv = document.getElementById('bible-chapter');
+    const innerDiv = chapterDiv?.querySelector('[data-book-code]');
+    if (!innerDiv) return;
+
+    const bookCode = innerDiv.dataset.bookCode;
+    const chapter = parseInt(innerDiv.dataset.chapter);
+    let newChapter = chapter + offset;
+    if (newChapter < 1) newChapter = 1;
+
+    try {
+      const response = await fetch(`/bible/htmx/chapter/?book_code=${bookCode}&chapter=${newChapter}`);
+      if (!response.ok) return;
+      const html = await response.text();
+      chapterDiv.innerHTML = html;
+      htmx.process(chapterDiv);
+      
+      // Update nav title
+      const newBookName = chapterDiv.querySelector('.bible-chapter-title')?.textContent?.trim() || 'Scripture';
+      document.querySelector('.sidecar-nav div').textContent = newBookName;
+      
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } catch (error) { console.error(error); }
+  }
+</script>
+{% endblock %}

@@ -1,7 +1,9 @@
 <!-- Chapter header -->
+{% if not request.GET.view == 'sidecar' %}
 <div class="bible-chapter-header">
   <h1 class="bible-chapter-title">{{ book.name }} {{ chapter }}</h1>
 </div>
+{% endif %}
 
 <div class="bible-verse-list" data-book-code="{{ book.code }}" data-chapter="{{ chapter }}" style="display: flex; flex-direction: column; gap: 4px; padding-bottom: 2rem;">
   {% for verse in verses %}

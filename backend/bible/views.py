@@ -54,7 +54,12 @@ class BibleReaderView(LoginRequiredMixin, View):
             'tenant_noted': tenant_noted,
             'active_app': 'bible',
         }
-        return render(request, 'bible/reader.html', context)
+
+        template_name = 'bible/reader.html'
+        if request.GET.get('view') == 'sidecar':
+            template_name = 'bible/sidecar_reader.html'
+
+        return render(request, template_name, context)
 
 
 @login_required
