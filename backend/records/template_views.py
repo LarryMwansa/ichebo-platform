@@ -251,3 +251,50 @@ def htmx_record_search(request):
         'query': query,
         'has_results': results.exists(),
     })
+
+
+# ── Knowledge Graph (Apostolic Web) ──────────────────────────────────────────
+
+@login_required
+def graph_view(request):
+    """Full-page graph visualization shell."""
+    return render(request, 'workspace/records/graph.html', {
+        'active_app': 'records',
+        'ws_page_title': 'Knowledge Graph',
+    })
+
+
+@login_required
+def htmx_graph_data(request):
+    """Returns JSON nodes and links for the D3 graph."""
+    import json
+    from django.http import JsonResponse
+
+    # Fetch all active records (nodes)
+    records = Record.objects.filter(deleted_at__isnull=True)
+    
+    nodes = []
+    for r in records:
+        nodes.append({
+            'id': str(r.id),
+            'title': r.title,
+            'family': r.record_family,
+            'type': r.record_type,
+            'level': r.permissions_data.get('required_level', 1) if r.permissions_data else 1,
+        })
+
+    # Fetch all active relationships (links)
+    relationships = Relationship.objects.filter(deleted_at__isnull=True, to_record__isnull=False)
+    
+    links = []
+    for rel in relationships:
+        links.append({
+            'source': str(rel.from_record_id),
+            'target': str(rel.to_record_id),
+            'type': rel.relationship_type,
+        })
+
+    return JsonResponse({
+        'nodes': nodes,
+        'links': links,
+    })

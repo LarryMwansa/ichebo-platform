@@ -1,0 +1,243 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block title %}Apostolic Web — Knowledge Graph{% endblock %}
+
+{% block extra_css %}
+<style>
+    .graph-container {
+        width: 100%;
+        height: calc(100vh - 64px); /* Subtract topbar height */
+        background: #050505; /* Deeper black for the web */
+        overflow: hidden;
+        position: relative;
+    }
+
+    #apostolic-web-svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    .graph-node {
+        cursor: pointer;
+        stroke-width: 1.5px;
+        transition: all 0.3s ease;
+    }
+
+    .graph-node:hover {
+        stroke: #fff !important;
+        filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+    }
+
+    .graph-link {
+        stroke-opacity: 0.2;
+        stroke-width: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .graph-link.active {
+        stroke-opacity: 0.8;
+        stroke-width: 2px;
+    }
+
+    .graph-label {
+        font-family: 'Inter', sans-serif;
+        font-size: 10px;
+        fill: rgba(255,255,255,0.4);
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .graph-overlay {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        pointer-events: none;
+    }
+
+    .graph-legend {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(10px);
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 11px;
+        color: rgba(255,255,255,0.7);
+    }
+
+    .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    /* Tooltip */
+    .graph-tooltip {
+        position: absolute;
+        padding: 10px 15px;
+        background: rgba(20,20,20,0.95);
+        border: 1px solid var(--accent-red);
+        color: #fff;
+        border-radius: 8px;
+        font-size: 12px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 100;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+</style>
+{% endblock %}
+
+{% block ws_content %}
+<div class="graph-container" id="graph-stage">
+    <div class="graph-overlay">
+        <h1 class="ws-page-title" style="color: #fff !important; margin: 0; font-size: 32px;">Apostolic <span style="color: var(--accent-red);">Web</span></h1>
+        <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-top: 5px;">Relational Map of Mandates, Records & Divine Patterns</p>
+    </div>
+
+    <svg id="apostolic-web-svg"></svg>
+
+    <div class="graph-tooltip" id="graph-tooltip"></div>
+
+    <div class="graph-legend">
+        <div class="label-caps" style="font-size: 9px; opacity: 0.5; margin-bottom: 5px;">Registry Classification</div>
+        <div class="legend-item"><div class="legend-dot" style="background: var(--accent-red);"></div> Governance</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #3498db;"></div> Personal Journal</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #f1c40f;"></div> Learning</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #2ecc71;"></div> Community</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const svg = d3.select("#apostolic-web-svg");
+        const container = document.getElementById('graph-stage');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        const tooltip = document.getElementById('graph-tooltip');
+
+        // Apostolic Colors
+        const colors = {
+            governance: '#ff4757',
+            journal: '#3498db',
+            learning: '#f1c40f',
+            community: '#2ecc71',
+            default: '#95a5a6'
+        };
+
+        // Fetch Data
+        const response = await fetch("{% url 'records:htmx-graph-data' %}");
+        const data = await response.json();
+
+        const simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.links).id(d => d.id).distance(100))
+            .force("charge", d3.forceManyBody().strength(-300))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("x", d3.forceX(width / 2).strength(0.1))
+            .force("y", d3.forceY(height / 2).strength(0.1));
+
+        // Add Zoom
+        const g = svg.append("g");
+        svg.call(d3.zoom().on("zoom", (event) => {
+            g.attr("transform", event.transform);
+        }));
+
+        // Render Links
+        const link = g.append("g")
+            .attr("class", "links")
+            .selectAll("line")
+            .data(data.links)
+            .enter().append("line")
+            .attr("class", "graph-link")
+            .attr("stroke", d => colors[d.type] || 'rgba(255,255,255,0.1)');
+
+        // Render Nodes
+        const node = g.append("g")
+            .attr("class", "nodes")
+            .selectAll("circle")
+            .data(data.nodes)
+            .enter().append("circle")
+            .attr("class", "graph-node")
+            .attr("r", d => 5 + (d.level * 2))
+            .attr("fill", d => colors[d.family] || colors.default)
+            .attr("stroke", d => d3.color(colors[d.family] || colors.default).darker(1))
+            .on("mouseover", (event, d) => {
+                tooltip.style.opacity = 1;
+                tooltip.innerHTML = `<strong>${d.title}</strong><br><span style="opacity:0.6; font-size:10px;">${d.type.toUpperCase()}</span>`;
+                tooltip.style.left = (event.pageX + 10) + 'px';
+                tooltip.style.top = (event.pageY - 10) + 'px';
+            })
+            .on("mouseout", () => {
+                tooltip.style.opacity = 0;
+            })
+            .on("click", (event, d) => {
+                // Open detail in context bar or push URL
+                window.location.href = `/records/${d.id}/`;
+            })
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        // Labels
+        const label = g.append("g")
+            .attr("class", "labels")
+            .selectAll("text")
+            .data(data.nodes)
+            .enter().append("text")
+            .attr("class", "graph-label")
+            .text(d => d.title.length > 20 ? d.title.substring(0, 20) + '...' : d.title)
+            .attr("dx", 12)
+            .attr("dy", 4);
+
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+
+            label
+                .attr("x", d => d.x)
+                .attr("y", d => d.y);
+        });
+
+        function dragstarted(event) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            event.subject.fx = event.subject.x;
+            event.subject.fy = event.subject.y;
+        }
+
+        function dragged(event) {
+            event.subject.fx = event.x;
+            event.subject.fy = event.y;
+        }
+
+        function dragended(event) {
+            if (!event.active) simulation.alphaTarget(0);
+            event.subject.fx = null;
+            event.subject.fy = null;
+        }
+    });
+</script>
+{% endblock %}

@@ -166,6 +166,11 @@
                    title="Governance" hx-boost="false">
                     <span class="material-symbols-outlined">gavel</span>
                 </a>
+                <a href="{% url 'records:graph' %}" 
+                   class="ics-sidebar__item {% if active_app == 'records' and ws_page_title == 'Knowledge Graph' %}active{% endif %}"
+                   title="Apostolic Web (Graph)" hx-boost="false">
+                    <span class="material-symbols-outlined">hub</span>
+                </a>
                 <a href="{% url 'community:community-home' %}" 
                    class="ics-sidebar__item {% if active_app == 'community' %}active{% endif %}"
                    title="Community" hx-boost="false">
