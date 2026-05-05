@@ -155,67 +155,55 @@
             </a>
 
             <nav class="ics-sidebar__nav">
-                <a href="{% url 'dashboard:index' %}" 
+                <a href="{% url 'dashboard:index' %}"
                    class="ics-sidebar__item {% if active_app == 'dashboard' %}active{% endif %}"
-                   title="Dashboard" hx-boost="false">
+                   data-tooltip="Dashboard" hx-boost="false">
                     <span class="material-symbols-outlined">dashboard</span>
                 </a>
-                <a href="{% url 'governance:desk' %}" 
+                <a href="{% url 'governance:desk' %}"
                    class="ics-sidebar__item {% if active_app == 'desk' %}active{% endif %}"
-                   title="The Desk" hx-boost="false">
+                   data-tooltip="The Desk" hx-boost="false">
                     <span class="material-symbols-outlined">edit_note</span>
                 </a>
-                <a href="{% url 'records:records-home' %}" 
-                   class="ics-sidebar__item {% if active_app == 'records' %}active{% endif %}"
-                   title="Records & Journal" hx-boost="false">
-                    <span class="material-symbols-outlined">history_edu</span>
-                </a>
-                <a href="{% url 'governance:home' %}" 
+                <a href="{% url 'governance:home' %}"
                    class="ics-sidebar__item {% if active_app == 'governance' %}active{% endif %}"
-                   title="Governance" hx-boost="false">
+                   data-tooltip="Governance" hx-boost="false">
                     <span class="material-symbols-outlined">gavel</span>
                 </a>
-                <a href="{% url 'records:graph' %}" 
-                   class="ics-sidebar__item {% if active_app == 'records' and ws_page_title == 'Knowledge Graph' %}active{% endif %}"
-                   title="Apostolic Web (Graph)" hx-boost="false">
-                    <span class="material-symbols-outlined">hub</span>
-                </a>
-                <a href="{% url 'community:community-home' %}" 
+                <a href="{% url 'community:community-home' %}"
                    class="ics-sidebar__item {% if active_app == 'community' %}active{% endif %}"
-                   title="Community" hx-boost="false">
+                   data-tooltip="Community" hx-boost="false">
                     <span class="material-symbols-outlined">groups</span>
                 </a>
-                <a href="{% url 'learn:learn-home' %}" 
+                <a href="{% url 'learn:learn-home' %}"
                    class="ics-sidebar__item {% if active_app == 'formation' %}active{% endif %}"
-                   title="Formation" hx-boost="false">
+                   data-tooltip="Formation" hx-boost="false">
                     <span class="material-symbols-outlined">school</span>
                 </a>
-                <a href="{% url 'activity:activity-home' %}" 
+                <a href="{% url 'activity:activity-home' %}"
                    class="ics-sidebar__item {% if active_app == 'activity' %}active{% endif %}"
-                   title="Activity" hx-boost="false">
+                   data-tooltip="Activity" hx-boost="false">
                     <span class="material-symbols-outlined">task_alt</span>
                 </a>
-                <a href="{% url 'calendar:month' %}" 
-                   class="ics-sidebar__item {% if active_app == 'calendar' %}active{% endif %}"
-                   title="Institutional Calendar" hx-boost="false">
-                    <span class="material-symbols-outlined">calendar_month</span>
-                </a>
-                <a href="{% url 'bible:reader' %}" 
+                <a href="{% url 'bible:reader' %}"
                    class="ics-sidebar__item {% if active_app == 'bible' %}active{% endif %}"
-                   title="Bible Reader" hx-boost="false">
+                   data-tooltip="Bible Reader" hx-boost="false">
                     <span class="material-symbols-outlined">menu_book</span>
                 </a>
-                <a href="{% url 'video_live:home' %}" 
+                <a href="{% url 'video_live:home' %}"
                    class="ics-sidebar__item {% if active_app == 'video' %}active{% endif %}"
-                   title="Video & Broadcast" hx-boost="false">
+                   data-tooltip="Video & Broadcast" hx-boost="false">
                     <span class="material-symbols-outlined">live_tv</span>
                 </a>
-                <a href="{% url 'tenants:steward-dashboard' %}" 
+            </nav>
+
+            <div class="ics-sidebar__bottom">
+                <a href="{% url 'tenants:steward-dashboard' %}"
                    class="ics-sidebar__item {% if active_app == 'tenancy' %}active{% endif %}"
-                   title="Tenancy Hub" hx-boost="false">
+                   data-tooltip="Tenancy Hub" hx-boost="false">
                     <span class="material-symbols-outlined">account_balance</span>
                 </a>
-            </nav>
+            </div>
 
         </aside>
 

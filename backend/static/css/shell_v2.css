@@ -80,6 +80,23 @@ html:not(.dark) .ics-logo {
   display: flex;
   flex-direction: column;
   gap: var(--space-m);
+  flex: 1;
+}
+
+/* Bottom-pinned admin items (Tenancy etc.) — visually separated from core nav */
+.ics-sidebar__bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-m);
+  padding-bottom: var(--space-s);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: var(--space-s);
+  margin-top: var(--space-s);
+}
+
+html:not(.dark) .ics-sidebar__bottom {
+  border-top-color: var(--border);
 }
 
 .ics-sidebar__item {
@@ -123,6 +140,42 @@ html:not(.dark) .ics-sidebar__item:hover {
   background: var(--primary);
   border-radius: 0 2px 2px 0;
   box-shadow: 0 0 8px var(--primary);
+}
+
+/* ── Instant tooltip on sidebar items ───────────────────────── */
+.ics-sidebar__item[data-tooltip] {
+  overflow: visible;
+}
+
+.ics-sidebar__item[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--ff-body);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: var(--radius-s);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  z-index: 200;
+}
+
+.ics-sidebar__item[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+html:not(.dark) .ics-sidebar__item[data-tooltip]::after {
+  background: var(--ink);
+  color: #fff;
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 /* ── Column 2: Context Bar (App Nav / Explorer) ─────────────── */

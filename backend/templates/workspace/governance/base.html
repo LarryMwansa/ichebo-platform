@@ -29,6 +29,18 @@
     <div class="ctx-divider"></div>
 
     <div class="ws-sidebar__section">
+        <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Knowledge</div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            <a href="{% url 'records:graph' %}" class="ctx-btn">
+                <span class="material-symbols-outlined">hub</span>
+                Apostolic Web
+            </a>
+        </div>
+    </div>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-sidebar__section">
         <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Sub-Types</div>
         <div style="display: flex; flex-direction: column; gap: 2px;">
             {% if active_branch == 'library' %}
