@@ -17,10 +17,15 @@
     
     <div class="ws-page-header" style="margin-bottom: 40px;">
         <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Kingdom Node</div>
-        <h1 class="ws-page-title">My <em>Community</em></h1>
-        {% if primary_perm.tenant.name %}
-        <p style="margin: 8px 0 0; font-size: 14px; color: var(--muted); font-weight: 600;">{{ primary_perm.tenant.name }}</p>
-        {% endif %}
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <h1 class="ws-page-title">My <em>Community</em></h1>
+            {% if primary_perm.tenant.name %}
+            <div style="display: flex; align-items: center; gap: 10px; font-family: 'Inter', sans-serif;">
+                <span class="material-symbols-outlined" style="font-size: 18px; opacity: 0.4; color: var(--text);">chevron_right</span>
+                <span style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; color: var(--muted);">{{ primary_perm.tenant.name }}</span>
+            </div>
+            {% endif %}
+        </div>
     </div>
 
     {# 1. Formation Track (High Density) #}

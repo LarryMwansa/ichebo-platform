@@ -1,17 +1,17 @@
 {% extends "tenants/base_tenants.html" %}
 
 {% block tenants_content %}
-<div class="ws-page-header" style="margin-bottom: var(--space-l);">
-  <div class="label-tag" style="margin-bottom: var(--space-xs);">Institutional Hub</div>
-  <div style="display: flex; align-items: center; justify-content: space-between;">
-    <h1 class="editorial-title" style="font-size: var(--fz-3); margin: 0;">Tenancy <em>Oversight</em></h1>
-    {% if can_create %}
-    <a href="{% url 'tenants:create-tenant' %}" class="btn-touch btn-touch--primary">
-      <span class="material-symbols-outlined">add_business</span>
-      New Community
-    </a>
-    {% endif %}
+<div class="ws-page-header" style="margin-bottom: var(--space-l); display: flex; justify-content: space-between; align-items: flex-end;">
+  <div>
+    <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Institutional Hub</div>
+    <h1 class="ws-page-title">Tenancy <em>Oversight</em></h1>
   </div>
+  {% if can_create %}
+  <a href="{% url 'tenants:create-tenant' %}" class="ws-topbar__cta" style="text-decoration: none; flex-shrink: 0;">
+    <span class="material-symbols-outlined">add_business</span>
+    New Community
+  </a>
+  {% endif %}
 </div>
 
 {% if my_tenants %}
