@@ -4,21 +4,21 @@
 {% block governance_content %}
     <div class="editorial-stage">
         {# ── Published View Header ── #}
-        <div class="ws-page-header" style="padding: var(--space-m) var(--space-4xl);">
+        <div class="ws-page-header" style="padding: var(--space-m) var(--space-4xl); display: flex; justify-content: space-between; align-items: flex-end;">
             <div class="ws-page-header__left">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div class="ws-label-tag">{{ record.get_record_type_display|upper }}</div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <div class="ws-label-tag" style="color: var(--accent-red);">{{ record.get_record_type_display|upper }}</div>
                     {% if record.status == 'locked' %}
                     <span class="material-symbols-outlined" style="font-size: 16px; color: var(--muted);">lock</span>
                     {% endif %}
                 </div>
-                <h1 class="editorial-title" style="margin-top: 8px;">{{ record.title }}</h1>
+                <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; color: var(--text); margin: 0; line-height: 1.2;">{{ record.title }}</h1>
             </div>
-            <div class="ws-page-header__actions">
+            <div class="ws-page-header__actions" style="flex-shrink: 0;">
                 {% if is_level5 and record.status != 'locked' %}
                 <button class="ws-topbar__cta"
                         hx-get="{% url 'governance:htmx-record-edit' record.id %}"
-                        hx-target="#main-content"
+                        hx-target="#main-stage"
                         hx-push-url="true">
                     <span class="material-symbols-outlined">edit_note</span>
                     Edit Decree

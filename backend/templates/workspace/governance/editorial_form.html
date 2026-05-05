@@ -85,7 +85,7 @@
               {% else %}
                 hx-post="{% url 'governance:htmx-record-create' %}"
               {% endif %}
-              hx-target="#main-content" 
+              hx-target="#main-stage" 
               hx-push-url="true">
             {% csrf_token %}
             <input type="hidden" name="record_family" value="{{ record_family }}">

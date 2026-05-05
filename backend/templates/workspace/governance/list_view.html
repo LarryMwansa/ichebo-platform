@@ -2,10 +2,11 @@
 {% load static %}
 
 {% block governance_content %}
-    {# ── MASTER LIST HEADER ── #}
-    <div class="ws-page-header" style="padding: var(--space-m) var(--space-m) 0;">
-        <div class="ws-page-header__left">
-            <div class="ws-label-tag">Registry: {{ active_branch|title }}</div>
+<div style="max-width: 860px; margin: 0 auto; padding: 20px 0 100px;">
+
+    <div class="ws-page-header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">{{ active_branch|title }} Registry</div>
             <h1 class="ws-page-title">
                 {% if record_type %}
                     {{ type_label }}
@@ -14,27 +15,25 @@
                 {% endif %}
             </h1>
         </div>
-        <div class="ws-page-header__actions">
-            {% if is_level5 %}
-            <button class="ws-topbar__cta"
-                    hx-get="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={{ record_type|default:'decree' }}"
-                    hx-target="#main-content"
-                    hx-push-url="true">
-                <span class="material-symbols-outlined">add</span>
-                New {% if active_branch == 'keys' %}Key{% else %}Act{% endif %}
-            </button>
-            {% endif %}
-        </div>
+        {% if is_level5 %}
+        <button class="ws-topbar__cta" style="flex-shrink: 0;"
+                hx-get="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={{ record_type|default:'decree' }}"
+                hx-target="#main-stage"
+                hx-push-url="true">
+            <span class="material-symbols-outlined">add</span>
+            New {% if active_branch == 'keys' %}Key{% else %}Act{% endif %}
+        </button>
+        {% endif %}
     </div>
 
-    <div class="ws-content__inner" style="padding-top: var(--space-m);">
+    <div>
         {# Registry Grid #}
         {% if records %}
             <div class="ws-stat-grid" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
                 {% for record in records %}
                     <div class="ws-stat-card" 
                          hx-get="{% if active_branch == 'keys' %}{% url 'governance:keys-detail' record.id %}{% elif active_branch == 'library' %}{% url 'governance:library-detail' record.id %}{% else %}{% url 'governance:mandate-detail' record.id %}{% endif %}"
-                         hx-target="#main-content"
+                         hx-target="#main-stage"
                          hx-push-url="true"
                          style="cursor: pointer; position: relative; padding: var(--space-m);">
                         
@@ -78,10 +77,12 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div class="ws-empty-state" style="height: 300px; border: 1px dashed var(--border); border-radius: var(--radius-m); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-s); color: var(--muted);">
-                <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.5;">inventory_2</span>
-                <p style="font-weight: 500;">No records found in this registry.</p>
+            <div style="height: 300px; border: 1px dashed var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--muted);">
+                <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2;">inventory_2</span>
+                <p style="font-size: 14px; font-weight: 500;">No records found in this registry.</p>
             </div>
         {% endif %}
     </div>
+
+</div>
 {% endblock %}

@@ -72,6 +72,7 @@ def governance_home(request):
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
         'active_branch': 'library',
+        'is_level5':     _level(request.user) >= 5,
     })
 
 
@@ -85,6 +86,7 @@ def library_home(request):
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
         'active_branch': 'library',
+        'is_level5':     _level(request.user) >= 5,
     })
 
 
@@ -150,6 +152,7 @@ def mandate_home(request):
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
         'active_branch': 'mandate',
+        'is_level5':     _level(request.user) >= 5,
     })
 
 

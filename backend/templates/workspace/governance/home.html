@@ -2,31 +2,30 @@
 {% load static %}
 
 {% block governance_content %}
-    {# By default, we show the registry overview or the desk #}
-    <div class="ws-page-header" style="padding: var(--space-m) var(--space-m) 0;">
-        <div class="ws-page-header__left">
-            <div class="ws-label-tag">Registry Hub</div>
+<div style="max-width: 860px; margin: 0 auto; padding: 20px 0 100px;">
+
+    <div class="ws-page-header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Apostolic Records</div>
             <h1 class="ws-page-title">
                 {% if active_branch == 'library' %}Reference <em>Library</em>{% else %}Mandate <em>Branch</em>{% endif %}
             </h1>
         </div>
-        <div class="ws-page-header__actions">
-            {% if is_level5 %}
-            <button class="ws-topbar__cta"
-                    hx-get="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={% if active_branch == 'library' %}decree{% else %}ordinance{% endif %}"
-                    hx-target="#main-content"
-                    hx-push-url="true">
-                <span class="material-symbols-outlined">add</span>
-                New Official Act
-            </button>
-            {% endif %}
-        </div>
+        {% if is_level5 %}
+        <button class="ws-topbar__cta" style="flex-shrink: 0;"
+                hx-get="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={% if active_branch == 'library' %}decree{% else %}ordinance{% endif %}"
+                hx-target="#main-stage"
+                hx-push-url="true">
+            <span class="material-symbols-outlined">add</span>
+            New Official Act
+        </button>
+        {% endif %}
     </div>
 
-    <div class="ws-content__inner" style="padding-top: var(--space-m);">
-        <div class="ws-empty-state" style="height: 300px; border: 1px dashed var(--border); border-radius: var(--radius-m); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-s); color: var(--muted);">
-            <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.5;">account_balance</span>
-            <p style="font-weight: 500;">Select a registry from the context bar to begin review.</p>
-        </div>
+    <div style="height: 300px; border: 1px dashed var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--muted);">
+        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2;">account_balance</span>
+        <p style="font-size: 14px; font-weight: 500;">Select a registry from the context bar to begin review.</p>
     </div>
+
+</div>
 {% endblock %}
