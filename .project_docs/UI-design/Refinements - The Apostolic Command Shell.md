@@ -228,3 +228,14 @@ Stage window:
 
 **Options Bar (Sidecar & Metadata):**
 - suggest the properties
+
+
+
+---
+
+# Prompt stuff
+
+from the last time session we had I have made major development change. I have introduce a Web UI in line with our direction for mobile and operators dashboard. Review the following:
+@.project_docs/UI-design/DESIGN.md 
+@.project_docs/UI-design/design-preview.html 
+ 

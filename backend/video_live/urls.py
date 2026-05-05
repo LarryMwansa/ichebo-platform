@@ -1,9 +1,13 @@
 from django.urls import path
-from . import views
+from . import views, api_views
 
 app_name = 'video_live'
 
 urlpatterns = [
+    # ── Mobile API ──
+    path('api/feed/', api_views.VideoFeedView.as_view(), name='api-feed'),
+
+    # ── Template views ──
     path('',                          views.video_home,         name='home'),
     path('live/',                     views.video_live_view,    name='live'),
     path('schedule/',                 views.video_schedule,     name='schedule'),
