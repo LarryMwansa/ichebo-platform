@@ -10,14 +10,6 @@
     
     <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
     
-    <div style="padding: 0 8px;">
-        <button class="ws-topbar__cta" style="width: 100%; justify-content: center; height: 44px; background: var(--accent-red);"
-                hx-post="{{ save_url }}" 
-                hx-include="#editorial-form"
-                hx-target="#editorial-stage">
-            <span class="material-symbols-outlined">save</span>
-            Save to Registry
-        </button>
     <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
     
     {% include "workspace/editorial/partials/file_explorer.html" %}

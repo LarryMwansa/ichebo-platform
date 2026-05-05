@@ -16,15 +16,12 @@
 
 {# ── MAIN STAGE (CENTER) ── #}
 {% block ws_content %}
-    <div id="editorial-stage" class="editorial-stage">
-        {% block hub_stage %}
-            {# Default empty state or the common editor #}
-            <div class="ws-empty-state">
-                <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2;">edit_note</span>
-                <p>Select a record or create a new one to begin drafting.</p>
-            </div>
-        {% endblock %}
-    </div>
+    {% block hub_stage %}
+        <div class="ws-empty-state" style="padding: 100px 0; text-align: center;">
+            <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2; display: block;">edit_note</span>
+            <p style="font-size: 14px; color: var(--muted); margin-top: 16px;">Select a record or create a new one to begin drafting.</p>
+        </div>
+    {% endblock %}
 {% endblock %}
 
 {# ── OPTIONS BAR (RIGHT) ── #}
