@@ -3,6 +3,69 @@
 
 {% block watermark %}SCRIPTURE{% endblock %}
 
+{% block context_header %}Scripture{% endblock %}
+{% block context_content %}
+<div style="display: flex; flex-direction: column; gap: var(--space-s);">
+
+    {# Version selector #}
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs); color: var(--accent-red);">Translation</div>
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+        {% for trans in translations %}
+        <button class="ctx-btn {% if trans == translation %}active{% endif %}"
+                style="{% if trans == translation %}background: var(--primary-light); color: var(--primary); border-color: var(--primary-alpha);{% endif %}"
+                hx-post="{% url 'bible:htmx-set-translation' %}"
+                hx-vals='{"translation_code": "{{ trans.code }}", "book_code": "{{ book.code }}", "chapter": "{{ chapter }}"}'
+                hx-target="#bible-chapter"
+                hx-swap="innerHTML">
+            <span class="material-symbols-outlined">{% if trans == translation %}check{% else %}menu_book{% endif %}</span>
+            {{ trans.code }} — {{ trans.name|truncatechars:18 }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <div class="ctx-divider"></div>
+
+    {# Book selector #}
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs); color: var(--accent-red);">Book</div>
+    <div style="display: flex; flex-direction: column; gap: 3px; max-height: 200px; overflow-y: auto;">
+        {% for b in books %}
+        <a href="{% url 'bible:reader-chapter' b.code 1 %}"
+           class="ctx-btn {% if b.code == book.code %}active{% endif %}"
+           style="height: 32px; font-size: 12px; {% if b.code == book.code %}background: var(--primary-light); color: var(--primary); border-color: var(--primary-alpha);{% endif %}">
+            {{ b.name }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <div class="ctx-divider"></div>
+
+    {# Chapter selector #}
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs); color: var(--accent-red);">Chapter</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+        {% for ch in chapters %}
+        <a href="{% url 'bible:reader-chapter' book.code ch %}"
+           style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+                  font-size: 12px; font-weight: 700; border-radius: var(--radius-s); text-decoration: none;
+                  border: 1px solid var(--border); color: var(--text);
+                  {% if ch == chapter %}background: var(--primary); color: #fff; border-color: var(--primary);{% else %}background: var(--card-2);{% endif %}
+                  transition: all var(--transition-fast);">
+            {{ ch }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <div class="ctx-divider"></div>
+
+    {# Quick tools #}
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs); color: var(--accent-red);">Tools</div>
+    <a href="{% url 'bible:search' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">search</span>
+        Search Scripture
+    </a>
+
+</div>
+{% endblock %}
+
 {% block breadcrumb %}
     <span class="ws-topbar__breadcrumb-item">Bible Reader</span>
     {% block bible_breadcrumb %}{% endblock %}
