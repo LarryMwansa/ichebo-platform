@@ -38,7 +38,7 @@
         {% for activity in activities %}
         <div class="list-item" id="ws-activity-{{ activity.id }}"
              hx-get="{% url 'activity:activity-detail' activity.id %}"
-             hx-target="#ws-content"
+             hx-target="#main-stage"
              hx-push-url="true"
              style="cursor: pointer;">
           <div class="list-item__icon">
@@ -117,7 +117,7 @@
     {% for activity in activities %}
     <div class="list-item activity-item" id="activity-{{ activity.id }}"
          hx-get="{% url 'activity:activity-detail' activity.id %}"
-         hx-target="#main-content"
+         hx-target="#main-stage"
          hx-push-url="true"
          style="cursor: pointer;">
       <div class="list-item__icon">

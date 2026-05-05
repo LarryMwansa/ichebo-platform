@@ -1,272 +1,236 @@
 {% extends "activity/base_activity.html" %}
 {% load static %}
 
-{# ── WORKSPACE layout ── #}
 {% block ws_content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner" style="max-width: 800px; margin: 0 auto;">
+<div style="max-width: 800px; margin: 0 auto; padding: 40px 0 100px;">
 
-    <div class="ws-page-header">
-      <div class="ws-page-header__left">
-        <a href="{% url 'activity:activity-home' %}" class="ws-back-btn" hx-get="{% url 'activity:activity-home' %}" hx-target="#ws-content" hx-push-url="true">
-          <span class="material-symbols-outlined">arrow_back</span>
-        </a>
-        <div>
-          <h2 class="ws-page-title">{{ activity.title }}</h2>
-          <p class="ws-page-subtitle">
-            {{ activity.get_activity_type_display|default:activity.activity_type|title }} &nbsp;·&nbsp;
-            {% if activity.due_at %}Due {{ activity.due_at|date:"d M Y" }}{% else %}No due date{% endif %}
-          </p>
-        </div>
-      </div>
-      <div class="ws-page-header__actions">
-        <div style="display: flex; gap: var(--space-xs);">
-          {% if activity.status != 'completed' %}
-          <button class="ws-btn ws-btn--primary"
-                  hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=detail"
-                  hx-target="#ws-content"
-                  hx-push-url="true">
-            Complete
-          </button>
-          {% endif %}
-          <button class="ws-btn ws-btn--secondary"
-                  hx-get="{% url 'activity:htmx-edit' activity.id %}"
-                  hx-target="#drawerInner"
-                  hx-swap="innerHTML"
-                  onclick="window.ICSDrawer.open('Edit Activity')">
-            Edit
-          </button>
-        </div>
-      </div>
+    {# Breadcrumb back #}
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 24px;">
+        <a href="{% url 'activity:activity-home' %}"
+           class="ws-label-tag" style="color: var(--muted); text-decoration: none; cursor: pointer;"
+           hx-get="{% url 'activity:activity-home' %}"
+           hx-target="#main-stage"
+           hx-push-url="true">Activity</a>
+        <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); opacity: 0.5;">chevron_right</span>
+        <span class="ws-label-tag" style="color: var(--accent-red);">
+            {{ activity.get_activity_type_display|default:activity.activity_type|title }}
+        </span>
     </div>
 
-    <div class="ws-feed-section" style="background: var(--card); padding: var(--space-xl); border: 1px solid var(--border); border-radius: var(--radius-m); margin-bottom: var(--space-xl);">
-      {% if activity.description %}
-      <div style="font-size: 1.1rem; line-height: 1.7; color: var(--text); margin-bottom: var(--space-l);">
-        {{ activity.description|linebreaks }}
-      </div>
-      {% endif %}
+    {# Header #}
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 32px;">
+        <div>
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900;
+                       color: var(--text); margin: 0 0 12px; line-height: 1.2;">
+                {{ activity.title }}
+            </h1>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted);">
+                <span style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+                    {{ activity.activity_type }}
+                </span>
+                {% if activity.due_at %}
+                <span>·</span>
+                <span class="material-symbols-outlined" style="font-size: 14px;">event</span>
+                <span {% if activity.due_at < now %}style="color: var(--accent-red); font-weight: 700;"{% endif %}>
+                    {{ activity.due_at|date:"d M Y, H:i" }}
+                </span>
+                {% endif %}
+                {% if activity.recurrence != 'none' %}
+                <span>·</span>
+                <span class="material-symbols-outlined" style="font-size: 14px;">sync</span>
+                <span>{{ activity.recurrence|title }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-shrink: 0;">
+            {% if activity.status != 'completed' %}
+            <button class="ws-topbar__cta"
+                    style="background: #2ecc71; border-color: #2ecc71;"
+                    hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=detail"
+                    hx-target="#main-stage"
+                    hx-push-url="true">
+                <span class="material-symbols-outlined">check_circle</span>
+                Complete
+            </button>
+            {% endif %}
+            <button class="ws-topbar__cta"
+                    hx-get="{% url 'activity:htmx-edit' activity.id %}"
+                    hx-target="#drawerInner"
+                    hx-swap="innerHTML"
+                    onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Activity')">
+                <span class="material-symbols-outlined">edit</span>
+                Edit
+            </button>
+        </div>
+    </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-m); border-top: 1px solid var(--border); padding-top: var(--space-l);">
-        <div>
-          <label class="label-caps" style="font-size: 10px; margin-bottom: 4px; display: block;">Status</label>
-          <span class="badge {% if activity.status == 'completed' %}b-success{% else %}b-warning{% endif %}">{{ activity.status|title }}</span>
-        </div>
-        {% if activity.recurrence != 'none' %}
-        <div>
-          <label class="label-caps" style="font-size: 10px; margin-bottom: 4px; display: block;">Recurrence</label>
-          <span style="font-weight: 700; font-size: 13px;">{{ activity.recurrence|title }}</span>
-        </div>
+    {# Status badge #}
+    <div style="display: flex; gap: 8px; margin-bottom: 32px;">
+        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+                     padding: 4px 10px; border-radius: 4px;
+                     {% if activity.status == 'completed' %}background: rgba(46,204,113,0.1); color: #2ecc71;
+                     {% elif activity.status == 'in_progress' %}background: var(--primary-light); color: var(--primary);
+                     {% else %}background: var(--card-2); color: var(--muted);{% endif %}">
+            {{ activity.status|title }}
+        </span>
+        {% if activity.due_at and activity.due_at < now and activity.status != 'completed' %}
+        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+                     padding: 4px 10px; border-radius: 4px;
+                     background: rgba(175,50,54,0.08); color: var(--accent-red);">
+            Overdue
+        </span>
         {% endif %}
+    </div>
+
+    {# Description #}
+    {% if activity.description %}
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+                padding: 24px; margin-bottom: 32px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Description</div>
+        <div style="font-size: 15px; line-height: 1.7; color: var(--text);">
+            {{ activity.description|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+
+    {# Metadata grid #}
+    {% if activity.kgs_pathway or activity.recurrence != 'none' %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 32px;">
         {% if activity.kgs_pathway %}
-        <div>
-          <label class="label-caps" style="font-size: 10px; margin-bottom: 4px; display: block;">Pathway</label>
-          <span style="font-weight: 700; font-size: 13px;">{{ activity.kgs_pathway|title|cut:"_" }}</span>
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+            <div class="ws-label-tag" style="margin-bottom: 6px;">Pathway</div>
+            <div style="font-weight: 700; font-size: 14px;">{{ activity.kgs_pathway|title|cut:"_" }}</div>
         </div>
         {% endif %}
-      </div>
+        {% if activity.recurrence != 'none' %}
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+            <div class="ws-label-tag" style="margin-bottom: 6px;">Recurrence</div>
+            <div style="font-weight: 700; font-size: 14px;">{{ activity.recurrence|title }}</div>
+        </div>
+        {% endif %}
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+            <div class="ws-label-tag" style="margin-bottom: 6px;">Progress</div>
+            <div style="font-weight: 700; font-size: 14px;">{{ activity.progress }}%</div>
+            <div style="height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden;">
+                <div style="height: 100%; width: {{ activity.progress }}%; background: var(--primary); border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Linked Record #}
+    <div style="margin-bottom: 32px;">
+        <div class="ws-label-tag" style="margin-bottom: 16px;">Linked Context</div>
+        {% if activity.linked_record %}
+        <div class="activity-card" style="background: var(--card); border: 1px solid var(--border);
+                    padding: 16px 20px; border-radius: 12px; cursor: pointer;
+                    display: flex; align-items: center; justify-content: space-between;
+                    transition: all 0.2s ease;"
+             hx-get="{% url 'records:records-detail' activity.linked_record.id %}"
+             hx-target="#main-stage"
+             hx-push-url="true">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span class="material-symbols-outlined" style="font-size: 20px; color: var(--muted);">description</span>
+                <div>
+                    <div style="font-weight: 700; font-size: 14px;">{{ activity.linked_record.title }}</div>
+                    <div style="font-size: 11px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em;">
+                        {{ activity.linked_record.record_type }} · {{ activity.linked_record.record_family }}
+                    </div>
+                </div>
+            </div>
+            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--muted);">chevron_right</span>
+        </div>
+        {% else %}
+        <div style="padding: 24px; text-align: center; border: 1px dashed var(--border);
+                    border-radius: 12px; color: var(--muted);">
+            <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.2; display: block; margin-bottom: 8px;">link</span>
+            <p style="font-size: 13px; margin: 0 0 12px;">No record linked to this activity.</p>
+            <button class="ws-topbar__cta" style="font-size: 12px;" onclick="openLinkModal()">
+                <span class="material-symbols-outlined">add_link</span>
+                Attach Record
+            </button>
+        </div>
+        {% endif %}
     </div>
 
-    <div class="ws-feed-section">
-      <div class="label-caps" style="margin-bottom: var(--space-s);">Linked Context</div>
-      {% if activity.linked_record %}
-      <div class="list-item" style="cursor: pointer;"
-           hx-get="{% url 'records:records-detail' activity.linked_record.id %}"
-           hx-target="#ws-content"
-           hx-push-url="true">
-        <div class="list-item__icon">
-          <span class="material-symbols-outlined">description</span>
+    {# Deep relationships via linked record #}
+    {% if activity.linked_record %}
+    <div style="margin-bottom: 32px;">
+        <div class="ws-label-tag" style="margin-bottom: 16px;">Deep Relationships</div>
+        <div style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">via {{ activity.linked_record.title }}</div>
+        <div id="linked-records-panel"
+             hx-get="{% url 'records:htmx-linked-records' activity.linked_record.id %}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+            <div style="color: var(--muted); font-size: 13px;">Loading…</div>
         </div>
-        <div class="list-item__content">
-          <div class="list-item__title" style="font-weight: 700;">{{ activity.linked_record.title }}</div>
-          <div class="list-item__meta">{{ activity.linked_record.record_type|title }} · {{ activity.linked_record.record_family|title }}</div>
-        </div>
-        <div class="list-item__action">
-          <span class="material-symbols-outlined">chevron_right</span>
-        </div>
-      </div>
-      {% else %}
-      <div class="ws-empty-state" style="padding: var(--space-l); border: 1px dashed var(--border);">
-        <p style="font-size: 13px; color: var(--muted);">No primary record linked to this activity.</p>
-      </div>
-      {% endif %}
     </div>
+    {% endif %}
 
-  </div>
+    {# Hidden form for linking #}
+    <form id="set-link-form" hx-post="{% url 'activity:htmx-set-link' activity.id %}" hx-swap="none">
+        {% csrf_token %}
+        <input type="hidden" name="record_id" id="target-record-id">
+    </form>
+
+    {% include "records/partials/_link_modal.html" %}
+
+    <script>
+    window.selectRecord = function(recordId, recordTitle) {
+        if (confirm('Link this activity to "' + recordTitle + '"?')) {
+            document.getElementById('target-record-id').value = recordId;
+            htmx.trigger('#set-link-form', 'submit');
+        }
+        closeLinkModal();
+    };
+    </script>
+
 </div>
 {% endblock %}
 
-  {% if request.htmx %}
-    <div class="nav-left" id="nav-left-content" hx-swap-oob="true">
-      <a href="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'activity:activity-home' %}{% endif %}" 
-         hx-get="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'activity:activity-home' %}{% endif %}" 
-         hx-target="#main-content" 
-         hx-push-url="true"
-         class="btn-touch" aria-label="Back">
-        <span class="material-symbols-outlined">arrow_back</span>
-      </a>
-      <span class="nav-title">{{ activity.title|truncatechars:20 }}</span>
-    </div>
-  {% else %}
-    <a href="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'activity:activity-home' %}{% endif %}" 
-       hx-get="{% if via_record %}{% url 'records:records-detail' via_record.id %}{% else %}{% url 'activity:activity-home' %}{% endif %}" 
-       hx-target="#main-content" 
-       hx-push-url="true"
-       class="btn-touch" aria-label="Back">
-      <span class="material-symbols-outlined">arrow_back</span>
-    </a>
-    <span class="nav-title">{{ activity.title|truncatechars:20 }}</span>
-  {% endif %}
-{% endblock %}
+{% block activity_content_mobile %}
+<div class="activity-detail" style="margin-top: var(--space-s); padding: 0 1rem 4rem;">
 
-{% block activity_content %}
-<div class="activity-detail" style="margin-top: var(--space-s);">
-  
-  {% if via_record %}
-  <div class="breadcrumb-via" style="margin-bottom: 12px;">
-    <a href="{% url 'records:records-detail' via_record.id %}" 
-       hx-get="{% url 'records:records-detail' via_record.id %}" 
-       hx-target="#main-content" 
-       style="font-size: 11px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px;">
-      <span class="material-symbols-outlined" style="font-size: 14px;">arrow_back_ios</span>
-      Linked via: <span style="text-decoration: underline;">{{ via_record.title|truncatechars:30 }}</span>
-    </a>
-  </div>
-  {% endif %}
-
-  <!-- Header -->
-  <div class="activity-detail-header">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-      <div>
-        <span class="status-badge 
-          {% if activity.due_at and activity.due_at < now %}status-badge--danger
-          {% elif activity.due_at and activity.due_at.date == now.date %}status-badge--active
-          {% else %}status-badge--muted{% endif %}" style="margin-bottom: 8px; display: inline-block;">
-          {{ activity.activity_type|upper }}
-        </span>
-        <h2 style="margin: 0; font-size: 24px; font-weight: 700;">{{ activity.title }}</h2>
-      </div>
-      <div class="activity-status-badge">
-        <span class="badge-unit {% if activity.status == 'completed' %}badge-unit--primary{% else %}badge-unit--warning{% endif %}">
-          {{ activity.status|title }}
-        </span>
-      </div>
-    </div>
-
-    <div class="activity-meta-strip" style="display: flex; gap: 16px; margin-bottom: 24px; color: var(--muted); font-size: 13px;">
-      {% if activity.due_at %}
-      <div style="display: flex; align-items: center; gap: 4px;">
-        <span class="material-symbols-outlined" style="font-size: 16px;">event</span>
-        <span>Due {{ activity.due_at|date:"d M Y" }}</span>
-      </div>
-      {% endif %}
-      {% if activity.recurrence != 'none' %}
-      <div style="display: flex; align-items: center; gap: 4px;">
-        <span class="material-symbols-outlined" style="font-size: 16px;">sync</span>
-        <span>{{ activity.recurrence|title }}</span>
-      </div>
-      {% endif %}
-      {% if activity.kgs_pathway %}
-      <div style="display: flex; align-items: center; gap: 4px;">
-        <span class="material-symbols-outlined" style="font-size: 16px;">account_tree</span>
-        <span>{{ activity.kgs_pathway|title|cut:"_" }}</span>
-      </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- Description -->
-  {% if activity.description %}
-  <div class="activity-section" style="margin-bottom: 2rem;">
-    <div class="label-caps" style="margin-bottom: 8px;">Description</div>
-    <div class="activity-description-box" style="line-height: 1.6; color: var(--text);">
-      {{ activity.description|linebreaks }}
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- Primary Linked Record (FK) -->
-  <div class="activity-section" style="margin-bottom: 2rem;">
-    <div class="label-caps" style="margin-bottom: 8px;">Linked Context</div>
-    {% if activity.linked_record %}
-    <div class="list-item" style="background: var(--hover); border-radius: 12px; cursor: pointer;"
-         hx-get="{% url 'records:records-detail' activity.linked_record.id %}"
-         hx-target="#main-content"
-         hx-push-url="true">
-      <div class="list-item__icon">
-        <span class="material-symbols-outlined">description</span>
-      </div>
-      <div class="list-item__content">
-        <div class="list-item__title">{{ activity.linked_record.title }}</div>
-        <div class="list-item__meta">{{ activity.linked_record.record_type|title }} · {{ activity.linked_record.record_family|title }}</div>
-      </div>
-      <div class="list-item__action">
-        <span class="material-symbols-outlined">chevron_right</span>
-      </div>
-    </div>
-    {% else %}
-    <div class="empty-state-mini" style="padding: 1.5rem; text-align: center; background: var(--hover); border-radius: 12px; color: var(--muted); border: 1px dashed var(--border);">
-      <p style="font-size: 13px; margin: 0;">No primary record linked to this activity.</p>
-      <button class="btn-touch" style="margin-top: 12px; font-size: 12px; background: var(--bg); border: 1px solid var(--border);"
-              onclick="openLinkModal()">
-        Attach Record
-      </button>
+    {% if via_record %}
+    <div style="margin-bottom: 12px;">
+        <a href="{% url 'records:records-detail' via_record.id %}"
+           style="font-size: 11px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+            <span class="material-symbols-outlined" style="font-size: 14px;">arrow_back_ios</span>
+            Linked via: <span style="text-decoration: underline;">{{ via_record.title|truncatechars:30 }}</span>
+        </a>
     </div>
     {% endif %}
-  </div>
 
-  <!-- Actions -->
-  <div class="activity-detail-actions" style="margin-bottom: 3rem; display: flex; gap: 8px;">
-    {% if activity.status != 'completed' %}
-    <button class="btn-touch" style="background: var(--primary); color: #fff; flex: 2;"
-            hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=detail"
-            hx-target="#main-content"
-            hx-push-url="true"
-            hx-confirm="Mark this activity as completed?">
-      Mark Completed
-    </button>
-    {% endif %}
-    <button class="btn-touch" style="background: var(--bg); border: 1px solid var(--border); flex: 1;"
-            hx-get="{% url 'activity:htmx-edit' activity.id %}"
-            hx-target="#drawerInner"
-            hx-swap="innerHTML"
-            onclick="window.ICSDrawer.open('Edit Activity')">
-      Edit
-    </button>
-  </div>
-
-  <!-- Linked Records Panel (of the Anchor Record) -->
-  {% if activity.linked_record %}
-  <div class="gov-panel" style="padding: 0; margin-top: 2rem;">
-    <div class="label-caps" style="padding: 1rem 1rem 0; margin-bottom: 0;">Deep Relationships</div>
-    <div style="padding: 0 1rem 0.5rem; font-size: 11px; color: var(--muted);">via {{ activity.linked_record.title }}</div>
-    <div id="linked-records-panel"
-         hx-get="{% url 'records:htmx-linked-records' activity.linked_record.id %}"
-         hx-trigger="load"
-         hx-swap="innerHTML">
-      <div style="padding: 1rem; color: var(--muted); font-size: 13px;">Loading…</div>
+    <div style="margin-bottom: 16px;">
+        <span class="status-badge status-badge--muted" style="margin-bottom: 8px; display: inline-block;">
+            {{ activity.activity_type|upper }}
+        </span>
+        <h2 style="margin: 0; font-size: 22px; font-weight: 700;">{{ activity.title }}</h2>
     </div>
-  </div>
-  {% endif %}
 
-  <!-- Hidden form for setting link -->
-  <form id="set-link-form" hx-post="{% url 'activity:htmx-set-link' activity.id %}" hx-swap="none">
-    {% csrf_token %}
-    <input type="hidden" name="record_id" id="target-record-id">
-  </form>
+    <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+        {% if activity.status != 'completed' %}
+        <button class="btn-touch" style="background: var(--primary); color: #fff; flex: 2;"
+                hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=detail"
+                hx-push-url="true">
+            Mark Completed
+        </button>
+        {% endif %}
+        <button class="btn-touch" style="background: var(--bg); border: 1px solid var(--border); flex: 1;"
+                hx-get="{% url 'activity:htmx-edit' activity.id %}"
+                hx-target="#drawerInner"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Activity')">
+            Edit
+        </button>
+    </div>
 
-  {% include "records/partials/_link_modal.html" %}
-
-  <script>
-    // Override selectRecord from _link_modal.html for this specific context
-    window.selectRecord = function(recordId, recordTitle) {
-      if (confirm('Link this activity to "' + recordTitle + '"?')) {
-        document.getElementById('target-record-id').value = recordId;
-        htmx.trigger('#set-link-form', 'submit');
-      }
-      closeLinkModal();
-    };
-  </script>
+    {% if activity.description %}
+    <div style="margin-bottom: 24px;">
+        <div class="label-caps" style="margin-bottom: 8px;">Description</div>
+        <div style="line-height: 1.6; color: var(--text);">{{ activity.description|linebreaks }}</div>
+    </div>
+    {% endif %}
 
 </div>
 {% endblock %}
