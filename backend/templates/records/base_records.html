@@ -12,27 +12,25 @@
     </div>
     
     <div class="ics-context-bar__content">
-        <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Journals</div>
-        
-        <nav class="ics-sidebar__nav" style="width: 100%;">
-            <a href="{% url 'records:records-home' %}" 
-               class="ics-sidebar__item active" 
-               style="width: 100%; justify-content: flex-start; padding: 0 var(--space-s); gap: 10px;">
-                <span class="material-symbols-outlined">description</span>
-                <span style="font-size: 13px;">My Journal</span>
-            </a>
-            <a href="#" class="ics-sidebar__item" 
-               style="width: 100%; justify-content: flex-start; padding: 0 var(--space-s); gap: 10px; opacity: 0.5;">
-                <span class="material-symbols-outlined">folder</span>
-                <span style="font-size: 13px;">Governance Acts</span>
-            </a>
-        </nav>
+        <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
 
-        <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
-        
-        <div class="ws-label-tag">Recent Drafts</div>
-        <div class="ws_detail-empty" style="padding: var(--space-s); font-size: 12px; color: var(--muted);">
-            No local drafts found.
+            <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Journals</div>
+            <a href="{% url 'records:records-home' %}" class="ctx-btn active">
+                <span class="material-symbols-outlined">description</span>
+                My Journal
+            </a>
+            <a href="#" class="ctx-btn">
+                <span class="material-symbols-outlined">folder</span>
+                Governance Acts
+            </a>
+
+            <div class="ctx-divider"></div>
+
+            <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Recent Drafts</div>
+            <div style="padding: var(--space-s); font-size: 12px; color: var(--muted);">
+                No local drafts found.
+            </div>
+
         </div>
     </div>
 {% endblock %}

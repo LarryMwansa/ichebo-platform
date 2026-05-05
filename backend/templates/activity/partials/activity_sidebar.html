@@ -1,90 +1,42 @@
 {# templates/activity/partials/activity_sidebar.html #}
-<div class="ics-explorer">
-    
-    {# Strategic Filters #}
-    <div class="explorer-section">
-        <div class="explorer-header" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; margin-bottom: 12px; opacity: 0.7;">
-            <span class="material-symbols-outlined" style="font-size: 18px;">analytics</span>
-            <span class="label-caps" style="font-size: 10px; letter-spacing: 1.5px;">Strategic Filters</span>
-        </div>
-        <div class="explorer-list" style="display: flex; flex-direction: column; gap: 2px;">
-            <a href="{% url 'activity:activity-home' %}" class="explorer-item {% if not active_type %}active{% endif %}">
-                <span class="material-symbols-outlined explorer-icon">all_inclusive</span>
-                <span class="explorer-name">All Activity</span>
-            </a>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 0 8px;">
-                <a href="{% url 'activity:activity-home' %}?type=task" class="explorer-item {% if active_type == 'task' %}active{% endif %}" style="padding: 8px 12px;">
-                    <span class="material-symbols-outlined explorer-icon" style="font-size: 18px;">check_circle</span>
-                    <span class="explorer-name" style="font-size: 12px;">Tasks</span>
-                </a>
-                <a href="{% url 'activity:activity-home' %}?type=habit" class="explorer-item {% if active_type == 'habit' %}active{% endif %}" style="padding: 8px 12px;">
-                    <span class="material-symbols-outlined explorer-icon" style="font-size: 18px;">autorenew</span>
-                    <span class="explorer-name" style="font-size: 12px;">Habits</span>
-                </a>
-                <a href="{% url 'activity:activity-home' %}?type=goal" class="explorer-item {% if active_type == 'goal' %}active{% endif %}" style="padding: 8px 12px;">
-                    <span class="material-symbols-outlined explorer-icon" style="font-size: 18px;">trophy</span>
-                    <span class="explorer-name" style="font-size: 12px;">Goals</span>
-                </a>
-                <a href="{% url 'activity:activity-home' %}?type=event" class="explorer-item {% if active_type == 'event' %}active{% endif %}" style="padding: 8px 12px;">
-                    <span class="material-symbols-outlined explorer-icon" style="font-size: 18px;">calendar_today</span>
-                    <span class="explorer-name" style="font-size: 12px;">Events</span>
-                </a>
-            </div>
-        </div>
-    </div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
 
-    {# Time Context #}
-    <div class="explorer-section" style="margin-top: 30px;">
-        <div class="explorer-header" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; margin-bottom: 12px; opacity: 0.7;">
-            <span class="material-symbols-outlined" style="font-size: 18px;">schedule</span>
-            <span class="label-caps" style="font-size: 10px; letter-spacing: 1.5px;">Time Context</span>
-        </div>
-        <div class="explorer-list" style="display: flex; flex-direction: column; gap: 2px;">
-            <a href="{% url 'calendar:month' %}" class="explorer-item">
-                <span class="material-symbols-outlined explorer-icon">calendar_view_month</span>
-                <span class="explorer-name">Institutional Grid</span>
-            </a>
-            <a href="{% url 'activity:calendar' %}" class="explorer-item">
-                <span class="material-symbols-outlined explorer-icon">view_timeline</span>
-                <span class="explorer-name">Timeline View</span>
-            </a>
-            <a href="{% url 'activity:ministry' %}" class="explorer-item">
-                <span class="material-symbols-outlined explorer-icon">hub</span>
-                <span class="explorer-name">Ministry Hub</span>
-            </a>
-        </div>
-    </div>
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Strategic Filters</div>
+    <a href="{% url 'activity:activity-home' %}" class="ctx-btn {% if not active_type %}active{% endif %}">
+        <span class="material-symbols-outlined">all_inclusive</span>
+        All Activity
+    </a>
+    <a href="{% url 'activity:activity-home' %}?type=task" class="ctx-btn {% if active_type == 'task' %}active{% endif %}">
+        <span class="material-symbols-outlined">check_circle</span>
+        Tasks
+    </a>
+    <a href="{% url 'activity:activity-home' %}?type=habit" class="ctx-btn {% if active_type == 'habit' %}active{% endif %}">
+        <span class="material-symbols-outlined">autorenew</span>
+        Habits
+    </a>
+    <a href="{% url 'activity:activity-home' %}?type=goal" class="ctx-btn {% if active_type == 'goal' %}active{% endif %}">
+        <span class="material-symbols-outlined">trophy</span>
+        Goals
+    </a>
+    <a href="{% url 'activity:activity-home' %}?type=event" class="ctx-btn {% if active_type == 'event' %}active{% endif %}">
+        <span class="material-symbols-outlined">calendar_today</span>
+        Events
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Time Context</div>
+    <a href="{% url 'calendar:month' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">calendar_view_month</span>
+        Institutional Grid
+    </a>
+    <a href="{% url 'activity:calendar' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">view_timeline</span>
+        Timeline View
+    </a>
+    <a href="{% url 'activity:ministry' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">hub</span>
+        Ministry Hub
+    </a>
 
 </div>
-
-<style>
-.explorer-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    text-decoration: none;
-    color: var(--muted);
-    border-radius: 6px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.explorer-item:hover {
-    background: rgba(255,255,255,0.05);
-    color: #fff;
-}
-.explorer-item.active {
-    background: var(--accent-red);
-    color: #fff !important;
-}
-.explorer-item.active .explorer-icon {
-    color: #fff !important;
-}
-.explorer-icon {
-    font-size: 20px;
-    color: var(--accent-red);
-}
-.explorer-name {
-    font-size: 13px;
-    font-weight: 500;
-}
-</style>
