@@ -1,6 +1,6 @@
 <div class="ws-list-item" id="record-{{ record.id }}"
      hx-get="{% url 'records:records-detail' record.id %}"
-     hx-target="#ws-detail"
+     hx-target="#main-stage"
      hx-push-url="true">
 
   <div class="ws-list-item__content">
@@ -16,7 +16,7 @@
   <div class="ws-list-item__action" onclick="event.stopPropagation();">
     <button class="ws-btn ws-btn--secondary" style="padding: 4px;"
             hx-get="{% url 'records:htmx-edit' record.id %}"
-            hx-target="#ws-detail"
+            hx-target="#main-stage"
             hx-swap="innerHTML">
       <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
     </button>

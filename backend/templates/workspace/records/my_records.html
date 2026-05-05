@@ -14,43 +14,28 @@
 {% block ws_content %}
 <div class="registry-archive-v2">
     
-    <div class="ws-page-header" style="margin-bottom: 40px;">
-        <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Permanent Record</div>
-        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+    <div class="ws-page-header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Permanent Record</div>
             <h1 class="ws-page-title">Steward <em>Registry</em></h1>
-            <a href="{% url 'governance:desk' %}" class="ws-topbar__cta" style="text-decoration: none; background: var(--accent-red);">
-                <span class="material-symbols-outlined">add</span>
-                New Entry
-            </a>
         </div>
+        <a href="{% url 'governance:desk' %}" class="ws-topbar__cta" style="text-decoration: none; flex-shrink: 0;">
+            <span class="material-symbols-outlined">add</span>
+            New Entry
+        </a>
     </div>
 
-    {# The Registry Grid #}
-    <div id="record-list" class="ws-stat-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-        {% include "records/partials/record_list.html" %}
+    {# The Registry List #}
+    <div id="record-list" style="display: flex; flex-direction: column; gap: 8px; max-width: 860px;">
+        {% include "workspace/records/partials/record_list.html" %}
     </div>
-
-    {% if not records %}
-        <div class="ws-empty-state" style="margin-top: 60px;">
-            <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.1;">inventory_2</span>
-            <p style="color: var(--muted); margin-top: 15px;">The registry is silent. Begin your first draft at The Desk.</p>
-        </div>
-    {% endif %}
 </div>
 
 <style>
 .registry-archive-v2 {
-    padding: 40px 0;
-}
-/* Ensure record cards look premium on Stone */
-.ws-stat-card {
-    background: #fff;
-    border: 1px solid rgba(0,0,0,0.05);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.ws-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px 0 100px;
 }
 </style>
 {% endblock %}

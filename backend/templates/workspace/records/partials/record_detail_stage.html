@@ -1,0 +1,82 @@
+{# templates/workspace/records/partials/record_detail_stage.html #}
+{# Rendered into #main-stage via HTMX — no extends #}
+<div class="record-detail-stage" style="max-width: 860px; margin: 0 auto; padding: 40px 0 100px;">
+
+    {# Header #}
+    <div style="margin-bottom: 32px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+            <a href="{% url 'records:records-home' %}" class="ws-label-tag"
+               style="color: var(--muted); text-decoration: none; cursor: pointer;"
+               hx-get="{% url 'records:records-home' %}"
+               hx-target="#main-stage"
+               hx-push-url="true">Registry</a>
+            <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); opacity: 0.5;">chevron_right</span>
+            <span class="ws-label-tag" style="color: var(--accent-red);">{{ record.get_record_type_display|default:record.record_type|title }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900;
+                       color: var(--text); margin: 0; line-height: 1.2;">
+                {{ record.title }}
+            </h1>
+            {% if record.created_by == request.user %}
+            <button class="ws-topbar__cta" style="flex-shrink: 0;"
+                    hx-get="{% url 'records:htmx-edit' record.id %}"
+                    hx-target="#drawerInner"
+                    hx-swap="innerHTML"
+                    onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Record')">
+                <span class="material-symbols-outlined">edit</span>
+                Edit
+            </button>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 12px; color: var(--muted);">
+            <span style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">{{ record.record_type }}</span>
+            <span>·</span>
+            <span>{{ record.updated_at|date:"d M Y, H:i" }}</span>
+            <span>·</span>
+            <span>{{ record.created_by.get_full_name|default:record.created_by.username }}</span>
+        </div>
+    </div>
+
+    {# Divider #}
+    <div style="height: 1px; background: var(--border); margin-bottom: 40px;"></div>
+
+    {# Body: Markdown content #}
+    <div id="record-markdown-body"
+         style="font-size: 15px; line-height: 1.85; color: var(--text);">
+        {{ record.content|default:"" }}
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+(function() {
+    const body = document.getElementById('record-markdown-body');
+    if (body && typeof marked !== 'undefined') {
+        body.innerHTML = marked.parse(body.textContent.trim());
+    } else if (body) {
+        // Retry once marked.js loads
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+        s.onload = () => { body.innerHTML = marked.parse(body.textContent.trim()); };
+        document.head.appendChild(s);
+    }
+})();
+</script>
+
+<style>
+#record-markdown-body h1 { font-family: 'Playfair Display', serif; font-size: 1.6em; margin: 1.2em 0 0.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+#record-markdown-body h2 { font-size: 1.2em; font-weight: 700; margin: 1.2em 0 0.5em; color: var(--text); }
+#record-markdown-body h3 { font-size: 1em; font-weight: 700; margin: 1em 0 0.4em; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+#record-markdown-body p { margin-bottom: 1.2em; }
+#record-markdown-body ul, #record-markdown-body ol { margin-bottom: 1.2em; padding-left: 1.8em; }
+#record-markdown-body li { margin-bottom: 0.4em; }
+#record-markdown-body blockquote { border-left: 3px solid var(--accent-red); padding-left: 1.2em; color: var(--muted); font-style: italic; margin: 1.5em 0; }
+#record-markdown-body code { background: var(--card-2); padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9em; }
+#record-markdown-body pre code { display: block; padding: 16px; overflow-x: auto; background: var(--card-2); border-radius: 8px; }
+#record-markdown-body strong { font-weight: 700; color: var(--text); }
+#record-markdown-body a { color: var(--primary); text-decoration: underline; }
+</style>

@@ -39,7 +39,10 @@
 
     {# 2. The Writing Canvas #}
     <div class="editorial-canvas">
-        <form id="editorial-form" hx-post="{% url 'records:htmx-create' %}" hx-target="#main-content" hx-push-url="true">
+        <form id="editorial-form"
+              hx-post="{% if record %}{% url 'records:htmx-edit' record.id %}{% else %}{% url 'records:htmx-create' %}{% endif %}"
+              hx-target="body"
+              hx-push-url="true">
             {% csrf_token %}
             <input type="hidden" name="record_type" id="hidden-record-type" value="{{ active_type }}">
 

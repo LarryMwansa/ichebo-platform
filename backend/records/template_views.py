@@ -63,6 +63,12 @@ def record_detail(request, record_id):
     if via_id:
         via_record = Record.objects.filter(id=via_id).first()
 
+    if request.headers.get('HX-Request'):
+        return render(request, 'workspace/records/partials/record_detail_stage.html', {
+            'record': record,
+            'via_record': via_record,
+        })
+
     return render(request, 'workspace/records/record_detail.html', {
         'record': record,
         'via_record': via_record,
@@ -127,7 +133,11 @@ def htmx_edit_record(request, record_id):
         if rtype:
             record.record_type = rtype
         record.save(update_fields=['title', 'content', 'record_type', 'updated_at'])
-        return render(request, 'records/partials/record_card.html', {'record': record})
+        # Redirect to detail page after saving
+        from django.urls import reverse
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = reverse('records:records-detail', kwargs={'record_id': record.id})
+        return response
 
     # GET — return edit form pre-populated
     return render(request, 'workspace/records/partials/editorial_form.html', {

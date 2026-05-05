@@ -76,14 +76,17 @@ def my_activities(request):
     activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
 
     return render(request, 'activity/my_activities.html', {
-        'overdue':       overdue,
-        'due_today':     due_today,
-        'upcoming':      upcoming,
-        'active_type':   active_type,
+        'overdue':        overdue,
+        'due_today':      due_today,
+        'upcoming':       upcoming,
+        'active_type':    active_type,
         'activity_types': activity_types,
-        'user_level':    _user_level(user),
-        'active_app':    'activity',
-        'ws_page_title': 'Activity',
+        'user_level':     _user_level(user),
+        'active_app':     'activity',
+        'ws_page_title':  'Activity',
+        'overdue_count':  overdue.count(),
+        'active_count':   qs.count(),
+        'due_today_count': due_today.count(),
     })
 
 
