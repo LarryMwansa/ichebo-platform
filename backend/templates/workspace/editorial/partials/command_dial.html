@@ -101,6 +101,7 @@ const Dial = {
             <button type="button"
                     class="ctx-btn ${i === 0 && !restoreType ? 'active' : ''}"
                     data-type="${t.val}"
+                    style="flex-shrink: 0;"
                     onclick="Dial.setType(this, '${t.val}')">
                 <span class="material-symbols-outlined">${t.icon}</span>
                 ${t.label}

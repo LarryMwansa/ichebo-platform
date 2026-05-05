@@ -42,7 +42,9 @@
 
     <div class="ws-sidebar__section">
         <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Sub-Types</div>
-        <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;
+                    max-height: 240px; overflow-y: auto;
+                    scrollbar-width: thin; scrollbar-color: var(--border) transparent;">
             {% if active_branch == 'library' %}
                 {% for slug, label in library_types.items %}
                 <a href="{% url 'governance:library-list' slug %}"
