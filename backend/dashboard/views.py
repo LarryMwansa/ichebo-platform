@@ -60,7 +60,7 @@ def htmx_records_tab(request):
         deleted_at__isnull=True,
         created_by=user,
         record_family='journal',
-    ).order_by('-updated_at')[:10]
+    ).order_by('-updated_at')[:5]
     return render(request, 'dashboard/_records_panel.html', {
         'records': records,
     })

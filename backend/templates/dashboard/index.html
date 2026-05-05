@@ -98,19 +98,19 @@
     </div>
 
     {# 3. Strategic Intel Hero #}
-    <div class="card-ink" style="padding: 60px; border-radius: 24px; background: var(--ink-2); border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; margin-bottom: 40px;">
-        <div style="position: absolute; right: -40px; top: -40px; font-size: 300px; opacity: 0.05; color: #fff; pointer-events: none;">
-            <span class="material-symbols-outlined" style="font-size: 300px;">auto_awesome</span>
+    <div class="card-ink" style="padding: 60px; border-radius: 24px; background: linear-gradient(135deg, #6c3483 0%, #af3236 100%); border: none; position: relative; overflow: hidden; margin-bottom: 40px;">
+        <div style="position: absolute; right: -40px; top: -40px; pointer-events: none;">
+            <span class="material-symbols-outlined" style="font-size: 300px; opacity: 0.06; color: #fff;">auto_awesome</span>
         </div>
-        
-        <div class="label-caps" style="color: var(--accent-red); margin-bottom: 20px; font-size: 12px; letter-spacing: 3px;">DIVINE INTEL</div>
+
+        <div class="ws-label-tag" style="color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1); border: none; margin-bottom: 20px;">Divine Intel</div>
         <h2 style="font-family: 'Playfair Display', serif; font-size: 32px; line-height: 1.4; margin-bottom: 40px; font-weight: 800; color: #fff; max-width: 80%;">
             "{{ digest.discipline_prompt }}"
         </h2>
-        
-        <div style="display: flex; gap: 15px;">
+
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
             {% for s in digest.suggestions %}
-                <a href="{{ s.action_url|default:'#' }}" class="btn-touch" style="background: #fff; color: #000; padding: 0 25px; height: 44px; font-size: 12px; font-weight: 800; text-decoration: none; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                <a href="{{ s.action_url|default:'#' }}" class="btn-touch" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 0 25px; height: 44px; font-size: 12px; font-weight: 800; text-decoration: none; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
                     <span class="material-symbols-outlined" style="font-size: 18px;">bolt</span>
                     {{ s.text|upper }}
                 </a>
@@ -176,6 +176,25 @@
     transform: translateY(-2px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     border-color: rgba(255,255,255,0.1);
+}
+/* Light mode: give ink cards a visible surface and border */
+html:not(.dark) .card-ink {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+html:not(.dark) .card-ink .label-caps,
+html:not(.dark) .card-ink .ws-label-tag {
+    opacity: 1;
+    color: var(--muted);
+}
+html:not(.dark) .card-ink [style*="color: #fff"],
+html:not(.dark) .card-ink [style*="color:#fff"] {
+    color: var(--text) !important;
+}
+html:not(.dark) .card-ink:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    border-color: var(--primary-alpha) !important;
 }
 </style>
 {% endblock %}
