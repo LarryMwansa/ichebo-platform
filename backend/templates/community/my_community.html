@@ -16,8 +16,12 @@
 <div class="community-hub-v2">
     
     <div class="ws-page-header" style="margin-bottom: 40px;">
-        <div class="ws-label-tag" style="margin-bottom: 8px; color: var(--accent-red);">Kingdom Node</div>
-        <h1 class="ws-page-title" style="font-size: 36px; margin: 0;">{{ primary_perm.tenant.name|default:"My <em>Community</em>" }}</h1>
+        <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Kingdom Node</div>
+        {% if primary_perm.tenant.name %}
+        <h1 class="ws-page-title">{{ primary_perm.tenant.name }}</h1>
+        {% else %}
+        <h1 class="ws-page-title">My <em>Community</em></h1>
+        {% endif %}
     </div>
 
     {# 1. Formation Track (High Density) #}
