@@ -302,18 +302,83 @@ def ministry(request):
 
 @login_required
 def calendar_view(request):
-    user = request.user
+    import calendar as cal_module
+    from datetime import date, timedelta
 
+    user = request.user
+    now = timezone.now()
+
+    # Which month/year to show (default: current)
+    try:
+        year = int(request.GET.get('year', now.year))
+        month = int(request.GET.get('month', now.month))
+    except ValueError:
+        year, month = now.year, now.month
+    # Clamp
+    month = max(1, min(12, month))
+
+    # First and last day of the displayed month
+    first_day = date(year, month, 1)
+    last_day = date(year, month, cal_module.monthrange(year, month)[1])
+
+    # Fetch activities that fall in this month
     qs = Activity.objects.filter(
         assigned_to=user,
         deleted_at__isnull=True,
         due_at__isnull=False,
+        due_at__date__gte=first_day,
+        due_at__date__lte=last_day,
     ).exclude(activity_type__in=['programme', 'lesson']).order_by('due_at')
 
+    # Build date → [activities] map
+    from collections import defaultdict
+    activity_map = defaultdict(list)
+    for activity in qs:
+        activity_map[activity.due_at.date()].append(activity)
+
+    # Build weeks grid: each week is a list of date (or None for padding)
+    # Week starts Monday (isoweekday 1)
+    start_weekday = first_day.isoweekday() % 7  # 0=Mon … 6=Sun (Mon-based)
+    # Actually use Mon=0 … Sun=6
+    start_offset = (first_day.isoweekday() - 1) % 7  # Mon=0
+
+    weeks = []
+    week = [None] * start_offset
+    current = first_day
+    while current <= last_day:
+        week.append(current)
+        if len(week) == 7:
+            weeks.append(week)
+            week = []
+        current += timedelta(days=1)
+    if week:
+        while len(week) < 7:
+            week.append(None)
+        weeks.append(week)
+
+    # Prev / next month navigation
+    if month == 1:
+        prev_year, prev_month = year - 1, 12
+    else:
+        prev_year, prev_month = year, month - 1
+    if month == 12:
+        next_year, next_month = year + 1, 1
+    else:
+        next_year, next_month = year, month + 1
+
     return render(request, 'activity/calendar_view.html', {
-        'activities': qs,
+        'weeks': weeks,
+        'activity_map': dict(activity_map),
+        'year': year,
+        'month': month,
+        'month_name': first_day.strftime('%B'),
+        'prev_year': prev_year,
+        'prev_month': prev_month,
+        'next_year': next_year,
+        'next_month': next_month,
+        'today': now.date(),
+        'now': now,
         'user_level': _user_level(user),
-        'now': timezone.now(),
         'active_app': 'activity',
         'ws_page_title': 'Activity',
     })

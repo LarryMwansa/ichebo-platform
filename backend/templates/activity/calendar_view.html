@@ -1,82 +1,218 @@
 {% extends "activity/base_activity.html" %}
-{% load tz %}
+{% load activity_tags %}
 
-
-{# ── WORKSPACE layout ── #}
 {% block ws_content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner">
+<div class="cal-shell">
 
-    <div class="ws-page-header">
-      <div class="ws-page-header__left">
-        <h2 class="ws-page-title">Activity <em>Timeline</em></h2>
-        <p class="ws-page-subtitle">Chronological view of missions, habits, and spiritual milestones.</p>
-      </div>
-      <div class="ws-page-header__actions">
-        <button class="ws-topbar__cta"
+    {# ── Header ── #}
+    <div class="ws-page-header" style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Kingdom Momentum</div>
+            <h1 class="ws-page-title">Activity <em>Calendar</em></h1>
+        </div>
+        <button class="ws-topbar__cta" style="flex-shrink: 0;"
                 hx-get="{% url 'activity:htmx-create' %}"
                 hx-target="#drawerInner"
                 hx-swap="innerHTML"
                 onclick="window.ICSDrawer && window.ICSDrawer.open('New Activity')">
-          <span class="material-symbols-outlined">add</span>
-          New Activity
+            <span class="material-symbols-outlined">add</span>
+            New Activity
         </button>
-      </div>
     </div>
 
-    {% if activities %}
-    {% regroup activities by due_at|date:"Y-m-d" as day_groups %}
-    {% for day in day_groups %}
-      {% with first=day.list.0 %}
-      <div class="ws-feed-section">
-        <div class="label-caps" style="
-          margin-bottom: var(--space-xs);
-          {% if first.due_at.date == now.date %}color: var(--primary);{% endif %}
-          {% if first.due_at < now %}color: var(--danger);{% endif %}
-        ">
-          {{ first.due_at|date:"l, d F Y" }}
-          {% if first.due_at.date == now.date %}&nbsp;— Today{% endif %}
-          {% if first.due_at < now and first.due_at.date != now.date %}&nbsp;— Overdue{% endif %}
-        </div>
-        <div class="list-group">
-          {% for activity in day.list %}
-          <div class="list-item" id="ws-activity-cal-{{ activity.id }}"
-               hx-get="{% url 'activity:activity-detail' activity.id %}"
-               hx-target="#main-stage"
-               hx-push-url="true"
-               style="cursor: pointer;">
-            <div class="list-item__icon">
-              <span class="status-badge
-                {% if activity.due_at < now %}status-badge--danger
-                {% elif activity.due_at.date == now.date %}status-badge--active
-                {% else %}status-badge--muted{% endif %}">
-                {{ activity.activity_type|slice:":3"|upper }}
-              </span>
-            </div>
-            <div class="list-item__content">
-              <div class="list-item__title" style="font-weight: 700;">{{ activity.title }}</div>
-              <div class="list-item__meta">
-                {{ activity.due_at|date:"H:i" }}
-                &nbsp;·&nbsp;{{ activity.get_activity_type_display|default:activity.activity_type }}
-              </div>
-            </div>
-            <div class="list-item__action">
-              <span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">chevron_right</span>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endwith %}
-    {% endfor %}
-    {% else %}
-    <div class="ws-empty-state">
-      <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">event_note</span>
-      <p style="color: var(--muted);">No activities with due dates.</p>
+    {# ── Month Nav ── #}
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+        <a href="?year={{ prev_year }}&month={{ prev_month }}"
+           style="display: flex; align-items: center; justify-content: center;
+                  width: 36px; height: 36px; border-radius: 50%;
+                  border: 1px solid var(--border); background: var(--card);
+                  color: var(--muted); text-decoration: none; transition: all 0.15s;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
+        </a>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
+                   color: var(--text); margin: 0; min-width: 200px; text-align: center;">
+            {{ month_name }} {{ year }}
+        </h2>
+        <a href="?year={{ next_year }}&month={{ next_month }}"
+           style="display: flex; align-items: center; justify-content: center;
+                  width: 36px; height: 36px; border-radius: 50%;
+                  border: 1px solid var(--border); background: var(--card);
+                  color: var(--muted); text-decoration: none; transition: all 0.15s;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+        </a>
+        <a href="?year={{ today.year }}&month={{ today.month }}"
+           style="font-size: 12px; font-weight: 600; color: var(--primary);
+                  text-decoration: none; margin-left: 8px;">
+            Today
+        </a>
     </div>
-    {% endif %}
 
-  </div>
+    {# ── Grid ── #}
+    <div class="cal-grid">
+
+        {# Day headers #}
+        {% for day in "Mon,Tue,Wed,Thu,Fri,Sat,Sun"|split:"," %}
+        <div class="cal-day-header">{{ day }}</div>
+        {% endfor %}
+
+        {# Weeks #}
+        {% for week in weeks %}
+            {% for day in week %}
+            {% if day %}
+                {% with day_activities=activity_map|dict_key:day %}
+                <div class="cal-cell {% if day == today %}cal-cell--today{% endif %}">
+                    <div class="cal-cell__number {% if day == today %}cal-cell__number--today{% endif %}">
+                        {{ day.day }}
+                    </div>
+                    {% if day_activities %}
+                    <div class="cal-cell__events">
+                        {% for activity in day_activities %}
+                        <div class="cal-event
+                            {% if activity.due_at < now %}cal-event--overdue
+                            {% elif activity.due_at.date == today %}cal-event--today
+                            {% else %}cal-event--upcoming{% endif %}"
+                             hx-get="{% url 'activity:activity-detail' activity.id %}"
+                             hx-target="#main-stage"
+                             hx-push-url="true"
+                             title="{{ activity.title }}">
+                            <span class="cal-event__dot"></span>
+                            <span class="cal-event__title">{{ activity.title|truncatechars:22 }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endwith %}
+            {% else %}
+                <div class="cal-cell cal-cell--empty"></div>
+            {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+    </div>
+
 </div>
-{% endblock %}
 
+<style>
+.cal-shell {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 0 100px;
+}
+
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-left: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.cal-day-header {
+    background: var(--card-2);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+}
+
+.cal-cell {
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    min-height: 110px;
+    padding: 10px 8px 8px;
+    vertical-align: top;
+    transition: background 0.15s;
+}
+
+.cal-cell--empty {
+    background: var(--card-2);
+    opacity: 0.5;
+}
+
+.cal-cell--today {
+    background: var(--primary-light, rgba(175,50,54,0.04));
+}
+
+.cal-cell:hover:not(.cal-cell--empty) {
+    background: var(--card-2);
+}
+
+.cal-cell__number {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 6px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.cal-cell__number--today {
+    background: var(--accent-red);
+    color: #fff;
+}
+
+.cal-cell__events {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.cal-event {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.cal-event:hover { opacity: 0.75; }
+
+.cal-event__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cal-event__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cal-event--overdue {
+    background: rgba(175,50,54,0.1);
+    color: var(--accent-red);
+}
+.cal-event--overdue .cal-event__dot { background: var(--accent-red); }
+
+.cal-event--today {
+    background: var(--primary-light, rgba(175,50,54,0.08));
+    color: var(--primary);
+}
+.cal-event--today .cal-event__dot { background: var(--primary); }
+
+.cal-event--upcoming {
+    background: var(--card-2);
+    color: var(--text);
+}
+.cal-event--upcoming .cal-event__dot { background: var(--muted); }
+</style>
+{% endblock %}
