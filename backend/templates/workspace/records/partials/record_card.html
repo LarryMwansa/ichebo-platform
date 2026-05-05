@@ -16,8 +16,9 @@
   <div class="ws-list-item__action" onclick="event.stopPropagation();">
     <button class="ws-btn ws-btn--secondary" style="padding: 4px;"
             hx-get="{% url 'records:htmx-edit' record.id %}"
-            hx-target="#main-stage"
-            hx-swap="innerHTML">
+            hx-target="#drawerInner"
+            hx-swap="innerHTML"
+            onclick="event.stopPropagation(); window.ICSDrawer && window.ICSDrawer.open('Edit Record')">
       <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
     </button>
   </div>

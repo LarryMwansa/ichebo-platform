@@ -10,7 +10,7 @@
     <a href="{% url 'records:records-home' %}?type={{ value }}"
        class="ctx-btn {% if active_type == value %}active{% endif %}">
         <span class="material-symbols-outlined">
-            {% if value == 'note' %}description{% elif value == 'act' %}gavel{% elif value == 'journal' %}history_edu{% else %}drafts{% endif %}
+            {% if value == 'prayer' %}church{% elif value == 'spirit' %}self_improvement{% elif value == 'dream' %}bedtime{% elif value == 'dar' %}summarize{% elif value == 'note' %}description{% elif value == 'act' %}gavel{% else %}history_edu{% endif %}
         </span>
         {{ label }}
     </a>

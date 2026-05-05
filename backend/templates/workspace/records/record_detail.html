@@ -9,8 +9,8 @@
         
         {# 1. Record Header #}
         <div class="editorial-hero" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); margin-bottom: 30px;">
-            <div class="ws-label-tag" style="margin-bottom: 8px;">Registry Archive</div>
-            <h1 class="editorial-title" style="font-size: 32px; margin: 0 0 12px 0;">{{ record.title }}</h1>
+            <div class="ws-label-tag" style="margin-bottom: 8px; color: var(--accent-red);">Registry Archive</div>
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; color: var(--text); margin: 0 0 12px; line-height: 1.2;">{{ record.title }}</h1>
             <div class="editorial-meta" style="display: flex; gap: 12px; font-size: 13px; color: var(--muted);">
                 <span class="ws-tag-outline">{{ record.get_record_type_display|default:record.record_type|title }}</span>
                 <span>·</span>

@@ -43,23 +43,39 @@
 {# Zone 4: Registry Vitals #}
 {% block ws_options %}
     <div class="ws-options-section">
-        <div class="ws-label-tag">Registry Stats</div>
-        <div class="ws-stat-card" style="margin-top: 15px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
-            <div class="ws-stat-card__label">Total Entries</div>
-            <div class="ws-stat-card__value" style="color: var(--ink-bg);">{{ records.count|default:0 }}</div>
-        </div>
-        <div class="ws-stat-card" style="margin-top: 10px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
-            <div class="ws-stat-card__label">Storage Utilization</div>
-            <div class="ws-stat-card__value" style="color: var(--ink-bg); font-size: 14px;">2.4 MB / 500 MB</div>
+        <div class="ws-label-tag" style="margin-bottom: 16px;">Registry Stats</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <div style="padding: 14px; background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;">
+                <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px;">ENTRIES</div>
+                <div style="font-size: 22px; font-weight: 800; color: var(--text);">{{ records.count|default:0 }}</div>
+            </div>
+            <div style="padding: 14px; background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;">
+                <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px;">FAMILY</div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text);">Journal</div>
+            </div>
         </div>
     </div>
-    
-    <div class="ws-sidebar__divider" style="margin: 30px 0;"></div>
-    
+
+    <div class="ws-sidebar__divider" style="margin: 20px 0;"></div>
+
     <div class="ws-options-section">
-        <div class="ws-label-tag">Archival Guidelines</div>
-        <p style="font-size: 12px; color: var(--muted); margin-top: 15px; line-height: 1.6;">
-            The Registry is the permanent memory of the platform. Journals are private, while Acts are subject to apostolic review.
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Quick Actions</div>
+        <a href="{% url 'governance:desk' %}" class="ctx-btn" style="text-decoration: none;">
+            <span class="material-symbols-outlined">draw</span>
+            Open The Desk
+        </a>
+        <a href="{% url 'governance:home' %}" class="ctx-btn" style="text-decoration: none; margin-top: 4px;">
+            <span class="material-symbols-outlined">account_balance</span>
+            Governance Portal
+        </a>
+    </div>
+
+    <div class="ws-sidebar__divider" style="margin: 20px 0;"></div>
+
+    <div class="ws-options-section">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Guidelines</div>
+        <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+            The Registry is your permanent memory. Journals are private. Acts are subject to apostolic review.
         </p>
     </div>
 {% endblock %}
