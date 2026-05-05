@@ -141,12 +141,44 @@
 }
 
 
-/* ── Context Bar Button (.ctx-btn) ──────────────────────────────
-   Canonical context bar button style — faithfully extracted from
-   the governance app (the reference implementation per DESIGN.md).
-   Extends ws-icon-btn: bordered, card-surface background, full-width,
-   left-aligned with icon + label.
-──────────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   CONTEXT BAR STANDARD — workspace_v2.css is the source of truth
+   ══════════════════════════════════════════════════════════════
+
+   Every context bar (Column 2) in the Apostolic Command Shell
+   must be built from these three primitives only:
+
+   1. .ws-label-tag          — section heading pill (from workspace_v2.css)
+   2. .ctx-btn               — nav/action button (defined below)
+   3. .ctx-divider           — horizontal rule between sections (defined below)
+
+   NEVER use:  .ics-explorer  .explorer-item  .ics-sidebar__item
+               .explorer-section  .explorer-header  .ws-sidebar__divider
+               embedded <style> blocks in context bar partials
+
+   TEMPLATE PATTERN — copy this shell for any new context bar partial:
+
+      <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+
+          <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Section Title</div>
+          <a href="{% url 'app:view' %}" class="ctx-btn {% if active %}active{% endif %}">
+              <span class="material-symbols-outlined">icon_name</span>
+              Link Label
+          </a>
+
+          <div class="ctx-divider"></div>
+
+          <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Next Section</div>
+          <button class="ctx-btn" hx-get="..." hx-target="...">
+              <span class="material-symbols-outlined">icon_name</span>
+              Action Label
+          </button>
+
+      </div>
+
+   Works on both <a> and <button> elements.
+   Active state: add class "active" — handled by .ctx-btn.active below.
+   ══════════════════════════════════════════════════════════════ */
 
 .ctx-btn {
     display: flex;

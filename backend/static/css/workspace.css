@@ -220,7 +220,7 @@
   flex-shrink: 0;
 }
 
-/* ── Sidebar divider ── */
+/* ── Sidebar divider — DEPRECATED: use .ctx-divider from workspace_v2.css ── */
 .ws-sidebar__divider {
   height: 1px;
   background: var(--border);
