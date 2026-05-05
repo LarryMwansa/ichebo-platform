@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block breadcrumb %}
-    <span class="ws-topbar__breadcrumb-item">Calendar</span>
+    <span class="ws-topbar__breadcrumb-item">Activity Calendar</span>
     <span class="ws-topbar__breadcrumb-sep" aria-hidden="true">·</span>
     <span class="ws-topbar__current" id="cal-breadcrumb-title">{% block cal_title %}{% endblock %}</span>
 {% endblock %}
@@ -28,11 +28,11 @@
 <div class="ws-tab-row">
   <a href="{% url 'calendar:month' %}{% if view == 'month' %}?year={{ year }}&month={{ month }}{% endif %}"
      class="ws-tab {% if view == 'month' %}active{% endif %}">
-    Month View
+    Month
   </a>
   <a href="{% url 'calendar:week' %}{% if view == 'week' %}?date={{ monday|date:'Y-m-d' }}{% endif %}"
      class="ws-tab {% if view == 'week' %}active{% endif %}">
-    Week View
+    Week
   </a>
 </div>
 {% endblock %}
