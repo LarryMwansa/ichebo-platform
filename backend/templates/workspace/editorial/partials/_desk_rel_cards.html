@@ -1,0 +1,38 @@
+{% for rel in relationships %}
+<div class="dopt-rel-card">
+    <div style="display: flex; align-items: flex-start; gap: 10px;">
+        <span class="material-symbols-outlined"
+              style="font-size: 16px; color: var(--accent-red); flex-shrink: 0; margin-top: 1px;">
+            link
+        </span>
+        <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 9px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.08em; color: var(--accent-red); margin-bottom: 2px;">
+                {{ rel.get_relationship_type_display }}
+            </div>
+            <div style="font-size: 12px; font-weight: 600; color: var(--text);
+                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {% if rel.to_record %}{{ rel.to_record.title }}{% endif %}
+            </div>
+            {% if rel.notes %}
+            <div style="font-size: 11px; color: var(--muted); margin-top: 2px;
+                        font-style: italic; line-height: 1.4;">{{ rel.notes }}</div>
+            {% endif %}
+        </div>
+        {% if rel.to_record %}
+        <a href="{% url 'governance:desk-edit' rel.to_record.id %}"
+           style="color: var(--muted); flex-shrink: 0;" title="Open in Desk">
+            <span class="material-symbols-outlined" style="font-size: 15px;">open_in_new</span>
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% empty %}
+<div style="padding: 24px 0; text-align: center;">
+    <span class="material-symbols-outlined"
+          style="font-size: 36px; opacity: 0.12; display: block;">link_off</span>
+    <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">
+        No established links yet.
+    </p>
+</div>
+{% endfor %}

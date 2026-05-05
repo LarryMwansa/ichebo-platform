@@ -27,7 +27,10 @@ urlpatterns = [
     # ── HTMX Operations ──────────────────────────────────────────────────────
     path('htmx/record/create/', views.htmx_record_create, name='htmx-record-create'),
     path('htmx/record/<uuid:record_id>/edit/', views.htmx_record_edit, name='htmx-record-edit'),
+    path('htmx/record/<uuid:record_id>/lock/', views.htmx_record_lock, name='htmx-record-lock'),
     path('htmx/record/<uuid:record_id>/links/', views.htmx_linked_records, name='htmx-linked-records'),
     path('htmx/record/<uuid:record_id>/history/', views.htmx_version_history, name='htmx-version-history'),
+    path('htmx/relationship/create/', views.htmx_relationship_create, name='htmx-relationship-create'),
     path('htmx/global-search/', views.htmx_global_search, name='htmx-global-search'),
+    path('htmx/desk/relationships/<uuid:record_id>/', desk_views.desk_relationships_partial, name='htmx-desk-relationships'),
 ]

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from records.models import Record
@@ -47,6 +47,17 @@ def universal_desk(request, record_id=None):
         'current_relationships': current_relationships,
     }
     return render(request, 'workspace/editorial/desk_view.html', context)
+
+@login_required
+def desk_relationships_partial(request, record_id):
+    """Return desk-style relationship cards for the options bar Relations tab."""
+    record = get_object_or_404(Record, id=record_id, created_by=request.user)
+    relationships = record.outgoing_relationships.select_related('to_record').all()
+    return render(request, 'workspace/editorial/partials/_desk_rel_cards.html', {
+        'relationships': relationships,
+        'record': record,
+    })
+
 
 @login_required
 def universal_save(request):
