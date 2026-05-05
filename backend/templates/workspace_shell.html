@@ -300,6 +300,7 @@
                 </button>
             </header>
 
+            {% block ws_options_tabs %}
             <div class="ics-options-tabs">
                 <button class="ics-options-tab active" id="tab-relations" onclick="WorkspaceUI.switchOptionsTab('relations')">Relations</button>
             </div>
@@ -318,6 +319,7 @@
                 </div>
 
             </div>
+            {% endblock %}
         </aside>
         
         {% include "components/_search_overlay.html" %}
