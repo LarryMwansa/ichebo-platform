@@ -139,11 +139,11 @@
 
 .cal-cell {
   border-right: 1px solid var(--border, rgba(0,0,0,.06));
-  padding: 4px;
-  min-height: 72px;
+  padding: 8px 6px 6px;
+  min-height: 110px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   background: var(--card, #fff);
   transition: background .1s;
 }
@@ -151,55 +151,88 @@
 .cal-cell:last-child { border-right: none; }
 
 .cal-cell--muted {
-  background: var(--bg, #f2f2f2);
+  background: var(--card-2, #f8f8f8);
+  opacity: 0.6;
 }
 
 .cal-cell--today {
-  background: var(--primary-tint);
+  background: rgba(175, 50, 54, 0.04);
 }
 
 .cal-cell__day {
-  font-size: var(--fz--2, 0.78rem);
-  font-weight: var(--font-weight-medium, 500);
-  color: var(--text, #222);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted, #888);
   line-height: 1;
-  padding: 2px 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-bottom: 4px;
 }
 
-.cal-cell--muted .cal-cell__day { color: var(--muted, #aaa); }
+.cal-cell--muted .cal-cell__day { color: var(--muted, #aaa); opacity: 0.5; }
 
 .cal-cell--today .cal-cell__day {
-  color: var(--primary, #af3236);
-  font-weight: var(--font-weight-bold, 700);
+  background: var(--accent-red, #af3236);
+  color: #fff;
+  font-weight: 900;
 }
 
 .cal-cell__events {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   overflow: hidden;
 }
 
-/* Event pills — month view */
+/* Event pills */
 .cal-pill {
-  font-size: 9px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
   font-weight: 600;
   line-height: 1.2;
-  padding: 2px 4px;
-  border-radius: 3px;
+  padding: 3px 6px;
+  border-radius: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  cursor: default;
+  cursor: pointer;
+  transition: opacity 0.15s;
 }
 
-.cal-pill--task      { background: var(--info-light);         color: var(--info-dark); }
-.cal-pill--habit     { background: var(--success-light);      color: var(--success-dark); }
-.cal-pill--event     { background: var(--accent-event-light); color: var(--accent-event); }
-.cal-pill--reminder  { background: var(--warning-light);      color: var(--warning-dark); }
-.cal-pill--goal      { background: var(--accent-rose-light);  color: var(--accent-rose); }
-.cal-pill--campaign  { background: color-mix(in srgb, var(--info) 10%, transparent); color: var(--info); }
-.cal-pill--more      { background: var(--hover, #eee);        color: var(--muted, #666); }
+.cal-pill:hover { opacity: 0.75; }
+
+.cal-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cal-pill--task     { background: rgba(52,152,219,0.12); color: #3498db; }
+.cal-pill--task     .cal-pill__dot { background: #3498db; }
+.cal-pill--habit    { background: rgba(46,204,113,0.12); color: #2ecc71; }
+.cal-pill--habit    .cal-pill__dot { background: #2ecc71; }
+.cal-pill--goal     { background: rgba(155,89,182,0.12); color: #9b59b6; }
+.cal-pill--goal     .cal-pill__dot { background: #9b59b6; }
+.cal-pill--event    { background: rgba(230,126,34,0.12); color: #e67e22; }
+.cal-pill--event    .cal-pill__dot { background: #e67e22; }
+.cal-pill--reminder { background: rgba(241,196,15,0.15); color: #b8860b; }
+.cal-pill--reminder .cal-pill__dot { background: #f1c40f; }
+.cal-pill--campaign { background: rgba(52,152,219,0.10); color: #2980b9; }
+.cal-pill--campaign .cal-pill__dot { background: #2980b9; }
+.cal-pill--project  { background: rgba(127,140,141,0.12); color: #7f8c8d; }
+.cal-pill--project  .cal-pill__dot { background: #7f8c8d; }
+.cal-pill--skill    { background: rgba(175,50,54,0.10);  color: var(--accent-red, #af3236); }
+.cal-pill--skill    .cal-pill__dot { background: var(--accent-red, #af3236); }
+.cal-pill--done     { opacity: 0.4; text-decoration: line-through; }
+.cal-pill--more     { background: transparent; color: var(--muted, #888); font-size: 10px; cursor: default; }
+.cal-pill--more:hover { opacity: 1; }
 
 /* ── Week grid ───────────────────────────────────────────────────────── */
 

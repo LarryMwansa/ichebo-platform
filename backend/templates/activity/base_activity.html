@@ -69,8 +69,8 @@
      class="ws-tab {% if request.resolver_match.url_name == 'ministry' %}active{% endif %}">
     Ministry
   </a>
-  <a href="{% url 'activity:calendar' %}"
-     class="ws-tab {% if request.resolver_match.url_name == 'calendar' %}active{% endif %}">
+  <a href="{% url 'calendar:month' %}"
+     class="ws-tab {% if request.resolver_match.namespace == 'calendar' %}active{% endif %}">
     Calendar
   </a>
 </div>

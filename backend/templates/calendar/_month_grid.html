@@ -1,45 +1,163 @@
 {# HTMX swappable partial — also included statically on first load #}
-
-{# Re-emit nav/title so HTMX swaps update them too #}
 <script>
   (function(){
     var t = document.getElementById('cal-page-title');
-    if (t) t.innerHTML = '{{ month_name }} <em>{{ year }}</em>';
-    
+    if (t) t.innerHTML = 'Institutional <em>Grid</em>';
     var b = document.getElementById('cal-breadcrumb-title');
     if (b) b.textContent = '{{ month_name }} {{ year }}';
   })();
 </script>
 
-<div class="cal-month">
-  {# Day-of-week headers #}
-  <div class="cal-dow-row" style="background: var(--stone-3); border-top: 1px solid var(--border);">
-    {% for h in day_headers %}
-    <div class="cal-dow" style="font-family: var(--ff-body); font-weight: 800; color: var(--muted);">{{ h }}</div>
-    {% endfor %}
-  </div>
+<div class="cal-grid">
 
-  {# Weeks #}
-  {% for week in grid %}
-  <div class="cal-week">
-    {% for cell in week %}
-    <div class="cal-cell {% if not cell.in_month %}cal-cell--muted{% endif %} {% if cell.is_today %}cal-cell--today{% endif %}"
-         style="border-color: var(--border); background: {% if cell.is_today %}rgba(175, 50, 54, 0.05){% elif not cell.in_month %}var(--stone-2){% else %}var(--stone){% endif %};">
-      <div class="cal-cell__day" style="font-weight: {% if cell.is_today %}900{% else %}700{% endif %}; color: {% if cell.is_today %}var(--primary){% else %}var(--text){% endif %}; opacity: {% if not cell.in_month %}0.4{% else %}1{% endif %};">
-        {{ cell.day }}
-      </div>
-      <div class="cal-cell__events">
-        {% for ev in cell.events %}
-        <div class="cal-pill cal-pill--{{ ev.activity_type }}" title="{{ ev.title }}">
-          {{ ev.title|truncatechars:18 }}
+    {# Day headers #}
+    {% for h in day_headers %}
+    <div class="cal-day-header">{{ h }}</div>
+    {% endfor %}
+
+    {# Weeks #}
+    {% for week in grid %}
+        {% for cell in week %}
+        <div class="cal-cell {% if not cell.in_month %}cal-cell--empty{% endif %} {% if cell.is_today %}cal-cell--today{% endif %}">
+            <div class="cal-cell__number {% if cell.is_today %}cal-cell__number--today{% endif %}">
+                {{ cell.day }}
+            </div>
+            {% if cell.events %}
+            <div class="cal-cell__events">
+                {% for ev in cell.events %}
+                <div class="cal-event
+                    {% if ev.status == 'completed' %}cal-event--done
+                    {% elif ev.is_overdue %}cal-event--overdue
+                    {% elif cell.is_today %}cal-event--today
+                    {% else %}cal-event--upcoming{% endif %}"
+                     hx-get="/activity/{{ ev.id }}/"
+                     hx-target="#main-stage"
+                     hx-push-url="true"
+                     title="{{ ev.title }}">
+                    <span class="cal-event__dot"></span>
+                    <span class="cal-event__title">{{ ev.title|truncatechars:22 }}</span>
+                </div>
+                {% endfor %}
+                {% if cell.overflow %}
+                <div class="cal-event cal-event--more">+{{ cell.overflow }} more</div>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
-        {% if cell.overflow %}
-        <div class="cal-pill cal-pill--more">+{{ cell.overflow }}</div>
-        {% endif %}
-      </div>
-    </div>
     {% endfor %}
-  </div>
-  {% endfor %}
+
 </div>
+
+<style>
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-left: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.cal-day-header {
+    background: var(--card-2);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+}
+
+.cal-cell {
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    min-height: 110px;
+    padding: 10px 8px 8px;
+    transition: background 0.15s;
+}
+
+.cal-cell--empty {
+    background: var(--card-2);
+    opacity: 0.5;
+}
+
+.cal-cell--today {
+    background: rgba(175, 50, 54, 0.04);
+}
+
+.cal-cell:hover:not(.cal-cell--empty) {
+    background: var(--card-2);
+}
+
+.cal-cell__number {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 6px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.cal-cell__number--today {
+    background: var(--accent-red);
+    color: #fff;
+}
+
+.cal-cell__events {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.cal-event {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.cal-event:hover { opacity: 0.75; }
+
+.cal-event__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cal-event__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cal-event--overdue  { background: rgba(175,50,54,0.10); color: var(--accent-red); }
+.cal-event--overdue  .cal-event__dot { background: var(--accent-red); }
+
+.cal-event--today    { background: rgba(175,50,54,0.08); color: var(--primary); }
+.cal-event--today    .cal-event__dot { background: var(--primary); }
+
+.cal-event--upcoming { background: var(--card-2); color: var(--text); }
+.cal-event--upcoming .cal-event__dot { background: var(--muted); }
+
+.cal-event--done     { opacity: 0.35; text-decoration: line-through; }
+.cal-event--done     .cal-event__dot { background: var(--muted); }
+
+.cal-event--more     { color: var(--muted); font-size: 10px; cursor: default; background: transparent; }
+.cal-event--more:hover { opacity: 1; }
+</style>

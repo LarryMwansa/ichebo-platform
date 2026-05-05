@@ -13,24 +13,24 @@
             width: 36px; height: 36px; border-radius: 50%;
             border: 1px solid var(--border); background: var(--card);
             color: var(--muted); text-decoration: none; transition: all 0.15s;"
-     href="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}"
-     hx-get="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}"
+     href="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+     hx-get="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
      hx-target="#cal-body"
      hx-push-url="true"
      aria-label="Previous month">
      <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
   </a>
   <a style="font-size: 12px; font-weight: 600; color: var(--primary); text-decoration: none;"
-     href="{% url 'calendar:month' %}"
-     hx-get="{% url 'calendar:month' %}"
+     href="{% url 'calendar:month' %}{% if cal_filter %}?filter={{ cal_filter }}{% endif %}"
+     hx-get="{% url 'calendar:month' %}{% if cal_filter %}?filter={{ cal_filter }}{% endif %}"
      hx-target="#cal-body"
      hx-push-url="true">Today</a>
   <a style="display: flex; align-items: center; justify-content: center;
             width: 36px; height: 36px; border-radius: 50%;
             border: 1px solid var(--border); background: var(--card);
             color: var(--muted); text-decoration: none; transition: all 0.15s;"
-     href="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}"
-     hx-get="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}"
+     href="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+     hx-get="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
      hx-target="#cal-body"
      hx-push-url="true"
      aria-label="Next month">

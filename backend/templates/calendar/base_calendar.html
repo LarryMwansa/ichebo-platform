@@ -51,6 +51,37 @@
       </div>
     </div>
 
+    {# ── Filter strip ── #}
+    <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+        <a href="?year={{ year }}&month={{ month }}"
+           style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px;
+                  border: 1px solid {% if not cal_filter %}var(--accent-red){% else %}var(--border){% endif %};
+                  background: {% if not cal_filter %}rgba(175,50,54,0.08){% else %}var(--card-2){% endif %};
+                  font-size: 12px; font-weight: 600; text-decoration: none;
+                  color: {% if not cal_filter %}var(--accent-red){% else %}var(--muted){% endif %};">
+            <span class="material-symbols-outlined" style="font-size: 15px;">calendar_month</span>
+            All
+        </a>
+        <a href="?year={{ year }}&month={{ month }}&filter=personal"
+           style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px;
+                  border: 1px solid {% if cal_filter == 'personal' %}var(--accent-red){% else %}var(--border){% endif %};
+                  background: {% if cal_filter == 'personal' %}rgba(175,50,54,0.08){% else %}var(--card-2){% endif %};
+                  font-size: 12px; font-weight: 600; text-decoration: none;
+                  color: {% if cal_filter == 'personal' %}var(--accent-red){% else %}var(--muted){% endif %};">
+            <span class="material-symbols-outlined" style="font-size: 15px;">person</span>
+            Personal
+        </a>
+        <a href="?year={{ year }}&month={{ month }}&filter=institutional"
+           style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px;
+                  border: 1px solid {% if cal_filter == 'institutional' %}var(--accent-red){% else %}var(--border){% endif %};
+                  background: {% if cal_filter == 'institutional' %}rgba(175,50,54,0.08){% else %}var(--card-2){% endif %};
+                  font-size: 12px; font-weight: 600; text-decoration: none;
+                  color: {% if cal_filter == 'institutional' %}var(--accent-red){% else %}var(--muted){% endif %};">
+            <span class="material-symbols-outlined" style="font-size: 15px;">corporate_fare</span>
+            Institutional
+        </a>
+    </div>
+
     <div id="cal-body">
       {% block cal_body %}{% endblock %}
     </div>

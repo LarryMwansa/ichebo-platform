@@ -97,7 +97,23 @@ def month_view(request):
     from_date = weeks[0][0]
     to_date = weeks[-1][6]
 
+    # Filter: 'personal' = only mine, 'institutional' = only tenant, '' = all
+    cal_filter = request.GET.get('filter', '')
+
     raw_events = get_calendar_events(request.user, from_date, to_date)
+
+    # Apply filter
+    if cal_filter == 'personal':
+        raw_events = [e for e in raw_events if not e.get('tenant_id')]
+    elif cal_filter == 'institutional':
+        raw_events = [e for e in raw_events if e.get('tenant_id')]
+
+    # Annotate overdue
+    now_iso = date.today().isoformat()
+    for ev in raw_events:
+        ev_date = (ev.get('scheduled_at') or ev.get('due_at') or '')[:10]
+        ev['is_overdue'] = bool(ev_date and ev_date < now_iso and ev.get('status') != 'completed')
+
     grouped = _events_by_date(raw_events)
 
     grid = []
@@ -129,6 +145,7 @@ def month_view(request):
         'day_headers': _DAY_HEADERS,
         'grid': grid,
         'today': today,
+        'cal_filter': cal_filter,
         'prev_year': prev_first.year,
         'prev_month': prev_first.month,
         'next_year': next_first.year,
