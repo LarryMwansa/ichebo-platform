@@ -1,44 +1,31 @@
 {# templates/workspace/records/partials/records_sidebar.html #}
-<div class="ics-explorer">
-    
-    {# Registry Filters #}
-    <div class="explorer-section">
-        <div class="explorer-header">
-            <span class="material-symbols-outlined">inventory_2</span>
-            <span class="label-caps">Registry Filters</span>
-        </div>
-        <div class="explorer-list">
-            <a href="{% url 'records:records-home' %}" class="explorer-item {% if not active_type %}active{% endif %}">
-                <span class="material-symbols-outlined explorer-icon">all_inclusive</span>
-                <span class="explorer-name">All Records</span>
-            </a>
-            {% for value, label in record_types %}
-                <a href="{% url 'records:records-home' %}?type={{ value }}" class="explorer-item {% if active_type == value %}active{% endif %}">
-                    <span class="material-symbols-outlined explorer-icon">
-                        {% if value == 'note' %}description{% elif value == 'act' %}gavel{% elif value == 'journal' %}history_edu{% else %}drafts{% endif %}
-                    </span>
-                    <span class="explorer-name">{{ label }}</span>
-                </a>
-            {% endfor %}
-        </div>
-    </div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
 
-    {# Drafting Hub #}
-    <div class="explorer-section" style="margin-top: 20px;">
-        <div class="explorer-header">
-            <span class="material-symbols-outlined">edit_square</span>
-            <span class="label-caps">Drafting Hub</span>
-        </div>
-        <div class="explorer-list">
-            <a href="{% url 'governance:desk' %}" class="explorer-item">
-                <span class="material-symbols-outlined explorer-icon">draw</span>
-                <span class="explorer-name">The Desk</span>
-            </a>
-            <a href="{% url 'governance:home' %}" class="explorer-item">
-                <span class="material-symbols-outlined explorer-icon">account_balance</span>
-                <span class="explorer-name">Governance Portal</span>
-            </a>
-        </div>
-    </div>
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Registry Filters</div>
+    <a href="{% url 'records:records-home' %}" class="ctx-btn {% if not active_type %}active{% endif %}">
+        <span class="material-symbols-outlined">all_inclusive</span>
+        All Records
+    </a>
+    {% for value, label in record_types %}
+    <a href="{% url 'records:records-home' %}?type={{ value }}"
+       class="ctx-btn {% if active_type == value %}active{% endif %}">
+        <span class="material-symbols-outlined">
+            {% if value == 'note' %}description{% elif value == 'act' %}gavel{% elif value == 'journal' %}history_edu{% else %}drafts{% endif %}
+        </span>
+        {{ label }}
+    </a>
+    {% endfor %}
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Drafting Hub</div>
+    <a href="{% url 'governance:desk' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">draw</span>
+        The Desk
+    </a>
+    <a href="{% url 'governance:home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">account_balance</span>
+        Governance Portal
+    </a>
 
 </div>
