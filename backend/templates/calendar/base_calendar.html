@@ -9,6 +9,15 @@
 
 {% block watermark %}CALENDAR{% endblock %}
 
+{% block context_header %}Tactical Intel{% endblock %}
+{% block context_content %}
+    {% include "activity/partials/activity_sidebar.html" %}
+{% endblock %}
+
+{% block ws_options %}
+    {% include "activity/partials/activity_intel.html" %}
+{% endblock %}
+
 {% block breadcrumb %}
     <span class="ws-topbar__breadcrumb-item">Calendar</span>
     <span class="ws-topbar__breadcrumb-sep" aria-hidden="true">·</span>

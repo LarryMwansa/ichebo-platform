@@ -7,6 +7,15 @@
     <span class="ws-topbar__breadcrumb-item">Activity Timeline</span>
 {% endblock %}
 
+{% block context_header %}Tactical Intel{% endblock %}
+{% block context_content %}
+    {% include "activity/partials/activity_sidebar.html" %}
+{% endblock %}
+
+{% block ws_options %}
+    {% include "activity/partials/activity_intel.html" %}
+{% endblock %}
+
 {% block ws_content %}
 <div class="activity-shell" style="padding: var(--space-l) 0;">
     {% block activity_content %}{% endblock %}
