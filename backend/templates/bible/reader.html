@@ -6,7 +6,7 @@
 {% block bible_breadcrumb %}
     <span class="material-symbols-outlined" style="font-size: 16px; opacity: 0.5;">chevron_right</span>
     <span class="ws-topbar__breadcrumb-item bible-topbar__title">{{ book.name }} {{ chapter }}</span>
-    <span class="status-badge" style="margin-left: var(--space-s); font-size: 9px;">{{ translation.code }}</span>
+    <span class="status-badge" id="bible-topbar-version" style="margin-left: var(--space-s); font-size: 9px;">{{ translation.code }}</span>
 {% endblock %}
 
 {% block bible_topbar %}{% endblock %}
