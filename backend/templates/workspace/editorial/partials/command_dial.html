@@ -1,229 +1,147 @@
 {# templates/workspace/editorial/partials/command_dial.html #}
-<div class="apostolic-dial-stack">
-    <!-- Category Switch -->
-    <div class="dial-group">
-        <label class="dial-group-label">Registry Origin</label>
-        <div class="apple-switch apple-switch--vertical" id="family-dial">
-            <div class="apple-switch__pill" id="family-pill"></div>
-            <button type="button" class="apple-switch__btn active" data-family="journal" onclick="updateFamily(this, 'journal')">Journal</button>
-            <button type="button" class="apple-switch__btn" data-family="governance" onclick="updateFamily(this, 'governance')">Governance</button>
-            <button type="button" class="apple-switch__btn" data-family="activity" onclick="updateFamily(this, 'activity')">Activity</button>
-            <button type="button" class="apple-switch__btn" data-family="missions" onclick="updateFamily(this, 'missions')">Missions</button>
-        </div>
-    </div>
 
-    <!-- Type Switch -->
-    <div class="dial-group" style="margin-top: 24px;">
-        <label class="dial-group-label">Record Type</label>
-        <div class="apple-switch apple-switch--vertical" id="type-dial">
-            <div class="apple-switch__pill" id="type-pill"></div>
-            <div id="type-options-container" style="display: flex; flex-direction: column; width: 100%;">
-                <!-- Populated by JS -->
-            </div>
-        </div>
-    </div>
+<div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Registry Origin</div>
+<div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--space-s);" id="family-nav">
+    <button type="button" class="ctx-btn active" data-family="journal" onclick="Dial.setFamily(this, 'journal')">
+        <span class="material-symbols-outlined">menu_book</span>
+        Journal
+    </button>
+    <button type="button" class="ctx-btn" data-family="governance" onclick="Dial.setFamily(this, 'governance')">
+        <span class="material-symbols-outlined">account_balance</span>
+        Governance
+    </button>
+    <button type="button" class="ctx-btn" data-family="activity" onclick="Dial.setFamily(this, 'activity')">
+        <span class="material-symbols-outlined">task_alt</span>
+        Activity
+    </button>
+    <button type="button" class="ctx-btn" data-family="community" onclick="Dial.setFamily(this, 'community')">
+        <span class="material-symbols-outlined">groups</span>
+        Community
+    </button>
+    <button type="button" class="ctx-btn" data-family="bible" onclick="Dial.setFamily(this, 'bible')">
+        <span class="material-symbols-outlined">auto_stories</span>
+        Scripture
+    </button>
 </div>
 
-<style>
-.apostolic-dial-stack {
-    padding: 12px 4px;
-}
+<div class="ctx-divider"></div>
 
-.dial-group-label {
-    display: block;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 12px;
-    padding-left: 8px;
-}
-
-/* Apple-style Segmented Control (Vertical) */
-.apple-switch {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    padding: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-}
-
-.apple-switch__pill {
-    position: absolute;
-    left: 4px;
-    right: 4px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 7px;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-.apple-switch__btn {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: 36px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    font-size: 13px;
-    font-weight: 500;
-    text-align: left;
-    padding: 0 12px;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-.apple-switch__btn.active {
-    color: var(--text-main);
-}
-</style>
+<div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Record Type</div>
+<div id="type-nav"
+     style="display: flex; flex-direction: column; gap: 2px;
+            max-height: 240px; overflow-y: auto;
+            scrollbar-width: thin; scrollbar-color: var(--border) transparent;">
+    {# Populated by Dial.setFamily() #}
+</div>
 
 <script>
 const DIAL_MAP = {
-    'journal': [
-        {val: 'note', label: 'General journal / reflection entry'},
-        {val: 'prayer', label: 'prayer entry'},
-        {val: 'spirit', label: 'Spirit Journal entry'},
-        {val: 'dream', label: 'Dream Journal entry'},
-        {val: 'dar', label: 'Daily Activity Report'}
+    journal: [
+        { val: 'note',   label: 'Reflection / Note',      icon: 'edit_note' },
+        { val: 'prayer', label: 'Prayer',                  icon: 'church' },
+        { val: 'spirit', label: 'Spirit Journal',          icon: 'self_improvement' },
+        { val: 'dream',  label: 'Dream Journal',           icon: 'bedtime' },
+        { val: 'dar',    label: 'Daily Activity Report',   icon: 'summarize' },
     ],
-    'governance': [
-        {val: 'decree', label: 'Apostolic Decree'},
-        {val: 'mandate', label: 'Kingdom Mandate'},
-        {val: 'principle', label: 'Foundational Principle'},
-        {val: 'concept', label: 'Theological Concept'},
-        {val: 'divine_pattern', label: 'Divine Pattern'},
-        {val: 'framework', label: 'Governance Framework'},
-        {val: 'protocol', label: 'Defined Protocol'},
-        {val: 'procedure', label: 'Operational Procedure'},
-        {val: 'statement', label: 'Formal Statement'},
-        {val: 'class', label: 'Knowledge Class'},
-        {val: 'narrative', label: 'Governance Narrative'},
-        {val: 'subject', label: 'Domain Subject'},
-        {val: 'entity', label: 'Named Entity'}
+    governance: [
+        { val: 'class',         label: 'Class',            icon: 'category' },
+        { val: 'principle',     label: 'Principle',        icon: 'lightbulb' },
+        { val: 'concept',       label: 'Concept',          icon: 'psychology' },
+        { val: 'divine_pattern',label: 'Divine Pattern',   icon: 'pattern' },
+        { val: 'mandate',       label: 'Mandate',          icon: 'gavel' },
+        { val: 'statement',     label: 'Statement',        icon: 'format_quote' },
+        { val: 'framework',     label: 'Framework',        icon: 'account_tree' },
+        { val: 'narrative',     label: 'Narrative',        icon: 'history_edu' },
+        { val: 'protocol',      label: 'Protocol',         icon: 'rule' },
+        { val: 'procedure',     label: 'Procedure',        icon: 'checklist' },
+        { val: 'subject',       label: 'Subject',          icon: 'topic' },
+        { val: 'entity',        label: 'Entity',           icon: 'badge' },
     ],
-    'activity': [
-        {val: 'event', label: 'Ministry Event'},
-        {val: 'campaign', label: 'Strategic Campaign'},
-        {val: 'project', label: 'Stewardship Project'},
-        {val: 'habit', label: 'Spiritual Habit'},
-        {val: 'task', label: 'Assigned Task'},
-        {val: 'skill', label: 'Ministry Skill'}
+    activity: [
+        { val: 'task',     label: 'Task',              icon: 'task_alt' },
+        { val: 'project',  label: 'Project',           icon: 'folder_open' },
+        { val: 'campaign', label: 'Campaign',          icon: 'campaign' },
+        { val: 'event',    label: 'Event',             icon: 'event' },
+        { val: 'habit',    label: 'Spiritual Habit',   icon: 'repeat' },
     ],
-    'learning': [
-        {val: 'programme', label: 'Qualification Programme'},
-        {val: 'course', label: 'Curriculum Course'},
-        {val: 'lesson', label: 'Study Lesson'},
-        {val: 'assignment', label: 'Steward Assignment'},
-        {val: 'quiz', label: 'Knowledge Quiz'},
-        {val: 'certification', label: 'Certification'}
+    community: [
+        { val: 'announcement', label: 'Announcement',      icon: 'announcement' },
+        { val: 'gathering',    label: 'Gathering',         icon: 'groups' },
+        { val: 'report',       label: 'Pastoral Report',   icon: 'description' },
     ],
-    'reference': [
-        {val: 'key', label: 'Steward Key'},
-        {val: 'property', label: 'Property Attribute'},
-        {val: 'attachment', label: 'File Attachment'}
+    bible: [
+        { val: 'bible_note', label: 'Scripture Note', icon: 'auto_stories' },
     ],
-    'bible': [
-        {val: 'bible_note', label: 'Scripture Note'}
-    ],
-    'community': [
-        {val: 'announcement', label: 'Public Announcement'},
-        {val: 'gathering', label: 'Community Gathering'},
-        {val: 'report', label: 'Pastoral Report'}
-    ]
 };
 
-function updateFamily(btn, family) {
-    // UI Update
-    const container = btn.parentElement;
-    const buttons = container.querySelectorAll('.apple-switch__btn');
-    const pill = container.querySelector('.apple-switch__pill');
-    
-    buttons.forEach((b, idx) => {
-        b.classList.toggle('active', b === btn);
-        if (b === btn) {
-            pill.style.transform = `translateY(${idx * 36}px)`;
+const Dial = {
+    currentFamily: 'journal',
+    currentType:   'note',
+
+    init() {
+        // Restore from hidden fields if editing an existing record
+        const family = document.getElementById('hidden-record-family')?.value || 'journal';
+        const type   = document.getElementById('hidden-record-type')?.value   || 'note';
+        const btn    = document.querySelector(`[data-family="${family}"]`);
+        if (btn) this.setFamily(btn, family, type);
+        else     this.setFamily(document.querySelector('[data-family="journal"]'), 'journal', type);
+    },
+
+    setFamily(btn, family, restoreType = null) {
+        this.currentFamily = family;
+
+        // Update family buttons
+        document.querySelectorAll('#family-nav .ctx-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+
+        // Render type list
+        const types = DIAL_MAP[family] || [];
+        const container = document.getElementById('type-nav');
+        container.innerHTML = types.map((t, i) => `
+            <button type="button"
+                    class="ctx-btn ${i === 0 && !restoreType ? 'active' : ''}"
+                    data-type="${t.val}"
+                    onclick="Dial.setType(this, '${t.val}')">
+                <span class="material-symbols-outlined">${t.icon}</span>
+                ${t.label}
+            </button>
+        `).join('');
+
+        // Select restored type or first
+        const target = restoreType
+            ? container.querySelector(`[data-type="${restoreType}"]`)
+            : container.querySelector('.ctx-btn');
+        if (target) {
+            container.querySelectorAll('.ctx-btn').forEach(b => b.classList.remove('active'));
+            target.classList.add('active');
+            this.currentType = target.dataset.type;
         }
-    });
 
-    // Update Types
-    const typeContainer = document.getElementById('type-options-container');
-    const types = DIAL_MAP[family] || [];
-    
-    typeContainer.innerHTML = types.map((t, idx) => `
-        <button type="button" class="apple-switch__btn ${idx === 0 ? 'active' : ''}" 
-                data-type="${t.val}" 
-                onclick="updateType(this, '${t.val}', '${family}')">
-            ${t.label}
-        </button>
-    `).join('');
+        this._sync(family, this.currentType);
+    },
 
-    // Reset Type Pill
-    const typePill = document.getElementById('type-pill');
-    if (typePill) typePill.style.transform = 'translateY(0)';
+    setType(btn, type) {
+        this.currentType = type;
+        document.querySelectorAll('#type-nav .ctx-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        this._sync(this.currentFamily, type);
+    },
 
-    // Form Update
-    const form = document.getElementById('editorial-form');
-    if (form) {
-        let fInput = document.getElementById('hidden-record-family') || form.querySelector('[name="record_family"]');
-        if (!fInput) {
-            fInput = document.createElement('input');
-            fInput.type = 'hidden'; fInput.name = 'record_family'; fInput.id = 'hidden-record-family';
-            form.appendChild(fInput);
-        }
-        fInput.value = family;
-        
-        // Emit global event for Hero and Options Bar
+    _sync(family, type) {
+        const fi = document.getElementById('hidden-record-family');
+        const ti = document.getElementById('hidden-record-type');
+        const st = document.getElementById('save-status');
+        if (fi) fi.value = family;
+        if (ti) ti.value = type;
+        if (st) st.textContent = family.charAt(0).toUpperCase() + family.slice(1) +
+                                  ' · ' + type.replace(/_/g, ' ');
+
         document.body.dispatchEvent(new CustomEvent('dialChanged', {
-            detail: { family: family, type: DIAL_MAP[family][0].val }
+            detail: { family, type }
         }));
-
-        updateType(typeContainer.children[0], types[0].val, family);
     }
-}
+};
 
-function updateType(btn, type, family) {
-    const container = btn.parentElement;
-    const buttons = container.querySelectorAll('.apple-switch__btn');
-    const pill = document.getElementById('type-pill');
-    
-    buttons.forEach((b, idx) => {
-        b.classList.toggle('active', b === btn);
-        if (b === btn) {
-            pill.style.transform = `translateY(${idx * 36}px)`;
-        }
-    });
-
-    const form = document.getElementById('editorial-form');
-    if (form) {
-        let tInput = document.getElementById('hidden-record-type') || form.querySelector('[name="record_type"]');
-        if (!tInput) {
-            tInput = document.createElement('input');
-            tInput.type = 'hidden'; tInput.name = 'record_type'; tInput.id = 'hidden-record-type';
-            form.appendChild(tInput);
-        }
-        tInput.value = type;
-        
-        // Emit specific type change
-        document.body.dispatchEvent(new CustomEvent('dialChanged', {
-            detail: { family: family, type: type }
-        }));
-        
-        const status = document.getElementById('save-status');
-        if (status) status.textContent = `Drafting ${family.charAt(0).toUpperCase() + family.slice(1)}`;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const defaultBtn = document.querySelector('[data-family="journal"]');
-    if (defaultBtn) updateFamily(defaultBtn, 'journal');
-});
+document.addEventListener('DOMContentLoaded', () => Dial.init());
+document.addEventListener('htmx:afterSwap',   () => Dial.init());
 </script>

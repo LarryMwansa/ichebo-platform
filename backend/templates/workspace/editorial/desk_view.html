@@ -5,14 +5,7 @@
 
 {% block hub_context_nav %}
     <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Editorial Control</div>
-    
     {% include "workspace/editorial/partials/command_dial.html" %}
-    
-    <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
-    
-    <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
-    
-    {% include "workspace/editorial/partials/file_explorer.html" %}
 
     <div class="ctx-divider"></div>
 
@@ -21,14 +14,10 @@
         <span class="material-symbols-outlined">history_edu</span>
         View Registry
     </a>
-
-    <div class="ctx-divider"></div>
-
-    <div class="ws-label-tag">Status</div>
-    <div class="ws-stat-card" style="margin-top: var(--space-s); background: var(--surface-2);">
-        <div class="ws-stat-card__label">Active Session</div>
-        <div class="ws-stat-card__value" style="font-size: 14px;" id="save-status">Steward drafting...</div>
-    </div>
+    <a href="{% url 'governance:library-home' %}" class="ctx-btn" style="margin-top: 2px;">
+        <span class="material-symbols-outlined">account_balance</span>
+        Governance Portal
+    </a>
 {% endblock %}
 
 {% block hub_stage %}
