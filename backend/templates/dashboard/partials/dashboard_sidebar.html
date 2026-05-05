@@ -1,48 +1,34 @@
 {# templates/dashboard/partials/dashboard_sidebar.html #}
-<div class="ics-explorer">
-    
-    {# Strategic Actions #}
-    <div class="explorer-section">
-        <div class="explorer-header">
-            <span class="material-symbols-outlined">bolt</span>
-            <span class="label-caps">Strategic Actions</span>
-        </div>
-        <div class="explorer-list">
-            <button class="explorer-item" style="width: 100%; border: none; background: transparent; text-align: left; cursor: pointer;"
-                    hx-get="{% url 'records:htmx-create' %}?record_type=dar"
-                    hx-target="#drawerInner"
-                    hx-swap="innerHTML"
-                    onclick="window.ICSDrawer.open('Daily Activity Report')">
-                <span class="material-symbols-outlined explorer-icon">edit_note</span>
-                <span class="explorer-name">Submit Daily DAR</span>
-            </button>
-            <a href="{% url 'governance:desk' %}" class="explorer-item">
-                <span class="material-symbols-outlined explorer-icon">draw</span>
-                <span class="explorer-name">Open The Desk</span>
-            </a>
-            <a href="{% url 'governance:home' %}" class="explorer-item">
-                <span class="material-symbols-outlined explorer-icon">gavel</span>
-                <span class="explorer-name">Governance Acts</span>
-            </a>
-        </div>
-    </div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
 
-    {# System Links #}
-    <div class="explorer-section" style="margin-top: 20px;">
-        <div class="explorer-header">
-            <span class="material-symbols-outlined">settings_suggest</span>
-            <span class="label-caps">Workspace Tools</span>
-        </div>
-        <div class="explorer-list">
-            <a href="{% url 'accounts:settings' %}" class="explorer-item">
-                <span class="material-symbols-outlined explorer-icon">manage_accounts</span>
-                <span class="explorer-name">Steward Settings</span>
-            </a>
-            <a href="{% url 'notifications:list' %}" class="explorer-item">
-                <span class="material-symbols-outlined explorer-icon">notifications</span>
-                <span class="explorer-name">Alerts Center</span>
-            </a>
-        </div>
-    </div>
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Strategic Actions</div>
+    <button class="ctx-btn"
+            hx-get="{% url 'records:htmx-create' %}?record_type=dar"
+            hx-target="#drawerInner"
+            hx-swap="innerHTML"
+            onclick="window.ICSDrawer.open('Daily Activity Report')">
+        <span class="material-symbols-outlined">edit_note</span>
+        Submit Daily DAR
+    </button>
+    <a href="{% url 'governance:desk' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">draw</span>
+        Open The Desk
+    </a>
+    <a href="{% url 'governance:home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">gavel</span>
+        Governance Acts
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Workspace Tools</div>
+    <a href="{% url 'accounts:settings' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        Steward Settings
+    </a>
+    <a href="{% url 'notifications:list' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">notifications</span>
+        Alerts Center
+    </a>
 
 </div>
