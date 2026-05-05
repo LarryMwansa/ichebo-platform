@@ -7,41 +7,42 @@
     <div class="ws-sidebar__section">
         <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Registers</div>
         <div style="display: flex; flex-direction: column; gap: 4px;">
-            <a href="{% url 'governance:library-home' %}" 
-               class="ws-icon-btn {% if active_branch == 'library' %}active{% endif %}" 
-               style="justify-content: flex-start; gap: 12px; padding: 0 12px; height: 40px; width: 100%;">
-                <span class="material-symbols-outlined" style="font-size: 20px;">library_books</span>
-                <span style="font-size: 13px; font-weight: 500;">Reference Library</span>
+            <a href="{% url 'governance:library-home' %}"
+               class="ctx-btn {% if active_branch == 'library' %}active{% endif %}">
+                <span class="material-symbols-outlined">library_books</span>
+                Reference Library
             </a>
-            <a href="{% url 'governance:mandate-home' %}" 
-               class="ws-icon-btn {% if active_branch == 'mandate' %}active{% endif %}" 
-               style="justify-content: flex-start; gap: 12px; padding: 0 12px; height: 40px; width: 100%;">
-                <span class="material-symbols-outlined" style="font-size: 20px;">gavel</span>
-                <span style="font-size: 13px; font-weight: 500;">Mandate Branch</span>
+            <a href="{% url 'governance:mandate-home' %}"
+               class="ctx-btn {% if active_branch == 'mandate' %}active{% endif %}">
+                <span class="material-symbols-outlined">gavel</span>
+                Mandate Branch
             </a>
-            <a href="{% url 'governance:keys-list' %}" 
-               class="ws-icon-btn {% if active_branch == 'keys' %}active{% endif %}" 
-               style="justify-content: flex-start; gap: 12px; padding: 0 12px; height: 40px; width: 100%;">
-                <span class="material-symbols-outlined" style="font-size: 20px;">vpn_key</span>
-                <span style="font-size: 13px; font-weight: 500;">Steward Keys</span>
+            <a href="{% url 'governance:keys-list' %}"
+               class="ctx-btn {% if active_branch == 'keys' %}active{% endif %}">
+                <span class="material-symbols-outlined">vpn_key</span>
+                Steward Keys
             </a>
         </div>
     </div>
 
-    <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+    <div class="ctx-divider"></div>
 
     <div class="ws-sidebar__section">
         <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Sub-Types</div>
         <div style="display: flex; flex-direction: column; gap: 2px;">
             {% if active_branch == 'library' %}
                 {% for slug, label in library_types.items %}
-                <a href="{% url 'governance:library-list' slug %}" class="ws-nav-item {% if record_type == slug %}active{% endif %}" style="padding-left: 12px; height: 32px; font-size: 13px;">
+                <a href="{% url 'governance:library-list' slug %}"
+                   class="ctx-btn {% if record_type == slug %}active{% endif %}"
+                   style="height: 32px; font-size: 12px; padding-left: 16px;">
                     {{ label }}
                 </a>
                 {% endfor %}
             {% elif active_branch == 'mandate' %}
                 {% for slug, label in mandate_types.items %}
-                <a href="{% url 'governance:mandate-list' slug %}" class="ws-nav-item {% if record_type == slug %}active{% endif %}" style="padding-left: 12px; height: 32px; font-size: 13px;">
+                <a href="{% url 'governance:mandate-list' slug %}"
+                   class="ctx-btn {% if record_type == slug %}active{% endif %}"
+                   style="height: 32px; font-size: 12px; padding-left: 16px;">
                     {{ label }}
                 </a>
                 {% endfor %}

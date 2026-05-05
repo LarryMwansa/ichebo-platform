@@ -139,3 +139,96 @@
     border-color: var(--primary);
     transform: translateX(4px);
 }
+
+
+/* ── Context Bar Button (.ctx-btn) ──────────────────────────────
+   Standard button for Column 2 (Context Bar) across all apps.
+   Governance app is the canonical reference style.
+   Dark surface (ink-2) context; light surface variant via .ctx-btn--light.
+──────────────────────────────────────────────────────────────── */
+
+.ctx-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    height: 40px;
+    width: 100%;
+    border-radius: var(--radius-s);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--ff-body);
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.6);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ctx-btn .material-symbols-outlined {
+    font-size: 18px;
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.4);
+    transition: color var(--transition-fast);
+}
+
+.ctx-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.ctx-btn:hover .material-symbols-outlined {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.ctx-btn.active {
+    background: rgba(175, 50, 54, 0.18);
+    color: var(--primary);
+}
+
+.ctx-btn.active .material-symbols-outlined {
+    color: var(--primary);
+}
+
+/* Light surface variant — for apps using stone/card context bars */
+html:not(.dark) .ctx-btn {
+    color: var(--muted);
+}
+
+html:not(.dark) .ctx-btn .material-symbols-outlined {
+    color: var(--muted-light);
+}
+
+html:not(.dark) .ctx-btn:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+
+html:not(.dark) .ctx-btn:hover .material-symbols-outlined {
+    color: var(--text);
+}
+
+html:not(.dark) .ctx-btn.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+html:not(.dark) .ctx-btn.active .material-symbols-outlined {
+    color: var(--primary);
+}
+
+/* Section divider inside context bar */
+.ctx-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    margin: var(--space-xs) 0;
+}
+
+html:not(.dark) .ctx-divider {
+    background: var(--border);
+}
