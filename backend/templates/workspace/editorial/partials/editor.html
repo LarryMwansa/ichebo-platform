@@ -1,161 +1,117 @@
-{# templates/workspace/editorial/partials/editor.html — Unified Editorial Desk #}
-{% include "workspace/editorial/partials/context_menu.html" %}
+{# templates/workspace/editorial/partials/editor.html — The Desk writing surface #}
+{% load static %}
 
-<div class="editorial-desk">
-    
-    {# 1. Minimalist Sticky Toolbar #}
-    <div class="editorial-sticky-toolbar" style="position: sticky; top: 0; background: var(--surface-bg); padding: 10px 0; border-bottom: 1px solid var(--border-color); z-index: 100;">
-        <div class="toolbar-inner" style="display: flex; gap: 15px; align-items: center; justify-content: center;">
-            <button onclick="window.apostolicEditor.toggleBold()"><b>B</b></button>
-            <button onclick="window.apostolicEditor.toggleItalic()"><i>I</i></button>
-            <div class="toolbar-divider"></div>
-            <button onclick="window.apostolicEditor.toggleHeading1()">H1</button>
-            <button onclick="window.apostolicEditor.toggleHeading2()">H2</button>
-            <div class="toolbar-status" id="draft-pulse">
-                <span class="status-text" id="draft-status" style="font-size: 12px; color: var(--muted);">Saved</span>
-            </div>
+{#
+  The Desk uses the shared writing_canvas partial.
+  toolbar_left is overridden here to show the live status label;
+  the command_dial (in the context bar) drives hidden-record-family
+  and hidden-record-type via dialChanged events.
+#}
+
+<div class="editorial-stage" id="editorial-stage">
+
+    {# ── 1. Sticky Toolbar ── #}
+    <div class="editorial-toolbar">
+
+        <div class="editorial-toolbar__left">
+            <span class="editorial-status" id="save-status">Steward drafting…</span>
+        </div>
+
+        <div class="editorial-toolbar__group--center">
+            <button type="button" class="editorial-toolbar__btn" title="Bold"
+                    onclick="EditorialUI.handleAction('bold')">
+                <span class="material-symbols-outlined">format_bold</span>
+            </button>
+            <button type="button" class="editorial-toolbar__btn" title="Italic"
+                    onclick="EditorialUI.handleAction('italic')">
+                <span class="material-symbols-outlined">format_italic</span>
+            </button>
+            <div class="editorial-toolbar__divider"></div>
+            <button type="button" class="editorial-toolbar__btn" title="Heading 1"
+                    onclick="EditorialUI.handleAction('heading 1')">
+                <span class="material-symbols-outlined">format_h1</span>
+            </button>
+            <button type="button" class="editorial-toolbar__btn" title="Heading 2"
+                    onclick="EditorialUI.handleAction('heading 2')">
+                <span class="material-symbols-outlined">format_h2</span>
+            </button>
+            <div class="editorial-toolbar__divider"></div>
+            <button type="button" class="editorial-toolbar__btn" title="Quote"
+                    onclick="EditorialUI.handleAction('quote')">
+                <span class="material-symbols-outlined">format_quote</span>
+            </button>
+            <button type="button" class="editorial-toolbar__btn" title="Link"
+                    onclick="EditorialUI.handleAction('link')">
+                <span class="material-symbols-outlined">link</span>
+            </button>
+            <button type="button" class="editorial-toolbar__btn" title="Bullet List"
+                    onclick="EditorialUI.handleAction('bullet')">
+                <span class="material-symbols-outlined">format_list_bulleted</span>
+            </button>
+            <div class="editorial-toolbar__divider"></div>
+            <button type="button" class="editorial-toolbar__btn" title="Preview (⌘P)"
+                    id="preview-toggle" onclick="EditorialUI.togglePreview()">
+                <span class="material-symbols-outlined">visibility</span>
+            </button>
+            <button type="button" class="editorial-toolbar__btn" title="Focus Mode (⌘⇧F)"
+                    id="focus-toggle" onclick="EditorialUI.toggleFocus()">
+                <span class="material-symbols-outlined">fullscreen</span>
+            </button>
+        </div>
+
+        <div class="editorial-toolbar__right">
+            <span class="editorial-status" id="word-count" style="min-width: 60px; text-align: right;"></span>
+            <button type="submit" form="editorial-form"
+                    class="ws-topbar__cta editorial-save-btn">
+                Save to Registry
+            </button>
         </div>
     </div>
 
-    <div class="editorial-canvas" style="padding-top: 40px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; background: var(--stone-bg);">
-        
-        <!-- Heading Hero: Design System Standard -->
-        <div class="editorial-hero" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); margin-bottom: 50px;">
-            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red); font-weight: 700;">Apostolic Drafting <span id="draft-status-hero" style="margin-left:15px; font-weight: 400; opacity: 0.6; font-family: 'Inter', sans-serif;"></span></div>
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <h1 class="ws-page-title" style="margin: 0; font-size: 36px; font-family: 'Playfair Display', serif; font-weight: 800; color: var(--ink-bg);" id="hero-title">New Record</h1>
-                <div id="hero-breadcrumb" style="font-size: 14px; color: var(--muted); display: flex; align-items: center; gap: 10px; font-family: 'Inter', sans-serif;">
-                    <span class="material-symbols-outlined" style="font-size: 18px; opacity: 0.4;">chevron_right</span>
-                    <span id="hero-family-label" style="text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Journal</span>
-                </div>
-            </div>
-        </div>
+    {# ── 2. Writing Canvas ── #}
+    <div class="editorial-canvas" id="editorial-canvas">
+        <form id="editorial-form"
+              hx-post="{{ save_url }}"
+              hx-target="#main-stage"
+              hx-push-url="true">
+            {% csrf_token %}
 
-        <div class="editorial-workspace" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); flex: 1;">
-            <form id="editorial-form" class="editorial-form" 
-                  style="display: flex; flex-direction: column; gap: 20px; height: 100%;"
-                  hx-post="{{ save_url }}" 
-                  hx-trigger="save-pulse"
-                  hx-swap="none">
-                <input type="hidden" name="record_family" id="hidden-record-family" value="journal">
-                <input type="hidden" name="record_type" id="hidden-record-type" value="{{ record.record_type|default:active_type }}">
-                
-                <input type="text" name="title" class="editorial-title-input" 
-                       style="font-size: 28px; font-weight: 700; border: none; background: transparent; color: var(--text-main); outline: none; width: 100%;"
-                       placeholder="Untitled Record..." value="{{ record.title|default:'' }}"
-                       oninput="document.getElementById('hero-title').innerHTML = this.value || 'New <em>Record</em>'">
-                
-                <textarea name="content" id="editorial-editor" class="editorial-editor-textarea editorial-body"
-                    placeholder="Begin writing... The word is alive. Right-click for tools.">{{ record.content|default:'' }}</textarea>
-            </form>
-        </div>
+            <input type="hidden" name="record_family" id="hidden-record-family"
+                   value="{{ active_family|default:'journal' }}">
+            <input type="hidden" name="record_type" id="hidden-record-type"
+                   value="{{ active_type|default:'note' }}">
+
+            <input type="text" name="title" id="record-title"
+                   value="{{ record.title|default:'' }}"
+                   placeholder="Title…"
+                   class="editorial-title-input editorial-title"
+                   required autofocus autocomplete="off">
+
+            <textarea name="content" id="editorial-editor"
+                      class="editorial-editor-textarea editorial-body"
+                      placeholder="Begin writing… the word is alive.">{{ record.content|default:'' }}</textarea>
+
+            <div id="editorial-preview"
+                 class="editorial-preview-pane editorial-body"
+                 style="display: none;"></div>
+        </form>
     </div>
 </div>
 
+<script src="{% static 'js/editorial_v2.js' %}"></script>
 <script>
-    // Initialize EasyMDE (Obsidian-style Live Preview)
-    var easymde = new EasyMDE({ 
-        element: document.getElementById("editorial-editor"),
-        spellChecker: false,
-        status: false,
-        toolbar: false,
-        forceSync: true,
-        placeholder: "Begin writing... The word is alive. Right-click for tools.",
-        renderingConfig: {
-            singleLineBreaks: false,
-            codeSyntaxHighlighting: true,
-        },
-        shortcuts: {
-            "toggleBold": "Cmd-B",
-            "toggleItalic": "Cmd-I",
-        }
-    });
+    document.addEventListener('DOMContentLoaded', () => EditorialUI.init());
+    document.addEventListener('htmx:afterSwap', () => EditorialUI.init());
 
-    // Global reference for context menu
-    window.apostolicEditor = easymde;
-
-    // Sync hero with dial
+    // Sync command dial → hidden form fields + status label
     document.body.addEventListener('dialChanged', (e) => {
-        const family = e.detail.family;
-        const type = e.detail.type;
-        const heroFamily = document.getElementById('hero-family-label');
-        if (heroFamily) heroFamily.textContent = family.charAt(0).toUpperCase() + family.slice(1);
-    });
-</script>
-
-<style>
-/* EasyMDE Dark Mode Integration */
-.EasyMDEContainer {
-    width: 100%;
-}
-.CodeMirror {
-    background: transparent !important;
-    color: var(--text-main) !important;
-    border: none !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 16px !important;
-    line-height: 1.8 !important;
-    min-height: 600px !important;
-}
-.CodeMirror-selected { background: rgba(255, 255, 255, 0.1) !important; }
-.CodeMirror-cursor { border-left: 2px solid var(--accent-red) !important; }
-
-/* Real-time rendering styles — Force visibility in Dark Mode */
-.cm-header-1 { font-size: 2.4em !important; color: var(--text-main) !important; font-weight: 700 !important; line-height: 1.2 !important; }
-.cm-header-2 { font-size: 1.8em !important; color: var(--text-main) !important; font-weight: 600 !important; }
-.cm-header-3 { font-size: 1.4em !important; color: var(--text-main) !important; font-weight: 600 !important; }
-.cm-bold { font-weight: 700 !important; color: var(--accent-red) !important; }
-.cm-italic { font-style: italic !important; color: var(--text-main) !important; }
-.cm-quote { color: var(--muted) !important; font-style: italic !important; border-left: 3px solid var(--accent-red) !important; padding-left: 12px !important; }
-.cm-link { color: var(--accent-red) !important; text-decoration: underline !important; }
-.cm-url { color: var(--muted) !important; font-size: 0.9em !important; }
-.cm-variable-2 { color: var(--text-main) !important; } /* Lists */
-.cm-comment { background: rgba(255,255,255,0.05); border-radius: 2px; } /* Code blocks */
-
-/* Hide the raw markdown symbols when not focused? No, let's keep them visible but subtle */
-.cm-formatting { color: var(--muted) !important; opacity: 0.5; }
-</style>
-
-<script>
-    // 1. Sync hidden inputs with Dial
-    document.body.addEventListener('dialChanged', (e) => {
-        document.getElementById('hidden-record-family').value = e.detail.family;
-        document.getElementById('hidden-record-type').value = e.detail.type;
-        document.getElementById('hero-type-label').textContent = e.detail.type.charAt(0).toUpperCase() + e.detail.type.slice(1);
-    });
-
-    // 2. Debounced Auto-Save Pulse
-    let saveTimeout;
-    const statusHero = document.getElementById('draft-status-hero');
-    const statusToolbar = document.getElementById('draft-status');
-
-    function triggerSave() {
-        statusHero.textContent = 'Saving...';
-        statusToolbar.textContent = 'Saving...';
-        
-        // Ensure textarea is synced before HTMX takes over
-        document.getElementById('editorial-editor').value = window.apostolicEditor.value();
-        
-        // Trigger HTMX
-        htmx.trigger('#editorial-form', 'save-pulse');
-    }
-
-    window.apostolicEditor.codemirror.on('change', () => {
-        statusHero.textContent = 'Drafting...';
-        statusToolbar.textContent = 'Drafting...';
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(triggerSave, 2000); // 2 second debounce
-    });
-
-    // 3. HTMX Success Feedback
-    document.body.addEventListener('htmx:afterRequest', (e) => {
-        if (e.detail.elt.id === 'editorial-form') {
-            statusHero.textContent = 'Saved';
-            statusToolbar.textContent = 'Saved';
-            setTimeout(() => {
-                statusHero.textContent = '';
-                statusToolbar.textContent = 'Ready';
-            }, 3000);
-        }
+        const fi = document.getElementById('hidden-record-family');
+        const ti = document.getElementById('hidden-record-type');
+        const st = document.getElementById('save-status');
+        if (fi) fi.value = e.detail.family;
+        if (ti) ti.value = e.detail.type;
+        if (st) st.textContent = e.detail.family.charAt(0).toUpperCase() +
+                                  e.detail.family.slice(1) + ' · ' +
+                                  e.detail.type.replace(/_/g, ' ');
     });
 </script>

@@ -62,6 +62,9 @@
             {% endif %}
         </div>
     </div>
+
+    {# Extra context injected by child templates (e.g. editorial_form adds drafts + quick actions) #}
+    {% block hub_context_nav_extra %}{% endblock %}
 {% endblock %}
 
 {% block hub_stage %}

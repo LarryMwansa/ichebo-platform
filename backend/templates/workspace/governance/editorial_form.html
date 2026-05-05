@@ -1,40 +1,42 @@
 {% extends "workspace/governance/base.html" %}
 {% load static %}
 
-{% block context_content %}
-<div class="ws-context-section">
-    <div class="label-caps" style="padding: 0 var(--space-s); margin-bottom: var(--space-xs);">Local Drafts</div>
+{# ── Extra context bar content: drafts + quick actions ── #}
+{% block hub_context_nav_extra %}
+<div class="ctx-divider"></div>
+
+<div class="ws-sidebar__section">
+    <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Local Drafts</div>
     <div id="ws-recent-drafts">
-        <!-- Rendered by editorial_v2.js -->
+        {# Populated by EditorialUI.renderDraftsList() on init #}
     </div>
 </div>
 
-<div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+<div class="ctx-divider"></div>
 
-<div class="ws-context-section">
-    <div class="label-caps" style="padding: 0 var(--space-s); margin-bottom: var(--space-xs);">Quick Actions</div>
-    <nav class="ics-context-nav">
-        <a href="{% url 'governance:htmx-record-create' %}?record_family=governance" class="ics-context-item">
-            <span class="material-symbols-outlined">add_circle</span>
-            New Handbook Act
-        </a>
-        <a href="{% url 'governance:htmx-record-create' %}?record_family=reference" class="ics-context-item">
-            <span class="material-symbols-outlined">key</span>
-            New Steward Key
-        </a>
-    </nav>
+<div class="ws-sidebar__section">
+    <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Quick Actions</div>
+    <a href="{% url 'governance:htmx-record-create' %}?record_family=governance" class="ctx-btn">
+        <span class="material-symbols-outlined">add_circle</span>
+        New Governance Act
+    </a>
+    <a href="{% url 'governance:htmx-record-create' %}?record_family=reference" class="ctx-btn" style="margin-top: 4px;">
+        <span class="material-symbols-outlined">key</span>
+        New Steward Key
+    </a>
 </div>
 {% endblock %}
 
-{% block watermark %}EDITORIAL{% endblock %}
-
+{# ── Stage: Writing Canvas only — no extra shell ── #}
 {% block governance_content %}
-<div class="editorial-stage">
-    {# 1. Full-Width Sticky Toolbar #}
+<div class="editorial-stage" id="editorial-stage">
+
+    {# Sticky toolbar #}
     <div class="editorial-toolbar">
-        {# Left: Context Actions #}
         <div class="editorial-toolbar__left">
-            <select name="record_type" id="record-type" class="editorial-type-picker" form="editorial-form">
+            <select name="record_type" id="record-type"
+                    class="editorial-type-picker" form="editorial-form"
+                    onchange="document.getElementById('hidden-record-type').value = this.value">
                 {% if record_family == 'governance' %}
                     <optgroup label="Reference Library">
                         {% for slug, label in library_types.items %}
@@ -53,144 +55,179 @@
             <span id="save-status" class="editorial-status">Drafting Official Act</span>
         </div>
 
-        {# Center: Formatting Tools #}
         <div class="editorial-toolbar__group--center">
-            <button type="button" class="editorial-toolbar__btn" title="Bold"><span class="material-symbols-outlined">format_bold</span></button>
-            <button type="button" class="editorial-toolbar__btn" title="Italic"><span class="material-symbols-outlined">format_italic</span></button>
+            <button type="button" class="editorial-toolbar__btn" title="Bold"
+                    onclick="EditorialUI.handleAction('bold')">
+                <span class="material-symbols-outlined">format_bold</span>
+            </button>
+            <button type="button" class="editorial-toolbar__btn" title="Italic"
+                    onclick="EditorialUI.handleAction('italic')">
+                <span class="material-symbols-outlined">format_italic</span>
+            </button>
             <div class="editorial-toolbar__divider"></div>
-            <button type="button" class="editorial-toolbar__btn" title="Heading 1"><span class="material-symbols-outlined">format_h1</span></button>
-            <button type="button" class="editorial-toolbar__btn" title="Heading 2"><span class="material-symbols-outlined">format_h2</span></button>
+            <button type="button" class="editorial-toolbar__btn" title="Heading 1"
+                    onclick="EditorialUI.handleAction('heading 1')">
+                <span class="material-symbols-outlined">format_h1</span>
+            </button>
+            <button type="button" class="editorial-toolbar__btn" title="Heading 2"
+                    onclick="EditorialUI.handleAction('heading 2')">
+                <span class="material-symbols-outlined">format_h2</span>
+            </button>
             <div class="editorial-toolbar__divider"></div>
-            <button type="button" class="editorial-toolbar__btn" title="Quote"><span class="material-symbols-outlined">format_quote</span></button>
-            <button type="button" class="editorial-toolbar__btn" title="Link"><span class="material-symbols-outlined">link</span></button>
+            <button type="button" class="editorial-toolbar__btn" title="Quote"
+                    onclick="EditorialUI.handleAction('quote')">
+                <span class="material-symbols-outlined">format_quote</span>
+            </button>
+            <button type="button" class="editorial-toolbar__btn" title="Link"
+                    onclick="EditorialUI.handleAction('link')">
+                <span class="material-symbols-outlined">link</span>
+            </button>
+            <button type="button" class="editorial-toolbar__btn" title="Bullet List"
+                    onclick="EditorialUI.handleAction('bullet')">
+                <span class="material-symbols-outlined">format_list_bulleted</span>
+            </button>
             <div class="editorial-toolbar__divider"></div>
-            <button type="button" class="editorial-toolbar__btn" id="preview-toggle" onclick="EditorialUI.togglePreview()" title="Preview (⌘+P)">
+            <button type="button" class="editorial-toolbar__btn" title="Preview (⌘P)"
+                    id="preview-toggle" onclick="EditorialUI.togglePreview()">
                 <span class="material-symbols-outlined">visibility</span>
+            </button>
+            <button type="button" class="editorial-toolbar__btn" title="Focus Mode (⌘⇧F)"
+                    id="focus-toggle" onclick="EditorialUI.toggleFocus()">
+                <span class="material-symbols-outlined">fullscreen</span>
             </button>
         </div>
 
-        {# Right: Save Actions #}
         <div class="editorial-toolbar__right">
+            <span class="editorial-status" id="word-count" style="min-width: 60px; text-align: right;"></span>
             <button type="submit" form="editorial-form" class="ws-topbar__cta editorial-save-btn">
                 Publish Act
             </button>
         </div>
     </div>
 
-    {# 2. The Writing Canvas #}
-    <div class="editorial-canvas">
-        <form id="editorial-form" 
+    {# Writing canvas #}
+    <div class="editorial-canvas" id="editorial-canvas">
+        <form id="editorial-form"
               {% if record %}
                 hx-post="{% url 'governance:htmx-record-edit' record.id %}"
               {% else %}
                 hx-post="{% url 'governance:htmx-record-create' %}"
               {% endif %}
-              hx-target="#main-stage" 
+              hx-target="#main-stage"
               hx-push-url="true">
             {% csrf_token %}
             <input type="hidden" name="record_family" value="{{ record_family }}">
-            
-            <input type="text" name="title" id="record-title" value="{{ record.title|default:'' }}"
-                placeholder="Title of the Decree or Protocol..." class="editorial-title-input editorial-title"
-                required autofocus autofill="off">
+            <input type="hidden" name="record_type" id="hidden-record-type"
+                   value="{{ record.record_type|default:record_type|default:'decree' }}">
+            <input type="hidden" name="tags" id="hidden-tags"
+                   value="{{ record.tags|join:', ' }}">
+            <input type="hidden" name="status" id="hidden-status"
+                   value="{{ record.status|default:'draft' }}">
 
-            <textarea name="summary" class="editorial-body" 
-                      placeholder="Brief summary/purpose of this act..." 
-                      style="width: 100%; min-height: 80px; border: none; background: transparent; outline: none; font-style: italic; color: var(--muted); margin-bottom: var(--space-m); resize: none;"
-                      form="editorial-form">{{ record.summary|default:'' }}</textarea>
+            <input type="text" name="title" id="record-title"
+                   value="{{ record.title|default:'' }}"
+                   placeholder="Title of the Decree or Protocol…"
+                   class="editorial-title-input editorial-title"
+                   required autofocus autocomplete="off">
 
-            <textarea name="content" id="editorial-editor" class="editorial-editor-textarea editorial-body"
-                placeholder="Formal text of the act... Supports Markdown.">{{ record.content|default:'' }}</textarea>
-            
-            <div id="editorial-preview" class="editorial-preview-pane editorial-body" style="display: none;">
-                <!-- Rendered Markdown -->
-            </div>
-            
-            {# Hidden inputs for the side-panel metadata (synced via JS) #}
-            <input type="hidden" name="tags" id="hidden-tags" value="{{ record.tags|join:', ' }}">
-            <input type="hidden" name="categories" id="hidden-categories" value="{{ record.categories|join:', ' }}">
-            <input type="hidden" name="status" id="hidden-status" value="{{ record.status|default:'draft' }}">
+            <textarea name="summary" id="record-summary"
+                      class="editorial-summary-input"
+                      placeholder="Brief summary or purpose of this act…">{{ record.summary|default:'' }}</textarea>
+
+            <textarea name="content" id="editorial-editor"
+                      class="editorial-editor-textarea editorial-body"
+                      placeholder="Formal text of the act… Supports Markdown.">{{ record.content|default:'' }}</textarea>
+
+            <div id="editorial-preview"
+                 class="editorial-preview-pane editorial-body"
+                 style="display: none;"></div>
         </form>
     </div>
 </div>
 
 <script src="{% static 'js/editorial_v2.js' %}"></script>
 <script>
-    if (typeof EditorialUI !== 'undefined') { EditorialUI.init(); }
+    document.addEventListener('DOMContentLoaded', () => EditorialUI.init());
+    document.addEventListener('htmx:afterSwap',   () => EditorialUI.init());
 </script>
 {% endblock %}
 
+{# ── Options Bar: HRS Stewardship Attributes ── #}
 {% block ws_options %}
-    {# ── Options Bar: Stewardship Input Panel ── #}
-    <div class="ws-options-section">
-        <div class="ws-label-tag">Stewardship Attributes</div>
-        <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Tune the HRS properties of this act.</p>
+<div class="ws-options-section">
+    <div class="ws-label-tag">Stewardship Attributes</div>
+    <p style="font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5;">
+        Tune the HRS properties of this act.
+    </p>
 
-        <div style="display: flex; flex-direction: column; gap: 16px; margin-top: var(--space-m);">
-            {% with cf=record.custom_fields %}
-            <div class="gov-form-group">
-                <label class="editorial-status" style="display: block; margin-bottom: 6px;">Complexity</label>
-                <select name="complexity" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    {% for opt in complexity_opts %}
-                    <option value="{{ opt }}" {% if cf.complexity == opt %}selected{% endif %}>{{ opt }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+    <div style="display: flex; flex-direction: column; gap: 16px; margin-top: var(--space-m);">
+        {% with cf=record.custom_fields %}
 
-            <div class="gov-form-group">
-                <label class="editorial-status" style="display: block; margin-bottom: 6px;">Polarity</label>
-                <select name="polarity" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    {% for opt in polarity_opts %}
-                    <option value="{{ opt }}" {% if cf.polarity == opt %}selected{% endif %}>{{ opt|title }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="gov-form-group">
-                <label class="editorial-status" style="display: block; margin-bottom: 6px;">Position / Direction</label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <select name="position" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                        <option value="">Pos</option>
-                        {% for opt in position_opts %}
-                        <option value="{{ opt }}" {% if cf.position == opt %}selected{% endif %}>{{ opt|title }}</option>
-                        {% endfor %}
-                    </select>
-                    <select name="direction" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                        <option value="">Dir</option>
-                        {% for opt in direction_opts %}
-                        <option value="{{ opt }}" {% if cf.direction == opt %}selected{% endif %}>{{ opt|title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div class="gov-form-group">
-                <label class="editorial-status" style="display: block; margin-bottom: 6px;">Symbol</label>
-                <input type="text" name="symbol" value="{{ cf.symbol|default:'' }}" 
-                       placeholder="Prophetic Symbol" 
-                       class="editorial-type-picker" style="width: 100%; padding-left: 12px; font-size: 14px;" 
-                       form="editorial-form">
-            </div>
-            {% endwith %}
-        </div>
-    </div>
-
-    <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
-
-    <div class="ws-options-section">
-        <div class="ws-label-tag">Publication Tags</div>
-        <div style="margin-top: var(--space-m); display: flex; flex-direction: column; gap: 12px;">
-            <input type="text" placeholder="Tags (comma separated)" class="editorial-type-picker" style="width: 100%;" 
-                   oninput="document.getElementById('hidden-tags').value = this.value"
-                   value="{{ record.tags|join:', ' }}">
-            
-            <select class="editorial-type-picker" style="width: 100%;" 
-                    onchange="document.getElementById('hidden-status').value = this.value">
-                <option value="draft" {% if record.status == 'draft' %}selected{% endif %}>Status: Draft</option>
-                <option value="active" {% if record.status == 'active' %}selected{% endif %}>Status: Active</option>
+        <div class="gov-form-group">
+            <label class="editorial-status" style="display: block; margin-bottom: 6px;">Complexity</label>
+            <select name="complexity" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
+                <option value="">—</option>
+                {% for opt in complexity_opts %}
+                <option value="{{ opt }}" {% if cf.complexity == opt %}selected{% endif %}>{{ opt }}</option>
+                {% endfor %}
             </select>
         </div>
+
+        <div class="gov-form-group">
+            <label class="editorial-status" style="display: block; margin-bottom: 6px;">Polarity</label>
+            <select name="polarity" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
+                <option value="">—</option>
+                {% for opt in polarity_opts %}
+                <option value="{{ opt }}" {% if cf.polarity == opt %}selected{% endif %}>{{ opt|title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="gov-form-group">
+            <label class="editorial-status" style="display: block; margin-bottom: 6px;">Position / Direction</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <select name="position" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
+                    <option value="">Pos</option>
+                    {% for opt in position_opts %}
+                    <option value="{{ opt }}" {% if cf.position == opt %}selected{% endif %}>{{ opt|title }}</option>
+                    {% endfor %}
+                </select>
+                <select name="direction" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
+                    <option value="">Dir</option>
+                    {% for opt in direction_opts %}
+                    <option value="{{ opt }}" {% if cf.direction == opt %}selected{% endif %}>{{ opt|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="gov-form-group">
+            <label class="editorial-status" style="display: block; margin-bottom: 6px;">Symbol</label>
+            <input type="text" name="symbol" value="{{ cf.symbol|default:'' }}"
+                   placeholder="Prophetic Symbol"
+                   class="editorial-type-picker"
+                   style="width: 100%; padding-left: 12px; font-size: 14px;"
+                   form="editorial-form">
+        </div>
+
+        {% endwith %}
     </div>
+</div>
+
+<div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+
+<div class="ws-options-section">
+    <div class="ws-label-tag">Publication</div>
+    <div style="margin-top: var(--space-m); display: flex; flex-direction: column; gap: 12px;">
+        <input type="text" placeholder="Tags (comma separated)"
+               class="editorial-type-picker" style="width: 100%;"
+               oninput="document.getElementById('hidden-tags').value = this.value"
+               value="{{ record.tags|join:', ' }}">
+        <select class="editorial-type-picker" style="width: 100%;"
+                onchange="document.getElementById('hidden-status').value = this.value">
+            <option value="draft" {% if record.status == 'draft' or not record %}selected{% endif %}>Status: Draft</option>
+            <option value="active" {% if record.status == 'active' %}selected{% endif %}>Status: Active</option>
+        </select>
+    </div>
+</div>
 {% endblock %}

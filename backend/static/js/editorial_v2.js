@@ -1,170 +1,202 @@
 /**
- * Editorial Controller (v2)
- * Handles Markdown formatting, auto-saving, and drafting logic.
+ * EditorialUI — Unified writing controller for ICS Apostolic Command Shell.
+ * Used by: Governance Desk, Records Desk, The Desk.
+ * No third-party editor dependencies.
  */
 
 const EditorialUI = {
-    editorId: 'editorial-editor',
-    draftsKey: 'ics_editorial_drafts',
-    autoSaveInterval: 3000, // 3 seconds
-    saveTimer: null,
+    editorId:        'editorial-editor',
+    draftsKey:       'ics_editorial_drafts',
+    autoSaveDelay:   2500,
+    _saveTimer:      null,
+    _focusActive:    false,
+    editor:          null,
+
+    // ── Boot ────────────────────────────────────────────────────────────────
 
     init() {
         this.editor = document.getElementById(this.editorId);
         if (!this.editor) return;
 
-        this.setupToolbar();
-        this.setupShortcuts();
-        this.setupAutoSave();
+        this._setupAutoSave();
+        this._setupShortcuts();
+        this._setupWordCount();
         this.renderDraftsList();
-        this.updatePreview(); // Initial render
+        this._syncPreview();
     },
 
-    // ── Formatting Logic ─────────────────────────────────────────────────────
-
-    setupToolbar() {
-        const toolbar = document.querySelector('.editorial-toolbar');
-        if (!toolbar) return;
-
-        toolbar.addEventListener('click', (e) => {
-            const btn = e.target.closest('.editorial-toolbar__btn');
-            if (!btn) return;
-
-            const action = btn.title.toLowerCase();
-            this.handleAction(action);
-        });
-    },
+    // ── Formatting actions ───────────────────────────────────────────────────
 
     handleAction(action) {
         if (!this.editor) return;
-
-        const actions = {
-            'bold': { prefix: '**', suffix: '**' },
-            'italic': { prefix: '_', suffix: '_' },
-            'heading 1': { prefix: '# ', suffix: '', block: true },
-            'heading 2': { prefix: '## ', suffix: '', block: true },
-            'quote': { prefix: '> ', suffix: '', block: true },
-            'link': { prefix: '[', suffix: '](url)' },
+        const map = {
+            'bold':      { pre: '**',  suf: '**'    },
+            'italic':    { pre: '_',   suf: '_'     },
+            'heading 1': { pre: '# ',  suf: '',  block: true },
+            'heading 2': { pre: '## ', suf: '',  block: true },
+            'quote':     { pre: '> ',  suf: '',  block: true },
+            'bullet':    { pre: '- ',  suf: '',  block: true },
+            'link':      { pre: '[',   suf: '](url)' },
         };
-
-        const config = actions[action];
-        if (config) {
-            this.wrapSelection(config.prefix, config.suffix, config.block);
-        }
+        const cfg = map[action];
+        if (cfg) this._wrap(cfg.pre, cfg.suf, cfg.block);
     },
 
-    wrapSelection(prefix, suffix, isBlock = false) {
-        const start = this.editor.selectionStart;
-        const end = this.editor.selectionEnd;
-        const text = this.editor.value;
-        const selection = text.substring(start, end);
+    _wrap(pre, suf, isBlock = false) {
+        const el    = this.editor;
+        const start = el.selectionStart;
+        const end   = el.selectionEnd;
+        const val   = el.value;
+        const sel   = val.substring(start, end);
 
-        let replacement = '';
+        let insert;
         if (isBlock) {
-            // Block elements usually need a newline
-            replacement = `\n${prefix}${selection}`;
+            // If there's a selection, prefix each line
+            if (sel.includes('\n')) {
+                insert = sel.split('\n').map(l => pre + l).join('\n');
+            } else {
+                insert = (start > 0 && val[start - 1] !== '\n' ? '\n' : '') + pre + sel;
+            }
         } else {
-            replacement = `${prefix}${selection}${suffix}`;
+            insert = pre + sel + suf;
         }
 
-        this.editor.value = text.substring(0, start) + replacement + text.substring(end);
-        
-        // Restore focus and selection
-        this.editor.focus();
-        const newPos = start + prefix.length + (selection.length > 0 ? selection.length : 0) + suffix.length;
-        
-        // If it's a link and no selection, put cursor inside the URL part
-        if (prefix === '[' && suffix === '](url)' && selection.length === 0) {
-            const linkPos = start + 3; // After '[' and before '](url)'
-            this.editor.setSelectionRange(linkPos, linkPos);
+        el.value = val.substring(0, start) + insert + val.substring(end);
+        el.focus();
+
+        // Position cursor sensibly
+        if (pre === '[' && !sel) {
+            el.setSelectionRange(start + 1, start + 1); // inside link text
+        } else if (isBlock) {
+            const newPos = start + insert.length;
+            el.setSelectionRange(newPos, newPos);
         } else {
-            this.editor.setSelectionRange(newPos, newPos);
+            el.setSelectionRange(start + pre.length + sel.length, start + pre.length + sel.length);
         }
-        
-        this.triggerAutoSave();
+
+        this._syncPreview();
+        this._triggerAutoSave();
     },
 
-    setupShortcuts() {
+    // ── Keyboard shortcuts ───────────────────────────────────────────────────
+
+    _setupShortcuts() {
+        if (!this.editor) return;
         this.editor.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey)) {
-                if (e.key === 'b') { e.preventDefault(); this.handleAction('bold'); }
-                if (e.key === 'i') { e.preventDefault(); this.handleAction('italic'); }
-                if (e.key === 'p') { e.preventDefault(); this.togglePreview(); }
+            const mod = e.ctrlKey || e.metaKey;
+            if (!mod) return;
+            if (e.key === 'b') { e.preventDefault(); this.handleAction('bold'); }
+            if (e.key === 'i') { e.preventDefault(); this.handleAction('italic'); }
+            if (e.key === 'p') { e.preventDefault(); this.togglePreview(); }
+            if (e.key === 'F' && e.shiftKey) { e.preventDefault(); this.toggleFocus(); }
+            // Tab → indent with spaces inside textarea
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                this._wrap('    ', '', false);
             }
         });
     },
 
+    // ── Live preview ─────────────────────────────────────────────────────────
+
     togglePreview() {
         const preview = document.getElementById('editorial-preview');
-        const btn = document.getElementById('preview-toggle');
+        const btn     = document.getElementById('preview-toggle');
         if (!preview || !this.editor) return;
 
-        const isVisible = preview.style.display !== 'none';
-        if (isVisible) {
+        const showing = preview.style.display !== 'none';
+        if (showing) {
             preview.style.display = 'none';
-            this.editor.style.display = 'block';
-            if (btn) btn.classList.remove('active');
+            this.editor.style.display = '';
+            btn && btn.classList.remove('active');
         } else {
-            this.updatePreview();
-            preview.style.display = 'block';
+            this._syncPreview();
+            preview.style.display = '';
             this.editor.style.display = 'none';
-            if (btn) btn.classList.add('active');
+            btn && btn.classList.add('active');
         }
     },
 
-    updatePreview() {
+    _syncPreview() {
         const preview = document.getElementById('editorial-preview');
-        if (!preview || !this.editor || typeof marked === 'undefined') return;
-        preview.innerHTML = marked.parse(this.editor.value);
+        if (!preview || !this.editor) return;
+        if (preview.style.display === 'none') return;
+        if (typeof marked === 'undefined') return;
+        marked.setOptions({ breaks: true, gfm: true });
+        preview.innerHTML = marked.parse(this.editor.value || '');
     },
 
-    // ── Auto-Save Logic ──────────────────────────────────────────────────────
+    // ── Focus mode ────────────────────────────────────────────────────────────
 
-    setupAutoSave() {
+    toggleFocus() {
+        const btn = document.getElementById('focus-toggle');
+        this._focusActive = !this._focusActive;
+        document.body.classList.toggle('focus-mode', this._focusActive);
+        if (btn) {
+            btn.classList.toggle('active', this._focusActive);
+            btn.querySelector('.material-symbols-outlined').textContent =
+                this._focusActive ? 'fullscreen_exit' : 'fullscreen';
+        }
+        // Return focus to editor so typing continues uninterrupted
+        if (this.editor) this.editor.focus();
+    },
+
+    // ── Word count ───────────────────────────────────────────────────────────
+
+    _setupWordCount() {
+        if (!this.editor) return;
+        this._updateWordCount();
+        this.editor.addEventListener('input', () => this._updateWordCount());
+    },
+
+    _updateWordCount() {
+        const el = document.getElementById('word-count');
+        if (!el || !this.editor) return;
+        const words = (this.editor.value.trim().match(/\S+/g) || []).length;
+        el.textContent = words === 0 ? '' : `${words} w`;
+    },
+
+    // ── Auto-save to localStorage ─────────────────────────────────────────────
+
+    _setupAutoSave() {
+        if (!this.editor) return;
         this.editor.addEventListener('input', () => {
-            this.updatePreview();
-            this.triggerAutoSave();
+            this._syncPreview();
+            this._triggerAutoSave();
         });
     },
 
-    triggerAutoSave() {
-        clearTimeout(this.saveTimer);
-        this.saveTimer = setTimeout(() => this.saveDraft(), this.autoSaveInterval);
+    _triggerAutoSave() {
+        clearTimeout(this._saveTimer);
+        this._saveTimer = setTimeout(() => this._saveDraft(), this.autoSaveDelay);
     },
 
-    saveDraft() {
+    _saveDraft() {
         if (!this.editor || !this.editor.value.trim()) return;
 
-        const drafts = JSON.parse(localStorage.getItem(this.draftsKey) || '[]');
-        const currentDraft = {
-            id: Date.now(),
-            title: document.getElementById('record-title')?.value || 'Untitled Draft',
-            content: this.editor.value,
-            timestamp: new Date().toISOString(),
-            type: document.getElementById('record-type')?.value || 'note'
+        const title   = document.getElementById('record-title')?.value || 'Untitled';
+        const rtype   = document.getElementById('hidden-record-type')?.value ||
+                        document.getElementById('record-type')?.value || 'note';
+        const family  = document.getElementById('hidden-record-family')?.value || 'journal';
+
+        const draft = {
+            id:        Date.now(),
+            title,
+            content:   this.editor.value,
+            summary:   document.getElementById('record-summary')?.value || '',
+            family,
+            type:      rtype,
+            savedAt:   new Date().toISOString(),
         };
 
-        // For simplicity, we'll just keep the latest 5 drafts
-        drafts.unshift(currentDraft);
-        const uniqueDrafts = drafts.slice(0, 5);
-        
-        localStorage.setItem(this.draftsKey, JSON.stringify(uniqueDrafts));
+        let drafts = JSON.parse(localStorage.getItem(this.draftsKey) || '[]');
+        // Deduplicate by title — replace if same title exists
+        drafts = drafts.filter(d => d.title !== draft.title);
+        drafts.unshift(draft);
+        localStorage.setItem(this.draftsKey, JSON.stringify(drafts.slice(0, 8)));
+
         this.renderDraftsList();
-        
-        // Visual Feedback: Pulse the status label
-        const statusLabel = document.getElementById('save-status');
-        if (statusLabel) {
-            statusLabel.textContent = 'Draft Saved';
-            statusLabel.classList.remove('pulse');
-            void statusLabel.offsetWidth; // Trigger reflow
-            statusLabel.classList.add('pulse');
-            
-            setTimeout(() => {
-                statusLabel.textContent = 'Drafting Official Act';
-            }, 2000);
-        }
-        
-        console.log('Draft auto-saved to localStorage');
+        this._pulse('Draft saved');
     },
 
     renderDraftsList() {
@@ -172,39 +204,69 @@ const EditorialUI = {
         if (!container) return;
 
         const drafts = JSON.parse(localStorage.getItem(this.draftsKey) || '[]');
-        if (drafts.length === 0) {
-            container.innerHTML = '<div class="ws_detail-empty" style="padding: var(--space-s); font-size: 11px; color: var(--muted);">No local drafts found.</div>';
+        if (!drafts.length) {
+            container.innerHTML = `<div style="padding: 8px 4px; font-size: 11px; color: var(--muted); font-style: italic;">No local drafts.</div>`;
             return;
         }
 
-        let html = '<div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">';
-        drafts.forEach(draft => {
-            const time = new Date(draft.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            html += `
-                <div class="ws-draft-item" onclick="EditorialUI.loadDraft(${draft.id})" 
-                     style="padding: 8px; border-radius: 4px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;">
-                    <div style="font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${draft.title}</div>
-                    <div style="font-size: 10px; color: var(--muted);">${time} · ${draft.type}</div>
-                </div>
-            `;
-        });
-        html += '</div>';
-        container.innerHTML = html;
+        container.innerHTML = drafts.map(d => {
+            const t = new Date(d.savedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return `
+                <div class="ws-draft-item" onclick="EditorialUI.loadDraft(${d.id})">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text);
+                                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${d.title}
+                    </div>
+                    <div style="font-size: 10px; color: var(--muted); margin-top: 2px;">
+                        ${t} · ${d.family}/${d.type}
+                    </div>
+                </div>`;
+        }).join('');
     },
 
     loadDraft(id) {
         const drafts = JSON.parse(localStorage.getItem(this.draftsKey) || '[]');
-        const draft = drafts.find(d => d.id === id);
-        if (draft && this.editor) {
-            if (confirm('Load this draft? Current unsaved work will be replaced.')) {
-                this.editor.value = draft.content;
-                const titleInput = document.getElementById('record-title');
-                if (titleInput) titleInput.value = draft.title;
-            }
-        }
-    }
+        const draft  = drafts.find(d => d.id === id);
+        if (!draft || !this.editor) return;
+
+        if (!confirm(`Load "${draft.title}"? Unsaved work will be replaced.`)) return;
+
+        this.editor.value = draft.content;
+
+        const titleEl   = document.getElementById('record-title');
+        const summaryEl = document.getElementById('record-summary');
+        const typeEl    = document.getElementById('record-type');
+        const hiddenT   = document.getElementById('hidden-record-type');
+        const hiddenF   = document.getElementById('hidden-record-family');
+
+        if (titleEl)   titleEl.value   = draft.title;
+        if (summaryEl) summaryEl.value = draft.summary || '';
+        if (typeEl)    typeEl.value    = draft.type;
+        if (hiddenT)   hiddenT.value   = draft.type;
+        if (hiddenF)   hiddenF.value   = draft.family;
+
+        this._syncPreview();
+        this._updateWordCount();
+        this._pulse('Draft loaded');
+    },
+
+    // ── Status pulse ──────────────────────────────────────────────────────────
+
+    _pulse(msg) {
+        const el = document.getElementById('save-status');
+        if (!el) return;
+        const prev = el.textContent;
+        el.textContent = msg;
+        el.classList.remove('pulse');
+        void el.offsetWidth;
+        el.classList.add('pulse');
+        setTimeout(() => {
+            el.textContent = prev;
+            el.classList.remove('pulse');
+        }, 2200);
+    },
 };
 
-// Initialize on load
+// Boot on first load and after HTMX swaps
 document.addEventListener('DOMContentLoaded', () => EditorialUI.init());
-document.addEventListener('htmx:afterSwap', () => EditorialUI.init());
+document.addEventListener('htmx:afterSwap',   () => EditorialUI.init());
