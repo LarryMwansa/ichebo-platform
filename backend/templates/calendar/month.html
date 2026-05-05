@@ -1,12 +1,18 @@
 {% extends "calendar/base_calendar.html" %}
 
 {% block cal_title %}{{ month_name }} {{ year }}{% endblock %}
-{% block cal_header_title %}{{ month_name }} <em>{{ year }}</em>{% endblock %}
+{% block cal_header_title %}Institutional <em>Grid</em>{% endblock %}
 
 {% block cal_nav %}
-<div style="display: flex; gap: 4px;">
-  <a class="btn-touch"
-     style="height: 32px; padding: 0 8px; min-width: 32px;"
+<div style="display: flex; align-items: center; gap: 8px;">
+  <span style="font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700;
+               color: var(--text); min-width: 130px; text-align: right;">
+      {{ month_name }} {{ year }}
+  </span>
+  <a style="display: flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1px solid var(--border); background: var(--card);
+            color: var(--muted); text-decoration: none; transition: all 0.15s;"
      href="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}"
      hx-get="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}"
      hx-target="#cal-body"
@@ -14,16 +20,15 @@
      aria-label="Previous month">
      <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
   </a>
-
-  <a class="btn-touch"
-     style="height: 32px; padding: 0 12px; font-size: 11px;"
+  <a style="font-size: 12px; font-weight: 600; color: var(--primary); text-decoration: none;"
      href="{% url 'calendar:month' %}"
      hx-get="{% url 'calendar:month' %}"
      hx-target="#cal-body"
      hx-push-url="true">Today</a>
-
-  <a class="btn-touch"
-     style="height: 32px; padding: 0 8px; min-width: 32px;"
+  <a style="display: flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1px solid var(--border); background: var(--card);
+            color: var(--muted); text-decoration: none; transition: all 0.15s;"
      href="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}"
      hx-get="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}"
      hx-target="#cal-body"
@@ -31,6 +36,14 @@
      aria-label="Next month">
      <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
   </a>
+  <button class="ws-topbar__cta" style="margin-left: 8px;"
+          hx-get="{% url 'activity:htmx-create' %}"
+          hx-target="#drawerInner"
+          hx-swap="innerHTML"
+          onclick="window.ICSDrawer && window.ICSDrawer.open('New Activity')">
+      <span class="material-symbols-outlined">add</span>
+      New Activity
+  </button>
 </div>
 {% endblock %}
 
