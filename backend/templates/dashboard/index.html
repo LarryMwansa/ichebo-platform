@@ -32,13 +32,34 @@
 <div class="ministry-dashboard">
     
     {# 1. Sovereign Greeting #}
-    <div class="ws-page-header" style="margin-bottom: 60px; padding-top: 20px;">
+    <div class="ws-page-header" style="margin-bottom: 40px; padding-top: 20px;">
         <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Strategic Command</div>
         <h1 class="ws-page-title">Peace, <em>Steward</em> {{ user.first_name|default:user.display_name }}</h1>
         <p style="font-size: 14px; opacity: 0.6; margin-top: 10px; font-weight: 500;">Registry Standing: Level {{ user.competence_level }} Coordinator</p>
     </div>
 
-    {# 2. Mission Critical Grid #}
+    {# 2. Divine Intel Hero #}
+    <div class="card-ink" style="padding: 60px; border-radius: 24px; background: linear-gradient(135deg, #6c3483 0%, #af3236 100%); border: none; position: relative; overflow: hidden; margin-bottom: 40px;">
+        <div style="position: absolute; right: -40px; top: -40px; pointer-events: none;">
+            <span class="material-symbols-outlined" style="font-size: 300px; opacity: 0.06; color: #fff;">auto_awesome</span>
+        </div>
+
+        <div class="ws-label-tag" style="color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1); border: none; margin-bottom: 20px;">Divine Intel</div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 32px; line-height: 1.4; margin-bottom: 40px; font-weight: 800; color: #fff; max-width: 80%;">
+            "{{ digest.discipline_prompt }}"
+        </h2>
+
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            {% for s in digest.suggestions %}
+                <a href="{{ s.action_url|default:'#' }}" class="btn-touch" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 0 25px; height: 44px; font-size: 12px; font-weight: 800; text-decoration: none; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">bolt</span>
+                    {{ s.text|upper }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# 3. Mission Critical Grid #}
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
         
         {# Daily Briefing Status #}
@@ -95,27 +116,6 @@
             </div>
         </div>
 
-    </div>
-
-    {# 3. Strategic Intel Hero #}
-    <div class="card-ink" style="padding: 60px; border-radius: 24px; background: linear-gradient(135deg, #6c3483 0%, #af3236 100%); border: none; position: relative; overflow: hidden; margin-bottom: 40px;">
-        <div style="position: absolute; right: -40px; top: -40px; pointer-events: none;">
-            <span class="material-symbols-outlined" style="font-size: 300px; opacity: 0.06; color: #fff;">auto_awesome</span>
-        </div>
-
-        <div class="ws-label-tag" style="color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1); border: none; margin-bottom: 20px;">Divine Intel</div>
-        <h2 style="font-family: 'Playfair Display', serif; font-size: 32px; line-height: 1.4; margin-bottom: 40px; font-weight: 800; color: #fff; max-width: 80%;">
-            "{{ digest.discipline_prompt }}"
-        </h2>
-
-        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-            {% for s in digest.suggestions %}
-                <a href="{{ s.action_url|default:'#' }}" class="btn-touch" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 0 25px; height: 44px; font-size: 12px; font-weight: 800; text-decoration: none; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">bolt</span>
-                    {{ s.text|upper }}
-                </a>
-            {% endfor %}
-        </div>
     </div>
 
     {# 4. Split View: Critical & Recent #}
