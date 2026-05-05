@@ -1,160 +1,188 @@
 {% extends "activity/base_activity.html" %}
 
-
-{# ── WORKSPACE layout ── #}
 {% block ws_content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner">
+<div style="max-width: 860px; margin: 0 auto; padding: 0 0 100px;">
 
-    <div class="ws-page-header" style="margin-bottom: var(--space-l);">
-      <div class="label-tag" style="margin-bottom: var(--space-xs);">Public Missions</div>
-      <div style="display: flex; align-items: center; justify-content: space-between;">
-        <h1 class="editorial-title" style="font-size: var(--fz-3); margin: 0;">Ministry <em>Missions</em></h1>
-        <button class="btn-touch btn-touch--primary"
+    {# Hero #}
+    <div class="ws-page-header" style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Public Missions</div>
+            <h1 class="ws-page-title">Ministry <em>Hub</em></h1>
+        </div>
+        <button class="ws-topbar__cta" style="flex-shrink: 0;"
                 hx-get="{% url 'activity:htmx-create' %}?ministry=1"
                 hx-target="#drawerInner"
                 hx-swap="innerHTML"
                 onclick="window.ICSDrawer && window.ICSDrawer.open('New Ministry Activity')">
-          <span class="material-symbols-outlined">campaign</span>
-          Initiate Mission
+            <span class="material-symbols-outlined">campaign</span>
+            Initiate Mission
         </button>
-      </div>
     </div>
 
-    <div class="ws-toolbar" style="margin-bottom: var(--space-m); display: flex; gap: var(--space-xs);">
+    {# Filter strip #}
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px;">
         <a href="{% url 'activity:ministry' %}"
-           class="btn-touch {% if not active_type and assigned_tab == 'all' %}btn-touch--primary{% endif %}" style="height: 32px; font-size: 11px;">All</a>
+           class="activity-legend-pill {% if not active_type and assigned_tab == 'all' %}activity-legend-pill--active{% endif %}">
+            <span class="material-symbols-outlined">grid_view</span>
+            All
+        </a>
         <a href="{% url 'activity:ministry' %}?tab=mine"
-           class="btn-touch {% if assigned_tab == 'mine' and not active_type %}btn-touch--primary{% endif %}" style="height: 32px; font-size: 11px;">Assigned to Me</a>
+           class="activity-legend-pill {% if assigned_tab == 'mine' and not active_type %}activity-legend-pill--active{% endif %}">
+            <span class="material-symbols-outlined">person</span>
+            Assigned to Me
+        </a>
         {% for slug, label in ministry_types %}
         <a href="{% url 'activity:ministry' %}?type={{ slug }}"
-           class="btn-touch {% if active_type == slug %}btn-touch--primary{% endif %}" style="height: 32px; font-size: 11px;">{{ label }}</a>
+           class="activity-legend-pill {% if active_type == slug %}activity-legend-pill--active{% endif %}">
+            <span class="material-symbols-outlined">
+                {% if slug == 'task' %}task_alt{% elif slug == 'campaign' %}campaign{% elif slug == 'project' %}folder_open{% elif slug == 'event' %}event{% else %}circle{% endif %}
+            </span>
+            {{ label }}
+        </a>
         {% endfor %}
     </div>
 
-    <div class="ws-feed">
-      {% if activities %}
-      <div class="list-group">
+    {# Activity list #}
+    {% if activities %}
+    <div style="display: flex; flex-direction: column; gap: 12px;">
         {% for activity in activities %}
-        <div class="list-item" id="ws-activity-{{ activity.id }}"
+        <div class="activity-card" style="background: var(--card); border: 1px solid var(--border);
+                    padding: 20px 24px; border-radius: 12px; cursor: pointer;
+                    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+                    transition: all 0.2s ease;"
              hx-get="{% url 'activity:activity-detail' activity.id %}"
              hx-target="#main-stage"
-             hx-push-url="true"
-             style="cursor: pointer;">
-          <div class="list-item__icon">
-            <span class="status-badge
-              {% if activity.due_at and activity.due_at < now %}status-badge--danger
-              {% elif activity.due_at and activity.due_at.date == now.date %}status-badge--active
-              {% else %}status-badge--muted{% endif %}">
-              {{ activity.activity_type|slice:":3"|upper }}
-            </span>
-          </div>
-          <div class="list-item__content">
-            <div class="list-item__title" style="font-weight: 800; font-size: var(--fz-1);">{{ activity.title }}</div>
-            <div class="list-item__meta" style="display: flex; align-items: center; gap: 12px; font-size: 11px;">
-              {% if activity.assigned_to %}
-              <span style="color: var(--muted); display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-outlined" style="font-size: 14px;">person</span>
-                {{ activity.assigned_to.display_name|default:activity.assigned_to.email }}
-              </span>
-              {% endif %}
-              {% if activity.due_at %}
-              <span class="{% if activity.due_at < now %}status-badge--danger{% else %}color: var(--muted);{% endif %}" style="display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-outlined" style="font-size: 14px;">event</span>
-                {{ activity.due_at|date:"d M Y" }}
-              </span>
-              {% endif %}
+             hx-push-url="true">
+
+            <div style="display: flex; align-items: center; gap: 16px; min-width: 0;">
+                <div style="width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+                            background: var(--card-2);
+                            display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--muted);">
+                        {% if activity.activity_type == 'task' %}task_alt
+                        {% elif activity.activity_type == 'campaign' %}campaign
+                        {% elif activity.activity_type == 'project' %}folder_open
+                        {% elif activity.activity_type == 'event' %}event
+                        {% else %}circle{% endif %}
+                    </span>
+                </div>
+                <div style="min-width: 0;">
+                    <div style="font-size: 14px; font-weight: 700; color: var(--text);
+                                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ activity.title }}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap;">
+                        <span style="font-size: 11px; font-weight: 600; text-transform: uppercase;
+                                     letter-spacing: 0.05em; color: var(--muted);">
+                            {{ activity.activity_type }}
+                        </span>
+                        {% if activity.assigned_to %}
+                        <span style="font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 3px;">
+                            <span class="material-symbols-outlined" style="font-size: 13px;">person</span>
+                            {{ activity.assigned_to.get_full_name|default:activity.assigned_to.email }}
+                        </span>
+                        {% endif %}
+                        {% if activity.due_at %}
+                        <span style="font-size: 11px; color: {% if activity.due_at < now %}var(--accent-red){% else %}var(--muted){% endif %};
+                                     font-weight: {% if activity.due_at < now %}700{% else %}400{% endif %};
+                                     display: flex; align-items: center; gap: 3px;">
+                            <span class="material-symbols-outlined" style="font-size: 13px;">event</span>
+                            {{ activity.due_at|date:"d M Y" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="list-item__action">
-            <span class="material-symbols-outlined" style="color: var(--muted); font-size: 18px;">arrow_forward_ios</span>
-          </div>
+
+            <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+                {% if activity.due_at and activity.due_at < now %}
+                <span style="font-size: 10px; font-weight: 800; text-transform: uppercase;
+                             letter-spacing: 0.08em; color: var(--accent-red);
+                             background: rgba(175,50,54,0.08); padding: 3px 8px; border-radius: 4px;">Overdue</span>
+                {% elif activity.status == 'in_progress' %}
+                <span style="font-size: 10px; font-weight: 800; text-transform: uppercase;
+                             letter-spacing: 0.08em; color: var(--primary);
+                             background: var(--primary-light); padding: 3px 8px; border-radius: 4px;">In Progress</span>
+                {% endif %}
+                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--muted);">chevron_right</span>
+            </div>
         </div>
         {% endfor %}
-      </div>
-      {% else %}
-      <div class="ws-empty-state">
-        <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">campaign</span>
-        <p style="color: var(--muted);">No ministry activities found.</p>
-      </div>
-      {% endif %}
     </div>
+    {% else %}
+    <div style="padding: 100px 0; text-align: center;">
+        <span class="material-symbols-outlined" style="font-size: 64px; opacity: 0.08; display: block;">campaign</span>
+        <p style="font-size: 14px; color: var(--muted); margin-top: 20px; font-weight: 500;">No ministry activities found.</p>
+    </div>
+    {% endif %}
 
-  </div>
 </div>
+
+<style>
+.activity-legend-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--card-2);
+    font-size: 12px; font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+.activity-legend-pill .material-symbols-outlined { font-size: 16px; }
+.activity-legend-pill:hover { border-color: var(--primary); color: var(--primary); }
+.activity-legend-pill--active {
+    background: var(--primary-light);
+    border-color: var(--primary-alpha);
+    color: var(--primary);
+}
+.activity-card:hover {
+    border-color: var(--primary-alpha) !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+}
+</style>
 {% endblock %}
 
-
-{% block activity_content %}
-
-<div class="activity-page">
-  <header class="explore-header" style="margin-bottom: 0;">
-    <h1 class="explore-title">Ministry</h1>
-  </header>
-
-  <div style="display: flex; gap: 8px; overflow-x: auto; padding: 0.75rem 0 1rem; scrollbar-width: none; -webkit-overflow-scrolling: touch; flex-wrap: nowrap;">
-    <a href="{% url 'activity:ministry' %}"
-       style="flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
-              {% if not active_type and assigned_tab == 'all' %}background: var(--primary); color: #fff;{% else %}background: var(--hover); color: var(--muted);{% endif %}">
-      All
-    </a>
-    <a href="{% url 'activity:ministry' %}?tab=mine"
-       style="flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
-              {% if assigned_tab == 'mine' and not active_type %}background: var(--primary); color: #fff;{% else %}background: var(--hover); color: var(--muted);{% endif %}">
-      Assigned to Me
-    </a>
-    {% for slug, label in ministry_types %}
-    <a href="{% url 'activity:ministry' %}?type={{ slug }}"
-       style="flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
-              {% if active_type == slug %}background: var(--primary); color: #fff;{% else %}background: var(--hover); color: var(--muted);{% endif %}">
-      {{ label }}
-    </a>
-    {% endfor %}
-  </div>
-
-  {% if activities %}
-  <div class="list-group">
-    {% for activity in activities %}
-    <div class="list-item activity-item" id="activity-{{ activity.id }}"
-         hx-get="{% url 'activity:activity-detail' activity.id %}"
-         hx-target="#main-stage"
-         hx-push-url="true"
-         style="cursor: pointer;">
-      <div class="list-item__icon">
-        <span class="status-badge
-          {% if activity.due_at and activity.due_at < now %}status-badge--danger
-          {% elif activity.due_at and activity.due_at.date == now.date %}status-badge--active
-          {% else %}status-badge--muted{% endif %}">
-          {{ activity.activity_type|slice:":3"|upper }}
-        </span>
-      </div>
-      <div class="list-item__content">
-        <div class="list-item__title" style="font-weight: 700;">{{ activity.title }}</div>
-        <div class="list-item__meta" style="display: flex; align-items: center; gap: 8px;">
-          {% if activity.assigned_to %}
-          <span style="font-size: 11px; color: var(--muted);">{{ activity.assigned_to.display_name|default:activity.assigned_to.email }}</span>
-          {% endif %}
-          {% if activity.due_at %}
-          <span class="activity-due {% if activity.due_at < now %}activity-due--overdue{% endif %}" style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
-            <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
-            {{ activity.due_at|date:"d M Y" }}
-          </span>
-          {% endif %}
-        </div>
-      </div>
-      <div class="list-item__action">
-        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">chevron_right</span>
-      </div>
+{% block activity_content_mobile %}
+<div class="activity-page" style="padding: 0 1rem 4rem;">
+    <div style="display: flex; gap: 8px; overflow-x: auto; padding: 0.75rem 0 1rem; scrollbar-width: none; flex-wrap: nowrap;">
+        <a href="{% url 'activity:ministry' %}"
+           style="flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
+                  {% if not active_type and assigned_tab == 'all' %}background: var(--primary); color: #fff;{% else %}background: var(--hover); color: var(--muted);{% endif %}">All</a>
+        <a href="{% url 'activity:ministry' %}?tab=mine"
+           style="flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
+                  {% if assigned_tab == 'mine' %}background: var(--primary); color: #fff;{% else %}background: var(--hover); color: var(--muted);{% endif %}">Assigned to Me</a>
+        {% for slug, label in ministry_types %}
+        <a href="{% url 'activity:ministry' %}?type={{ slug }}"
+           style="flex-shrink: 0; text-decoration: none; display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
+                  {% if active_type == slug %}background: var(--primary); color: #fff;{% else %}background: var(--hover); color: var(--muted);{% endif %}">{{ label }}</a>
+        {% endfor %}
     </div>
-    {% endfor %}
-  </div>
-  {% else %}
-  <div class="empty-state">
-    <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2; margin-bottom: 20px; display: block;">campaign</span>
-    <p>No ministry activities found.</p>
-  </div>
-  {% endif %}
-
+    {% if activities %}
+    <div class="list-group">
+        {% for activity in activities %}
+        <div class="list-item" id="activity-{{ activity.id }}"
+             hx-get="{% url 'activity:activity-detail' activity.id %}"
+             hx-target="#main-stage"
+             hx-push-url="true" style="cursor: pointer;">
+            <div class="list-item__content">
+                <div class="list-item__title" style="font-weight: 700;">{{ activity.title }}</div>
+                <div class="list-item__meta">{{ activity.activity_type|title }}{% if activity.due_at %} · {{ activity.due_at|date:"d M Y" }}{% endif %}</div>
+            </div>
+            <div class="list-item__action">
+                <span class="material-symbols-outlined" style="color: var(--muted); font-size: 20px;">chevron_right</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="text-align: center; padding: 3rem 1rem;">
+        <p style="color: var(--muted);">No ministry activities found.</p>
+    </div>
+    {% endif %}
 </div>
-
 {% endblock %}
