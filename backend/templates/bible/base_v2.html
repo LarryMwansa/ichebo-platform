@@ -6,18 +6,26 @@
 {% block context_header %}Scripture{% endblock %}
 {% block context_content %}
 
-    {# Book selector — scrollable list fills most of the sidebar #}
+    {# Search — pinned at top #}
+    <a href="{% url 'bible:search' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">search</span>
+        Search Scripture
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    {# Book selector — scrollable list #}
     <div class="ws-label-tag" style="margin-bottom: var(--space-xs); color: var(--accent-red);">Book</div>
     <div style="max-height: calc(100vh - 380px); overflow-y: auto; margin-bottom: var(--space-s);">
         <div style="display: flex; flex-direction: column; gap: 3px;">
-        {% for b in books %}
-        <a href="{% url 'bible:reader-chapter' b.code 1 %}"
-           class="ctx-btn {% if b.code == book.code %}active{% endif %}"
-           style="height: 32px; min-height: 32px; font-size: 12px; flex-shrink: 0;
-                  {% if b.code == book.code %}background: var(--primary-light); color: var(--primary); border-color: var(--primary-alpha);{% endif %}">
-            {{ b.name }}
-        </a>
-        {% endfor %}
+            {% for b in books %}
+            <a href="{% url 'bible:reader-chapter' b.code 1 %}"
+               class="ctx-btn {% if b.code == book.code %}active{% endif %}"
+               style="height: 32px; min-height: 32px; font-size: 12px; flex-shrink: 0;
+                      {% if b.code == book.code %}background: var(--primary-light); color: var(--primary); border-color: var(--primary-alpha);{% endif %}">
+                {{ b.name }}
+            </a>
+            {% endfor %}
         </div>
     </div>
 
@@ -37,13 +45,6 @@
         </a>
         {% endfor %}
     </div>
-
-    <div class="ctx-divider"></div>
-
-    <a href="{% url 'bible:search' %}" class="ctx-btn">
-        <span class="material-symbols-outlined">search</span>
-        Search Scripture
-    </a>
 
 {% endblock %}
 
@@ -68,19 +69,22 @@
         <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">{{ translation.name }}</div>
     </div>
 
-    <div style="margin-top: var(--space-s); display: flex; flex-direction: column; gap: 4px;">
-        {% for trans in translations %}
-        <button class="ctx-btn {% if trans == translation %}active{% endif %}"
-                style="{% if trans == translation %}background: var(--primary-light); color: var(--primary); border-color: var(--primary-alpha);{% endif %}"
-                hx-post="{% url 'bible:htmx-set-translation' %}"
-                hx-vals='{"translation_code": "{{ trans.code }}", "book_code": "{{ book.code }}", "chapter": "{{ chapter }}"}'
-                hx-target="#bible-chapter"
-                hx-swap="innerHTML">
-            <span class="material-symbols-outlined" style="font-size: 16px;">{% if trans == translation %}check{% else %}menu_book{% endif %}</span>
-            <span style="font-weight: 700;">{{ trans.code }}</span>
-            <span style="color: var(--muted); font-size: 11px; margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">{{ trans.name }}</span>
-        </button>
-        {% endfor %}
+    <div style="margin-top: var(--space-s); max-height: calc(100vh - 320px); overflow-y: auto;">
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            {% for trans in translations %}
+            <button class="ctx-btn {% if trans == translation %}active{% endif %}"
+                    style="min-height: 40px; flex-shrink: 0;
+                           {% if trans == translation %}background: var(--primary-light); color: var(--primary); border-color: var(--primary-alpha);{% endif %}"
+                    hx-post="{% url 'bible:htmx-set-translation' %}"
+                    hx-vals='{"translation_code": "{{ trans.code }}", "book_code": "{{ book.code }}", "chapter": "{{ chapter }}"}'
+                    hx-target="#bible-chapter"
+                    hx-swap="innerHTML">
+                <span class="material-symbols-outlined" style="font-size: 16px;">{% if trans == translation %}check{% else %}menu_book{% endif %}</span>
+                <span style="font-weight: 700;">{{ trans.code }}</span>
+                <span style="color: var(--muted); font-size: 11px; margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px;">{{ trans.name }}</span>
+            </button>
+            {% endfor %}
+        </div>
     </div>
 
     <div class="ctx-divider"></div>
