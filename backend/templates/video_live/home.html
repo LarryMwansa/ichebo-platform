@@ -8,17 +8,17 @@
 <div class="ws-layout--full-page">
   <div class="ws-full-page-inner">
 
-    <div class="ws-page-header" style="margin-bottom: var(--space-l);">
-      <div class="label-tag" style="margin-bottom: var(--space-xs);">Broadcast Center</div>
-      <div style="display: flex; align-items: center; justify-content: space-between;">
-        <h1 class="editorial-title" style="font-size: var(--fz-3); margin: 0;">Video & <em>Live</em></h1>
-        {% if can_manage %}
-        <a href="{% url 'video_live:manage' %}" class="btn-touch btn-touch--primary">
-          <span class="material-symbols-outlined">video_call</span>
-          Schedule Broadcast
-        </a>
-        {% endif %}
+    <div class="ws-page-header" style="margin-bottom: var(--space-l); display: flex; justify-content: space-between; align-items: flex-end;">
+      <div>
+        <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Broadcast Center</div>
+        <h1 class="ws-page-title">Video &amp; <em>Live</em></h1>
       </div>
+      {% if can_manage %}
+      <a href="{% url 'video_live:manage' %}" class="ws-topbar__cta" style="text-decoration: none; flex-shrink: 0;">
+        <span class="material-symbols-outlined">video_call</span>
+        Schedule Broadcast
+      </a>
+      {% endif %}
     </div>
 
     {% if live %}
