@@ -4,68 +4,74 @@
 
 {% block title %}Community Hub — Ichebo{% endblock %}
 
-{# Zone 2: Shepherding Ops #}
 {% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Community</span>{% endblock %}
 {% block context_header %}Community Ops{% endblock %}
 {% block context_content %}
     {% include "community/partials/community_sidebar.html" %}
 {% endblock %}
 
-{# Zone 3: The Formation Stage #}
 {% block ws_content %}
-<div class="community-hub-v2">
-    
-    <div class="ws-page-header" style="margin-bottom: 40px;">
+<div style="padding: 40px 48px; max-width: 900px;">
+
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
         <div>
-            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Kingdom Node</div>
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <h1 class="ws-page-title">My <em>Community</em></h1>
-                {% if primary_perm.tenant.name %}
-                <div style="display: flex; align-items: center; gap: 10px; font-family: 'Inter', sans-serif;">
-                    <span class="material-symbols-outlined" style="font-size: 18px; opacity: 0.4; color: var(--text);">chevron_right</span>
-                    <span style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; color: var(--muted);">{{ primary_perm.tenant.name }}</span>
-                </div>
-                {% endif %}
-            </div>
+            <div class="ws-label-tag" style="margin-bottom: 12px;">Kingdom Node{% if primary_perm.tenant.name %} · {{ primary_perm.tenant.name }}{% endif %}</div>
+            <h1 class="ws-page-title">My <em>Community</em></h1>
         </div>
+        <a href="{% url 'community:community-gatherings' %}" class="ws-topbar__cta" style="text-decoration: none; flex-shrink: 0;">
+            <span class="material-symbols-outlined">event_available</span>
+            Gatherings
+        </a>
     </div>
 
-    {# 1. Formation Track (High Density) #}
-    <div class="ws-card-v2" style="background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 30px; margin-bottom: 40px;">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px;">
+    {# ── Formation Progress ── #}
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+                padding: 24px 28px; margin-bottom: 36px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
             <div class="ws-label-tag">Personal Formation</div>
-            <div style="font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink-bg);">{{ level_label }}</div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700;
+                        color: var(--text);">{{ level_label }}</div>
         </div>
-        
-        <div class="formation-steps-v2" style="display: flex; gap: 8px; margin-bottom: 15px;">
+        <div style="display: flex; gap: 6px; margin-bottom: 10px;">
             {% for step in participation_steps %}
-                <div style="flex: 1; height: 6px; background: {% if step <= level %}var(--accent-red){% else %}rgba(0,0,0,0.05){% endif %}; border-radius: 3px;"></div>
+            <div style="flex: 1; height: 5px; border-radius: 3px;
+                        background: {% if step <= level %}var(--primary){% else %}var(--border){% endif %};"></div>
             {% endfor %}
         </div>
-        <div style="font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+        <div style="font-size: 11px; color: var(--muted); font-weight: 600;
+                    text-transform: uppercase; letter-spacing: 0.08em;">
             Stage: {{ participation_stage }}
         </div>
     </div>
 
-    {# 2. Two-Column Pulse #}
-    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px;">
-        
+    {# ── Two-Column Pulse ── #}
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 36px;">
+
         {# Announcements #}
         <div>
-            <div class="ws-label-tag" style="margin-bottom: 20px;">Announcements</div>
-            <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="ws-label-tag" style="margin-bottom: 16px;">Announcements</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
                 {% for ann in announcements %}
-                <div class="ws-stat-card" style="padding: 20px; background: #fff; border: 1px solid rgba(0,0,0,0.05);">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <div style="font-weight: 700; color: var(--ink-bg);">{{ ann.title }}</div>
-                        <div style="font-size: 11px; color: var(--muted);">{{ ann.created_at|date:"d M" }}</div>
+                <div style="background: var(--card); border: 1px solid var(--border);
+                            border-radius: 10px; padding: 18px 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <div style="font-weight: 700; font-size: 13px; color: var(--text);">{{ ann.title }}</div>
+                        <div style="font-size: 10px; color: var(--muted); flex-shrink: 0; margin-left: 12px;">{{ ann.created_at|date:"d M" }}</div>
                     </div>
                     <div style="font-size: 13px; color: var(--muted); line-height: 1.6;">{{ ann.content|truncatechars:200 }}</div>
                 </div>
                 {% empty %}
-                <div class="ws-empty-state" style="padding: 40px 0;">
-                    <span class="material-symbols-outlined" style="opacity: 0.1;">campaign</span>
-                    <p style="font-size: 11px; color: var(--muted); margin-top: 10px;">No active community bulletins.</p>
+                <div style="padding: 40px 0; text-align: center;">
+                    <span class="material-symbols-outlined" style="font-size: 40px; opacity: 0.12; display: block; color: var(--text);">campaign</span>
+                    <p style="font-size: 12px; color: var(--muted); margin-top: 10px;">No active bulletins.</p>
+                    {% if level >= 3 %}
+                    <a href="{% url 'community:community-management' %}"
+                       style="display: inline-block; margin-top: 12px; font-size: 12px;
+                              color: var(--primary); text-decoration: none; font-weight: 600;">
+                        Post an announcement →
+                    </a>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -73,20 +79,36 @@
 
         {# Upcoming Gatherings #}
         <div>
-            <div class="ws-label-tag" style="margin-bottom: 20px;">Gatherings</div>
-            <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="ws-label-tag" style="margin-bottom: 16px;">Gatherings</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
                 {% for gathering in upcoming_gatherings %}
-                <div class="ws-stat-card" style="padding: 20px; background: #fff; border: 1px solid rgba(0,0,0,0.05);">
-                    <div style="font-weight: 700; color: var(--ink-bg); margin-bottom: 10px;">{{ gathering.title }}</div>
-                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); margin-bottom: 5px;">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">calendar_today</span>
+                <div style="background: var(--card); border: 1px solid var(--border);
+                            border-radius: 10px; padding: 18px 20px;">
+                    <div style="font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 10px;">{{ gathering.title }}</div>
+                    {% if gathering.scheduled_at %}
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px;
+                                color: var(--muted); margin-bottom: 4px;">
+                        <span class="material-symbols-outlined" style="font-size: 15px;">calendar_today</span>
                         {{ gathering.scheduled_at|date:"D, d M · H:i" }}
                     </div>
-                    {% if gathering.custom_fields.location %}
+                    {% endif %}
+                    {% if gathering.metadata.location %}
                     <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted);">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span>
-                        {{ gathering.custom_fields.location }}
+                        <span class="material-symbols-outlined" style="font-size: 15px;">location_on</span>
+                        {{ gathering.metadata.location }}
                     </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div style="padding: 40px 0; text-align: center;">
+                    <span class="material-symbols-outlined" style="font-size: 40px; opacity: 0.12; display: block; color: var(--text);">groups</span>
+                    <p style="font-size: 12px; color: var(--muted); margin-top: 10px;">No upcoming gatherings.</p>
+                    {% if level >= 3 %}
+                    <a href="{% url 'community:community-gatherings' %}"
+                       style="display: inline-block; margin-top: 12px; font-size: 12px;
+                              color: var(--primary); text-decoration: none; font-weight: 600;">
+                        Schedule one →
+                    </a>
                     {% endif %}
                 </div>
                 {% endfor %}
@@ -95,40 +117,52 @@
 
     </div>
 </div>
-
-<style>
-.community-hub-v2 {
-    padding: 40px 0;
-}
-</style>
 {% endblock %}
 
-{# Zone 4: Steward Context #}
 {% block ws_options %}
-<div class="ws-options-section">
-    <div class="ws-label-tag">Shepherding Context</div>
-    
+<div style="padding: 0 4px;">
+
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Shepherding Context</div>
+
     {% if shepherd %}
-    <div class="ws-stat-card" style="margin-top: 15px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
-        <div class="ws-stat-card__label">Assigned Shepherd</div>
-        <div class="ws-stat-card__value" style="color: var(--ink-bg); font-size: 16px;">{{ shepherd.display_name|default:shepherd.email }}</div>
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 8px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Assigned Shepherd</div>
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">
+            {{ shepherd.display_name|default:shepherd.email }}
+        </div>
     </div>
     {% endif %}
 
     {% if service_order %}
-    <div class="ws-stat-card" style="margin-top: 10px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
-        <div class="ws-stat-card__label">Service Placement</div>
-        <div class="ws-stat-card__value" style="color: var(--ink-bg); font-size: 16px;">{{ service_order }}</div>
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 8px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Service Placement</div>
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">{{ service_order }}</div>
     </div>
     {% endif %}
 
-    <div class="ws-sidebar__divider" style="margin: 30px 0;"></div>
+    {% if not shepherd and not service_order %}
+    <div style="padding: 20px 0; text-align: center;">
+        <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.12; display: block; color: var(--text);">person_search</span>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">No shepherd assigned yet.</p>
+    </div>
+    {% endif %}
 
-    <div class="ws-label-tag">Spiritual Inventory</div>
-    <div class="ws-stat-card" style="margin-top: 15px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
-        <div class="ws-stat-card__label">Active Gifts</div>
-        <div style="display: flex; align-items: baseline; gap: 10px;">
-            <div class="ws-stat-card__value" style="color: var(--ink-bg);">{{ gifts_count }}</div>
+    <div style="height: 1px; background: var(--border); margin: 20px 0;"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Spiritual Inventory</div>
+
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Active Gifts</div>
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+            <div style="font-size: 28px; font-weight: 800; color: var(--text); font-family: 'Playfair Display', serif;">
+                {{ gifts_count }}
+            </div>
             <div style="font-size: 11px; color: var(--muted);">Verified by council</div>
         </div>
     </div>

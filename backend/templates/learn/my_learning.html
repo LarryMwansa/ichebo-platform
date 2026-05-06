@@ -3,20 +3,19 @@
 
 {% block title %}Formation Hub — Ichebo{% endblock %}
 
-{# Zone 2: Academic Navigator #}
 {% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Formation</span>{% endblock %}
 {% block context_header %}Formation Ops{% endblock %}
 {% block context_content %}
     {% include "learn/partials/learn_sidebar.html" %}
 {% endblock %}
 
-{# Zone 3: The Sovereign Classroom #}
 {% block ws_content %}
-<div class="formation-hub-v2">
-    
-    <div class="ws-page-header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+<div style="padding: 40px 48px; max-width: 900px;">
+
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
         <div>
-            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Spiritual Formation</div>
+            <div class="ws-label-tag" style="margin-bottom: 12px;">Spiritual Formation</div>
             <h1 class="ws-page-title">My <em>Learning</em></h1>
         </div>
         <a href="{% url 'learn:learn-catalogue' %}" class="ws-topbar__cta" style="text-decoration: none; flex-shrink: 0;">
@@ -25,82 +24,106 @@
         </a>
     </div>
 
-    {# Active Pathway Context #}
+    {# ── Active Pathway Banner ── #}
     {% if active_pathway %}
-    <div class="ws-card-v2" style="background: var(--ink-bg); color: #fff; border-radius: 12px; padding: 25px; margin-bottom: 40px; display: flex; align-items: center; justify-content: space-between;">
+    <div style="background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--primary);
+                border-radius: 10px; padding: 20px 24px; margin-bottom: 32px;
+                display: flex; align-items: center; justify-content: space-between;">
         <div>
-            <div class="ws-label-tag" style="background: rgba(255,255,255,0.1); color: #fff; border: none; margin-bottom: 8px;">Active Pathway</div>
-            <div style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;">{{ active_qualification|default:active_pathway|title }}</div>
+            <div class="ws-label-tag" style="margin-bottom: 6px;">Active Pathway</div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700;
+                        color: var(--text);">{{ active_qualification|default:active_pathway|title }}</div>
         </div>
-        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2;">school</span>
+        <span class="material-symbols-outlined" style="font-size: 40px; opacity: 0.15; color: var(--text);">school</span>
     </div>
     {% endif %}
 
-    {# Active Programmes Grid #}
-    <div class="ws-label-tag" style="margin-bottom: 20px;">Active Programmes</div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+    {# ── Active Programmes ── #}
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Active Programmes</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
         {% for enrolment in enrolments %}
-        <a href="{% if enrolment.metadata.programme_record_id %}{% url 'learn:learn-programme' enrolment.metadata.programme_record_id %}{% else %}#{% endif %}" 
-           class="ws-stat-card enrolment-card" 
-           style="text-decoration: none; padding: 25px; background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; display: block;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                <div style="font-weight: 700; color: var(--ink-bg); font-size: 16px; line-height: 1.4;">{{ enrolment.title }}</div>
-                <div style="font-weight: 800; color: var(--accent-red); font-size: 14px;">{{ enrolment.progress|default:0 }}%</div>
+        <a href="{% if enrolment.metadata.programme_record_id %}{% url 'learn:learn-programme' enrolment.metadata.programme_record_id %}{% else %}#{% endif %}"
+           style="display: block; text-decoration: none; background: var(--card);
+                  border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px;
+                  transition: border-color 0.15s, transform 0.15s;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 14px; gap: 12px;">
+                <div style="font-weight: 700; font-size: 14px; color: var(--text); line-height: 1.4;">
+                    {{ enrolment.title }}
+                </div>
+                <div style="font-weight: 800; font-size: 14px; color: var(--primary); flex-shrink: 0;">
+                    {{ enrolment.progress|default:0 }}%
+                </div>
             </div>
-            <div class="progress-track-v2" style="height: 4px; background: rgba(0,0,0,0.05); border-radius: 2px;">
-                <div style="height: 100%; width: {{ enrolment.progress|default:0 }}%; background: var(--accent-red); border-radius: 2px;"></div>
+            <div style="height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 14px;">
+                <div style="height: 100%; width: {{ enrolment.progress|default:0 }}%;
+                            background: var(--primary); border-radius: 2px;"></div>
             </div>
-            <div style="margin-top: 15px; font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
-                {% if enrolment.progress == 100 %}Awaiting Certification{% else %}In Progress{% endif %}
+            <div style="font-size: 10px; color: var(--muted); font-weight: 700;
+                        text-transform: uppercase; letter-spacing: 0.08em;">
+                {% if enrolment.progress == 100 %}
+                    <span style="color: var(--primary);">Awaiting Certification</span>
+                {% else %}
+                    In Progress
+                {% endif %}
             </div>
         </a>
         {% empty %}
-        <div class="ws-empty-state" style="grid-column: 1 / -1; padding: 60px 0;">
-            <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.1;">school</span>
-            <p style="color: var(--muted); margin-top: 15px;">No active enrolments. Your formation awaits.</p>
+        <div style="grid-column: 1 / -1; padding: 60px 0; text-align: center;">
+            <span class="material-symbols-outlined"
+                  style="font-size: 48px; opacity: 0.1; display: block; color: var(--text);">school</span>
+            <p style="font-size: 13px; color: var(--muted); margin-top: 16px;">
+                No active enrolments. Your formation awaits.
+            </p>
+            <a href="{% url 'learn:learn-catalogue' %}" class="ws-topbar__cta"
+               style="display: inline-flex; margin-top: 20px; text-decoration: none;">
+                <span class="material-symbols-outlined">apps</span>
+                Browse Programme Catalogue
+            </a>
         </div>
         {% endfor %}
     </div>
 
 </div>
-
-<style>
-.formation-hub-v2 {
-    padding: 40px 0;
-}
-.enrolment-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.05);
-    border-color: rgba(0,0,0,0.1) !important;
-}
-</style>
 {% endblock %}
 
-{# Zone 4: Competence Inventory #}
 {% block ws_options %}
-<div class="ws-options-section">
-    <div class="ws-label-tag">Competence Inventory</div>
-    
-    <div class="ws-stat-card" style="margin-top: 15px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
-        <div class="ws-stat-card__label">Earned Credentials</div>
-        <div class="ws-stat-card__value" style="color: var(--ink-bg);">{{ certifications.count|default:0 }}</div>
+<div style="padding: 0 4px;">
+
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Competence Inventory</div>
+
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 20px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Earned Credentials</div>
+        <div style="font-size: 28px; font-weight: 800; color: var(--text);
+                    font-family: 'Playfair Display', serif;">{{ certifications.count|default:0 }}</div>
     </div>
 
-    <div class="ws-sidebar__divider" style="margin: 30px 0;"></div>
+    <div style="height: 1px; background: var(--border); margin: 20px 0;"></div>
 
-    <div class="ws-label-tag">Certifications</div>
-    <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 15px;">
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Certifications</div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
         {% for cert in certifications %}
         <div style="display: flex; gap: 12px; align-items: flex-start;">
-            <span class="material-symbols-outlined" style="color: var(--accent-red); font-size: 20px;">workspace_premium</span>
+            <span class="material-symbols-outlined" style="color: var(--primary); font-size: 18px; flex-shrink: 0;">
+                workspace_premium
+            </span>
             <div>
-                <div style="font-size: 13px; font-weight: 700; color: var(--ink-bg);">{{ cert.title }}</div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text);">{{ cert.title }}</div>
                 <div style="font-size: 11px; color: var(--muted);">Issued {{ cert.created_at|date:"M Y" }}</div>
             </div>
         </div>
         {% empty %}
-        <div style="font-size: 12px; color: var(--muted); font-style: italic;">No certifications yet attained.</div>
+        <div style="padding: 16px 0; text-align: center;">
+            <span class="material-symbols-outlined"
+                  style="font-size: 32px; opacity: 0.12; display: block; color: var(--text);">workspace_premium</span>
+            <p style="font-size: 12px; color: var(--muted); margin-top: 8px; font-style: italic;">
+                No certifications yet attained.
+            </p>
+        </div>
         {% endfor %}
     </div>
+
 </div>
 {% endblock %}
