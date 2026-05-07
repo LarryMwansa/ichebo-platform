@@ -1,36 +1,86 @@
 {% extends "tenants/base_tenants.html" %}
 
 {% block tenants_content %}
-<div class="success-card">
-  <div class="success-icon">🏛️</div>
-  <h2>{{ tenant.name }}</h2>
-  <p>Your community has been created. You are now its founding steward.</p>
-  <a href="{% url 'community:management-home' %}" class="btn btn-primary">Go to Management Dashboard</a>
+<div style="padding: 40px 48px; max-width: 680px;">
 
-  <div class="next-steps">
-    <h3>Next Steps</h3>
-    <div class="next-step">
-      <div class="next-step__num">1</div>
-      <div class="next-step__text">
-        <strong>Accept membership requests</strong> — seekers who complete the platform induction
-        can submit a request to join your community.
-        <a href="{% url 'community:management-home' %}">Review pending requests →</a>
-      </div>
+    {# ── Success hero ── #}
+    <div style="margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Community Created</div>
+        <h1 class="ws-page-title">{{ tenant.name }}</h1>
+        <p style="font-size: 13px; color: var(--muted); line-height: 1.7; margin-top: 12px;">
+            Your community has been created. You are now its founding steward.
+        </p>
     </div>
-    <div class="next-step">
-      <div class="next-step__num">2</div>
-      <div class="next-step__text">
-        <strong>Post an announcement</strong> — welcome your first members and set the tone for
-        your community.
-      </div>
+
+    {# ── CTA ── #}
+    <a href="{% url 'community:community-management' %}" class="ws-topbar__cta"
+       style="text-decoration: none; background: var(--primary); color: #fff;
+              display: inline-flex; margin-bottom: 40px;">
+        <span class="material-symbols-outlined">settings_account_box</span>
+        Go to Management Dashboard
+    </a>
+
+    {# ── Next steps ── #}
+    <div style="height: 1px; background: var(--border); margin-bottom: 28px;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 20px;">Next Steps</div>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+
+        <div style="display: flex; gap: 16px; align-items: flex-start;
+                    background: var(--card); border: 1px solid var(--border);
+                    border-radius: 10px; padding: 18px 20px;">
+            <div style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+                        background: var(--primary); color: #fff;
+                        display: flex; align-items: center; justify-content: center;
+                        font-size: 12px; font-weight: 900;">1</div>
+            <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+                    Accept membership requests
+                </div>
+                <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+                    Seekers who complete the platform induction can submit a request to join your community.
+                    <a href="{% url 'community:community-management' %}"
+                       style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                        Review pending requests →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; align-items: flex-start;
+                    background: var(--card); border: 1px solid var(--border);
+                    border-radius: 10px; padding: 18px 20px;">
+            <div style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+                        background: var(--primary); color: #fff;
+                        display: flex; align-items: center; justify-content: center;
+                        font-size: 12px; font-weight: 900;">2</div>
+            <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+                    Post an announcement
+                </div>
+                <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+                    Welcome your first members and set the tone for your community.
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; align-items: flex-start;
+                    background: var(--card); border: 1px solid var(--border);
+                    border-radius: 10px; padding: 18px 20px;">
+            <div style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+                        background: var(--primary); color: #fff;
+                        display: flex; align-items: center; justify-content: center;
+                        font-size: 12px; font-weight: 900;">3</div>
+            <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+                    Schedule a gathering
+                </div>
+                <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+                    Regular gatherings keep the community connected and on mission.
+                </div>
+            </div>
+        </div>
+
     </div>
-    <div class="next-step">
-      <div class="next-step__num">3</div>
-      <div class="next-step__text">
-        <strong>Schedule a gathering</strong> — regular gatherings keep the community connected
-        and on mission.
-      </div>
-    </div>
-  </div>
+
 </div>
 {% endblock %}
