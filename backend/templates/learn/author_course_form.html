@@ -1,47 +1,132 @@
-{% extends "learn/base_learn.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 
-{% block learn_content %}
-<div class="learn-header">
-  <div class="label-caps" hx-get="{% url 'learn:learn-author' %}" hx-target="#main-content" hx-push-url="true" style="cursor:pointer; color:var(--primary);">
-    Authorship &rsaquo;
-  </div>
-  <h1 class="title-small">{% if record %}Edit Course{% else %}New Course{% endif %}</h1>
+{% block title %}{% if record %}Edit Course{% else %}New Course{% endif %} — Ichebo{% endblock %}
+
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Formation</span>{% endblock %}
+{% block context_header %}Formation Ops{% endblock %}
+{% block context_content %}
+    {% include "learn/partials/learn_sidebar.html" %}
+{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 720px;">
+
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <a href="{% url 'learn:learn-author' %}"
+               style="display: flex; align-items: center; gap: 4px; font-size: 11px;
+                      font-weight: 700; color: var(--muted); text-decoration: none;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">arrow_back</span>
+                Authorship
+            </a>
+        </div>
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Curriculum Authorship</div>
+        <h1 class="ws-page-title">{% if record %}Edit <em>Course</em>{% else %}New <em>Course</em>{% endif %}</h1>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.6;">
+            Define the objective and scope of this course.
+        </p>
+    </div>
+
+    {# ── Form ── #}
+    <form method="post"
+          action="{% if record %}{% url 'learn:learn-author-course-edit' record.id %}{% else %}{% url 'learn:learn-author-course' %}{% endif %}">
+        {% csrf_token %}
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Course Title
+                </label>
+                <input type="text" name="title" required maxlength="500"
+                       value="{{ record.title|default:'' }}"
+                       placeholder="e.g. Introduction to Systematic Theology"
+                       style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                              background: var(--card-2); border: 1px solid var(--border);
+                              border-radius: 8px; font-size: 13px; color: var(--text);
+                              outline: none; box-sizing: border-box;"
+                       onfocus="this.style.borderColor='var(--primary)'"
+                       onblur="this.style.borderColor='var(--border)'">
+            </div>
+
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Course Summary
+                </label>
+                <textarea name="description" rows="6"
+                          placeholder="Objective and scope of the course…"
+                          style="display: block; width: 100%; padding: 10px 12px;
+                                 background: var(--card-2); border: 1px solid var(--border);
+                                 border-radius: 8px; font-size: 13px; color: var(--text);
+                                 font-family: inherit; outline: none; resize: vertical;
+                                 box-sizing: border-box; line-height: 1.6;"
+                          onfocus="this.style.borderColor='var(--primary)'"
+                          onblur="this.style.borderColor='var(--border)'">{{ record.content|default:'' }}</textarea>
+            </div>
+
+            {% if not record %}
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Parent Programme
+                </label>
+                <select name="programme_id"
+                        style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                               background: var(--card-2); border: 1px solid var(--border);
+                               border-radius: 8px; font-size: 13px; color: var(--text);
+                               outline: none; box-sizing: border-box;"
+                        onfocus="this.style.borderColor='var(--primary)'"
+                        onblur="this.style.borderColor='var(--border)'">
+                    <option value="">— Independent Course —</option>
+                    {% for p in programmes %}
+                    <option value="{{ p.id }}">{{ p.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 10px; padding-top: 8px;
+                        border-top: 1px solid var(--border); margin-top: 8px;">
+                <button type="submit" name="action" value="save"
+                        style="flex: 1; height: 40px; background: none;
+                               border: 1px solid var(--border); border-radius: 8px;
+                               font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer;">
+                    {% if record %}Save Draft{% else %}Save as Draft{% endif %}
+                </button>
+                <button type="submit" name="action" value="submit" class="ws-topbar__cta"
+                        style="flex: 1; background: var(--primary); color: #fff; border: none; cursor: pointer;">
+                    <span class="material-symbols-outlined">send</span>
+                    Submit for Review
+                </button>
+            </div>
+
+        </div>
+    </form>
+
 </div>
+{% endblock %}
 
-<form method="post" class="record-drawer-form" style="max-width: 600px; margin: 0 auto;"
-      action="{% if record %}{% url 'learn:learn-author-course-edit' record.id %}{% else %}{% url 'learn:learn-author-course' %}{% endif %}">
-  {% csrf_token %}
-
-  <div class="record-form-group">
-    <label class="label-caps">Course Title</label>
-    <input type="text" name="title" class="form-input-touch" required maxlength="500"
-           value="{{ record.title|default:'' }}" placeholder="e.g. Introduction to Systematic Theology">
-  </div>
-
-  <div class="record-form-group">
-    <label class="label-caps">Course Summary</label>
-    <textarea name="description" class="form-input-touch" rows="6" placeholder="Objective and scope of the course…">{{ record.content|default:'' }}</textarea>
-  </div>
-
-  {% if not record %}
-  <div class="record-form-group">
-    <label class="label-caps">Parent Programme Assignment</label>
-    <select name="programme_id" class="form-input-touch">
-      <option value="">— Independent Course —</option>
-      {% for p in programmes %}
-      <option value="{{ p.id }}">{{ p.title }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  {% endif %}
-
-  <div style="margin-top: 2rem; display: flex; gap: 12px;">
-    <button type="submit" name="action" value="save" class="btn-touch btn-secondary" style="flex: 1;">
-      {% if record %}Save Draft{% else %}Save as Draft{% endif %}
-    </button>
-    <button type="submit" name="action" value="submit" class="btn-touch btn-primary" style="flex: 1;">
-      Submit for Review
-    </button>
-  </div>
-</form>
+{% block ws_options %}
+<div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 16px;">About Courses</div>
+    <div style="font-size: 12px; color: var(--muted); line-height: 1.7;">
+        <p style="margin: 0 0 10px;">A <strong style="color: var(--text);">Course</strong> groups related lessons into a unit of study within a programme.</p>
+        <p style="margin: 0;">Assign it to a <strong style="color: var(--text);">Parent Programme</strong> to place it in the curriculum hierarchy.</p>
+    </div>
+    {% if programmes %}
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 10px;">Your Programmes</div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+        {% for p in programmes %}
+        <div style="font-size: 12px; color: var(--text); padding: 8px 10px;
+                    background: var(--card-2); border: 1px solid var(--border);
+                    border-radius: 6px;">{{ p.title }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

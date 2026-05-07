@@ -1,85 +1,188 @@
-{% extends "learn/base_learn.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 
-{% block learn_content %}
-<div class="learn-page">
-  <header class="explore-header">
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-      <a href="{% url 'learn:learn-author' %}" class="btn-touch btn-sm btn-secondary" style="min-height: 32px; width: 32px; padding: 0; border-radius: 8px;">
-        <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
-      </a>
-      <span class="label-caps" style="margin-bottom: 0;">Authorship</span>
-    </div>
-    <h1 class="explore-title">{% if record %}Edit Programme{% else %}New Programme{% endif %}</h1>
-    <p class="explore-subtitle">Define the vision, level and curriculum structure</p>
-  </header>
+{% block title %}{% if record %}Edit Programme{% else %}New Programme{% endif %} — Ichebo{% endblock %}
 
-  <form method="post" class="learn-section"
-        action="{% if record %}{% url 'learn:learn-author-programme-edit' record.id %}{% else %}{% url 'learn:learn-author-programme' %}{% endif %}">
-    {% csrf_token %}
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Formation</span>{% endblock %}
+{% block context_header %}Formation Ops{% endblock %}
+{% block context_content %}
+    {% include "learn/partials/learn_sidebar.html" %}
+{% endblock %}
 
-    <div class="profile-card" style="display: flex; flex-direction: column; gap: 20px; padding: 24px;">
-      
-      {% if can_create_induction %}
-      <div class="record-form-group">
-        <label class="label-caps">Classification</label>
-        <select name="programme_type" class="form-input-touch">
-          <option value="programme" {% if record and record.record_type != 'induction' %}selected{% endif %}>Standard Programme</option>
-          <option value="induction" {% if record and record.record_type == 'induction' %}selected{% endif %}>Global Induction</option>
-        </select>
-      </div>
-      {% endif %}
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 720px;">
 
-      <div class="record-form-group">
-        <label class="label-caps">Title</label>
-        <input type="text" name="title" class="form-input-touch" required maxlength="500"
-               value="{{ record.title|default:'' }}" placeholder="e.g. Bachelor of Divinity">
-      </div>
-
-      <div class="record-form-group">
-        <label class="label-caps">Qualification Level</label>
-        <select name="qualification" class="form-input-touch">
-          <option value="Certificate" {% if record.metadata.qualification == 'Certificate' %}selected{% endif %}>Certificate</option>
-          <option value="Diploma" {% if record.metadata.qualification == 'Diploma' %}selected{% endif %}>Diploma</option>
-          <option value="Degree" {% if record.metadata.qualification == 'Degree' %}selected{% endif %}>Degree</option>
-          <option value="Masters" {% if record.metadata.qualification == 'Masters' %}selected{% endif %}>Masters</option>
-          <option value="Doctorate" {% if record.metadata.qualification == 'Doctorate' %}selected{% endif %}>Doctorate</option>
-        </select>
-      </div>
-
-      <div class="record-form-group">
-        <label class="label-caps">Vision & Scope</label>
-        <textarea name="description" class="form-input-touch" rows="6" style="min-height: 120px;" placeholder="Describe the aims of this programme…">{{ record.content|default:'' }}</textarea>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <div class="record-form-group">
-          <label class="label-caps">Duration (Years)</label>
-          <input type="number" name="duration_years" class="form-input-touch" min="1" max="10"
-                 value="{{ record.metadata.duration_years|default:'' }}">
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <a href="{% url 'learn:learn-author' %}"
+               style="display: flex; align-items: center; gap: 4px; font-size: 11px;
+                      font-weight: 700; color: var(--muted); text-decoration: none;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">arrow_back</span>
+                Authorship
+            </a>
         </div>
-        {% if not record %}
-        <div class="record-form-group">
-          <label class="label-caps">Req. Level</label>
-          <input type="number" name="required_level" class="form-input-touch" min="1" max="5" value="1">
-        </div>
-        {% endif %}
-      </div>
-
-      <div class="record-form-group">
-        <label class="label-caps">Meta Pathways (Tags)</label>
-        <input type="text" name="pathways" class="form-input-touch" placeholder="e.g. Leadership, Governance"
-               value="{{ record.metadata.pathways|default:'' }}">
-      </div>
-
-      <div style="margin-top: 12px; display: flex; gap: 12px;">
-        <button type="submit" name="action" value="save" class="btn-touch btn-secondary" style="flex: 1;">
-          {% if record %}Save Draft{% else %}Save as Draft{% endif %}
-        </button>
-        <button type="submit" name="action" value="submit" class="btn-touch btn-primary" style="flex: 1;">
-          Submit for Review
-        </button>
-      </div>
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Curriculum Authorship</div>
+        <h1 class="ws-page-title">{% if record %}Edit <em>Programme</em>{% else %}New <em>Programme</em>{% endif %}</h1>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.6;">
+            Define the vision, level and curriculum structure.
+        </p>
     </div>
-  </form>
+
+    {# ── Form ── #}
+    <form method="post"
+          action="{% if record %}{% url 'learn:learn-author-programme-edit' record.id %}{% else %}{% url 'learn:learn-author-programme' %}{% endif %}">
+        {% csrf_token %}
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+
+            {% if can_create_induction %}
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Classification
+                </label>
+                <select name="programme_type"
+                        style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                               background: var(--card-2); border: 1px solid var(--border);
+                               border-radius: 8px; font-size: 13px; color: var(--text);
+                               outline: none; box-sizing: border-box;"
+                        onfocus="this.style.borderColor='var(--primary)'"
+                        onblur="this.style.borderColor='var(--border)'">
+                    <option value="programme" {% if record and record.record_type != 'induction' %}selected{% endif %}>Standard Programme</option>
+                    <option value="induction" {% if record and record.record_type == 'induction' %}selected{% endif %}>Global Induction</option>
+                </select>
+            </div>
+            {% endif %}
+
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Title
+                </label>
+                <input type="text" name="title" required maxlength="500"
+                       value="{{ record.title|default:'' }}"
+                       placeholder="e.g. Bachelor of Divinity"
+                       style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                              background: var(--card-2); border: 1px solid var(--border);
+                              border-radius: 8px; font-size: 13px; color: var(--text);
+                              outline: none; box-sizing: border-box;"
+                       onfocus="this.style.borderColor='var(--primary)'"
+                       onblur="this.style.borderColor='var(--border)'">
+            </div>
+
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Qualification Level
+                </label>
+                <select name="qualification"
+                        style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                               background: var(--card-2); border: 1px solid var(--border);
+                               border-radius: 8px; font-size: 13px; color: var(--text);
+                               outline: none; box-sizing: border-box;"
+                        onfocus="this.style.borderColor='var(--primary)'"
+                        onblur="this.style.borderColor='var(--border)'">
+                    <option value="Certificate" {% if record.metadata.qualification == 'Certificate' %}selected{% endif %}>Certificate</option>
+                    <option value="Diploma" {% if record.metadata.qualification == 'Diploma' %}selected{% endif %}>Diploma</option>
+                    <option value="Degree" {% if record.metadata.qualification == 'Degree' %}selected{% endif %}>Degree</option>
+                    <option value="Masters" {% if record.metadata.qualification == 'Masters' %}selected{% endif %}>Masters</option>
+                    <option value="Doctorate" {% if record.metadata.qualification == 'Doctorate' %}selected{% endif %}>Doctorate</option>
+                </select>
+            </div>
+
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Vision &amp; Scope
+                </label>
+                <textarea name="description" rows="7"
+                          placeholder="Describe the aims of this programme…"
+                          style="display: block; width: 100%; padding: 10px 12px;
+                                 background: var(--card-2); border: 1px solid var(--border);
+                                 border-radius: 8px; font-size: 13px; color: var(--text);
+                                 font-family: inherit; outline: none; resize: vertical;
+                                 box-sizing: border-box; line-height: 1.6;"
+                          onfocus="this.style.borderColor='var(--primary)'"
+                          onblur="this.style.borderColor='var(--border)'">{{ record.content|default:'' }}</textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                   letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                        Duration (Years)
+                    </label>
+                    <input type="number" name="duration_years" min="1" max="10"
+                           value="{{ record.metadata.duration_years|default:'' }}"
+                           style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                                  background: var(--card-2); border: 1px solid var(--border);
+                                  border-radius: 8px; font-size: 13px; color: var(--text);
+                                  outline: none; box-sizing: border-box;"
+                           onfocus="this.style.borderColor='var(--primary)'"
+                           onblur="this.style.borderColor='var(--border)'">
+                </div>
+                {% if not record %}
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                   letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                        Required Level
+                    </label>
+                    <input type="number" name="required_level" min="1" max="5" value="1"
+                           style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                                  background: var(--card-2); border: 1px solid var(--border);
+                                  border-radius: 8px; font-size: 13px; color: var(--text);
+                                  outline: none; box-sizing: border-box;"
+                           onfocus="this.style.borderColor='var(--primary)'"
+                           onblur="this.style.borderColor='var(--border)'">
+                </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Meta Pathways (Tags)
+                </label>
+                <input type="text" name="pathways"
+                       value="{{ record.metadata.pathways|default:'' }}"
+                       placeholder="e.g. Leadership, Governance"
+                       style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                              background: var(--card-2); border: 1px solid var(--border);
+                              border-radius: 8px; font-size: 13px; color: var(--text);
+                              outline: none; box-sizing: border-box;"
+                       onfocus="this.style.borderColor='var(--primary)'"
+                       onblur="this.style.borderColor='var(--border)'">
+            </div>
+
+            <div style="display: flex; gap: 10px; padding-top: 8px;
+                        border-top: 1px solid var(--border); margin-top: 8px;">
+                <button type="submit" name="action" value="save"
+                        style="flex: 1; height: 40px; background: none;
+                               border: 1px solid var(--border); border-radius: 8px;
+                               font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer;">
+                    {% if record %}Save Draft{% else %}Save as Draft{% endif %}
+                </button>
+                <button type="submit" name="action" value="submit" class="ws-topbar__cta"
+                        style="flex: 1; background: var(--primary); color: #fff; border: none; cursor: pointer;">
+                    <span class="material-symbols-outlined">send</span>
+                    Submit for Review
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 16px;">About Programmes</div>
+    <div style="font-size: 12px; color: var(--muted); line-height: 1.7;">
+        <p style="margin: 0 0 10px;">A <strong style="color: var(--text);">Programme</strong> is the top-level curriculum unit — a degree, diploma, or certificate that learners enrol in.</p>
+        <p style="margin: 0 0 10px;">Add <strong style="color: var(--text);">Courses</strong> and <strong style="color: var(--text);">Lessons</strong> under a programme to build the full curriculum.</p>
+        <p style="margin: 0;">Saved drafts appear in your <a href="{% url 'learn:learn-author' %}" style="color: var(--primary); text-decoration: none;">Authorship</a> workspace.</p>
+    </div>
 </div>
 {% endblock %}
