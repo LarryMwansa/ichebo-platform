@@ -26,6 +26,11 @@
     {% if can_manage %}
     <div class="ctx-divider"></div>
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Management</div>
+    <a href="{% url 'video_live:studio' %}"
+       class="ctx-btn {% if active_video_tab == 'studio' %}active{% endif %}">
+        <span class="material-symbols-outlined">settings_input_component</span>
+        Broadcast Studio
+    </a>
     <a href="{% url 'video_live:manage' %}"
        class="ctx-btn {% if active_video_tab == 'manage' %}active{% endif %}">
         <span class="material-symbols-outlined">manage_accounts</span>

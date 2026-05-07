@@ -271,3 +271,183 @@ def video_delete_event(request, event_id):
     event.save(update_fields=['deleted_at'])
     messages.success(request, f'"{title}" has been deleted.')
     return redirect('video_live:manage')
+
+
+# ---------------------------------------------------------------------------
+# Studio — playout scheduler (Level 3+)
+# ---------------------------------------------------------------------------
+
+def _get_fallback():
+    """Return the studio fallback Activity, or None."""
+    return Activity.objects.filter(
+        activity_type='event',
+        deleted_at__isnull=True,
+        metadata__studio_fallback=True,
+    ).first()
+
+
+def _studio_context(request):
+    """Shared context for the studio view and its partials."""
+    import datetime as dt
+    now = timezone.now()
+    all_events = [_annotate_event(e) for e in _event_qs()]
+    live   = [e for e in all_events if e['is_live']]
+    upcoming = [e for e in all_events if not e['is_live'] and not e['is_past']]
+    fallback_obj = _get_fallback()
+    fallback = _annotate_event(fallback_obj) if fallback_obj else None
+
+    # Build today's timeline: 48 half-hour slots
+    today = now.date()
+    slots = []
+    for h in range(24):
+        for m in (0, 30):
+            slot_dt = timezone.make_aware(
+                dt.datetime.combine(today, dt.time(h, m))
+            )
+            slot_end = slot_dt + dt.timedelta(minutes=30)
+            booked = [
+                e for e in all_events
+                if e['scheduled_at'] and
+                   slot_dt <= e['scheduled_at'] < slot_end
+            ]
+            slots.append({
+                'label': f'{h:02d}:{m:02d}',
+                'dt':    slot_dt,
+                'is_past': slot_end < now,
+                'is_now':  slot_dt <= now < slot_end,
+                'events':  booked,
+            })
+
+    return {
+        'live':        live,
+        'upcoming':    upcoming,
+        'fallback':    fallback,
+        'slots':       slots,
+        'now':         now,
+        'slot_size':   30,
+        'can_manage':  True,
+        'active_app':  'video',
+        'active_video_tab': 'studio',
+        'vod_count':   len([e for e in all_events if e['is_past']]),
+    }
+
+
+@login_required
+def video_studio(request):
+    if request.user.competence_level < 3:
+        return redirect('video_live:home')
+    ctx = _studio_context(request)
+    return render(request, 'video_live/studio.html', ctx)
+
+
+@login_required
+def htmx_studio_now_playing(request):
+    if request.user.competence_level < 3:
+        return HttpResponse(status=403)
+    ctx = _studio_context(request)
+    return render(request, 'video_live/partials/studio_now_playing.html', ctx)
+
+
+@login_required
+def htmx_studio_timeline(request):
+    if request.user.competence_level < 3:
+        return HttpResponse(status=403)
+    ctx = _studio_context(request)
+    return render(request, 'video_live/partials/studio_timeline.html', ctx)
+
+
+@login_required
+def htmx_studio_quick_schedule(request):
+    if request.user.competence_level < 3:
+        return HttpResponse(status=403)
+    slot_label = request.GET.get('slot', '')
+    if request.method == 'POST':
+        import json
+        from django.contrib import messages
+        from django.utils.dateparse import parse_datetime
+        title       = request.POST.get('title', '').strip()
+        stream_url  = request.POST.get('stream_url', '').strip()
+        scheduled_at_str = request.POST.get('scheduled_at', '').strip()
+        duration    = request.POST.get('duration_minutes', '60').strip()
+        error = None
+        if not title:
+            error = 'Title is required.'
+        elif not stream_url:
+            error = 'Stream URL is required.'
+        elif not scheduled_at_str:
+            error = 'Date/time is required.'
+        else:
+            scheduled_at = parse_datetime(scheduled_at_str)
+            if not scheduled_at:
+                error = 'Invalid date/time.'
+            else:
+                if timezone.is_naive(scheduled_at):
+                    scheduled_at = timezone.make_aware(scheduled_at)
+                Activity.objects.create(
+                    activity_type='event',
+                    title=title,
+                    scheduled_at=scheduled_at,
+                    status='pending',
+                    created_by=request.user,
+                    metadata={
+                        'stream_url': stream_url,
+                        'duration_minutes': int(duration) if duration.isdigit() else 60,
+                        'source_app': 'video_live',
+                    },
+                )
+                resp = HttpResponse(status=204)
+                resp['HX-Trigger'] = 'studioRefresh'
+                resp['X-WS-Toast'] = json.dumps([
+                    {'level': 'success', 'message': f'"{title}" added to the schedule.'}
+                ])
+                return resp
+        return render(request, 'video_live/partials/studio_quick_schedule.html', {
+            'slot_label': slot_label, 'error': error,
+        })
+    return render(request, 'video_live/partials/studio_quick_schedule.html', {
+        'slot_label': slot_label,
+    })
+
+
+@login_required
+def htmx_studio_set_fallback(request):
+    if request.user.competence_level < 3:
+        return HttpResponse(status=403)
+    import json
+    if request.method == 'POST':
+        from django.contrib import messages
+        stream_url = request.POST.get('fallback_url', '').strip()
+        label      = request.POST.get('fallback_label', 'Default Loop').strip() or 'Default Loop'
+        # Remove any existing fallback
+        Activity.objects.filter(
+            activity_type='event',
+            deleted_at__isnull=True,
+            metadata__studio_fallback=True,
+        ).update(deleted_at=timezone.now())
+        if stream_url:
+            Activity.objects.create(
+                activity_type='event',
+                title=label,
+                status='pending',
+                created_by=request.user,
+                metadata={
+                    'stream_url': stream_url,
+                    'studio_fallback': True,
+                    'source_app': 'video_live',
+                },
+            )
+        fallback_obj = _get_fallback()
+        from video_live.utils import get_embed_url, get_embed_type
+        fallback = _annotate_event(fallback_obj) if fallback_obj else None
+        resp = render(request, 'video_live/partials/studio_fallback_form.html', {
+            'fallback': fallback, 'saved': True,
+        })
+        resp['X-WS-Toast'] = json.dumps([
+            {'level': 'success', 'message': 'Fallback video updated.'}
+        ])
+        return resp
+    fallback_obj = _get_fallback()
+    fallback = _annotate_event(fallback_obj) if fallback_obj else None
+    return render(request, 'video_live/partials/studio_fallback_form.html', {
+        'fallback': fallback,
+    })
