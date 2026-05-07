@@ -1,136 +1,110 @@
-{% extends "learn/base_learn.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 
-{# ── WORKSPACE layout ── #}
+{% block title %}Content Review — Ichebo{% endblock %}
+
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Formation</span>{% endblock %}
+{% block context_header %}Formation Ops{% endblock %}
+{% block context_content %}
+    {% include "learn/partials/learn_sidebar.html" %}
+{% endblock %}
+
 {% block ws_content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner">
+<div style="padding: 40px 48px; max-width: 900px;">
 
-    <div class="ws-page-header">
-      <div class="ws-page-header__left">
-        <h2 class="ws-page-title">Content <em>Review</em></h2>
-        <p class="ws-page-subtitle">Approve or return submitted formation content for publication.</p>
-      </div>
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Spiritual Formation</div>
+        <h1 class="ws-page-title">Content <em>Review</em></h1>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.6;">
+            Approve or return submitted formation content for publication.
+        </p>
     </div>
 
+    {# ── Review Items ── #}
     {% if items %}
-    <div class="ws-feed">
-      <div class="list-group">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
         {% for item in items %}
-        <div class="list-item" id="ws-review-{{ item.id }}" style="flex-direction: column; align-items: stretch; gap: var(--space-m);">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: var(--space-s);">
-              <div class="list-item__icon" style="color: var(--primary);">
-                <span class="material-symbols-outlined">
-                  {% if item.record_type == 'programme' %}account_balance
-                  {% elif item.record_type == 'course' %}menu_book
-                  {% else %}draw{% endif %}
-                </span>
-              </div>
-              <div class="list-item__content">
-                <div class="list-item__title" style="font-weight: 700;">{{ item.title }}</div>
-                <div class="list-item__meta">
-                  <span class="badge-unit badge-unit--primary">{{ item.record_type }}</span>
-                  &nbsp;·&nbsp;Submitted by {{ item.author_display }}
+        <div id="ws-review-{{ item.id }}"
+             style="background: var(--card); border: 1px solid var(--border);
+                    border-radius: 12px; padding: 22px 24px;">
+
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="material-symbols-outlined"
+                          style="font-size: 22px; color: var(--primary); flex-shrink: 0;">
+                        {% if item.record_type == 'programme' %}account_balance
+                        {% elif item.record_type == 'course' %}menu_book
+                        {% else %}draw{% endif %}
+                    </span>
+                    <div>
+                        <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+                            {{ item.title }}
+                        </div>
+                        <div style="font-size: 11px; color: var(--muted);">
+                            <span style="text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;
+                                         color: var(--primary);">{{ item.record_type }}</span>
+                            · Submitted by {{ item.author_display }}
+                        </div>
+                    </div>
                 </div>
-              </div>
+                <span style="font-size: 11px; color: var(--muted); flex-shrink: 0; margin-left: 12px;">
+                    {{ item.updated_at|date:"d M, H:i" }}
+                </span>
             </div>
-            <span style="font-size: 12px; color: var(--muted);">{{ item.updated_at|date:"d M, H:i" }}</span>
-          </div>
 
-          {% if item.content %}
-          <div style="font-size: 14px; line-height: 1.6; color: var(--text); padding: var(--space-m); background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-m); border-left: 3px solid var(--primary);">
-            {{ item.content|truncatechars:400 }}
-          </div>
-          {% endif %}
+            {% if item.content %}
+            <div style="font-size: 13px; line-height: 1.7; color: var(--text); padding: 14px 16px;
+                        background: var(--card-2); border: 1px solid var(--border);
+                        border-left: 3px solid var(--primary); border-radius: 8px; margin-bottom: 16px;">
+                {{ item.content|truncatechars:400 }}
+            </div>
+            {% endif %}
 
-          <div style="display: flex; gap: var(--space-xs); justify-content: flex-end;">
-            <button class="ws-btn ws-btn--secondary"
-                    hx-post="{% url 'learn:htmx-return-content' item.id %}"
-                    hx-target="#ws-review-{{ item.id }}"
-                    hx-swap="outerHTML swap:1s">
-              Return to Author
-            </button>
-            <button class="ws-btn ws-btn--primary"
-                    hx-post="{% url 'learn:htmx-approve-content' item.id %}"
-                    hx-target="#ws-review-{{ item.id }}"
-                    hx-swap="outerHTML swap:1s">
-              Approve for Publication
-            </button>
-          </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;
+                        border-top: 1px solid var(--border); padding-top: 16px;">
+                <button style="display: flex; align-items: center; gap: 6px; padding: 0 16px; height: 36px;
+                               background: none; border: 1px solid var(--border); border-radius: 8px;
+                               font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer;"
+                        hx-post="{% url 'learn:htmx-return-content' item.id %}"
+                        hx-target="#ws-review-{{ item.id }}"
+                        hx-swap="outerHTML swap:1s">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">undo</span>
+                    Return to Author
+                </button>
+                <button class="ws-topbar__cta"
+                        hx-post="{% url 'learn:htmx-approve-content' item.id %}"
+                        hx-target="#ws-review-{{ item.id }}"
+                        hx-swap="outerHTML swap:1s"
+                        style="background: var(--primary); color: #fff; border: none; cursor: pointer;">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    Approve for Publication
+                </button>
+            </div>
         </div>
         {% endfor %}
-      </div>
     </div>
     {% else %}
-    <div class="ws-empty-state">
-      <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">check_circle</span>
-      <p style="color: var(--muted);">Review queue is empty. All submitted content has been processed.</p>
+    <div style="padding: 60px 0; text-align: center;">
+        <span class="material-symbols-outlined"
+              style="font-size: 48px; opacity: 0.1; display: block; color: var(--text);">check_circle</span>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 16px;">Review queue is empty.</p>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">All submitted content has been processed.</p>
     </div>
     {% endif %}
 
-  </div>
 </div>
 {% endblock %}
 
-<div class="learn-header">
-  <h1 class="title-small">Content Review Queue</h1>
-  <p class="explore-subtitle">Approve or return submitted learning content</p>
-</div>
-
-{% if items %}
-<div style="display: flex; flex-direction: column; gap: 16px;">
-  {% for item in items %}
-  <div class="review-card" id="review-{{ item.id }}" style="display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--bg-secondary); border-radius: 8px;">
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <span class="lesson-type-tag" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; background: var(--info-light); color: var(--info-dark);">
-          {{ item.record_type|title }}
-        </span>
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-          <h4 style="margin: 0; font-size: 14px; font-weight: 600;">{{ item.title }}</h4>
-          {% if item.parent_programme %}
-          <p class="cert-meta" style="margin: 0; font-size: 12px;">
-            <span style="color: var(--muted);">Part of:</span> {{ item.parent_programme.title }}
-          </p>
-          {% endif %}
-        </div>
-      </div>
-      <span style="font-size: 12px; color: var(--muted);">{{ item.updated_at|date:"d M" }}</span>
+{% block ws_options %}
+<div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Queue Stats</div>
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Pending Review</div>
+        <div style="font-size: 28px; font-weight: 800; color: var(--text);
+                    font-family: 'Playfair Display', serif;">{{ items|length }}</div>
     </div>
-
-    {% if item.content %}
-    <div style="font-size: 13px; line-height: 1.5; color: var(--text); padding: 12px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
-      {{ item.content|truncatechars:280 }}
-    </div>
-    {% endif %}
-
-    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-      <div style="font-size: 12px; color: var(--muted);">
-        Submitted by <strong>{{ item.author_display }}</strong>
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <button class="btn-touch btn-primary" style="min-height: 36px; padding: 8px 16px; font-size: 13px;"
-                hx-post="{% url 'learn:htmx-approve-content' item.id %}"
-                hx-target="#review-{{ item.id }}"
-                hx-swap="outerHTML swap:1s">
-          Approve
-        </button>
-        <button class="btn-touch btn-secondary" style="min-height: 36px; padding: 8px 16px; font-size: 13px;"
-                hx-post="{% url 'learn:htmx-return-content' item.id %}"
-                hx-target="#review-{{ item.id }}"
-                hx-swap="outerHTML swap:1s">
-          Return
-        </button>
-      </div>
-    </div>
-  </div>
-  {% endfor %}
 </div>
-{% else %}
-<div class="empty-state" style="padding: 48px 24px; text-align: center;">
-  <span class="material-symbols-outlined" style="font-size: 48px; color: var(--muted); margin-bottom: 16px; display: block;">check_circle</span>
-  <p style="font-size: 14px; color: var(--text);">No items pending review.</p>
-  <p style="font-size: 12px; color: var(--muted);">All submitted content has been reviewed.</p>
-</div>
-{% endif %}
 {% endblock %}

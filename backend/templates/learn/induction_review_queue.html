@@ -1,330 +1,166 @@
-{% extends "learn/base_learn.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
-{# ── WORKSPACE layout ── #}
-{% block ws_content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner">
+{% block title %}Induction Review — Ichebo{% endblock %}
 
-    <div class="ws-page-header">
-      <div class="ws-page-header__left">
-        <h2 class="ws-page-title">Induction <em>Review</em></h2>
-        <p class="ws-page-subtitle">Confirm inductees who have completed the formation and advance them to Level 1.</p>
-      </div>
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Formation</span>{% endblock %}
+{% block context_header %}Formation Ops{% endblock %}
+{% block context_content %}
+    {% include "learn/partials/learn_sidebar.html" %}
+{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 900px;">
+
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Spiritual Formation</div>
+        <h1 class="ws-page-title">Induction <em>Review</em></h1>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.6;">
+            Confirm inductees who have completed formation and advance them to Level 1.
+        </p>
     </div>
 
+    {# ── Inductee Cards ── #}
     {% if inductees %}
-    <div class="ws-feed">
-      <div class="list-group">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
         {% for inductee in inductees %}
         {% with profile=inductee.profile %}
-        <div class="list-item" id="ws-inductee-{{ inductee.id }}" style="flex-direction: column; align-items: stretch; gap: var(--space-m);">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: var(--space-s);">
-              <div class="list-item__icon" style="color: var(--primary);">
-                <span class="material-symbols-outlined">person</span>
-              </div>
-              <div class="list-item__content">
-                <div class="list-item__title" style="font-weight: 700;">
-                  {{ profile.full_name|default:inductee.display_name|default:inductee.email }}
+        <div id="inductee-{{ inductee.id }}"
+             style="background: var(--card); border: 1px solid var(--border);
+                    border-radius: 12px; padding: 24px 26px;">
+
+            {# Header #}
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+                                background: var(--primary-alpha, rgba(180,24,24,0.1));
+                                color: var(--primary); display: flex; align-items: center;
+                                justify-content: center; font-weight: 800; font-size: 14px;">
+                        {{ profile.full_name|default:inductee.display_name|default:inductee.email|first|upper }}
+                    </div>
+                    <div>
+                        <div style="font-size: 14px; font-weight: 700; color: var(--text);">
+                            {{ profile.full_name|default:inductee.display_name|default:inductee.email }}
+                            {% if inductee.induction_pathway %}
+                            <span style="font-size: 10px; font-weight: 600; color: var(--muted);
+                                         background: var(--card-2); border-radius: 4px;
+                                         padding: 2px 6px; margin-left: 6px;">
+                                {{ inductee.get_induction_pathway_display }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+                            {{ inductee.email }}
+                            {% if profile and profile.member_number %}
+                            · <span style="font-family: monospace; font-weight: 700; color: var(--primary);">{{ profile.member_number }}</span>
+                            {% endif %}
+                            {% if inductee.induction_enrolled_at %}
+                            · Enrolled {{ inductee.induction_enrolled_at|date:"d M Y" }}
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-                <div class="list-item__meta">
-                  {{ inductee.email }}
-                  {% if profile and profile.member_number %} &nbsp;·&nbsp; <span style="font-family: monospace; font-weight: 700;">{{ profile.member_number }}</span>{% endif %}
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                             letter-spacing: 0.06em; flex-shrink: 0;
+                             color: {% if inductee.enrolment_status == 'completed' %}var(--primary){% elif inductee.enrolment_status == 'in_progress' %}var(--muted){% else %}var(--muted){% endif %};">
+                    {% if inductee.enrolment_status == 'completed' %}Complete
+                    {% elif inductee.enrolment_status == 'in_progress' %}In Progress
+                    {% else %}Not Started{% endif %}
+                </span>
+            </div>
+
+            {# Progress bar #}
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                <div style="flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                    <div style="height: 100%; width: {{ inductee.progress }}%;
+                                background: var(--primary); border-radius: 3px;"></div>
                 </div>
-              </div>
+                <span style="font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap;">
+                    {{ inductee.lessons_done }}/{{ inductee.lessons_total }} units
+                </span>
             </div>
-            <div>
-              {% if inductee.enrolment_status == 'completed' %}
-                <span class="badge b-success">Complete</span>
-              {% elif inductee.enrolment_status == 'in_progress' %}
-                <span class="badge b-info">In Progress</span>
-              {% else %}
-                <span class="badge b-muted">Not Started</span>
-              {% endif %}
-            </div>
-          </div>
 
-          <div class="ws-induction-progress" style="display: flex; align-items: center; gap: var(--space-s);">
-            <div style="flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;">
-              <div style="height: 100%; width: {{ inductee.progress }}%; background: var(--primary);"></div>
+            {% if inductee.cert_pending %}
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px;
+                        color: var(--muted); margin-bottom: 16px;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">pending</span>
+                Certification record created — awaiting final confirmation.
             </div>
-            <span style="font-size: 11px; font-weight: 700; color: var(--muted);">{{ inductee.lessons_done }}/{{ inductee.lessons_total }} UNITS</span>
-          </div>
+            {% endif %}
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-s);">
-            <div>
-              <label class="label-caps" style="font-size: 10px; margin-bottom: 4px; display: block;">Placement Community</label>
-              <select name="placement_tenant_id" id="ws-placement-{{ inductee.id }}" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg);">
-                <option value="">— None / Keep in Induction —</option>
-                {% for tenant in placement_tenants %}
-                  <option value="{{ tenant.id }}">{{ tenant.name }}</option>
-                {% endfor %}
-              </select>
+            {# Actions #}
+            <div style="border-top: 1px solid var(--border); padding-top: 18px;
+                        display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                   letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                        Placement Community
+                    </label>
+                    <select name="placement_tenant_id" id="placement-{{ inductee.id }}"
+                            style="display: block; width: 100%; height: 38px; padding: 0 10px;
+                                   background: var(--card-2); border: 1px solid var(--border);
+                                   border-radius: 8px; font-size: 13px; color: var(--text);
+                                   outline: none; box-sizing: border-box;">
+                        <option value="">— None / keep in induction —</option>
+                        {% for tenant in placement_tenants %}
+                        <option value="{{ tenant.id }}">{{ tenant.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                   letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                        Steward Notes
+                    </label>
+                    <input type="text" name="notes" id="notes-{{ inductee.id }}"
+                           placeholder="Optional notes…"
+                           style="display: block; width: 100%; height: 38px; padding: 0 10px;
+                                  background: var(--card-2); border: 1px solid var(--border);
+                                  border-radius: 8px; font-size: 13px; color: var(--text);
+                                  outline: none; box-sizing: border-box;">
+                </div>
             </div>
-            <div>
-              <label class="label-caps" style="font-size: 10px; margin-bottom: 4px; display: block;">Steward Notes</label>
-              <input type="text" name="notes" id="ws-notes-{{ inductee.id }}" placeholder="Optional notes..." style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg);">
-            </div>
-          </div>
 
-          <div style="display: flex; justify-content: flex-end;">
-            <button class="ws-btn ws-btn--primary"
-                    hx-post="{% url 'learn:htmx-induction-confirm' inductee.id %}"
-                    hx-target="#ws-inductee-{{ inductee.id }}"
-                    hx-swap="outerHTML"
-                    hx-include="#ws-notes-{{ inductee.id }}, #ws-placement-{{ inductee.id }}"
-                    hx-confirm="Confirm induction completion for {{ profile.full_name|default:inductee.email }}?">
-              <span class="material-symbols-outlined">how_to_reg</span>
-              Confirm & Advance to Level 1
-            </button>
-          </div>
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="ws-topbar__cta"
+                        hx-post="{% url 'learn:htmx-induction-confirm' inductee.id %}"
+                        hx-target="#inductee-{{ inductee.id }}"
+                        hx-swap="outerHTML"
+                        hx-include="#notes-{{ inductee.id }}, #placement-{{ inductee.id }}"
+                        hx-confirm="Confirm induction for {{ profile.full_name|default:inductee.email }}? This advances them to Level 1."
+                        style="background: var(--primary); color: #fff; border: none; cursor: pointer;">
+                    <span class="material-symbols-outlined">how_to_reg</span>
+                    Confirm &amp; Advance to Level 1
+                </button>
+            </div>
         </div>
         {% endwith %}
         {% endfor %}
-      </div>
     </div>
     {% else %}
-    <div class="ws-empty-state">
-      <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">group</span>
-      <p style="color: var(--muted);">No active inductees at the moment.</p>
+    <div style="padding: 60px 0; text-align: center;">
+        <span class="material-symbols-outlined"
+              style="font-size: 48px; opacity: 0.1; display: block; color: var(--text);">group</span>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 16px;">No active inductees at the moment.</p>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+            Users who complete registration and are placed in the Induction Tenant will appear here.
+        </p>
     </div>
     {% endif %}
 
-  </div>
 </div>
 {% endblock %}
 
-<div class="learn-header">
-  <h2>Induction Review</h2>
-  <p class="explore-subtitle">Confirm inductees who have completed the programme and advance them to Level 1.</p>
+{% block ws_options %}
+<div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Queue Stats</div>
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Active Inductees</div>
+        <div style="font-size: 28px; font-weight: 800; color: var(--text);
+                    font-family: 'Playfair Display', serif;">{{ inductees|length }}</div>
+    </div>
 </div>
-
-<style>
-  .induction-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1rem;
-  }
-  .induction-card--confirmed {
-    border-color: var(--success);
-    background: color-mix(in srgb, var(--success) 8%, var(--card));
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 0.9rem;
-  }
-  .induction-card__header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 0.875rem;
-  }
-  .induction-card__identity h4 {
-    font-size: 0.9375rem;
-    font-weight: 700;
-    margin: 0 0 0.2rem;
-  }
-  .induction-card__identity .kmn {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: var(--primary);
-    font-family: monospace;
-  }
-  .induction-card__identity .meta {
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-top: 0.2rem;
-  }
-  .induction-progress {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.875rem;
-  }
-  .induction-progress__bar-wrap {
-    flex: 1;
-    height: 8px;
-    background: var(--border);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-  .induction-progress__bar {
-    height: 100%;
-    background: var(--primary);
-    border-radius: 99px;
-    transition: width 0.3s ease;
-  }
-  .induction-progress__label {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--muted);
-    white-space: nowrap;
-    min-width: 60px;
-    text-align: right;
-  }
-  .induction-card__actions {
-    border-top: 1px solid var(--border);
-    padding-top: 0.875rem;
-    margin-top: 0.875rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-  .induction-card__actions select,
-  .induction-card__actions textarea {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 0.875rem;
-    font-family: inherit;
-    box-sizing: border-box;
-  }
-  .induction-card__actions select:focus,
-  .induction-card__actions textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-  }
-  .induction-card__actions textarea { resize: vertical; }
-  .induction-btn-row {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
-  .badge-pill {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 99px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
-  .badge-pill--complete {
-    background: color-mix(in srgb, var(--success) 15%, transparent);
-    color: var(--success-dark);
-  }
-  .badge-pill--progress {
-    background: color-mix(in srgb, var(--primary) 12%, transparent);
-    color: var(--primary);
-  }
-  .badge-pill--pending {
-    background: var(--hover);
-    color: var(--muted);
-  }
-  .pathway-tag {
-    display: inline-block;
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--muted);
-    background: var(--hover);
-    border-radius: 6px;
-    padding: 2px 8px;
-    margin-left: 0.4rem;
-  }
-  .form-error {
-    color: var(--error);
-    font-size: 0.82rem;
-  }
-</style>
-
-{% if inductees %}
-  {% for inductee in inductees %}
-  {% with profile=inductee.profile %}
-  <div class="induction-card" id="inductee-{{ inductee.id }}">
-
-    <div class="induction-card__header">
-      <div class="induction-card__identity">
-        <h4>
-          {{ profile.full_name|default:inductee.display_name|default:inductee.email }}
-          {% if inductee.induction_pathway %}
-            <span class="pathway-tag">{{ inductee.get_induction_pathway_display }}</span>
-          {% endif %}
-        </h4>
-        {% if profile and profile.member_number %}
-          <div class="kmn">{{ profile.member_number }}</div>
-        {% endif %}
-        <div class="meta">
-          {{ inductee.email }}
-          {% if inductee.induction_enrolled_at %}
-            &middot; Enrolled {{ inductee.induction_enrolled_at|date:"d M Y" }}
-          {% endif %}
-          {% if profile and profile.country %}
-            &middot; {{ profile.country }}
-          {% endif %}
-        </div>
-      </div>
-
-      <div>
-        {% if inductee.enrolment_status == 'completed' %}
-          <span class="badge-pill badge-pill--complete">Complete</span>
-        {% elif inductee.enrolment_status == 'in_progress' %}
-          <span class="badge-pill badge-pill--progress">In progress</span>
-        {% else %}
-          <span class="badge-pill badge-pill--pending">Not started</span>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Progress bar -->
-    <div class="induction-progress">
-      <div class="induction-progress__bar-wrap">
-        <div class="induction-progress__bar" style="width:{{ inductee.progress }}%"></div>
-      </div>
-      <div class="induction-progress__label">{{ inductee.lessons_done }}/{{ inductee.lessons_total }} lessons</div>
-    </div>
-
-    <!-- Already confirmed -->
-    {% if inductee.cert_pending %}
-    <div style="font-size:0.82rem;color:var(--warning);display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem">
-      <span class="material-symbols-outlined" style="font-size:1rem">pending</span>
-      Certification record created — awaiting final confirmation below.
-    </div>
-    {% endif %}
-
-    <!-- Confirm action -->
-    <div class="induction-card__actions">
-      <label style="font-size:0.78rem;font-weight:600;color:var(--muted)">Placement community (optional)</label>
-      <select name="placement_tenant_id" id="placement-{{ inductee.id }}">
-        <option value="">— None / keep in induction —</option>
-        {% for tenant in placement_tenants %}
-          <option value="{{ tenant.id }}">{{ tenant.name }}</option>
-        {% endfor %}
-      </select>
-
-      <textarea name="notes" id="notes-{{ inductee.id }}"
-                placeholder="Steward notes (optional)…"
-                rows="2"></textarea>
-
-      <div class="induction-btn-row">
-        <button class="btn-save"
-                hx-post="{% url 'learn:htmx-induction-confirm' inductee.id %}"
-                hx-target="#inductee-{{ inductee.id }}"
-                hx-swap="outerHTML"
-                hx-include="#notes-{{ inductee.id }}, #placement-{{ inductee.id }}"
-                hx-confirm="Confirm induction completion for {{ profile.full_name|default:inductee.email }}? This will advance them to Level 1.">
-          <span class="material-symbols-outlined" style="font-size:1rem;vertical-align:middle">how_to_reg</span>
-          Confirm &amp; Advance to Level 1
-        </button>
-      </div>
-    </div>
-
-  </div>
-  {% endwith %}
-  {% endfor %}
-
-{% else %}
-  <div class="empty-state">
-    <span class="material-symbols-outlined" style="font-size:2.5rem;color:var(--border)">group</span>
-    <p>No active inductees at the moment.</p>
-    <p style="font-size:0.82rem">Users who complete registration and are placed in the Induction Tenant will appear here.</p>
-  </div>
-{% endif %}
-
 {% endblock %}

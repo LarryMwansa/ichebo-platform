@@ -1,28 +1,89 @@
-{% extends "learn/base_learn.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 
-{% block learn_content %}
-<div class="learn-header">
-  <h2>Certifications Pending</h2>
+{% block title %}Certification Queue — Ichebo{% endblock %}
+
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Formation</span>{% endblock %}
+{% block context_header %}Formation Ops{% endblock %}
+{% block context_content %}
+    {% include "learn/partials/learn_sidebar.html" %}
+{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 900px;">
+
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Spiritual Formation</div>
+        <h1 class="ws-page-title">Certification <em>Queue</em></h1>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.6;">
+            Review completed programmes and confirm member certifications.
+        </p>
+    </div>
+
+    {# ── Queue ── #}
+    {% if certifications %}
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for cert in certifications %}
+        <div id="cert-{{ cert.id }}"
+             style="background: var(--card); border: 1px solid var(--border);
+                    border-radius: 10px; padding: 22px 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+                        {{ cert.title }}
+                    </div>
+                    <div style="font-size: 11px; color: var(--muted);">
+                        Submitted {{ cert.created_at|date:"d M Y" }}
+                    </div>
+                </div>
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                             letter-spacing: 0.06em; color: var(--primary);">Awaiting Confirmation</span>
+            </div>
+            <textarea name="notes" id="notes-{{ cert.id }}"
+                      placeholder="Confirmation notes (optional)"
+                      rows="2"
+                      style="display: block; width: 100%; padding: 10px 12px; margin-bottom: 14px;
+                             background: var(--card-2); border: 1px solid var(--border);
+                             border-radius: 8px; font-size: 13px; color: var(--text);
+                             font-family: inherit; outline: none; resize: vertical;
+                             box-sizing: border-box; transition: border-color 0.15s;"
+                      onfocus="this.style.borderColor='var(--primary)'"
+                      onblur="this.style.borderColor='var(--border)'"></textarea>
+            <button class="ws-topbar__cta"
+                    hx-post="{% url 'learn:htmx-confirm-cert' cert.id %}"
+                    hx-target="#cert-{{ cert.id }}"
+                    hx-swap="outerHTML"
+                    hx-include="#notes-{{ cert.id }}"
+                    style="background: var(--primary); color: #fff; border: none; cursor: pointer;">
+                <span class="material-symbols-outlined">workspace_premium</span>
+                Confirm &amp; Advance Level
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding: 60px 0; text-align: center;">
+        <span class="material-symbols-outlined"
+              style="font-size: 48px; opacity: 0.1; display: block; color: var(--text);">workspace_premium</span>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 16px;">
+            No certifications pending.
+        </p>
+    </div>
+    {% endif %}
+
 </div>
+{% endblock %}
 
-{% if certifications %}
-  {% for cert in certifications %}
-  <div class="cert-card" id="cert-{{ cert.id }}">
-    <h4>{{ cert.title }}</h4>
-    <p class="cert-meta">Submitted: {{ cert.created_at|date:"d M Y" }}</p>
-    <textarea name="notes" id="notes-{{ cert.id }}"
-              placeholder="Confirmation notes (optional)"
-              class="quiz-text-answer" rows="2"></textarea>
-    <button class="btn-primary"
-            hx-post="{% url 'learn:htmx-confirm-cert' cert.id %}"
-            hx-target="#cert-{{ cert.id }}"
-            hx-swap="outerHTML"
-            hx-include="#notes-{{ cert.id }}">
-      Confirm &amp; Advance Level
-    </button>
-  </div>
-  {% endfor %}
-{% else %}
-  <p class="empty-state">No certifications pending.</p>
-{% endif %}
+{% block ws_options %}
+<div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Queue Stats</div>
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Pending</div>
+        <div style="font-size: 28px; font-weight: 800; color: var(--text);
+                    font-family: 'Playfair Display', serif;">{{ certifications|length }}</div>
+    </div>
+</div>
 {% endblock %}

@@ -1,225 +1,150 @@
-{% extends "learn/base_learn.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 
+{% block title %}Curriculum Authorship — Ichebo{% endblock %}
 
-{# ── WORKSPACE layout ── #}
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Formation</span>{% endblock %}
+{% block context_header %}Formation Ops{% endblock %}
+{% block context_content %}
+    {% include "learn/partials/learn_sidebar.html" %}
+{% endblock %}
+
 {% block ws_content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner">
+<div style="padding: 40px 48px; max-width: 900px;">
 
-    <div class="ws-page-header">
-      <div class="ws-page-header__left">
-        <h2 class="ws-page-title">Curriculum <em>Authorship</em></h2>
-        <p class="ws-page-subtitle">Draft and manage formation programmes, courses, and lessons.</p>
-      </div>
-      <div class="ws-page-header__actions">
-        <div style="display: flex; gap: var(--space-xs);">
-          <a href="{% url 'learn:learn-author-programme' %}" class="ws-btn ws-btn--secondary">New Programme</a>
-          <a href="{% url 'learn:learn-author-course' %}" class="ws-btn ws-btn--secondary">New Course</a>
-          <a href="{% url 'learn:learn-author-lesson' %}" class="ws-topbar__cta">
-            <span class="material-symbols-outlined">add</span>
-            New Lesson
-          </a>
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px;">Curriculum Authorship</div>
+            <h1 class="ws-page-title">Create &amp; Manage <em>Content</em></h1>
         </div>
-      </div>
+        <div style="display: flex; gap: 8px; flex-shrink: 0;">
+            <a href="{% url 'learn:learn-author-programme' %}" class="ws-topbar__cta"
+               style="text-decoration: none; background: none; border: 1px solid var(--border);">
+                <span class="material-symbols-outlined">account_balance</span>
+                New Programme
+            </a>
+            <a href="{% url 'learn:learn-author-course' %}" class="ws-topbar__cta"
+               style="text-decoration: none; background: none; border: 1px solid var(--border);">
+                <span class="material-symbols-outlined">menu_book</span>
+                New Course
+            </a>
+            <a href="{% url 'learn:learn-author-lesson' %}" class="ws-topbar__cta"
+               style="text-decoration: none; background: var(--primary); color: #fff;">
+                <span class="material-symbols-outlined">add</span>
+                New Lesson
+            </a>
+        </div>
     </div>
 
+    {# ── Work in Progress ── #}
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Work in Progress</div>
+
     {% if user_records %}
-    <div class="ws-feed">
-      <div class="list-group">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
         {% for record in user_records %}
-        <div class="list-item" style="flex-direction: column; align-items: stretch; gap: var(--space-xs);">
-          <div style="display: flex; align-items: center; gap: var(--space-s);">
-            <div class="list-item__icon" style="color: var(--primary);">
-              <span class="material-symbols-outlined">
+        <div style="display: flex; align-items: center; gap: 14px; background: var(--card);
+                    border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;">
+            <span class="material-symbols-outlined"
+                  style="font-size: 22px; color: var(--primary); flex-shrink: 0;">
                 {% if record.record_type == 'programme' %}account_balance
                 {% elif record.record_type == 'course' %}menu_book
                 {% else %}draw{% endif %}
-              </span>
+            </span>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px;
+                            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ record.title }}
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                 letter-spacing: 0.06em; color: var(--primary);">{{ record.record_type }}</span>
+                    <span style="font-size: 11px; color: var(--muted);">
+                        Updated {{ record.updated_at|date:"d M, H:i" }}
+                    </span>
+                </div>
             </div>
-            <div class="list-item__content">
-              <div class="list-item__title" style="font-weight: 700;">{{ record.title }}</div>
-              <div class="list-item__meta">
-                <span class="badge-unit badge-unit--primary">{{ record.record_type }}</span>
-                &nbsp;·&nbsp;Updated {{ record.updated_at|date:"d M, H:i" }}
-              </div>
-            </div>
-            <div class="list-item__action">
-              {% if record.status == 'submitted' %}
-                <span class="badge b-info">Awaiting Review</span>
-              {% else %}
-                <span class="badge b-warning">Draft</span>
-              {% endif %}
-            </div>
-          </div>
-          
-          <div style="padding-left: 52px; display: flex; gap: var(--space-2xs);">
+            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                         letter-spacing: 0.06em; flex-shrink: 0;
+                         color: {% if record.status == 'submitted' %}var(--muted){% else %}var(--primary){% endif %};">
+                {% if record.status == 'submitted' %}Awaiting Review{% else %}Draft{% endif %}
+            </span>
             {% if record.record_type == 'programme' %}
-              <a href="{% url 'learn:learn-author-programme-edit' record.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2); padding: 4px 12px;">Edit Programme</a>
+            <a href="{% url 'learn:learn-author-programme-edit' record.id %}"
+               style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
+                      color: var(--text); text-decoration: none; padding: 6px 12px;
+                      background: var(--card-2); border: 1px solid var(--border);
+                      border-radius: 6px; flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">edit</span>Edit
+            </a>
             {% elif record.record_type == 'course' %}
-              <a href="{% url 'learn:learn-author-course-edit' record.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2); padding: 4px 12px;">Edit Course</a>
+            <a href="{% url 'learn:learn-author-course-edit' record.id %}"
+               style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
+                      color: var(--text); text-decoration: none; padding: 6px 12px;
+                      background: var(--card-2); border: 1px solid var(--border);
+                      border-radius: 6px; flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">edit</span>Edit
+            </a>
             {% elif record.record_type in 'lesson,assignment,quiz' %}
-              <a href="{% url 'learn:learn-author-lesson-edit' record.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2); padding: 4px 12px;">Edit Lesson</a>
+            <a href="{% url 'learn:learn-author-lesson-edit' record.id %}"
+               style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
+                      color: var(--text); text-decoration: none; padding: 6px 12px;
+                      background: var(--card-2); border: 1px solid var(--border);
+                      border-radius: 6px; flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">edit</span>Edit
+            </a>
             {% endif %}
-          </div>
         </div>
         {% endfor %}
-      </div>
     </div>
     {% else %}
-    <div class="ws-empty-state">
-      <span class="material-symbols-outlined" style="font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: var(--space-xs);">edit_note</span>
-      <p style="color: var(--muted);">Nothing in progress yet. Create a programme, course, or lesson above.</p>
+    <div style="padding: 60px 0; text-align: center;">
+        <span class="material-symbols-outlined"
+              style="font-size: 48px; opacity: 0.1; display: block; color: var(--text);">edit_note</span>
+        <p style="font-size: 13px; font-weight: 600; color: var(--text); margin-top: 16px;">
+            Nothing in progress yet
+        </p>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+            Start by creating a programme, course, or lesson above.
+        </p>
     </div>
     {% endif %}
 
-  </div>
 </div>
 {% endblock %}
 
-
-{# ── Page hero overrides ── #}
-{% block learn_hero_label %}Curriculum Authorship{% endblock %}
-
-{% block learn_hero_title %}Create &amp; manage<br><em>learning content.</em>{% endblock %}
-
-{% block learn_hero_sub %}
-  <p class="page-hero__sub">
-    Draft programmes, courses, and lessons. Submit for Level 5 review when ready.
-  </p>
-{% endblock %}
-
-{# Optional ghost watermark — matches the website pattern #}
-{% block learn_hero_watermark_class %}page-hero--watermark{% endblock %}
-{% block learn_hero_watermark_attr %}data-watermark="AUTHOR"{% endblock %}
-
-
-{% block learn_content %}
-
-{# ── CREATE NEW CONTENT ─────────────────────────────────── #}
-<div class="learn-section" style="margin-top: var(--space-m);">
-
-  <div class="label-caps" style="margin-bottom: var(--space-xs);">New Content</div>
-
-  <div class="programme-grid">
-
-    <a href="{% url 'learn:learn-author-programme' %}" class="programme-card">
-      <div class="list-item__icon icon-blue"
-           style="margin-bottom: var(--space-2xs);">
-        <span class="material-symbols-outlined">account_balance</span>
-      </div>
-      <div class="programme-meta">Core Entity</div>
-      <div class="programme-title">New Programme</div>
-      <p style="font-size: var(--fz--2); color: var(--muted); margin-top: 2px; line-height: 1.5;">
-        Create a qualification pathway — Degree, Diploma, Certificate.
-      </p>
-    </a>
-
-    <a href="{% url 'learn:learn-author-course' %}" class="programme-card">
-      <div class="list-item__icon icon-purple"
-           style="margin-bottom: var(--space-2xs);">
-        <span class="material-symbols-outlined">menu_book</span>
-      </div>
-      <div class="programme-meta">Module</div>
-      <div class="programme-title">New Course</div>
-      <p style="font-size: var(--fz--2); color: var(--muted); margin-top: 2px; line-height: 1.5;">
-        Define a subject area within a programme.
-      </p>
-    </a>
-
-    <a href="{% url 'learn:learn-author-lesson' %}" class="programme-card">
-      <div class="list-item__icon icon-green"
-           style="margin-bottom: var(--space-2xs);">
-        <span class="material-symbols-outlined">draw</span>
-      </div>
-      <div class="programme-meta">Content Unit</div>
-      <div class="programme-title">New Lesson</div>
-      <p style="font-size: var(--fz--2); color: var(--muted); margin-top: 2px; line-height: 1.5;">
-        Draft lessons, quizzes, or assignments.
-      </p>
-    </a>
-
-  </div>
-</div>
-
-
-{# ── WORK IN PROGRESS ───────────────────────────────────── #}
-{% if user_records %}
-<div class="learn-section">
-
-  <div class="label-caps" style="margin-bottom: var(--space-xs);">Your Work in Progress</div>
-
-  <div class="list-group">
-    {% for record in user_records %}
-    <div class="list-item" style="align-items: flex-start; flex-direction: column; gap: var(--space-xs);">
-
-      {# Row 1: type + title + status #}
-      <div style="display: flex; align-items: center; gap: var(--space-xs); width: 100%; min-width: 0;">
-
-        {# Record type badge #}
-        <span class="badge-unit badge-unit--primary">{{ record.record_type }}</span>
-
-        {# Title #}
-        <span class="list-item__title" style="flex: 1;">{{ record.title }}</span>
-
-        {# Status badge #}
-        {% if record.status == 'submitted' %}
-          <span class="status-badge status-badge--seeker">Awaiting Review</span>
-        {% else %}
-          <span class="status-badge status-badge--warning">Draft</span>
-        {% endif %}
-
-      </div>
-
-      {# Row 2: meta + actions #}
-      <div style="display: flex; align-items: center; justify-content: space-between; width: 100; gap: var(--space-s);">
-
-        <span class="list-item__meta">
-          Updated {{ record.updated_at|date:"d M, H:i" }}
-        </span>
-
-        <div style="display: flex; gap: var(--space-2xs);">
-          {% if record.record_type == 'programme' %}
-            <a href="{% url 'learn:learn-author-programme-edit' record.id %}"
-               class="btn-touch btn-secondary"
-               style="min-height: 36px; font-size: var(--fz--2); padding: 0 var(--space-xs);">
-              Edit
-            </a>
-          {% elif record.record_type == 'course' %}
-            <a href="{% url 'learn:learn-author-course-edit' record.id %}"
-               class="btn-touch btn-secondary"
-               style="min-height: 36px; font-size: var(--fz--2); padding: 0 var(--space-xs);">
-              Edit
-            </a>
-          {% elif record.record_type in 'lesson,assignment,quiz' %}
-            <a href="{% url 'learn:learn-author-lesson-edit' record.id %}"
-               class="btn-touch btn-secondary"
-               style="min-height: 36px; font-size: var(--fz--2); padding: 0 var(--space-xs);">
-              Edit
-            </a>
-          {% endif %}
-        </div>
-
-      </div>
-
+{% block ws_options %}
+<div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Quick Create</div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="{% url 'learn:learn-author-programme' %}"
+           style="display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+                  background: var(--card-2); border: 1px solid var(--border);
+                  border-radius: 8px; text-decoration: none; font-size: 12px;
+                  font-weight: 700; color: var(--text);">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">account_balance</span>
+            New Programme
+        </a>
+        <a href="{% url 'learn:learn-author-course' %}"
+           style="display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+                  background: var(--card-2); border: 1px solid var(--border);
+                  border-radius: 8px; text-decoration: none; font-size: 12px;
+                  font-weight: 700; color: var(--text);">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">menu_book</span>
+            New Course
+        </a>
+        <a href="{% url 'learn:learn-author-lesson' %}"
+           style="display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+                  background: var(--card-2); border: 1px solid var(--border);
+                  border-radius: 8px; text-decoration: none; font-size: 12px;
+                  font-weight: 700; color: var(--text);">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">draw</span>
+            New Lesson
+        </a>
     </div>
-    {% endfor %}
-  </div>
-
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 12px;">In Progress</div>
+    <div style="font-size: 28px; font-weight: 800; color: var(--text);
+                font-family: 'Playfair Display', serif;">{{ user_records|length }}</div>
 </div>
-{% else %}
-
-{# Empty state — shown when no WIP records exist #}
-<div class="learn-section">
-  <div class="empty-state">
-    <span class="material-symbols-outlined empty-state__icon">edit_note</span>
-    <p class="empty-state__title">Nothing in progress yet</p>
-    <p class="empty-state__message">
-      Start by creating a programme, course, or lesson above.
-      Drafts appear here until submitted for review.
-    </p>
-  </div>
-</div>
-
-{% endif %}
-
 {% endblock %}
