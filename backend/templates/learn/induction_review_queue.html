@@ -124,16 +124,17 @@
 
             <div style="display: flex; justify-content: flex-end;">
                 <button class="ws-topbar__cta"
-                        hx-post="{% url 'learn:htmx-induction-confirm' inductee.id %}"
-                        hx-target="#inductee-{{ inductee.id }}"
-                        hx-swap="outerHTML"
-                        hx-include="#notes-{{ inductee.id }}, #placement-{{ inductee.id }}"
-                        hx-confirm="Confirm induction for {{ profile.full_name|default:inductee.email }}? This advances them to Level 1."
+                        hx-get="{% url 'learn:htmx-induction-confirm-prompt' inductee.id %}"
+                        hx-target="#confirm-slot-{{ inductee.id }}"
+                        hx-swap="innerHTML"
+                        hx-include="#placement-{{ inductee.id }}"
                         style="background: var(--primary); color: #fff; border: none; cursor: pointer;">
                     <span class="material-symbols-outlined">how_to_reg</span>
                     Confirm &amp; Advance to Level 1
                 </button>
             </div>
+
+            <div id="confirm-slot-{{ inductee.id }}"></div>
         </div>
         {% endwith %}
         {% endfor %}

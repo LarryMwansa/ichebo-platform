@@ -577,8 +577,41 @@ def induction_review_queue(request):
 
 
 @login_required
+def htmx_induction_confirm_prompt(request, user_id):
+    """HTMX GET: return inline confirmation prompt partial for induction."""
+    import json
+    from django.contrib.auth import get_user_model
+    from tenants.models import Tenant
+    User = get_user_model()
+
+    if _user_level(request.user) < 5:
+        return HttpResponse(status=403)
+
+    learner = get_object_or_404(User, id=user_id)
+    profile = getattr(learner, 'profile', None)
+    name = (profile.full_name if profile else None) or getattr(learner, 'display_name', None) or learner.email
+
+    placement_tenant_id = request.GET.get('placement_tenant_id', '').strip() or None
+    placement_tenant = None
+    if placement_tenant_id:
+        placement_tenant = Tenant.objects.filter(id=placement_tenant_id).first()
+
+    class _Obj:
+        pass
+    inductee = _Obj()
+    inductee.id = user_id
+
+    return render(request, 'learn/partials/induction_confirm_prompt.html', {
+        'inductee': inductee,
+        'name': name,
+        'placement_tenant': placement_tenant,
+    })
+
+
+@login_required
 def htmx_induction_confirm(request, user_id):
     """HTMX POST: steward confirms induction completion → advances learner to Level 1."""
+    import json
     if request.method != 'POST':
         return HttpResponse(status=405)
 
@@ -634,23 +667,38 @@ def htmx_induction_confirm(request, user_id):
             placement_tenant_id=placement_tenant_id,
         )
     except CertificationError as exc:
-        return HttpResponse(
-            f'<div class="induction-card" id="inductee-{user_id}">'
-            f'<p class="form-error">{exc}</p></div>',
+        resp = HttpResponse(
+            f'<div id="inductee-{user_id}"'
+            f' style="background:var(--card);border:1px solid var(--border);border-radius:12px;'
+            f'padding:22px 24px;display:flex;align-items:center;gap:12px;">'
+            f'<span class="material-symbols-outlined" style="color:#e53e3e;font-size:20px;">error</span>'
+            f'<div style="font-size:13px;color:var(--text);">{exc}</div>'
+            f'</div>',
             status=400,
         )
+        resp['X-WS-Toast'] = json.dumps([{'level': 'error', 'message': str(exc)}])
+        return resp
 
     profile = getattr(learner, 'profile', None)
-    name = (profile.full_name if profile else None) or learner.display_name or learner.email
-    return HttpResponse(
-        f'<div class="induction-card induction-card--confirmed" id="inductee-{user_id}">'
-        f'<span class="material-symbols-outlined" style="color:var(--success);font-size:1.5rem">verified</span>'
+    name = (profile.full_name if profile else None) or getattr(learner, 'display_name', None) or learner.email
+    resp = HttpResponse(
+        f'<div id="inductee-{user_id}"'
+        f' style="background:var(--card);border:1px solid var(--border);border-radius:12px;'
+        f'padding:22px 24px;display:flex;align-items:center;gap:14px;">'
+        f'<span class="material-symbols-outlined" style="color:var(--primary);font-size:28px;">verified</span>'
         f'<div>'
-        f'<strong>{name}</strong> confirmed — '
-        f'Level {confirmation.previous_competence_level} → Level {confirmation.new_competence_level}'
+        f'<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">{name}</div>'
+        f'<div style="font-size:12px;color:var(--muted);">'
+        f'Confirmed · Level {confirmation.previous_competence_level} → Level {confirmation.new_competence_level}'
+        f'</div>'
         f'</div>'
         f'</div>'
     )
+    resp['X-WS-Toast'] = json.dumps([{
+        'level': 'success',
+        'message': f'{name} advanced to Level {confirmation.new_competence_level}.',
+    }])
+    return resp
 
 
 # ── HTMX Partial Views ────────────────────────────────────────────────────────

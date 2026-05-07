@@ -26,6 +26,7 @@ urlpatterns = [
     path('review/', views.review_queue, name='learn-review'),
     # Induction review queue (Level 5)
     path('induction/review/', views.induction_review_queue, name='learn-induction-review'),
+    path('htmx/induction/confirm-prompt/<uuid:user_id>/', views.htmx_induction_confirm_prompt, name='htmx-induction-confirm-prompt'),
     path('htmx/induction/confirm/<uuid:user_id>/', views.htmx_induction_confirm, name='htmx-induction-confirm'),
 
     # ── HTMX action routes ─────────────────────────────────────────────────

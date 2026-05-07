@@ -326,12 +326,72 @@
 
     </div>
 
+    {# ── Django Messages Toast Container ── #}
+    <div id="ws-toast-container" aria-live="polite"
+         style="position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+                display: flex; flex-direction: column; gap: 10px; pointer-events: none;">
+        {% for message in messages %}
+        <div class="ws-toast ws-toast--{{ message.tags }}"
+             style="display: flex; align-items: center; gap: 10px;
+                    padding: 12px 16px; border-radius: 10px; min-width: 280px; max-width: 400px;
+                    background: var(--card); border: 1px solid var(--border);
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                    font-size: 13px; color: var(--text); pointer-events: all;
+                    animation: ws-toast-in 0.2s ease;">
+            <span class="material-symbols-outlined" style="font-size: 18px; flex-shrink: 0;
+                  color: {% if 'error' in message.tags %}#e53e3e{% elif 'warning' in message.tags %}#d97706{% else %}var(--primary){% endif %};">
+                {% if 'error' in message.tags %}error{% elif 'warning' in message.tags %}warning{% else %}check_circle{% endif %}
+            </span>
+            <span style="flex: 1; line-height: 1.4;">{{ message }}</span>
+            <button onclick="this.closest('.ws-toast').remove()"
+                    style="background: none; border: none; cursor: pointer; padding: 2px;
+                           color: var(--muted); display: flex; align-items: center;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <style>
+    @keyframes ws-toast-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    </style>
+
     <!-- Core Scripts -->
     <script src="{% static 'js/shell_v2.js' %}"></script>
 
     <script>
         document.addEventListener('htmx:configRequest', (e) => {
             e.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+
+        // Auto-dismiss toasts after 5 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.ws-toast').forEach(t => {
+                setTimeout(() => t.remove(), 5000);
+            });
+        });
+
+        // Inject HTMX-triggered toasts into the container
+        document.addEventListener('htmx:afterRequest', (e) => {
+            const toastJson = e.detail.xhr.getResponseHeader('X-WS-Toast');
+            if (!toastJson) return;
+            try {
+                const toasts = JSON.parse(toastJson);
+                const container = document.getElementById('ws-toast-container');
+                toasts.forEach(({level, message}) => {
+                    const icons = {error: 'error', warning: 'warning', success: 'check_circle', info: 'info'};
+                    const colors = {error: '#e53e3e', warning: '#d97706', success: 'var(--primary)', info: 'var(--muted)'};
+                    const el = document.createElement('div');
+                    el.className = `ws-toast ws-toast--${level}`;
+                    el.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;min-width:280px;max-width:400px;background:var(--card);border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.15);font-size:13px;color:var(--text);pointer-events:all;animation:ws-toast-in 0.2s ease;';
+                    el.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;color:${colors[level]||colors.success}">${icons[level]||'check_circle'}</span><span style="flex:1;line-height:1.4">${message}</span><button onclick="this.closest('.ws-toast').remove()" style="background:none;border:none;cursor:pointer;padding:2px;color:var(--muted);display:flex;align-items:center;"><span class="material-symbols-outlined" style="font-size:16px">close</span></button>`;
+                    container.appendChild(el);
+                    setTimeout(() => el.remove(), 5000);
+                });
+            } catch {}
         });
     </script>
 
