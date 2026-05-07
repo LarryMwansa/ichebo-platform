@@ -1,50 +1,144 @@
-<div class="record-drawer-form" id="gathering-form">
-  <div class="record-form-group">
-    <label class="label-caps">Gathering Title</label>
-    <input type="text" name="title" class="form-input-touch" placeholder="e.g. Sunday Morning Service" required>
-  </div>
-  
-  <div class="record-form-group">
-    <label class="label-caps">Date & Time</label>
-    <input type="datetime-local" name="scheduled_at" class="form-input-touch" required>
-  </div>
-  
-  <div class="record-form-group">
-    <label class="label-caps">Delivery Format</label>
-    <select name="format" class="form-input-touch"
-            onchange="
-              const fmt = this.value;
-              document.getElementById('loc-field').style.display = (fmt !== 'digital' ? 'block' : 'none');
-              document.getElementById('stream-field').style.display = (fmt !== 'in_person' ? 'block' : 'none');
-            ">
-      <option value="in_person">In Person</option>
-      <option value="digital">Digital (Online Only)</option>
-      <option value="hybrid">Hybrid (Both)</option>
-    </select>
-  </div>
+<div id="gathering-form"
+     style="background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+            padding: 24px 28px; margin-bottom: 24px;">
 
-  <div class="record-form-group" id="loc-field">
-    <label class="label-caps">Location / Venue</label>
-    <input type="text" name="location" class="form-input-touch" placeholder="Physical address or venue name">
-  </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div class="ws-label-tag">Schedule a Gathering</div>
+        <button type="button"
+                hx-get="{% url 'community:htmx-gatherings-list' %}"
+                hx-target="#gathering-form-slot"
+                hx-swap="innerHTML"
+                style="background: none; border: none; cursor: pointer; color: var(--muted);
+                       display: flex; align-items: center; padding: 4px;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+        </button>
+    </div>
 
-  <div class="record-form-group" id="stream-field" style="display: none;">
-    <label class="label-caps">Stream Link</label>
-    <input type="url" name="stream_url" class="form-input-touch" placeholder="https://youtube.com/live/…">
-  </div>
+    <div style="display: flex; flex-direction: column; gap: 16px;">
 
-  <div class="record-form-group">
-    <label class="label-caps">Additional Notes</label>
-    <textarea name="description" class="form-input-touch" rows="3" placeholder="Bullet points or agenda…"></textarea>
-  </div>
+        {# Title #}
+        <div>
+            <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                           letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                Gathering Title
+            </label>
+            <input type="text" name="title" placeholder="e.g. Sunday Morning Service" required
+                   style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                          background: var(--card-2); border: 1px solid var(--border);
+                          border-radius: 8px; font-size: 13px; color: var(--text);
+                          outline: none; box-sizing: border-box; transition: border-color 0.15s;"
+                   onfocus="this.style.borderColor='var(--primary)'"
+                   onblur="this.style.borderColor='var(--border)'">
+        </div>
 
-  <div style="margin-top: var(--space-m);">
-    <button class="btn-touch" style="background: var(--primary); color: #fff; width: 100%; font-weight: 700;"
-            hx-post="{% url 'community:htmx-create-gathering' %}"
-            hx-target="#gathering-form-slot"
-            hx-swap="innerHTML"
-            hx-include="#gathering-form">
-      Publish Gathering
-    </button>
-  </div>
+        {# Date & Time #}
+        <div>
+            <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                           letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                Date &amp; Time
+            </label>
+            <input type="datetime-local" name="scheduled_at" required
+                   style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                          background: var(--card-2); border: 1px solid var(--border);
+                          border-radius: 8px; font-size: 13px; color: var(--text);
+                          outline: none; box-sizing: border-box; cursor: pointer;
+                          transition: border-color 0.15s;"
+                   onfocus="this.style.borderColor='var(--primary)'"
+                   onblur="this.style.borderColor='var(--border)'">
+        </div>
+
+        {# Delivery Format #}
+        <div>
+            <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                           letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                Delivery Format
+            </label>
+            <select name="format"
+                    style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                           background: var(--card-2); border: 1px solid var(--border);
+                           border-radius: 8px; font-size: 13px; color: var(--text);
+                           outline: none; box-sizing: border-box; cursor: pointer;
+                           transition: border-color 0.15s;"
+                    onfocus="this.style.borderColor='var(--primary)'"
+                    onblur="this.style.borderColor='var(--border)'"
+                    onchange="
+                        const fmt = this.value;
+                        document.getElementById('loc-field').style.display = (fmt !== 'digital' ? 'block' : 'none');
+                        document.getElementById('stream-field').style.display = (fmt !== 'in_person' ? 'block' : 'none');
+                    ">
+                <option value="in_person">In Person</option>
+                <option value="digital">Digital (Online Only)</option>
+                <option value="hybrid">Hybrid (Both)</option>
+            </select>
+        </div>
+
+        {# Location #}
+        <div id="loc-field">
+            <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                           letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                Location / Venue
+            </label>
+            <input type="text" name="location" placeholder="Physical address or venue name"
+                   style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                          background: var(--card-2); border: 1px solid var(--border);
+                          border-radius: 8px; font-size: 13px; color: var(--text);
+                          outline: none; box-sizing: border-box; transition: border-color 0.15s;"
+                   onfocus="this.style.borderColor='var(--primary)'"
+                   onblur="this.style.borderColor='var(--border)'">
+        </div>
+
+        {# Stream Link #}
+        <div id="stream-field" style="display: none;">
+            <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                           letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                Stream Link
+            </label>
+            <input type="url" name="stream_url" placeholder="https://youtube.com/live/…"
+                   style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                          background: var(--card-2); border: 1px solid var(--border);
+                          border-radius: 8px; font-size: 13px; color: var(--text);
+                          outline: none; box-sizing: border-box; transition: border-color 0.15s;"
+                   onfocus="this.style.borderColor='var(--primary)'"
+                   onblur="this.style.borderColor='var(--border)'">
+        </div>
+
+        {# Additional Notes #}
+        <div>
+            <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                           letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                Additional Notes
+            </label>
+            <textarea name="description" rows="3" placeholder="Bullet points or agenda…"
+                      style="display: block; width: 100%; padding: 10px 12px;
+                             background: var(--card-2); border: 1px solid var(--border);
+                             border-radius: 8px; font-size: 13px; color: var(--text);
+                             font-family: inherit; outline: none; resize: vertical;
+                             box-sizing: border-box; line-height: 1.6; transition: border-color 0.15s;"
+                      onfocus="this.style.borderColor='var(--primary)'"
+                      onblur="this.style.borderColor='var(--border)'"></textarea>
+        </div>
+
+        {# Submit #}
+        <div style="display: flex; gap: 12px; align-items: center; padding-top: 4px;
+                    border-top: 1px solid var(--border); margin-top: 4px;">
+            <button class="ws-topbar__cta"
+                    hx-post="{% url 'community:htmx-create-gathering' %}"
+                    hx-target="#gathering-form-slot"
+                    hx-swap="innerHTML"
+                    hx-include="#gathering-form"
+                    style="background: var(--primary); color: #fff; border: none; cursor: pointer;">
+                <span class="material-symbols-outlined">event_available</span>
+                Publish Gathering
+            </button>
+            <button type="button"
+                    hx-get="{% url 'community:htmx-gatherings-list' %}"
+                    hx-target="#gathering-form-slot"
+                    hx-swap="innerHTML"
+                    style="background: none; border: none; cursor: pointer; font-size: 13px;
+                           color: var(--muted); font-weight: 600;">
+                Cancel
+            </button>
+        </div>
+
+    </div>
 </div>
