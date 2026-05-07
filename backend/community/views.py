@@ -89,6 +89,7 @@ def my_community(request):
             except User.DoesNotExist:
                 pass
 
+        from django.db.models import Q
         announcements = list(
             Record.objects.filter(
                 record_family='community',
@@ -96,8 +97,7 @@ def my_community(request):
                 status='active',
                 deleted_at__isnull=True,
             ).filter(
-                # tenant scoping — filter by tenant FK if available, else no filter
-                **({'tenant_id': tenant.id} if hasattr(Record, 'tenant') else {})
+                Q(tenant_id=tenant.id) | Q(tenant_id__isnull=True)
             ).order_by('-created_at')[:5]
         )
 
@@ -108,7 +108,7 @@ def my_community(request):
                 status__in=['pending', 'in_progress'],
                 metadata__source_app='community',
             ).filter(
-                **({'tenant_id': tenant.id} if hasattr(Activity, 'tenant') else {})
+                Q(tenant_id=tenant.id) | Q(tenant_id__isnull=True)
             ).order_by('scheduled_at')[:10]
         )
 
@@ -158,12 +158,15 @@ def management_home(request):
             tenant__path__startswith=scope_tenant.path,
         ).count()
 
+        from django.db.models import Q
         announcements = list(
             Record.objects.filter(
                 record_family='community',
                 record_type='announcement',
                 status='active',
                 deleted_at__isnull=True,
+            ).filter(
+                Q(tenant_id=scope_tenant.id) | Q(tenant_id__isnull=True)
             ).order_by('-created_at')[:3]
         )
 
@@ -173,6 +176,8 @@ def management_home(request):
                 activity_type='event',
                 status__in=['pending', 'in_progress'],
                 metadata__source_app='community',
+            ).filter(
+                Q(tenant_id=scope_tenant.id) | Q(tenant_id__isnull=True)
             ).order_by('scheduled_at')[:5]
         )
 
@@ -465,6 +470,7 @@ def htmx_create_announcement(request):
     if request.method == 'POST':
         perms = _get_user_permissions(request.user)
         primary_perm = perms[0] if perms else None
+        tenant = primary_perm.tenant if primary_perm else None
 
         Record.objects.create(
             created_by=request.user,
@@ -475,6 +481,7 @@ def htmx_create_announcement(request):
             title=request.POST.get('title', '').strip(),
             content=request.POST.get('content', '').strip(),
             status='active',
+            tenant=tenant,
             metadata={'source_app': 'community'},
             permissions_data={'visibility': 'tenant', 'required_level': 1,
                               'roles_allowed': [], 'can_edit': []},
@@ -506,6 +513,10 @@ def htmx_create_gathering(request):
     if request.method == 'POST':
         from django.db import transaction
 
+        perms = _get_user_permissions(request.user)
+        primary_perm = perms[0] if perms else None
+        tenant = primary_perm.tenant if primary_perm else None
+
         title        = request.POST.get('title', '').strip()
         description  = request.POST.get('description', '').strip() or None
         fmt          = request.POST.get('format', 'in_person')
@@ -525,6 +536,7 @@ def htmx_create_gathering(request):
                     title=title,
                     content=description,
                     status='active',
+                    tenant=tenant,
                     metadata={'source_app': 'community'},
                     permissions_data={'visibility': 'tenant', 'required_level': 1,
                                       'roles_allowed': [], 'can_edit': []},
@@ -545,6 +557,7 @@ def htmx_create_gathering(request):
                     scheduled_at=scheduled_at or None,
                     status='pending',
                     kgs_pathway='community_life',
+                    tenant=tenant,
                     metadata={'source_app': 'community'},
                 )
 
