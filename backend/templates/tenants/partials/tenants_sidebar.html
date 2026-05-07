@@ -1,0 +1,25 @@
+{# templates/tenants/partials/tenants_sidebar.html #}
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Tenancy</div>
+    <a href="{% url 'tenants:steward-dashboard' %}"
+       class="ctx-btn {% if active_tenants_tab == 'dashboard' %}active{% endif %}">
+        <span class="material-symbols-outlined">account_balance</span>
+        Steward Dashboard
+    </a>
+    <a href="{% url 'tenants:my-tenants' %}"
+       class="ctx-btn {% if active_tenants_tab == 'my-tenants' %}active{% endif %}">
+        <span class="material-symbols-outlined">groups</span>
+        My Communities
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Administration</div>
+    <a href="{% url 'tenants:create-tenant' %}"
+       class="ctx-btn {% if active_tenants_tab == 'create' %}active{% endif %}">
+        <span class="material-symbols-outlined">add_home</span>
+        New Community
+    </a>
+
+</div>

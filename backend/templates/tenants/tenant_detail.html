@@ -1,140 +1,247 @@
 {% extends "tenants/base_tenants.html" %}
 
 {% block tenants_content %}
+<div style="padding: 40px 48px; max-width: 860px;">
 
-<div class="tenants-header">
-  <h2>{{ tenant.name }}</h2>
-  <a href="{% url 'tenants:steward-dashboard' %}" style="font-size:0.85rem;color:var(--muted);text-decoration:none;">
-    ← Dashboard
-  </a>
-</div>
+    {# ── Hero ── #}
+    <div style="margin-bottom: 36px;">
+        <a href="{% url 'tenants:steward-dashboard' %}"
+           style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+                  font-weight: 600; color: var(--muted); text-decoration: none; margin-bottom: 20px;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+            Dashboard
+        </a>
+        <div class="ws-label-tag" style="margin-bottom: 12px;">
+            {{ tenant.get_tier_display }}{% if tenant.is_agency %} · Constitutional Agency{% endif %}
+        </div>
+        <h1 class="ws-page-title">{{ tenant.name }}</h1>
+        {% if tenant.description %}
+        <p style="font-size: 13px; color: var(--muted); line-height: 1.7; margin-top: 10px; max-width: 560px;">
+            {{ tenant.description }}
+        </p>
+        {% endif %}
+    </div>
 
-<div class="tenant-card" style="margin-bottom:1.25rem">
-  <div style="display:flex;gap:1rem;flex-wrap:wrap">
-    <div>
-      <div style="font-size:0.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Tier</div>
-      <div style="font-size:0.9rem;font-weight:600">{{ tenant.get_tier_display }}</div>
+    {# ── Meta strip ── #}
+    <div style="display: flex; gap: 16px; margin-bottom: 36px; flex-wrap: wrap;">
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+                    padding: 10px 16px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.07em; color: var(--muted); margin-bottom: 2px;">Status</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text);">{{ tenant.get_status_display }}</div>
+        </div>
+        {% if tenant.parent %}
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+                    padding: 10px 16px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.07em; color: var(--muted); margin-bottom: 2px;">Parent Node</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text);">{{ tenant.parent.name }}</div>
+        </div>
+        {% endif %}
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+                    padding: 10px 16px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.07em; color: var(--muted); margin-bottom: 2px;">Members</div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 20px;
+                        font-weight: 900; color: var(--text);">{{ members.count }}</div>
+        </div>
     </div>
-    <div>
-      <div style="font-size:0.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Status</div>
-      <div style="font-size:0.9rem;font-weight:600">{{ tenant.get_status_display }}</div>
+
+    {# ── Members ── #}
+    <div class="ws-label-tag" style="margin-bottom: 16px;">
+        Active Members
     </div>
-    {% if tenant.parent %}
-    <div>
-      <div style="font-size:0.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Parent</div>
-      <div style="font-size:0.9rem;font-weight:600">{{ tenant.parent.name }}</div>
+
+    {% if members %}
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px;">
+        {% for m in members %}
+        <div style="display: flex; align-items: center; gap: 14px; background: var(--card);
+                    border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+                        background: var(--primary-alpha, rgba(180,24,24,0.1));
+                        color: var(--primary); display: flex; align-items: center;
+                        justify-content: center; font-weight: 800; font-size: 13px;">
+                {{ m.user.display_name|first|upper|default:"?" }}
+            </div>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 700; color: var(--text);">
+                    {{ m.user.display_name|default:m.user.email }}
+                </div>
+                <div style="font-size: 11px; color: var(--muted);">
+                    {{ m.user.email }}{% if m.metadata.service_order %} · {{ m.metadata.service_order|title|cut:"-" }}{% endif %}
+                </div>
+            </div>
+            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                         letter-spacing: 0.06em; color: var(--primary); flex-shrink: 0;">
+                {{ m.get_role_display }}
+            </span>
+
+            {% if is_steward %}
+            <details style="position: relative; flex-shrink: 0;">
+                <summary style="list-style: none; cursor: pointer; color: var(--muted);">
+                    <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">more_vert</span>
+                </summary>
+                <div style="position: absolute; right: 0; top: 1.5rem;
+                            background: var(--card); border: 1px solid var(--border);
+                            border-radius: 10px; padding: 12px; min-width: 220px;
+                            z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.12);">
+                    <form method="post" action="{% url 'tenants:assign-member-role' tenant.id m.id %}">
+                        {% csrf_token %}
+                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Role</div>
+                        <select name="role"
+                                style="width: 100%; height: 34px; padding: 0 10px; font-size: 12px;
+                                       background: var(--card-2); border: 1px solid var(--border);
+                                       border-radius: 6px; color: var(--text); margin-bottom: 10px;">
+                            {% for val, label in m.ROLE_CHOICES %}
+                            <option value="{{ val }}" {% if m.role == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Service Order</div>
+                        <select name="service_order"
+                                style="width: 100%; height: 34px; padding: 0 10px; font-size: 12px;
+                                       background: var(--card-2); border: 1px solid var(--border);
+                                       border-radius: 6px; color: var(--text); margin-bottom: 10px;">
+                            <option value="">— None —</option>
+                            {% for so in service_orders %}
+                            <option value="{{ so.slug }}" {% if m.metadata.service_order == so.slug %}selected{% endif %}>
+                                {{ so.order_number }}. {{ so.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="ws-topbar__cta"
+                                style="width: 100%; justify-content: center; background: var(--primary);
+                                       color: #fff; border: none; cursor: pointer; font-size: 12px;">
+                            Save Changes
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'tenants:remove-member' tenant.id m.id %}"
+                          onsubmit="return confirm('Remove {{ m.user.display_name|default:m.user.email }} from {{ tenant.name }}?')"
+                          style="margin-top: 8px;">
+                        {% csrf_token %}
+                        <button type="submit"
+                                style="width: 100%; background: none; border: none; color: var(--primary);
+                                       font-size: 12px; cursor: pointer; padding: 6px; text-align: left;
+                                       font-weight: 600;">
+                            Remove member
+                        </button>
+                    </form>
+                </div>
+            </details>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding: 40px 0; text-align: center; margin-bottom: 32px;">
+        <span class="material-symbols-outlined"
+              style="font-size: 40px; opacity: 0.1; display: block; color: var(--text);">group_off</span>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 10px;">No active members yet.</p>
     </div>
     {% endif %}
-    {% if tenant.is_agency %}
-    <div>
-      <span class="tenant-card__role" style="background:var(--primary-muted);color:var(--primary)">Constitutional Agency</span>
+
+    {# ── Invite ── #}
+    {% if can_invite %}
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+                padding: 24px 28px; margin-bottom: 32px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Invite a Member</div>
+        <p style="font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.6;">
+            Invitations are for existing Level 1+ members only. New people join through the Induction Programme.
+        </p>
+        {% if invite_error %}
+        <div style="background: var(--card-2); border: 1px solid var(--primary);
+                    border-radius: 8px; padding: 10px 14px; color: var(--primary);
+                    font-size: 12px; margin-bottom: 14px;">
+            {{ invite_error }}
+        </div>
+        {% endif %}
+        <form method="post" action="{% url 'tenants:invite-member' tenant.id %}"
+              style="display: flex; gap: 10px; align-items: center;">
+            {% csrf_token %}
+            <input type="email" name="email" value="{{ invite_email|default:'' }}"
+                   placeholder="member@email.com" required
+                   style="flex: 1; height: 40px; padding: 0 14px; background: var(--card-2);
+                          border: 1px solid var(--border); border-radius: 8px;
+                          font-size: 13px; color: var(--text); outline: none;"
+                   onfocus="this.style.borderColor='var(--primary)'"
+                   onblur="this.style.borderColor='var(--border)'">
+            <button type="submit" class="ws-topbar__cta"
+                    style="background: var(--primary); color: #fff; border: none; cursor: pointer; flex-shrink: 0;">
+                <span class="material-symbols-outlined">send</span>
+                Send Invite
+            </button>
+        </form>
     </div>
     {% endif %}
-  </div>
-  {% if tenant.description %}
-  <div style="margin-top:0.75rem;font-size:0.85rem;color:var(--muted)">{{ tenant.description }}</div>
-  {% endif %}
-</div>
 
-{# --- Members --- #}
-<div class="sd-section-title">
-  Members
-  <span style="font-size:0.78rem;color:var(--muted);font-weight:400;margin-left:0.5rem">{{ members.count }} active</span>
-</div>
-
-{% if members %}
-<div style="margin-bottom:1rem">
-{% for m in members %}
-<div class="tenant-card" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem">
-  <div style="flex:1">
-    <div style="font-size:0.9rem;font-weight:600">{{ m.user.display_name|default:m.user.email }}</div>
-    <div style="font-size:0.78rem;color:var(--muted)">
-      {{ m.user.email }}
-      {% if m.metadata.service_order %} · {{ m.metadata.service_order|title|cut:"-" }}{% endif %}
+    {# ── Invitations ── #}
+    {% if invitations %}
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Invitations</div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        {% for inv in invitations %}
+        <div style="display: flex; align-items: center; gap: 12px; background: var(--card);
+                    border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px;">
+            <span class="material-symbols-outlined"
+                  style="font-size: 18px; flex-shrink: 0;
+                         color: {% if inv.status == 'accepted' %}var(--primary){% elif inv.status == 'pending' %}var(--muted){% else %}var(--muted){% endif %};">
+                {% if inv.status == 'accepted' %}check_circle{% elif inv.status == 'pending' %}schedule{% else %}cancel{% endif %}
+            </span>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 600; color: var(--text);">{{ inv.email }}</div>
+                <div style="font-size: 11px; color: var(--muted);">
+                    Sent {{ inv.created_at|date:"d M Y" }} · expires {{ inv.expires_at|date:"d M" }}
+                </div>
+            </div>
+            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                         letter-spacing: 0.06em; color: var(--muted); flex-shrink: 0;">
+                {{ inv.get_status_display }}
+            </span>
+        </div>
+        {% endfor %}
     </div>
-  </div>
-  <span class="tenant-card__role">{{ m.get_role_display }}</span>
+    {% endif %}
 
-  {% if is_steward %}
-  <details style="position:relative">
-    <summary style="list-style:none;cursor:pointer;color:var(--muted)">
-      <span class="material-symbols-outlined" style="font-size:1.1rem;vertical-align:middle">more_vert</span>
-    </summary>
-    <div style="position:absolute;right:0;top:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0.5rem;min-width:220px;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,.12)">
-      <form method="post" action="{% url 'tenants:assign-member-role' tenant.id m.id %}">
-        {% csrf_token %}
-        <div style="padding:0.25rem 0.5rem;font-size:0.75rem;color:var(--muted);font-weight:600;text-transform:uppercase">Role</div>
-        <select name="role" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;font-size:0.85rem;background:var(--bg);color:var(--text);margin-bottom:0.4rem">
-          {% for val, label in m.ROLE_CHOICES %}
-          <option value="{{ val }}" {% if m.role == val %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-        <div style="padding:0.25rem 0.5rem;font-size:0.75rem;color:var(--muted);font-weight:600;text-transform:uppercase">Service Order</div>
-        <select name="service_order" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;font-size:0.85rem;background:var(--bg);color:var(--text);margin-bottom:0.5rem">
-          <option value="">— None —</option>
-          {% for so in service_orders %}
-          <option value="{{ so.slug }}" {% if m.metadata.service_order == so.slug %}selected{% endif %}>
-            {{ so.order_number }}. {{ so.name }}
-          </option>
-          {% endfor %}
-        </select>
-        <button type="submit" class="btn btn-primary" style="width:100%;font-size:0.82rem;padding:0.35rem">Save</button>
-      </form>
-      <form method="post" action="{% url 'tenants:remove-member' tenant.id m.id %}"
-            onsubmit="return confirm('Remove {{ m.user.display_name|default:m.user.email }} from {{ tenant.name }}?')">
-        {% csrf_token %}
-        <button type="submit" style="width:100%;background:none;border:none;color:var(--error);font-size:0.82rem;cursor:pointer;padding:0.35rem;margin-top:0.25rem;text-align:left">
-          Remove member
-        </button>
-      </form>
-    </div>
-  </details>
-  {% endif %}
 </div>
-{% endfor %}
-</div>
-{% else %}
-<p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem">No active members yet.</p>
-{% endif %}
+{% endblock %}
 
-{# --- Invite --- #}
-{% if can_invite %}
-<div class="sd-section-title" style="margin-top:1.25rem">Invite a Member</div>
-<p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem">
-  Invitations are for existing Level 1+ members only. New people join through the Induction Programme.
-</p>
-{% if invite_error %}
-<div style="background:var(--error-muted,#fde8e8);border:1px solid var(--error);border-radius:6px;padding:0.6rem 0.9rem;color:var(--error);font-size:0.85rem;margin-bottom:0.75rem">
-  {{ invite_error }}
-</div>
-{% endif %}
-<form method="post" action="{% url 'tenants:invite-member' tenant.id %}" style="display:flex;gap:0.5rem;align-items:flex-start">
-  {% csrf_token %}
-  <input type="email" name="email" value="{{ invite_email|default:'' }}" placeholder="member@email.com" required
-         style="flex:1;padding:0.5rem 0.75rem;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-size:0.9rem">
-  <button type="submit" class="btn btn-primary" style="white-space:nowrap">Send Invite</button>
-</form>
-{% endif %}
-
-{# --- Invitations list --- #}
-{% if invitations %}
-<div class="sd-section-title" style="margin-top:1.5rem">Invitations</div>
+{% block tenants_options %}
 <div>
-{% for inv in invitations %}
-<div class="tenant-card" style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 1rem">
-  <span class="material-symbols-outlined" style="font-size:1rem;color:{% if inv.status == 'accepted' %}var(--success){% elif inv.status == 'pending' %}var(--warning){% else %}var(--muted){% endif %}">
-    {% if inv.status == 'accepted' %}check_circle{% elif inv.status == 'pending' %}schedule{% else %}cancel{% endif %}
-  </span>
-  <div style="flex:1">
-    <div style="font-size:0.88rem;font-weight:600">{{ inv.email }}</div>
-    <div style="font-size:0.75rem;color:var(--muted)">Sent {{ inv.created_at|date:"d M Y" }} · expires {{ inv.expires_at|date:"d M" }}</div>
-  </div>
-  <span class="tenant-card__role" style="{% if inv.status == 'accepted' %}background:#e6f4ea;color:#1e7e34{% elif inv.status == 'expired' or inv.status == 'declined' %}background:var(--surface-2,#f5f5f5);color:var(--muted){% endif %}">
-    {{ inv.get_status_display }}
-  </span>
-</div>
-{% endfor %}
-</div>
-{% endif %}
+    <div class="ws-label-tag" style="margin-bottom: 16px;">{{ tenant.name }}</div>
 
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 8px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Tier</div>
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">{{ tenant.get_tier_display }}</div>
+    </div>
+
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 8px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Members</div>
+        <div style="font-size: 28px; font-weight: 800; color: var(--text);
+                    font-family: 'Playfair Display', serif;">{{ members.count }}</div>
+    </div>
+
+    {% if tenant.parent %}
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 8px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Parent Node</div>
+        <div style="font-size: 13px; font-weight: 600; color: var(--text);">{{ tenant.parent.name }}</div>
+    </div>
+    {% endif %}
+
+    {% if can_invite %}
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+    <a href="#"
+       onclick="document.querySelector('form[action*=invite]')?.scrollIntoView({behavior:'smooth'}); return false;"
+       style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700;
+              color: var(--primary); text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">person_add</span>
+        Invite Member
+    </a>
+    {% endif %}
+</div>
 {% endblock %}

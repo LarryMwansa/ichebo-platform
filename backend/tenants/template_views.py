@@ -99,6 +99,7 @@ def steward_dashboard(request):
         'can_create': level >= 3,
         'is_prime': level >= 5,
         'active_app': 'tenancy',
+        'active_tenants_tab': 'dashboard',
     })
 
 
@@ -117,10 +118,13 @@ def my_tenants(request):
         .order_by('tenant__name')
     )
     can_create = level >= 3
+    my_tenants = [p.tenant for p in perms]
     return render(request, 'tenants/my_tenants.html', {
         'perms': perms,
+        'my_tenants': my_tenants,
         'can_create': can_create,
         'active_app': 'tenancy',
+        'active_tenants_tab': 'my-tenants',
     })
 
 
@@ -152,6 +156,12 @@ def tenant_detail(request, tenant_id):
     )
     service_orders = ServiceOrder.objects.filter(is_active=True)
 
+    my_tenants = [p.tenant for p in UserPermission.objects.filter(
+        user=user, is_active=True,
+        role__in={'branch-steward', 'district-steward', 'provincial-steward',
+                  'national-steward', 'regional-steward', 'continental-steward',
+                  'global-steward', 'admin'},
+    ).select_related('tenant').order_by('tenant__name')]
     return render(request, 'tenants/tenant_detail.html', {
         'tenant': tenant,
         'members': members,
@@ -159,7 +169,9 @@ def tenant_detail(request, tenant_id):
         'service_orders': service_orders,
         'is_steward': is_steward,
         'can_invite': is_steward or level >= 5,
+        'my_tenants': my_tenants,
         'active_app': 'tenancy',
+        'active_tenants_tab': 'dashboard',
     })
 
 
@@ -382,13 +394,23 @@ def create_tenant(request):
             )
             return redirect('tenants:tenant-created', tenant_id=tenant.id)
 
+    my_tenants = [
+        p.tenant for p in UserPermission.objects.filter(
+            user=request.user, is_active=True,
+            role__in={'branch-steward', 'district-steward', 'provincial-steward',
+                      'national-steward', 'regional-steward', 'continental-steward',
+                      'global-steward', 'admin'},
+        ).select_related('tenant').order_by('tenant__name')
+    ]
     return render(request, 'tenants/create_tenant.html', {
         'form_data': form_data,
         'errors': errors,
         'tier_choices': SELF_SERVICE_TIERS,
         'affiliation_choices': Tenant.AFFILIATION_CHOICES,
         'all_active_tenants': all_active_tenants,
+        'my_tenants': my_tenants,
         'active_app': 'tenancy',
+        'active_tenants_tab': 'create',
     })
 
 

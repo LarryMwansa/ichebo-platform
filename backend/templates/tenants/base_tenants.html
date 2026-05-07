@@ -7,56 +7,100 @@
     <span class="ws-topbar__breadcrumb-item">Tenancy Hub</span>
 {% endblock %}
 
+{% block context_header %}Tenancy Hub{% endblock %}
+{% block context_content %}
+    {% include "tenants/partials/tenants_sidebar.html" %}
+{% endblock %}
+
 {% block ws_content %}
-<div class="tenants-surface" style="padding: var(--space-l) 0;">
+<div class="tenants-surface">
     {% block tenants_content %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 0 4px;">
+    {% block tenants_options %}
+
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Node Context</div>
+
+    {% if my_tenants %}
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        {% for tenant in my_tenants %}
+        <a href="{% url 'tenants:tenant-detail' tenant.id %}"
+           style="display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+                  background: var(--card-2); border: 1px solid var(--border);
+                  border-radius: 8px; text-decoration: none; transition: border-color 0.15s;">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary); flex-shrink: 0;">account_balance</span>
+            <div style="min-width: 0;">
+                <div style="font-size: 12px; font-weight: 700; color: var(--text);
+                            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ tenant.name }}
+                </div>
+                <div style="font-size: 10px; color: var(--muted); text-transform: uppercase;
+                            letter-spacing: 0.05em;">{{ tenant.get_tier_display }}</div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding: 20px 0; text-align: center;">
+        <span class="material-symbols-outlined"
+              style="font-size: 32px; opacity: 0.12; display: block; color: var(--text);">account_balance</span>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">No communities stewarded yet.</p>
+    </div>
+    {% endif %}
+
+    {% endblock %}
 </div>
 {% endblock %}
 
 {% block extra_css %}
 <style>
-    .sd-section-title { 
-        font-family: var(--ff-body);
-        font-size: 0.75rem; 
-        font-weight: 700; 
-        color: var(--muted); 
-        text-transform: uppercase; 
-        letter-spacing: 0.05em; 
-        margin-bottom: var(--space-s); 
-        margin-top: var(--space-l); 
+    .tenants-surface {
+        padding: 0;
     }
-    .tenant-card { 
-        background: var(--stone); 
-        border: 1px solid var(--border); 
-        border-radius: var(--radius-m); 
-        padding: var(--space-m); 
-        margin-bottom: var(--space-s); 
+    .sd-section-title {
+        font-family: var(--ff-body);
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: var(--space-s);
+        margin-top: var(--space-l);
+    }
+    .tenant-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: var(--space-m);
+        margin-bottom: var(--space-s);
         transition: all var(--transition-fast);
     }
-    .tenant-card--link { 
-        display: flex; 
-        align-items: center; 
-        justify-content: space-between; 
-        text-decoration: none; 
-        color: inherit; 
+    .tenant-card--link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-decoration: none;
+        color: inherit;
     }
-    .tenant-card--link:hover { 
-        border-color: var(--primary); 
+    .tenant-card--link:hover {
+        border-color: var(--primary);
         transform: translateX(4px);
     }
-    .tenant-card--agency { 
-        border-left: 4px solid var(--primary); 
+    .tenant-card--agency {
+        border-left: 4px solid var(--primary);
     }
-    .tenant-card__name { 
+    .tenant-card__name {
         font-family: var(--ff-body);
-        font-weight: 700; 
-        color: var(--text); 
-        margin-bottom: 2px; 
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 2px;
     }
-    .tenant-card__meta { 
-        font-size: 0.85rem; 
-        color: var(--muted); 
+    .tenant-card__meta {
+        font-size: 0.85rem;
+        color: var(--muted);
     }
 </style>
 {% endblock %}
-

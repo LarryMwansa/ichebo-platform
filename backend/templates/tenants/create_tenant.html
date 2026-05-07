@@ -1,70 +1,167 @@
 {% extends "tenants/base_tenants.html" %}
 
 {% block tenants_content %}
-<div class="tenants-header">
-  <h2>Create a New Community</h2>
-  <a href="{% url 'tenants:my-tenants' %}" class="btn-back" style="font-size:0.85rem;color:var(--text-secondary);">
-    ← My Communities
-  </a>
+<div style="padding: 40px 48px; max-width: 680px;">
+
+    {# ── Hero ── #}
+    <div style="margin-bottom: 36px;">
+        <a href="{% url 'tenants:my-tenants' %}"
+           style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+                  font-weight: 600; color: var(--muted); text-decoration: none; margin-bottom: 20px;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+            My Communities
+        </a>
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Tenancy Hub</div>
+        <h1 class="ws-page-title">Create a <em>New Community</em></h1>
+        <p style="font-size: 13px; color: var(--muted); line-height: 1.7; margin-top: 12px; max-width: 520px;">
+            Communities form the structural backbone of the Kingdom Governance System.
+            As a founding steward, you will be assigned the stewardship role for this community.
+        </p>
+    </div>
+
+    {# ── Form ── #}
+    <form method="post">
+        {% csrf_token %}
+
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+
+            {# Community Name #}
+            <div>
+                <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 8px;">
+                    Community Name <span style="color: var(--primary);">*</span>
+                </label>
+                <input type="text" name="name" maxlength="200" required
+                       value="{{ form_data.name|default:'' }}"
+                       placeholder="e.g. Graceland Church Pretoria"
+                       style="display: block; width: 100%; height: 42px; padding: 0 14px;
+                              background: var(--card); border: 1px solid var(--border);
+                              border-radius: 8px; font-size: 14px; color: var(--text);
+                              outline: none; box-sizing: border-box; transition: border-color 0.15s;"
+                       onfocus="this.style.borderColor='var(--primary)'"
+                       onblur="this.style.borderColor='var(--border)'">
+                {% if errors.name %}
+                <p style="font-size: 12px; color: var(--primary); margin-top: 6px;">{{ errors.name }}</p>
+                {% endif %}
+            </div>
+
+            {# Tier + Affiliation row #}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                                   letter-spacing: 0.07em; color: var(--muted); margin-bottom: 8px;">
+                        Tier <span style="color: var(--primary);">*</span>
+                    </label>
+                    <select name="tier" required
+                            style="display: block; width: 100%; height: 42px; padding: 0 14px;
+                                   background: var(--card); border: 1px solid var(--border);
+                                   border-radius: 8px; font-size: 14px; color: var(--text);
+                                   outline: none; box-sizing: border-box; cursor: pointer;
+                                   transition: border-color 0.15s;"
+                            onfocus="this.style.borderColor='var(--primary)'"
+                            onblur="this.style.borderColor='var(--border)'">
+                        <option value="">— Select tier —</option>
+                        {% for value, label in tier_choices %}
+                        <option value="{{ value }}" {% if form_data.tier == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if errors.tier %}
+                    <p style="font-size: 12px; color: var(--primary); margin-top: 6px;">{{ errors.tier }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                                   letter-spacing: 0.07em; color: var(--muted); margin-bottom: 8px;">
+                        Affiliation <span style="color: var(--primary);">*</span>
+                    </label>
+                    <select name="affiliation" required
+                            style="display: block; width: 100%; height: 42px; padding: 0 14px;
+                                   background: var(--card); border: 1px solid var(--border);
+                                   border-radius: 8px; font-size: 14px; color: var(--text);
+                                   outline: none; box-sizing: border-box; cursor: pointer;
+                                   transition: border-color 0.15s;"
+                            onfocus="this.style.borderColor='var(--primary)'"
+                            onblur="this.style.borderColor='var(--border)'">
+                        <option value="">— Select affiliation —</option>
+                        {% for value, label in affiliation_choices %}
+                        <option value="{{ value }}" {% if form_data.affiliation == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if errors.affiliation %}
+                    <p style="font-size: 12px; color: var(--primary); margin-top: 6px;">{{ errors.affiliation }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Parent Community #}
+            <div>
+                <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 8px;">
+                    Parent Community
+                    <span style="font-weight: 400; text-transform: none; letter-spacing: 0;
+                                 color: var(--muted); opacity: 0.6;">(optional)</span>
+                </label>
+                <select name="parent_id"
+                        style="display: block; width: 100%; height: 42px; padding: 0 14px;
+                               background: var(--card); border: 1px solid var(--border);
+                               border-radius: 8px; font-size: 14px; color: var(--text);
+                               outline: none; box-sizing: border-box; cursor: pointer;
+                               transition: border-color 0.15s;"
+                        onfocus="this.style.borderColor='var(--primary)'"
+                        onblur="this.style.borderColor='var(--border)'">
+                    <option value="">— None (root community) —</option>
+                    {% for tenant in all_active_tenants %}
+                    <option value="{{ tenant.id }}"
+                        {% if form_data.parent_id == tenant.id|stringformat:"s" %}selected{% endif %}>
+                        {{ tenant.name }} ({{ tenant.get_tier_display }})
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if errors.parent_id %}
+                <p style="font-size: 12px; color: var(--primary); margin-top: 6px;">{{ errors.parent_id }}</p>
+                {% endif %}
+            </div>
+
+            {# Description #}
+            <div>
+                <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 8px;">
+                    Description
+                    <span style="font-weight: 400; text-transform: none; letter-spacing: 0;
+                                 color: var(--muted); opacity: 0.6;">(optional)</span>
+                </label>
+                <textarea name="description" rows="4"
+                          placeholder="Brief description of this community's purpose and focus…"
+                          style="display: block; width: 100%; padding: 12px 14px;
+                                 background: var(--card); border: 1px solid var(--border);
+                                 border-radius: 8px; font-size: 14px; color: var(--text);
+                                 font-family: inherit; outline: none; resize: vertical;
+                                 box-sizing: border-box; line-height: 1.6; transition: border-color 0.15s;"
+                          onfocus="this.style.borderColor='var(--primary)'"
+                          onblur="this.style.borderColor='var(--border)'">{{ form_data.description|default:'' }}</textarea>
+            </div>
+
+            {# ── Actions ── #}
+            <div style="display: flex; align-items: center; gap: 20px; padding-top: 8px;
+                        border-top: 1px solid var(--border); margin-top: 8px;">
+                <button type="submit" class="ws-topbar__cta"
+                        style="background: var(--primary); color: #fff; border: none; cursor: pointer;">
+                    <span class="material-symbols-outlined">add_home</span>
+                    Create Community
+                </button>
+                <a href="{% url 'tenants:my-tenants' %}"
+                   style="font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600;">
+                    Cancel
+                </a>
+            </div>
+
+        </div>
+    </form>
+
 </div>
-
-<p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1.5rem">
-  Communities form the structural backbone of the Kingdom Governance System.
-  As a founding steward, you will be assigned the stewardship role for this community.
-</p>
-
-<form method="post" class="wizard-form">
-  {% csrf_token %}
-
-  <label for="id_name">Community Name <span style="color:var(--error)">*</span></label>
-  <input type="text" id="id_name" name="name" maxlength="200" required
-         value="{{ form_data.name|default:'' }}"
-         placeholder="e.g. Graceland Church Pretoria">
-  {% if errors.name %}<p class="field-error">{{ errors.name }}</p>{% endif %}
-
-  <label for="id_tier">Tier <span style="color:var(--error)">*</span></label>
-  <select id="id_tier" name="tier" required>
-    <option value="">— Select tier —</option>
-    {% for value, label in tier_choices %}
-    <option value="{{ value }}"
-      {% if form_data.tier == value %}selected{% endif %}>
-      {{ label }}
-    </option>
-    {% endfor %}
-  </select>
-  {% if errors.tier %}<p class="field-error">{{ errors.tier }}</p>{% endif %}
-
-  <label for="id_affiliation">Affiliation <span style="color:var(--error)">*</span></label>
-  <select id="id_affiliation" name="affiliation" required>
-    <option value="">— Select affiliation —</option>
-    {% for value, label in affiliation_choices %}
-    <option value="{{ value }}"
-      {% if form_data.affiliation == value %}selected{% endif %}>
-      {{ label }}
-    </option>
-    {% endfor %}
-  </select>
-  {% if errors.affiliation %}<p class="field-error">{{ errors.affiliation }}</p>{% endif %}
-
-  <label for="id_parent_id">Parent Community <span style="color:var(--text-secondary);font-weight:400">(optional)</span></label>
-  <select id="id_parent_id" name="parent_id">
-    <option value="">— None (root community) —</option>
-    {% for tenant in all_active_tenants %}
-    <option value="{{ tenant.id }}"
-      {% if form_data.parent_id == tenant.id|stringformat:"s" %}selected{% endif %}>
-      {{ tenant.name }} ({{ tenant.get_tier_display }})
-    </option>
-    {% endfor %}
-  </select>
-  {% if errors.parent_id %}<p class="field-error">{{ errors.parent_id }}</p>{% endif %}
-
-  <label for="id_description">Description <span style="color:var(--text-secondary);font-weight:400">(optional)</span></label>
-  <textarea id="id_description" name="description"
-            placeholder="Brief description of this community's purpose and focus…">{{ form_data.description|default:'' }}</textarea>
-
-  <div class="wizard-actions">
-    <button type="submit" class="btn btn-primary">Create Community</button>
-    <a href="{% url 'tenants:my-tenants' %}" style="color:var(--text-secondary);font-size:0.9rem;text-decoration:none;">Cancel</a>
-  </div>
-</form>
 {% endblock %}
