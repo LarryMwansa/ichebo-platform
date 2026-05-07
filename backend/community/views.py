@@ -351,6 +351,7 @@ def gatherings_list(request):
     tenant = primary_perm.tenant if primary_perm else None
 
     now = timezone.now()
+    from django.db.models import Q
     qs = Record.objects.filter(
         record_family='community',
         record_type='gathering',
@@ -359,7 +360,7 @@ def gatherings_list(request):
     ).order_by('custom_fields__scheduled_at')
 
     if tenant:
-        qs = qs.filter(tenant_id=tenant.id)
+        qs = qs.filter(Q(tenant_id=tenant.id) | Q(tenant_id__isnull=True))
 
     if request.headers.get('HX-Request'):
         return render(request, 'community/partials/gathering_list.html', {
@@ -426,6 +427,7 @@ def htmx_gatherings_list(request):
     primary_perm = perms[0] if perms else None
     tenant = primary_perm.tenant if primary_perm else None
 
+    from django.db.models import Q
     qs = Record.objects.filter(
         record_family='community',
         record_type='gathering',
@@ -434,7 +436,7 @@ def htmx_gatherings_list(request):
     ).order_by('custom_fields__scheduled_at')
 
     if tenant:
-        qs = qs.filter(tenant_id=tenant.id)
+        qs = qs.filter(Q(tenant_id=tenant.id) | Q(tenant_id__isnull=True))
 
     return render(request, 'community/partials/gathering_list.html', {
         'gatherings': qs[:20],
