@@ -62,13 +62,16 @@ def video_home(request):
     ]
     recent_vod = [e for e in events if e['is_past']][:6]
 
+    all_vod = [e for e in events if e['is_past']]
     return render(request, 'video_live/home.html', {
         'live': live,
         'upcoming': upcoming,
-        'recent_vod': recent_vod,
+        'recent_vod': recent_vod[:6],
         'can_manage': request.user.competence_level >= 3,
         'active_app': 'video',
+        'active_video_tab': 'home',
         'ws_page_title': 'Video',
+        'vod_count': len(all_vod),
     })
 
 
@@ -84,7 +87,16 @@ def video_live_view(request):
     if request.headers.get('HX-Request'):
         return render(request, 'video_live/_live_player.html', {'live': live})
 
-    return render(request, 'video_live/live.html', {'live': live})
+    all_events = [_annotate_event(e) for e in _event_qs()]
+    upcoming = [e for e in all_events if not e['is_live'] and not e['is_past']]
+    return render(request, 'video_live/live.html', {
+        'live': live,
+        'upcoming': upcoming,
+        'can_manage': request.user.competence_level >= 3,
+        'active_app': 'video',
+        'active_video_tab': 'live',
+        'vod_count': len([e for e in all_events if e['is_past']]),
+    })
 
 
 # ---------------------------------------------------------------------------
@@ -100,11 +112,15 @@ def video_schedule(request):
         e for e in all_events
         if e['scheduled_at'] and now <= e['scheduled_at'] <= cutoff
     ]
+    live = [e for e in all_events if e['is_live']]
     return render(request, 'video_live/schedule.html', {
         'upcoming': upcoming,
+        'live': live,
         'can_manage': request.user.competence_level >= 3,
         'active_app': 'video',
+        'active_video_tab': 'schedule',
         'ws_page_title': 'Video',
+        'vod_count': len([e for e in all_events if e['is_past']]),
     })
 
 
@@ -116,10 +132,17 @@ def video_schedule(request):
 def video_vod(request):
     all_events = [_annotate_event(e) for e in _event_qs()]
     vod = [e for e in all_events if e['is_past']]
+    live = [e for e in all_events if e['is_live']]
+    upcoming = [e for e in all_events if not e['is_live'] and not e['is_past']]
     return render(request, 'video_live/vod.html', {
         'vod': vod,
+        'live': live,
+        'upcoming': upcoming,
+        'can_manage': request.user.competence_level >= 3,
         'active_app': 'video',
+        'active_video_tab': 'vod',
         'ws_page_title': 'Video',
+        'vod_count': len(vod),
     })
 
 
@@ -131,7 +154,18 @@ def video_vod(request):
 def video_watch(request, event_id):
     activity = get_object_or_404(Activity, id=event_id, activity_type='event', deleted_at__isnull=True)
     event = _annotate_event(activity)
-    return render(request, 'video_live/watch.html', {'event': event})
+    all_events = [_annotate_event(e) for e in _event_qs()]
+    upcoming = [e for e in all_events if not e['is_live'] and not e['is_past']]
+    live = [e for e in all_events if e['is_live']]
+    return render(request, 'video_live/watch.html', {
+        'event': event,
+        'live': live,
+        'upcoming': upcoming,
+        'can_manage': request.user.competence_level >= 3,
+        'active_app': 'video',
+        'active_video_tab': 'home',
+        'vod_count': len([e for e in all_events if e['is_past']]),
+    })
 
 
 # ---------------------------------------------------------------------------
@@ -182,12 +216,19 @@ def video_manage(request):
                 )
                 return redirect('video_live:manage')
 
+    all_events_ann = [_annotate_event(e) for e in _event_qs()]
+    upcoming = [e for e in all_events_ann if not e['is_live'] and not e['is_past']]
+    live = [e for e in all_events_ann if e['is_live']]
     return render(request, 'video_live/manage.html', {
         'events': events,
         'error': error,
+        'live': live,
+        'upcoming': upcoming,
         'can_manage': True,
         'active_app': 'video',
+        'active_video_tab': 'manage',
         'ws_page_title': 'Video',
+        'vod_count': len([e for e in all_events_ann if e['is_past']]),
     })
 
 

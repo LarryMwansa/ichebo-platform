@@ -7,6 +7,80 @@
     <span class="ws-topbar__breadcrumb-item">Video & Live</span>
 {% endblock %}
 
+{% block context_header %}Broadcast Center{% endblock %}
+{% block context_content %}
+    {% include "video_live/partials/video_sidebar.html" %}
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 0 4px;">
+
+    {# Live status indicator #}
+    {% if live %}
+    <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; margin-bottom: 16px;
+                background: var(--card-2); border: 1px solid var(--border);
+                border-left: 3px solid #e53e3e; border-radius: 8px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: #e53e3e;
+                     animation: ws-live-pulse 1.2s infinite; flex-shrink: 0;"></span>
+        <div>
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.07em; color: #e53e3e;">On Air Now</div>
+            <div style="font-size: 11px; color: var(--text); font-weight: 600; margin-top: 1px;">
+                {{ live.0.title|truncatechars:28 }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Broadcast Stats</div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+        <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Upcoming</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--text);
+                        font-family: 'Playfair Display', serif;">{{ upcoming|length|default:"0" }}</div>
+        </div>
+        <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Recordings</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--text);
+                        font-family: 'Playfair Display', serif;">{{ vod_count|default:"0" }}</div>
+        </div>
+    </div>
+
+    {% if upcoming %}
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Next Broadcast</div>
+    <div style="padding: 12px 14px; background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+            {{ upcoming.0.title|truncatechars:36 }}
+        </div>
+        <div style="font-size: 11px; color: var(--muted);">
+            {{ upcoming.0.scheduled_at|date:"D d M · H:i" }}
+        </div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+            {{ upcoming.0.duration }} min
+        </div>
+    </div>
+    {% endif %}
+
+    {% if can_manage %}
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+    <a href="{% url 'video_live:manage' %}" class="ws-topbar__cta"
+       style="display: flex; text-decoration: none; width: 100%; box-sizing: border-box;
+              background: var(--primary); color: #fff; border: none; justify-content: center;">
+        <span class="material-symbols-outlined">video_call</span>
+        Schedule Broadcast
+    </a>
+    {% endif %}
+
+</div>
+<style>
+@keyframes ws-live-pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+</style>
+{% endblock %}
+
 {% block ws_content %}
 <div class="video-shell-v2" style="padding: var(--space-l) 0;">
     {% block video_content %}{% endblock %}
