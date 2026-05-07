@@ -22,7 +22,8 @@
   <iframe id="video-iframe-{{ event.id }}"
           src="{{ event.embed_url }}"
           allowfullscreen
-          allow="autoplay; encrypted-media; picture-in-picture"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="autoplay; encrypted-media; picture-in-picture; web-share"
           onload="checkEmbedAllowed(this)">
   </iframe>
   {# Fallback shown if embed is blocked (e.g. YouTube Error 153) #}

@@ -201,6 +201,7 @@ def video_manage(request):
             else:
                 if timezone.is_naive(scheduled_at):
                     scheduled_at = timezone.make_aware(scheduled_at)
+                from django.contrib import messages as _messages
                 Activity.objects.create(
                     activity_type='event',
                     title=title,
@@ -214,6 +215,7 @@ def video_manage(request):
                         'source_app': 'video_live',
                     },
                 )
+                _messages.success(request, f'"{title}" scheduled successfully.')
                 return redirect('video_live:manage')
 
     all_events_ann = [_annotate_event(e) for e in _event_qs()]
@@ -235,9 +237,12 @@ def video_manage(request):
 @login_required
 @require_POST
 def video_delete_event(request, event_id):
+    from django.contrib import messages
     if request.user.competence_level < 3:
         return redirect('video_live:home')
     event = get_object_or_404(Activity, id=event_id, activity_type='event')
+    title = event.title
     event.deleted_at = timezone.now()
     event.save(update_fields=['deleted_at'])
+    messages.success(request, f'"{title}" has been deleted.')
     return redirect('video_live:manage')

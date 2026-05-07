@@ -40,7 +40,7 @@ def get_embed_url(url):
     if kind == 'youtube':
         vid = get_youtube_id(url)
         if vid:
-            return f'https://www.youtube.com/embed/{vid}?autoplay=0&rel=0'
+            return f'https://www.youtube-nocookie.com/embed/{vid}?rel=0&modestbranding=1'
     if kind == 'vimeo':
         vid = get_vimeo_id(url)
         if vid:

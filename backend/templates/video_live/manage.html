@@ -57,8 +57,7 @@
           </div>
           <div style="display: flex; gap: var(--space-xs); align-items: center; flex-shrink: 0;">
             <a href="{% url 'video_live:watch' event.id %}" class="ws-btn ws-btn--secondary" style="font-size: var(--fz--2);">View</a>
-            <form method="post" action="{% url 'video_live:delete-event' event.id %}"
-                  onsubmit="return confirm('Delete {{ event.title }}?')" style="margin: 0;">
+            <form method="post" action="{% url 'video_live:delete-event' event.id %}" style="margin: 0;">
               {% csrf_token %}
               <button type="submit" class="ws-btn" style="background: none; color: var(--error); font-size: var(--fz--2); border: 1px solid var(--error);">Delete</button>
             </form>
