@@ -13,24 +13,25 @@
 <div style="padding: 40px 48px; max-width: 900px;">
 
     {# ── Hero ── #}
-    <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end;">
         <div>
             <div class="ws-label-tag" style="margin-bottom: 12px;">Upcoming Events</div>
             <h1 class="ws-page-title">Community <em>Gatherings</em></h1>
         </div>
         {% if is_steward %}
-        <div id="gathering-form-slot">
-            <button class="ws-topbar__cta"
-                    hx-get="{% url 'community:htmx-create-gathering' %}"
-                    hx-target="#gathering-form-slot"
-                    hx-swap="innerHTML"
-                    style="background: none; border: 1px solid var(--border); cursor: pointer;">
-                <span class="material-symbols-outlined">calendar_add_on</span>
-                Schedule Gathering
-            </button>
-        </div>
+        <button class="ws-topbar__cta"
+                hx-get="{% url 'community:htmx-create-gathering' %}"
+                hx-target="#gathering-form-slot"
+                hx-swap="innerHTML"
+                style="background: none; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0;">
+            <span class="material-symbols-outlined">calendar_add_on</span>
+            Schedule Gathering
+        </button>
         {% endif %}
     </div>
+
+    {# ── Form slot — renders below hero, above list ── #}
+    <div id="gathering-form-slot"></div>
 
     {# ── Gatherings List ── #}
     <div id="gatherings-list"

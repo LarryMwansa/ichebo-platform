@@ -2,16 +2,8 @@
      style="background: var(--card); border: 1px solid var(--border); border-radius: 12px;
             padding: 24px 28px; margin-bottom: 24px;">
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="margin-bottom: 20px;">
         <div class="ws-label-tag">Schedule a Gathering</div>
-        <button type="button"
-                hx-get="{% url 'community:htmx-gatherings-list' %}"
-                hx-target="#gathering-form-slot"
-                hx-swap="innerHTML"
-                style="background: none; border: none; cursor: pointer; color: var(--muted);
-                       display: flex; align-items: center; padding: 4px;">
-            <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
-        </button>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -131,9 +123,7 @@
                 Publish Gathering
             </button>
             <button type="button"
-                    hx-get="{% url 'community:htmx-gatherings-list' %}"
-                    hx-target="#gathering-form-slot"
-                    hx-swap="innerHTML"
+                    onclick="document.getElementById('gathering-form-slot').innerHTML = ''"
                     style="background: none; border: none; cursor: pointer; font-size: 13px;
                            color: var(--muted); font-weight: 600;">
                 Cancel
