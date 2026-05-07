@@ -1,69 +1,96 @@
-{% extends "community/base_community.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
-{% block title %}Formation Pipeline — Community Management{% endblock %}
+{% block title %}Formation Pipeline — Ichebo{% endblock %}
+
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Community</span>{% endblock %}
+{% block context_header %}Community Ops{% endblock %}
+{% block context_content %}
+    {% include "community/partials/community_sidebar.html" %}
+{% endblock %}
 
 {% block ws_content %}
-<div class="formation-pipeline-shell">
-    
-    {# 1. Pipeline Header #}
-    <div class="pipeline-header">
+<div style="display: flex; flex-direction: column; height: 100%; padding: 40px 48px 0;">
+
+    {# ── Hero ── #}
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 36px; flex-shrink: 0;">
         <div>
-            <div class="label-caps" style="color: var(--accent-red); margin-bottom: 8px;">Institutional Formation</div>
-            <h1 class="ws-page-title" style="margin: 0; font-size: 32px;">Steward <span style="font-style: italic; color: var(--accent-red);">Pipeline</span></h1>
+            <div class="ws-label-tag" style="margin-bottom: 12px;">Institutional Formation</div>
+            <h1 class="ws-page-title">Steward <em>Pipeline</em></h1>
         </div>
-        <div class="pipeline-stats">
-            <div class="stat-pill">
-                <span class="label-caps">Total Stewards</span>
-                <span class="stat-value">{{ total }}</span>
+        <div style="display: flex; gap: 16px;">
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+                        padding: 12px 20px; text-align: center;">
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Total Stewards</div>
+                <div style="font-family: 'Playfair Display', serif; font-size: 22px;
+                            font-weight: 900; color: var(--text);">{{ total }}</div>
             </div>
-            <div class="stat-pill">
-                <span class="label-caps">Active Formation</span>
-                <span class="stat-value">{{ pipeline_display.1.count|add:pipeline_display.2.count }}</span>
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+                        padding: 12px 20px; text-align: center;">
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Active Formation</div>
+                <div style="font-family: 'Playfair Display', serif; font-size: 22px;
+                            font-weight: 900; color: var(--text);">{{ pipeline_display.1.count|add:pipeline_display.2.count }}</div>
             </div>
         </div>
     </div>
 
-    {# 2. Pipeline Board #}
-    <div class="pipeline-board">
+    {# ── Pipeline Board ── #}
+    <div style="flex: 1; display: flex; gap: 16px; overflow-x: auto; padding-bottom: 40px;
+                scrollbar-width: thin; scrollbar-color: var(--border) transparent;">
         {% for col in pipeline_display %}
-        <div class="pipeline-column {% if col.level >= 3 %}column-senior{% endif %}">
-            <div class="column-header">
-                <div class="column-title">
-                    <span class="level-badge" style="background: var(--level-{{ col.level }});">{{ col.level }}</span>
+        <div style="min-width: 280px; flex: 1; display: flex; flex-direction: column;
+                    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+                    {% if col.level >= 3 %}border-top: 3px solid var(--primary);{% endif %}">
+
+            <div style="padding: 16px 18px; border-bottom: 1px solid var(--border);
+                        display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 24px; height: 24px; border-radius: 50%;
+                                background: var(--primary); color: #fff;
+                                display: flex; align-items: center; justify-content: center;
+                                font-size: 10px; font-weight: 900;">{{ col.level }}</div>
                     <div>
-                        <div class="label-caps" style="font-size: 10px;">{{ col.label }}</div>
-                        <div style="font-size: 11px; opacity: 0.5;">{{ col.stage }}</div>
+                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
+                                    letter-spacing: 0.07em; color: var(--text);">{{ col.label }}</div>
+                        <div style="font-size: 10px; color: var(--muted);">{{ col.stage }}</div>
                     </div>
                 </div>
-                <div class="column-count">{{ col.count }}</div>
+                <div style="font-size: 12px; font-weight: 800; color: var(--muted);">{{ col.count }}</div>
             </div>
 
-            <div class="column-cards">
+            <div style="flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 8px;
+                        overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent;">
                 {% for m in col.members %}
-                <div class="member-card card-ink" 
-                     hx-get="{% url 'community:community-member-profile' m.user.id %}"
-                     hx-target="#ics-shell"
-                     hx-push-url="true"
-                     style="cursor: pointer;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="member-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: var(--stone-2); color: var(--text-ink); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; border: 1px solid var(--border-ink);">
-                            {{ m.user.display_name|first|upper|default:m.user.email|first|upper }}
+                <a href="{% url 'community:community-member-profile' m.user.id %}"
+                   style="display: flex; align-items: center; gap: 10px;
+                          background: var(--card-2); border: 1px solid var(--border);
+                          border-radius: 8px; padding: 12px 14px; text-decoration: none;
+                          transition: border-color 0.15s, transform 0.1s;">
+                    <div style="width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+                                background: var(--primary-alpha, rgba(180,24,24,0.1));
+                                color: var(--primary); display: flex; align-items: center;
+                                justify-content: center; font-weight: 800; font-size: 11px;">
+                        {{ m.user.display_name|first|upper|default:m.user.email|first|upper }}
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text);
+                                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            {{ m.user.display_name|default:m.user.email }}
                         </div>
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 13px; font-weight: 700; color: var(--text-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                {{ m.user.display_name|default:m.user.email }}
-                            </div>
-                            <div style="font-size: 10px; opacity: 0.5; text-transform: uppercase;">
-                                {{ m.metadata.service_order|default:"Active Member" }}
-                            </div>
+                        <div style="font-size: 10px; color: var(--muted); text-transform: uppercase;
+                                    letter-spacing: 0.04em;">
+                            {{ m.metadata.service_order|default:"Active Member" }}
                         </div>
                     </div>
-                </div>
+                </a>
                 {% empty %}
-                <div class="column-empty">
-                    <span class="material-symbols-outlined">person_off</span>
-                    <span>Zero</span>
+                <div style="display: flex; flex-direction: column; align-items: center;
+                            justify-content: center; padding: 40px 0; opacity: 0.15;">
+                    <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text);">person_off</span>
+                    <span style="font-size: 10px; font-weight: 800; text-transform: uppercase;
+                                 color: var(--text); margin-top: 8px;">Zero</span>
                 </div>
                 {% endfor %}
             </div>
@@ -72,139 +99,23 @@
     </div>
 
 </div>
+{% endblock %}
 
-<style>
-    .formation-pipeline-shell {
-        height: calc(100vh - 64px);
-        display: flex;
-        flex-direction: column;
-        padding: 40px;
-        background: var(--stone-bg);
-    }
+{% block ws_options %}
+<div style="padding: 0 4px;">
 
-    .pipeline-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 40px;
-    }
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Pipeline Overview</div>
 
-    .pipeline-stats {
-        display: flex;
-        gap: 20px;
-    }
+    {% for col in pipeline_display %}
+    <div style="display: flex; justify-content: space-between; align-items: center;
+                padding: 10px 0; border-bottom: 1px solid var(--border);">
+        <div style="font-size: 12px; color: var(--text); font-weight: 600;">
+            L{{ col.level }} · {{ col.label }}
+        </div>
+        <div style="font-size: 14px; font-weight: 800; color: var(--primary);
+                    font-family: 'Playfair Display', serif;">{{ col.count }}</div>
+    </div>
+    {% endfor %}
 
-    .stat-pill {
-        background: var(--stone-2);
-        padding: 12px 20px;
-        border-radius: 12px;
-        border: 1px solid var(--border-ink);
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .stat-value {
-        font-family: 'Playfair Display', serif;
-        font-size: 20px;
-        font-weight: 900;
-        color: var(--text-ink);
-    }
-
-    .pipeline-board {
-        flex: 1;
-        display: flex;
-        gap: 20px;
-        overflow-x: auto;
-        padding-bottom: 20px;
-    }
-
-    .pipeline-column {
-        min-width: 300px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        background: rgba(0,0,0,0.02);
-        border-radius: 16px;
-        border: 1px solid var(--border-ink);
-    }
-
-    .column-header {
-        padding: 20px;
-        border-bottom: 1px solid var(--border-ink);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: rgba(0,0,0,0.02);
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
-    }
-
-    .column-title {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .level-badge {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        font-weight: 900;
-        color: #fff;
-    }
-
-    .column-count {
-        font-size: 12px;
-        font-weight: 800;
-        opacity: 0.4;
-    }
-
-    .column-cards {
-        padding: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        overflow-y: auto;
-    }
-
-    .member-card {
-        background: #fff;
-        padding: 15px;
-        border-radius: 12px;
-        border: 1px solid var(--border-ink);
-        transition: all 0.2s ease;
-    }
-
-    .dark .member-card {
-        background: var(--ink-bg);
-    }
-
-    .member-card:hover {
-        transform: translateY(-2px);
-        border-color: var(--accent-red);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-
-    .column-empty {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 0;
-        opacity: 0.1;
-        font-weight: 800;
-        text-transform: uppercase;
-        font-size: 10px;
-    }
-
-    /* Scrollbar Styling */
-    .pipeline-board::-webkit-scrollbar { height: 6px; }
-    .pipeline-board::-webkit-scrollbar-track { background: transparent; }
-    .pipeline-board::-webkit-scrollbar-thumb { background: var(--border-ink); border-radius: 10px; }
-</style>
+</div>
 {% endblock %}

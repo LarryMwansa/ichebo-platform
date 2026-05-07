@@ -1,29 +1,73 @@
-{% extends "community/base_community.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
-{% block community_content %}
-<div class="community-section">
+{% block title %}Gatherings — Ichebo{% endblock %}
 
-  <div class="community-section-header">
-    <h2 class="community-section-title">Gatherings</h2>
-    {% if is_steward %}
-    <div id="gathering-form-slot">
-      <button class="btn-primary btn-sm"
-              hx-get="{% url 'community:htmx-create-gathering' %}"
-              hx-target="#gathering-form-slot"
-              hx-swap="innerHTML">
-        + Schedule
-      </button>
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Community</span>{% endblock %}
+{% block context_header %}Community Ops{% endblock %}
+{% block context_content %}
+    {% include "community/partials/community_sidebar.html" %}
+{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 900px;">
+
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px;">Upcoming Events</div>
+            <h1 class="ws-page-title">Community <em>Gatherings</em></h1>
+        </div>
+        {% if is_steward %}
+        <div id="gathering-form-slot">
+            <button class="ws-topbar__cta"
+                    hx-get="{% url 'community:htmx-create-gathering' %}"
+                    hx-target="#gathering-form-slot"
+                    hx-swap="innerHTML"
+                    style="background: none; border: 1px solid var(--border); cursor: pointer;">
+                <span class="material-symbols-outlined">calendar_add_on</span>
+                Schedule Gathering
+            </button>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-  </div>
 
-  <div id="gatherings-list"
-       hx-get="{% url 'community:htmx-gatherings-list' %}"
-       hx-trigger="load"
-       hx-swap="innerHTML">
-    <div class="community-loading">Loading gatherings…</div>
-  </div>
+    {# ── Gatherings List ── #}
+    <div id="gatherings-list"
+         hx-get="{% url 'community:htmx-gatherings-list' %}"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+        <div style="padding: 60px 0; text-align: center;">
+            <span class="material-symbols-outlined"
+                  style="font-size: 48px; opacity: 0.1; display: block; color: var(--text);">event</span>
+            <p style="font-size: 13px; color: var(--muted); margin-top: 16px;">Loading gatherings…</p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 0 4px;">
+
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Quick Actions</div>
+
+    {% if is_steward %}
+    <button class="ws-topbar__cta"
+            hx-get="{% url 'community:htmx-create-gathering' %}"
+            hx-target="#gathering-form-slot"
+            hx-swap="innerHTML"
+            style="width: 100%; background: none; border: 1px solid var(--border);
+                   cursor: pointer; justify-content: center; margin-bottom: 12px;">
+        <span class="material-symbols-outlined">add</span>
+        New Gathering
+    </button>
+    {% endif %}
+
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Filters</div>
+    <div style="font-size: 12px; color: var(--muted);">Showing all upcoming events.</div>
 
 </div>
 {% endblock %}

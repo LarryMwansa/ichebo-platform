@@ -2,15 +2,18 @@
 <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Shepherding Ops</div>
-    <a href="{% url 'community:community-home' %}" class="ctx-btn active">
+    <a href="{% url 'community:community-home' %}"
+       class="ctx-btn {% if active_community_tab == 'home' or not active_community_tab %}active{% endif %}">
         <span class="material-symbols-outlined">hub</span>
         Community Hub
     </a>
-    <a href="{% url 'community:community-members' %}" class="ctx-btn">
+    <a href="{% url 'community:community-members' %}"
+       class="ctx-btn {% if active_community_tab == 'members' %}active{% endif %}">
         <span class="material-symbols-outlined">badge</span>
         Member Directory
     </a>
-    <a href="{% url 'community:community-pipeline' %}" class="ctx-btn">
+    <a href="{% url 'community:community-pipeline' %}"
+       class="ctx-btn {% if active_community_tab == 'pipeline' %}active{% endif %}">
         <span class="material-symbols-outlined">account_tree</span>
         Formation Pipeline
     </a>
@@ -18,11 +21,13 @@
     <div class="ctx-divider"></div>
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Gatherings</div>
-    <a href="{% url 'community:community-gatherings' %}" class="ctx-btn">
+    <a href="{% url 'community:community-gatherings' %}"
+       class="ctx-btn {% if active_community_tab == 'gatherings' %}active{% endif %}">
         <span class="material-symbols-outlined">event_available</span>
         Upcoming Events
     </a>
-    <a href="{% url 'community:community-management' %}" class="ctx-btn">
+    <a href="{% url 'community:community-management' %}"
+       class="ctx-btn {% if active_community_tab == 'management' %}active{% endif %}">
         <span class="material-symbols-outlined">settings_account_box</span>
         Management
     </a>

@@ -1,124 +1,119 @@
-{% extends "community/base_community.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 
-{% block ws_community_list %}
-<div style="padding: var(--space-xs) var(--space-s);">
+{% block title %}Member Directory — Ichebo{% endblock %}
 
-  <div class="ws-list-panel__search" style="margin-bottom: var(--space-xs);">
-    <span class="material-symbols-outlined">search</span>
-    <input type="search" placeholder="Search members…"
-           name="q" value="{{ search_q }}"
-           hx-get="{% url 'community:htmx-member-search' %}?ws=1"
-           hx-trigger="keyup changed delay:400ms"
-           hx-target="#ws-member-list"
-           hx-swap="innerHTML">
-  </div>
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Community</span>{% endblock %}
+{% block context_header %}Community Ops{% endblock %}
+{% block context_content %}
+    {% include "community/partials/community_sidebar.html" %}
+{% endblock %}
 
-  <div style="display: flex; gap: var(--space-2xs); margin-bottom: var(--space-xs);">
-    <select name="level"
-            hx-get="{% url 'community:htmx-member-search' %}?ws=1"
-            hx-trigger="change"
-            hx-target="#ws-member-list"
-            hx-swap="innerHTML"
-            hx-include="[name='q'],[name='order']"
-            class="form-input-touch" style="flex:1; height:32px; font-size:var(--fz--2); padding: 0 var(--space-xs);">
-      <option value="">All Levels</option>
-      {% for val, label in level_choices %}
-      <option value="{{ val }}" {% if filter_level == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-      {% endfor %}
-    </select>
-    <select name="order"
-            hx-get="{% url 'community:htmx-member-search' %}?ws=1"
-            hx-trigger="change"
-            hx-target="#ws-member-list"
-            hx-swap="innerHTML"
-            hx-include="[name='q'],[name='level']"
-            class="form-input-touch" style="flex:1; height:32px; font-size:var(--fz--2); padding: 0 var(--space-xs);">
-      <option value="">All Orders</option>
-      {% for val, label in order_choices %}
-      <option value="{{ val }}" {% if filter_order == val %}selected{% endif %}>{{ val }}</option>
-      {% endfor %}
-    </select>
-  </div>
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 900px;">
 
-</div>
-
-<div id="ws-member-list">
-  {% for m in members %}
-  <a href="{% url 'community:community-member-profile' m.user.id %}"
-     class="ws-list-item"
-     hx-get="{% url 'community:community-member-profile' m.user.id %}"
-     hx-target="#ws-detail"
-     hx-push-url="true">
-    <div class="ws-sidebar__avatar" style="background: var(--primary-light); color: var(--primary); width:32px; height:32px; font-size:13px;">
-      {{ m.user.display_name|first|upper|default:"?" }}
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px;">Shepherding Ops</div>
+            <h1 class="ws-page-title">Member <em>Directory</em></h1>
+        </div>
     </div>
-    <div style="flex:1; min-width:0;">
-      <div class="ws-list-item__title">{{ m.user.display_name|default:m.user.email }}</div>
-      <div class="ws-list-item__meta">L{{ m.level|default:0 }}{% if m.metadata.service_order %} · {{ m.metadata.service_order }}{% endif %}</div>
+
+    {# ── Search + Filters ── #}
+    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center;">
+        <div style="flex: 1; display: flex; align-items: center; gap: 8px;
+                    background: var(--card); border: 1px solid var(--border);
+                    border-radius: 8px; padding: 0 12px; height: 40px;">
+            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--muted);">search</span>
+            <input type="search" placeholder="Search members…"
+                   name="q" value="{{ search_q }}"
+                   hx-get="{% url 'community:htmx-member-search' %}?ws=1"
+                   hx-trigger="keyup changed delay:400ms"
+                   hx-target="#member-results"
+                   hx-swap="innerHTML"
+                   style="border: none; background: transparent; outline: none;
+                          font-size: 13px; color: var(--text); width: 100%;">
+        </div>
+        <select name="level"
+                hx-get="{% url 'community:htmx-member-search' %}?ws=1"
+                hx-trigger="change"
+                hx-target="#member-results"
+                hx-swap="innerHTML"
+                hx-include="[name='q'],[name='order']"
+                style="height: 40px; padding: 0 12px; font-size: 13px; border-radius: 8px;
+                       background: var(--card); border: 1px solid var(--border);
+                       color: var(--text); cursor: pointer; outline: none;">
+            <option value="">All Levels</option>
+            {% for val, label in level_choices %}
+            <option value="{{ val }}" {% if filter_level == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="order"
+                hx-get="{% url 'community:htmx-member-search' %}?ws=1"
+                hx-trigger="change"
+                hx-target="#member-results"
+                hx-swap="innerHTML"
+                hx-include="[name='q'],[name='level']"
+                style="height: 40px; padding: 0 12px; font-size: 13px; border-radius: 8px;
+                       background: var(--card); border: 1px solid var(--border);
+                       color: var(--text); cursor: pointer; outline: none;">
+            <option value="">All Orders</option>
+            {% for val, label in order_choices %}
+            <option value="{{ val }}" {% if filter_order == val %}selected{% endif %}>{{ val }}</option>
+            {% endfor %}
+        </select>
     </div>
-  </a>
-  {% empty %}
-  <div class="ws-detail-empty" style="min-height:120px;">
-    <span class="material-symbols-outlined">search_off</span>
-    <span class="ws-detail-empty__label">No members found</span>
-  </div>
-  {% endfor %}
+
+    {# ── Member Grid ── #}
+    <div id="member-results"
+         style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+        {% for m in members %}
+        <a href="{% url 'community:community-member-profile' m.user.id %}"
+           style="display: flex; align-items: center; gap: 14px;
+                  background: var(--card); border: 1px solid var(--border);
+                  border-radius: 10px; padding: 16px 18px; text-decoration: none;
+                  transition: border-color 0.15s;">
+            <div style="width: 38px; height: 38px; border-radius: 50%;
+                        background: var(--primary-alpha, rgba(var(--primary-rgb, 180,24,24),0.12));
+                        color: var(--primary); display: flex; align-items: center;
+                        justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0;">
+                {{ m.user.display_name|first|upper|default:"?" }}
+            </div>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 700; color: var(--text);
+                            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ m.user.display_name|default:m.user.email }}
+                </div>
+                <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+                    L{{ m.level|default:0 }}{% if m.metadata.service_order %} · {{ m.metadata.service_order }}{% endif %}
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div style="grid-column: 1 / -1; padding: 60px 0; text-align: center;">
+            <span class="material-symbols-outlined"
+                  style="font-size: 48px; opacity: 0.1; display: block; color: var(--text);">search_off</span>
+            <p style="font-size: 13px; color: var(--muted); margin-top: 16px;">No members found.</p>
+        </div>
+        {% endfor %}
+    </div>
+
 </div>
 {% endblock %}
 
-{% block community_content %}
+{% block ws_options %}
+<div style="padding: 0 4px;">
 
-<div class="community-header">
-  <div class="community-avatar">
-    <span class="material-symbols-outlined">groups</span>
-  </div>
-  <div class="community-info">
-    <div class="community-name">Member Directory</div>
-    <div class="community-tier">Community Registry</div>
-  </div>
-</div>
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Directory Stats</div>
 
-<div class="community-search-container">
-  <span class="material-symbols-outlined search-icon">search</span>
-  <input type="search" placeholder="Search members…"
-         name="q" value="{{ search_q }}"
-         hx-get="{% url 'community:htmx-member-search' %}"
-         hx-trigger="keyup changed delay:400ms"
-         hx-target="#member-list"
-         hx-swap="innerHTML"
-         class="form-input-touch community-search-input">
-</div>
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 12px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Total Members</div>
+        <div style="font-size: 28px; font-weight: 800; color: var(--text);
+                    font-family: 'Playfair Display', serif;">{{ members|length }}</div>
+    </div>
 
-<!-- Filters -->
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px;">
-  <select name="level"
-          hx-get="{% url 'community:htmx-member-search' %}"
-          hx-trigger="change"
-          hx-target="#member-list"
-          hx-swap="innerHTML"
-          hx-include="[name='q'],[name='order']"
-          class="form-input-touch">
-    <option value="">All Levels</option>
-    {% for val, label in level_choices %}
-    <option value="{{ val }}" {% if filter_level == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-    {% endfor %}
-  </select>
-
-  <select name="order"
-          hx-get="{% url 'community:htmx-member-search' %}"
-          hx-trigger="change"
-          hx-target="#member-list"
-          hx-swap="innerHTML"
-          hx-include="[name='q'],[name='level']"
-          class="form-input-touch">
-    <option value="">All Orders</option>
-    {% for val, label in order_choices %}
-    <option value="{{ val }}" {% if filter_order == val %}selected{% endif %}>{{ val }}</option>
-    {% endfor %}
-  </select>
-</div>
-
-<div id="member-list" class="list-group">
-  {% include "community/partials/member_list.html" %}
 </div>
 {% endblock %}

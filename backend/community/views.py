@@ -366,6 +366,9 @@ def gatherings_list(request):
         'gatherings': qs[:20],
         'now': now,
         'level': _user_level(user),
+        'is_steward': _user_level(user) >= 3,
+        'active_app': 'community',
+        'active_community_tab': 'gatherings',
     })
 
 

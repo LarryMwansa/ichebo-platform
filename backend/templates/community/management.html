@@ -1,160 +1,200 @@
-{% extends "community/base_community.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 
-{% block ws_community_list %}
+{% block title %}Community Management — Ichebo{% endblock %}
 
-{# Pending membership requests #}
-<div style="padding: var(--space-xs) var(--space-s);">
-  <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Membership Requests</div>
-  <div id="ws-membership-requests"
-       hx-get="{% url 'community:htmx-pending-requests' %}"
-       hx-trigger="load"
-       hx-swap="innerHTML">
-    <div style="padding: var(--space-s); color: var(--muted); font-size: var(--fz--1);">Loading…</div>
-  </div>
-</div>
-
-<div class="ws-sidebar__divider"></div>
-
-{# Management nav links #}
-<a href="{% url 'community:community-members' %}"
-   class="ws-list-item"
-   hx-get="{% url 'community:community-members' %}"
-   hx-target="#ws-list-content"
-   hx-push-url="true">
-  <span class="material-symbols-outlined" style="font-size:16px;">groups</span>
-  <div>
-    <div class="ws-list-item__title">{{ member_count }} Members</div>
-    <div class="ws-list-item__meta">View full directory</div>
-  </div>
-  <span class="material-symbols-outlined" style="font-size:16px; color:var(--border); margin-left:auto;">chevron_right</span>
-</a>
-
-<a href="{% url 'community:community-pipeline' %}"
-   class="ws-list-item"
-   hx-get="{% url 'community:community-pipeline' %}"
-   hx-target="#ws-list-content"
-   hx-push-url="true">
-  <span class="material-symbols-outlined" style="font-size:16px;">analytics</span>
-  <div>
-    <div class="ws-list-item__title">Formation Pipeline</div>
-    <div class="ws-list-item__meta">Track member progress</div>
-  </div>
-  <span class="material-symbols-outlined" style="font-size:16px; color:var(--border); margin-left:auto;">chevron_right</span>
-</a>
-
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Community</span>{% endblock %}
+{% block context_header %}Community Ops{% endblock %}
+{% block context_content %}
+    {% include "community/partials/community_sidebar.html" %}
 {% endblock %}
 
-{% block community_content %}
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 900px;">
 
-<div class="community-header">
-  <div class="community-avatar">
-    <span class="material-symbols-outlined">settings_suggest</span>
-  </div>
-  <div class="community-info">
-    <div class="community-name">Community Management</div>
-    <div class="community-tier">Administrative Oversight · {{ scope_tenant.name|default:"Local Node" }}</div>
-  </div>
-</div>
-
-<!-- Pending membership requests -->
-<div class="section-header">
-  <div class="label-caps">Membership Requests</div>
-</div>
-<div id="membership-requests-list"
-     hx-get="{% url 'community:htmx-pending-requests' %}"
-     hx-trigger="load"
-     hx-swap="innerHTML">
-  <div class="htmx-indicator">Loading registry&hellip;</div>
-</div>
-
-<div style="margin-top: var(--space-l);"></div>
-
-<!-- Management Navigation Grid -->
-<div class="stat-grid">
-  <a href="{% url 'community:community-members' %}" class="stat-item" style="text-decoration: none;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <div class="stat-item__label">Members</div>
-      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">groups</span>
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px;">
+                Administrative Oversight · {{ scope_tenant.name|default:"Local Node" }}
+            </div>
+            <h1 class="ws-page-title">Community <em>Management</em></h1>
+        </div>
     </div>
-    <div class="stat-item__value">{{ member_count }} Registered</div>
-  </a>
 
-  <a href="{% url 'community:community-pipeline' %}" class="stat-item" style="text-decoration: none;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <div class="stat-item__label">Pipeline</div>
-      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">analytics</span>
-    </div>
-    <div class="stat-item__value">Formation Tracking</div>
-  </a>
+    {# ── Quick Nav Grid ── #}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 12px; margin-bottom: 40px;">
+        <a href="{% url 'community:community-members' %}"
+           style="display: flex; justify-content: space-between; align-items: center;
+                  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+                  padding: 18px 20px; text-decoration: none; transition: border-color 0.15s;">
+            <div>
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Members</div>
+                <div style="font-family: 'Playfair Display', serif; font-size: 20px;
+                            font-weight: 800; color: var(--text);">{{ member_count }}</div>
+            </div>
+            <span class="material-symbols-outlined" style="font-size: 24px; color: var(--primary); opacity: 0.7;">groups</span>
+        </a>
 
-  {% if request.user.competence_level >= 3 %}
-  <a href="{% url 'tenants:create-tenant' %}" class="stat-item" style="text-decoration: none;">
-     <div style="display: flex; justify-content: space-between; align-items: center;">
-      <div class="stat-item__label">New Node</div>
-      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">add_home</span>
-    </div>
-    <div class="stat-item__value">Create Community</div>
-  </a>
+        <a href="{% url 'community:community-pipeline' %}"
+           style="display: flex; justify-content: space-between; align-items: center;
+                  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+                  padding: 18px 20px; text-decoration: none; transition: border-color 0.15s;">
+            <div>
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Pipeline</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--text);">Formation Tracking</div>
+            </div>
+            <span class="material-symbols-outlined" style="font-size: 24px; color: var(--primary); opacity: 0.7;">analytics</span>
+        </a>
 
-  <a href="{% url 'tenants:my-tenants' %}" class="stat-item" style="text-decoration: none;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <div class="stat-item__label">Hierarchy</div>
-      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">account_tree</span>
+        {% if request.user.competence_level >= 3 %}
+        <a href="{% url 'tenants:create-tenant' %}"
+           style="display: flex; justify-content: space-between; align-items: center;
+                  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+                  padding: 18px 20px; text-decoration: none; transition: border-color 0.15s;">
+            <div>
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">New Node</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--text);">Create Community</div>
+            </div>
+            <span class="material-symbols-outlined" style="font-size: 24px; color: var(--primary); opacity: 0.7;">add_home</span>
+        </a>
+
+        <a href="{% url 'tenants:my-tenants' %}"
+           style="display: flex; justify-content: space-between; align-items: center;
+                  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+                  padding: 18px 20px; text-decoration: none; transition: border-color 0.15s;">
+            <div>
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Hierarchy</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--text);">My Communities</div>
+            </div>
+            <span class="material-symbols-outlined" style="font-size: 24px; color: var(--primary); opacity: 0.7;">account_tree</span>
+        </a>
+        {% endif %}
     </div>
-    <div class="stat-item__value">My Communities</div>
-  </a>
-  {% endif %}
+
+    {# ── Two-column content ── #}
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 36px;">
+
+        {# Membership Requests #}
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 16px;">Membership Requests</div>
+            <div id="membership-requests-list"
+                 hx-get="{% url 'community:htmx-pending-requests' %}"
+                 hx-trigger="load"
+                 hx-swap="innerHTML">
+                <div style="padding: 40px 0; text-align: center;">
+                    <span class="material-symbols-outlined"
+                          style="font-size: 40px; opacity: 0.1; display: block; color: var(--text);">person_add</span>
+                    <p style="font-size: 12px; color: var(--muted); margin-top: 10px;">Loading requests…</p>
+                </div>
+            </div>
+        </div>
+
+        {# Announcements #}
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div class="ws-label-tag">Announcements</div>
+                <button style="display: flex; align-items: center; gap: 4px; background: none; border: none;
+                               cursor: pointer; color: var(--primary); font-size: 12px; font-weight: 700; padding: 0;"
+                        hx-get="{% url 'community:htmx-create-announcement' %}"
+                        hx-target="#announcement-form-slot"
+                        hx-swap="innerHTML">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+                    New
+                </button>
+            </div>
+            <div id="announcement-form-slot" style="margin-bottom: 12px;"></div>
+            <div id="announcement-list"
+                 hx-get="{% url 'community:htmx-announcement-list' %}"
+                 hx-trigger="load"
+                 hx-swap="innerHTML">
+                <div style="padding: 40px 0; text-align: center;">
+                    <span class="material-symbols-outlined"
+                          style="font-size: 40px; opacity: 0.1; display: block; color: var(--text);">campaign</span>
+                    <p style="font-size: 12px; color: var(--muted); margin-top: 10px;">Loading bulletins…</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {# ── Gatherings ── #}
+    <div style="margin-top: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div class="ws-label-tag">Seven-Day Calendar</div>
+            <button style="display: flex; align-items: center; gap: 4px; background: none; border: none;
+                           cursor: pointer; color: var(--primary); font-size: 12px; font-weight: 700; padding: 0;"
+                    hx-get="{% url 'community:htmx-create-gathering' %}"
+                    hx-target="#gathering-form-slot"
+                    hx-swap="innerHTML">
+                <span class="material-symbols-outlined" style="font-size: 16px;">calendar_add_on</span>
+                Schedule
+            </button>
+        </div>
+        <div id="gathering-form-slot" style="margin-bottom: 12px;"></div>
+
+        {% if gatherings %}
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            {% for g in gatherings %}
+            <div style="background: var(--card); border: 1px solid var(--border);
+                        border-radius: 10px; padding: 18px 20px;"
+                 id="gathering-{{ g.id }}">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <div style="font-weight: 700; font-size: 13px; color: var(--text);">{{ g.title }}</div>
+                    {% with fmt=g.metadata.format|default:"in_person" %}
+                    <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                 letter-spacing: 0.06em; color: var(--muted); flex-shrink: 0; margin-left: 12px;">
+                        {{ fmt|title }}
+                    </span>
+                    {% endwith %}
+                </div>
+                {% if g.scheduled_at %}
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted);">
+                    <span class="material-symbols-outlined" style="font-size: 15px;">schedule</span>
+                    {{ g.scheduled_at|date:"D, d M · H:i" }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="padding: 40px 0; text-align: center;">
+            <span class="material-symbols-outlined"
+                  style="font-size: 40px; opacity: 0.1; display: block; color: var(--text);">event_busy</span>
+            <p style="font-size: 12px; color: var(--muted); margin-top: 10px;">No gatherings in the next 7 days.</p>
+        </div>
+        {% endif %}
+    </div>
+
 </div>
+{% endblock %}
 
-<!-- Announcements Section -->
-<div class="section-header" style="margin-top: var(--space-l);">
-  <div class="label-caps">Announcements</div>
-  <button class="btn-touch btn-sm" style="color: var(--primary);"
-          hx-get="{% url 'community:htmx-create-announcement' %}"
-          hx-target="#announcement-form-slot"
-          hx-swap="innerHTML">
-    <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
-  </button>
-</div>
-<div id="announcement-form-slot"></div>
-<div id="announcement-list" class="list-group"
-     hx-get="{% url 'community:htmx-announcement-list' %}"
-     hx-trigger="load"
-     hx-swap="innerHTML">
-  <div class="htmx-indicator">Loading bulletins&hellip;</div>
-</div>
+{% block ws_options %}
+<div style="padding: 0 4px;">
 
-<!-- Gatherings Section -->
-<div class="section-header" style="margin-top: var(--space-l);">
-  <div class="label-caps">Seven-Day Calendar</div>
-  <button class="btn-touch btn-sm" style="color: var(--primary);"
-          hx-get="{% url 'community:htmx-create-gathering' %}"
-          hx-target="#gathering-form-slot"
-          hx-swap="innerHTML">
-    <span class="material-symbols-outlined" style="font-size: 18px;">calendar_add_on</span>
-  </button>
-</div>
-<div id="gathering-form-slot"></div>
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Node Context</div>
 
-{% if gatherings %}
-  {% for g in gatherings %}
-  <div class="gathering-card" id="gathering-{{ g.id }}">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-      <div class="gathering-title">{{ g.title }}</div>
-      {% with fmt=g.custom_fields.format|default:"in_person" %}
-      <span class="gathering-format-badge format-{{ fmt }}">{{ fmt|title }}</span>
-      {% endwith %}
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 12px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Community Node</div>
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">
+            {{ scope_tenant.name|default:"Local Node" }}
+        </div>
     </div>
-    {% if g.scheduled_at %}
-    <div class="gathering-meta">
-      <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
-      {{ g.scheduled_at|date:"D, d M · H:i" }}
-    </div>
-    {% endif %}
-  </div>
-  {% endfor %}
-{% else %}
-  <div class="empty-state" style="padding: 24px 0;">No gatherings in the next 7 days.</div>
-{% endif %}
 
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Registered Members</div>
+        <div style="font-size: 28px; font-weight: 800; color: var(--text);
+                    font-family: 'Playfair Display', serif;">{{ member_count }}</div>
+    </div>
+
+</div>
 {% endblock %}
