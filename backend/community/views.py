@@ -133,6 +133,8 @@ def my_community(request):
         'stage_name':          stage_info[0],
         'participation_stage': stage_info[1],
         'participation_steps': range(1, 6),
+        'active_app':          'community',
+        'active_community_tab': 'home',
     })
 
 
@@ -414,6 +416,8 @@ def community_detail(request, record_id):
         'linked_activity': linked_activity,
         'level': _user_level(request.user),
         'is_steward': _user_level(request.user) >= 3,
+        'active_app': 'community',
+        'active_community_tab': 'home',
     })
 
 
