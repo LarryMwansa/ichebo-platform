@@ -105,17 +105,42 @@ def video_live_view(request):
 
 @login_required
 def video_schedule(request):
+    from collections import defaultdict
+    import datetime as dt
+
     now = timezone.now()
-    cutoff = now + timezone.timedelta(days=7)
+    weeks = int(request.GET.get('weeks', 1))
+    weeks = max(1, min(weeks, 4))  # clamp 1–4
+    cutoff = now + timezone.timedelta(weeks=weeks)
+
     all_events = [_annotate_event(e) for e in _event_qs()]
+    live = [e for e in all_events if e['is_live']]
     upcoming = [
         e for e in all_events
         if e['scheduled_at'] and now <= e['scheduled_at'] <= cutoff
     ]
-    live = [e for e in all_events if e['is_live']]
+
+    # Build a list of day buckets for the window
+    today = now.date()
+    days = []
+    for i in range(weeks * 7):
+        day = today + dt.timedelta(days=i)
+        days.append({
+            'date': day,
+            'label': day.strftime('%A'),          # Monday
+            'short': day.strftime('%d %b'),        # 08 May
+            'is_today': day == today,
+            'events': [
+                e for e in upcoming
+                if e['scheduled_at'] and e['scheduled_at'].date() == day
+            ],
+        })
+
     return render(request, 'video_live/schedule.html', {
+        'days': days,
         'upcoming': upcoming,
         'live': live,
+        'weeks': weeks,
         'can_manage': request.user.competence_level >= 3,
         'active_app': 'video',
         'active_video_tab': 'schedule',
