@@ -36,9 +36,9 @@
 {% if records %}
 <div class="dash-widget">
   <div class="dash-widget__label">Recent Entries</div>
-  <div class="list-group" id="dash-recent-list">
+  <div class="list-group" id="dash-recent-list" style="display: flex; flex-direction: column; gap: 8px;">
     {% for rec in records %}
-    <div class="list-item">
+    <div class="list-item" style="padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);">
       <div class="list-item__icon">
         <span class="status-badge" style="background: var(--bg);">
           {{ rec.record_type|slice:":3"|upper }}

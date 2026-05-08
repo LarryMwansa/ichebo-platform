@@ -2,14 +2,10 @@
 <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Strategic Actions</div>
-    <button class="ctx-btn"
-            hx-get="{% url 'records:htmx-create' %}?record_type=dar"
-            hx-target="#drawerInner"
-            hx-swap="innerHTML"
-            onclick="window.ICSDrawer.open('Daily Activity Report')">
+    <a href="{% url 'records:htmx-create' %}?record_type=dar" class="ctx-btn">
         <span class="material-symbols-outlined">edit_note</span>
         Submit Daily DAR
-    </button>
+    </a>
     <a href="{% url 'governance:desk' %}" class="ctx-btn">
         <span class="material-symbols-outlined">draw</span>
         Open The Desk

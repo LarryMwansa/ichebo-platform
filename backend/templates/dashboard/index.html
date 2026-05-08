@@ -78,11 +78,10 @@
                 </div>
             </div>
             {% if not digest.dar_today %}
-            <button class="btn-touch" style="width: 100%; margin-top: 20px; background: var(--accent-red); color: #fff; font-size: 11px; font-weight: 800;"
-                    hx-get="{% url 'records:htmx-create' %}?record_type=dar"
-                    hx-target="#drawerInner"
-                    hx-swap="innerHTML"
-                    onclick="window.ICSDrawer.open('Daily Activity Report')">SUBMIT REPORT NOW</button>
+            <a href="{% url 'records:htmx-create' %}?record_type=dar"
+               class="btn-touch" style="width: 100%; margin-top: 20px; background: var(--accent-red); color: #fff; font-size: 11px; font-weight: 800; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                SUBMIT REPORT NOW
+            </a>
             {% endif %}
         </div>
 
