@@ -70,22 +70,22 @@
     {# Writing canvas #}
     <div class="editorial-canvas" id="editorial-canvas">
         <form id="editorial-form"
-              hx-post="{% if record %}{% url 'records:htmx-edit' record.id %}{% else %}{% url 'records:htmx-create' %}{% endif %}"
+              hx-post="{% if record and record.id %}{% url 'records:htmx-edit' record.id %}{% else %}{% url 'records:htmx-create' %}{% endif %}"
               hx-target="#main-stage"
               hx-push-url="true">
             {% csrf_token %}
             <input type="hidden" name="record_type" id="hidden-record-type"
-                   value="{{ active_type|default:record.record_type|default:'note' }}">
+                   value="{{ active_type|default:'note' }}">
 
             <input type="text" name="title" id="record-title"
-                   value="{{ record.title|default:'' }}"
+                   value="{% if record and record.title %}{{ record.title }}{% endif %}"
                    placeholder="Give your record a title…"
                    class="editorial-title-input editorial-title"
                    required autofocus autocomplete="off">
 
             <textarea name="content" id="editorial-editor"
                       class="editorial-editor-textarea editorial-body"
-                      placeholder="Begin writing… the word is alive.">{{ record.content|default:'' }}</textarea>
+                      placeholder="Begin writing… the word is alive.">{% if record and record.content %}{{ record.content }}{% endif %}</textarea>
 
             <div id="editorial-preview"
                  class="editorial-preview-pane editorial-body"

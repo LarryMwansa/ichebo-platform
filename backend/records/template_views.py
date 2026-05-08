@@ -108,7 +108,6 @@ def htmx_create_record(request):
 
     # GET — partial for HTMX, full shell for direct navigation
     ctx = {
-        'record': None,
         'record_types': JOURNAL_RECORD_TYPES,
         'active_type': request.GET.get('record_type', 'note'),
         'active_app': 'records',
