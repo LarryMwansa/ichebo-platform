@@ -67,6 +67,63 @@ def htmx_records_tab(request):
 
 
 @login_required
+def htmx_learn_tab(request):
+    """Active enrolments, next lesson, habit streaks."""
+    digest = build_digest(request.user)
+    return render(request, 'dashboard/partials/_learn_panel.html', {
+        'enrolments':   digest.active_enrolments,
+        'next_lesson':  digest.next_lesson,
+        'habit_streaks': digest.habit_streaks,
+    })
+
+
+@login_required
+def htmx_today_schedule(request):
+    """Today's broadcasts + community events."""
+    from activity.models import Activity
+    from django.utils import timezone
+
+    today = timezone.now().date()
+    user  = request.user
+
+    tenant_ids = list(
+        user.tenant_permissions.filter(is_active=True).values_list('tenant_id', flat=True)
+    )
+
+    events = (
+        Activity.objects
+        .filter(
+            deleted_at__isnull=True,
+            activity_type='event',
+            scheduled_at__date=today,
+            status__in=['pending', 'in_progress'],
+        )
+        .filter(
+            Q(tenant_id__in=tenant_ids) |
+            Q(metadata__stream_url__isnull=False)
+        )
+        .order_by('scheduled_at')[:10]
+    )
+
+    items = []
+    for ev in events:
+        meta = ev.metadata or {}
+        items.append({
+            'title':      ev.title,
+            'time':       ev.scheduled_at.strftime('%H:%M') if ev.scheduled_at else '',
+            'duration':   meta.get('duration_minutes', ''),
+            'is_broadcast': bool(meta.get('stream_url')),
+            'source':     meta.get('source_app', 'activity'),
+            'id':         str(ev.id),
+        })
+
+    return render(request, 'dashboard/partials/_today_schedule.html', {
+        'items': items,
+        'today': today,
+    })
+
+
+@login_required
 def htmx_launcher(request):
     """Returns the App Launcher grid component."""
     return render(request, 'components/_app_launcher.html')

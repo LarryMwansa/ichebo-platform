@@ -117,39 +117,65 @@
 
     </div>
 
-    {# 4. Split View: Critical & Recent #}
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-        
+    {# 4. Three-Column: Missions / Learn / Schedule + Activity #}
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; align-items: start;">
+
         {# Priority Missions #}
         <div>
-            <div class="label-caps" style="margin-bottom: 25px; opacity: 0.5;">Priority Missions</div>
-            <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="label-caps" style="margin-bottom: 16px; opacity: 0.5;">Priority Missions</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
                 {% for item in digest.overdue_items %}
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-ink); border-radius: 12px;">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <span class="material-symbols-outlined" style="color: var(--accent-red);">priority_high</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-ink); border-radius: 10px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="material-symbols-outlined" style="color: var(--accent-red); font-size: 18px;">priority_high</span>
                         <div>
-                            <div style="font-size: 14px; font-weight: 700; color: var(--text-ink);">{{ item.title }}</div>
-                            <div style="font-size: 11px; opacity: 0.5;">OVERDUE MANDATE</div>
+                            <div style="font-size: 13px; font-weight: 700; color: var(--text-ink);">{{ item.title|truncatechars:32 }}</div>
+                            <div style="font-size: 10px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.06em;">Overdue Mandate</div>
                         </div>
                     </div>
-                    <span class="material-symbols-outlined" style="opacity: 0.3;">chevron_right</span>
+                    <span class="material-symbols-outlined" style="opacity: 0.3; font-size: 16px;">chevron_right</span>
                 </div>
                 {% empty %}
-                <div style="padding: 40px; text-align: center; border: 1px dashed var(--border-ink); border-radius: 12px; opacity: 0.5;">
-                    <span class="material-symbols-outlined" style="font-size: 32px; display: block; margin-bottom: 10px;">verified</span>
-                    <p style="font-size: 13px;">No critical mission alerts.</p>
+                <div style="padding: 32px 16px; text-align: center; border: 1px dashed var(--border-ink); border-radius: 10px; opacity: 0.5;">
+                    <span class="material-symbols-outlined" style="font-size: 28px; display: block; margin-bottom: 8px;">verified</span>
+                    <p style="font-size: 12px;">No critical mission alerts.</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        {# Recent Registry Activity #}
+        {# Learning Panel #}
         <div>
-            <div class="label-caps" style="margin-bottom: 25px; opacity: 0.5;">Registry Activity</div>
-            <div id="dashboard-recent-activity" hx-get="{% url 'dashboard:htmx-records' %}" hx-trigger="load">
-                <div style="padding: 40px; text-align: center;">
-                    <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.1; animation: pulse 2s infinite;">sync</span>
+            <div class="label-caps" style="margin-bottom: 16px; opacity: 0.5;">Formation & Learning</div>
+            <div id="dashboard-learn-panel"
+                 hx-get="{% url 'dashboard:htmx-learn' %}"
+                 hx-trigger="load">
+                <div style="padding: 32px; text-align: center;">
+                    <span class="material-symbols-outlined" style="font-size: 28px; opacity: 0.1; animation: pulse 2s infinite;">school</span>
+                </div>
+            </div>
+        </div>
+
+        {# Today's Schedule + Registry Activity #}
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+            <div>
+                <div class="label-caps" style="margin-bottom: 16px; opacity: 0.5;">Today's Schedule</div>
+                <div id="dashboard-schedule"
+                     hx-get="{% url 'dashboard:htmx-schedule' %}"
+                     hx-trigger="load">
+                    <div style="padding: 32px; text-align: center;">
+                        <span class="material-symbols-outlined" style="font-size: 28px; opacity: 0.1; animation: pulse 2s infinite;">today</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="label-caps" style="margin-bottom: 16px; opacity: 0.5;">Registry Activity</div>
+                <div id="dashboard-recent-activity"
+                     hx-get="{% url 'dashboard:htmx-records' %}"
+                     hx-trigger="load">
+                    <div style="padding: 32px; text-align: center;">
+                        <span class="material-symbols-outlined" style="font-size: 28px; opacity: 0.1; animation: pulse 2s infinite;">sync</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -201,27 +227,81 @@ html:not(.dark) .card-ink:hover {
 {# Zone 4: Support & Community #}
 {% block ws_options %}
 <div class="ws-options-section">
-    <div class="ws-label-tag">Team Vitals</div>
-    
-    <div class="ws-stat-card" style="margin-top: 15px; background: var(--stone-bg); border: 1px solid rgba(0,0,0,0.05);">
-        <div class="ws-stat-card__label">Team Support</div>
-        <div class="ws-stat-card__value" style="color: var(--ink-bg);">{{ digest.team_pending_count|default:0 }}</div>
-        <div style="font-size: 11px; color: var(--muted); margin-top: 5px;">Awaiting shepherd response</div>
+
+    <div class="ws-label-tag">Steward Status</div>
+    <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;
+                    padding: 10px 12px; background: var(--card-2); border: 1px solid var(--border);
+                    border-radius: 8px;">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text);">Formation Level</span>
+            <span style="font-size: 13px; font-weight: 800; color: var(--primary);">{{ user.competence_level }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;
+                    padding: 10px 12px; background: var(--card-2); border: 1px solid var(--border);
+                    border-radius: 8px;">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text);">Active Mandates</span>
+            <span style="font-size: 13px; font-weight: 800; color: var(--text);">{{ digest.pending_count }}</span>
+        </div>
+        {% if user.competence_level >= 3 %}
+        <div style="display: flex; justify-content: space-between; align-items: center;
+                    padding: 10px 12px; background: var(--card-2); border: 1px solid var(--border);
+                    border-radius: 8px;">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text);">Team Support</span>
+            <span style="font-size: 13px; font-weight: 800; color: {% if digest.team_pending_count %}var(--accent-red){% else %}var(--text){% endif %};">
+                {{ digest.team_pending_count|default:0 }}
+            </span>
+        </div>
+        {% endif %}
     </div>
 
-    <div class="ws-sidebar__divider" style="margin: 30px 0;"></div>
+    <div class="ws-sidebar__divider" style="margin: 20px 0;"></div>
 
-    <div class="ws-label-tag">Recent Activity</div>
-    <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px;">
-        <div style="display: flex; gap: 10px; font-size: 12px;">
-            <span class="material-symbols-outlined" style="font-size: 16px; color: #2ecc71;">check_circle</span>
-            <div style="color: var(--muted);">Journal entry secured.</div>
-        </div>
-        <div style="display: flex; gap: 10px; font-size: 12px;">
-            <span class="material-symbols-outlined" style="font-size: 16px; color: #3498db;">info</span>
-            <div style="color: var(--muted);">Stewardship level 4 attained.</div>
-        </div>
+    <div class="ws-label-tag">Notifications</div>
+    <div id="dashboard-notifications" style="margin-top: 12px;">
+        <a href="{% url 'notifications:list' %}"
+           style="display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+                  background: var(--card-2); border: 1px solid var(--border);
+                  border-radius: 8px; text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">notifications</span>
+            <span style="font-size: 12px; font-weight: 600; color: var(--text);">View All Alerts</span>
+            <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); margin-left: auto;">arrow_forward</span>
+        </a>
     </div>
+
+    <div class="ws-sidebar__divider" style="margin: 20px 0;"></div>
+
+    <div class="ws-label-tag">Quick Links</div>
+    <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
+        <a href="/learn/" style="display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+                                  border-radius: 8px; text-decoration: none; color: var(--text);
+                                  font-size: 12px; font-weight: 600; transition: background 0.15s;"
+           onmouseover="this.style.background='var(--card-2)'" onmouseout="this.style.background=''">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">school</span>
+            Learning Hub
+        </a>
+        <a href="/community/" style="display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+                                      border-radius: 8px; text-decoration: none; color: var(--text);
+                                      font-size: 12px; font-weight: 600; transition: background 0.15s;"
+           onmouseover="this.style.background='var(--card-2)'" onmouseout="this.style.background=''">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">groups</span>
+            Community
+        </a>
+        <a href="/schedule/" style="display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+                                     border-radius: 8px; text-decoration: none; color: var(--text);
+                                     font-size: 12px; font-weight: 600; transition: background 0.15s;"
+           onmouseover="this.style.background='var(--card-2)'" onmouseout="this.style.background=''">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">calendar_month</span>
+            Full Schedule
+        </a>
+        <a href="/records/graph/" style="display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+                                          border-radius: 8px; text-decoration: none; color: var(--text);
+                                          font-size: 12px; font-weight: 600; transition: background 0.15s;"
+           onmouseover="this.style.background='var(--card-2)'" onmouseout="this.style.background=''">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">hub</span>
+            Apostolic Web
+        </a>
+    </div>
+
 </div>
 {% endblock %}
 
