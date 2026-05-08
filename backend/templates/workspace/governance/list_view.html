@@ -16,7 +16,7 @@
             </h1>
         </div>
         {% if is_level5 %}
-        <a href="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={{ record_type|default:'decree' }}"
+        <a href="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={{ record_type|default:'mandate' }}"
            class="ws-topbar__cta" style="flex-shrink: 0; text-decoration: none;">
             <span class="material-symbols-outlined">add</span>
             New {% if active_branch == 'keys' %}Key{% else %}Act{% endif %}
@@ -29,11 +29,9 @@
         {% if records %}
             <div class="ws-stat-grid" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
                 {% for record in records %}
-                    <div class="ws-stat-card" 
-                         hx-get="{% if active_branch == 'keys' %}{% url 'governance:keys-detail' record.id %}{% elif active_branch == 'library' %}{% url 'governance:library-detail' record.id %}{% else %}{% url 'governance:mandate-detail' record.id %}{% endif %}"
-                         hx-target="#main-stage"
-                         hx-push-url="true"
-                         style="cursor: pointer; position: relative; padding: var(--space-m);">
+                    <a href="{% if active_branch == 'keys' %}{% url 'governance:keys-detail' record.id %}{% elif active_branch == 'library' %}{% url 'governance:library-detail' record.id %}{% else %}{% url 'governance:mandate-detail' record.id %}{% endif %}"
+                       style="display: block; text-decoration: none; color: inherit; position: relative; padding: var(--space-m);"
+                       class="ws-stat-card">
                         
                         {# Card Header: Type & Status #}
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
@@ -71,7 +69,7 @@
                             </div>
                         </div>
                         {% endif %}
-                    </div>
+                    </a>
                 {% endfor %}
             </div>
         {% else %}
