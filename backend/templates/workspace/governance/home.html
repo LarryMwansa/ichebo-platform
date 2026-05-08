@@ -12,7 +12,7 @@
             </h1>
         </div>
         {% if is_level5 %}
-        <a href="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={% if active_branch == 'library' %}decree{% else %}ordinance{% endif %}"
+        <a href="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={% if active_branch == 'library' %}class{% else %}mandate{% endif %}"
            class="ws-topbar__cta" style="flex-shrink: 0; text-decoration: none;">
             <span class="material-symbols-outlined">add</span>
             New Official Act

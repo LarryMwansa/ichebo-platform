@@ -55,34 +55,6 @@
         pointer-events: none;
     }
 
-    .graph-legend {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        background: rgba(0,0,0,0.6);
-        backdrop-filter: blur(10px);
-        padding: 15px;
-        border-radius: 12px;
-        border: 1px solid rgba(255,255,255,0.1);
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 11px;
-        color: rgba(255,255,255,0.7);
-    }
-
-    .legend-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-    }
-
     /* Tooltip */
     .graph-tooltip {
         position: absolute;
@@ -101,6 +73,116 @@
 </style>
 {% endblock %}
 
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Governance</span>
+    <span class="ws-topbar__breadcrumb-sep">›</span>
+    <span class="ws-topbar__breadcrumb-item">Apostolic Web</span>
+{% endblock %}
+
+{% block context_header %}Apostolic Web{% endblock %}
+
+{% block context_content %}
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Graph</div>
+    <a href="{% url 'records:graph' %}" class="ctx-btn active">
+        <span class="material-symbols-outlined">hub</span>
+        Apostolic Web
+    </a>
+    <a href="{% url 'records:records-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">history_edu</span>
+        My Journal
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Governance</div>
+    <a href="{% url 'governance:library-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">library_books</span>
+        Reference Library
+    </a>
+    <a href="{% url 'governance:mandate-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">gavel</span>
+        Mandate Branch
+    </a>
+    <a href="{% url 'governance:keys-list' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">vpn_key</span>
+        Steward Keys
+    </a>
+
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 0 4px;">
+
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Graph Stats</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px;">
+        <div style="background: var(--card-2); border: 1px solid var(--border);
+                    border-radius: 8px; padding: 10px 12px; text-align: center;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px;">Nodes</div>
+            <div style="font-size: 22px; font-weight: 800; color: var(--text);
+                        font-family: 'Playfair Display', serif;">{{ total_nodes }}</div>
+        </div>
+        <div style="background: var(--card-2); border: 1px solid var(--border);
+                    border-radius: 8px; padding: 10px 12px; text-align: center;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px;">Links</div>
+            <div style="font-size: 22px; font-weight: 800; color: var(--text);
+                        font-family: 'Playfair Display', serif;">{{ relationship_count }}</div>
+        </div>
+        <div style="background: var(--card-2); border: 1px solid var(--border);
+                    border-radius: 8px; padding: 10px 12px; text-align: center;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px;">Governance</div>
+            <div style="font-size: 22px; font-weight: 800; color: #e53e3e;
+                        font-family: 'Playfair Display', serif;">{{ governance_count }}</div>
+        </div>
+        <div style="background: var(--card-2); border: 1px solid var(--border);
+                    border-radius: 8px; padding: 10px 12px; text-align: center;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px;">Personal</div>
+            <div style="font-size: 22px; font-weight: 800; color: #3498db;
+                        font-family: 'Playfair Display', serif;">{{ personal_count }}</div>
+        </div>
+    </div>
+
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: 10px;">Legend</div>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text);">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: #e53e3e; flex-shrink: 0;"></div>
+            Governance Acts
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text);">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: #3498db; flex-shrink: 0;"></div>
+            Personal Journal
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text);">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: #f1c40f; flex-shrink: 0;"></div>
+            Learning Records
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text);">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: #2ecc71; flex-shrink: 0;"></div>
+            Community
+        </div>
+    </div>
+
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: 10px;">Controls</div>
+    <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+        <div style="margin-bottom: 6px;"><strong style="color: var(--text);">Scroll</strong> — zoom in/out</div>
+        <div style="margin-bottom: 6px;"><strong style="color: var(--text);">Drag canvas</strong> — pan the web</div>
+        <div style="margin-bottom: 6px;"><strong style="color: var(--text);">Drag node</strong> — reposition</div>
+        <div><strong style="color: var(--text);">Click node</strong> — open record</div>
+    </div>
+
+</div>
+{% endblock %}
+
 {% block ws_content %}
 <div class="graph-container" id="graph-stage">
     <div class="graph-overlay">
@@ -112,13 +194,6 @@
 
     <div class="graph-tooltip" id="graph-tooltip"></div>
 
-    <div class="graph-legend">
-        <div class="label-caps" style="font-size: 9px; opacity: 0.5; margin-bottom: 5px;">Registry Classification</div>
-        <div class="legend-item"><div class="legend-dot" style="background: var(--accent-red);"></div> Governance</div>
-        <div class="legend-item"><div class="legend-dot" style="background: #3498db;"></div> Personal Journal</div>
-        <div class="legend-item"><div class="legend-dot" style="background: #f1c40f;"></div> Learning</div>
-        <div class="legend-item"><div class="legend-dot" style="background: #2ecc71;"></div> Community</div>
-    </div>
 </div>
 {% endblock %}
 

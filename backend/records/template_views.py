@@ -268,9 +268,19 @@ def htmx_record_search(request):
 @login_required
 def graph_view(request):
     """Full-page graph visualization shell."""
+    qs = Record.objects.filter(deleted_at__isnull=True)
+    total = qs.count()
+    governance_count = qs.filter(record_class='governance').count()
+    personal_count   = qs.filter(record_family='journal').count()
+    relationship_count = Relationship.objects.filter(deleted_at__isnull=True, to_record__isnull=False).count()
+
     return render(request, 'workspace/records/graph.html', {
         'active_app': 'records',
         'ws_page_title': 'Knowledge Graph',
+        'total_nodes': total,
+        'governance_count': governance_count,
+        'personal_count': personal_count,
+        'relationship_count': relationship_count,
     })
 
 

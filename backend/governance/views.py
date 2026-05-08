@@ -321,8 +321,12 @@ def htmx_record_create(request):
         tags       = [t.strip() for t in request.POST.get('tags', '').split(',') if t.strip()]
         categories = [c.strip() for c in request.POST.get('categories', '').split(',') if c.strip()]
 
+        from tenants.models import Tenant
+        handbook = Tenant.objects.filter(tier='handbook').first()
+
         record = Record.objects.create(
             created_by=request.user,
+            tenant=handbook if record_family == 'governance' else None,
             record_class='governance' if record_family == 'governance' else 'personal',
             record_family=record_family,
             record_type=record_type,
@@ -349,7 +353,10 @@ def htmx_record_create(request):
             target_url = reverse('governance:keys-detail', kwargs={'record_id': record.id})
         elif record.record_type in LIBRARY_TYPES:
             target_url = reverse('governance:reference-detail', kwargs={'record_id': record.id})
+        elif record.record_type in MANDATE_TYPES:
+            target_url = reverse('governance:mandate-detail', kwargs={'record_id': record.id})
         else:
+            # Unknown type — fall back to the mandate branch detail
             target_url = reverse('governance:mandate-detail', kwargs={'record_id': record.id})
 
         # Since this is htmx_record_create, we always return HX-Redirect to the detail view
