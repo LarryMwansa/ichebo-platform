@@ -106,11 +106,16 @@ def htmx_create_record(request):
             'is_desk': False
         })
 
-    # GET — return the create form
-    return render(request, 'workspace/records/partials/editorial_form.html', {
+    # GET — partial for HTMX, full shell for direct navigation
+    ctx = {
+        'record': None,
         'record_types': JOURNAL_RECORD_TYPES,
         'active_type': request.GET.get('record_type', 'note'),
-    })
+        'active_app': 'records',
+    }
+    if request.headers.get('HX-Request'):
+        return render(request, 'workspace/records/partials/editorial_form.html', ctx)
+    return render(request, 'workspace/records/create.html', ctx)
 
 
 # ── HTMX: edit record ─────────────────────────────────────────────────────────

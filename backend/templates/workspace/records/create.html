@@ -1,0 +1,91 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block title %}New Journal Entry — Ichebo{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
+{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Records</span>
+    <span class="ws-topbar__breadcrumb-sep">›</span>
+    <span class="ws-topbar__breadcrumb-item">New Entry</span>
+{% endblock %}
+
+{% block context_header %}Journal{% endblock %}
+{% block context_content %}
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Entry Types</div>
+    {% for value, label in record_types %}
+    <a href="?record_type={{ value }}"
+       class="ctx-btn {% if value == active_type %}active{% endif %}">
+        <span class="material-symbols-outlined">
+            {% if value == 'prayer' %}self_improvement
+            {% elif value == 'spirit' %}auto_awesome
+            {% elif value == 'dream' %}bedtime
+            {% elif value == 'dar' %}assignment
+            {% else %}edit_note{% endif %}
+        </span>
+        {{ label }}
+    </a>
+    {% endfor %}
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Navigate</div>
+    <a href="{% url 'records:records-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">history_edu</span>
+        My Journal
+    </a>
+    <a href="{% url 'dashboard:index' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">dashboard</span>
+        Command Center
+    </a>
+</div>
+{% endblock %}
+
+{% block ws_content %}
+    {% include "workspace/records/partials/editorial_form.html" %}
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 12px;">About This Entry</div>
+
+    {% if active_type == 'dar' %}
+    <p style="font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 16px;">
+        A <strong style="color: var(--text);">Daily Activity Report</strong> is your personal ministry summary for the day — what you did, what you prayed, what you discerned.
+    </p>
+    <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+        Submitting one daily builds your discipline record and feeds the Paraclete with context for your journey.
+    </p>
+    {% elif active_type == 'prayer' %}
+    <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+        Record your prayer — petitions, intercessions, declarations. These form a lasting record of your communion with God.
+    </p>
+    {% elif active_type == 'spirit' %}
+    <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+        Spirit Journal entries capture prophetic impressions, words received, and spiritual discernment. These feed your Steward Keys over time.
+    </p>
+    {% elif active_type == 'dream' %}
+    <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+        Record dreams while detail is fresh. Patterns across dream entries surface symbols that become your personal Key Library.
+    </p>
+    {% else %}
+    <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+        A general journal entry — reflections, notes, or anything you want to record for your personal registry.
+    </p>
+    {% endif %}
+
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: 10px;">Quick Tips</div>
+    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--muted); line-height: 1.5;">
+        <div><strong style="color: var(--text);">⌘B</strong> — Bold</div>
+        <div><strong style="color: var(--text);">⌘I</strong> — Italic</div>
+        <div><strong style="color: var(--text);">⌘P</strong> — Preview</div>
+        <div><strong style="color: var(--text);">⌘⇧F</strong> — Focus mode</div>
+    </div>
+</div>
+{% endblock %}

@@ -75,7 +75,7 @@
               hx-push-url="true">
             {% csrf_token %}
             <input type="hidden" name="record_type" id="hidden-record-type"
-                   value="{{ active_type|default:record.record_type }}">
+                   value="{{ active_type|default:record.record_type|default:'note' }}">
 
             <input type="text" name="title" id="record-title"
                    value="{{ record.title|default:'' }}"
