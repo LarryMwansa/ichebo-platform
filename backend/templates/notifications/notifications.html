@@ -7,6 +7,81 @@
     <span class="ws-topbar__breadcrumb-item">Notifications</span>
 {% endblock %}
 
+{% block context_header %}Alerts{% endblock %}
+{% block context_content %}
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Filter</div>
+    <a href="{% url 'notifications:list' %}" class="ctx-btn active">
+        <span class="material-symbols-outlined">notifications</span>
+        All Notifications
+    </a>
+    <a href="{% url 'notifications:list' %}?filter=unread" class="ctx-btn">
+        <span class="material-symbols-outlined">mark_email_unread</span>
+        Unread
+        {% if unread_count %}
+        <span style="margin-left: auto; font-size: 10px; font-weight: 800; color: var(--primary);">{{ unread_count }}</span>
+        {% endif %}
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Go To</div>
+    <a href="{% url 'dashboard:index' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">dashboard</span>
+        Command Centre
+    </a>
+    <a href="{% url 'activity:activity-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">task_alt</span>
+        Activity
+    </a>
+
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div class="ws-options-section">
+
+    {% if unread_count %}
+    <div style="padding: 14px 16px; background: color-mix(in srgb, var(--primary) 10%, transparent);
+                border: 1px solid var(--primary); border-radius: 10px; margin-bottom: 16px;
+                display: flex; align-items: center; gap: 10px;">
+        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">notifications_active</span>
+        <div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text);">{{ unread_count }} unread</div>
+            <div style="font-size: 11px; color: var(--muted);">Awaiting your review</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="ws-label-tag">Actions</div>
+    <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+        {% if unread_count %}
+        <form method="post" action="{% url 'notifications:mark-all-read' %}">
+            {% csrf_token %}
+            <button type="submit"
+                    style="width: 100%; display: flex; align-items: center; gap: 8px;
+                           padding: 9px 12px; background: var(--card-2); border: 1px solid var(--border);
+                           border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600;
+                           color: var(--text); text-align: left;">
+                <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">done_all</span>
+                Mark all as read
+            </button>
+        </form>
+        {% endif %}
+        <a href="{% url 'accounts:settings' %}"
+           style="display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+                  background: var(--card-2); border: 1px solid var(--border);
+                  border-radius: 8px; text-decoration: none; font-size: 12px;
+                  font-weight: 600; color: var(--text);">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--muted);">tune</span>
+            Notification Settings
+        </a>
+    </div>
+
+</div>
+{% endblock %}
+
 {% block ws_content %}
 <div class="ws-full-page-inner" style="padding: var(--space-l) 0;">
 

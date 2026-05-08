@@ -9,6 +9,51 @@
     <span class="ws-topbar__breadcrumb-item">Personal Hub</span>
 {% endblock %}
 
+{% block context_header %}Personal Hub{% endblock %}
+{% block context_content %}
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Identity</div>
+    <a href="{% url 'accounts:profile' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">person</span>
+        Registry Profile
+    </a>
+    <a href="{% url 'accounts:settings' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        Settings
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Work</div>
+    <a href="{% url 'activity:activity-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">task_alt</span>
+        Active Duties
+    </a>
+    <a href="{% url 'records:records-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">description</span>
+        My Records
+    </a>
+    <a href="{% url 'learn:learn-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">school</span>
+        Formation Academy
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Community</div>
+    <a href="{% url 'community:community-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">group</span>
+        Community Mandate
+    </a>
+    <a href="{% url 'tenants:steward-dashboard' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">account_balance</span>
+        Tenancy Hub
+    </a>
+
+</div>
+{% endblock %}
+
 {% block ws_content %}
 <div class="ws-layout--full-page">
   <div class="ws-full-page-inner">
@@ -195,5 +240,77 @@
     </div>
 
   </div>
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div class="ws-options-section">
+
+    <div class="ws-label-tag">Steward Card</div>
+    <div style="margin-top: 12px; padding: 16px; background: var(--card-2);
+                border: 1px solid var(--border); border-radius: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 8px; background: var(--primary);
+                        display: flex; align-items: center; justify-content: center;
+                        font-size: 18px; font-weight: 800; color: #fff; flex-shrink: 0;">
+                {{ user.display_name|default:user.email|first|upper }}
+            </div>
+            <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text);">
+                    {{ user.display_name|default:user.username }}
+                </div>
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 0.06em; color: var(--muted);">
+                    Level {{ user.competence_level }} · {{ user.status|default:"Seeker"|title }}
+                </div>
+            </div>
+        </div>
+        <div style="height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;">
+            <div style="width: {% widthratio user.competence_level 7 100 %}%; height: 100%;
+                        background: var(--primary); border-radius: 2px;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 6px;">
+            <span style="font-size: 10px; color: var(--muted);">Formation</span>
+            <span style="font-size: 10px; font-weight: 700; color: var(--primary);">{{ user.competence_level }}/7</span>
+        </div>
+    </div>
+
+    <div class="ws-sidebar__divider" style="margin: 20px 0;"></div>
+
+    <div class="ws-label-tag">Registry Stats</div>
+    <div style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div style="padding: 12px; background: var(--card-2); border: 1px solid var(--border);
+                    border-radius: 8px; text-align: center;">
+            <div style="font-size: 20px; font-weight: 900; color: var(--primary);">{{ activity_count|default:0 }}</div>
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-top: 2px;">Acts</div>
+        </div>
+        <div style="padding: 12px; background: var(--card-2); border: 1px solid var(--border);
+                    border-radius: 8px; text-align: center;">
+            <div style="font-size: 20px; font-weight: 900; color: var(--text);">{{ record_count|default:0 }}</div>
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-top: 2px;">Records</div>
+        </div>
+    </div>
+
+    {% if digest.habit_streaks %}
+    <div class="ws-sidebar__divider" style="margin: 20px 0;"></div>
+    <div class="ws-label-tag">Active Streaks</div>
+    <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
+        {% for h in digest.habit_streaks %}
+        <a href="/activity/{{ h.activity_id }}/"
+           style="display: flex; align-items: center; justify-content: space-between;
+                  padding: 8px 10px; background: var(--card-2); border: 1px solid var(--border);
+                  border-radius: 8px; text-decoration: none;">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text);">
+                {{ h.title|truncatechars:22 }}
+            </span>
+            <span style="font-size: 12px; font-weight: 800;
+                         color: {% if h.streak > 0 %}var(--primary){% else %}var(--muted){% endif %};">
+                {{ h.streak }}d
+            </span>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}
