@@ -361,7 +361,6 @@ def htmx_record_create(request):
     record_type   = request.GET.get('record_type', 'key')
     record_family = request.GET.get('record_family', 'reference')
 
-    # Workspace detection — use the new editorial desk if requested via full shell or workspace path
     return render(request, 'workspace/governance/editorial_form.html', {
         'record':           None,
         'record_type':      record_type,

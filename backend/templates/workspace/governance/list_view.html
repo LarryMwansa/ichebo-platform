@@ -16,13 +16,11 @@
             </h1>
         </div>
         {% if is_level5 %}
-        <button class="ws-topbar__cta" style="flex-shrink: 0;"
-                hx-get="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={{ record_type|default:'decree' }}"
-                hx-target="#main-stage"
-                hx-push-url="true">
+        <a href="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={{ record_type|default:'decree' }}"
+           class="ws-topbar__cta" style="flex-shrink: 0; text-decoration: none;">
             <span class="material-symbols-outlined">add</span>
             New {% if active_branch == 'keys' %}Key{% else %}Act{% endif %}
-        </button>
+        </a>
         {% endif %}
     </div>
 

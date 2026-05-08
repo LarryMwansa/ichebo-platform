@@ -16,13 +16,11 @@
             </div>
             <div class="ws-page-header__actions" style="flex-shrink: 0;">
                 {% if is_level5 and record.status != 'locked' %}
-                <button class="ws-topbar__cta"
-                        hx-get="{% url 'governance:htmx-record-edit' record.id %}"
-                        hx-target="#main-stage"
-                        hx-push-url="true">
+                <a href="{% url 'governance:htmx-record-edit' record.id %}"
+                   class="ws-topbar__cta" style="text-decoration: none;">
                     <span class="material-symbols-outlined">edit_note</span>
                     Edit Decree
-                </button>
+                </a>
                 {% endif %}
             </div>
         </div>
