@@ -1,17 +1,49 @@
-{# video/_player.html — Universal video embed partial
-   Context required: video_url (raw URL), embed_url (processed by get_embed_url), video_type
-#}
 {% if video_url %}
 <div class="video-player-wrap" style="margin: var(--space-l) 0; border-radius: 12px; overflow: hidden;
                                        background: #000; aspect-ratio: 16/9; position: relative;">
     {% if video_type == 'youtube' or video_type == 'vimeo' %}
-    <iframe src="{{ embed_url }}"
+    <iframe id="video-iframe-{{ lesson.id|default:'player' }}"
+            src="{{ embed_url }}"
             style="position: absolute; inset: 0; width: 100%; height: 100%; border: none;"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
             loading="lazy"
             title="{{ title|default:'Lesson video' }}">
     </iframe>
+    <div id="video-fallback-{{ lesson.id|default:'player' }}"
+         style="display: none; position: absolute; inset: 0; align-items: center;
+                justify-content: center; flex-direction: column; gap: 16px; background: #111;">
+        <span class="material-symbols-outlined" style="font-size: 56px; color: #fff; opacity: 0.4;">play_circle</span>
+        <p style="color: #fff; font-size: 13px; opacity: 0.7; margin: 0;">Video could not be embedded.</p>
+        <a href="{{ video_url }}" target="_blank" rel="noopener"
+           style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+                  background: #fff; color: #111; border-radius: 8px; font-size: 13px;
+                  font-weight: 700; text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">open_in_new</span>
+            Watch on {% if video_type == 'youtube' %}YouTube{% else %}External Site{% endif %}
+        </a>
+    </div>
+    <script>
+    (function() {
+        var iframe = document.getElementById('video-iframe-{{ lesson.id|default:"player" }}');
+        var fallback = document.getElementById('video-fallback-{{ lesson.id|default:"player" }}');
+        if (!iframe || !fallback) return;
+        iframe.addEventListener('error', function() {
+            iframe.style.display = 'none';
+            fallback.style.display = 'flex';
+        });
+        // YouTube Error 153 / load-blocked detection via postMessage
+        window.addEventListener('message', function(e) {
+            try {
+                var data = JSON.parse(e.data);
+                if (data.event === 'onError' && (data.info === 150 || data.info === 101 || data.info === 153)) {
+                    iframe.style.display = 'none';
+                    fallback.style.display = 'flex';
+                }
+            } catch(err) {}
+        });
+    })();
+    </script>
     {% elif video_type == 'direct' %}
     <video src="{{ embed_url }}"
            controls

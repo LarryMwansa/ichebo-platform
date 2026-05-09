@@ -242,6 +242,7 @@ def lesson_viewer(request, lesson_id):
         'lesson': lesson,
         'course': course,
         'programme': programme,
+        'siblings': siblings,
         'prev_lesson': prev_lesson,
         'next_lesson': next_lesson,
         'is_completed': is_completed,
