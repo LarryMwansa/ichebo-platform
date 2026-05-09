@@ -245,9 +245,18 @@
                         <input type="text" placeholder="Search ( / )" aria-label="Search" readonly>
                     </div>
 
-                    {# Notifications #}
-                    <a href="{% url 'notifications:list' %}" class="ws-icon-btn {% if active_app == 'notifications' %}active{% endif %}" title="Alerts Center">
+                    {# Notifications — live badge via HTMX polling #}
+                    <a href="{% url 'notifications:list' %}"
+                       class="ws-icon-btn {% if active_app == 'notifications' %}active{% endif %}"
+                       title="Alerts Center"
+                       style="position: relative;">
                         <span class="material-symbols-outlined">notifications</span>
+                        <span id="notif-badge"
+                              hx-get="{% url 'notifications:htmx-badge' %}"
+                              hx-trigger="load, every 60s"
+                              hx-target="#notif-badge"
+                              hx-swap="outerHTML"
+                              style="display: none;"></span>
                     </a>
 
                     {# Theme Toggle #}

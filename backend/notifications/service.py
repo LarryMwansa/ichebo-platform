@@ -219,3 +219,25 @@ def notify_member_removed(user, tenant):
             'tenant_name': tenant.name,
         },
     )
+
+
+# ---------------------------------------------------------------------------
+# V2.6 — Content approval
+# ---------------------------------------------------------------------------
+
+def notify_content_approved(record, approved_by):
+    approver = getattr(approved_by, 'display_name', None) or approved_by.email
+    rtype = record.record_type.title()
+    create_notification(
+        user=record.created_by,
+        notification_type='mandate_published',
+        title=f'Your {rtype} has been approved: {record.title}',
+        body=f'Approved by {approver}. It is now live and visible to learners.',
+        data={
+            'record_id': str(record.id),
+            'record_type': record.record_type,
+            'url': f'/learn/lesson/{record.id}/' if record.record_type in ('lesson', 'assignment', 'quiz')
+                   else f'/learn/course/{record.id}/' if record.record_type == 'course'
+                   else f'/learn/programme/{record.id}/',
+        },
+    )

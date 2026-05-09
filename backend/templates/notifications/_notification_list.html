@@ -1,73 +1,25 @@
-<!-- _notification_list.html — real notification list -->
-
 {% if notifications %}
 
-<div style="text-align:right;margin-bottom:0.75rem;">
-  <button class="btn-secondary btn-sm"
-          hx-post="{% url 'notifications-api:mark-all-read' %}"
-          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-          hx-swap="none"
-          hx-on::after-request="document.querySelectorAll('.notif-dot').forEach(e => e.remove())">
-    Mark all as read
-  </button>
-</div>
-
-<div style="display:flex;flex-direction:column;gap:0.5rem;">
-{% for n in notifications %}
-<div class="announcement-card"
-     id="notif-{{ n.id }}"
-     style="{% if not n.is_read %}border-left:3px solid var(--primary);{% endif %}position:relative;">
-
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">
-    <div style="flex:1;min-width:0;">
-      <div class="announcement-title" style="font-size:0.9rem;">
-        {% if not n.is_read %}
-        <span class="notif-dot"
-              style="display:inline-block;width:8px;height:8px;border-radius:50%;
-                     background:var(--primary);margin-right:6px;vertical-align:middle;flex-shrink:0;">
-        </span>
-        {% endif %}
-        {{ n.title }}
-      </div>
-      {% if n.body %}
-      <div class="announcement-meta" style="margin-top:3px;white-space:normal;">{{ n.body }}</div>
-      {% endif %}
-      <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:4px;">
-        {{ n.created_at|timesince }} ago &nbsp;·&nbsp; {{ n.get_notification_type_display }}
-      </div>
-    </div>
-
-    {% if not n.is_read %}
-    <button class="btn-secondary btn-sm"
-            style="font-size:0.75rem;padding:0.2rem 0.5rem;flex-shrink:0;"
-            hx-post="{% url 'notifications-api:mark-one-read' n.id %}"
-            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-            hx-target="#notif-{{ n.id }}"
-            hx-swap="outerHTML">
-      ✓
-    </button>
-    {% endif %}
-  </div>
-
-  {% if n.data.url %}
-  <a href="{{ n.data.url }}"
-     style="display:block;margin-top:6px;font-size:0.8rem;color:var(--primary);text-decoration:none;">
-    View →
-  </a>
-  {% endif %}
-
-</div>
-{% endfor %}
+<div id="notification-list"
+     style="background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden;">
+    {% for n in notifications %}
+    {% include "notifications/_notification_card.html" %}
+    {% endfor %}
 </div>
 
 {% else %}
 
-<div style="text-align:center;padding:3rem 1rem;color:var(--muted);">
-  <div style="font-size:2.5rem;margin-bottom:0.75rem;" aria-hidden="true">🔔</div>
-  <p style="font-size:1rem;font-weight:600;color:var(--text);margin-bottom:0.375rem;">No notifications yet.</p>
-  <p style="font-size:0.875rem;max-width:320px;margin:0 auto;">
-    You'll be notified here about community announcements, assigned tasks, and formation milestones.
-  </p>
+<div style="text-align: center; padding: 80px 24px;">
+    <span class="material-symbols-outlined"
+          style="font-size: 48px; opacity: 0.1; display: block;
+                 color: var(--text); margin-bottom: 16px;">notifications_off</span>
+    <p style="font-size: 14px; font-weight: 600; color: var(--text); margin: 0 0 6px;">
+        No notifications yet
+    </p>
+    <p style="font-size: 12px; color: var(--muted); max-width: 300px; margin: 0 auto; line-height: 1.6;">
+        You'll be notified here about community activity, assigned tasks, and formation milestones.
+    </p>
 </div>
 
 {% endif %}

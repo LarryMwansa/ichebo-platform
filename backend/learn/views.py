@@ -1005,6 +1005,9 @@ def htmx_approve_content(request, record_id):
     record.status = 'active'
     record.save(update_fields=['status', 'updated_at'])
 
+    from notifications.signals import content_approved
+    content_approved.send(sender=record.__class__, record=record, approved_by=request.user)
+
     # Return HTMX fragment that fades out
     html = f'''
     <div class="review-card" style="opacity: 0.5; background: var(--success-light); border: 1px solid var(--success); transition: all 0.3s ease;">

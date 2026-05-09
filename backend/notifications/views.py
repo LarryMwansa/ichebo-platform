@@ -99,13 +99,48 @@ def health(request):
 
 class NotificationListView(LoginRequiredMixin, View):
     def get(self, request):
-        notifications = Notification.objects.filter(
-            user=request.user
-        ).order_by('-created_at')[:50]
-        unread = sum(1 for n in notifications if not n.is_read)
+        filter_param = request.GET.get('filter', 'all')
+        qs = Notification.objects.filter(user=request.user).order_by('-created_at')
+        if filter_param == 'unread':
+            qs = qs.filter(read_at__isnull=True)
+        notifications = qs[:50]
+        unread = Notification.objects.filter(user=request.user, read_at__isnull=True).count()
         return render(request, 'notifications/notifications.html', {
             'notifications': notifications,
             'unread_count': unread,
+            'active_filter': filter_param,
             'active_app': 'notifications',
             'ws_page_title': 'Notifications',
         })
+
+
+@login_required
+def htmx_mark_all_read(request):
+    """Template-friendly POST: mark all notifications read, redirect back."""
+    if request.method != 'POST':
+        from django.shortcuts import redirect
+        return redirect('notifications:list')
+    now = timezone.now()
+    Notification.objects.filter(user=request.user, read_at__isnull=True).update(read_at=now)
+    if request.headers.get('HX-Request'):
+        # Return refreshed list fragment
+        notifications = Notification.objects.filter(user=request.user).order_by('-created_at')[:50]
+        return render(request, 'notifications/_notification_list.html', {
+            'notifications': notifications,
+            'unread_count': 0,
+        })
+    from django.shortcuts import redirect
+    return redirect('notifications:list')
+
+
+@login_required
+def htmx_mark_one_read(request, notification_id):
+    """HTMX POST: mark single notification read, return updated card."""
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+    try:
+        n = Notification.objects.get(id=notification_id, user=request.user)
+        n.mark_read()
+        return render(request, 'notifications/_notification_card.html', {'n': n})
+    except Notification.DoesNotExist:
+        return HttpResponse(status=404)

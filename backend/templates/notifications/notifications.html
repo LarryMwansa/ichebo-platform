@@ -12,11 +12,13 @@
 <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Filter</div>
-    <a href="{% url 'notifications:list' %}" class="ctx-btn active">
+    <a href="{% url 'notifications:list' %}"
+       class="ctx-btn {% if active_filter != 'unread' %}active{% endif %}">
         <span class="material-symbols-outlined">notifications</span>
         All Notifications
     </a>
-    <a href="{% url 'notifications:list' %}?filter=unread" class="ctx-btn">
+    <a href="{% url 'notifications:list' %}?filter=unread"
+       class="ctx-btn {% if active_filter == 'unread' %}active{% endif %}">
         <span class="material-symbols-outlined">mark_email_unread</span>
         Unread
         {% if unread_count %}
@@ -57,17 +59,16 @@
     <div class="ws-label-tag">Actions</div>
     <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
         {% if unread_count %}
-        <form method="post" action="{% url 'notifications:mark-all-read' %}">
-            {% csrf_token %}
-            <button type="submit"
-                    style="width: 100%; display: flex; align-items: center; gap: 8px;
-                           padding: 9px 12px; background: var(--card-2); border: 1px solid var(--border);
-                           border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600;
-                           color: var(--text); text-align: left;">
-                <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">done_all</span>
-                Mark all as read
-            </button>
-        </form>
+        <button hx-post="{% url 'notifications:mark-all-read' %}"
+                hx-target="#notification-list"
+                hx-swap="outerHTML"
+                style="width: 100%; display: flex; align-items: center; gap: 8px;
+                       padding: 9px 12px; background: var(--card-2); border: 1px solid var(--border);
+                       border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600;
+                       color: var(--text); text-align: left;">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">done_all</span>
+            Mark all as read
+        </button>
         {% endif %}
         <a href="{% url 'accounts:settings' %}"
            style="display: flex; align-items: center; gap: 8px; padding: 9px 12px;

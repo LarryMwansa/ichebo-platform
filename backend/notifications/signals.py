@@ -14,6 +14,9 @@ invitation_sent = Signal()  # kwargs: tenant, email, invited_by, token
 # Custom signal fired by tenants/service.py after member removed
 member_removed_signal = Signal()  # kwargs: user, tenant
 
+# Custom signal fired by learn/views.py htmx_approve_content
+content_approved = Signal()  # kwargs: record, approved_by
+
 
 # ---------------------------------------------------------------------------
 # MembershipRequest — approval / denial
@@ -127,3 +130,13 @@ def on_invitation_accepted(sender, instance, created, **kwargs):
 def on_member_removed(sender, user, tenant, **kwargs):
     from notifications.service import notify_member_removed
     notify_member_removed(user=user, tenant=tenant)
+
+
+# ---------------------------------------------------------------------------
+# Learn — content approved by reviewer
+# ---------------------------------------------------------------------------
+
+@receiver(content_approved)
+def on_content_approved(sender, record, approved_by, **kwargs):
+    from notifications.service import notify_content_approved
+    notify_content_approved(record=record, approved_by=approved_by)

@@ -1,0 +1,76 @@
+<div class="notif-card"
+     id="notif-{{ n.id }}"
+     style="display: flex; align-items: flex-start; gap: 14px; padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            {% if not n.is_read %}border-left: 3px solid var(--primary); background: color-mix(in srgb, var(--primary) 4%, transparent);{% endif %}
+            transition: background 0.15s;">
+
+    {# Icon by type #}
+    <div style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+                background: var(--card-2); border: 1px solid var(--border);
+                display: flex; align-items: center; justify-content: center;">
+        <span class="material-symbols-outlined" style="font-size: 18px; color:
+            {% if n.notification_type == 'level_advanced' %}var(--primary)
+            {% elif n.notification_type == 'certification_earned' %}#d97706
+            {% elif n.notification_type == 'tenant_invitation' %}var(--primary)
+            {% elif n.notification_type == 'announcement' %}#7c3aed
+            {% elif n.notification_type == 'member_added' %}#16a34a
+            {% elif n.notification_type == 'member_removed' %}#dc2626
+            {% elif n.notification_type == 'activity_assigned' %}#0284c7
+            {% else %}var(--muted){% endif %};">
+            {% if n.notification_type == 'level_advanced' %}military_tech
+            {% elif n.notification_type == 'certification_earned' %}workspace_premium
+            {% elif n.notification_type == 'tenant_invitation' %}group_add
+            {% elif n.notification_type == 'announcement' %}campaign
+            {% elif n.notification_type == 'member_added' %}person_add
+            {% elif n.notification_type == 'member_removed' %}person_remove
+            {% elif n.notification_type == 'activity_assigned' %}task_alt
+            {% elif n.notification_type == 'induction_completed' %}school
+            {% else %}notifications{% endif %}
+        </span>
+    </div>
+
+    {# Content #}
+    <div style="flex: 1; min-width: 0;">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+            <div style="font-size: 13px; font-weight: {% if not n.is_read %}700{% else %}500{% endif %};
+                        color: var(--text); line-height: 1.4;">
+                {% if not n.is_read %}
+                <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+                             background: var(--primary); margin-right: 5px;
+                             vertical-align: middle; flex-shrink: 0;"></span>
+                {% endif %}
+                {{ n.title }}
+            </div>
+            {% if not n.is_read %}
+            <button hx-post="{% url 'notifications:mark-read' n.id %}"
+                    hx-target="#notif-{{ n.id }}"
+                    hx-swap="outerHTML"
+                    style="flex-shrink: 0; background: none; border: none; cursor: pointer;
+                           padding: 2px; color: var(--muted); display: flex; align-items: center;"
+                    title="Mark as read">
+                <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+            </button>
+            {% endif %}
+        </div>
+
+        {% if n.body %}
+        <div style="font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5;">
+            {{ n.body }}
+        </div>
+        {% endif %}
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+            <span style="font-size: 11px; color: var(--muted);">{{ n.created_at|timesince }} ago</span>
+            <span style="font-size: 11px; color: var(--muted);">·</span>
+            <span style="font-size: 11px; color: var(--muted);">{{ n.get_notification_type_display }}</span>
+            {% if n.data.url %}
+            <span style="font-size: 11px; color: var(--muted);">·</span>
+            <a href="{{ n.data.url }}"
+               style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none;">
+                View →
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
