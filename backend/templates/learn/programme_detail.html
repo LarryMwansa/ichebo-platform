@@ -124,9 +124,20 @@
                         {{ forloop.counter }}
                     </div>
                     <div style="flex: 1; min-width: 0;">
-                        <div style="font-size: 13px; font-weight: 600; color: var(--text);
-                                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            {{ lesson.title }}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 13px; font-weight: 600; color: var(--text);
+                                         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ lesson.title }}
+                            </span>
+                            {% if lesson.status == 'draft' %}
+                            <span style="font-size: 9px; font-weight: 700; text-transform: uppercase;
+                                         letter-spacing: 0.06em; padding: 2px 6px; border-radius: 4px;
+                                         background: var(--card-2); color: var(--muted); flex-shrink: 0;">Draft</span>
+                            {% elif lesson.status == 'submitted' %}
+                            <span style="font-size: 9px; font-weight: 700; text-transform: uppercase;
+                                         letter-spacing: 0.06em; padding: 2px 6px; border-radius: 4px;
+                                         background: #fff3cd; color: #856404; flex-shrink: 0;">In Review</span>
+                            {% endif %}
                         </div>
                         <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
                             {{ lesson.record_type|title }}

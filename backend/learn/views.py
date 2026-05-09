@@ -114,9 +114,12 @@ def programme_detail(request, programme_id):
         relationship_type='part_of'
     ).values_list('from_record_id', flat=True)
 
+    is_author = _user_level(user) >= 4
+    visible_statuses = ['active', 'locked', 'draft', 'submitted'] if is_author else ['active', 'locked']
+
     courses = Record.objects.filter(
         id__in=course_ids, record_type='course',
-        status__in=['active', 'locked']
+        status__in=visible_statuses
     ).order_by('created_at')
 
     curriculum = []
@@ -127,7 +130,7 @@ def programme_detail(request, programme_id):
         lessons = Record.objects.filter(
             id__in=lesson_ids,
             record_type__in=['lesson', 'assignment', 'quiz'],
-            status__in=['active', 'locked']
+            status__in=visible_statuses
         ).order_by('created_at')
         curriculum.append({'course': course, 'lessons': list(lessons)})
 
@@ -148,10 +151,13 @@ def programme_detail(request, programme_id):
 
 @login_required
 def course_detail(request, course_id):
+    is_author = _user_level(request.user) >= 4
+    visible_statuses = ['active', 'locked', 'draft', 'submitted'] if is_author else ['active', 'locked']
+
     course = get_object_or_404(
         Record, id=course_id,
         record_type='course',
-        status__in=['active', 'locked']
+        status__in=visible_statuses
     )
 
     lesson_ids = Relationship.objects.filter(
@@ -161,7 +167,7 @@ def course_detail(request, course_id):
     lessons = Record.objects.filter(
         id__in=lesson_ids,
         record_type__in=['lesson', 'assignment', 'quiz'],
-        status__in=['active', 'locked']
+        status__in=visible_statuses
     ).order_by('created_at')
 
     # Resolve parent programme via relationship
@@ -469,6 +475,8 @@ def author_lesson_form(request, record_id=None):
 
     if request.method == 'POST':
         video_url = request.POST.get('video_url', '').strip()
+        is_submit = request.POST.get('action') == 'submit'
+
         if record:
             record.title = request.POST.get('title', '').strip()
             record.content = request.POST.get('content', '').strip()
@@ -478,9 +486,12 @@ def author_lesson_form(request, record_id=None):
             elif 'video_url' in custom:
                 del custom['video_url']
             record.custom_fields = custom
-            record.save(update_fields=['title', 'content', 'custom_fields', 'updated_at'])
+            if is_submit and record.status == 'draft':
+                record.status = 'submitted'
+            record.save(update_fields=['title', 'content', 'custom_fields', 'status', 'updated_at'])
         else:
             custom_fields = {'video_url': video_url} if video_url else {}
+            status = 'submitted' if is_submit else 'draft'
             lesson = Record.objects.create(
                 created_by=request.user,
                 record_class='organizational',
@@ -489,7 +500,7 @@ def author_lesson_form(request, record_id=None):
                 origin='user',
                 title=request.POST.get('title', '').strip(),
                 content=request.POST.get('content', '').strip(),
-                status='draft',
+                status=status,
                 custom_fields=custom_fields,
                 metadata={'source_app': 'learn'},
                 permissions_data={'visibility': 'tenant', 'required_level': 1,

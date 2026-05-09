@@ -142,11 +142,21 @@
                           font-size: 13px; font-weight: 700; color: var(--text); text-decoration: none;">
                     Cancel
                 </a>
-                <button type="submit" class="ws-topbar__cta"
-                        style="flex: 2; background: var(--primary); color: #fff; border: none; cursor: pointer;">
-                    <span class="material-symbols-outlined">save</span>
-                    {% if record %}Save Changes{% else %}Create Draft Unit{% endif %}
+                <button type="submit" name="action" value="draft"
+                        style="flex: 1; height: 40px; display: flex; align-items: center; justify-content: center;
+                               gap: 6px; background: var(--card-2); border: 1px solid var(--border);
+                               border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--text);
+                               cursor: pointer;">
+                    <span class="material-symbols-outlined" style="font-size: 17px;">save</span>
+                    {% if record %}Save Draft{% else %}Save as Draft{% endif %}
                 </button>
+                {% if not record or record.status == 'draft' %}
+                <button type="submit" name="action" value="submit" class="ws-topbar__cta"
+                        style="flex: 2; background: var(--primary); color: #fff; border: none; cursor: pointer;">
+                    <span class="material-symbols-outlined">send</span>
+                    Submit for Review
+                </button>
+                {% endif %}
             </div>
 
         </div>
