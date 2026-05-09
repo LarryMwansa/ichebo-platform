@@ -138,6 +138,11 @@
      class="ws-tab {% if request.resolver_match.url_name == 'manage' %}active{% endif %}">
     Manage
   </a>
+  <a href="{% url 'video_live:studio' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'studio' %}active{% endif %}">
+    <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">live_tv</span>
+    Studio
+  </a>
   {% endif %}
 </div>
 {% endblock %}

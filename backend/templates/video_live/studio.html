@@ -10,6 +10,20 @@
     <span class="ws-topbar__breadcrumb-item">Studio</span>
 {% endblock %}
 
+{% block ws_tabs %}
+<div class="ws-tab-row">
+  <a href="{% url 'video_live:home' %}" class="ws-tab">Home</a>
+  <a href="{% url 'video_live:live' %}" class="ws-tab">Live</a>
+  <a href="{% url 'video_live:schedule' %}" class="ws-tab">Schedule</a>
+  <a href="{% url 'video_live:vod' %}" class="ws-tab">Recordings</a>
+  <a href="{% url 'video_live:manage' %}" class="ws-tab">Manage</a>
+  <a href="{% url 'video_live:studio' %}" class="ws-tab active">
+    <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">live_tv</span>
+    Studio
+  </a>
+</div>
+{% endblock %}
+
 {% block context_header %}Broadcast Center{% endblock %}
 {% block context_content %}
     {% include "video_live/partials/video_sidebar.html" %}
