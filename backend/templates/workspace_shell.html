@@ -232,7 +232,7 @@
                     </button>
                     <div class="ws-topbar__breadcrumb">
                         {% block breadcrumb %}
-                            <span class="ws-topbar__breadcrumb-item">Workspace</span>
+                            <span class="ws-topbar__breadcrumb-item">{{ ws_page_title|default:"ICS" }}</span>
                         {% endblock %}
                     </div>
                 </div>

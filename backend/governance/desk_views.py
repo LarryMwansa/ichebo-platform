@@ -69,6 +69,23 @@ def universal_save(request):
     rtype = request.POST.get('record_type', 'note')
     title = request.POST.get('title', 'Untitled').strip()
     content = request.POST.get('content', '').strip()
+    record_id = request.POST.get('record_id', '').strip()
+
+    # 0. Handle UPDATE path — existing record
+    if record_id:
+        try:
+            record = Record.objects.get(id=record_id, created_by=request.user, deleted_at__isnull=True)
+            record.title = title
+            record.content = content
+            record.record_type = rtype
+            record.record_family = family
+            record.save(update_fields=['title', 'content', 'record_type', 'record_family', 'updated_at'])
+            from django.urls import reverse
+            response = HttpResponse(status=204)
+            response['HX-Redirect'] = reverse('records:records-detail', kwargs={'record_id': record.id})
+            return response
+        except Record.DoesNotExist:
+            return HttpResponse('<div class="ws-alert ws-alert--error">Record not found.</div>', status=404)
 
     # 1. Handle Activity Family
     if family == 'activity':

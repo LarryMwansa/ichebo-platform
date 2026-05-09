@@ -72,7 +72,7 @@
                    value="{{ active_family|default:'journal' }}">
             <input type="hidden" name="record_type" id="hidden-record-type"
                    value="{{ active_type|default:'note' }}">
-            <input type="hidden" id="record-id-meta" value="{{ record.id|default:'' }}">
+            <input type="hidden" name="record_id" id="record-id-meta" value="{{ record.id|default:'' }}">
 
             <input type="text" name="title" id="record-title"
                    value="{{ record.title|default:'' }}"
