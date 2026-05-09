@@ -468,11 +468,19 @@ def author_lesson_form(request, record_id=None):
     )
 
     if request.method == 'POST':
+        video_url = request.POST.get('video_url', '').strip()
         if record:
             record.title = request.POST.get('title', '').strip()
             record.content = request.POST.get('content', '').strip()
-            record.save(update_fields=['title', 'content', 'updated_at'])
+            custom = record.custom_fields or {}
+            if video_url:
+                custom['video_url'] = video_url
+            elif 'video_url' in custom:
+                del custom['video_url']
+            record.custom_fields = custom
+            record.save(update_fields=['title', 'content', 'custom_fields', 'updated_at'])
         else:
+            custom_fields = {'video_url': video_url} if video_url else {}
             lesson = Record.objects.create(
                 created_by=request.user,
                 record_class='organizational',
@@ -482,6 +490,7 @@ def author_lesson_form(request, record_id=None):
                 title=request.POST.get('title', '').strip(),
                 content=request.POST.get('content', '').strip(),
                 status='draft',
+                custom_fields=custom_fields,
                 metadata={'source_app': 'learn'},
                 permissions_data={'visibility': 'tenant', 'required_level': 1,
                                   'roles_allowed': [], 'can_edit': []},
