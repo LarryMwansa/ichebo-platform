@@ -1,64 +1,193 @@
-{% extends "learn/base_learn.html" %}
+{% extends "workspace_shell.html" %}
+{% load static %}
 
-{% block learn_content %}
-<div class="lesson-viewer">
-  {% if programme %}
-    <a href="{% url 'learn:learn-programme' programme.id %}" class="btn-touch" style="margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px;">
-      <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back</span> Back to Programme
+{% block title %}{{ lesson.title }} — Ichebo{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Formation</span>
+    <span class="ws-topbar__breadcrumb-sep">›</span>
+    {% if programme %}
+    <a href="{% url 'learn:learn-programme' programme.id %}"
+       class="ws-topbar__breadcrumb-item" style="text-decoration: none; color: inherit;">
+        {{ programme.title|truncatechars:24 }}
     </a>
-  {% elif course %}
-    <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch" style="margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 4px;">
-      <span class="material-symbols-outlined" style="font-size: 1.2rem;">arrow_back</span> Back to Catalogue
+    <span class="ws-topbar__breadcrumb-sep">›</span>
+    {% elif course %}
+    <a href="{% url 'learn:learn-course' course.id %}"
+       class="ws-topbar__breadcrumb-item" style="text-decoration: none; color: inherit;">
+        {{ course.title|truncatechars:24 }}
     </a>
-  {% endif %}
-  <span class="lesson-type-tag">{{ lesson.record_type }}</span>
-  <h2 class="lesson-title">{{ lesson.title }}</h2>
-
-  {% if video_url %}
-  {% include "video/_player.html" with title=lesson.title %}
-  {% endif %}
-
-  <div class="lesson-content">
-    {{ lesson.content|linebreaks }}
-  </div>
-
-  <!-- Quiz form if lesson is a quiz -->
-  {% if lesson.record_type == 'quiz' and lesson.custom_fields.questions %}
-  {% include "learn/partials/quiz.html" %}
-  {% endif %}
-
-  <div class="lesson-nav">
-    {% if prev_lesson %}
-      <a href="{% url 'learn:learn-lesson' prev_lesson.id %}" class="btn-touch">← Previous</a>
-    {% else %}
-      <span></span>
+    <span class="ws-topbar__breadcrumb-sep">›</span>
     {% endif %}
+    <span class="ws-topbar__breadcrumb-item">{{ lesson.title|truncatechars:28 }}</span>
+{% endblock %}
 
-    <div id="complete-section">
-      {% if is_completed %}
-        <button class="btn-touch" style="background: #2e7d32; color: #fff;" disabled>✓ Completed</button>
-      {% elif lesson.record_type == 'assignment' %}
-        {% include "learn/partials/assignment_form.html" %}
-      {% else %}
-        {% include "learn/partials/lesson_complete_btn.html" %}
-      {% endif %}
+{% block ws_tabs %}
+<div class="ws-tab-row">
+    <a href="{% url 'learn:learn-home' %}"
+       class="ws-tab {% if request.resolver_match.url_name == 'learn-home' %}active{% endif %}">
+        My Learning
+    </a>
+    <a href="{% url 'learn:learn-catalogue' %}"
+       class="ws-tab {% if request.resolver_match.url_name == 'learn-catalogue' %}active{% endif %}">
+        Catalogue
+    </a>
+    <a href="{% url 'learn:learn-cert-queue' %}"
+       class="ws-tab {% if request.resolver_match.url_name == 'learn-cert-queue' %}active{% endif %}">
+        Certifications
+    </a>
+    {% if request.user.competence_level >= 4 %}
+    <a href="{% url 'learn:learn-author' %}"
+       class="ws-tab {% if 'author' in request.resolver_match.url_name %}active{% endif %}">
+        Authorship
+    </a>
+    {% endif %}
+    {% if request.user.competence_level >= 5 %}
+    <a href="{% url 'learn:learn-review' %}"
+       class="ws-tab {% if 'review' in request.resolver_match.url_name %}active{% endif %}">
+        Review Queue
+    </a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block context_header %}Formation Ops{% endblock %}
+{% block context_content %}
+    {% include "learn/partials/learn_sidebar.html" %}
+{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 860px;">
+
+    {# ── Back link ── #}
+    <div style="margin-bottom: 24px;">
+        {% if programme %}
+        <a href="{% url 'learn:learn-programme' programme.id %}"
+           style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px;
+                  font-weight: 700; color: var(--muted); text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 15px;">arrow_back</span>
+            Back to Programme
+        </a>
+        {% elif course %}
+        <a href="{% url 'learn:learn-course' course.id %}"
+           style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px;
+                  font-weight: 700; color: var(--muted); text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 15px;">arrow_back</span>
+            Back to Course
+        </a>
+        {% else %}
+        <a href="{% url 'learn:learn-catalogue' %}"
+           style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px;
+                  font-weight: 700; color: var(--muted); text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 15px;">arrow_back</span>
+            Catalogue
+        </a>
+        {% endif %}
     </div>
 
-    {% if next_lesson %}
-      <a href="{% url 'learn:learn-lesson' next_lesson.id %}" class="btn-touch">Next →</a>
-    {% else %}
-      <span></span>
-    {% endif %}
-  </div>
+    {# ── Lesson header ── #}
+    <div style="margin-bottom: 32px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">{{ lesson.record_type|title }}</div>
+        <h1 class="ws-page-title">{{ lesson.title }}</h1>
+    </div>
 
-  <!-- Linked Records Panel -->
-  <div style="margin-top: 2rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
+    {# ── Video player ── #}
+    {% if video_url %}
+    {% include "video/_player.html" with title=lesson.title %}
+    {% endif %}
+
+    {# ── Lesson content ── #}
+    <div style="font-size: 15px; line-height: 1.8; color: var(--text); margin-bottom: 40px;">
+        {{ lesson.content|linebreaks }}
+    </div>
+
+    {# ── Quiz ── #}
+    {% if lesson.record_type == 'quiz' and lesson.custom_fields.questions %}
+    {% include "learn/partials/quiz.html" %}
+    {% endif %}
+
+    {# ── Navigation + completion ── #}
+    <div style="display: flex; align-items: center; justify-content: space-between;
+                padding: 20px 0; border-top: 1px solid var(--border); margin-top: 16px; gap: 16px;">
+
+        <div style="flex: 1;">
+            {% if prev_lesson %}
+            <a href="{% url 'learn:learn-lesson' prev_lesson.id %}"
+               style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;
+                      font-weight: 700; color: var(--text); text-decoration: none; padding: 10px 16px;
+                      border: 1px solid var(--border); border-radius: 8px;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+                Previous
+            </a>
+            {% endif %}
+        </div>
+
+        <div id="complete-section" style="flex-shrink: 0;">
+            {% if is_completed %}
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+                        background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px;
+                        font-size: 13px; font-weight: 700; color: #2e7d32;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span>
+                Completed
+            </div>
+            {% elif lesson.record_type == 'assignment' %}
+            {% include "learn/partials/assignment_form.html" %}
+            {% else %}
+            {% include "learn/partials/lesson_complete_btn.html" %}
+            {% endif %}
+        </div>
+
+        <div style="flex: 1; display: flex; justify-content: flex-end;">
+            {% if next_lesson %}
+            <a href="{% url 'learn:learn-lesson' next_lesson.id %}"
+               style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px;
+                      font-weight: 700; color: #fff; text-decoration: none; padding: 10px 16px;
+                      background: var(--primary); border: none; border-radius: 8px;">
+                Next
+                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 0 4px;">
+
+    {# ── Lesson progress in course ── #}
+    {% if siblings %}
+    <div class="ws-label-tag" style="margin-bottom: 12px;">In This Course</div>
+    <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 20px;">
+        {% for s in siblings %}
+        <a href="{% url 'learn:learn-lesson' s.id %}"
+           style="display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+                  border-radius: 6px; text-decoration: none; font-size: 12px;
+                  font-weight: {% if s.id == lesson.id %}700{% else %}500{% endif %};
+                  color: {% if s.id == lesson.id %}var(--primary){% else %}var(--text){% endif %};
+                  background: {% if s.id == lesson.id %}var(--card-2){% else %}transparent{% endif %};">
+            <span class="material-symbols-outlined" style="font-size: 14px; flex-shrink: 0;
+                  color: {% if s.id == lesson.id %}var(--primary){% else %}var(--muted){% endif %};">
+                {% if s.id == lesson.id %}play_circle{% else %}radio_button_unchecked{% endif %}
+            </span>
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                {{ s.title|truncatechars:30 }}
+            </span>
+        </a>
+        {% endfor %}
+    </div>
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+    {% endif %}
+
+    {# ── Linked Records ── #}
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Linked Records</div>
     <div id="linked-records-panel"
          hx-get="{% url 'learn:htmx-linked-records' lesson.id %}"
          hx-trigger="load"
          hx-swap="innerHTML">
-      <div style="color: var(--muted); font-size: 13px;">Loading linked records…</div>
+        <div style="font-size: 12px; color: var(--muted); font-style: italic;">Loading…</div>
     </div>
-  </div>
+
 </div>
 {% endblock %}

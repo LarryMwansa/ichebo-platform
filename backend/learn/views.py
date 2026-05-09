@@ -1,4 +1,6 @@
 # learn/views.py — Django template views + HTMX partial views
+import json
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -840,15 +842,16 @@ def htmx_enrol(request, programme_id):
         already = 'already enrolled' in str(exc).lower()
         if already:
             return HttpResponse(
-                '<div class="status-badge status-badge--active" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;">'
+                '<div style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;'
+                'background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;'
+                'font-size:13px;font-weight:700;color:#2e7d32;">'
                 '<span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>'
                 'Active Enrolment'
                 '</div>'
             )
-        return HttpResponse(
-            f'<span style="color:var(--error);font-size:13px;">{exc}</span>',
-            status=400,
-        )
+        resp = HttpResponse(status=400)
+        resp['X-WS-Toast'] = json.dumps([{'level': 'error', 'message': str(exc)}])
+        return resp
 
     return HttpResponse(
         '<div class="status-badge status-badge--active" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;">'
@@ -874,23 +877,30 @@ def htmx_complete_lesson(request, lesson_id):
     ).first()
 
     if not task_activity:
-        return HttpResponse(
-            '<span style="color:var(--muted);font-size:13px;">Enrol in this programme to track progress.</span>'
-        )
+        resp = HttpResponse(status=204)
+        resp['X-WS-Toast'] = json.dumps([{
+            'level': 'warning',
+            'message': 'Enrol in this programme first to track your progress.',
+        }])
+        return resp
 
     try:
         complete_lesson(request.user, task_activity)
     except EnrolmentError as exc:
-        return HttpResponse(
-            f'<span style="color:var(--error);font-size:13px;">{exc}</span>',
-            status=400,
-        )
+        resp = HttpResponse(status=400)
+        resp['X-WS-Toast'] = json.dumps([{'level': 'error', 'message': str(exc)}])
+        return resp
 
-    return HttpResponse(
-        '<button class="btn-touch" style="background:#2e7d32;color:#fff;" disabled>'
-        '✓ Completed'
-        '</button>'
+    resp = HttpResponse(
+        '<div style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;'
+        'background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;'
+        'font-size:13px;font-weight:700;color:#2e7d32;">'
+        '<span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>'
+        'Completed'
+        '</div>'
     )
+    resp['X-WS-Toast'] = json.dumps([{'level': 'success', 'message': 'Lesson marked complete!'}])
+    return resp
 
 
 @login_required
@@ -909,9 +919,12 @@ def htmx_submit_assessment(request, lesson_id):
     ).first()
 
     if not task_activity:
-        return HttpResponse(
-            '<span style="color:var(--muted);font-size:13px;">Enrol in this programme to submit.</span>'
-        )
+        resp = HttpResponse(status=204)
+        resp['X-WS-Toast'] = json.dumps([{
+            'level': 'warning',
+            'message': 'Enrol in this programme first to submit.',
+        }])
+        return resp
 
     # Collect submission: single textarea (assignment) or multiple q_* fields (quiz)
     submission_data = {}
@@ -928,16 +941,20 @@ def htmx_submit_assessment(request, lesson_id):
     try:
         complete_lesson(request.user, task_activity)
     except EnrolmentError as exc:
-        return HttpResponse(
-            f'<span style="color:var(--error);font-size:13px;">{exc}</span>',
-            status=400,
-        )
+        resp = HttpResponse(status=400)
+        resp['X-WS-Toast'] = json.dumps([{'level': 'error', 'message': str(exc)}])
+        return resp
 
-    return HttpResponse(
-        '<button class="btn-touch" style="background:#2e7d32;color:#fff;" disabled>'
-        '✓ Submitted &amp; Completed'
-        '</button>'
+    resp = HttpResponse(
+        '<div style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;'
+        'background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;'
+        'font-size:13px;font-weight:700;color:#2e7d32;">'
+        '<span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>'
+        'Submitted &amp; Completed'
+        '</div>'
     )
+    resp['X-WS-Toast'] = json.dumps([{'level': 'success', 'message': 'Submission received and lesson complete!'}])
+    return resp
 
 
 @login_required
