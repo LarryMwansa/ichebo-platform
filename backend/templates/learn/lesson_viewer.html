@@ -14,6 +14,10 @@
   <span class="lesson-type-tag">{{ lesson.record_type }}</span>
   <h2 class="lesson-title">{{ lesson.title }}</h2>
 
+  {% if video_url %}
+  {% include "video/_player.html" with title=lesson.title %}
+  {% endif %}
+
   <div class="lesson-content">
     {{ lesson.content|linebreaks }}
   </div>

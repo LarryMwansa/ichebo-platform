@@ -58,6 +58,8 @@ class Tenant(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
         null=True, blank=True, related_name='coordinating_tenants'
     )
+    community_theme = models.CharField(max_length=100, blank=True)
+    area_of_operation = models.TextField(blank=True)
 
     # Location (JSON field — PostgreSQL)
     location = models.JSONField(default=dict, blank=True)

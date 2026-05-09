@@ -1,0 +1,33 @@
+{# video/_player.html — Universal video embed partial
+   Context required: video_url (raw URL), embed_url (processed by get_embed_url), video_type
+#}
+{% if video_url %}
+<div class="video-player-wrap" style="margin: var(--space-l) 0; border-radius: 12px; overflow: hidden;
+                                       background: #000; aspect-ratio: 16/9; position: relative;">
+    {% if video_type == 'youtube' or video_type == 'vimeo' %}
+    <iframe src="{{ embed_url }}"
+            style="position: absolute; inset: 0; width: 100%; height: 100%; border: none;"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+            title="{{ title|default:'Lesson video' }}">
+    </iframe>
+    {% elif video_type == 'direct' %}
+    <video src="{{ embed_url }}"
+           controls
+           style="position: absolute; inset: 0; width: 100%; height: 100%;"
+           preload="metadata">
+        Your browser does not support the video tag.
+    </video>
+    {% else %}
+    <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+        <a href="{{ video_url }}" target="_blank" rel="noopener"
+           style="display: flex; flex-direction: column; align-items: center; gap: 12px;
+                  color: #fff; text-decoration: none; opacity: 0.8;">
+            <span class="material-symbols-outlined" style="font-size: 48px;">play_circle</span>
+            <span style="font-size: 13px; font-weight: 600;">Open video in new tab</span>
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endif %}

@@ -99,9 +99,11 @@
                                 letter-spacing: 0.07em; color: var(--muted); margin-bottom: 2px;">
                         Course {{ forloop.counter }}
                     </div>
-                    <div style="font-size: 14px; font-weight: 700; color: var(--text);">
+                    <a href="{% url 'learn:learn-course' item.course.id %}"
+                       style="font-size: 14px; font-weight: 700; color: var(--primary);
+                              text-decoration: none;">
                         {{ item.course.title }}
-                    </div>
+                    </a>
                 </div>
             </div>
 

@@ -144,6 +144,40 @@ def programme_detail(request, programme_id):
     })
 
 
+# ── Course Detail ─────────────────────────────────────────────────────────────
+
+@login_required
+def course_detail(request, course_id):
+    course = get_object_or_404(
+        Record, id=course_id,
+        record_type='course',
+        status__in=['active', 'locked']
+    )
+
+    lesson_ids = Relationship.objects.filter(
+        to_record_id=course_id, relationship_type='part_of'
+    ).values_list('from_record_id', flat=True)
+
+    lessons = Record.objects.filter(
+        id__in=lesson_ids,
+        record_type__in=['lesson', 'assignment', 'quiz'],
+        status__in=['active', 'locked']
+    ).order_by('created_at')
+
+    # Resolve parent programme via relationship
+    programme_rel = Relationship.objects.filter(
+        from_record_id=course_id, relationship_type='part_of',
+    ).select_related('to_record').first()
+    programme = programme_rel.to_record if programme_rel else None
+
+    return render(request, 'learn/course_detail.html', {
+        'course': course,
+        'lessons': lessons,
+        'programme': programme,
+        'ws_page_title': 'Learn',
+    })
+
+
 # ── Lesson Viewer ─────────────────────────────────────────────────────────────
 
 @login_required
@@ -191,6 +225,11 @@ def lesson_viewer(request, lesson_id):
         linked_record_id=lesson_id,
     ).exists()
 
+    from core.utils.video import get_embed_url, get_video_type
+    raw_video_url = (lesson.custom_fields or {}).get('video_url', '')
+    embed_url = get_embed_url(raw_video_url) if raw_video_url else None
+    video_type = get_video_type(raw_video_url) if raw_video_url else None
+
     return render(request, 'learn/lesson_viewer.html', {
         'lesson': lesson,
         'course': course,
@@ -198,6 +237,9 @@ def lesson_viewer(request, lesson_id):
         'prev_lesson': prev_lesson,
         'next_lesson': next_lesson,
         'is_completed': is_completed,
+        'video_url': raw_video_url,
+        'embed_url': embed_url,
+        'video_type': video_type,
     })
 
 

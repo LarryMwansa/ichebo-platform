@@ -1,0 +1,170 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block title %}{{ course.title }} — Ichebo{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Formation</span>
+    <span class="ws-topbar__breadcrumb-sep">›</span>
+    {% if programme %}
+    <a href="{% url 'learn:learn-programme' programme.id %}"
+       class="ws-topbar__breadcrumb-item" style="text-decoration: none; color: inherit;">
+        {{ programme.title|truncatechars:24 }}
+    </a>
+    <span class="ws-topbar__breadcrumb-sep">›</span>
+    {% endif %}
+    <span class="ws-topbar__breadcrumb-item">{{ course.title|truncatechars:28 }}</span>
+{% endblock %}
+
+{% block context_header %}Formation Ops{% endblock %}
+{% block context_content %}
+    {% include "learn/partials/learn_sidebar.html" %}
+{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 900px;">
+
+    {# ── Back link ── #}
+    <div style="margin-bottom: 24px;">
+        {% if programme %}
+        <a href="{% url 'learn:learn-programme' programme.id %}"
+           style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px;
+                  font-weight: 700; color: var(--muted); text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 15px;">arrow_back</span>
+            Back to Programme
+        </a>
+        {% else %}
+        <a href="{% url 'learn:learn-catalogue' %}"
+           style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px;
+                  font-weight: 700; color: var(--muted); text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 15px;">arrow_back</span>
+            Catalogue
+        </a>
+        {% endif %}
+    </div>
+
+    {# ── Hero ── #}
+    <div style="margin-bottom: 36px;">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;">
+            <div style="flex: 1; min-width: 0;">
+                <div class="ws-label-tag" style="margin-bottom: 12px;">Course</div>
+                <h1 class="ws-page-title" style="margin-bottom: 14px;">{{ course.title }}</h1>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                 letter-spacing: 0.06em; color: var(--primary);">
+                        {{ course.custom_fields.kgs_qualification|default:"Course" }}
+                    </span>
+                    {% if course.custom_fields.duration %}
+                    <span style="font-size: 10px; color: var(--muted);">·</span>
+                    <span style="font-size: 10px; color: var(--muted);">{{ course.custom_fields.duration }}</span>
+                    {% endif %}
+                    <span style="font-size: 10px; color: var(--muted);">·</span>
+                    <span style="font-size: 10px; color: var(--muted);">{{ lessons|length }} lesson{{ lessons|length|pluralize }}</span>
+                </div>
+            </div>
+            <span class="material-symbols-outlined"
+                  style="font-size: 48px; opacity: 0.08; flex-shrink: 0; color: var(--text);">menu_book</span>
+        </div>
+
+        {% if course.content %}
+        <p style="font-size: 13px; color: var(--muted); margin-top: 20px; line-height: 1.7; max-width: 680px;">
+            {{ course.content }}
+        </p>
+        {% endif %}
+    </div>
+
+    {# ── Lessons ── #}
+    <div class="ws-label-tag" style="margin-bottom: 20px;">Lessons</div>
+
+    {% if lessons %}
+    <div style="background: var(--card); border: 1px solid var(--border);
+                border-radius: 12px; overflow: hidden;">
+        {% for lesson in lessons %}
+        <a href="{% url 'learn:learn-lesson' lesson.id %}"
+           style="display: flex; align-items: center; gap: 14px;
+                  padding: 16px 20px; text-decoration: none;
+                  border-bottom: {% if not forloop.last %}1px solid var(--border){% else %}none{% endif %};
+                  transition: background 0.12s;"
+           onmouseover="this.style.background='var(--hover)'"
+           onmouseout="this.style.background='transparent'">
+
+            <div style="width: 32px; height: 32px; border-radius: 50%;
+                        background: var(--card-2); border: 1px solid var(--border);
+                        display: flex; align-items: center; justify-content: center;
+                        font-size: 11px; font-weight: 800; color: var(--muted); flex-shrink: 0;">
+                {{ forloop.counter }}
+            </div>
+
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 14px; font-weight: 600; color: var(--text);
+                            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ lesson.title }}
+                </div>
+                <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+                    {{ lesson.record_type|title }}
+                    {% if lesson.custom_fields.duration %}· {{ lesson.custom_fields.duration }}{% endif %}
+                </div>
+            </div>
+
+            <span class="material-symbols-outlined"
+                  style="font-size: 20px; color: var(--primary); flex-shrink: 0;">
+                {% if lesson.record_type == 'assignment' %}assignment
+                {% elif lesson.record_type == 'quiz' %}quiz
+                {% else %}play_circle{% endif %}
+            </span>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div style="padding: 60px 0; text-align: center;">
+        <span class="material-symbols-outlined"
+              style="font-size: 48px; opacity: 0.1; display: block; color: var(--text);">auto_stories</span>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 16px;">
+            Lessons pending publication.
+        </p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 0 4px;">
+
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Course Info</div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+        <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                    padding: 12px 14px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Lessons</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--text);
+                        font-family: 'Playfair Display', serif;">{{ lessons|length }}</div>
+        </div>
+    </div>
+
+    {% if programme %}
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Programme</div>
+    <a href="{% url 'learn:learn-programme' programme.id %}"
+       style="display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+              background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+              text-decoration: none; font-size: 12px; font-weight: 600; color: var(--text);">
+        <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">school</span>
+        {{ programme.title|truncatechars:32 }}
+    </a>
+    {% endif %}
+
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Linked Records</div>
+    <div id="linked-records-panel"
+         hx-get="{% url 'learn:htmx-linked-records' course.id %}"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+        <div style="font-size: 12px; color: var(--muted); font-style: italic;">Loading…</div>
+    </div>
+
+</div>
+{% endblock %}

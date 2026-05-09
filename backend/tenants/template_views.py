@@ -340,17 +340,21 @@ def create_tenant(request):
     )
 
     if request.method == 'POST':
-        name        = request.POST.get('name', '').strip()
-        tier        = request.POST.get('tier', '').strip()
-        affiliation = request.POST.get('affiliation', '').strip()
-        description = request.POST.get('description', '').strip()
-        parent_id   = request.POST.get('parent_id', '').strip()
+        name             = request.POST.get('name', '').strip()
+        tier             = request.POST.get('tier', '').strip()
+        affiliation      = request.POST.get('affiliation', '').strip()
+        description      = request.POST.get('description', '').strip()
+        parent_id        = request.POST.get('parent_id', '').strip()
+        community_theme  = request.POST.get('community_theme', '').strip()
+        area_of_operation = request.POST.get('area_of_operation', '').strip()
 
         form_data = {
             'name': name, 'tier': tier,
             'affiliation': affiliation,
             'description': description,
             'parent_id': parent_id,
+            'community_theme': community_theme,
+            'area_of_operation': area_of_operation,
         }
 
         valid_tiers        = [t[0] for t in SELF_SERVICE_TIERS]
@@ -383,6 +387,8 @@ def create_tenant(request):
                 tier=tier, affiliation=affiliation,
                 status='active',
                 description=description or None,
+                community_theme=community_theme,
+                area_of_operation=area_of_operation,
                 parent=parent,
             )
             UserPermission.objects.create(
