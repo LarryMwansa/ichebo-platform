@@ -3,6 +3,10 @@
 
 {% block title %}Profile — {{ profile_user.display_name|default:profile_user.username }}{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
+
 {% block watermark %}IDENTITY{% endblock %}
 
 {% block breadcrumb %}
@@ -14,7 +18,7 @@
 <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Identity</div>
-    <a href="{% url 'accounts:profile' %}" class="ctx-btn ctx-btn--active">
+    <a href="{% url 'accounts:profile' %}" class="ctx-btn active">
         <span class="material-symbols-outlined">person</span>
         Registry Profile
     </a>

@@ -55,3 +55,11 @@ Promise4kipa
 Kingdom Member Number: 
 
 KMN-ZA-2026-00001
+
+
+petermikaili@gmail.com
+
+dressupSanji
+
+YOUR KINGDOM MEMBER NUMBER
+KMN-ZA-2026-00002

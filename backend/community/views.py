@@ -67,7 +67,10 @@ def my_community(request):
     level = _user_level(user)
 
     if level < 1:
-        return render(request, 'community/seeker_gate.html')
+        return render(request, 'community/seeker_gate.html', {
+            'active_app': 'community',
+            'ws_page_title': 'Community',
+        })
 
     perms = _get_user_permissions(user)
     primary_perm = perms[0] if perms else None
@@ -143,7 +146,7 @@ def my_community(request):
 @login_required
 def management_home(request):
     if not _require_level(request, 3):
-        return render(request, 'community/locked.html', {'min_level': 3}, status=403)
+        return render(request, 'community/locked.html', {'min_level': 3, 'active_app': 'community', 'ws_page_title': 'Community'}, status=403)
 
     perms = _get_user_permissions(request.user)
     primary_perm = perms[0] if perms else None
@@ -200,7 +203,7 @@ def management_home(request):
 @login_required
 def member_directory(request):
     if not _require_level(request, 3):
-        return render(request, 'community/locked.html', {'min_level': 3}, status=403)
+        return render(request, 'community/locked.html', {'min_level': 3, 'active_app': 'community', 'ws_page_title': 'Community'}, status=403)
 
     perms = _get_user_permissions(request.user)
     primary_perm = perms[0] if perms else None
@@ -238,7 +241,7 @@ def member_directory(request):
 @login_required
 def formation_pipeline(request):
     if not _require_level(request, 3):
-        return render(request, 'community/locked.html', {'min_level': 3}, status=403)
+        return render(request, 'community/locked.html', {'min_level': 3, 'active_app': 'community', 'ws_page_title': 'Community'}, status=403)
 
     perms = _get_user_permissions(request.user)
     primary_perm = perms[0] if perms else None
@@ -276,7 +279,7 @@ def formation_pipeline(request):
 @login_required
 def member_profile(request, member_id):
     if not _require_level(request, 3):
-        return render(request, 'community/locked.html', {'min_level': 3}, status=403)
+        return render(request, 'community/locked.html', {'min_level': 3, 'active_app': 'community', 'ws_page_title': 'Community'}, status=403)
 
     # UserPermission imported at module level
 
@@ -346,7 +349,9 @@ def gatherings_list(request):
     """Upcoming gatherings for the user's tenant. Level 1+."""
     user = request.user
     if _user_level(user) < 1:
-        return render(request, 'community/seeker_gate.html')
+        return render(request, 'community/seeker_gate.html', {
+            'active_app': 'community', 'ws_page_title': 'Community',
+        })
 
     perms = _get_user_permissions(user)
     primary_perm = perms[0] if perms else None
@@ -386,7 +391,9 @@ def gatherings_list(request):
 def community_detail(request, record_id):
     """Detail view for a gathering or announcement. Level 1+."""
     if _user_level(request.user) < 1:
-        return render(request, 'community/seeker_gate.html')
+        return render(request, 'community/seeker_gate.html', {
+            'active_app': 'community', 'ws_page_title': 'Community',
+        })
 
     record = get_object_or_404(
         Record,

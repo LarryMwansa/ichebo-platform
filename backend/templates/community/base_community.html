@@ -1,93 +1,54 @@
-{% extends base_template %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/community.css' %}">
 {% endblock %}
 
+{% block watermark %}COMMUNITY{% endblock %}
 
-{# ═══════════════════════════════════════════════════════════
-   WORKSPACE LAYOUT — Level 3+ Sceptre Stewards, desktop only.
-   Uses ws-layout--master-detail pattern from workspace.css.
-   ws_content is overridden per-template for steward views.
-   ═══════════════════════════════════════════════════════════ #}
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">{% block community_breadcrumb %}Community{% endblock %}</span>
+{% endblock %}
+
+{% block context_header %}Community{% endblock %}
+{% block context_content %}
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+    <a href="{% url 'community:community-home' %}" class="ctx-btn {% if active_community_tab == 'home' or not active_community_tab %}active{% endif %}">
+        <span class="material-symbols-outlined">group</span>
+        My Community
+    </a>
+    <a href="{% url 'community:community-gatherings' %}" class="ctx-btn {% if active_community_tab == 'gatherings' %}active{% endif %}">
+        <span class="material-symbols-outlined">calendar_month</span>
+        Gatherings
+    </a>
+    <a href="{% url 'community:community-members' %}" class="ctx-btn {% if active_community_tab == 'members' %}active{% endif %}">
+        <span class="material-symbols-outlined">groups</span>
+        Members
+    </a>
+    <a href="{% url 'community:community-management' %}" class="ctx-btn {% if active_community_tab == 'management' %}active{% endif %}">
+        <span class="material-symbols-outlined">settings_suggest</span>
+        Management
+    </a>
+    <a href="{% url 'community:community-pipeline' %}" class="ctx-btn {% if active_community_tab == 'pipeline' %}active{% endif %}">
+        <span class="material-symbols-outlined">analytics</span>
+        Pipeline
+    </a>
+</div>
+{% endblock %}
 
 {% block ws_content %}
-{# Default workspace shell — steward sub-templates override this #}
-<div class="ws-layout--master-detail">
-  <div class="ws-master-detail">
-
-    {# ── List panel — steward nav ── #}
-    <div class="ws-list-panel">
-      <div class="ws-list-panel__header">
-        <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Community</div>
-        <div style="display: flex; flex-direction: column; gap: var(--space-3xs);">
-
-          <a href="{% url 'community:community-management' %}"
-             class="ws-list-item {% if active_community_tab == 'management' or not active_community_tab %}active{% endif %}">
-            <span class="material-symbols-outlined" style="font-size:16px; flex-shrink:0;">settings_suggest</span>
-            <div>
-              <div class="ws-list-item__title">Management</div>
-              <div class="ws-list-item__meta">Requests &amp; oversight</div>
-            </div>
-          </a>
-
-          <a href="{% url 'community:community-members' %}"
-             class="ws-list-item {% if active_community_tab == 'members' %}active{% endif %}">
-            <span class="material-symbols-outlined" style="font-size:16px; flex-shrink:0;">groups</span>
-            <div>
-              <div class="ws-list-item__title">Members</div>
-              <div class="ws-list-item__meta">Directory &amp; search</div>
-            </div>
-          </a>
-
-          <a href="{% url 'community:community-pipeline' %}"
-             class="ws-list-item {% if active_community_tab == 'pipeline' %}active{% endif %}">
-            <span class="material-symbols-outlined" style="font-size:16px; flex-shrink:0;">analytics</span>
-            <div>
-              <div class="ws-list-item__title">Pipeline</div>
-              <div class="ws-list-item__meta">Formation tracking</div>
-            </div>
-          </a>
-
-          <a href="{% url 'community:community-gatherings' %}"
-             class="ws-list-item {% if active_community_tab == 'gatherings' %}active{% endif %}">
-            <span class="material-symbols-outlined" style="font-size:16px; flex-shrink:0;">calendar_month</span>
-            <div>
-              <div class="ws-list-item__title">Gatherings</div>
-              <div class="ws-list-item__meta">Seven-day calendar</div>
-            </div>
-          </a>
-
-        </div>
-      </div>
-
-      <div class="ws-list-panel__scroll" id="ws-list-content">
-        {% block ws_community_list %}{% endblock %}
-      </div>
-    </div>
-
-    {# ── Detail panel ── #}
-    <div class="ws-detail-panel" id="ws-detail">
-      <div class="ws-detail-empty">
-        <span class="material-symbols-outlined">person</span>
-        <span class="ws-detail-empty__label">Select a member to view their profile</span>
-      </div>
-    </div>
-
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+    {% block community_content %}{% endblock %}
   </div>
 </div>
 {% endblock %}
 
-
-{# ═══════════════════════════════════════════════════════════
-   MOBILE LAYOUT — unchanged, mobile shell only.
-   ═══════════════════════════════════════════════════════════ #}
-
 {% block content %}
 <div class="community-shell">
   <div class="community-content">
-    {% block community_content %}{% endblock %}
+    {% block community_content_mobile %}{% endblock %}
   </div>
 </div>
 {% endblock %}
