@@ -315,19 +315,57 @@ def htmx_relationship_create(request):
     from_record = get_object_or_404(Record, id=from_record_id)
     bible_verse = get_object_or_404(BibleVerse, id=bible_verse_id)
 
-    Relationship.objects.create(
-        created_by=request.user,
+    Relationship.objects.get_or_create(
         from_record=from_record,
         bible_verse=bible_verse,
-        relationship_type=rel_type,
-        direction='directed',
-        notes=notes,
+        defaults={
+            'created_by': request.user,
+            'relationship_type': rel_type,
+            'direction': 'directed',
+            'notes': notes,
+        },
     )
 
-    # Return refreshed annotation panel with Links tab active
-    request.GET = request.GET.copy()
-    request.GET['active_tab'] = 'links-tab'
-    return htmx_annotation_panel(request, bible_verse_id)
+    # Return refreshed links list for the Links pane
+    return htmx_verse_links(request, bible_verse_id)
+
+
+@login_required
+def htmx_verse_links(request, verse_id):
+    """HTMX: return existing record links for a verse (for the Links pane)."""
+    from .models import BibleVerse
+    from records.models import Relationship
+
+    verse = get_object_or_404(BibleVerse, id=verse_id)
+    relationships = Relationship.objects.filter(
+        bible_verse=verse,
+        deleted_at__isnull=True,
+    ).select_related('from_record').order_by('from_record__record_family', '-created_at')
+
+    return render(request, 'bible/_verse_links.html', {
+        'verse': verse,
+        'relationships': relationships,
+    })
+
+
+@login_required
+def htmx_bible_record_search(request):
+    """HTMX: search records for Bible link pane — results include a Link button."""
+    from records.models import Record
+
+    q      = request.GET.get('q', '').strip()
+    family = request.GET.get('family', '').strip()
+
+    qs = Record.objects.filter(deleted_at__isnull=True).order_by('-updated_at')
+    if q:
+        qs = qs.filter(title__icontains=q)
+    if family:
+        qs = qs.filter(record_family=family)
+
+    return render(request, 'bible/_link_search_results.html', {
+        'results': qs[:40],
+        'query': q,
+    })
 
 
 @login_required

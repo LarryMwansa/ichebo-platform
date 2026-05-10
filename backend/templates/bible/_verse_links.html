@@ -1,0 +1,24 @@
+{% if relationships %}
+<div style="display: flex; flex-direction: column; gap: 6px;">
+    {% for rel in relationships %}
+    <div style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+                background: var(--card); border: 1px solid var(--border); border-radius: 8px;">
+        <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary); flex-shrink: 0; margin-top: 2px;">link</span>
+        <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text);
+                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {{ rel.from_record.title }}
+            </div>
+            <div style="font-size: 10px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em;">
+                {{ rel.from_record.record_family }} · {{ rel.relationship_type|title }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div style="padding: 16px 0; text-align: center;">
+    <span class="material-symbols-outlined" style="font-size: 28px; opacity: 0.12; display: block; color: var(--text);">link_off</span>
+    <p style="font-size: 11px; color: var(--muted); margin-top: 8px;">No links yet for this verse.</p>
+</div>
+{% endif %}

@@ -60,7 +60,7 @@
 {% endblock %}
 
 {% block ws_options_tabs %}
-<div class="ics-options-tabs" style="flex-wrap: wrap;">
+<div class="ics-options-tabs" style="flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;">
     <button class="ics-options-tab active" id="btab-versions" onclick="bibleSwitchTab('versions')">Versions</button>
     <button class="ics-options-tab" id="btab-notes" onclick="bibleSwitchTab('notes')">Notes</button>
     <button class="ics-options-tab" id="btab-links" onclick="bibleSwitchTab('links')">Links</button>
@@ -146,13 +146,64 @@
     </div>
 
     {# ── Links Pane ── #}
-    <div class="ws-options-pane" id="bpane-links" style="padding: var(--space-m); display: none;">
-        <div class="ws-label-tag" style="color: var(--accent-red);">Record Links</div>
-        <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s); margin-bottom: var(--space-m); line-height: 1.6;">Click any verse to view or create links to governance records, activities, and missions.</p>
-        <div style="padding: 40px 0; text-align: center;">
-            <span class="material-symbols-outlined" style="font-size: 36px; opacity: 0.15;">link</span>
-            <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s);">Select a verse to see its connections.</p>
+    <div class="ws-options-pane" id="bpane-links" style="display: none; flex-direction: column; height: 100%;">
+
+        {# Selected verse header #}
+        <div style="padding: var(--space-s) var(--space-m); border-bottom: 1px solid var(--border); background: var(--card-2);">
+            <div class="ws-label-tag" style="color: var(--accent-red);">Verse Links</div>
+            <div id="blnk-ref" style="font-size: 12px; color: var(--muted); margin-top: 4px; font-style: italic;">
+                Select a verse, then tap Links in the toolbar.
+            </div>
         </div>
+
+        {# Existing links for selected verse #}
+        <div id="blnk-existing" style="padding: var(--space-m); border-bottom: 1px solid var(--border);">
+            <div style="padding: 20px 0; text-align: center;">
+                <span class="material-symbols-outlined" style="font-size: 28px; opacity: 0.12; display: block; color: var(--text);">link</span>
+                <p style="font-size: 11px; color: var(--muted); margin-top: 8px;">No verse selected.</p>
+            </div>
+        </div>
+
+        {# Record search — always visible to browse and link #}
+        <div style="padding: var(--space-s) var(--space-m) var(--space-xs); border-bottom: 1px solid var(--border);">
+            <div class="ws-label-tag" style="margin-bottom: 6px;">Link a Record</div>
+            <input id="blnk-search" type="text" placeholder="Search records…"
+                   style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid var(--border);
+                          border-radius: 8px; background: var(--bg); color: var(--text); font-size: 12px;
+                          outline: none; transition: border-color 0.15s;"
+                   onfocus="this.style.borderColor='var(--primary)'"
+                   onblur="this.style.borderColor='var(--border)'"
+                   oninput="bibleLinkSearch(this.value)">
+            <select id="blnk-family" style="width: 100%; margin-top: 6px; box-sizing: border-box; padding: 6px 8px;
+                                             border: 1px solid var(--border); border-radius: 8px; background: var(--bg);
+                                             color: var(--text); font-size: 11px; outline: none;"
+                    onchange="bibleLinkSearch(document.getElementById('blnk-search').value)">
+                <option value="">All families</option>
+                <option value="governance">Governance</option>
+                <option value="journal">Journal</option>
+                <option value="learning">Learning</option>
+                <option value="activity">Activity</option>
+                <option value="bible">Bible</option>
+            </select>
+        </div>
+
+        {# Search results #}
+        <div id="blnk-results" style="flex: 1; overflow-y: auto; padding: var(--space-xs) 0;">
+            <div style="padding: 16px; text-align: center;">
+                <p style="font-size: 11px; color: var(--muted);">Type to search records.</p>
+            </div>
+        </div>
+
+        {# Hidden form — submitted when a record is picked #}
+        <form id="blnk-form" style="display: none;"
+              hx-post="{% url 'bible:htmx-relationship-create' %}"
+              hx-target="#blnk-existing"
+              hx-swap="innerHTML">
+            {% csrf_token %}
+            <input type="hidden" id="blnk-verse-id" name="bible_verse_id">
+            <input type="hidden" id="blnk-record-id" name="from_record_id">
+            <input type="hidden" name="relationship_type" value="references">
+        </form>
     </div>
 
     {# ── Display / Appearance Pane ── #}
@@ -211,10 +262,67 @@ function bibleSwitchTab(name) {
     ['versions', 'notes', 'links', 'appear'].forEach(t => {
         document.getElementById('btab-' + t)?.classList.toggle('active', t === name);
         const pane = document.getElementById('bpane-' + t);
-        if (pane) pane.style.display = t === name ? 'block' : 'none';
+        if (pane) {
+            if (t === name) {
+                pane.style.display = (t === 'links') ? 'flex' : 'block';
+            } else {
+                pane.style.display = 'none';
+            }
+        }
     });
     if (name === 'appear') bibleInitAppearPane();
     if (name === 'notes')  bibleRefreshHighlightChips();
+    if (name === 'links')  bibleLinkSearch('');
+}
+
+/* ═══════════════════════════════════════════════════════
+   Links Pane — inline record search + relationship creation
+═══════════════════════════════════════════════════════ */
+let _bibleLinkDebounce = null;
+
+function bibleLinkSearch(q) {
+    clearTimeout(_bibleLinkDebounce);
+    _bibleLinkDebounce = setTimeout(() => {
+        const family = document.getElementById('blnk-family')?.value || '';
+        const params = new URLSearchParams({ q, family });
+        htmx.ajax('GET', '/bible/htmx/record-search/?' + params.toString(), {
+            target: '#blnk-results',
+            swap: 'innerHTML',
+        });
+    }, 220);
+}
+
+function bibleLinkSelectRecord(recordId, recordTitle) {
+    const verseId = document.getElementById('blnk-verse-id').value;
+    if (!verseId) {
+        // No verse selected — flash the ref label
+        const ref = document.getElementById('blnk-ref');
+        ref.style.color = 'var(--danger)';
+        ref.textContent = 'Select a verse first (click a verse, then tap Links in the toolbar).';
+        setTimeout(() => {
+            ref.style.color = '';
+            ref.textContent = _blnkCurrentRef || 'Select a verse, then tap Links in the toolbar.';
+        }, 2500);
+        return;
+    }
+    if (!confirm(`Link this verse to "${recordTitle}"?`)) return;
+    document.getElementById('blnk-record-id').value = recordId;
+    htmx.trigger('#blnk-form', 'submit');
+}
+
+let _blnkCurrentRef = '';
+
+function bibleLinkLoadVerse(verseId, ref) {
+    _blnkCurrentRef = ref;
+    document.getElementById('blnk-verse-id').value = verseId;
+    document.getElementById('blnk-ref').textContent = ref;
+    document.getElementById('blnk-ref').style.color = 'var(--text)';
+
+    // Load existing links for this verse from the annotation endpoint
+    htmx.ajax('GET', `/bible/htmx/links/${verseId}/`, {
+        target: '#blnk-existing',
+        swap: 'innerHTML',
+    });
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -388,6 +496,17 @@ function bibleUpdateSelection() {
     // Show toolbar
     const tb = document.getElementById('bible-verse-toolbar');
     tb.style.display = 'flex';
+
+    // Pre-load link data for selected verse (single selection only)
+    if (sorted.length === 1) {
+        const entry = _bibleVerseMap[first];
+        if (entry?.id) {
+            const list = document.querySelector('.bible-verse-list');
+            const book = list?.dataset.bookCode || '';
+            const ch   = list?.dataset.chapter  || '';
+            bibleLinkLoadVerse(entry.id, `${book} ${ch}:${first}`);
+        }
+    }
 }
 
 function bibleDismissToolbar() {
@@ -693,6 +812,11 @@ document.addEventListener('keydown', (e) => {
 
 {% block extra_css %}
 <style>
+    /* Keep all bible option tabs on one scrollable row */
+    #ics-options-bar .ics-options-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+    #ics-options-bar .ics-options-tabs::-webkit-scrollbar { display: none; }
+    #ics-options-bar .ics-options-tab { flex-shrink: 0; }
+
     .bible-v2-stage {
         max-width: 800px;
         margin: 0 auto;

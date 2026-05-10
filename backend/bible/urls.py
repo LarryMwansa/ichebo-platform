@@ -21,4 +21,6 @@ urlpatterns = [
     path('htmx/appearance/', views.htmx_appearance_sheet, name='htmx-appearance'),
     path('htmx/set-translation/', views.htmx_set_translation, name='htmx-set-translation'),
     path('htmx/relationship/create/', views.htmx_relationship_create, name='htmx-relationship-create'),
+    path('htmx/links/<uuid:verse_id>/', views.htmx_verse_links, name='htmx-verse-links'),
+    path('htmx/record-search/', views.htmx_bible_record_search, name='htmx-bible-record-search'),
 ]
