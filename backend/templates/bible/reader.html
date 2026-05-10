@@ -51,82 +51,54 @@
 
 {% block extra_js %}
 <script>
-  // Chapter Navigation logic
   async function navChapter(offset) {
     const chapterDiv = document.getElementById('bible-chapter');
     const innerDiv = chapterDiv?.querySelector('[data-book-code]');
     if (!innerDiv) return;
 
     const bookCode = innerDiv.dataset.bookCode || 'GEN';
-    const chapter = parseInt(innerDiv.dataset.chapter || '1');
-    let newChapter = chapter + offset;
-    if (newChapter < 1) newChapter = 1;
+    const chapter  = parseInt(innerDiv.dataset.chapter || '1');
+    const newChapter = Math.max(1, chapter + offset);
 
     try {
       const response = await fetch(`/bible/htmx/chapter/?book_code=${bookCode}&chapter=${newChapter}`);
       if (!response.ok) return;
       const html = await response.text();
       chapterDiv.innerHTML = html;
-      htmx.process(chapterDiv); // Essential: process new verses for HTMX triggers
-      updateNavDisplay();
+
+      // Fire a synthetic event so base_v2.html's afterSwap handler runs
+      const evt = new CustomEvent('bible:chapterSwapped', { bubbles: true });
+      chapterDiv.dispatchEvent(evt);
+
+      _updateNavDisplay();
       window.scrollTo({ top: 0, behavior: 'instant' });
-    } catch (error) { console.error(error); }
+    } catch (e) { console.error(e); }
   }
 
-  function updateNavDisplay() {
-    const chapterDiv = document.getElementById('bible-chapter');
-    const innerDiv = chapterDiv?.querySelector('[data-book-code]');
-    const headerTitle = chapterDiv?.querySelector('.bible-chapter-title');
-    
+  function _updateNavDisplay() {
+    const chapterDiv   = document.getElementById('bible-chapter');
+    const innerDiv     = chapterDiv?.querySelector('[data-book-code]');
+    const headerTitle  = chapterDiv?.querySelector('.bible-chapter-title');
     if (!innerDiv) return;
 
-    const bookCode = innerDiv.dataset.bookCode;
-    const chapter = innerDiv.dataset.chapter;
+    const bookCode     = innerDiv.dataset.bookCode;
+    const chapter      = innerDiv.dataset.chapter;
     const bookNameText = headerTitle?.textContent?.trim() || 'Scripture';
-    
-    // Update Top bar title
+
     const topBarTitle = document.querySelector('.bible-topbar__title');
     if (topBarTitle) topBarTitle.textContent = bookNameText;
 
-    // Update Nav strip and button
     const navBtn = document.getElementById('bible-nav-chapter-btn');
     if (navBtn) {
       navBtn.textContent = bookNameText;
       navBtn.setAttribute('hx-get', `/bible/pick/?book_code=${bookCode}&chapter=${chapter}&back=${window.location.pathname}`);
-      // Re-process HTMX for the new attribute
       htmx.process(navBtn);
     }
 
-    // Update URL without reload
     const newUrl = `/bible/${bookCode}/${chapter}/`;
     if (window.location.pathname !== newUrl) {
       window.history.pushState({ bookCode, chapter }, '', newUrl);
     }
   }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Apply UI state on load
-    const bibleChapter = document.getElementById('bible-chapter');
-    if (bibleChapter) {
-      const size = ICSStorage.getUIState('bible_font_size', '100');
-      bibleChapter.style.fontSize = `${size / 100}em`;
-      
-      const family = ICSStorage.getUIState('bible_font_family', 'system');
-      const ffMap = {
-        'system': 'inherit',
-        'serif': 'Georgia, "Times New Roman", serif',
-        'sans-serif': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-        'monospace': '"Courier New", monospace'
-      };
-      bibleChapter.style.fontFamily = ffMap[family] || 'inherit';
-    }
-
-    // HTMX Integrations
-    document.body.addEventListener('htmx:afterSwap', (e) => {
-      if (e.detail.target.id === 'bible-chapter') {
-        updateNavDisplay();
-      }
-    });
-  });
 </script>
 {% endblock %}

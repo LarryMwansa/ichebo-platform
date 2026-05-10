@@ -529,16 +529,113 @@ function bibleRefreshHighlightChips() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   Note shortcut — opens drawer for the first selected verse
+   Note popup — inline textarea anchored near selected verse
 ═══════════════════════════════════════════════════════ */
 function bibleOpenVerseNote(verseNum) {
-    const num = verseNum || ([..._bibleSelected].sort((a,b)=>a-b)[0]);
+    const num = verseNum || ([..._bibleSelected].sort((a,b) => a - b)[0]);
     if (!num) return;
     const entry = _bibleVerseMap[num];
     if (!entry?.id) return;
-    const annotUrl = `/bible/htmx/annotation/${entry.id}/`;
-    htmx.ajax('GET', annotUrl, { target: '#drawerContent', swap: 'innerHTML' });
-    if (window.ICSDrawer) ICSDrawer.open('Verse ' + num);
+
+    const popup = document.getElementById('bible-note-popup');
+    const backdrop = document.getElementById('bible-note-backdrop');
+    if (!popup) return;
+
+    // Populate header and quote
+    const list = document.querySelector('.bible-verse-list');
+    const book = list?.dataset.bookCode || '';
+    const ch   = list?.dataset.chapter  || '';
+    document.getElementById('bnp-ref').textContent = `${book} ${ch}:${num}`;
+    document.getElementById('bnp-quote').textContent = entry.text || '';
+    document.getElementById('bnp-verse-id').value = entry.id;
+    document.getElementById('bnp-note-id').value = '';
+    document.getElementById('bnp-textarea').value = '';
+    document.getElementById('bnp-response').textContent = '';
+
+    // Position: below the verse element, or centered if off-screen
+    const verseRect = entry.el?.getBoundingClientRect();
+    const popupW = 340;
+    let top, left;
+
+    if (verseRect) {
+        top  = Math.min(verseRect.bottom + 8, window.innerHeight - 280);
+        left = Math.max(16, Math.min(verseRect.left, window.innerWidth - popupW - 16));
+    } else {
+        top  = window.innerHeight / 2 - 140;
+        left = window.innerWidth  / 2 - popupW / 2;
+    }
+
+    popup.style.top    = `${top}px`;
+    popup.style.left   = `${left}px`;
+    popup.style.display = 'block';
+    backdrop.style.display = 'block';
+
+    // Fetch existing note content via the annotation endpoint, extract text only
+    fetch(`/bible/htmx/annotation/${entry.id}/`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.text())
+    .then(html => {
+        // Parse just the textarea value from the returned HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const existingText = doc.querySelector('textarea[name="content"]')?.value?.trim() || '';
+        const noteId = doc.querySelector('input[name="note_id"]')?.value?.trim() || '';
+        document.getElementById('bnp-textarea').value = existingText;
+        document.getElementById('bnp-note-id').value = noteId;
+        document.getElementById('bnp-textarea').focus();
+    })
+    .catch(() => {
+        document.getElementById('bnp-textarea').focus();
+    });
+}
+
+function bibleCloseNotePopup() {
+    const popup = document.getElementById('bible-note-popup');
+    const backdrop = document.getElementById('bible-note-backdrop');
+    if (popup) popup.style.display = 'none';
+    if (backdrop) backdrop.style.display = 'none';
+}
+
+function _bibleWireNoteForm() {
+    const form = document.getElementById('bnp-form');
+    if (!form || form._wired) return;
+    form._wired = true;
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const verseId  = document.getElementById('bnp-verse-id').value;
+        const noteId   = document.getElementById('bnp-note-id').value;
+        const content  = document.getElementById('bnp-textarea').value.trim();
+        const response = document.getElementById('bnp-response');
+
+        if (!content) return;
+
+        const body = new FormData(form);
+        if (!noteId) body.delete('note_id');
+
+        fetch('/bible/htmx/note/save/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '' },
+            body,
+        })
+        .then(r => {
+            if (r.ok) {
+                response.textContent = 'Saved ✓';
+                // Mark verse as having a personal note
+                const entry = Object.values(_bibleVerseMap).find(v => v.id === verseId);
+                if (entry?.el) entry.el.classList.add('bible-verse--personal');
+                setTimeout(bibleCloseNotePopup, 800);
+            } else {
+                response.textContent = 'Error saving.';
+                response.style.color = 'var(--danger)';
+            }
+        })
+        .catch(() => {
+            response.textContent = 'Network error.';
+            response.style.color = 'var(--danger)';
+        });
+    });
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -547,6 +644,7 @@ function bibleOpenVerseNote(verseNum) {
 document.addEventListener('DOMContentLoaded', () => {
     // Wire appearance controls once — never re-wired
     _bibleWireAppearPane();
+    _bibleWireNoteForm();
 
     // Restore saved appearance state and apply to reader
     _bibleSize = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
@@ -559,23 +657,32 @@ document.addEventListener('DOMContentLoaded', () => {
     bibleInitVerseInteraction();
 });
 
+function _bibleOnChapterSwap() {
+    _bibleVerseMap = {};
+    _bibleSelected = new Set();
+    bibleDismissToolbar();
+    bibleCloseNotePopup();
+    _bibleApplySize(_bibleSize);
+    _bibleApplyLh(_bibleLh);
+    _bibleApplyFf(_bibleFf);
+    bibleInitVerseInteraction();
+    bibleRefreshHighlightChips();
+}
+
+// HTMX swap (translation change via options bar)
 document.addEventListener('htmx:afterSwap', (e) => {
-    if (e.detail.target.id === 'bible-chapter') {
-        _bibleVerseMap = {};
-        _bibleSelected = new Set();
-        bibleDismissToolbar();
-        // Re-apply appearance to the freshly swapped reader element
-        _bibleApplySize(_bibleSize);
-        _bibleApplyLh(_bibleLh);
-        _bibleApplyFf(_bibleFf);
-        bibleInitVerseInteraction();
-        bibleRefreshHighlightChips();
-    }
+    if (e.detail.target.id === 'bible-chapter') _bibleOnChapterSwap();
 });
 
-// Keyboard: Escape dismisses selection
+// fetch()-based chapter navigation (prev/next buttons)
+document.addEventListener('bible:chapterSwapped', () => _bibleOnChapterSwap());
+
+// Keyboard: Escape dismisses selection and note popup
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') bibleDismissToolbar();
+    if (e.key === 'Escape') {
+        bibleCloseNotePopup();
+        bibleDismissToolbar();
+    }
 });
 </script>
 {% endblock %}
@@ -711,4 +818,64 @@ document.addEventListener('keydown', (e) => {
             box-shadow:0 4px 16px rgba(0,0,0,0.2);">
     Copied!
 </div>
+
+{# ── Verse Note Popup — anchors near selected verse, no drawer needed ── #}
+<div id="bible-note-popup"
+     style="display:none; position:fixed; z-index:9002;
+            background:var(--card); border:1px solid var(--border);
+            border-radius:14px; box-shadow:0 12px 40px rgba(0,0,0,0.2);
+            width:340px; max-width:calc(100vw - 32px); overflow:hidden;">
+
+    {# Header #}
+    <div style="display:flex; align-items:center; justify-content:space-between;
+                padding:12px 16px; border-bottom:1px solid var(--border);
+                background:var(--card-2);">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:16px; color:var(--primary);">edit_note</span>
+            <span id="bnp-ref" style="font-size:13px; font-weight:700; color:var(--text);">Verse</span>
+        </div>
+        <button onclick="bibleCloseNotePopup()"
+                style="background:none; border:none; cursor:pointer; padding:4px;
+                       color:var(--muted); display:flex; align-items:center; border-radius:6px;">
+            <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+        </button>
+    </div>
+
+    {# Verse quote #}
+    <div id="bnp-quote"
+         style="padding:10px 16px; font-size:12px; font-style:italic; color:var(--muted);
+                line-height:1.5; border-bottom:1px solid var(--border);
+                background:var(--bg); max-height:60px; overflow:hidden;
+                display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;"></div>
+
+    {# Note form #}
+    <form id="bnp-form" style="padding:14px 16px;">
+        <input type="hidden" id="bnp-verse-id" name="verse_id">
+        <input type="hidden" id="bnp-note-id" name="note_id">
+        <input type="hidden" name="note_class" value="personal">
+        <textarea id="bnp-textarea" name="content"
+                  placeholder="Write your reflection…"
+                  style="width:100%; box-sizing:border-box; resize:none; height:110px;
+                         padding:10px 12px; border:1px solid var(--border); border-radius:8px;
+                         background:var(--bg); color:var(--text); font-size:13px;
+                         line-height:1.6; font-family:inherit; outline:none;
+                         transition:border-color 0.15s;"
+                  onfocus="this.style.borderColor='var(--primary)'"
+                  onblur="this.style.borderColor='var(--border)'"></textarea>
+        <div style="display:flex; gap:8px; margin-top:10px; align-items:center;">
+            <button type="submit"
+                    style="flex:1; padding:9px 0; background:var(--primary); color:#fff;
+                           border:none; border-radius:8px; font-size:13px; font-weight:700;
+                           cursor:pointer;">
+                Save
+            </button>
+            <div id="bnp-response" style="font-size:11px; color:var(--primary); font-weight:600;"></div>
+        </div>
+    </form>
+</div>
+
+{# Backdrop — tap outside to close #}
+<div id="bible-note-backdrop"
+     style="display:none; position:fixed; inset:0; z-index:9001; background:transparent;"
+     onclick="bibleCloseNotePopup()"></div>
 {% endblock %}
