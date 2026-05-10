@@ -307,7 +307,9 @@ def invitation_accept(request, token):
 
     if request.method == 'POST':
         if not request.user.is_authenticated:
-            return redirect(f'/accounts/login/?next=/steward/invite/accept/{token}/')
+            from django.urls import reverse
+            accept_url = reverse('tenants:invitation-accept', kwargs={'token': token})
+            return redirect(f'/accounts/login/?next={accept_url}')
         try:
             accept_invitation(token, request.user)
             return render(request, 'tenants/invitation_accepted.html', {
