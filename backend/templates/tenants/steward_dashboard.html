@@ -112,3 +112,85 @@
 
 </div>
 {% endblock %}
+
+{# ── Mobile fallback (below 1024px) ── #}
+{% block content %}
+<div class="dashboard">
+
+  <div class="dash-header">
+    <div class="dash-greeting">
+      <span class="dash-name">Tenancy Hub</span>
+    </div>
+    {% if can_create %}
+    <a href="{% url 'tenants:create-tenant' %}" class="btn-touch btn-primary-sm" style="text-decoration:none;">+ New</a>
+    {% endif %}
+  </div>
+
+  {% if my_tenants %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">My Communities</div>
+      <div class="list-group">
+        {% for tenant in my_tenants %}
+        <a href="{% url 'tenants:tenant-detail' tenant.id %}" class="list-item" style="text-decoration:none; color: inherit;">
+          <div class="list-item__icon"><span class="material-symbols-outlined">account_balance</span></div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ tenant.name }}</div>
+            <div class="list-item__meta">{{ tenant.get_tier_display }}</div>
+          </div>
+          <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% else %}
+  <section class="dash-section">
+    <div class="dash-widget" style="text-align: center; padding: 2rem;">
+      <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--border);">account_balance</span>
+      <p style="color: var(--muted); margin-top: 0.5rem;">No communities stewarded yet</p>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if pending_invitations %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Pending Invitations ({{ pending_invitations|length }})</div>
+      <div class="list-group">
+        {% for inv in pending_invitations %}
+        <div class="list-item">
+          <div class="list-item__icon"><span class="material-symbols-outlined">mail</span></div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ inv.email }}</div>
+            <div class="list-item__meta">{{ inv.tenant.name }} · {{ inv.created_at|date:"d M" }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if agency_tenants %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Agency Tenants</div>
+      <div class="list-group">
+        {% for agency in agency_tenants %}
+        <a href="{% url 'tenants:tenant-detail' agency.id %}" class="list-item" style="text-decoration:none; color: inherit;">
+          <div class="list-item__icon" style="color: var(--primary);"><span class="material-symbols-outlined">verified_user</span></div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ agency.name }}</div>
+            <div class="list-item__meta">Service Domain</div>
+          </div>
+          <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

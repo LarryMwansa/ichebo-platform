@@ -168,3 +168,80 @@
     </div>
 </div>
 {% endblock %}
+
+{# ── Mobile fallback (below 1024px) ── #}
+{% block content %}
+<div class="dashboard">
+
+  <div class="dash-header">
+    <div class="dash-greeting">
+      <span class="dash-name">Community</span>
+      {% if primary_perm %}
+      <span class="dash-role">{{ primary_perm.tenant.name }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if not primary_perm %}
+  <section class="dash-section">
+    <div class="dash-widget" style="text-align: center; padding: 2rem;">
+      <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--border);">groups</span>
+      <p style="color: var(--muted); margin-top: 0.5rem;">You are not yet part of a community</p>
+    </div>
+  </section>
+  {% else %}
+
+  {% if announcements %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Announcements</div>
+      <div class="list-group">
+        {% for a in announcements|slice:":3" %}
+        <div class="list-item">
+          <div class="list-item__icon"><span class="material-symbols-outlined">campaign</span></div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ a.title }}</div>
+            <div class="list-item__meta">{{ a.created_at|date:"d M" }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if upcoming_gatherings %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Upcoming Gatherings</div>
+      <div class="list-group">
+        {% for g in upcoming_gatherings|slice:":3" %}
+        <div class="list-item">
+          <div class="list-item__icon"><span class="material-symbols-outlined">event</span></div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ g.title }}</div>
+            <div class="list-item__meta">
+              {% if g.scheduled_at %}{{ g.scheduled_at|date:"D d M · H:i" }}{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="dash-section">
+    <div class="list-group">
+      <a href="{% url 'community:community-home' %}" class="list-item" style="text-decoration:none; color: inherit;">
+        <div class="list-item__icon"><span class="material-symbols-outlined">groups</span></div>
+        <div class="list-item__content"><div class="list-item__title">Full Community Hub</div></div>
+        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+      </a>
+    </div>
+  </section>
+
+  {% endif %}
+
+</div>
+{% endblock %}

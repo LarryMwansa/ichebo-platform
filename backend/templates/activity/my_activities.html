@@ -163,3 +163,89 @@
 {% block ws_options %}
     {% include "activity/partials/activity_intel.html" %}
 {% endblock %}
+
+{# ── Mobile fallback (below 1024px) ── #}
+{% block content %}
+<div class="dashboard">
+
+  <div class="dash-header">
+    <div class="dash-greeting">
+      <span class="dash-name">My Activities</span>
+    </div>
+    <a href="#" class="btn-touch btn-primary-sm" style="text-decoration:none;">+ New</a>
+  </div>
+
+  {% if overdue %}
+  <section class="dash-section">
+    <div class="dash-widget dash-widget--danger">
+      <div class="dash-widget__label">Overdue</div>
+      <div class="list-group">
+        {% for item in overdue %}
+        <div class="list-item">
+          <div class="list-item__icon" style="color: var(--error);">
+            <span class="material-symbols-outlined">priority_high</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ item.title }}</div>
+            <div class="list-item__meta">{{ item.activity_type|upper }} · Overdue</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if due_today %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Due Today</div>
+      <div class="list-group">
+        {% for item in due_today %}
+        <div class="list-item">
+          <div class="list-item__icon">
+            <span class="material-symbols-outlined">task_alt</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ item.title }}</div>
+            <div class="list-item__meta">{{ item.activity_type|title }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if upcoming %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Upcoming</div>
+      <div class="list-group">
+        {% for item in upcoming %}
+        <div class="list-item">
+          <div class="list-item__content">
+            <div class="list-item__title">{{ item.title }}</div>
+            <div class="list-item__meta">
+              {{ item.activity_type|title }}
+              {% if item.due_at %} · {{ item.due_at|date:"d M" }}{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if not overdue and not due_today and not upcoming %}
+  <section class="dash-section">
+    <div class="dash-widget" style="text-align: center; padding: 2rem;">
+      <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--border);">task_alt</span>
+      <p style="color: var(--muted); margin-top: 0.5rem;">No active activities</p>
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

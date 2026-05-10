@@ -79,3 +79,46 @@
         </p>
     </div>
 {% endblock %}
+
+{# ── Mobile fallback (below 1024px) ── #}
+{% block content %}
+<div class="dashboard">
+
+  <div class="dash-header">
+    <div class="dash-greeting">
+      <span class="dash-name">My Records</span>
+    </div>
+    <a href="{% url 'governance:desk' %}" class="btn-touch btn-primary-sm" style="text-decoration:none;">+ New</a>
+  </div>
+
+  {% if records %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Recent Entries</div>
+      <div class="list-group">
+        {% for record in records|slice:":10" %}
+        <div class="list-item">
+          <div class="list-item__icon">
+            <span class="material-symbols-outlined">{% if record.record_type == 'journal' %}book{% elif record.record_type == 'dar' %}assignment{% else %}article{% endif %}</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ record.title|truncatechars:40 }}</div>
+            <div class="list-item__meta">{{ record.record_type|title }} · {{ record.updated_at|date:"d M" }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% else %}
+  <section class="dash-section">
+    <div class="dash-widget" style="text-align: center; padding: 2rem;">
+      <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--border);">article</span>
+      <p style="color: var(--muted); margin-top: 0.5rem;">No records yet</p>
+      <a href="{% url 'governance:desk' %}" class="btn-touch btn-primary-sm" style="text-decoration:none; display:inline-block; margin-top: 1rem;">Open The Desk →</a>
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

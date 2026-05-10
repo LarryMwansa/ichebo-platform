@@ -86,6 +86,75 @@
 </div>
 {% endblock %}
 
+{# ── Mobile fallback (below 1024px) ── #}
+{% block content %}
+<div class="dashboard">
+
+  <div class="dash-header">
+    <div class="dash-greeting">
+      <span class="dash-name">Formation</span>
+    </div>
+  </div>
+
+  {% if enrolments %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Active Enrolments</div>
+      <div class="list-group">
+        {% for enrolment in enrolments %}
+        <div class="list-item">
+          <div class="list-item__icon"><span class="material-symbols-outlined">school</span></div>
+          <div class="list-item__content">
+            <div class="list-item__title">
+              {{ enrolment.metadata.programme_title|default:"Programme" }}
+            </div>
+            <div class="list-item__meta">{{ enrolment.status|title }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if certifications %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Certifications</div>
+      <div class="list-group">
+        {% for cert in certifications %}
+        <div class="list-item">
+          <div class="list-item__icon" style="color: #d97706;">
+            <span class="material-symbols-outlined">workspace_premium</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ cert.title }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="dash-section">
+    <div class="list-group">
+      <a href="{% url 'learn:learn-catalogue' %}" class="list-item" style="text-decoration:none; color: inherit;">
+        <div class="list-item__icon"><span class="material-symbols-outlined">library_books</span></div>
+        <div class="list-item__content"><div class="list-item__title">Browse Catalogue</div></div>
+        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+      </a>
+      <a href="{% url 'learn:learn-home' %}" class="list-item" style="text-decoration:none; color: inherit;">
+        <div class="list-item__icon"><span class="material-symbols-outlined">school</span></div>
+        <div class="list-item__content"><div class="list-item__title">Full Formation Hub</div></div>
+        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+      </a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
 {% block ws_options %}
 <div style="padding: 0 4px;">
 

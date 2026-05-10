@@ -27,3 +27,44 @@
 
 </div>
 {% endblock %}
+
+{# ── Mobile fallback (below 1024px) ── #}
+{% block content %}
+<div class="dashboard">
+
+  <div class="dash-header">
+    <div class="dash-greeting">
+      <span class="dash-name">Governance</span>
+    </div>
+  </div>
+
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Registers</div>
+      <div class="list-group">
+        <a href="{% url 'governance:library-home' %}" class="list-item" style="text-decoration:none; color: inherit;">
+          <div class="list-item__icon"><span class="material-symbols-outlined">library_books</span></div>
+          <div class="list-item__content"><div class="list-item__title">Reference Library</div></div>
+          <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+        </a>
+        <a href="{% url 'governance:mandate-home' %}" class="list-item" style="text-decoration:none; color: inherit;">
+          <div class="list-item__icon"><span class="material-symbols-outlined">gavel</span></div>
+          <div class="list-item__content"><div class="list-item__title">Mandate Branch</div></div>
+          <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+        </a>
+        <a href="{% url 'governance:keys-list' %}" class="list-item" style="text-decoration:none; color: inherit;">
+          <div class="list-item__icon"><span class="material-symbols-outlined">vpn_key</span></div>
+          <div class="list-item__content"><div class="list-item__title">Steward Keys</div></div>
+          <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+        </a>
+        <a href="{% url 'governance:desk' %}" class="list-item" style="text-decoration:none; color: inherit;">
+          <div class="list-item__icon"><span class="material-symbols-outlined">edit_note</span></div>
+          <div class="list-item__content"><div class="list-item__title">The Desk</div></div>
+          <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

@@ -23,6 +23,15 @@
   --shell-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ── Mobile breakpoint: hide desktop shell, show mobile fallback ── */
+@media (max-width: 1023px) {
+  .ics-shell { display: none !important; }
+  #ws-mobile-shell { display: block !important; }
+}
+@media (min-width: 1024px) {
+  #ws-mobile-shell { display: none !important; }
+}
+
 /* ── Shell Container ────────────────────────────────────────── */
 .ics-shell {
   display: grid;

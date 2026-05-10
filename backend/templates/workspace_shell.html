@@ -406,5 +406,10 @@
 
     {% block extra_js %}{% endblock %}
 
+    {# ── Mobile shell: visible below 1024px, hidden on desktop via shell_v2.css ── #}
+    <div id="ws-mobile-shell" style="display:none;">
+        {% block content %}{% endblock %}
+    </div>
+
 </body>
 </html>
