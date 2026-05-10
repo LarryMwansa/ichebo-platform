@@ -139,6 +139,7 @@ class ProfileView(LoginRequiredMixin, View):
             'platform_label': platform_label,
             'memberships': memberships,
             'active_app': 'accounts',
+            'ws_page_title': 'Profile',
         }
         return render(request, 'accounts/profile.html', context)
 

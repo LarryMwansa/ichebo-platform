@@ -1,39 +1,102 @@
-{% extends "base.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
-{% block title %}Profile{% endblock %}
+{% block title %}Profile — {{ profile_user.display_name|default:profile_user.username }}{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% block watermark %}IDENTITY{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Profile</span>
 {% endblock %}
 
-{% block content %}
-<div class="accounts-shell">
+{% block context_header %}Profile{% endblock %}
+{% block context_content %}
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
 
-  <div class="accounts-content">
-    
-    <!-- Profile Hero -->
-    <div class="profile-hero">
-      <div class="profile-avatar-wrap">
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Identity</div>
+    <a href="{% url 'accounts:profile' %}" class="ctx-btn ctx-btn--active">
+        <span class="material-symbols-outlined">person</span>
+        Registry Profile
+    </a>
+    <a href="{% url 'accounts:settings' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        Settings
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Work</div>
+    <a href="{% url 'activity:activity-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">task_alt</span>
+        Active Duties
+    </a>
+    <a href="{% url 'records:records-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">description</span>
+        My Records
+    </a>
+    <a href="{% url 'learn:learn-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">school</span>
+        Formation Academy
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Community</div>
+    <a href="{% url 'community:community-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">group</span>
+        Community Mandate
+    </a>
+    <a href="{% url 'tenants:steward-dashboard' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">account_balance</span>
+        Tenancy Hub
+    </a>
+
+</div>
+{% endblock %}
+
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="card-dark" style="padding: var(--space-l); margin-bottom: var(--space-xl); background: var(--ink); border: none; display: flex; align-items: center; gap: var(--space-l);">
+      <div style="width: 80px; height: 80px; border-radius: var(--radius-m); overflow: hidden; background: var(--stone-2); display: flex; align-items: center; justify-content: center; border: 2px solid var(--primary); flex-shrink: 0;">
         {% if profile_user.avatar_url %}
-          <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}" class="profile-avatar">
+          <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}" style="width: 100%; height: 100%; object-fit: cover;">
         {% else %}
-          <div class="profile-avatar-initials" aria-hidden="true">
-            {{ profile_user.display_name|default:profile_user.email|first|upper }}
-          </div>
+          <span style="font-size: 32px; font-weight: 800; color: var(--text);">{{ profile_user.display_name|default:profile_user.email|first|upper }}</span>
         {% endif %}
       </div>
-      <div class="profile-hero-meta">
-          <h2 class="profile-hero-name">{{ profile_user.display_name|default:profile_user.username }}</h2>
-          <span class="status-badge status-badge--{{ profile_user.status }}">
-            {{ profile_user.get_status_display }}
-          </span>
+      <div>
+        <h1 class="editorial-title" style="font-size: var(--fz-4); margin: 0 0 var(--space-2xs); color: #fff;">{{ profile_user.display_name|default:profile_user.username }}</h1>
+        <div class="label-tag" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);">{{ profile_user.status|default:"Seeker"|upper }} · LEVEL {{ profile_user.competence_level }}</div>
       </div>
     </div>
 
     {% include "accounts/_profile_identity.html" %}
     {% include "accounts/_profile_formation.html" %}
 
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+    <div class="card-dark" style="padding: var(--space-l); margin-bottom: var(--space-xl); background: var(--ink); border: none; display: flex; align-items: center; gap: var(--space-l);">
+      <div style="width: 80px; height: 80px; border-radius: var(--radius-m); overflow: hidden; background: var(--stone-2); display: flex; align-items: center; justify-content: center; border: 2px solid var(--primary); flex-shrink: 0;">
+        {% if profile_user.avatar_url %}
+          <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}" style="width: 100%; height: 100%; object-fit: cover;">
+        {% else %}
+          <span style="font-size: 32px; font-weight: 800; color: var(--text);">{{ profile_user.display_name|default:profile_user.email|first|upper }}</span>
+        {% endif %}
+      </div>
+      <div>
+        <h1 style="font-size: var(--fz-4); margin: 0 0 var(--space-2xs); color: #fff; font-weight: 800;">{{ profile_user.display_name|default:profile_user.username }}</h1>
+        <div class="label-tag" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);">{{ profile_user.status|default:"Seeker"|upper }} · LEVEL {{ profile_user.competence_level }}</div>
+      </div>
+    </div>
+    {% include "accounts/_profile_identity.html" %}
+    {% include "accounts/_profile_formation.html" %}
   </div>
 </div>
 {% endblock %}
