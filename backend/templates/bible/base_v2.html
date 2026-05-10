@@ -279,73 +279,83 @@ function bibleSwitchTab(name) {
 
 /* ═══════════════════════════════════════════════════════
    Appearance Pane — font size, line height, font family, theme
+   All wired once on DOMContentLoaded; bibleInitAppearPane()
+   just refreshes the label display when the tab is opened.
 ═══════════════════════════════════════════════════════ */
-function bibleInitAppearPane() {
-    const reader = () => document.getElementById('bible-chapter');
+const _bibleFF = {
+    system:       'inherit',
+    serif:        'Georgia, "Times New Roman", serif',
+    'sans-serif': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    monospace:    '"Courier New", monospace',
+};
 
-    // ── Font size ──
-    let size = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
-    const sizeLabel = document.getElementById('bFontSizeLabel');
-    function applySize(s) {
-        size = Math.max(80, Math.min(200, s));
-        const el = reader();
-        if (el) el.style.fontSize = `${size / 100}em`;
-        if (sizeLabel) sizeLabel.textContent = `${size}%`;
-        ICSStorage.setUIState('bible_font_size', size);
-    }
-    applySize(size);
-    document.getElementById('bIncrFont').onclick = () => applySize(size + 10);
-    document.getElementById('bDecrFont').onclick = () => applySize(size - 10);
+function _bibleReader() { return document.getElementById('bible-chapter'); }
 
-    // ── Line height ──
-    const ffMap = {
-        system:     'inherit',
-        serif:      'Georgia, "Times New Roman", serif',
-        'sans-serif': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-        monospace:  '"Courier New", monospace',
-    };
-    let savedLh = ICSStorage.getUIState('bible_line_height', '1.8');
-    function applyLh(lh) {
-        savedLh = lh;
-        const el = reader();
-        if (el) el.style.lineHeight = lh;
-        ICSStorage.setUIState('bible_line_height', lh);
-        document.querySelectorAll('.bible-lh-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.lh === lh);
-        });
-    }
-    document.querySelectorAll('.bible-lh-btn').forEach(b => {
-        b.addEventListener('click', () => applyLh(b.dataset.lh));
-    });
-    applyLh(savedLh);
+// ── Font size ──
+let _bibleSize = 100;
+function _bibleApplySize(s) {
+    _bibleSize = Math.max(80, Math.min(200, s));
+    const el = _bibleReader();
+    if (el) el.style.setProperty('--bible-font-size', `${_bibleSize / 100}em`);
+    const label = document.getElementById('bFontSizeLabel');
+    if (label) label.textContent = `${_bibleSize}%`;
+    ICSStorage.setUIState('bible_font_size', _bibleSize);
+}
 
-    // ── Font family ──
-    let savedFf = ICSStorage.getUIState('bible_font_family', 'system');
-    function applyFf(ff) {
-        savedFf = ff;
-        const el = reader();
-        if (el) el.style.fontFamily = ffMap[ff] || 'inherit';
-        ICSStorage.setUIState('bible_font_family', ff);
-        document.querySelectorAll('.bible-ff-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.ff === ff);
-        });
-    }
-    document.querySelectorAll('.bible-ff-btn').forEach(b => {
-        b.addEventListener('click', () => applyFf(b.dataset.ff));
-    });
-    applyFf(savedFf);
+// ── Line height ──
+let _bibleLh = '1.8';
+function _bibleApplyLh(lh) {
+    _bibleLh = lh;
+    const el = _bibleReader();
+    if (el) el.style.setProperty('--bible-line-height', lh);
+    ICSStorage.setUIState('bible_line_height', lh);
+    document.querySelectorAll('.bible-lh-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.lh === lh)
+    );
+}
 
-    // ── Theme ──
-    document.getElementById('bLightMode').onclick = () => {
+// ── Font family ──
+let _bibleFf = 'system';
+function _bibleApplyFf(ff) {
+    _bibleFf = ff;
+    const el = _bibleReader();
+    if (el) el.style.setProperty('--bible-font-family', _bibleFF[ff] || 'inherit');
+    ICSStorage.setUIState('bible_font_family', ff);
+    document.querySelectorAll('.bible-ff-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.ff === ff)
+    );
+}
+
+function _bibleWireAppearPane() {
+    // Font size buttons
+    document.getElementById('bIncrFont')?.addEventListener('click', () => _bibleApplySize(_bibleSize + 10));
+    document.getElementById('bDecrFont')?.addEventListener('click', () => _bibleApplySize(_bibleSize - 10));
+
+    // Line height buttons
+    document.querySelectorAll('.bible-lh-btn').forEach(b =>
+        b.addEventListener('click', () => _bibleApplyLh(b.dataset.lh))
+    );
+
+    // Font family buttons
+    document.querySelectorAll('.bible-ff-btn').forEach(b =>
+        b.addEventListener('click', () => _bibleApplyFf(b.dataset.ff))
+    );
+
+    // Theme buttons
+    document.getElementById('bLightMode')?.addEventListener('click', () => {
         document.documentElement.classList.remove('dark');
-        WorkspaceUI.state.theme = 'light';
-        WorkspaceUI.saveState();
-    };
-    document.getElementById('bDarkMode').onclick = () => {
+        if (window.WorkspaceUI) { WorkspaceUI.state.theme = 'light'; WorkspaceUI.saveState(); }
+    });
+    document.getElementById('bDarkMode')?.addEventListener('click', () => {
         document.documentElement.classList.add('dark');
-        WorkspaceUI.state.theme = 'dark';
-        WorkspaceUI.saveState();
-    };
+        if (window.WorkspaceUI) { WorkspaceUI.state.theme = 'dark'; WorkspaceUI.saveState(); }
+    });
+}
+
+// Called by bibleSwitchTab — just refreshes the size label, no re-wiring
+function bibleInitAppearPane() {
+    const label = document.getElementById('bFontSizeLabel');
+    if (label) label.textContent = `${_bibleSize}%`;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -595,17 +605,18 @@ function bibleOpenVerseNote(verseNum) {
    Init on DOM ready + re-init after HTMX chapter swap
 ═══════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-    bibleInitVerseInteraction();
+    // Wire appearance controls once — never re-wired
+    _bibleWireAppearPane();
 
-    // Re-apply font settings from storage
-    const reader = document.getElementById('bible-chapter');
-    if (reader) {
-        const size = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
-        reader.style.fontSize = `${size / 100}em`;
-        const ffMap = { system:'inherit', serif:'Georgia, serif', 'sans-serif':'-apple-system, sans-serif', monospace:'"Courier New", monospace' };
-        reader.style.fontFamily = ffMap[ICSStorage.getUIState('bible_font_family', 'system')] || 'inherit';
-        reader.style.lineHeight = ICSStorage.getUIState('bible_line_height', '1.8');
-    }
+    // Restore saved appearance state and apply to reader
+    _bibleSize = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
+    _bibleLh   = ICSStorage.getUIState('bible_line_height', '1.8');
+    _bibleFf   = ICSStorage.getUIState('bible_font_family', 'system');
+    _bibleApplySize(_bibleSize);
+    _bibleApplyLh(_bibleLh);
+    _bibleApplyFf(_bibleFf);
+
+    bibleInitVerseInteraction();
 });
 
 document.addEventListener('htmx:afterSwap', (e) => {
@@ -613,6 +624,10 @@ document.addEventListener('htmx:afterSwap', (e) => {
         _bibleVerseMap = {};
         _bibleSelected = new Set();
         bibleDismissToolbar();
+        // Re-apply appearance to the freshly swapped reader element
+        _bibleApplySize(_bibleSize);
+        _bibleApplyLh(_bibleLh);
+        _bibleApplyFf(_bibleFf);
         bibleInitVerseInteraction();
         bibleRefreshHighlightChips();
     }
@@ -640,9 +655,9 @@ document.addEventListener('keydown', (e) => {
         color: var(--text);
     }
     .bible-verse {
-        font-family: var(--ff-body);
-        font-size: var(--fz-1);
-        line-height: 1.8;
+        font-family: var(--bible-font-family, var(--ff-body));
+        font-size: var(--bible-font-size, var(--fz-1));
+        line-height: var(--bible-line-height, 1.8);
         margin-bottom: var(--space-xs);
         color: var(--text);
     }
