@@ -85,13 +85,9 @@
     {# ── 2. Writing Canvas ── #}
     <div class="editorial-canvas" id="editorial-canvas">
         <form id="editorial-form"
-              {% if record %}
-                hx-post="{{ save_url }}"
-              {% else %}
-                hx-post="{{ save_url }}"
-              {% endif %}
-              hx-target="#main-stage"
-              hx-push-url="true">
+              hx-post="{{ save_url }}"
+              hx-target="this"
+              hx-swap="none">
             {% csrf_token %}
 
             {# Hidden routing fields — caller populates via context or JS #}

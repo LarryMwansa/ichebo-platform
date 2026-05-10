@@ -87,6 +87,20 @@ def universal_save(request):
         except Record.DoesNotExist:
             return HttpResponse('<div class="ws-alert ws-alert--error">Record not found.</div>', status=404)
 
+    import json
+    from django.urls import reverse
+
+    def _saved_response(record, toast_msg):
+        """Return HX-Redirect to the record detail page with a toast header."""
+        try:
+            redirect_url = reverse('records:records-detail', kwargs={'record_id': record.id})
+        except Exception:
+            redirect_url = reverse('governance:desk')
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = redirect_url
+        response['X-WS-Toast'] = json.dumps([{'level': 'success', 'message': toast_msg}])
+        return response
+
     # 1. Handle Activity Family
     if family == 'activity':
         activity = Activity.objects.create(
@@ -99,7 +113,10 @@ def universal_save(request):
             kgs_pathway=request.POST.get('kgs_pathway', ''),
             status='pending'
         )
-        return HttpResponse(f'<div class="ws-alert ws-alert--success">Activity "{title}" Saved to Registry</div>')
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = reverse('governance:desk')
+        response['X-WS-Toast'] = json.dumps([{'level': 'success', 'message': f'Activity "{title}" saved to Registry'}])
+        return response
 
     # 2. Handle Governance Family
     elif family == 'governance':
@@ -115,12 +132,7 @@ def universal_save(request):
             version=version,
             status='draft'
         )
-        return HttpResponse(f'''
-            <div class="ws-alert ws-alert--success">
-                <span class="material-symbols-outlined">gavel</span>
-                Governance {rtype.title()} Saved as Draft (v{version})
-            </div>
-        ''')
+        return _saved_response(record, f'{rtype.title()} saved as draft')
 
     # 3. Handle Journal Family (Default)
     else:
@@ -133,4 +145,4 @@ def universal_save(request):
             content=content,
             status='active'
         )
-        return HttpResponse(f'<div class="ws-alert ws-alert--success">Journal entry saved to Registry</div>')
+        return _saved_response(record, f'"{title}" saved to Registry')
