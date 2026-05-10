@@ -160,6 +160,9 @@ def notify_induction_completed(user, placement_tenant_name):
 
 def notify_tenant_invitation(email, tenant, invited_by, token):
     from accounts.models import User
+    from django.urls import reverse
+    accept_url = reverse('tenants:invitation-accept', kwargs={'token': token})
+
     try:
         user = User.objects.get(email__iexact=email)
     except User.DoesNotExist:
@@ -170,13 +173,11 @@ def notify_tenant_invitation(email, tenant, invited_by, token):
             body=(
                 f"{invited_by.display_name if hasattr(invited_by, 'display_name') else invited_by.email} "
                 f"has invited you to join {tenant.name} on the Ichebo platform.\n\n"
-                f"Accept your invitation at: /tenants/invite/accept/{token}/"
+                f"Accept your invitation at: {accept_url}"
             ),
-            data={'url': f'/tenants/invite/accept/{token}/'},
+            data={'url': accept_url},
         )
         return
-
-    accept_url = f'/tenants/invite/accept/{token}/'
     create_notification(
         user=user,
         notification_type='tenant_invitation',
