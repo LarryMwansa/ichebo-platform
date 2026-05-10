@@ -406,6 +406,9 @@
 
     {% block extra_js %}{% endblock %}
 
+    {# ── Extra body elements (fixed overlays, portals) — rendered outside all grid/overflow containers ── #}
+    {% block extra_body %}{% endblock %}
+
     {# ── Mobile shell: visible below 1024px, hidden on desktop via shell_v2.css ── #}
     <div id="ws-mobile-shell" style="display:none;">
         {% block content %}{% endblock %}

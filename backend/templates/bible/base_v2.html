@@ -203,66 +203,6 @@
 
 </div>
 
-{# ── Verse Action Toolbar (copy / highlight — floats above nav) ── #}
-<div id="bible-verse-toolbar"
-     style="display: none; position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            background: var(--ink); color: #fff; border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4); padding: 6px 8px;
-            display: none; align-items: center; gap: 4px; z-index: 1200;
-            white-space: nowrap;">
-
-    {# Verse label #}
-    <span id="vtb-label" style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5);
-                                padding: 0 8px 0 4px; border-right: 1px solid rgba(255,255,255,0.12); margin-right: 4px;">v.1</span>
-
-    {# Copy single #}
-    <button class="vtb-btn" id="vtb-copy-single" title="Copy verse" onclick="bibleCopySelected()">
-        <span class="material-symbols-outlined">content_copy</span>
-        <span class="vtb-label">Copy</span>
-    </button>
-
-    {# Copy range — shown when ≥2 verses selected #}
-    <button class="vtb-btn vtb-range-only" id="vtb-copy-range" title="Copy range" onclick="bibleCopyRange()" style="display:none;">
-        <span class="material-symbols-outlined">file_copy</span>
-        <span class="vtb-label">Copy Range</span>
-    </button>
-
-    <div style="width:1px; height:20px; background:rgba(255,255,255,0.12); margin: 0 4px;"></div>
-
-    {# Highlight swatches #}
-    <button class="vtb-hl-swatch" data-color="hl-yellow" title="Yellow" onclick="bibleHighlight('hl-yellow')" style="background:#fde68a;"></button>
-    <button class="vtb-hl-swatch" data-color="hl-green"  title="Green"  onclick="bibleHighlight('hl-green')"  style="background:#bbf7d0;"></button>
-    <button class="vtb-hl-swatch" data-color="hl-blue"   title="Blue"   onclick="bibleHighlight('hl-blue')"   style="background:#bfdbfe;"></button>
-    <button class="vtb-hl-swatch" data-color="hl-pink"   title="Pink"   onclick="bibleHighlight('hl-pink')"   style="background:#fecdd3;"></button>
-
-    {# Remove highlight #}
-    <button class="vtb-btn" id="vtb-clear-hl" title="Remove highlight" onclick="bibleHighlight(null)" style="display:none;">
-        <span class="material-symbols-outlined" style="font-size:15px;">format_color_reset</span>
-    </button>
-
-    <div style="width:1px; height:20px; background:rgba(255,255,255,0.12); margin: 0 4px;"></div>
-
-    {# Note shortcut — opens drawer for first selected verse #}
-    <button class="vtb-btn" title="Add note" onclick="bibleOpenVerseNote()">
-        <span class="material-symbols-outlined">edit_note</span>
-        <span class="vtb-label">Note</span>
-    </button>
-
-    {# Dismiss #}
-    <button class="vtb-btn" title="Dismiss" onclick="bibleDismissToolbar()">
-        <span class="material-symbols-outlined" style="font-size:16px;">close</span>
-    </button>
-</div>
-
-{# ── Toast for copy confirmation ── #}
-<div id="bible-copy-toast"
-     style="display:none; position:fixed; bottom: 140px; left:50%; transform:translateX(-50%);
-            background: var(--primary); color:#fff; font-size:12px; font-weight:700;
-            padding: 8px 16px; border-radius: 20px; z-index:1300;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
-    Copied!
-</div>
-
 <script>
 /* ═══════════════════════════════════════════════════════
    Bible Options Bar — tab switcher
@@ -717,4 +657,58 @@ document.addEventListener('keydown', (e) => {
         border-color: var(--primary-alpha);
     }
 </style>
+{% endblock %}
+
+{# ── Verse toolbar + copy toast: rendered outside all grid/overflow containers ── #}
+{% block extra_body %}
+<div id="bible-verse-toolbar"
+     style="display:none; position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+            background:var(--ink); color:#fff; border-radius:12px;
+            box-shadow:0 8px 32px rgba(0,0,0,0.4); padding:6px 8px;
+            align-items:center; gap:4px; z-index:9000;
+            white-space:nowrap;">
+
+    <span id="vtb-label" style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.5);
+                                 padding:0 8px 0 4px; border-right:1px solid rgba(255,255,255,0.12); margin-right:4px;">v.1</span>
+
+    <button class="vtb-btn" id="vtb-copy-single" title="Copy verse" onclick="bibleCopySelected()">
+        <span class="material-symbols-outlined">content_copy</span>
+        <span class="vtb-label">Copy</span>
+    </button>
+
+    <button class="vtb-btn vtb-range-only" id="vtb-copy-range" title="Copy range" onclick="bibleCopyRange()" style="display:none;">
+        <span class="material-symbols-outlined">file_copy</span>
+        <span class="vtb-label">Copy Range</span>
+    </button>
+
+    <div style="width:1px; height:20px; background:rgba(255,255,255,0.12); margin:0 4px;"></div>
+
+    <button class="vtb-hl-swatch" title="Yellow" onclick="bibleHighlight('hl-yellow')" style="background:#fde68a;"></button>
+    <button class="vtb-hl-swatch" title="Green"  onclick="bibleHighlight('hl-green')"  style="background:#bbf7d0;"></button>
+    <button class="vtb-hl-swatch" title="Blue"   onclick="bibleHighlight('hl-blue')"   style="background:#bfdbfe;"></button>
+    <button class="vtb-hl-swatch" title="Pink"   onclick="bibleHighlight('hl-pink')"   style="background:#fecdd3;"></button>
+
+    <button class="vtb-btn" id="vtb-clear-hl" title="Remove highlight" onclick="bibleHighlight(null)" style="display:none;">
+        <span class="material-symbols-outlined" style="font-size:15px;">format_color_reset</span>
+    </button>
+
+    <div style="width:1px; height:20px; background:rgba(255,255,255,0.12); margin:0 4px;"></div>
+
+    <button class="vtb-btn" title="Add note" onclick="bibleOpenVerseNote()">
+        <span class="material-symbols-outlined">edit_note</span>
+        <span class="vtb-label">Note</span>
+    </button>
+
+    <button class="vtb-btn" title="Dismiss" onclick="bibleDismissToolbar()">
+        <span class="material-symbols-outlined" style="font-size:16px;">close</span>
+    </button>
+</div>
+
+<div id="bible-copy-toast"
+     style="display:none; position:fixed; bottom:140px; left:50%; transform:translateX(-50%);
+            background:var(--primary); color:#fff; font-size:12px; font-weight:700;
+            padding:8px 16px; border-radius:20px; z-index:9001;
+            box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+    Copied!
+</div>
 {% endblock %}
