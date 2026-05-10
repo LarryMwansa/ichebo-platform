@@ -1,17 +1,15 @@
 /**
- * storage.js — ICS Platform UI State Layer
- * Scope: localStorage for UI-only state (theme preference).
- * Auth, session, and records data are handled server-side by Django.
- *
- * Ported from: archive_old_project/frontend/assets/js/core/storage.js
- * Trimmed: Session, AppStorage, records cache — all removed (live in Django session + DB).
+ * storage.js — ICS Platform UI Preferences Layer
+ * Thin wrapper around localStorage for UI state (font size, reader prefs, etc).
+ * Theme on workspace pages is owned by WorkspaceUI (shell_v2.js) — do NOT
+ * auto-apply theme here, as it would clobber the workspace shell's theme state.
  */
 
 const THEME_KEY = 'ics_theme';
 
 const ICSStorage = (() => {
 
-  // ── Theme ────────────────────────────────────────────────────────────────
+  // ── Theme — used by mobile/old-shell pages via navbar.js ─────────────────
   function getTheme() {
     return localStorage.getItem(THEME_KEY) || 'light';
   }
@@ -25,12 +23,7 @@ const ICSStorage = (() => {
     }
   }
 
-  // Apply immediately on script load to prevent dark/light flash
-  document.addEventListener('DOMContentLoaded', () => {
-    setTheme(getTheme());
-  });
-
-  // ── UI Preferences ───────────────────────────────────────────────────────
+  // ── UI Preferences ────────────────────────────────────────────────────────
   function getUIState(key, fallback = null) {
     try {
       const val = localStorage.getItem(`ics_ui.${key}`);

@@ -283,12 +283,18 @@ function _bibleWireAppearPane() {
 
     // Theme buttons
     document.getElementById('bLightMode')?.addEventListener('click', () => {
-        document.documentElement.classList.remove('dark');
-        if (window.WorkspaceUI) { WorkspaceUI.state.theme = 'light'; WorkspaceUI.saveState(); }
+        if (window.WorkspaceUI) {
+            WorkspaceUI.state.theme = 'light';
+            WorkspaceUI.applyState();
+            WorkspaceUI.saveState();
+        }
     });
     document.getElementById('bDarkMode')?.addEventListener('click', () => {
-        document.documentElement.classList.add('dark');
-        if (window.WorkspaceUI) { WorkspaceUI.state.theme = 'dark'; WorkspaceUI.saveState(); }
+        if (window.WorkspaceUI) {
+            WorkspaceUI.state.theme = 'dark';
+            WorkspaceUI.applyState();
+            WorkspaceUI.saveState();
+        }
     });
 }
 
