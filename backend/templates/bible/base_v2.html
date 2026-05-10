@@ -60,10 +60,11 @@
 {% endblock %}
 
 {% block ws_options_tabs %}
-<div class="ics-options-tabs">
+<div class="ics-options-tabs" style="flex-wrap: wrap;">
     <button class="ics-options-tab active" id="btab-versions" onclick="bibleSwitchTab('versions')">Versions</button>
     <button class="ics-options-tab" id="btab-notes" onclick="bibleSwitchTab('notes')">Notes</button>
     <button class="ics-options-tab" id="btab-links" onclick="bibleSwitchTab('links')">Links</button>
+    <button class="ics-options-tab" id="btab-appear" onclick="bibleSwitchTab('appear')">Display</button>
 </div>
 
 <div class="ics-options-bar__content">
@@ -98,17 +99,26 @@
     <div class="ws-options-pane" id="bpane-notes" style="padding: var(--space-m); display: none;">
         <div class="ws-label-tag" style="color: var(--accent-red);">{{ book.name }} {{ chapter }}</div>
 
+        {# Highlighted verse chips — populated by JS on load #}
+        <div id="bible-notes-highlights" style="margin-top: var(--space-s); margin-bottom: var(--space-m);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: var(--space-xs);">Highlighted</div>
+            <div id="hl-verse-chips" style="display: flex; flex-wrap: wrap; gap: 4px; min-height: 32px;">
+                <span id="hl-none-msg" style="font-size: 11px; color: var(--muted); font-style: italic;">None</span>
+            </div>
+        </div>
+
         {% if personal_noted %}
-        <div style="margin-top: var(--space-s); margin-bottom: var(--space-m);">
+        <div style="margin-bottom: var(--space-m);">
             <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: var(--space-xs);">Your Reflections</div>
             <div style="display: flex; flex-wrap: wrap; gap: 4px;">
                 {% for v in personal_noted %}
-                <span style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-                             font-size: 11px; font-weight: 700; border-radius: var(--radius-s);
-                             background: var(--primary); color: #fff;">{{ v }}</span>
+                <button onclick="bibleOpenVerseNote({{ v }})"
+                        style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+                               font-size: 11px; font-weight: 700; border-radius: var(--radius-s); cursor: pointer;
+                               background: var(--primary); color: #fff; border: none;">{{ v }}</button>
                 {% endfor %}
             </div>
-            <p style="font-size: 11px; color: var(--muted); margin-top: var(--space-xs);">Tap a highlighted verse to view or edit.</p>
+            <p style="font-size: 11px; color: var(--muted); margin-top: var(--space-xs);">Click a verse to view or edit.</p>
         </div>
         {% endif %}
 
@@ -117,9 +127,10 @@
             <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: var(--space-xs);">Community Insights</div>
             <div style="display: flex; flex-wrap: wrap; gap: 4px;">
                 {% for v in tenant_noted %}
-                <span style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-                             font-size: 11px; font-weight: 700; border-radius: var(--radius-s);
-                             background: var(--secondary-light); color: #fff;">{{ v }}</span>
+                <button onclick="bibleOpenVerseNote({{ v }})"
+                        style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+                               font-size: 11px; font-weight: 700; border-radius: var(--radius-s); cursor: pointer;
+                               background: var(--secondary-light); color: #fff; border: none;">{{ v }}</button>
                 {% endfor %}
             </div>
             <p style="font-size: 11px; color: var(--muted); margin-top: var(--space-xs);">Community notes on this chapter.</p>
@@ -127,9 +138,9 @@
         {% endif %}
 
         {% if not personal_noted and not tenant_noted %}
-        <div style="padding: 40px 0; text-align: center;">
+        <div id="notes-empty-msg" style="padding: 24px 0; text-align: center;">
             <span class="material-symbols-outlined" style="font-size: 36px; opacity: 0.15;">edit_note</span>
-            <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s);">No notes on this chapter yet. Tap any verse to add a reflection.</p>
+            <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s);">No notes on this chapter yet.<br>Click any verse to add a reflection.</p>
         </div>
         {% endif %}
     </div>
@@ -137,23 +148,480 @@
     {# ── Links Pane ── #}
     <div class="ws-options-pane" id="bpane-links" style="padding: var(--space-m); display: none;">
         <div class="ws-label-tag" style="color: var(--accent-red);">Record Links</div>
-        <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s); margin-bottom: var(--space-m); line-height: 1.6;">Tap any verse to view or create links to governance records, activities, and missions.</p>
+        <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s); margin-bottom: var(--space-m); line-height: 1.6;">Click any verse to view or create links to governance records, activities, and missions.</p>
         <div style="padding: 40px 0; text-align: center;">
             <span class="material-symbols-outlined" style="font-size: 36px; opacity: 0.15;">link</span>
             <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s);">Select a verse to see its connections.</p>
         </div>
     </div>
 
+    {# ── Display / Appearance Pane ── #}
+    <div class="ws-options-pane" id="bpane-appear" style="padding: var(--space-m); display: none;">
+        <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: var(--space-s);">Font Size</div>
+        <div style="display: flex; align-items: center; gap: 10px; background: var(--card-2);
+                    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: var(--space-m);">
+            <button id="bDecrFont" class="ws-icon-btn" style="flex-shrink: 0;">
+                <span class="material-symbols-outlined">remove</span>
+            </button>
+            <div id="bFontSizeLabel" style="flex: 1; text-align: center; font-size: 13px; font-weight: 700;">100%</div>
+            <button id="bIncrFont" class="ws-icon-btn" style="flex-shrink: 0;">
+                <span class="material-symbols-outlined">add</span>
+            </button>
+        </div>
+
+        <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: var(--space-s);">Line Spacing</div>
+        <div style="display: flex; gap: 6px; margin-bottom: var(--space-m);">
+            <button class="bible-lh-btn" data-lh="1.5" style="flex:1;">Compact</button>
+            <button class="bible-lh-btn" data-lh="1.8" style="flex:1;">Normal</button>
+            <button class="bible-lh-btn" data-lh="2.2" style="flex:1;">Open</button>
+        </div>
+
+        <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: var(--space-s);">Font Style</div>
+        <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: var(--space-m);">
+            <button class="bible-ff-btn ctx-btn" data-ff="system">System Default</button>
+            <button class="bible-ff-btn ctx-btn" data-ff="serif">Classic Serif</button>
+            <button class="bible-ff-btn ctx-btn" data-ff="sans-serif">Modern Sans</button>
+            <button class="bible-ff-btn ctx-btn" data-ff="monospace">Mono Reference</button>
+        </div>
+
+        <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: var(--space-s);">Theme</div>
+        <div style="display: flex; gap: 8px;">
+            <button id="bLightMode"
+                    style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+                           padding: 10px; border-radius:8px; border:1px solid #ddd;
+                           background:#fff; color:#333; font-size:12px; font-weight:700; cursor:pointer;">
+                <span class="material-symbols-outlined" style="font-size:16px;">light_mode</span> Light
+            </button>
+            <button id="bDarkMode"
+                    style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+                           padding: 10px; border-radius:8px; border:1px solid #333;
+                           background:#1a1a1a; color:#eee; font-size:12px; font-weight:700; cursor:pointer;">
+                <span class="material-symbols-outlined" style="font-size:16px;">dark_mode</span> Dark
+            </button>
+        </div>
+    </div>
+
+</div>
+
+{# ── Verse Action Toolbar (copy / highlight — floats above nav) ── #}
+<div id="bible-verse-toolbar"
+     style="display: none; position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background: var(--ink); color: #fff; border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4); padding: 6px 8px;
+            display: none; align-items: center; gap: 4px; z-index: 1200;
+            white-space: nowrap;">
+
+    {# Verse label #}
+    <span id="vtb-label" style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5);
+                                padding: 0 8px 0 4px; border-right: 1px solid rgba(255,255,255,0.12); margin-right: 4px;">v.1</span>
+
+    {# Copy single #}
+    <button class="vtb-btn" id="vtb-copy-single" title="Copy verse" onclick="bibleCopySelected()">
+        <span class="material-symbols-outlined">content_copy</span>
+        <span class="vtb-label">Copy</span>
+    </button>
+
+    {# Copy range — shown when ≥2 verses selected #}
+    <button class="vtb-btn vtb-range-only" id="vtb-copy-range" title="Copy range" onclick="bibleCopyRange()" style="display:none;">
+        <span class="material-symbols-outlined">file_copy</span>
+        <span class="vtb-label">Copy Range</span>
+    </button>
+
+    <div style="width:1px; height:20px; background:rgba(255,255,255,0.12); margin: 0 4px;"></div>
+
+    {# Highlight swatches #}
+    <button class="vtb-hl-swatch" data-color="hl-yellow" title="Yellow" onclick="bibleHighlight('hl-yellow')" style="background:#fde68a;"></button>
+    <button class="vtb-hl-swatch" data-color="hl-green"  title="Green"  onclick="bibleHighlight('hl-green')"  style="background:#bbf7d0;"></button>
+    <button class="vtb-hl-swatch" data-color="hl-blue"   title="Blue"   onclick="bibleHighlight('hl-blue')"   style="background:#bfdbfe;"></button>
+    <button class="vtb-hl-swatch" data-color="hl-pink"   title="Pink"   onclick="bibleHighlight('hl-pink')"   style="background:#fecdd3;"></button>
+
+    {# Remove highlight #}
+    <button class="vtb-btn" id="vtb-clear-hl" title="Remove highlight" onclick="bibleHighlight(null)" style="display:none;">
+        <span class="material-symbols-outlined" style="font-size:15px;">format_color_reset</span>
+    </button>
+
+    <div style="width:1px; height:20px; background:rgba(255,255,255,0.12); margin: 0 4px;"></div>
+
+    {# Note shortcut — opens drawer for first selected verse #}
+    <button class="vtb-btn" title="Add note" onclick="bibleOpenVerseNote()">
+        <span class="material-symbols-outlined">edit_note</span>
+        <span class="vtb-label">Note</span>
+    </button>
+
+    {# Dismiss #}
+    <button class="vtb-btn" title="Dismiss" onclick="bibleDismissToolbar()">
+        <span class="material-symbols-outlined" style="font-size:16px;">close</span>
+    </button>
+</div>
+
+{# ── Toast for copy confirmation ── #}
+<div id="bible-copy-toast"
+     style="display:none; position:fixed; bottom: 140px; left:50%; transform:translateX(-50%);
+            background: var(--primary); color:#fff; font-size:12px; font-weight:700;
+            padding: 8px 16px; border-radius: 20px; z-index:1300;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
+    Copied!
 </div>
 
 <script>
+/* ═══════════════════════════════════════════════════════
+   Bible Options Bar — tab switcher
+═══════════════════════════════════════════════════════ */
 function bibleSwitchTab(name) {
-    ['versions', 'notes', 'links'].forEach(t => {
-        document.getElementById('btab-' + t).classList.toggle('active', t === name);
+    ['versions', 'notes', 'links', 'appear'].forEach(t => {
+        document.getElementById('btab-' + t)?.classList.toggle('active', t === name);
         const pane = document.getElementById('bpane-' + t);
-        pane.style.display = t === name ? 'block' : 'none';
+        if (pane) pane.style.display = t === name ? 'block' : 'none';
+    });
+    if (name === 'appear') bibleInitAppearPane();
+    if (name === 'notes')  bibleRefreshHighlightChips();
+}
+
+/* ═══════════════════════════════════════════════════════
+   Appearance Pane — font size, line height, font family, theme
+═══════════════════════════════════════════════════════ */
+function bibleInitAppearPane() {
+    const reader = () => document.getElementById('bible-chapter');
+
+    // ── Font size ──
+    let size = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
+    const sizeLabel = document.getElementById('bFontSizeLabel');
+    function applySize(s) {
+        size = Math.max(80, Math.min(200, s));
+        const el = reader();
+        if (el) el.style.fontSize = `${size / 100}em`;
+        if (sizeLabel) sizeLabel.textContent = `${size}%`;
+        ICSStorage.setUIState('bible_font_size', size);
+    }
+    applySize(size);
+    document.getElementById('bIncrFont').onclick = () => applySize(size + 10);
+    document.getElementById('bDecrFont').onclick = () => applySize(size - 10);
+
+    // ── Line height ──
+    const ffMap = {
+        system:     'inherit',
+        serif:      'Georgia, "Times New Roman", serif',
+        'sans-serif': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        monospace:  '"Courier New", monospace',
+    };
+    let savedLh = ICSStorage.getUIState('bible_line_height', '1.8');
+    function applyLh(lh) {
+        savedLh = lh;
+        const el = reader();
+        if (el) el.style.lineHeight = lh;
+        ICSStorage.setUIState('bible_line_height', lh);
+        document.querySelectorAll('.bible-lh-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.lh === lh);
+        });
+    }
+    document.querySelectorAll('.bible-lh-btn').forEach(b => {
+        b.addEventListener('click', () => applyLh(b.dataset.lh));
+    });
+    applyLh(savedLh);
+
+    // ── Font family ──
+    let savedFf = ICSStorage.getUIState('bible_font_family', 'system');
+    function applyFf(ff) {
+        savedFf = ff;
+        const el = reader();
+        if (el) el.style.fontFamily = ffMap[ff] || 'inherit';
+        ICSStorage.setUIState('bible_font_family', ff);
+        document.querySelectorAll('.bible-ff-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.ff === ff);
+        });
+    }
+    document.querySelectorAll('.bible-ff-btn').forEach(b => {
+        b.addEventListener('click', () => applyFf(b.dataset.ff));
+    });
+    applyFf(savedFf);
+
+    // ── Theme ──
+    document.getElementById('bLightMode').onclick = () => {
+        document.documentElement.classList.remove('dark');
+        WorkspaceUI.state.theme = 'light';
+        WorkspaceUI.saveState();
+    };
+    document.getElementById('bDarkMode').onclick = () => {
+        document.documentElement.classList.add('dark');
+        WorkspaceUI.state.theme = 'dark';
+        WorkspaceUI.saveState();
+    };
+}
+
+/* ═══════════════════════════════════════════════════════
+   Verse Selection — click to select, shift-click to extend range
+═══════════════════════════════════════════════════════ */
+let _bibleSelected = new Set();   // Set of verse numbers (ints)
+let _bibleVerseMap = {};          // verse number → { id, text, num }
+
+function bibleInitVerseInteraction() {
+    const list = document.querySelector('.bible-verse-list');
+    if (!list) return;
+
+    // Build verse map from DOM
+    _bibleVerseMap = {};
+    list.querySelectorAll('.bible-verse').forEach(el => {
+        const num = parseInt(el.querySelector('.bible-verse__num')?.textContent?.trim() || '0');
+        const text = el.querySelector('.bible-verse__text')?.textContent?.trim() || '';
+        const id = el.id?.replace('verse-', '') || '';
+        if (num) _bibleVerseMap[num] = { id, text, num, el };
+    });
+
+    // Re-apply saved highlights
+    bibleApplyAllHighlights();
+
+    // Wire click — single select; shift+click for range
+    list.addEventListener('click', (e) => {
+        const verseEl = e.target.closest('.bible-verse');
+        if (!verseEl) return;
+
+        // Let HTMX handle the annotation panel open — but also toggle selection
+        const num = parseInt(verseEl.querySelector('.bible-verse__num')?.textContent?.trim() || '0');
+        if (!num) return;
+
+        if (e.shiftKey && _bibleSelected.size > 0) {
+            // Extend selection to a range — suppress HTMX drawer open
+            e.preventDefault();
+            e.stopPropagation();
+            const existing = [..._bibleSelected];
+            const minV = Math.min(...existing, num);
+            const maxV = Math.max(...existing, num);
+            _bibleSelected = new Set();
+            for (let v = minV; v <= maxV; v++) _bibleSelected.add(v);
+        } else if (e.ctrlKey || e.metaKey) {
+            // Toggle individual verse — suppress HTMX drawer open
+            e.preventDefault();
+            e.stopPropagation();
+            if (_bibleSelected.has(num)) _bibleSelected.delete(num);
+            else _bibleSelected.add(num);
+        } else {
+            // Single select — HTMX fires normally to open annotation drawer
+            _bibleSelected = new Set([num]);
+        }
+
+        bibleUpdateSelection();
     });
 }
+
+function bibleUpdateSelection() {
+    // Update visual selection state
+    document.querySelectorAll('.bible-verse').forEach(el => {
+        const num = parseInt(el.querySelector('.bible-verse__num')?.textContent?.trim() || '0');
+        el.classList.toggle('bible-verse--selected', _bibleSelected.has(num));
+    });
+
+    if (_bibleSelected.size === 0) {
+        bibleDismissToolbar();
+        return;
+    }
+
+    // Update toolbar
+    const sorted = [..._bibleSelected].sort((a, b) => a - b);
+    const first = sorted[0], last = sorted[sorted.length - 1];
+    const label = sorted.length === 1 ? `v.${first}` : `v.${first}–${last}`;
+
+    document.getElementById('vtb-label').textContent = label;
+
+    const rangeOnly = document.querySelectorAll('.vtb-range-only');
+    rangeOnly.forEach(el => el.style.display = sorted.length > 1 ? 'flex' : 'none');
+
+    // Show "remove highlight" button only if first selected verse already has one
+    const hasHl = _bibleSelected.size === 1 && bibleGetHighlight(first);
+    document.getElementById('vtb-clear-hl').style.display = hasHl ? 'flex' : 'none';
+
+    // Show toolbar
+    const tb = document.getElementById('bible-verse-toolbar');
+    tb.style.display = 'flex';
+}
+
+function bibleDismissToolbar() {
+    _bibleSelected = new Set();
+    document.querySelectorAll('.bible-verse--selected').forEach(el => el.classList.remove('bible-verse--selected'));
+    const tb = document.getElementById('bible-verse-toolbar');
+    if (tb) tb.style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════════
+   Copy — single verse or range
+═══════════════════════════════════════════════════════ */
+function _bibleGetChapterRef() {
+    const list = document.querySelector('.bible-verse-list');
+    const book = list?.dataset.bookCode || '';
+    const ch   = list?.dataset.chapter || '';
+    return { book, ch };
+}
+
+function _bibleFormatVerse(num) {
+    const { book, ch } = _bibleGetChapterRef();
+    const entry = _bibleVerseMap[num];
+    return entry ? `${book} ${ch}:${num} — ${entry.text}` : '';
+}
+
+function bibleCopySelected() {
+    const sorted = [..._bibleSelected].sort((a, b) => a - b);
+    if (!sorted.length) return;
+    const { book, ch } = _bibleGetChapterRef();
+    const lines = sorted.map(n => {
+        const entry = _bibleVerseMap[n];
+        return entry ? `${entry.text}` : '';
+    }).filter(Boolean);
+    const ref = sorted.length === 1
+        ? `${book} ${ch}:${sorted[0]}`
+        : `${book} ${ch}:${sorted[0]}–${sorted[sorted.length - 1]}`;
+    const text = `${lines.join(' ')}\n— ${ref}`;
+    navigator.clipboard.writeText(text).then(() => bibleCopyToast());
+}
+
+function bibleCopyRange() {
+    bibleCopySelected();
+}
+
+function bibleCopyToast() {
+    const toast = document.getElementById('bible-copy-toast');
+    if (!toast) return;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 1800);
+}
+
+/* ═══════════════════════════════════════════════════════
+   Highlights — localStorage-backed, 4 colours
+   Key: bible_hl_{bookCode}_{chapter}_{verseNum}
+═══════════════════════════════════════════════════════ */
+const BIBLE_HL_COLORS = {
+    'hl-yellow': { bg: '#fef9c3', border: '#fde68a' },
+    'hl-green':  { bg: '#f0fdf4', border: '#bbf7d0' },
+    'hl-blue':   { bg: '#eff6ff', border: '#bfdbfe' },
+    'hl-pink':   { bg: '#fff1f2', border: '#fecdd3' },
+};
+
+function _bibleHlKey(verseNum) {
+    const list = document.querySelector('.bible-verse-list');
+    const book = list?.dataset.bookCode || 'X';
+    const ch   = list?.dataset.chapter  || '0';
+    return `bible_hl_${book}_${ch}_${verseNum}`;
+}
+
+function bibleGetHighlight(verseNum) {
+    return localStorage.getItem(_bibleHlKey(verseNum));
+}
+
+function bibleSetHighlight(verseNum, color) {
+    if (color) localStorage.setItem(_bibleHlKey(verseNum), color);
+    else        localStorage.removeItem(_bibleHlKey(verseNum));
+}
+
+function bibleApplyHighlightToEl(verseEl, color) {
+    // Strip any existing highlight classes
+    Object.keys(BIBLE_HL_COLORS).forEach(c => verseEl.classList.remove(c));
+    if (color && BIBLE_HL_COLORS[color]) {
+        verseEl.classList.add(color);
+    }
+}
+
+function bibleApplyAllHighlights() {
+    Object.values(_bibleVerseMap).forEach(({ num, el }) => {
+        const color = bibleGetHighlight(num);
+        bibleApplyHighlightToEl(el, color);
+    });
+    bibleRefreshHighlightChips();
+}
+
+function bibleHighlight(color) {
+    _bibleSelected.forEach(num => {
+        bibleSetHighlight(num, color);
+        const entry = _bibleVerseMap[num];
+        if (entry?.el) bibleApplyHighlightToEl(entry.el, color);
+    });
+    bibleRefreshHighlightChips();
+    // Update clear button
+    const hasHl = _bibleSelected.size === 1 && bibleGetHighlight([..._bibleSelected][0]);
+    document.getElementById('vtb-clear-hl').style.display = hasHl ? 'flex' : 'none';
+}
+
+function bibleRefreshHighlightChips() {
+    const chips = document.getElementById('hl-verse-chips');
+    const noneMsg = document.getElementById('hl-none-msg');
+    if (!chips) return;
+
+    const list = document.querySelector('.bible-verse-list');
+    const book = list?.dataset.bookCode || 'X';
+    const ch   = list?.dataset.chapter  || '0';
+
+    const highlighted = [];
+    for (let i = 1; i <= 200; i++) {
+        const key = `bible_hl_${book}_${ch}_${i}`;
+        const color = localStorage.getItem(key);
+        if (color) highlighted.push({ num: i, color });
+    }
+
+    // Clear chip children (keep noneMsg)
+    [...chips.children].forEach(c => { if (c !== noneMsg) c.remove(); });
+
+    if (highlighted.length === 0) {
+        if (noneMsg) noneMsg.style.display = '';
+    } else {
+        if (noneMsg) noneMsg.style.display = 'none';
+        highlighted.forEach(({ num, color }) => {
+            const c = BIBLE_HL_COLORS[color] || {};
+            const chip = document.createElement('button');
+            chip.textContent = num;
+            chip.title = `Verse ${num} — click to jump`;
+            chip.style.cssText = `width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+                font-size:11px;font-weight:700;border-radius:var(--radius-s);cursor:pointer;
+                background:${c.bg||'#eee'};border:2px solid ${c.border||'#ccc'};color:var(--text);`;
+            chip.onclick = () => {
+                const entry = _bibleVerseMap[num];
+                if (entry?.el) entry.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            };
+            chips.appendChild(chip);
+        });
+    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   Note shortcut — opens drawer for the first selected verse
+═══════════════════════════════════════════════════════ */
+function bibleOpenVerseNote(verseNum) {
+    const num = verseNum || ([..._bibleSelected].sort((a,b)=>a-b)[0]);
+    if (!num) return;
+    const entry = _bibleVerseMap[num];
+    if (!entry?.id) return;
+    const annotUrl = `/bible/htmx/annotation/${entry.id}/`;
+    htmx.ajax('GET', annotUrl, { target: '#drawerContent', swap: 'innerHTML' });
+    if (window.ICSDrawer) ICSDrawer.open('Verse ' + num);
+}
+
+/* ═══════════════════════════════════════════════════════
+   Init on DOM ready + re-init after HTMX chapter swap
+═══════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+    bibleInitVerseInteraction();
+
+    // Re-apply font settings from storage
+    const reader = document.getElementById('bible-chapter');
+    if (reader) {
+        const size = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
+        reader.style.fontSize = `${size / 100}em`;
+        const ffMap = { system:'inherit', serif:'Georgia, serif', 'sans-serif':'-apple-system, sans-serif', monospace:'"Courier New", monospace' };
+        reader.style.fontFamily = ffMap[ICSStorage.getUIState('bible_font_family', 'system')] || 'inherit';
+        reader.style.lineHeight = ICSStorage.getUIState('bible_line_height', '1.8');
+    }
+});
+
+document.addEventListener('htmx:afterSwap', (e) => {
+    if (e.detail.target.id === 'bible-chapter') {
+        _bibleVerseMap = {};
+        _bibleSelected = new Set();
+        bibleDismissToolbar();
+        bibleInitVerseInteraction();
+        bibleRefreshHighlightChips();
+    }
+});
+
+// Keyboard: Escape dismisses selection
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') bibleDismissToolbar();
+});
 </script>
 {% endblock %}
 
@@ -184,6 +652,54 @@ function bibleSwitchTab(name) {
         color: var(--accent-red);
         vertical-align: super;
         margin-right: 0.4em;
+    }
+
+    /* ── Verse selection ── */
+    .bible-verse--selected {
+        background: color-mix(in srgb, var(--primary) 8%, transparent) !important;
+        outline: 1.5px solid var(--primary-alpha);
+    }
+
+    /* ── Highlight classes ── */
+    .hl-yellow { background: #fef9c3 !important; border-left: 3px solid #fde68a !important; }
+    .hl-green  { background: #f0fdf4 !important; border-left: 3px solid #bbf7d0 !important; }
+    .hl-blue   { background: #eff6ff !important; border-left: 3px solid #bfdbfe !important; }
+    .hl-pink   { background: #fff1f2 !important; border-left: 3px solid #fecdd3 !important; }
+    .dark .hl-yellow { background: rgba(250,204,21,0.12) !important; border-left-color: #ca8a04 !important; }
+    .dark .hl-green  { background: rgba(74,222,128,0.1) !important;  border-left-color: #16a34a !important; }
+    .dark .hl-blue   { background: rgba(96,165,250,0.1) !important;  border-left-color: #2563eb !important; }
+    .dark .hl-pink   { background: rgba(251,113,133,0.1) !important; border-left-color: #e11d48 !important; }
+
+    /* ── Verse toolbar ── */
+    .vtb-btn {
+        display: flex; align-items: center; gap: 4px;
+        padding: 6px 8px; border-radius: 7px; border: none;
+        background: transparent; color: #fff; cursor: pointer;
+        font-size: 12px; font-weight: 600;
+        transition: background 0.12s;
+    }
+    .vtb-btn:hover { background: rgba(255,255,255,0.1); }
+    .vtb-btn .material-symbols-outlined { font-size: 17px; }
+    .vtb-label { font-size: 11px; }
+
+    .vtb-hl-swatch {
+        width: 22px; height: 22px; border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.3);
+        cursor: pointer; transition: transform 0.1s, border-color 0.1s;
+        flex-shrink: 0;
+    }
+    .vtb-hl-swatch:hover { transform: scale(1.25); border-color: #fff; }
+
+    /* ── Appearance pane buttons ── */
+    .bible-lh-btn, .bible-ff-btn {
+        padding: 8px 10px; border-radius: 7px;
+        border: 1px solid var(--border); background: var(--card-2);
+        color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer;
+        transition: all 0.12s; text-align: left;
+    }
+    .bible-lh-btn.active, .bible-ff-btn.active {
+        background: var(--primary-light); color: var(--primary);
+        border-color: var(--primary-alpha);
     }
 </style>
 {% endblock %}
