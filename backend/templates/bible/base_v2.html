@@ -607,33 +607,31 @@ function _bibleWireNoteForm() {
         const verseId  = document.getElementById('bnp-verse-id').value;
         const noteId   = document.getElementById('bnp-note-id').value;
         const content  = document.getElementById('bnp-textarea').value.trim();
-        const response = document.getElementById('bnp-response');
+        const respEl   = document.getElementById('bnp-response');
 
         if (!content) return;
 
-        const body = new FormData(form);
-        if (!noteId) body.delete('note_id');
+        // Build query params for htmx.ajax (it sends as form-encoded POST)
+        const params = new URLSearchParams();
+        params.set('verse_id',   verseId);
+        params.set('content',    content);
+        params.set('note_class', 'personal');
+        if (noteId) params.set('note_id', noteId);
 
-        fetch('/bible/htmx/note/save/', {
-            method: 'POST',
-            headers: { 'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '' },
-            body,
-        })
-        .then(r => {
-            if (r.ok) {
-                response.textContent = 'Saved ✓';
-                // Mark verse as having a personal note
-                const entry = Object.values(_bibleVerseMap).find(v => v.id === verseId);
-                if (entry?.el) entry.el.classList.add('bible-verse--personal');
-                setTimeout(bibleCloseNotePopup, 800);
-            } else {
-                response.textContent = 'Error saving.';
-                response.style.color = 'var(--danger)';
-            }
-        })
-        .catch(() => {
-            response.textContent = 'Network error.';
-            response.style.color = 'var(--danger)';
+        // Use htmx.ajax so OOB swaps (verse indicators) work automatically
+        htmx.ajax('POST', '/bible/htmx/note/save/', {
+            values: Object.fromEntries(params),
+            target: '#bnp-response',
+            swap: 'innerHTML',
+        }).then(() => {
+            respEl.textContent = 'Saved ✓';
+            respEl.style.color = 'var(--primary)';
+            const entry = Object.values(_bibleVerseMap).find(v => v.id === verseId);
+            if (entry?.el) entry.el.classList.add('bible-verse--personal');
+            setTimeout(bibleCloseNotePopup, 900);
+        }).catch(() => {
+            respEl.textContent = 'Error saving.';
+            respEl.style.color = 'var(--danger)';
         });
     });
 }

@@ -215,7 +215,7 @@ def htmx_save_note(request):
         return HttpResponse(status=405)
 
     from .models import BibleVerse
-    from records.models import Record
+    from records.models import Record, Relationship
 
     verse_id = request.POST.get('verse_id')
     content = request.POST.get('content', '').strip()
