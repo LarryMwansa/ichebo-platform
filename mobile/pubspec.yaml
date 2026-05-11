@@ -29,6 +29,9 @@ dependencies:
   # Local persistence
   shared_preferences: ^2.5.3
 
+  # External links
+  url_launcher: ^6.3.1
+
   # UI utilities
   cached_network_image: ^3.4.1
   flutter_markdown: ^0.7.6
