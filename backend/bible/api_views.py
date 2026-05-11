@@ -18,6 +18,7 @@ class TranslationListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = BibleTranslationSerializer
     queryset = BibleTranslation.objects.filter(is_public=True)
+    pagination_class = None
 
 
 class BookListView(generics.ListAPIView):
@@ -25,6 +26,7 @@ class BookListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = BibleBookSerializer
     queryset = BibleBook.objects.all()
+    pagination_class = None
 
 
 class VerseListView(generics.ListAPIView):
@@ -35,6 +37,7 @@ class VerseListView(generics.ListAPIView):
     """
     permission_classes = [IsAuthenticated]
     serializer_class = BibleVerseSerializer
+    pagination_class = None
 
     def get_queryset(self):
         book_code = self.request.query_params.get('book_code')
