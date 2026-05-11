@@ -188,6 +188,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')])
 
 CACHES = {
