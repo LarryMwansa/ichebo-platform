@@ -1,6 +1,6 @@
 # ICS Platform
 
-Ichebo Christian Services — digital twin of the Kingdom Governance System (KGS).
+This is ichebo-platform, Version 3 build, and link to the ecosystem architecture document.
 
 ## Stack
 
