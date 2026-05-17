@@ -259,7 +259,6 @@ class SyncPushView(APIView):
 
 def _push_record(user, entity_id, operation, payload, changed_at):
     from records.models import Record
-    from records.serializers import RecordSerializer
 
     if operation == OP_DELETE:
         try:
@@ -277,12 +276,13 @@ def _push_record(user, entity_id, operation, payload, changed_at):
     if operation == OP_CREATE:
         if Record.objects.filter(pk=entity_id).exists():
             return 'success', None  # idempotent
-        payload['id'] = str(entity_id)
-        payload['created_by'] = str(user.pk)
-        serializer = RecordSerializer(data=payload)
-        if not serializer.is_valid():
-            return 'rejected', str(serializer.errors)
-        serializer.save()
+        allowed = {'title', 'record_type', 'record_family', 'record_class', 'status',
+                   'tenant_id', 'tenant', 'body', 'metadata', 'permissions_data'}
+        kwargs = {k: v for k, v in payload.items() if k in allowed}
+        # Resolve tenant FK if provided as UUID string
+        if 'tenant' in kwargs and 'tenant_id' not in kwargs:
+            kwargs['tenant_id'] = kwargs.pop('tenant')
+        Record.objects.create(pk=entity_id, created_by=user, **kwargs)
         return 'success', None
 
     if operation == OP_UPDATE:
@@ -290,15 +290,13 @@ def _push_record(user, entity_id, operation, payload, changed_at):
             record = Record.objects.get(pk=entity_id)
         except Record.DoesNotExist:
             return 'rejected', 'not_found'
-        # Conflict detection: cloud version newer than incoming change
         if record.updated_at and changed_at and record.updated_at > changed_at:
-            incoming_hash = SyncChangelog.compute_hash(payload)
-            if incoming_hash != SyncChangelog.compute_hash({}):
-                return 'conflict', 'newer_version_exists'
-        serializer = RecordSerializer(record, data=payload, partial=True)
-        if not serializer.is_valid():
-            return 'rejected', str(serializer.errors)
-        serializer.save()
+            return 'conflict', 'newer_version_exists'
+        allowed_update = {'title', 'body', 'status', 'metadata', 'permissions_data'}
+        for field, value in payload.items():
+            if field in allowed_update:
+                setattr(record, field, value)
+        record.save()
         return 'success', None
 
     return 'rejected', 'unknown_operation'
@@ -306,7 +304,6 @@ def _push_record(user, entity_id, operation, payload, changed_at):
 
 def _push_activity(user, entity_id, operation, payload, changed_at):
     from activity.models import Activity
-    from activity.serializers import ActivitySerializer
 
     if operation == OP_DELETE:
         try:
@@ -320,12 +317,14 @@ def _push_activity(user, entity_id, operation, payload, changed_at):
     if operation == OP_CREATE:
         if Activity.objects.filter(pk=entity_id).exists():
             return 'success', None
-        payload['id'] = str(entity_id)
-        payload['created_by'] = str(user.pk)
-        serializer = ActivitySerializer(data=payload)
-        if not serializer.is_valid():
-            return 'rejected', str(serializer.errors)
-        serializer.save()
+        allowed = {'title', 'activity_type', 'status', 'tenant_id', 'tenant',
+                   'assigned_to_id', 'assigned_to', 'due_at', 'scheduled_at', 'body'}
+        kwargs = {k: v for k, v in payload.items() if k in allowed}
+        if 'tenant' in kwargs and 'tenant_id' not in kwargs:
+            kwargs['tenant_id'] = kwargs.pop('tenant')
+        if 'assigned_to' in kwargs and 'assigned_to_id' not in kwargs:
+            kwargs['assigned_to_id'] = kwargs.pop('assigned_to')
+        Activity.objects.create(pk=entity_id, created_by=user, **kwargs)
         return 'success', None
 
     if operation == OP_UPDATE:
@@ -335,10 +334,11 @@ def _push_activity(user, entity_id, operation, payload, changed_at):
             return 'rejected', 'not_found'
         if act.updated_at and changed_at and act.updated_at > changed_at:
             return 'conflict', 'newer_version_exists'
-        serializer = ActivitySerializer(act, data=payload, partial=True)
-        if not serializer.is_valid():
-            return 'rejected', str(serializer.errors)
-        serializer.save()
+        allowed_update = {'title', 'status', 'body', 'due_at', 'scheduled_at'}
+        for field, value in payload.items():
+            if field in allowed_update:
+                setattr(act, field, value)
+        act.save()
         return 'success', None
 
     return 'rejected', 'unknown_operation'
@@ -346,7 +346,6 @@ def _push_activity(user, entity_id, operation, payload, changed_at):
 
 def _push_relationship(user, entity_id, operation, payload, changed_at):
     from records.models import Relationship
-    from records.serializers import RelationshipSerializer
 
     if operation == OP_DELETE:
         try:
@@ -360,12 +359,14 @@ def _push_relationship(user, entity_id, operation, payload, changed_at):
     if operation == OP_CREATE:
         if Relationship.objects.filter(pk=entity_id).exists():
             return 'success', None
-        payload['id'] = str(entity_id)
-        payload['created_by'] = str(user.pk)
-        serializer = RelationshipSerializer(data=payload)
-        if not serializer.is_valid():
-            return 'rejected', str(serializer.errors)
-        serializer.save()
+        allowed = {'from_record_id', 'from_record', 'to_record_id', 'to_record',
+                   'relationship_type', 'strength', 'bible_verse_id', 'bible_verse'}
+        kwargs = {k: v for k, v in payload.items() if k in allowed}
+        if 'from_record' in kwargs and 'from_record_id' not in kwargs:
+            kwargs['from_record_id'] = kwargs.pop('from_record')
+        if 'to_record' in kwargs and 'to_record_id' not in kwargs:
+            kwargs['to_record_id'] = kwargs.pop('to_record')
+        Relationship.objects.create(pk=entity_id, created_by=user, **kwargs)
         return 'success', None
 
     return 'rejected', 'unknown_operation'
