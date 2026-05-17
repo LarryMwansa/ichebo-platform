@@ -16,11 +16,11 @@ source venv/bin/activate
 
 # 3. Install any new dependencies
 echo "Installing dependencies..."
-pip install -r backend/requirements.txt --quiet
+pip install -r ichebo-platform/requirements.txt --quiet
 
 # 4. Run migrations
 echo "Running migrations..."
-cd backend
+cd ichebo-platform
 python manage.py migrate --noinput
 
 # 5. Collect static files
