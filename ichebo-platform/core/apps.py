@@ -8,6 +8,7 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         register(check_uuid_primary_keys)
+        import core.signals  # noqa: F401
 
 
 @register()
