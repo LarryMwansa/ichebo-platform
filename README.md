@@ -10,5 +10,5 @@ This is ichebo-platform, Version 3 build, and link to the ecosystem architecture
 
 ## Setup
 
-See `/backend/README.md` for local development setup.
+See `/ichebo-platform/README.md` for local development setup.
 See `/deploy.sh` for deployment instructions.
