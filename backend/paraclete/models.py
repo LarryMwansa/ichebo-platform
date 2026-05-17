@@ -1,7 +1,9 @@
+import uuid
 from django.db import models
 
 
 class ParacletePrompt(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     KGS_PATHWAYS = [
         ('new_life', 'New Life'),
         ('spiritual_formation', 'Spiritual Formation'),

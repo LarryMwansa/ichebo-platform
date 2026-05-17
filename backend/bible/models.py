@@ -34,6 +34,7 @@ class BibleBook(models.Model):
     NT = 'NT'
     TESTAMENT_CHOICES = [(OT, 'Old Testament'), (NT, 'New Testament')]
 
+    id   = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     code = models.CharField(max_length=10, unique=True)   # 'GEN', 'MAT'
     name = models.CharField(max_length=50)                # 'Genesis'
     testament = models.CharField(max_length=2, choices=TESTAMENT_CHOICES)
