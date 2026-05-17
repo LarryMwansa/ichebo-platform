@@ -21,6 +21,7 @@ class CertificationConfirmation(models.Model):
     new_competence_level = models.IntegerField()
     confirmed_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True, null=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-confirmed_at']

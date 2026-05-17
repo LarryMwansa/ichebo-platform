@@ -64,6 +64,7 @@ class Tenant(models.Model):
     # Location (JSON field — PostgreSQL)
     location = models.JSONField(default=dict, blank=True)
     settings_data = models.JSONField(default=dict, blank=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'tenants_tenant'
@@ -135,6 +136,7 @@ class UserPermission(models.Model):
     # shepherd_id: UUID of pastoral supervisor (Community feature)
     # service_order: KGS Service Order label (Community feature)
     metadata = models.JSONField(default=dict, blank=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'tenants_userpermission'
@@ -161,6 +163,7 @@ class TenantInvitation(models.Model):
     accepted_at = models.DateTimeField(null=True, blank=True)
     expires_at  = models.DateTimeField()
     created_at  = models.DateTimeField(auto_now_add=True)
+    deleted_at  = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'tenants_tenantinvitation'
@@ -189,6 +192,7 @@ class ServiceOrder(models.Model):
     office       = models.CharField(max_length=120)
     order_number = models.PositiveSmallIntegerField(unique=True)
     is_active    = models.BooleanField(default=True)
+    deleted_at   = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'tenants_serviceorder'

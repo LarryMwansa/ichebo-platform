@@ -30,6 +30,7 @@ class MembershipRequest(models.Model):
     reviewed_at = models.DateTimeField(null=True, blank=True)
     note        = models.TextField(null=True, blank=True)
     created_at  = models.DateTimeField(auto_now_add=True)
+    deleted_at  = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'community_membership_request'

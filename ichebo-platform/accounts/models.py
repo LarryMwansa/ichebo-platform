@@ -42,6 +42,8 @@ class User(AbstractUser):
         choices=[('reconditioning', 'Reconditioning'), ('beginners', 'Beginners')],
     )
 
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         db_table = 'accounts_user'
 
@@ -110,6 +112,7 @@ class UserProfile(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'accounts_userprofile'
