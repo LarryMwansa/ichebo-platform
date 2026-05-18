@@ -6,6 +6,7 @@ import '../../shared/tokens/tokens.dart';
 import '../../shared/widgets/badges.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/ichebo_app_bar.dart';
+import '../../shared/widgets/ichebo_button.dart';
 import '../../shared/widgets/ichebo_card.dart';
 
 final _activityFilterProvider = StateProvider.autoDispose<String>((ref) => 'task');
@@ -33,6 +34,21 @@ class ActivityScreen extends ConsumerWidget {
           Expanded(child: _ActivityList(filter: filter)),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showCreateSheet(context, ref, filter),
+        backgroundColor: IcheboColors.primary,
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _showCreateSheet(BuildContext context, WidgetRef ref, String currentType) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: IcheboRadius.xl2),
+      builder: (_) => _CreateActivitySheet(initialType: currentType, ref: ref),
     );
   }
 }
@@ -212,5 +228,205 @@ class _ActivityCard extends ConsumerWidget {
         );
       }
     }
+  }
+}
+
+// ── Create activity bottom sheet ──────────────────────────────────────────────
+
+class _CreateActivitySheet extends StatefulWidget {
+  const _CreateActivitySheet({required this.initialType, required this.ref});
+  final String initialType;
+  final WidgetRef ref;
+
+  @override
+  State<_CreateActivitySheet> createState() => _CreateActivitySheetState();
+}
+
+class _CreateActivitySheetState extends State<_CreateActivitySheet> {
+  final _titleCtrl = TextEditingController();
+  final _descCtrl = TextEditingController();
+  final _form = GlobalKey<FormState>();
+  late String _type;
+  DateTime? _dueAt;
+  bool _saving = false;
+
+  static const _typeOptions = [
+    ('task', 'Task'),
+    ('habit', 'Habit'),
+    ('goal', 'Goal'),
+    ('reminder', 'Reminder'),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Habits and reminders are valid create types; fall back to task otherwise.
+    _type = _typeOptions.any((t) => t.$1 == widget.initialType)
+        ? widget.initialType
+        : 'task';
+  }
+
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _descCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (!_form.currentState!.validate()) return;
+    setState(() => _saving = true);
+    final data = <String, dynamic>{
+      'title': _titleCtrl.text.trim(),
+      'activity_type': _type,
+      if (_descCtrl.text.trim().isNotEmpty) 'description': _descCtrl.text.trim(),
+      if (_dueAt != null) 'due_at': _dueAt!.toUtc().toIso8601String(),
+    };
+    try {
+      await widget.ref.read(apiClientProvider).post<void>('activities/', data: data);
+      widget.ref.invalidate(activitiesProvider);
+      if (mounted) Navigator.pop(context);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not create. Please try again.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _dueAt ?? now,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365 * 3)),
+    );
+    if (picked != null) setState(() => _dueAt = picked);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: IcheboSpacing.s,
+        right: IcheboSpacing.s,
+        top: IcheboSpacing.s,
+        bottom: MediaQuery.of(context).viewInsets.bottom + IcheboSpacing.m,
+      ),
+      child: Form(
+        key: _form,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Header ────────────────────────────────────────────────────
+            Row(
+              children: [
+                Expanded(
+                  child: Text('New activity',
+                      style: IcheboTextStyles.titleLarge),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: IcheboSpacing.xs),
+
+            // ── Type chips ────────────────────────────────────────────────
+            SizedBox(
+              height: 40,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: _typeOptions.map((t) {
+                  final active = t.$1 == _type;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: IcheboSpacing.xs3),
+                    child: FilterChip(
+                      label: Text(t.$2),
+                      selected: active,
+                      onSelected: (_) => setState(() => _type = t.$1),
+                      selectedColor: IcheboColors.primaryLight,
+                      labelStyle: IcheboTextStyles.labelLarge.copyWith(
+                        color: active ? IcheboColors.primary : IcheboColors.muted,
+                        fontSize: 13,
+                      ),
+                      checkmarkColor: IcheboColors.primary,
+                      side: BorderSide(
+                        color: active ? IcheboColors.primary : IcheboColors.lightBorder,
+                      ),
+                      shape: const StadiumBorder(),
+                      padding: const EdgeInsets.symmetric(horizontal: IcheboSpacing.xs3),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: IcheboSpacing.xs),
+
+            // ── Title ─────────────────────────────────────────────────────
+            TextFormField(
+              controller: _titleCtrl,
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                labelText: 'Title',
+                border: OutlineInputBorder(borderRadius: IcheboRadius.m),
+              ),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Title is required' : null,
+            ),
+            const SizedBox(height: IcheboSpacing.xs),
+
+            // ── Description ───────────────────────────────────────────────
+            TextFormField(
+              controller: _descCtrl,
+              textInputAction: TextInputAction.newline,
+              maxLines: 2,
+              decoration: const InputDecoration(
+                labelText: 'Description (optional)',
+                border: OutlineInputBorder(borderRadius: IcheboRadius.m),
+              ),
+            ),
+            const SizedBox(height: IcheboSpacing.xs),
+
+            // ── Due date ──────────────────────────────────────────────────
+            InkWell(
+              onTap: _pickDate,
+              borderRadius: IcheboRadius.m,
+              child: InputDecorator(
+                decoration: InputDecoration(
+                  labelText: 'Due date (optional)',
+                  border: const OutlineInputBorder(borderRadius: IcheboRadius.m),
+                  suffixIcon: _dueAt != null
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, size: 18),
+                          onPressed: () => setState(() => _dueAt = null),
+                        )
+                      : const Icon(Icons.calendar_today_outlined, size: 18),
+                ),
+                child: Text(
+                  _dueAt != null
+                      ? '${_dueAt!.day}/${_dueAt!.month}/${_dueAt!.year}'
+                      : 'No due date',
+                  style: _dueAt != null
+                      ? IcheboTextStyles.bodyMedium
+                      : IcheboTextStyles.bodyMedium.copyWith(
+                          color: IcheboColors.mutedLight),
+                ),
+              ),
+            ),
+            const SizedBox(height: IcheboSpacing.s),
+
+            // ── Save ──────────────────────────────────────────────────────
+            IcheboButton(label: 'Create', onPressed: _save, loading: _saving),
+          ],
+        ),
+      ),
+    );
   }
 }

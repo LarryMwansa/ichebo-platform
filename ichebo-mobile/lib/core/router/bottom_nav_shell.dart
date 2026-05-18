@@ -13,12 +13,19 @@ const _baseItems = [
   _NavItem(path: '/profile', label: 'Profile', icon: Icons.person_outline, activeIcon: Icons.person),
 ];
 
-// Governance tab — only shown to Level 3+ users.
+// Level 3+ only tabs.
 const _governanceItem = _NavItem(
   path: '/governance',
   label: 'Governance',
   icon: Icons.account_balance_outlined,
   activeIcon: Icons.account_balance,
+);
+
+const _coordinatorItem = _NavItem(
+  path: '/coordinator',
+  label: 'Coord.',
+  icon: Icons.manage_accounts_outlined,
+  activeIcon: Icons.manage_accounts,
 );
 
 class BottomNavShell extends ConsumerWidget {
@@ -34,6 +41,7 @@ class BottomNavShell extends ConsumerWidget {
     final items = [
       ..._baseItems,
       if (hasGov) _governanceItem,
+      if (hasGov) _coordinatorItem,
     ];
 
     final location = GoRouterState.of(context).uri.path;

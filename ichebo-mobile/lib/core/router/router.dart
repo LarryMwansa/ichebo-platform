@@ -11,6 +11,7 @@ import '../../features/activity/activity_screen.dart';
 import '../../features/community/community_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/governance/governance_screen.dart';
+import '../../features/coordinator/coordinator_screen.dart';
 import 'bottom_nav_shell.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -74,6 +75,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/governance',
             builder: (ctx, state) => const GovernanceScreen(),
+          ),
+          GoRoute(
+            path: '/coordinator',
+            builder: (ctx, state) => const CoordinatorScreen(),
           ),
         ],
       ),

@@ -10,6 +10,7 @@ import '../../shared/widgets/ichebo_app_bar.dart';
 import '../../shared/widgets/ichebo_button.dart';
 import '../../shared/widgets/ichebo_card.dart';
 import '../../shared/widgets/progress_bar.dart';
+import 'lesson_screen.dart';
 
 final _learnTabProvider = StateProvider.autoDispose<int>((ref) => 0);
 
@@ -162,7 +163,17 @@ class _ProgrammeCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IcheboCard(
       accent: programme.enrolled,
-      child: Column(
+      child: InkWell(
+        onTap: programme.enrolled
+            ? () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LessonScreen(programmeId: programme.id),
+                  ),
+                )
+            : null,
+        borderRadius: IcheboRadius.l,
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -209,6 +220,7 @@ class _ProgrammeCard extends ConsumerWidget {
             ),
           ],
         ],
+        ),
       ),
     );
   }
