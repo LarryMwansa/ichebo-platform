@@ -295,6 +295,56 @@ final bibleChaptersProvider = FutureProvider.autoDispose.family<List<int>, Strin
   }
 });
 
+// ── Bible notes (record_family=bible, record_type=bible_note) ────────────────
+
+class BibleNote {
+  const BibleNote({
+    required this.id,
+    required this.title,
+    required this.summary,
+    required this.createdAt,
+    this.verseRef,
+  });
+  final String id;
+  final String title;
+  final String summary;
+  final String createdAt;
+  final String? verseRef; // e.g. "GEN 1:1"
+  factory BibleNote.fromJson(Map<String, dynamic> j) => BibleNote(
+        id: j['id'] as String,
+        title: (j['title'] as String?) ?? '',
+        summary: (j['summary'] as String?) ?? '',
+        createdAt: (j['created_at'] as String?) ?? '',
+        verseRef: j['verse_ref'] as String?,
+      );
+}
+
+// params: {book_code, chapter, verse}
+final bibleNotesProvider = FutureProvider.autoDispose
+    .family<List<BibleNote>, Map<String, String>>((ref, params) async {
+  final client = ref.read(apiClientProvider);
+  final verseRef = '${params['book_code']} ${params['chapter']}:${params['verse']}';
+  final cacheKey = 'bible_note_${params['book_code']}_${params['chapter']}_${params['verse']}';
+  List<BibleNote> parse(dynamic d) {
+    final raw = (d as Map<String, dynamic>)['results'] as List? ?? [];
+    return raw.map((e) => BibleNote.fromJson(e as Map<String, dynamic>)).toList();
+  }
+  try {
+    final res = await client.get<Map<String, dynamic>>(
+      'records/',
+      params: {
+        'record_family': 'bible',
+        'record_type': 'bible_note',
+        'verse_ref': verseRef,
+      },
+    );
+    await ref.read(offlineCacheProvider).put(cacheKey, res.data!);
+    return parse(res.data!);
+  } catch (_) {
+    return await ref.read(offlineCacheProvider).get<List<BibleNote>>(cacheKey, parse) ?? [];
+  }
+});
+
 // ── Learn ─────────────────────────────────────────────────────────────────────
 
 class Programme {

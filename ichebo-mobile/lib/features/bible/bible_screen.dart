@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/api/api_client.dart';
 import '../../core/api/providers.dart';
 import '../../shared/tokens/tokens.dart';
 import '../../shared/widgets/badges.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/ichebo_app_bar.dart';
+import '../../shared/widgets/ichebo_button.dart';
 
 // Local state providers for current book/chapter/translation selection.
 final _selectedTranslationProvider = StateProvider.autoDispose<String?>((ref) => null);
@@ -246,37 +248,308 @@ class _VerseList extends ConsumerWidget {
           vertical: IcheboSpacing.xs,
         ),
         itemCount: verses.length,
-        itemBuilder: (context, i) {
-          final v = verses[i];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: IcheboSpacing.xs3),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 28,
-                  child: Text(
-                    '${v.verse}',
-                    style: IcheboTextStyles.labelCaps.copyWith(
-                      color: IcheboColors.primary,
-                      fontSize: 10,
+        itemBuilder: (context, i) => _VerseTile(
+          verse: verses[i],
+          bookCode: book.code,
+        ),
+      ),
+    );
+  }
+}
+
+// ── Verse tile with note icon ─────────────────────────────────────────────────
+
+class _VerseTile extends StatelessWidget {
+  const _VerseTile({required this.verse, required this.bookCode});
+  final BibleVerse verse;
+  final String bookCode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: IcheboSpacing.xs3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 28,
+            child: Text(
+              '${verse.verse}',
+              style: IcheboTextStyles.labelCaps.copyWith(
+                color: IcheboColors.primary,
+                fontSize: 10,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              verse.text,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.7),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _openNotes(context),
+            child: const Padding(
+              padding: EdgeInsets.only(left: IcheboSpacing.xs3, top: 4),
+              child: Icon(Icons.edit_note_outlined,
+                  size: 18, color: IcheboColors.mutedLight),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openNotes(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: IcheboRadius.xl2),
+      builder: (_) => _VerseNoteSheet(
+        bookCode: bookCode,
+        chapter: verse.chapter,
+        verseNum: verse.verse,
+        bookName: verse.bookName,
+      ),
+    );
+  }
+}
+
+// ── Verse note bottom sheet ───────────────────────────────────────────────────
+
+class _VerseNoteSheet extends ConsumerStatefulWidget {
+  const _VerseNoteSheet({
+    required this.bookCode,
+    required this.chapter,
+    required this.verseNum,
+    required this.bookName,
+  });
+  final String bookCode;
+  final int chapter;
+  final int verseNum;
+  final String bookName;
+
+  @override
+  ConsumerState<_VerseNoteSheet> createState() => _VerseNoteSheetState();
+}
+
+class _VerseNoteSheetState extends ConsumerState<_VerseNoteSheet> {
+  final _noteCtrl = TextEditingController();
+  bool _saving = false;
+  bool _showCreate = false;
+
+  String get _verseRef =>
+      '${widget.bookCode} ${widget.chapter}:${widget.verseNum}';
+
+  Map<String, String> get _params => {
+        'book_code': widget.bookCode,
+        'chapter': '${widget.chapter}',
+        'verse': '${widget.verseNum}',
+      };
+
+  @override
+  void dispose() {
+    _noteCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveNote() async {
+    final text = _noteCtrl.text.trim();
+    if (text.isEmpty) return;
+    setState(() => _saving = true);
+    try {
+      await ref.read(apiClientProvider).post<void>(
+        'records/',
+        data: {
+          'record_family': 'bible',
+          'record_type': 'bible_note',
+          'record_class': 'personal',
+          'title': _verseRef,
+          'summary': text,
+          'verse_ref': _verseRef,
+        },
+      );
+      ref.invalidate(bibleNotesProvider(_params));
+      _noteCtrl.clear();
+      if (mounted) setState(() => _showCreate = false);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not save note. Please try again.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final notesAsync = ref.watch(bibleNotesProvider(_params));
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: IcheboSpacing.s,
+        right: IcheboSpacing.s,
+        top: IcheboSpacing.s,
+        bottom: MediaQuery.of(context).viewInsets.bottom + IcheboSpacing.m,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Header ────────────────────────────────────────────────────
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Notes', style: IcheboTextStyles.titleLarge),
+                    Text(
+                      '${widget.bookName} ${widget.chapter}:${widget.verseNum}',
+                      style: IcheboTextStyles.bodySmall
+                          .copyWith(color: IcheboColors.muted),
                     ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+          const SizedBox(height: IcheboSpacing.xs),
+
+          // ── Existing notes ────────────────────────────────────────────
+          notesAsync.when(
+            loading: () => const Padding(
+              padding: EdgeInsets.symmetric(vertical: IcheboSpacing.s),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, s) => const SizedBox.shrink(),
+            data: (notes) => notes.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: IcheboSpacing.xs),
+                    child: Text(
+                      'No notes yet for this verse.',
+                      style: IcheboTextStyles.bodySmall
+                          .copyWith(color: IcheboColors.mutedLight),
+                    ),
+                  )
+                : Column(
+                    children: notes
+                        .map((n) => _NoteItem(
+                            note: n, params: _params, ref: ref))
+                        .toList(),
+                  ),
+          ),
+
+          // ── Create note ───────────────────────────────────────────────
+          if (_showCreate) ...[
+            const SizedBox(height: IcheboSpacing.xs),
+            TextField(
+              controller: _noteCtrl,
+              maxLines: 3,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'Write your note…',
+                border: OutlineInputBorder(borderRadius: IcheboRadius.m),
+              ),
+            ),
+            const SizedBox(height: IcheboSpacing.xs),
+            Row(
+              children: [
+                Expanded(
+                  child: IcheboButton(
+                    label: 'Save note',
+                    onPressed: _saveNote,
+                    loading: _saving,
                   ),
                 ),
-                Expanded(
-                  child: Text(
-                    v.text,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(height: 1.7),
-                  ),
+                const SizedBox(width: IcheboSpacing.xs),
+                IcheboButton(
+                  label: 'Cancel',
+                  onPressed: () => setState(() {
+                    _showCreate = false;
+                    _noteCtrl.clear();
+                  }),
+                  variant: IcheboButtonVariant.ghost,
+                  expand: false,
                 ),
               ],
             ),
-          );
-        },
+          ] else ...[
+            const SizedBox(height: IcheboSpacing.xs),
+            IcheboButton(
+              label: 'Add note',
+              icon: Icons.add,
+              onPressed: () => setState(() => _showCreate = true),
+              variant: IcheboButtonVariant.secondary,
+            ),
+          ],
+        ],
       ),
     );
+  }
+}
+
+// ── Note item (with soft-delete) ──────────────────────────────────────────────
+
+class _NoteItem extends StatelessWidget {
+  const _NoteItem({
+    required this.note,
+    required this.params,
+    required this.ref,
+  });
+  final BibleNote note;
+  final Map<String, String> params;
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: IcheboSpacing.xs3),
+      child: Container(
+        padding: const EdgeInsets.all(IcheboSpacing.xs),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          borderRadius: IcheboRadius.m,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(note.summary,
+                  style: Theme.of(context).textTheme.bodyMedium),
+            ),
+            const SizedBox(width: IcheboSpacing.xs3),
+            GestureDetector(
+              onTap: () => _delete(context),
+              child: const Icon(Icons.delete_outline,
+                  size: 16, color: IcheboColors.mutedLight),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _delete(BuildContext context) async {
+    try {
+      await ref.read(apiClientProvider).patch<void>(
+        'records/${note.id}/',
+        data: {'deleted_at': DateTime.now().toUtc().toIso8601String()},
+      );
+      ref.invalidate(bibleNotesProvider(params));
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not delete note.')),
+        );
+      }
+    }
   }
 }

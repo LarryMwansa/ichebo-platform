@@ -151,7 +151,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       onPressed: _submit,
                       loading: isLoading,
                     ),
-                    const SizedBox(height: IcheboSpacing.s),
+                    const SizedBox(height: IcheboSpacing.xs3),
+                    TextButton(
+                      onPressed: () => context.go('/forgot-password'),
+                      child: Text(
+                        'Forgot password?',
+                        style: IcheboTextStyles.bodySmall.copyWith(
+                          color: IcheboColors.stone.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ),
                     TextButton(
                       onPressed: () => context.go('/register'),
                       child: Text(

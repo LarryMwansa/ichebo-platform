@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../auth/auth_provider.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/auth/register_screen.dart';
+import '../../features/auth/forgot_password_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/bible/bible_screen.dart';
 import '../../features/learn/learn_screen.dart';
@@ -42,6 +43,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/register',
         builder: (ctx, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (ctx, state) => const ForgotPasswordScreen(),
       ),
 
       // ── Shell routes (with bottom nav) ─────────────────────────────────

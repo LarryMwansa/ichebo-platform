@@ -6,6 +6,7 @@ import '../../shared/widgets/badges.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/ichebo_app_bar.dart';
 import '../../shared/widgets/ichebo_card.dart';
+import 'record_detail_screen.dart';
 
 // Governance tabs: Reference Library (class/principle/concept/divine_pattern)
 // and Mandate branch (mandate/statement/protocol/procedure).
@@ -139,7 +140,15 @@ class _RecordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IcheboCard(
-      child: Column(
+      child: InkWell(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => RecordDetailScreen(record: record),
+          ),
+        ),
+        borderRadius: IcheboRadius.l,
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -172,6 +181,7 @@ class _RecordCard extends StatelessWidget {
                     : StatusVariant.warning,
           ),
         ],
+        ),
       ),
     );
   }
