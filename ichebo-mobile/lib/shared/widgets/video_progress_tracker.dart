@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/api_client.dart';
 
@@ -10,14 +9,14 @@ class VideoProgressTracker {
     required this.activityId,
     required this.videoRecordId,
     required this.totalSeconds,
-    required this.ref,
+    required this.apiClient,
     this.onComplete,
   });
 
   final String activityId;
   final String videoRecordId;
   final int totalSeconds;
-  final WidgetRef ref;
+  final ApiClient apiClient;
   final VoidCallback? onComplete;
 
   final Set<int> _firedMilestones = {};
@@ -39,7 +38,7 @@ class VideoProgressTracker {
 
   Future<void> _report(int progress, int watchedSeconds) async {
     try {
-      await ref.read(apiClientProvider).patch<void>(
+      await apiClient.patch<void>(
         'activities/$activityId/',
         data: {
           'progress': progress,

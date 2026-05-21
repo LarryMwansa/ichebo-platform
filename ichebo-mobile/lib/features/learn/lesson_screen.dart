@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/providers.dart';
 import '../../shared/tokens/tokens.dart';
@@ -9,6 +8,7 @@ import '../../shared/widgets/badges.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/ichebo_button.dart';
 import '../../shared/widgets/ichebo_card.dart';
+import '../../shared/widgets/ichebo_video_player.dart';
 
 class LessonScreen extends ConsumerWidget {
   const LessonScreen({super.key, required this.programmeId});
@@ -188,7 +188,15 @@ class _LessonDetailScreenState extends ConsumerState<_LessonDetailScreen> {
 
           // ── Video ─────────────────────────────────────────────────────
           if (lesson.videoUrl != null && lesson.videoUrl!.isNotEmpty) ...[
-            _VideoCard(url: lesson.videoUrl!),
+            IcheboVideoPlayer(
+              videoUrl: lesson.videoUrl!,
+              activityId: lesson.activityId,
+              videoRecordId: lesson.videoRecordId,
+              chapters: lesson.chapterMarkers.isNotEmpty
+                  ? lesson.chapterMarkers
+                  : null,
+              onComplete: _markComplete,
+            ),
             const SizedBox(height: IcheboSpacing.s),
           ],
 
@@ -238,46 +246,3 @@ class _LessonDetailScreenState extends ConsumerState<_LessonDetailScreen> {
   }
 }
 
-// ── Video card (opens in external browser/player) ─────────────────────────────
-
-class _VideoCard extends StatelessWidget {
-  const _VideoCard({required this.url});
-  final String url;
-
-  @override
-  Widget build(BuildContext context) {
-    return IcheboCard(
-      child: InkWell(
-        onTap: () async {
-          final uri = Uri.tryParse(url);
-          if (uri != null && await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          }
-        },
-        borderRadius: IcheboRadius.l,
-        child: Container(
-          height: 180,
-          decoration: BoxDecoration(
-            color: IcheboColors.ink,
-            borderRadius: IcheboRadius.l,
-          ),
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.play_circle_filled,
-                  size: 56, color: Colors.white),
-              const SizedBox(height: IcheboSpacing.xs3),
-              Text(
-                'Watch video',
-                style: IcheboTextStyles.labelLarge.copyWith(
-                  color: IcheboColors.stone.withValues(alpha: 0.8),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

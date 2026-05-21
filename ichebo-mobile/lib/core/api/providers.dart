@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api_client.dart';
 import '../cache/offline_cache.dart';
+import '../../shared/widgets/chapter_navigator.dart';
 
 // Generic paginated result wrapper.
 class PageResult<T> {
@@ -449,9 +450,12 @@ class Lesson {
     required this.order,
     this.summary,
     this.videoUrl,
+    this.videoRecordId,
     this.markdownContent,
     required this.status,
     required this.completed,
+    this.activityId,
+    this.chapterMarkers = const [],
   });
   final String id;
   final String title;
@@ -460,9 +464,13 @@ class Lesson {
   final int order;
   final String? summary;
   final String? videoUrl;
+  final String? videoRecordId;
   final String? markdownContent;
   final String status;
   final bool completed;
+  final String? activityId;
+  final List<ChapterMarker> chapterMarkers;
+
   factory Lesson.fromJson(Map<String, dynamic> j) => Lesson(
         id: j['id'] as String,
         title: j['title'] as String,
@@ -471,9 +479,14 @@ class Lesson {
         order: (j['order'] as int?) ?? 0,
         summary: j['summary'] as String?,
         videoUrl: j['video_url'] as String?,
+        videoRecordId: j['video_record_id'] as String?,
         markdownContent: j['markdown_content'] as String?,
         status: (j['status'] as String?) ?? 'active',
         completed: (j['completed'] as bool?) ?? false,
+        activityId: j['activity_id'] as String?,
+        chapterMarkers: (j['chapter_markers'] as List? ?? [])
+            .map((e) => ChapterMarker.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
 }
 

@@ -1,13 +1,15 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../shared/tokens/tokens.dart';
+import '../../core/api/api_client.dart';
+import '../tokens/tokens.dart';
 import 'chapter_navigator.dart';
 import 'video_progress_tracker.dart';
 
-class IcheboVideoPlayer extends StatefulWidget {
+class IcheboVideoPlayer extends ConsumerStatefulWidget {
   const IcheboVideoPlayer({
     super.key,
     required this.videoUrl,
@@ -26,10 +28,10 @@ class IcheboVideoPlayer extends StatefulWidget {
   final VoidCallback? onComplete;
 
   @override
-  State<IcheboVideoPlayer> createState() => _IcheboVideoPlayerState();
+  ConsumerState<IcheboVideoPlayer> createState() => _IcheboVideoPlayerState();
 }
 
-class _IcheboVideoPlayerState extends State<IcheboVideoPlayer> {
+class _IcheboVideoPlayerState extends ConsumerState<IcheboVideoPlayer> {
   VideoPlayerController? _vpController;
   ChewieController? _chewieController;
   VideoProgressTracker? _tracker;
@@ -68,6 +70,7 @@ class _IcheboVideoPlayerState extends State<IcheboVideoPlayer> {
         activityId: widget.activityId!,
         videoRecordId: widget.videoRecordId!,
         totalSeconds: totalSecs,
+        apiClient: ref.read(apiClientProvider),
         onComplete: widget.onComplete,
       );
     }
