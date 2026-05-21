@@ -11,7 +11,7 @@
 // Build shared library:
 //
 //	go build -buildmode=c-shared -o libichebo_sync.so ./ffi/
-package ffi
+package main
 
 /*
 #include <stdlib.h>
@@ -25,6 +25,7 @@ import (
 
 	"github.com/ichebo/sync/pkg/clock"
 	"github.com/ichebo/sync/pkg/status"
+	"github.com/ichebo/sync/pkg/store"
 )
 
 // daemon holds the running sync engine state across FFI calls.
@@ -34,6 +35,7 @@ var daemon struct {
 	cancel  context.CancelFunc
 	monitor *status.Monitor
 	clock   *clock.HybridClock
+	db      store.Store
 }
 
 // SyncConfig is the JSON-decoded form of the configJSON parameter to SyncStart.
@@ -64,6 +66,12 @@ func SyncStart(configJSON *C.char) C.int {
 		return -1
 	}
 
+	db, err := store.Open(cfg.DBPath)
+	if err != nil {
+		return -2
+	}
+
+	daemon.db = db
 	daemon.monitor = status.New()
 	daemon.clock = clock.New()
 
@@ -71,11 +79,12 @@ func SyncStart(configJSON *C.char) C.int {
 	daemon.cancel = cancel
 	daemon.started = true
 
-	// The full engine wiring (store.Open, device.Load, push/pull goroutine)
-	// is assembled here. Stub: transitions to Offline immediately.
+	// Background daemon: transitions to Offline on start.
+	// Full push/pull wiring added in D.5.
 	go func() {
 		daemon.monitor.SetState(status.Offline)
 		<-ctx.Done()
+		db.Close()
 	}()
 
 	return 0
@@ -94,6 +103,7 @@ func SyncStop() {
 	}
 	daemon.cancel()
 	daemon.started = false
+	daemon.db = nil
 }
 
 // SyncNow triggers an immediate sync cycle (push + pull).

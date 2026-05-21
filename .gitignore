@@ -77,6 +77,7 @@ lib/
 lib64/
 # Flutter lib/ directories are source code — not excluded
 !ichebo-mobile/lib/
+!ichebo-desktop/lib/
 !ichebo-sync/
 parts/
 sdist/
