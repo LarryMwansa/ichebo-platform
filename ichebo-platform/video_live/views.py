@@ -451,3 +451,14 @@ def htmx_studio_set_fallback(request):
     return render(request, 'video_live/partials/studio_fallback_form.html', {
         'fallback': fallback,
     })
+
+
+
+@login_required
+def video_library(request):
+    from records.models import Record
+    videos = Record.objects.filter(
+        record_family='media',
+        deleted_at__isnull=True,
+    ).order_by('-created_at')[:50]
+    return render(request, 'video_live/library.html', {'videos': videos})

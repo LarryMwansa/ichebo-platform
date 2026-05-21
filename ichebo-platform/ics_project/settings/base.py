@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'notifications',
     'paraclete',
     'video_live',
+    'media',
     'encrypted_model_fields',
 ]
 
@@ -225,6 +226,10 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+
+# Ichebo Media — Video Engine
+MEDIA_ENGINE_URL = config('MEDIA_ENGINE_URL', default='http://localhost:8090')
+MEDIA_ENGINE_API_KEY = config('MEDIA_ENGINE_API_KEY', default='dev-key')
 
 # Security Settings
 X_FRAME_OPTIONS = 'SAMEORIGIN'

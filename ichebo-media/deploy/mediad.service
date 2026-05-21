@@ -1,0 +1,18 @@
+[Unit]
+Description=Ichebo Media Video Engine
+After=network.target
+
+[Service]
+Type=simple
+User=ichebo
+WorkingDirectory=/opt/ichebo-media
+EnvironmentFile=/etc/ichebo/media.env
+ExecStart=/usr/local/bin/mediad
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=mediad
+
+[Install]
+WantedBy=multi-user.target

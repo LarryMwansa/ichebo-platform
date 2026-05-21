@@ -16,6 +16,7 @@ class Record(models.Model):
         ('reference', 'Reference'),
         ('bible', 'Bible'),
         ('community', 'Community'),
+        ('media', 'Media'),
     ]
     ORIGIN_CHOICES = [
         ('user', 'User'),

@@ -17,6 +17,7 @@ urlpatterns = [
     path('manage/<uuid:event_id>/delete/', views.video_delete_event, name='delete-event'),
 
     # Studio (Level 3+)
+    path('library/',                              views.video_library,             name='library'),
     path('studio/',                               views.video_studio,              name='studio'),
     path('studio/htmx/now-playing/',              views.htmx_studio_now_playing,   name='studio-now-playing'),
     path('studio/htmx/timeline/',                 views.htmx_studio_timeline,      name='studio-timeline'),
