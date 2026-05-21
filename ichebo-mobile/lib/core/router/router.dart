@@ -28,7 +28,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuthed = auth is AuthAuthenticated;
       final isAuthRoute =
           state.uri.path.startsWith('/login') ||
-          state.uri.path.startsWith('/register');
+          state.uri.path.startsWith('/register') ||
+          state.uri.path.startsWith('/forgot-password');
 
       if (!isAuthed && !isAuthRoute) return '/login';
       if (isAuthed && isAuthRoute) return '/home';
