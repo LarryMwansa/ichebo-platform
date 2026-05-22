@@ -1,8 +1,10 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from core.managers import SoftDeleteMixin
 
-class Record(models.Model):
+
+class Record(SoftDeleteMixin, models.Model):
     RECORD_CLASS_CHOICES = [
         ('personal', 'Personal'),
         ('organizational', 'Organizational'),
@@ -45,7 +47,7 @@ class Record(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    # deleted_at — provided by SoftDeleteMixin
 
     record_class = models.CharField(max_length=20, choices=RECORD_CLASS_CHOICES)
     record_family = models.CharField(max_length=20, choices=RECORD_FAMILY_CHOICES)
@@ -99,7 +101,7 @@ class Record(models.Model):
         return f"{self.record_type}: {self.title}"
 
 
-class Relationship(models.Model):
+class Relationship(SoftDeleteMixin, models.Model):
     DIRECTION_CHOICES = [
         ('directed', 'Directed'),
         ('bidirectional', 'Bidirectional'),
@@ -134,7 +136,7 @@ class Relationship(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    # deleted_at — provided by SoftDeleteMixin
 
     from_record = models.ForeignKey(
         Record, on_delete=models.CASCADE, related_name='outgoing_relationships'

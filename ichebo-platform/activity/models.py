@@ -1,8 +1,10 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from core.managers import SoftDeleteMixin
 
-class Activity(models.Model):
+
+class Activity(SoftDeleteMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tenant = models.ForeignKey('tenants.Tenant', null=True, blank=True,
                                on_delete=models.SET_NULL, related_name='activities')
@@ -74,7 +76,7 @@ class Activity(models.Model):
     )
 
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    # deleted_at — provided by SoftDeleteMixin
 
     class Meta:
         ordering = ['-created_at']

@@ -116,6 +116,45 @@ func TestValidate_Direction(t *testing.T) {
 	}
 }
 
+func TestValidate_AllRelationshipTypes(t *testing.T) {
+	eng := relationships.New()
+	base := map[string]any{
+		"id":             "550e8400-e29b-41d4-a716-446655440000",
+		"created_by":     "550e8400-e29b-41d4-a716-446655440001",
+		"created_at":     "2026-05-13T14:00:00Z",
+		"from_record_id": "550e8400-e29b-41d4-a716-446655440002",
+		"to_record_id":   "550e8400-e29b-41d4-a716-446655440003",
+		"direction":      "directed",
+	}
+	allTypes := []string{
+		"relates_to", "derived_from", "references", "answers", "fulfills",
+		"requests", "has_symbol", "matches_pattern", "assigned_to", "tracks",
+		"completes", "part_of", "aligns_with", "authorised_by", "has_subject",
+		"has_entity", "tagged_in", "community_ref",
+	}
+	for _, rt := range allTypes {
+		t.Run(rt, func(t *testing.T) {
+			p := copyMap(base)
+			p["relationship_type"] = rt
+			raw, _ := json.Marshal(p)
+			if err := eng.Validate(raw); err != nil {
+				t.Errorf("relationship_type %q should be valid: %v", rt, err)
+			}
+		})
+	}
+	// Old types that were removed must now be rejected.
+	for _, rt := range []string{"related_to", "links_to", "annotates", "supersedes"} {
+		t.Run("reject_"+rt, func(t *testing.T) {
+			p := copyMap(base)
+			p["relationship_type"] = rt
+			raw, _ := json.Marshal(p)
+			if err := eng.Validate(raw); err == nil {
+				t.Errorf("removed relationship_type %q should be rejected", rt)
+			}
+		})
+	}
+}
+
 func copyMap(m map[string]any) map[string]any {
 	out := make(map[string]any, len(m))
 	for k, v := range m {

@@ -31,6 +31,7 @@ var validRecordFamilies = map[string]bool{
 	"reference":  true,
 	"bible":      true,
 	"community":  true,
+	"media":      true,
 }
 
 // Payload is the canonical representation of a Record entity.

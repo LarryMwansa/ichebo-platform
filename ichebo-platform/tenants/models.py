@@ -3,8 +3,10 @@ import secrets
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from core.managers import SoftDeleteMixin
 
-class Tenant(models.Model):
+
+class Tenant(SoftDeleteMixin, models.Model):
     TIER_CHOICES = [
         ('handbook', 'Handbook'),
         ('induction', 'Induction'),
@@ -64,7 +66,7 @@ class Tenant(models.Model):
     # Location (JSON field — PostgreSQL)
     location = models.JSONField(default=dict, blank=True)
     settings_data = models.JSONField(default=dict, blank=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    # deleted_at — provided by SoftDeleteMixin
 
     class Meta:
         db_table = 'tenants_tenant'
@@ -95,7 +97,7 @@ class Tenant(models.Model):
         return f"{self.name} ({self.path})"
 
 
-class UserPermission(models.Model):
+class UserPermission(SoftDeleteMixin, models.Model):
     ROLE_CHOICES = [
         ('seeker', 'Seeker'),
         ('beginner', 'Beginner'),
@@ -136,14 +138,14 @@ class UserPermission(models.Model):
     # shepherd_id: UUID of pastoral supervisor (Community feature)
     # service_order: KGS Service Order label (Community feature)
     metadata = models.JSONField(default=dict, blank=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    # deleted_at — provided by SoftDeleteMixin
 
     class Meta:
         db_table = 'tenants_userpermission'
         unique_together = [['tenant', 'user', 'role']]
 
 
-class TenantInvitation(models.Model):
+class TenantInvitation(SoftDeleteMixin, models.Model):
     STATUS_CHOICES = [
         ('pending',  'Pending'),
         ('accepted', 'Accepted'),
@@ -163,7 +165,7 @@ class TenantInvitation(models.Model):
     accepted_at = models.DateTimeField(null=True, blank=True)
     expires_at  = models.DateTimeField()
     created_at  = models.DateTimeField(auto_now_add=True)
-    deleted_at  = models.DateTimeField(null=True, blank=True)
+    # deleted_at — provided by SoftDeleteMixin
 
     class Meta:
         db_table = 'tenants_tenantinvitation'
@@ -184,7 +186,7 @@ class TenantInvitation(models.Model):
         return f"Invitation({self.email} → {self.tenant.name}, {self.status})"
 
 
-class DesktopLicence(models.Model):
+class DesktopLicence(SoftDeleteMixin, models.Model):
     """
     One row per issued Desktop licence key.
     Staff issues keys via Django admin; stewards enter them in the activation wizard.
@@ -220,7 +222,7 @@ class DesktopLicence(models.Model):
         return f"{self.licence_key} → {self.tenant.name} ({status})"
 
 
-class ServiceOrder(models.Model):
+class ServiceOrder(SoftDeleteMixin, models.Model):
     id           = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     slug         = models.CharField(max_length=80, unique=True)
     name         = models.CharField(max_length=120)
@@ -228,7 +230,7 @@ class ServiceOrder(models.Model):
     office       = models.CharField(max_length=120)
     order_number = models.PositiveSmallIntegerField(unique=True)
     is_active    = models.BooleanField(default=True)
-    deleted_at   = models.DateTimeField(null=True, blank=True)
+    # deleted_at — provided by SoftDeleteMixin
 
     class Meta:
         db_table = 'tenants_serviceorder'

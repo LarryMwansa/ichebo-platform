@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 from encrypted_model_fields.fields import EncryptedCharField
+from core.managers import SoftDeleteManager, AllObjectsManager
 
 
 class User(AbstractUser):
@@ -42,7 +43,10 @@ class User(AbstractUser):
         choices=[('reconditioning', 'Reconditioning'), ('beginners', 'Beginners')],
     )
 
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    objects = SoftDeleteManager()
+    all_objects = AllObjectsManager()
 
     class Meta:
         db_table = 'accounts_user'
@@ -112,7 +116,10 @@ class UserProfile(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    objects = SoftDeleteManager()
+    all_objects = AllObjectsManager()
 
     class Meta:
         db_table = 'accounts_userprofile'

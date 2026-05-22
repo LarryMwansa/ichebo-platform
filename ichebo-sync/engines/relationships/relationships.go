@@ -14,9 +14,26 @@ import (
 	"github.com/ichebo/sync/pkg/store"
 )
 
+// validRelationshipTypes is the exhaustive vocabulary from DOC C §4.3 / records.Relationship.
 var validRelationshipTypes = map[string]bool{
-	"part_of": true, "references": true, "supersedes": true,
-	"related_to": true, "links_to": true, "annotates": true,
+	"relates_to":      true,
+	"derived_from":    true,
+	"references":      true,
+	"answers":         true,
+	"fulfills":        true,
+	"requests":        true,
+	"has_symbol":      true,
+	"matches_pattern": true,
+	"assigned_to":     true,
+	"tracks":          true,
+	"completes":       true,
+	"part_of":         true,
+	"aligns_with":     true,
+	"authorised_by":   true,
+	"has_subject":     true,
+	"has_entity":      true,
+	"tagged_in":       true,
+	"community_ref":   true,
 }
 
 var validStrengths = map[string]bool{

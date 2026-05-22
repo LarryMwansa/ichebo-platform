@@ -9,9 +9,10 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from core.managers import SoftDeleteMixin
 
 
-class Notification(models.Model):
+class Notification(SoftDeleteMixin, models.Model):
     NOTIFICATION_TYPES = [
         ('membership_approved',  'Membership Approved'),
         ('membership_denied',    'Membership Denied'),
@@ -47,7 +48,7 @@ class Notification(models.Model):
     read_at = models.DateTimeField(null=True, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    # deleted_at — provided by SoftDeleteMixin
 
     class Meta:
         ordering = ['-created_at']

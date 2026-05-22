@@ -1,9 +1,10 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from core.managers import SoftDeleteMixin
 
 
-class CertificationConfirmation(models.Model):
+class CertificationConfirmation(SoftDeleteMixin, models.Model):
     """
     Audit record of a steward confirming a learner's certification.
     The certification itself is a records.Record with record_type='certification'.
@@ -21,7 +22,7 @@ class CertificationConfirmation(models.Model):
     new_competence_level = models.IntegerField()
     confirmed_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True, null=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    # deleted_at — provided by SoftDeleteMixin
 
     class Meta:
         ordering = ['-confirmed_at']

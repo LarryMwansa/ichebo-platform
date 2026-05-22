@@ -1,9 +1,10 @@
 import uuid
 from django.conf import settings
 from django.db import models
+from core.managers import SoftDeleteMixin
 
 
-class MembershipRequest(models.Model):
+class MembershipRequest(SoftDeleteMixin, models.Model):
     """
     Deferred — Phase 2 of Community App.
     Stubbed here so migration exists and Phase 2 requires no schema change.
@@ -30,7 +31,7 @@ class MembershipRequest(models.Model):
     reviewed_at = models.DateTimeField(null=True, blank=True)
     note        = models.TextField(null=True, blank=True)
     created_at  = models.DateTimeField(auto_now_add=True)
-    deleted_at  = models.DateTimeField(null=True, blank=True)
+    # deleted_at — provided by SoftDeleteMixin
 
     class Meta:
         db_table = 'community_membership_request'
