@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'paraclete',
     'video_live',
     'media',
+    'handbook',
     'encrypted_model_fields',
 ]
 

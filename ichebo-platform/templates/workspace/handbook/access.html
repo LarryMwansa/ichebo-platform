@@ -1,0 +1,86 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block title %}Manage Access — Handbook{% endblock %}
+
+{% block context_header %}Handbook{% endblock %}
+
+{% block context_content %}
+    <div style="padding: 0 4px;">
+        <a href="{% url 'handbook:home' %}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;font-size:13px;color:rgba(255,255,255,0.6);text-decoration:none;">
+            <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+            All Records
+        </a>
+    </div>
+{% endblock %}
+
+{% block ws_content %}
+    <div class="ics-stage__content" data-watermark="Access" style="height:100%;overflow-y:auto;">
+        <div style="max-width:700px;margin:0 auto;padding:32px 24px;">
+            <h1 class="ws-page-title" style="font-size:22px;margin:0 0 24px;">Manage Handbook Access</h1>
+            <div id="hb-access-list">
+                <p style="font-size:13px;color:var(--text-muted-ink);">Loading…</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ws_options %}
+    <div style="padding:14px;">
+        <div class="ws-label-tag" style="margin-bottom:12px;">Grant Access</div>
+        <div style="font-size:12px;color:var(--text-muted-ink);margin-bottom:10px;">
+            Enter the User ID (UUID) and select a role.
+        </div>
+        <div style="margin-bottom:8px;">
+            <label style="font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted-ink);display:block;margin-bottom:4px;">User ID</label>
+            <input id="hb-grant-user" type="text" style="width:100%;padding:6px 8px;border:1px solid var(--border-ink);border-radius:5px;font-size:12px;background:transparent;color:var(--text-ink);" placeholder="UUID">
+        </div>
+        <div style="margin-bottom:12px;">
+            <label style="font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted-ink);display:block;margin-bottom:4px;">Role</label>
+            <select id="hb-grant-role" style="width:100%;padding:6px 8px;border:1px solid var(--border-ink);border-radius:5px;font-size:12px;background:var(--stone-bg);color:var(--text-ink);">
+                <option value="reader">Reader</option>
+                <option value="author">Author</option>
+                <option value="editor">Editor</option>
+            </select>
+        </div>
+        <button onclick="HBAccess.grant()" style="width:100%;padding:8px;background:var(--accent-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
+            Grant Access
+        </button>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const HBAccess = {
+    async load() {
+        const r = await fetch('/api/handbook/access/');
+        const data = await r.json();
+        const list = document.getElementById('hb-access-list');
+        if (!data.length) { list.innerHTML = '<p style="font-size:13px;color:var(--text-muted-ink);">No access grants yet.</p>'; return; }
+        list.innerHTML = data.map(a => `
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-ink);font-size:13px;">
+                <div style="flex:1;">
+                    <div style="font-weight:600;">${a.user_name || a.user}</div>
+                    <div style="font-size:11px;color:var(--text-muted-ink);">${a.user_email || ''}</div>
+                </div>
+                <span style="font-size:11px;font-weight:600;text-transform:capitalize;padding:3px 8px;border-radius:4px;background:rgba(0,0,0,0.06);">${a.role}</span>
+            </div>
+        `).join('');
+    },
+
+    async grant() {
+        const user = document.getElementById('hb-grant-user').value.trim();
+        const role = document.getElementById('hb-grant-role').value;
+        if (!user) return;
+        const csrf = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+        const r = await fetch('/api/handbook/access/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+            body: JSON.stringify({ user, role }),
+        });
+        if (r.ok) { document.getElementById('hb-grant-user').value = ''; this.load(); }
+    },
+};
+HBAccess.load();
+</script>
+{% endblock %}

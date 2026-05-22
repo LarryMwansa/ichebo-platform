@@ -1,0 +1,173 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block title %}Handbook{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <style>
+        .hb-branch-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .hb-branch-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .hb-branch-item.active { background: rgba(255,255,255,0.08); color: #fff; }
+        .hb-branch-item .material-symbols-outlined { font-size: 16px; }
+
+        .hb-status-dot {
+            width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+        }
+        .hb-status-dot.draft     { background: #636e72; }
+        .hb-status-dot.published { background: #00b894; }
+        .hb-status-dot.locked    { background: var(--accent-red); }
+        .hb-status-dot.superseded{ background: #fdcb6e; }
+
+        .hb-record-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-ink);
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-ink);
+            transition: background 0.12s;
+        }
+        .hb-record-row:hover { background: rgba(0,0,0,0.03); }
+        .dark .hb-record-row:hover { background: rgba(255,255,255,0.03); }
+
+        .hb-record-row__title {
+            font-weight: 600;
+            font-size: 14px;
+            flex: 1;
+        }
+        .hb-record-row__meta {
+            font-size: 11px;
+            color: var(--text-muted-ink);
+            white-space: nowrap;
+        }
+        .hb-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.06);
+            color: var(--text-muted-ink);
+        }
+        .hb-tag.published { background: rgba(0, 184, 148, 0.12); color: #00b894; }
+        .hb-tag.locked    { background: rgba(175, 50, 54, 0.12); color: var(--accent-red); }
+        .hb-tag.draft     { background: rgba(99, 110, 114, 0.12); color: #636e72; }
+        .hb-tag.superseded{ background: rgba(253, 203, 110, 0.12); color: #e17055; }
+    </style>
+{% endblock %}
+
+{# ── Column 2: Context Bar — Branch Navigator ── #}
+{% block context_header %}Handbook{% endblock %}
+
+{% block context_content %}
+    <div style="padding: 0 4px;">
+        <div class="ws-label-tag" style="margin-bottom: 8px;">Navigation</div>
+
+        <a href="{% url 'handbook:home' %}" class="hb-branch-item active">
+            <span class="material-symbols-outlined">menu_book</span>
+            All Records
+        </a>
+        <a href="{% url 'handbook:new' %}" class="hb-branch-item">
+            <span class="material-symbols-outlined">add_circle</span>
+            New Record
+        </a>
+
+        <div class="ctx-divider" style="margin: 12px 0;"></div>
+        <div class="ws-label-tag" style="margin-bottom: 8px;">Filter by Status</div>
+
+        <a href="?status=draft"     class="hb-branch-item"><span class="hb-status-dot draft"></span>Drafts</a>
+        <a href="?status=published" class="hb-branch-item"><span class="hb-status-dot published"></span>Published</a>
+        <a href="?status=locked"    class="hb-branch-item"><span class="hb-status-dot locked"></span>Locked</a>
+
+        {% if access and access.role == 'editor' %}
+            <div class="ctx-divider" style="margin: 12px 0;"></div>
+            <div class="ws-label-tag" style="margin-bottom: 8px;">Editor</div>
+            <a href="{% url 'handbook:access' %}" class="hb-branch-item">
+                <span class="material-symbols-outlined">manage_accounts</span>
+                Manage Access
+            </a>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{# ── Column 3: Stage — Record Explorer ── #}
+{% block ws_content %}
+    <div class="ics-stage__content" data-watermark="Handbook" style="height: 100%; overflow-y: auto;">
+
+        <div style="padding: 28px 32px 12px;">
+            <h1 class="ws-page-title" style="font-size: 22px; margin: 0 0 4px;">Knowledge Base</h1>
+            <p style="font-size: 13px; color: var(--text-muted-ink); margin: 0;">
+                {% if access %}
+                    {{ records|length }} record{{ records|length|pluralize }} in
+                    <strong>{{ access.tenant.name }}</strong>
+                {% else %}
+                    No handbook access granted. Contact your tenant editor.
+                {% endif %}
+            </p>
+        </div>
+
+        {% if access %}
+            <div style="border-top: 1px solid var(--border-ink); margin-top: 12px;">
+                {% for record in records %}
+                    <a href="{% url 'handbook:record' record.id %}" class="hb-record-row">
+                        <span class="hb-status-dot {{ record.status }}"></span>
+                        <span class="hb-record-row__title">{{ record.title }}</span>
+                        {% if record.category %}
+                            <span style="font-size: 11px; color: var(--text-muted-ink);">{{ record.category }}</span>
+                        {% endif %}
+                        <span class="hb-tag {{ record.status }}">{{ record.get_status_display }}</span>
+                        <span class="hb-record-row__meta">v{{ record.version_number }}</span>
+                        <span class="hb-record-row__meta">{{ record.updated_at|date:"d M Y" }}</span>
+                    </a>
+                {% empty %}
+                    <div style="padding: 60px 32px; text-align: center; color: var(--text-muted-ink); font-size: 13px;">
+                        No records yet.
+                        {% if access.role != 'reader' %}
+                            <a href="{% url 'handbook:new' %}" style="color: var(--accent-red);">Create the first one.</a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="padding: 80px 32px; text-align: center;">
+                <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2; display: block; margin-bottom: 16px;">lock</span>
+                <p style="font-size: 14px; color: var(--text-muted-ink);">You do not have access to any Handbook workspace.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{# ── Column 4: Options Bar — Properties Sidecar ── #}
+{% block ws_options %}
+    <div style="padding: 16px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Handbook</div>
+        {% if access %}
+            <div style="font-size: 12px; color: var(--text-muted-ink); line-height: 1.7;">
+                <div><strong>Workspace</strong></div>
+                <div>{{ access.tenant.name }}</div>
+                <div style="margin-top: 10px;"><strong>Your role</strong></div>
+                <div style="text-transform: capitalize;">{{ access.role }}</div>
+            </div>
+        {% else %}
+            <p style="font-size: 12px; color: var(--text-muted-ink);">No access.</p>
+        {% endif %}
+    </div>
+{% endblock %}

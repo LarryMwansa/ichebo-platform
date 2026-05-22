@@ -47,4 +47,6 @@ urlpatterns = [
     path('', include('dashboard.urls', namespace='dashboard')),
     path('video/', include('video_live.urls', namespace='video_live')),
     path('api/media/', include('media.urls')),
+    path('handbook/', include('handbook.template_urls', namespace='handbook')),
+    path('api/handbook/', include('handbook.api_urls')),
 ]

@@ -1,0 +1,456 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block title %}{% if record %}{{ record.title }}{% else %}New Record{% endif %} — Handbook{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <style>
+        /* Branch Navigator reuse */
+        .hb-branch-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: 6px;
+            font-size: 13px; color: rgba(255,255,255,0.6);
+            text-decoration: none; transition: all 0.15s;
+        }
+        .hb-branch-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .hb-branch-item .material-symbols-outlined { font-size: 16px; }
+
+        /* Authorship Canvas */
+        .hb-canvas {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+        }
+
+        .hb-canvas__title-input {
+            width: 100%;
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 800;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--text-ink);
+            margin-bottom: 4px;
+            padding: 0;
+        }
+        .hb-canvas__title-input::placeholder { color: var(--text-muted-ink); opacity: 0.5; }
+
+        .hb-canvas__summary-input {
+            width: 100%;
+            font-size: 14px;
+            color: var(--text-muted-ink);
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 0;
+            margin-bottom: 20px;
+            resize: none;
+        }
+
+        .hb-canvas__divider { height: 1px; background: var(--border-ink); margin: 16px 0; }
+
+        .hb-canvas__editor {
+            width: 100%;
+            min-height: 400px;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            color: var(--text-ink);
+            line-height: 1.75;
+            resize: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hb-canvas__preview {
+            font-size: 14px;
+            line-height: 1.75;
+            color: var(--text-ink);
+        }
+        .hb-canvas__preview h1,
+        .hb-canvas__preview h2,
+        .hb-canvas__preview h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            margin: 24px 0 8px;
+        }
+
+        /* Options tabs */
+        .hb-opts-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-ink);
+            margin-bottom: 12px;
+        }
+        .hb-opts-tab {
+            flex: 1; text-align: center;
+            padding: 9px 0;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-muted-ink);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+        }
+        .hb-opts-tab.active {
+            color: var(--text-ink);
+            border-bottom-color: var(--accent-red);
+        }
+
+        .hb-opts-panel { display: none; }
+        .hb-opts-panel.active { display: block; }
+
+        .hb-prop-row {
+            font-size: 12px;
+            margin-bottom: 14px;
+        }
+        .hb-prop-row label {
+            display: block;
+            color: var(--text-muted-ink);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+        .hb-prop-input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid var(--border-ink);
+            border-radius: 5px;
+            font-size: 12px;
+            background: transparent;
+            color: var(--text-ink);
+            outline: none;
+        }
+        .hb-prop-input:focus { border-color: var(--accent-red); }
+
+        .hb-action-btn {
+            display: flex; align-items: center; gap: 6px;
+            width: 100%; padding: 8px 10px;
+            border: 1px solid var(--border-ink);
+            border-radius: 6px;
+            background: transparent;
+            font-size: 12px;
+            color: var(--text-ink);
+            cursor: pointer;
+            margin-bottom: 6px;
+            transition: all 0.15s;
+        }
+        .hb-action-btn:hover { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+        .hb-action-btn .material-symbols-outlined { font-size: 15px; }
+
+        .hb-history-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-ink);
+            font-size: 12px;
+            text-decoration: none;
+            color: var(--text-ink);
+        }
+        .hb-history-item:last-child { border-bottom: none; }
+    </style>
+{% endblock %}
+
+{# ── Column 2: Context Bar — Branch Navigator ── #}
+{% block context_header %}Handbook{% endblock %}
+
+{% block context_content %}
+    <div style="padding: 0 4px;">
+        <div class="ws-label-tag" style="margin-bottom: 8px;">Navigation</div>
+        <a href="{% url 'handbook:home' %}" class="hb-branch-item">
+            <span class="material-symbols-outlined">arrow_back</span>
+            All Records
+        </a>
+        {% if can_write %}
+            <a href="{% url 'handbook:new' %}" class="hb-branch-item">
+                <span class="material-symbols-outlined">add_circle</span>
+                New Record
+            </a>
+        {% endif %}
+        {% if record %}
+            <div class="ctx-divider" style="margin: 12px 0;"></div>
+            <div class="ws-label-tag" style="margin-bottom: 8px;">Record</div>
+            <div style="font-size: 12px; color: rgba(255,255,255,0.5); padding: 4px 12px; line-height: 1.5;">
+                v{{ record.version_number }} · {{ record.get_status_display }}<br>
+                {% if record.category %}{{ record.category }}{% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item"><a href="{% url 'handbook:home' %}" style="text-decoration: none; color: inherit;">Handbook</a></span>
+    {% if record %}
+        <span class="ws-topbar__breadcrumb-sep">/</span>
+        <span class="ws-topbar__breadcrumb-item">{{ record.title|truncatechars:30 }}</span>
+    {% else %}
+        <span class="ws-topbar__breadcrumb-sep">/</span>
+        <span class="ws-topbar__breadcrumb-item">New Record</span>
+    {% endif %}
+{% endblock %}
+
+{# ── Column 3: Stage — Authorship Canvas ── #}
+{% block ws_content %}
+    <div class="ics-stage__content"
+         data-watermark="{% if record %}{{ record.title|truncatechars:12 }}{% else %}New{% endif %}"
+         style="height: 100%; overflow-y: auto;">
+
+        <div id="hb-stage-toolbar" style="padding: 12px 32px; border-bottom: 1px solid var(--border-ink); display: flex; align-items: center; gap: 8px; position: sticky; top: 0; background: var(--stone-bg); z-index: 10;">
+            {% if record %}
+                {% if record.status == 'draft' and can_write %}
+                    <button onclick="HBDesk.save()" class="ws-btn ws-btn--primary" style="font-size: 12px; padding: 6px 14px;">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">save</span> Save
+                    </button>
+                    <button onclick="HBDesk.publish()" class="ws-btn" style="font-size: 12px; padding: 6px 14px;">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">publish</span> Publish
+                    </button>
+                {% endif %}
+                {% if record.status == 'published' and is_editor %}
+                    <button onclick="HBDesk.lock()" class="ws-btn" style="font-size: 12px; padding: 6px 14px;">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">lock</span> Lock
+                    </button>
+                {% endif %}
+                {% if record.status in 'published,locked' and can_write %}
+                    <button onclick="HBDesk.newVersion()" class="ws-btn" style="font-size: 12px; padding: 6px 14px;">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">fork_right</span> New Version
+                    </button>
+                {% endif %}
+            {% else %}
+                <button onclick="HBDesk.create()" class="ws-btn ws-btn--primary" style="font-size: 12px; padding: 6px 14px;">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">save</span> Create
+                </button>
+            {% endif %}
+
+            {% if record %}
+                <button onclick="HBDesk.togglePreview()" class="ws-btn" id="hb-preview-btn" style="font-size: 12px; padding: 6px 14px; margin-left: auto;">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">visibility</span> Preview
+                </button>
+            {% endif %}
+        </div>
+
+        <div class="hb-canvas">
+            <input
+                id="hb-title"
+                type="text"
+                class="hb-canvas__title-input"
+                placeholder="Record title…"
+                value="{% if record %}{{ record.title }}{% endif %}"
+                {% if record and record.status == 'locked' %}readonly{% endif %}
+            >
+            <textarea
+                id="hb-summary"
+                class="hb-canvas__summary-input"
+                rows="2"
+                placeholder="Brief summary…"
+                {% if record and record.status == 'locked' %}readonly{% endif %}
+            >{% if record %}{{ record.summary }}{% endif %}</textarea>
+
+            <div class="hb-canvas__divider"></div>
+
+            <div id="hb-editor-wrap">
+                <textarea
+                    id="hb-content"
+                    class="hb-canvas__editor"
+                    placeholder="Begin writing in Markdown…"
+                    {% if record and record.status == 'locked' %}readonly{% endif %}
+                >{% if record %}{{ record.content }}{% endif %}</textarea>
+            </div>
+
+            <div id="hb-preview-wrap" style="display: none;">
+                <div class="hb-canvas__preview" id="hb-preview-html"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{# ── Column 4: Options Bar — Properties Sidecar ── #}
+{% block ws_options %}
+    <div>
+        {% if record %}
+            <div class="hb-opts-tabs">
+                <div class="hb-opts-tab active" onclick="HBDesk.switchTab(this, 'props')">Props</div>
+                <div class="hb-opts-tab" onclick="HBDesk.switchTab(this, 'history')">History</div>
+            </div>
+
+            {# Properties panel #}
+            <div id="hb-panel-props" class="hb-opts-panel active" style="padding: 0 14px;">
+                <div class="hb-prop-row">
+                    <label>Status</label>
+                    <span style="font-size: 12px; font-weight: 600;">{{ record.get_status_display }}</span>
+                </div>
+                <div class="hb-prop-row">
+                    <label>Version</label>
+                    <span style="font-size: 12px;">v{{ record.version_number }}</span>
+                </div>
+                {% if record.status == 'draft' and can_write %}
+                    <div class="hb-prop-row">
+                        <label>Category</label>
+                        <input id="hb-category" type="text" class="hb-prop-input" value="{{ record.category }}" placeholder="e.g. Policy">
+                    </div>
+                    <div class="hb-prop-row">
+                        <label>Tags (comma-sep)</label>
+                        <input id="hb-tags" type="text" class="hb-prop-input" value="{{ record.tags|join:', ' }}" placeholder="tag1, tag2">
+                    </div>
+                {% else %}
+                    {% if record.category %}
+                        <div class="hb-prop-row">
+                            <label>Category</label>
+                            <span style="font-size: 12px;">{{ record.category }}</span>
+                        </div>
+                    {% endif %}
+                    {% if record.tags %}
+                        <div class="hb-prop-row">
+                            <label>Tags</label>
+                            <span style="font-size: 12px;">{{ record.tags|join:', ' }}</span>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                {% if record.published_at %}
+                    <div class="hb-prop-row">
+                        <label>Published</label>
+                        <span style="font-size: 12px;">{{ record.published_at|date:"d M Y" }}</span>
+                    </div>
+                {% endif %}
+                {% if record.locked_at %}
+                    <div class="hb-prop-row">
+                        <label>Locked</label>
+                        <span style="font-size: 12px;">{{ record.locked_at|date:"d M Y" }} by {{ record.locked_by.display_name|default:'—' }}</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# History panel #}
+            <div id="hb-panel-history" class="hb-opts-panel" style="padding: 0 14px;">
+                {% for h in history %}
+                    <a href="{% url 'handbook:record' h.id %}" class="hb-history-item">
+                        <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.5;">history</span>
+                        <span style="flex: 1; font-size: 12px;">v{{ h.version_number }}</span>
+                        <span style="font-size: 11px; color: var(--text-muted-ink);">{{ h.get_status_display }}</span>
+                        <span style="font-size: 11px; color: var(--text-muted-ink);">{{ h.updated_at|date:"d M" }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            {# New record — just show properties inputs #}
+            <div style="padding: 14px;">
+                <div class="ws-label-tag" style="margin-bottom: 12px;">Properties</div>
+                <div class="hb-prop-row">
+                    <label>Category</label>
+                    <input id="hb-category" type="text" class="hb-prop-input" placeholder="e.g. Policy">
+                </div>
+                <div class="hb-prop-row">
+                    <label>Tags (comma-sep)</label>
+                    <input id="hb-tags" type="text" class="hb-prop-input" placeholder="tag1, tag2">
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const HBDesk = {
+    recordId: '{% if record %}{{ record.id }}{% endif %}',
+
+    _payload() {
+        const tags = document.getElementById('hb-tags')?.value
+            .split(',').map(t => t.trim()).filter(Boolean) || [];
+        return {
+            title:    document.getElementById('hb-title').value,
+            summary:  document.getElementById('hb-summary').value,
+            content:  document.getElementById('hb-content').value,
+            category: document.getElementById('hb-category')?.value || '',
+            tags,
+        };
+    },
+
+    async _request(url, method, body) {
+        const csrfToken = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+        const r = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+            body: body ? JSON.stringify(body) : undefined,
+        });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(data.detail || `HTTP ${r.status}`);
+        return data;
+    },
+
+    async save() {
+        try {
+            await this._request(`/api/handbook/records/${this.recordId}/`, 'PATCH', this._payload());
+            this._toast('Saved', 'success');
+        } catch (e) { this._toast(e.message, 'error'); }
+    },
+
+    async create() {
+        try {
+            const data = await this._request('/api/handbook/records/', 'POST', this._payload());
+            window.location.href = `/handbook/records/${data.id}/`;
+        } catch (e) { this._toast(e.message, 'error'); }
+    },
+
+    async publish() {
+        try {
+            await this._request(`/api/handbook/records/${this.recordId}/publish/`, 'POST');
+            window.location.reload();
+        } catch (e) { this._toast(e.message, 'error'); }
+    },
+
+    async lock() {
+        try {
+            await this._request(`/api/handbook/records/${this.recordId}/lock/`, 'POST');
+            window.location.reload();
+        } catch (e) { this._toast(e.message, 'error'); }
+    },
+
+    async newVersion() {
+        try {
+            const data = await this._request(`/api/handbook/records/${this.recordId}/new-version/`, 'POST');
+            window.location.href = `/handbook/records/${data.id}/`;
+        } catch (e) { this._toast(e.message, 'error'); }
+    },
+
+    togglePreview() {
+        const editorWrap  = document.getElementById('hb-editor-wrap');
+        const previewWrap = document.getElementById('hb-preview-wrap');
+        const btn         = document.getElementById('hb-preview-btn');
+        const isEdit = editorWrap.style.display !== 'none';
+        if (isEdit) {
+            const md = document.getElementById('hb-content').value;
+            document.getElementById('hb-preview-html').innerHTML = marked.parse(md);
+            editorWrap.style.display  = 'none';
+            previewWrap.style.display = 'block';
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">edit</span> Edit';
+        } else {
+            editorWrap.style.display  = 'block';
+            previewWrap.style.display = 'none';
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">visibility</span> Preview';
+        }
+    },
+
+    switchTab(el, panel) {
+        document.querySelectorAll('.hb-opts-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.hb-opts-panel').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById(`hb-panel-${panel}`).classList.add('active');
+    },
+
+    _toast(msg, level) {
+        const div = Object.assign(document.createElement('div'), {
+            textContent: msg,
+            style: `position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:6px;
+                    font-size:13px;z-index:9999;color:#fff;
+                    background:${level === 'error' ? '#c0392b' : '#00b894'}`,
+        });
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 3000);
+    },
+};
+</script>
+{% endblock %}
