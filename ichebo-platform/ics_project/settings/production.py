@@ -46,16 +46,6 @@ DATABASES['default']['CONN_MAX_AGE'] = 60  # noqa: F405
 
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
-# ── Cache ─────────────────────────────────────────────────────────────────────
-# Run once: mkdir -p /var/cache/ics && chown www-data:www-data /var/cache/ics
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/cache/ics',
-    }
-}
-
 # ── Logging ───────────────────────────────────────────────────────────────────
 # Run once: mkdir -p /var/log/ics && chown www-data:www-data /var/log/ics
 # Logs rotate at 10 MB, keeping 5 backups (~50 MB max).

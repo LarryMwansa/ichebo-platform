@@ -28,7 +28,8 @@ def check_uuid_primary_keys(app_configs, **kwargs):
 
     EXEMPT_APP_LABELS = {
         'admin', 'auth', 'contenttypes', 'sessions',
-        'authtoken',  # DRF token
+        'authtoken',        # DRF token
+        'django_celery_beat',  # third-party scheduler — not sync data
     }
 
     errors = []

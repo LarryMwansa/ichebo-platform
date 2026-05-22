@@ -1,0 +1,17 @@
+[Unit]
+Description=Ichebo Celery Beat Scheduler
+After=network.target redis.service ics-celery.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/home/ics/ics/backend
+Environment="DJANGO_SETTINGS_MODULE=ics_project.settings.production"
+ExecStart=/home/ics/ics/venv/bin/celery -A ics_project beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

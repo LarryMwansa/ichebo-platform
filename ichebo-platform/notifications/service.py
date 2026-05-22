@@ -1,14 +1,11 @@
 """
 notifications/service.py
 
-Utility functions for creating Notification records and sending email.
-Called by signal handlers — never by views directly.
+Utility functions for creating Notification records and dispatching async
+email and FCM push tasks. Called by signal handlers — never by views directly.
 All functions are fire-and-forget; errors are logged, never raised.
 """
 import logging
-
-from django.conf import settings
-from django.core.mail import send_mail
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +15,7 @@ EMAIL_TYPES = {'level_advanced', 'certification_earned', 'tenant_invitation', 'i
 
 def create_notification(user, notification_type, title, body='', data=None):
     from .models import Notification
+    from .tasks import send_fcm_push
     try:
         n = Notification.objects.create(
             user=user,
@@ -28,6 +26,8 @@ def create_notification(user, notification_type, title, body='', data=None):
         )
         if notification_type in EMAIL_TYPES:
             _send_email(user, title, body, data or {})
+        if getattr(user, 'fcm_token', None):
+            send_fcm_push.delay(str(user.pk), title, body, data or {})
         return n
     except Exception:
         logger.exception(
@@ -38,23 +38,15 @@ def create_notification(user, notification_type, title, body='', data=None):
 
 
 def _send_email(user, title, body, data):
-    recipient = user.email
+    from .tasks import send_notification_email
+    recipient = user.email if hasattr(user, 'email') else str(user)
     if not recipient:
         return
-    try:
-        action_url = data.get('url', '')
-        message = body
-        if action_url:
-            message += f'\n\n{action_url}'
-        send_mail(
-            subject=title,
-            message=message,
-            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@ichebo.com'),
-            recipient_list=[recipient],
-            fail_silently=True,
-        )
-    except Exception:
-        logger.exception('Failed to send email to %s', recipient)
+    action_url = data.get('url', '') if isinstance(data, dict) else ''
+    message = body
+    if action_url:
+        message += f'\n\n{action_url}'
+    send_notification_email.delay(recipient, title, message)
 
 
 # ---------------------------------------------------------------------------
@@ -167,16 +159,13 @@ def notify_tenant_invitation(email, tenant, invited_by, token):
         user = User.objects.get(email__iexact=email)
     except User.DoesNotExist:
         # Not a registered user yet — email only, no in-app notification
-        _send_email(
-            type('obj', (object,), {'email': email})(),
-            title=f"You've been invited to join {tenant.name}",
-            body=(
-                f"{invited_by.display_name if hasattr(invited_by, 'display_name') else invited_by.email} "
-                f"has invited you to join {tenant.name} on the Ichebo platform.\n\n"
-                f"Accept your invitation at: {accept_url}"
-            ),
-            data={'url': accept_url},
+        from .tasks import send_notification_email
+        body = (
+            f"{invited_by.display_name if hasattr(invited_by, 'display_name') else invited_by.email} "
+            f"has invited you to join {tenant.name} on the Ichebo platform.\n\n"
+            f"Accept your invitation at: {accept_url}"
         )
+        send_notification_email.delay(email, f"You've been invited to join {tenant.name}", body)
         return
     create_notification(
         user=user,

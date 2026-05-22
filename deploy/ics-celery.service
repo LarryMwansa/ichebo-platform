@@ -1,0 +1,17 @@
+[Unit]
+Description=Ichebo Celery Worker
+After=network.target redis.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/home/ics/ics/backend
+Environment="DJANGO_SETTINGS_MODULE=ics_project.settings.production"
+ExecStart=/home/ics/ics/venv/bin/celery -A ics_project worker -l info -c 2
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

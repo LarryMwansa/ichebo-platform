@@ -34,7 +34,7 @@ class DigestView(APIView):
         digest = build_digest(request.user)
         serializer = ParacleteDigestSerializer(digest)
         data = serializer.data
-        cache.set(cache_key, data, 300)
+        cache.set(cache_key, data, 600)
         return Response(data)
 
 
