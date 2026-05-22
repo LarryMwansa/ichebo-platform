@@ -3,10 +3,12 @@ core/views/sync.py
 
 Cloud sync endpoints for Ichebo Desktop (DOC C §7):
 
-  GET  /api/sync/pull/  — delta pull (replaces legacy /sync/changes/)
-  POST /api/sync/push/  — receive desktop change events, apply to cloud store
+  POST /api/sync/validate-licence/  — pre-auth licence key validation (no auth required)
+  GET  /api/sync/pull/              — delta pull (replaces legacy /sync/changes/)
+  POST /api/sync/push/              — receive desktop change events, apply to cloud store
 
-Both endpoints require Token authentication.
+validate-licence requires no authentication — it is the pre-auth handshake.
+pull and push require Token authentication.
 """
 
 import uuid
@@ -15,7 +17,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -39,6 +41,51 @@ _STEWARD_ROLES = {
     'national-steward', 'regional-steward', 'continental-steward',
     'global-steward', 'admin',
 }
+
+
+# ── Licence validation ────────────────────────────────────────────────────────
+
+class ValidateLicenceView(APIView):
+    """
+    POST /api/sync/validate-licence/
+
+    Pre-auth handshake. No authentication required — the licence key is the credential.
+
+    Request body:
+      { "licence_key": "XXXX-XXXX-XXXX-XXXX" }
+
+    Response 200:
+      { "tenant_id": "<uuid>", "tenant_name": "<name>" }
+
+    Error responses (handled by Flutter wizard):
+      404 — key not found
+      403 — key revoked
+      410 — key expired
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        from tenants.models import DesktopLicence
+
+        key = request.data.get('licence_key', '').strip().upper()
+        if not key:
+            return Response({'detail': 'licence_key is required.'}, status=400)
+
+        try:
+            licence = DesktopLicence.objects.select_related('tenant').get(licence_key=key)
+        except DesktopLicence.DoesNotExist:
+            return Response({'detail': 'Licence key not found.'}, status=404)
+
+        if licence.revoked_at:
+            return Response({'detail': 'Licence key has been revoked.'}, status=403)
+
+        if licence.expires_at and timezone.now() > licence.expires_at:
+            return Response({'detail': 'Licence key has expired.'}, status=410)
+
+        return Response({
+            'tenant_id': str(licence.tenant_id),
+            'tenant_name': licence.tenant.name,
+        })
 
 
 # ── Pull ──────────────────────────────────────────────────────────────────────

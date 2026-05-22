@@ -184,6 +184,42 @@ class TenantInvitation(models.Model):
         return f"Invitation({self.email} → {self.tenant.name}, {self.status})"
 
 
+class DesktopLicence(models.Model):
+    """
+    One row per issued Desktop licence key.
+    Staff issues keys via Django admin; stewards enter them in the activation wizard.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tenant = models.ForeignKey(
+        Tenant, on_delete=models.PROTECT, related_name='desktop_licences'
+    )
+    licence_key = models.CharField(max_length=39, unique=True)  # XXXX-XXXX-XXXX-XXXX
+    issued_at = models.DateTimeField(auto_now_add=True)
+    issued_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='issued_licences'
+    )
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        db_table = 'tenants_desktoplicence'
+        ordering = ['-issued_at']
+
+    @property
+    def is_active(self):
+        if self.revoked_at:
+            return False
+        if self.expires_at and timezone.now() > self.expires_at:
+            return False
+        return True
+
+    def __str__(self):
+        status = 'active' if self.is_active else ('revoked' if self.revoked_at else 'expired')
+        return f"{self.licence_key} → {self.tenant.name} ({status})"
+
+
 class ServiceOrder(models.Model):
     id           = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     slug         = models.CharField(max_length=80, unique=True)
