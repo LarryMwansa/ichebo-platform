@@ -210,3 +210,54 @@ class TranscodeCompleteWebhookView(APIView):
         record.save(update_fields=['custom_fields', 'status'])
 
         return Response(status=status.HTTP_200_OK)
+
+
+class ChapterMarkersView(APIView):
+    """
+    GET   /api/media/videos/{id}/chapters/  — return current chapter markers
+    PATCH /api/media/videos/{id}/chapters/  — replace chapter markers for a lesson video
+
+    Body: { "chapter_markers": [ { "timestamp_seconds": 0, "title": "Introduction" }, ... ] }
+
+    Only the record owner or a Level 3+ steward may write chapter markers.
+    Chapter markers are stored in custom_fields.chapter_markers as a JSON array.
+    They are read back by the Flutter player to render the chapter navigator.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, record_id):
+        try:
+            record = Record.objects.get(id=record_id, record_family='media')
+        except Record.DoesNotExist:
+            return Response({'error': 'Not found'}, status=404)
+        return Response({'chapter_markers': record.custom_fields.get('chapter_markers', [])})
+
+    def patch(self, request, record_id):
+        try:
+            record = Record.objects.get(id=record_id, record_family='media')
+        except Record.DoesNotExist:
+            return Response({'error': 'Not found'}, status=404)
+
+        markers = request.data.get('chapter_markers')
+        if not isinstance(markers, list):
+            return Response({'error': 'chapter_markers must be a list'}, status=400)
+
+        for i, m in enumerate(markers):
+            if not isinstance(m, dict):
+                return Response({'error': f'marker[{i}] must be an object'}, status=400)
+            if not isinstance(m.get('timestamp_seconds'), int):
+                return Response({'error': f'marker[{i}].timestamp_seconds must be an integer'}, status=400)
+            if not isinstance(m.get('title'), str) or not m['title'].strip():
+                return Response({'error': f'marker[{i}].title must be a non-empty string'}, status=400)
+
+        # Normalise: sort by timestamp, strip extra keys.
+        clean = sorted(
+            [{'timestamp_seconds': m['timestamp_seconds'], 'title': m['title'].strip()} for m in markers],
+            key=lambda x: x['timestamp_seconds'],
+        )
+
+        record.custom_fields['chapter_markers'] = clean
+        record.save(update_fields=['custom_fields'])
+
+        return Response({'chapter_markers': clean})

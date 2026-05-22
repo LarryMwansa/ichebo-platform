@@ -5,7 +5,13 @@ app_name = 'video_live'
 
 urlpatterns = [
     # ── Mobile API ──
-    path('api/feed/', api_views.VideoFeedView.as_view(), name='api-feed'),
+    path('api/feed/',                          api_views.VideoFeedView.as_view(),           name='api-feed'),
+    path('api/broadcasts/',                    api_views.BroadcastListCreateView.as_view(), name='api-broadcast-list'),
+    path('api/broadcasts/<uuid:broadcast_id>/', api_views.BroadcastDetailView.as_view(),    name='api-broadcast-detail'),
+
+    # ── Go Engine webhooks (authenticated by shared API key, not user token) ──
+    path('api/stream/start/', api_views.StreamStartWebhookView.as_view(), name='api-stream-start'),
+    path('api/stream/end/',   api_views.StreamEndWebhookView.as_view(),   name='api-stream-end'),
 
     # ── Template views ──
     path('',                          views.video_home,         name='home'),

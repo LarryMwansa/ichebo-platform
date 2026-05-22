@@ -59,7 +59,9 @@ func NewS3Store(cfg S3Config) (*S3Store, error) {
 
 // PutObject uploads body to the bucket at key.
 // size is used for the Content-Length header — pass -1 if unknown (chunked encoding).
-func (s *S3Store) PutObject(ctx context.Context, key string, body io.Reader, size int64) error {
+// cacheControl sets the Cache-Control header on the object (e.g. "public, max-age=3600").
+// Pass an empty string to omit it.
+func (s *S3Store) PutObject(ctx context.Context, key string, body io.Reader, size int64, cacheControl ...string) error {
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(key),
@@ -67,6 +69,9 @@ func (s *S3Store) PutObject(ctx context.Context, key string, body io.Reader, siz
 	}
 	if size >= 0 {
 		input.ContentLength = aws.Int64(size)
+	}
+	if len(cacheControl) > 0 && cacheControl[0] != "" {
+		input.CacheControl = aws.String(cacheControl[0])
 	}
 
 	// Set ACL to public-read for delivery bucket objects so HLS segments

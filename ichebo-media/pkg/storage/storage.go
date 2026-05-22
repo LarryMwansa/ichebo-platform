@@ -11,14 +11,14 @@ import (
 
 // UploadStore handles raw upload bucket operations.
 type UploadStore interface {
-	PutObject(ctx context.Context, key string, body io.Reader, size int64) error
+	PutObject(ctx context.Context, key string, body io.Reader, size int64, cacheControl ...string) error
 	DeleteObject(ctx context.Context, key string) error
 	GetPresignedURL(ctx context.Context, key string, expiry time.Duration) (string, error)
 }
 
 // DeliveryStore handles CDN-backed delivery bucket operations.
 type DeliveryStore interface {
-	PutObject(ctx context.Context, key string, body io.Reader, size int64) error
+	PutObject(ctx context.Context, key string, body io.Reader, size int64, cacheControl ...string) error
 	GetPublicURL(key string) string
 }
 
@@ -35,7 +35,7 @@ func NewLocalStore(baseDir string) (*LocalStore, error) {
 	return &LocalStore{baseDir: baseDir, cdnBaseURL: "file://" + baseDir}, nil
 }
 
-func (l *LocalStore) PutObject(_ context.Context, key string, body io.Reader, _ int64) error {
+func (l *LocalStore) PutObject(_ context.Context, key string, body io.Reader, _ int64, _ ...string) error {
 	dest := filepath.Join(l.baseDir, key)
 	if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
 		return err

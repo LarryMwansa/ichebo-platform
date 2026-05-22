@@ -1,0 +1,32 @@
+# systemd service file for MediaMTX
+# Deploy to: /etc/systemd/system/mediamtx.service
+# After deploy: systemctl daemon-reload && systemctl enable mediamtx && systemctl start mediamtx
+
+[Unit]
+Description=MediaMTX — RTMP/HLS server for Ichebo Media
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=mediamtx
+Group=mediamtx
+WorkingDirectory=/opt/mediamtx
+
+# Load environment variables (S3 keys, API keys, URLs)
+EnvironmentFile=/etc/mediamtx/mediamtx.env
+
+ExecStart=/opt/mediamtx/mediamtx /etc/mediamtx/mediamtx.yml
+
+Restart=on-failure
+RestartSec=5s
+
+# Allow opening port 1935 (RTMP) and 8888 (HLS)
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+NoNewPrivileges=yes
+
+# Limit coredumps
+LimitCORE=0
+
+[Install]
+WantedBy=multi-user.target

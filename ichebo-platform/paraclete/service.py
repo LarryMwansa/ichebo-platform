@@ -51,6 +51,15 @@ class LessonCard:
 
 
 @dataclass
+class VideoProgressCard:
+    activity_id: str
+    video_record_id: str
+    title: str
+    progress: int      # 0–100 (milestone last fired: 25/50/75/100)
+    url: str
+
+
+@dataclass
 class DARCard:
     record_id: str
     title: str
@@ -84,6 +93,9 @@ class ParacleteDigest:
 
     # DAR
     dar_today: Optional[object] = None
+
+    # Video learning progress (media records being watched)
+    video_in_progress: list = field(default_factory=list)
 
     # Suggestions (stub in MVP)
     suggestions: list = field(default_factory=list)
@@ -128,6 +140,7 @@ def build_digest(user) -> ParacleteDigest:
     _populate_activity_surface(digest, user, now, today)
     _populate_reminders(digest, user, now)
     _populate_learn(digest, user)
+    _populate_video_progress(digest, user)
     digest.dar_today = _get_dar_today(user, today)
 
     # Level 3+ — team counts
@@ -328,6 +341,51 @@ def _populate_learn(digest, user):
 
 
 # ---------------------------------------------------------------------------
+# Video learning progress
+# ---------------------------------------------------------------------------
+
+def _populate_video_progress(digest, user):
+    """
+    Surface learning videos that the user has started but not completed.
+    These are Activity records written by VideoProgressTracker on Desktop:
+      - activity_type = 'lesson'  (or any type with source_app = 'learn')
+      - metadata.video_record_id set
+      - progress in (25, 50, 75) — started but not at 100
+    Completed videos (progress == 100 / status == 'completed') are excluded.
+    """
+    from activity.models import Activity
+    from records.models import Record
+
+    qs = Activity.objects.filter(
+        deleted_at__isnull=True,
+        assigned_to=user,
+        status__in=['pending', 'in_progress'],
+        progress__gt=0,
+        progress__lt=100,
+        metadata__source_app='learn',
+    ).order_by('-updated_at')[:5]
+
+    cards = []
+    for activity in qs:
+        video_record_id = activity.metadata.get('video_record_id')
+        if not video_record_id:
+            continue
+        try:
+            rec = Record.objects.get(id=video_record_id, record_family='media')
+        except Record.DoesNotExist:
+            continue
+        cards.append(VideoProgressCard(
+            activity_id=str(activity.id),
+            video_record_id=video_record_id,
+            title=rec.title,
+            progress=activity.progress,
+            url=f'/video/{video_record_id}/',
+        ))
+
+    digest.video_in_progress = cards
+
+
+# ---------------------------------------------------------------------------
 # DAR lookup
 # ---------------------------------------------------------------------------
 
@@ -445,6 +503,15 @@ def _build_suggestions(digest) -> list:
             'text': f'Your next lesson is ready: "{digest.next_lesson.title}".',
             'priority': 3,
             'action_url': digest.next_lesson.url,
+        })
+
+    # Rule 5b — Video lesson in progress
+    if digest.video_in_progress:
+        v = digest.video_in_progress[0]
+        suggestions.append({
+            'text': f'Continue watching "{v.title}" — you\'re {v.progress}% through.',
+            'priority': 3,
+            'action_url': v.url,
         })
 
     # Rule 6 — Many pending items (workload warning)

@@ -37,6 +37,14 @@ class DARCardSerializer(serializers.Serializer):
     url = serializers.CharField()
 
 
+class VideoProgressCardSerializer(serializers.Serializer):
+    activity_id = serializers.CharField()
+    video_record_id = serializers.CharField()
+    title = serializers.CharField()
+    progress = serializers.IntegerField()
+    url = serializers.CharField()
+
+
 class ParacleteDigestSerializer(serializers.Serializer):
     generated_at = serializers.CharField()
     user_id = serializers.CharField()
@@ -51,6 +59,7 @@ class ParacleteDigestSerializer(serializers.Serializer):
 
     active_enrolments = ProgrammeCardSerializer(many=True)
     next_lesson = LessonCardSerializer(allow_null=True)
+    video_in_progress = VideoProgressCardSerializer(many=True)
 
     discipline_prompt = serializers.CharField()
     prompt_pathway = serializers.CharField()

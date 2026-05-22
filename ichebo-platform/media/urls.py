@@ -6,5 +6,6 @@ urlpatterns = [
     path('upload/complete/', views.UploadCompleteView.as_view(), name='media-upload-complete'),
     path('videos/', views.VideoListView.as_view(), name='media-video-list'),
     path('videos/<uuid:record_id>/', views.VideoDetailView.as_view(), name='media-video-detail'),
+    path('videos/<uuid:record_id>/chapters/', views.ChapterMarkersView.as_view(), name='media-chapter-markers'),
     path('transcode-complete/', views.TranscodeCompleteWebhookView.as_view(), name='media-transcode-complete'),
 ]
