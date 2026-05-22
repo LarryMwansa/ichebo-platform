@@ -12,6 +12,7 @@ import (
 	"github.com/ichebo/media/pkg/config"
 	"github.com/ichebo/media/pkg/health"
 	"github.com/ichebo/media/pkg/storage"
+	"github.com/ichebo/media/pkg/stream"
 	"github.com/ichebo/media/pkg/transcode"
 	"github.com/ichebo/media/pkg/upload"
 	"github.com/ichebo/media/pkg/webhook"
@@ -70,6 +71,11 @@ func main() {
 		webhookClient = webhook.NewClient(cfg.DjangoWebhookURL, cfg.DjangoAPIKey)
 	}
 
+	// ── Stream session registry + archiver ──────────────────────────────────
+	streamRegistry := stream.NewRegistry()
+	streamArchiver := stream.NewArchiver(deliveryStore, cfg.FFmpegPath, cfg.TempDir, webhookClient)
+	streamHandler := stream.NewHandler(streamRegistry, streamArchiver)
+
 	// ── Upload registry ──────────────────────────────────────────────────────
 	registry := upload.NewRegistry()
 	uploadHandler := upload.NewHandler(registry, uploadStore, cfg.TempDir)
@@ -113,6 +119,29 @@ func main() {
 		default:
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		}
+	})
+
+	// Stream routes
+	mux.HandleFunc("/engine/stream/start", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		streamHandler.Start(w, r)
+	})
+	mux.HandleFunc("/engine/stream/end", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		streamHandler.End(w, r)
+	})
+	mux.HandleFunc("/engine/stream/active", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		streamHandler.Active(w, r)
 	})
 
 	// Transcode routes

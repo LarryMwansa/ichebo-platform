@@ -21,6 +21,8 @@ dependencies:
   http: ^1.2.0
   crypto: ^3.0.3
   uuid: ^4.4.0
+  video_player: ^2.8.7
+  chewie: ^1.8.5
 
 dev_dependencies:
   flutter_test:

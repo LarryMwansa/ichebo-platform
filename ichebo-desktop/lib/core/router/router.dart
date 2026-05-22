@@ -7,6 +7,7 @@ import '../../features/home/home_screen.dart';
 import '../../features/people/people_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/sync/sync_screen.dart';
+import '../../features/video/video_screen.dart';
 import '../../features/wizard/wizard_screen.dart';
 import '../../shell/desktop_shell.dart';
 import '../state/shell_state.dart';
@@ -92,13 +93,19 @@ final appRouter = GoRouter(
           path: '/settings',
           builder: (context, state) => const SettingsScreen(),
         ),
+        // Video & Broadcast — live
+        GoRoute(
+          path: '/video',
+          builder: (context, state) => const VideoScreen(),
+        ),
         // All other sections — placeholders
         for (final section in ShellSection.values)
           if (section != ShellSection.dashboard &&
               section != ShellSection.community &&
               section != ShellSection.activity &&
               section != ShellSection.governance &&
-              section != ShellSection.sync)
+              section != ShellSection.sync &&
+              section != ShellSection.video)
             GoRoute(
               path: section.route,
               builder: (context, state) => SectionPlaceholder(section: section),

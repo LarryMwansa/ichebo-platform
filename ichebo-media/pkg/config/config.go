@@ -21,6 +21,8 @@ type Config struct {
 	DjangoAPIKey      string
 	TempDir           string
 	LocalMode         bool // true when S3Endpoint is empty
+	// Live streaming
+	MediaMTXHLSBase   string // CDN root where MediaMTX writes live HLS segments
 }
 
 func Load() *Config {
@@ -69,5 +71,6 @@ func Load() *Config {
 		DjangoAPIKey:     os.Getenv("MEDIA_DJANGO_API_KEY"),
 		TempDir:          tempDir,
 		LocalMode:        s3Endpoint == "",
+		MediaMTXHLSBase:  os.Getenv("MEDIA_MEDIAMTX_HLS_BASE"),
 	}
 }
