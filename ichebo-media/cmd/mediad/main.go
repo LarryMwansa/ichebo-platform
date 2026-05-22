@@ -38,9 +38,30 @@ func main() {
 		deliveryStore = deliveryLocal
 	} else {
 		log.Println("[mediad] production mode — S3 storage at", cfg.S3Endpoint)
-		// S3Store implementation requires aws-sdk-go-v2 — add when deploying to production.
-		// See pkg/storage/s3.go (to be added when SDK is available on server).
-		log.Fatal("S3 mode not yet compiled in — run with MEDIA_S3_ENDPOINT unset for local mode")
+		uploadS3, err := storage.NewS3Store(storage.S3Config{
+			Endpoint:   cfg.S3Endpoint,
+			Region:     cfg.S3Region,
+			AccessKey:  cfg.S3AccessKey,
+			SecretKey:  cfg.S3SecretKey,
+			Bucket:     cfg.UploadBucket,
+			CDNBaseURL: "",
+		})
+		if err != nil {
+			log.Fatalf("init upload S3 store: %v", err)
+		}
+		deliveryS3, err := storage.NewS3Store(storage.S3Config{
+			Endpoint:   cfg.S3Endpoint,
+			Region:     cfg.S3Region,
+			AccessKey:  cfg.S3AccessKey,
+			SecretKey:  cfg.S3SecretKey,
+			Bucket:     cfg.DeliveryBucket,
+			CDNBaseURL: cfg.CDNBaseURL,
+		})
+		if err != nil {
+			log.Fatalf("init delivery S3 store: %v", err)
+		}
+		uploadStore = uploadS3
+		deliveryStore = deliveryS3
 	}
 
 	// ── Webhook client ───────────────────────────────────────────────────────
