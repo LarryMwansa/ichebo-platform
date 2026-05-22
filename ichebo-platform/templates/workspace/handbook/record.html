@@ -4,453 +4,665 @@
 {% block title %}{% if record %}{{ record.title }}{% else %}New Record{% endif %} — Handbook{% endblock %}
 
 {% block extra_css %}
-    {{ block.super }}
-    <style>
-        /* Branch Navigator reuse */
-        .hb-branch-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 8px 12px; border-radius: 6px;
-            font-size: 13px; color: rgba(255,255,255,0.6);
-            text-decoration: none; transition: all 0.15s;
-        }
-        .hb-branch-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
-        .hb-branch-item .material-symbols-outlined { font-size: 16px; }
+{{ block.super }}
+<style>
+    .hb-branch-btn {
+        display: flex; align-items: center; gap: 10px;
+        width: 100%; padding: 9px 12px;
+        border: none; background: transparent;
+        font-size: 13px; color: rgba(255,255,255,0.55);
+        cursor: pointer; border-radius: 6px;
+        text-decoration: none; transition: all 0.15s;
+    }
+    .hb-branch-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .hb-branch-btn .material-symbols-outlined { font-size: 16px; }
 
-        /* Authorship Canvas */
-        .hb-canvas {
-            max-width: 680px;
-            margin: 0 auto;
-            padding: 32px 24px 80px;
-        }
+    /* Authorship Canvas */
+    .hb-canvas { max-width: 680px; margin: 0 auto; padding: 32px 24px 100px; }
 
-        .hb-canvas__title-input {
-            width: 100%;
-            font-family: 'Playfair Display', serif;
-            font-size: 28px;
-            font-weight: 800;
-            border: none;
-            outline: none;
-            background: transparent;
-            color: var(--text-ink);
-            margin-bottom: 4px;
-            padding: 0;
-        }
-        .hb-canvas__title-input::placeholder { color: var(--text-muted-ink); opacity: 0.5; }
+    .hb-title-input {
+        width: 100%; font-family: 'Playfair Display', serif;
+        font-size: 28px; font-weight: 800;
+        border: none; outline: none; background: transparent;
+        color: var(--text-ink); padding: 0; margin-bottom: 4px;
+    }
+    .hb-title-input::placeholder { opacity: 0.35; }
 
-        .hb-canvas__summary-input {
-            width: 100%;
-            font-size: 14px;
-            color: var(--text-muted-ink);
-            border: none;
-            outline: none;
-            background: transparent;
-            padding: 0;
-            margin-bottom: 20px;
-            resize: none;
-        }
+    .hb-record-id {
+        font-family: 'Fira Code', monospace; font-size: 10px;
+        color: var(--text-muted-ink); margin-bottom: 16px; display: block;
+    }
 
-        .hb-canvas__divider { height: 1px; background: var(--border-ink); margin: 16px 0; }
+    .hb-summary-input {
+        width: 100%; font-size: 14px; color: var(--text-muted-ink);
+        border: none; outline: none; background: transparent;
+        padding: 0; margin-bottom: 20px; resize: none;
+    }
 
-        .hb-canvas__editor {
-            width: 100%;
-            min-height: 400px;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 14px;
-            color: var(--text-ink);
-            line-height: 1.75;
-            resize: none;
-            font-family: 'Inter', sans-serif;
-        }
+    .hb-canvas__editor {
+        width: 100%; min-height: 420px; border: none; outline: none;
+        background: transparent; font-size: 14px; color: var(--text-ink);
+        line-height: 1.8; resize: none; font-family: 'Inter', sans-serif;
+    }
 
-        .hb-canvas__preview {
-            font-size: 14px;
-            line-height: 1.75;
-            color: var(--text-ink);
-        }
-        .hb-canvas__preview h1,
-        .hb-canvas__preview h2,
-        .hb-canvas__preview h3 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 800;
-            margin: 24px 0 8px;
-        }
+    .hb-canvas__preview {
+        font-size: 14px; line-height: 1.8; color: var(--text-ink);
+    }
+    .hb-canvas__preview h1,
+    .hb-canvas__preview h2,
+    .hb-canvas__preview h3 {
+        font-family: 'Playfair Display', serif; font-weight: 800;
+        margin: 24px 0 8px;
+    }
+    .hb-canvas__preview blockquote {
+        border-left: 3px solid var(--accent-red);
+        padding-left: 16px; color: var(--text-muted-ink); margin: 16px 0;
+    }
 
-        /* Options tabs */
-        .hb-opts-tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border-ink);
-            margin-bottom: 12px;
-        }
-        .hb-opts-tab {
-            flex: 1; text-align: center;
-            padding: 9px 0;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            color: var(--text-muted-ink);
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.15s;
-        }
-        .hb-opts-tab.active {
-            color: var(--text-ink);
-            border-bottom-color: var(--accent-red);
-        }
+    /* Options sidecar */
+    .hb-tabs { display: flex; border-bottom: 1px solid var(--border-ink); margin: 0; }
+    .hb-tab {
+        flex: 1; text-align: center; padding: 10px 0;
+        font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+        text-transform: uppercase; color: var(--text-muted-ink);
+        cursor: pointer; border-bottom: 2px solid transparent;
+        transition: all 0.15s; background: none; border-top: none;
+        border-left: none; border-right: none;
+    }
+    .hb-tab.active { color: var(--text-ink); border-bottom-color: var(--accent-red); }
 
-        .hb-opts-panel { display: none; }
-        .hb-opts-panel.active { display: block; }
+    .hb-panel { display: none; padding: 14px; }
+    .hb-panel.active { display: block; }
 
-        .hb-prop-row {
-            font-size: 12px;
-            margin-bottom: 14px;
-        }
-        .hb-prop-row label {
-            display: block;
-            color: var(--text-muted-ink);
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            font-size: 10px;
-            margin-bottom: 4px;
-        }
-        .hb-prop-input {
-            width: 100%;
-            padding: 6px 8px;
-            border: 1px solid var(--border-ink);
-            border-radius: 5px;
-            font-size: 12px;
-            background: transparent;
-            color: var(--text-ink);
-            outline: none;
-        }
-        .hb-prop-input:focus { border-color: var(--accent-red); }
+    .hb-prop { margin-bottom: 14px; }
+    .hb-prop label {
+        display: block; font-size: 10px; font-weight: 700;
+        letter-spacing: 0.05em; text-transform: uppercase;
+        color: var(--text-muted-ink); margin-bottom: 4px;
+    }
+    .hb-input {
+        width: 100%; padding: 6px 8px;
+        border: 1px solid var(--border-ink); border-radius: 5px;
+        font-size: 12px; background: transparent; color: var(--text-ink);
+        outline: none; box-sizing: border-box;
+    }
+    .hb-input:focus { border-color: var(--accent-red); }
+    .hb-select { appearance: none; background-image: none; }
 
-        .hb-action-btn {
-            display: flex; align-items: center; gap: 6px;
-            width: 100%; padding: 8px 10px;
-            border: 1px solid var(--border-ink);
-            border-radius: 6px;
-            background: transparent;
-            font-size: 12px;
-            color: var(--text-ink);
-            cursor: pointer;
-            margin-bottom: 6px;
-            transition: all 0.15s;
-        }
-        .hb-action-btn:hover { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
-        .hb-action-btn .material-symbols-outlined { font-size: 15px; }
+    .hb-action {
+        display: flex; align-items: center; gap: 6px;
+        width: 100%; padding: 8px 10px;
+        border: 1px solid var(--border-ink); border-radius: 6px;
+        background: transparent; font-size: 12px; color: var(--text-ink);
+        cursor: pointer; margin-bottom: 6px; transition: all 0.15s;
+    }
+    .hb-action:hover { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+    .hb-action .material-symbols-outlined { font-size: 14px; }
 
-        .hb-history-item {
-            display: flex; align-items: center; gap: 8px;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border-ink);
-            font-size: 12px;
-            text-decoration: none;
-            color: var(--text-ink);
-        }
-        .hb-history-item:last-child { border-bottom: none; }
-    </style>
+    .hb-rel-item {
+        padding: 8px 0; border-bottom: 1px solid var(--border-ink);
+        font-size: 12px; display: flex; align-items: flex-start; gap: 8px;
+    }
+    .hb-rel-item:last-child { border-bottom: none; }
+    .hb-rel-type {
+        font-size: 10px; font-weight: 700; text-transform: uppercase;
+        padding: 2px 6px; border-radius: 4px;
+        background: rgba(175,50,54,0.1); color: var(--accent-red);
+        white-space: nowrap;
+    }
+
+    .hb-verse {
+        padding: 10px 0; border-bottom: 1px solid var(--border-ink);
+        font-size: 12px;
+    }
+    .hb-verse:last-child { border-bottom: none; }
+    .hb-verse__ref { font-weight: 700; margin-bottom: 3px; }
+    .hb-verse__text { color: var(--text-muted-ink); line-height: 1.5; }
+
+    .hb-history-row {
+        display: flex; align-items: center; gap: 8px;
+        padding: 8px 0; border-bottom: 1px solid var(--border-ink);
+        font-size: 12px; text-decoration: none; color: var(--text-ink);
+    }
+    .hb-history-row:last-child { border-bottom: none; }
+
+    .hb-toolbar {
+        padding: 10px 28px; border-bottom: 1px solid var(--border-ink);
+        display: flex; align-items: center; gap: 8px;
+        position: sticky; top: 0; background: var(--stone-bg); z-index: 10;
+    }
+    .ws-btn {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 6px 13px; border-radius: 6px; font-size: 12px;
+        font-weight: 600; cursor: pointer; border: 1px solid var(--border-ink);
+        background: transparent; color: var(--text-ink); transition: all 0.15s;
+    }
+    .ws-btn:hover { border-color: var(--accent-red); color: var(--accent-red); }
+    .ws-btn--primary { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+    .ws-btn--primary:hover { background: #8e2528; border-color: #8e2528; color: #fff; }
+    .ws-btn .material-symbols-outlined { font-size: 14px; }
+</style>
 {% endblock %}
 
-{# ── Column 2: Context Bar — Branch Navigator ── #}
+{# ── Column 2: Branch Navigator ── #}
 {% block context_header %}Handbook{% endblock %}
 
 {% block context_content %}
-    <div style="padding: 0 4px;">
-        <div class="ws-label-tag" style="margin-bottom: 8px;">Navigation</div>
-        <a href="{% url 'handbook:home' %}" class="hb-branch-item">
-            <span class="material-symbols-outlined">arrow_back</span>
-            All Records
-        </a>
-        {% if can_write %}
-            <a href="{% url 'handbook:new' %}" class="hb-branch-item">
-                <span class="material-symbols-outlined">add_circle</span>
-                New Record
-            </a>
-        {% endif %}
-        {% if record %}
-            <div class="ctx-divider" style="margin: 12px 0;"></div>
-            <div class="ws-label-tag" style="margin-bottom: 8px;">Record</div>
-            <div style="font-size: 12px; color: rgba(255,255,255,0.5); padding: 4px 12px; line-height: 1.5;">
-                v{{ record.version_number }} · {{ record.get_status_display }}<br>
-                {% if record.category %}{{ record.category }}{% endif %}
-            </div>
-        {% endif %}
-    </div>
+<div style="padding: 0 4px;">
+    <a href="{% url 'handbook:home' %}{% if record %}?branch={{ record.branch }}{% endif %}" class="hb-branch-btn">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Knowledge Explorer
+    </a>
+
+    {% if can_write %}
+        <div class="ctx-divider" style="margin: 10px 0;"></div>
+        <div class="ws-label-tag" style="margin-bottom: 8px;">New Record</div>
+        <a href="{% url 'handbook:new' %}?branch=reference" class="hb-branch-btn"><span class="material-symbols-outlined">library_books</span>Reference</a>
+        <a href="{% url 'handbook:new' %}?branch=mandate"   class="hb-branch-btn"><span class="material-symbols-outlined">gavel</span>Mandate</a>
+        <a href="{% url 'handbook:new' %}?branch=keys"      class="hb-branch-btn"><span class="material-symbols-outlined">key</span>Keys</a>
+    {% endif %}
+
+    {% if record %}
+        <div class="ctx-divider" style="margin: 10px 0;"></div>
+        <div class="ws-label-tag" style="margin-bottom: 8px;">Record</div>
+        <div style="font-size: 11px; color: rgba(255,255,255,0.45); padding: 4px 12px; line-height: 1.7;">
+            <div>{{ record.get_branch_display }}</div>
+            <div style="text-transform: capitalize;">{{ record.record_type|cut:"_" }}</div>
+            <div>v{{ record.version_number }} · {{ record.get_status_display }}</div>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
 
 {% block breadcrumb %}
-    <span class="ws-topbar__breadcrumb-item"><a href="{% url 'handbook:home' %}" style="text-decoration: none; color: inherit;">Handbook</a></span>
-    {% if record %}
-        <span class="ws-topbar__breadcrumb-sep">/</span>
-        <span class="ws-topbar__breadcrumb-item">{{ record.title|truncatechars:30 }}</span>
-    {% else %}
-        <span class="ws-topbar__breadcrumb-sep">/</span>
-        <span class="ws-topbar__breadcrumb-item">New Record</span>
-    {% endif %}
+    <span class="ws-topbar__breadcrumb-item"><a href="{% url 'handbook:home' %}" style="text-decoration:none;color:inherit;">Handbook</a></span>
+    <span class="ws-topbar__breadcrumb-sep">/</span>
+    <span class="ws-topbar__breadcrumb-item">{% if record %}{{ record.title|truncatechars:30 }}{% else %}New Record{% endif %}</span>
 {% endblock %}
 
-{# ── Column 3: Stage — Authorship Canvas ── #}
+{# ── Column 3: Authorship Canvas ── #}
 {% block ws_content %}
-    <div class="ics-stage__content"
-         data-watermark="{% if record %}{{ record.title|truncatechars:12 }}{% else %}New{% endif %}"
-         style="height: 100%; overflow-y: auto;">
+<div class="ics-stage__content"
+     data-watermark="{% if record %}{{ record.record_type|title }}{% else %}New{% endif %}"
+     style="height:100%;overflow-y:auto;">
 
-        <div id="hb-stage-toolbar" style="padding: 12px 32px; border-bottom: 1px solid var(--border-ink); display: flex; align-items: center; gap: 8px; position: sticky; top: 0; background: var(--stone-bg); z-index: 10;">
-            {% if record %}
-                {% if record.status == 'draft' and can_write %}
-                    <button onclick="HBDesk.save()" class="ws-btn ws-btn--primary" style="font-size: 12px; padding: 6px 14px;">
-                        <span class="material-symbols-outlined" style="font-size: 14px;">save</span> Save
-                    </button>
-                    <button onclick="HBDesk.publish()" class="ws-btn" style="font-size: 12px; padding: 6px 14px;">
-                        <span class="material-symbols-outlined" style="font-size: 14px;">publish</span> Publish
-                    </button>
-                {% endif %}
-                {% if record.status == 'published' and is_editor %}
-                    <button onclick="HBDesk.lock()" class="ws-btn" style="font-size: 12px; padding: 6px 14px;">
-                        <span class="material-symbols-outlined" style="font-size: 14px;">lock</span> Lock
-                    </button>
-                {% endif %}
-                {% if record.status in 'published,locked' and can_write %}
-                    <button onclick="HBDesk.newVersion()" class="ws-btn" style="font-size: 12px; padding: 6px 14px;">
-                        <span class="material-symbols-outlined" style="font-size: 14px;">fork_right</span> New Version
-                    </button>
-                {% endif %}
-            {% else %}
-                <button onclick="HBDesk.create()" class="ws-btn ws-btn--primary" style="font-size: 12px; padding: 6px 14px;">
-                    <span class="material-symbols-outlined" style="font-size: 14px;">save</span> Create
+    <div class="hb-toolbar">
+        {% if record %}
+            {% if record.status == 'draft' and can_write %}
+                <button onclick="HBDesk.save()" class="ws-btn ws-btn--primary">
+                    <span class="material-symbols-outlined">save</span> Save
+                </button>
+                <button onclick="HBDesk.publish()" class="ws-btn">
+                    <span class="material-symbols-outlined">publish</span> Publish
                 </button>
             {% endif %}
-
-            {% if record %}
-                <button onclick="HBDesk.togglePreview()" class="ws-btn" id="hb-preview-btn" style="font-size: 12px; padding: 6px 14px; margin-left: auto;">
-                    <span class="material-symbols-outlined" style="font-size: 14px;">visibility</span> Preview
+            {% if record.status == 'active' and is_editor %}
+                <button onclick="HBDesk.lock()" class="ws-btn">
+                    <span class="material-symbols-outlined">lock</span> Lock
                 </button>
             {% endif %}
+            {% if record.status in 'active,locked' and can_write %}
+                <button onclick="HBDesk.newVersion()" class="ws-btn">
+                    <span class="material-symbols-outlined">fork_right</span> New Version
+                </button>
+            {% endif %}
+            <button onclick="HBDesk.togglePreview()" id="hb-preview-btn" class="ws-btn" style="margin-left: auto;">
+                <span class="material-symbols-outlined">visibility</span> Preview
+            </button>
+        {% else %}
+            <button onclick="HBDesk.create()" class="ws-btn ws-btn--primary">
+                <span class="material-symbols-outlined">save</span> Create
+            </button>
+        {% endif %}
+    </div>
+
+    <div class="hb-canvas">
+        {% if record %}
+            <span class="hb-record-id">{{ record.id }}</span>
+        {% endif %}
+
+        <input id="hb-title" type="text" class="hb-title-input"
+               placeholder="Record title…"
+               value="{% if record %}{{ record.title }}{% endif %}"
+               {% if record and record.status == 'locked' %}readonly{% endif %}>
+
+        <textarea id="hb-summary" class="hb-summary-input" rows="2"
+                  placeholder="Brief summary — one or two sentences…"
+                  {% if record and record.status == 'locked' %}readonly{% endif %}>{% if record %}{{ record.summary }}{% endif %}</textarea>
+
+        <hr style="border:none;border-top:1px solid var(--border-ink);margin:0 0 20px;">
+
+        <div id="hb-editor-wrap">
+            <textarea id="hb-content" class="hb-canvas__editor"
+                      placeholder="Begin writing in Markdown…"
+                      {% if record and record.status == 'locked' %}readonly{% endif %}>{% if record %}{{ record.content }}{% endif %}</textarea>
         </div>
 
-        <div class="hb-canvas">
-            <input
-                id="hb-title"
-                type="text"
-                class="hb-canvas__title-input"
-                placeholder="Record title…"
-                value="{% if record %}{{ record.title }}{% endif %}"
-                {% if record and record.status == 'locked' %}readonly{% endif %}
-            >
-            <textarea
-                id="hb-summary"
-                class="hb-canvas__summary-input"
-                rows="2"
-                placeholder="Brief summary…"
-                {% if record and record.status == 'locked' %}readonly{% endif %}
-            >{% if record %}{{ record.summary }}{% endif %}</textarea>
-
-            <div class="hb-canvas__divider"></div>
-
-            <div id="hb-editor-wrap">
-                <textarea
-                    id="hb-content"
-                    class="hb-canvas__editor"
-                    placeholder="Begin writing in Markdown…"
-                    {% if record and record.status == 'locked' %}readonly{% endif %}
-                >{% if record %}{{ record.content }}{% endif %}</textarea>
-            </div>
-
-            <div id="hb-preview-wrap" style="display: none;">
-                <div class="hb-canvas__preview" id="hb-preview-html"></div>
-            </div>
+        <div id="hb-preview-wrap" style="display:none;">
+            <div class="hb-canvas__preview" id="hb-preview-html"></div>
         </div>
     </div>
+</div>
 {% endblock %}
 
-{# ── Column 4: Options Bar — Properties Sidecar ── #}
+{# ── Column 4: Properties Sidecar — four tabs ── #}
 {% block ws_options %}
-    <div>
-        {% if record %}
-            <div class="hb-opts-tabs">
-                <div class="hb-opts-tab active" onclick="HBDesk.switchTab(this, 'props')">Props</div>
-                <div class="hb-opts-tab" onclick="HBDesk.switchTab(this, 'history')">History</div>
-            </div>
+<div>
+    <div class="hb-tabs">
+        <button class="hb-tab active" onclick="HBDesk.tab(this,'props')">Props</button>
+        <button class="hb-tab" onclick="HBDesk.tab(this,'rels')">HRS</button>
+        <button class="hb-tab" onclick="HBDesk.tab(this,'scripture')">Scripture</button>
+        <button class="hb-tab" onclick="HBDesk.tab(this,'history')">History</button>
+    </div>
 
-            {# Properties panel #}
-            <div id="hb-panel-props" class="hb-opts-panel active" style="padding: 0 14px;">
-                <div class="hb-prop-row">
-                    <label>Status</label>
-                    <span style="font-size: 12px; font-weight: 600;">{{ record.get_status_display }}</span>
-                </div>
-                <div class="hb-prop-row">
-                    <label>Version</label>
-                    <span style="font-size: 12px;">v{{ record.version_number }}</span>
-                </div>
-                {% if record.status == 'draft' and can_write %}
-                    <div class="hb-prop-row">
-                        <label>Category</label>
-                        <input id="hb-category" type="text" class="hb-prop-input" value="{{ record.category }}" placeholder="e.g. Policy">
-                    </div>
-                    <div class="hb-prop-row">
-                        <label>Tags (comma-sep)</label>
-                        <input id="hb-tags" type="text" class="hb-prop-input" value="{{ record.tags|join:', ' }}" placeholder="tag1, tag2">
-                    </div>
-                {% else %}
-                    {% if record.category %}
-                        <div class="hb-prop-row">
-                            <label>Category</label>
-                            <span style="font-size: 12px;">{{ record.category }}</span>
-                        </div>
-                    {% endif %}
-                    {% if record.tags %}
-                        <div class="hb-prop-row">
-                            <label>Tags</label>
-                            <span style="font-size: 12px;">{{ record.tags|join:', ' }}</span>
-                        </div>
-                    {% endif %}
-                {% endif %}
-                {% if record.published_at %}
-                    <div class="hb-prop-row">
-                        <label>Published</label>
-                        <span style="font-size: 12px;">{{ record.published_at|date:"d M Y" }}</span>
-                    </div>
-                {% endif %}
-                {% if record.locked_at %}
-                    <div class="hb-prop-row">
-                        <label>Locked</label>
-                        <span style="font-size: 12px;">{{ record.locked_at|date:"d M Y" }} by {{ record.locked_by.display_name|default:'—' }}</span>
-                    </div>
-                {% endif %}
+    {# ── Tab: Properties ── #}
+    <div id="hb-panel-props" class="hb-panel active">
+        {% if not record %}
+            <div class="hb-prop">
+                <label>Branch</label>
+                <select id="hb-branch" class="hb-input hb-select" onchange="HBDesk.updateTypes()">
+                    {% for code, label in branches %}
+                        <option value="{{ code }}" {% if active_branch == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
             </div>
+            <div class="hb-prop">
+                <label>Record Type</label>
+                <select id="hb-record-type" class="hb-input hb-select">
+                    {% for code, label in branches %}
+                        {% for rtype in record_types_by_branch|default_if_none:code %}
+                        {% endfor %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="hb-prop">
+                <label>Tags (comma-sep)</label>
+                <input id="hb-tags" type="text" class="hb-input" placeholder="tag1, tag2">
+            </div>
+        {% else %}
+            <div class="hb-prop">
+                <label>Status</label>
+                <span style="font-size:12px;font-weight:700;">{{ record.get_status_display }}</span>
+            </div>
+            <div class="hb-prop">
+                <label>Branch / Type</label>
+                <span style="font-size:12px;">{{ record.get_branch_display }} · {{ record.record_type|title|cut:"_" }}</span>
+            </div>
+            <div class="hb-prop">
+                <label>Version</label>
+                <span style="font-size:12px;">v{{ record.version_number }}</span>
+            </div>
+            {% if record.tags %}
+                <div class="hb-prop">
+                    <label>Tags</label>
+                    <span style="font-size:12px;">{{ record.tags|join:", " }}</span>
+                </div>
+            {% elif record.status == 'draft' and can_write %}
+                <div class="hb-prop">
+                    <label>Tags (comma-sep)</label>
+                    <input id="hb-tags" type="text" class="hb-input" value="{{ record.tags|join:', ' }}" placeholder="tag1, tag2">
+                </div>
+            {% endif %}
+            {% if record.published_at %}
+                <div class="hb-prop">
+                    <label>Published</label>
+                    <span style="font-size:12px;">{{ record.published_at|date:"d M Y H:i" }}</span>
+                </div>
+            {% endif %}
+            {% if record.locked_at %}
+                <div class="hb-prop">
+                    <label>Locked</label>
+                    <span style="font-size:12px;">{{ record.locked_at|date:"d M Y" }} by {{ record.locked_by.display_name|default:"—" }}</span>
+                </div>
+            {% endif %}
+        {% endif %}
 
-            {# History panel #}
-            <div id="hb-panel-history" class="hb-opts-panel" style="padding: 0 14px;">
-                {% for h in history %}
-                    <a href="{% url 'handbook:record' h.id %}" class="hb-history-item">
-                        <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.5;">history</span>
-                        <span style="flex: 1; font-size: 12px;">v{{ h.version_number }}</span>
-                        <span style="font-size: 11px; color: var(--text-muted-ink);">{{ h.get_status_display }}</span>
-                        <span style="font-size: 11px; color: var(--text-muted-ink);">{{ h.updated_at|date:"d M" }}</span>
-                    </a>
+        {# HRS Attributes — Reference Library only #}
+        {% if is_reference or not record %}
+            <div style="margin-top:14px;">
+                <div class="ws-label-tag" style="margin-bottom:10px;">HRS Attributes</div>
+                {% for field_id, label in hrs_attrs %}
+                    <div class="hb-prop">
+                        <label>{{ label }}</label>
+                        {% if field_id == 'complexity' %}<input id="hrs-{{ field_id }}" type="text" class="hb-input" value="{% if record %}{{ record.hrs_complexity }}{% endif %}" placeholder="Not assessed" {% if record and record.status == 'locked' %}readonly{% endif %}>
+                        {% elif field_id == 'relationship_position' %}<input id="hrs-{{ field_id }}" type="text" class="hb-input" value="{% if record %}{{ record.hrs_relationship_position }}{% endif %}" placeholder="Not assessed" {% if record and record.status == 'locked' %}readonly{% endif %}>
+                        {% elif field_id == 'position' %}<input id="hrs-{{ field_id }}" type="text" class="hb-input" value="{% if record %}{{ record.hrs_position }}{% endif %}" placeholder="Not assessed" {% if record and record.status == 'locked' %}readonly{% endif %}>
+                        {% elif field_id == 'direction' %}<input id="hrs-{{ field_id }}" type="text" class="hb-input" value="{% if record %}{{ record.hrs_direction }}{% endif %}" placeholder="Not assessed" {% if record and record.status == 'locked' %}readonly{% endif %}>
+                        {% elif field_id == 'speed' %}<input id="hrs-{{ field_id }}" type="text" class="hb-input" value="{% if record %}{{ record.hrs_speed }}{% endif %}" placeholder="Not assessed" {% if record and record.status == 'locked' %}readonly{% endif %}>
+                        {% elif field_id == 'emotional_tone' %}<input id="hrs-{{ field_id }}" type="text" class="hb-input" value="{% if record %}{{ record.hrs_emotional_tone }}{% endif %}" placeholder="Not assessed" {% if record and record.status == 'locked' %}readonly{% endif %}>
+                        {% endif %}
+                    </div>
                 {% endfor %}
             </div>
+        {% endif %}
 
-        {% else %}
-            {# New record — just show properties inputs #}
-            <div style="padding: 14px;">
-                <div class="ws-label-tag" style="margin-bottom: 12px;">Properties</div>
-                <div class="hb-prop-row">
-                    <label>Category</label>
-                    <input id="hb-category" type="text" class="hb-prop-input" placeholder="e.g. Policy">
-                </div>
-                <div class="hb-prop-row">
-                    <label>Tags (comma-sep)</label>
-                    <input id="hb-tags" type="text" class="hb-prop-input" placeholder="tag1, tag2">
-                </div>
+        {% if record and record.status == 'draft' and can_write %}
+            <div style="margin-top:14px;">
+                <button onclick="HBDesk.save()" class="hb-action">
+                    <span class="material-symbols-outlined">save</span> Save changes
+                </button>
             </div>
         {% endif %}
     </div>
+
+    {# ── Tab: HRS Relationships ── #}
+    <div id="hb-panel-rels" class="hb-panel">
+        {% if record %}
+            <div id="hb-rels-list">
+                {% for rel in outgoing %}
+                    <div class="hb-rel-item">
+                        <span class="hb-rel-type">{{ rel.relationship_type|cut:"_" }}</span>
+                        <div style="flex:1;min-width:0;">
+                            {% if rel.to_record %}
+                                <a href="{% url 'handbook:record' rel.to_record.id %}" style="font-size:12px;color:var(--text-ink);text-decoration:none;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                    {{ rel.to_record.title }}
+                                </a>
+                                <span style="font-size:10px;color:var(--text-muted-ink);">{{ rel.to_record.record_type|cut:"_" }}</span>
+                            {% elif rel.bible_verse %}
+                                <span style="font-size:12px;">{{ rel.bible_verse.book.code }} {{ rel.bible_verse.chapter }}:{{ rel.bible_verse.verse }}</span>
+                            {% endif %}
+                        </div>
+                        {% if can_write and record.status != 'locked' %}
+                            <button onclick="HBDesk.deleteRel('{{ rel.id }}')" style="background:none;border:none;cursor:pointer;color:var(--text-muted-ink);padding:2px;" title="Remove">
+                                <span class="material-symbols-outlined" style="font-size:14px;">close</span>
+                            </button>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p style="font-size:12px;color:var(--text-muted-ink);">No HRS relationships yet.</p>
+                {% endfor %}
+            </div>
+
+            {% if can_write and record.status != 'locked' %}
+                <div style="margin-top:14px; border-top:1px solid var(--border-ink); padding-top:14px;">
+                    <div class="ws-label-tag" style="margin-bottom:8px;">Link Record</div>
+                    <div class="hb-prop">
+                        <label>Relationship Type</label>
+                        <select id="rel-type" class="hb-input hb-select">
+                            {% for code, label in hrs_relationship_types %}
+                                <option value="{{ code }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="hb-prop">
+                        <label>Target Record ID (UUID)</label>
+                        <input id="rel-target-id" type="text" class="hb-input" placeholder="Paste UUID…">
+                    </div>
+                    <div class="hb-prop">
+                        <label>Direction</label>
+                        <select id="rel-direction" class="hb-input hb-select">
+                            <option value="directed">Directed</option>
+                            <option value="bidirectional">Bidirectional</option>
+                        </select>
+                    </div>
+                    <div class="hb-prop">
+                        <label>Notes (optional)</label>
+                        <input id="rel-notes" type="text" class="hb-input" placeholder="…">
+                    </div>
+                    <button onclick="HBDesk.addRel()" class="hb-action">
+                        <span class="material-symbols-outlined">add_link</span> Add Relationship
+                    </button>
+                </div>
+            {% endif %}
+        {% else %}
+            <p style="font-size:12px;color:var(--text-muted-ink);">Save the record first to add relationships.</p>
+        {% endif %}
+    </div>
+
+    {# ── Tab: Scripture ── #}
+    <div id="hb-panel-scripture" class="hb-panel">
+        {% if record %}
+            <div id="hb-scripture-list">
+                {% for rel in outgoing %}
+                    {% if rel.bible_verse %}
+                        <div class="hb-verse">
+                            <div class="hb-verse__ref">
+                                {{ rel.bible_verse.book.code }} {{ rel.bible_verse.chapter }}:{{ rel.bible_verse.verse }}
+                                <span style="font-size:10px;color:var(--text-muted-ink);margin-left:6px;">{{ rel.relationship_type|cut:"_" }}</span>
+                            </div>
+                            <div class="hb-verse__text">{{ rel.bible_verse.text|truncatechars:140 }}</div>
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <p style="font-size:12px;color:var(--text-muted-ink);">No scripture links yet.</p>
+                {% endfor %}
+            </div>
+
+            {% if can_write and record.status != 'locked' %}
+                <div style="margin-top:14px; border-top:1px solid var(--border-ink); padding-top:14px;">
+                    <div class="ws-label-tag" style="margin-bottom:8px;">Link Scripture</div>
+                    <div class="hb-prop">
+                        <label>Reference (e.g. GEN 1:1)</label>
+                        <input id="scripture-ref" type="text" class="hb-input" placeholder="GEN 1:1">
+                    </div>
+                    <div id="scripture-results" style="margin-bottom:8px;"></div>
+                    <div class="hb-prop">
+                        <label>Relationship Type</label>
+                        <select id="scripture-rel-type" class="hb-input hb-select">
+                            {% for code, label in hrs_relationship_types %}
+                                <option value="{{ code }}" {% if code == 'references' %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button onclick="HBDesk.searchScripture()" class="hb-action">
+                        <span class="material-symbols-outlined">search</span> Search
+                    </button>
+                    <button onclick="HBDesk.addScripture()" class="hb-action" id="hb-add-scripture-btn" style="display:none;">
+                        <span class="material-symbols-outlined">link</span> Link Verse
+                    </button>
+                </div>
+            {% endif %}
+        {% else %}
+            <p style="font-size:12px;color:var(--text-muted-ink);">Save the record first to add scripture links.</p>
+        {% endif %}
+    </div>
+
+    {# ── Tab: History ── #}
+    <div id="hb-panel-history" class="hb-panel">
+        {% if record %}
+            {% for h in history %}
+                <a href="{% url 'handbook:record' h.id %}" class="hb-history-row">
+                    <span class="material-symbols-outlined" style="font-size:14px;opacity:0.4;">history</span>
+                    <span style="flex:1;font-size:12px;">v{{ h.version_number }} — {{ h.get_status_display }}</span>
+                    <span style="font-size:11px;color:var(--text-muted-ink);">{{ h.updated_at|date:"d M" }}</span>
+                </a>
+            {% endfor %}
+        {% else %}
+            <p style="font-size:12px;color:var(--text-muted-ink);">No history — unsaved record.</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 const HBDesk = {
     recordId: '{% if record %}{{ record.id }}{% endif %}',
+    _selectedVerseId: null,
 
-    _payload() {
-        const tags = document.getElementById('hb-tags')?.value
-            .split(',').map(t => t.trim()).filter(Boolean) || [];
-        return {
-            title:    document.getElementById('hb-title').value,
-            summary:  document.getElementById('hb-summary').value,
-            content:  document.getElementById('hb-content').value,
-            category: document.getElementById('hb-category')?.value || '',
-            tags,
-        };
+    // Branch → record types map for new-record form
+    typesByBranch: {{ record_types_by_branch|safe }},
+
+    updateTypes() {
+        const branch = document.getElementById('hb-branch')?.value;
+        const sel = document.getElementById('hb-record-type');
+        if (!sel || !branch) return;
+        const types = this.typesByBranch[branch] || [];
+        sel.innerHTML = types.map(t => `<option value="${t}">${t.replace(/_/g,' ')}</option>`).join('');
     },
 
-    async _request(url, method, body) {
-        const csrfToken = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+    _payload() {
+        const tagsRaw = document.getElementById('hb-tags')?.value || '';
+        const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+        const p = {
+            title:   document.getElementById('hb-title').value,
+            summary: document.getElementById('hb-summary').value,
+            content: document.getElementById('hb-content').value,
+            tags,
+        };
+        if (!this.recordId) {
+            p.branch = document.getElementById('hb-branch')?.value || 'reference';
+            p.record_type = document.getElementById('hb-record-type')?.value || 'principle';
+        }
+        // HRS attrs
+        ['complexity','relationship_position','position','direction','speed','emotional_tone'].forEach(f => {
+            const el = document.getElementById(`hrs-${f}`);
+            if (el) p[`hrs_${f}`] = el.value;
+        });
+        return p;
+    },
+
+    async _req(url, method, body) {
+        const csrf = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
         const r = await fetch(url, {
             method,
-            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
             body: body ? JSON.stringify(body) : undefined,
         });
         const data = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(data.detail || `HTTP ${r.status}`);
+        if (!r.ok) throw new Error(data.detail || JSON.stringify(data.errors || data) || `HTTP ${r.status}`);
         return data;
     },
 
     async save() {
         try {
-            await this._request(`/api/handbook/records/${this.recordId}/`, 'PATCH', this._payload());
+            await this._req(`/api/handbook/records/${this.recordId}/`, 'PATCH', this._payload());
             this._toast('Saved', 'success');
         } catch (e) { this._toast(e.message, 'error'); }
     },
 
     async create() {
         try {
-            const data = await this._request('/api/handbook/records/', 'POST', this._payload());
+            const data = await this._req('/api/handbook/records/', 'POST', this._payload());
             window.location.href = `/handbook/records/${data.id}/`;
         } catch (e) { this._toast(e.message, 'error'); }
     },
 
     async publish() {
+        if (!confirm('Publish this record? It will become visible to all users with appropriate access.')) return;
         try {
-            await this._request(`/api/handbook/records/${this.recordId}/publish/`, 'POST');
+            await this._req(`/api/handbook/records/${this.recordId}/publish/`, 'POST');
             window.location.reload();
         } catch (e) { this._toast(e.message, 'error'); }
     },
 
     async lock() {
+        if (!confirm('Lock this record? It will be immutable after locking.')) return;
         try {
-            await this._request(`/api/handbook/records/${this.recordId}/lock/`, 'POST');
+            await this._req(`/api/handbook/records/${this.recordId}/lock/`, 'POST');
             window.location.reload();
         } catch (e) { this._toast(e.message, 'error'); }
     },
 
     async newVersion() {
         try {
-            const data = await this._request(`/api/handbook/records/${this.recordId}/new-version/`, 'POST');
+            const data = await this._req(`/api/handbook/records/${this.recordId}/new-version/`, 'POST');
             window.location.href = `/handbook/records/${data.id}/`;
         } catch (e) { this._toast(e.message, 'error'); }
     },
 
+    async addRel() {
+        const rtype = document.getElementById('rel-type').value;
+        const targetId = document.getElementById('rel-target-id').value.trim();
+        const direction = document.getElementById('rel-direction').value;
+        const notes = document.getElementById('rel-notes').value.trim();
+        if (!targetId) { this._toast('Enter a target record UUID.', 'error'); return; }
+        try {
+            await this._req(`/api/handbook/records/${this.recordId}/relationships/`, 'POST', {
+                relationship_type: rtype, to_record: targetId, direction, notes,
+            });
+            window.location.reload();
+        } catch (e) { this._toast(e.message, 'error'); }
+    },
+
+    async deleteRel(relId) {
+        try {
+            await this._req(`/api/handbook/records/${this.recordId}/relationships/${relId}/`, 'DELETE');
+            window.location.reload();
+        } catch (e) { this._toast(e.message, 'error'); }
+    },
+
+    async searchScripture() {
+        const ref = document.getElementById('scripture-ref').value.trim();
+        if (!ref) return;
+        const resultsEl = document.getElementById('scripture-results');
+        const btn = document.getElementById('hb-add-scripture-btn');
+        try {
+            const data = await this._req(`/api/bible/search/?q=${encodeURIComponent(ref)}&limit=5`, 'GET');
+            const verses = data.results || data;
+            if (!verses.length) { resultsEl.innerHTML = '<p style="font-size:11px;color:var(--text-muted-ink);">No results.</p>'; return; }
+            resultsEl.innerHTML = verses.map(v =>
+                `<div onclick="HBDesk.selectVerse('${v.id}', this)"
+                      style="padding:6px 8px;border:1px solid var(--border-ink);border-radius:5px;cursor:pointer;margin-bottom:4px;font-size:11px;">
+                    <strong>${v.book_code || ''} ${v.chapter}:${v.verse}</strong><br>
+                    <span style="color:var(--text-muted-ink);">${(v.text||'').substring(0,80)}…</span>
+                </div>`
+            ).join('');
+        } catch (e) { this._toast(e.message, 'error'); }
+    },
+
+    selectVerse(verseId, el) {
+        this._selectedVerseId = verseId;
+        document.querySelectorAll('#scripture-results > div').forEach(d => d.style.borderColor = 'var(--border-ink)');
+        el.style.borderColor = 'var(--accent-red)';
+        document.getElementById('hb-add-scripture-btn').style.display = 'flex';
+    },
+
+    async addScripture() {
+        if (!this._selectedVerseId) return;
+        const rtype = document.getElementById('scripture-rel-type').value;
+        try {
+            await this._req(`/api/handbook/records/${this.recordId}/relationships/`, 'POST', {
+                relationship_type: rtype, bible_verse: this._selectedVerseId, direction: 'directed',
+            });
+            window.location.reload();
+        } catch (e) { this._toast(e.message, 'error'); }
+    },
+
     togglePreview() {
-        const editorWrap  = document.getElementById('hb-editor-wrap');
-        const previewWrap = document.getElementById('hb-preview-wrap');
-        const btn         = document.getElementById('hb-preview-btn');
-        const isEdit = editorWrap.style.display !== 'none';
+        const ew = document.getElementById('hb-editor-wrap');
+        const pw = document.getElementById('hb-preview-wrap');
+        const btn = document.getElementById('hb-preview-btn');
+        const isEdit = ew.style.display !== 'none';
         if (isEdit) {
-            const md = document.getElementById('hb-content').value;
-            document.getElementById('hb-preview-html').innerHTML = marked.parse(md);
-            editorWrap.style.display  = 'none';
-            previewWrap.style.display = 'block';
+            document.getElementById('hb-preview-html').innerHTML = marked.parse(document.getElementById('hb-content').value);
+            ew.style.display = 'none'; pw.style.display = 'block';
             btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">edit</span> Edit';
         } else {
-            editorWrap.style.display  = 'block';
-            previewWrap.style.display = 'none';
+            ew.style.display = 'block'; pw.style.display = 'none';
             btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">visibility</span> Preview';
         }
     },
 
-    switchTab(el, panel) {
-        document.querySelectorAll('.hb-opts-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.hb-opts-panel').forEach(p => p.classList.remove('active'));
+    tab(el, name) {
+        document.querySelectorAll('.hb-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.hb-panel').forEach(p => p.classList.remove('active'));
         el.classList.add('active');
-        document.getElementById(`hb-panel-${panel}`).classList.add('active');
+        document.getElementById(`hb-panel-${name}`).classList.add('active');
     },
 
     _toast(msg, level) {
-        const div = Object.assign(document.createElement('div'), {
+        const d = Object.assign(document.createElement('div'), {
             textContent: msg,
             style: `position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:6px;
                     font-size:13px;z-index:9999;color:#fff;
-                    background:${level === 'error' ? '#c0392b' : '#00b894'}`,
+                    background:${level==='error'?'#c0392b':'#00b894'}`,
         });
-        document.body.appendChild(div);
-        setTimeout(() => div.remove(), 3000);
+        document.body.appendChild(d);
+        setTimeout(() => d.remove(), 3500);
     },
 };
+
+// Init branch select for new record
+document.addEventListener('DOMContentLoaded', () => HBDesk.updateTypes());
+
+// Auto-save for draft records
+{% if record and record.status == 'draft' and can_write %}
+let _autoSaveTimer;
+document.getElementById('hb-content')?.addEventListener('input', () => {
+    clearTimeout(_autoSaveTimer);
+    _autoSaveTimer = setTimeout(() => HBDesk.save(), 3000);
+});
+{% endif %}
 </script>
 {% endblock %}
