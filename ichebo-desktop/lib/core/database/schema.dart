@@ -27,6 +27,7 @@ const cAvatarUrl = 'avatar_url';
 const cCompetenceLevel = 'competence_level';
 const cIsActive = 'is_active';
 const cShepherdId = 'shepherd_id';
+const cServiceOrder = 'service_order';
 const cCustomFields = 'custom_fields';
 const cCreatedBy = 'created_by';
 const cCreatedAt = 'created_at';

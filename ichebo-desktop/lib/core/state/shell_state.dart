@@ -14,6 +14,7 @@ enum ShellSection {
   bible,
   video,
   tenancy,
+  sync,
 }
 
 extension ShellSectionX on ShellSection {
@@ -27,6 +28,7 @@ extension ShellSectionX on ShellSection {
         ShellSection.bible => 'Bible Reader',
         ShellSection.video => 'Video & Broadcast',
         ShellSection.tenancy => 'Tenancy Hub',
+        ShellSection.sync => 'Sync',
       };
 
   String get watermark => name.toUpperCase();
@@ -41,6 +43,7 @@ extension ShellSectionX on ShellSection {
         ShellSection.bible => '/bible',
         ShellSection.video => '/video',
         ShellSection.tenancy => '/tenancy',
+        ShellSection.sync => '/sync',
       };
 
   IconData get icon => switch (this) {
@@ -53,6 +56,7 @@ extension ShellSectionX on ShellSection {
         ShellSection.bible => Icons.menu_book_outlined,
         ShellSection.video => Icons.live_tv_outlined,
         ShellSection.tenancy => Icons.account_balance_outlined,
+        ShellSection.sync => Icons.sync_outlined,
       };
 }
 

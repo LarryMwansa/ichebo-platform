@@ -8,6 +8,12 @@ import 'package:ffi/ffi.dart';
 typedef _SyncStartNative = Int32 Function(Pointer<Utf8> configJson);
 typedef _SyncStartDart = int Function(Pointer<Utf8> configJson);
 
+typedef _MemberWriteNative = Int32 Function(Pointer<Utf8> jsonPtr);
+typedef _MemberWriteDart = int Function(Pointer<Utf8> jsonPtr);
+
+typedef _ActivityWriteNative = Int32 Function(Pointer<Utf8> jsonPtr);
+typedef _ActivityWriteDart = int Function(Pointer<Utf8> jsonPtr);
+
 typedef _SyncStopNative = Void Function();
 typedef _SyncStopDart = void Function();
 
@@ -105,6 +111,11 @@ class SyncEngine {
   _SyncStatusDart? _syncStatus;
   _SyncConflictCountDart? _syncConflictCount;
   _SyncResolveConflictDart? _syncResolveConflict;
+  _MemberWriteDart? _memberCreate;
+  _MemberWriteDart? _memberUpdate;
+  _ActivityWriteDart? _activityCreate;
+  _ActivityWriteDart? _gatheringCreate;
+  _ActivityWriteDart? _attendanceSave;
 
   bool get isLoaded => _lib != null;
 
@@ -133,6 +144,21 @@ class SyncEngine {
       _syncResolveConflict = _lib!
           .lookup<NativeFunction<_SyncResolveConflictNative>>(
               'SyncResolveConflict')
+          .asFunction();
+      _memberCreate = _lib!
+          .lookup<NativeFunction<_MemberWriteNative>>('MemberCreate')
+          .asFunction();
+      _memberUpdate = _lib!
+          .lookup<NativeFunction<_MemberWriteNative>>('MemberUpdate')
+          .asFunction();
+      _activityCreate = _lib!
+          .lookup<NativeFunction<_ActivityWriteNative>>('ActivityCreate')
+          .asFunction();
+      _gatheringCreate = _lib!
+          .lookup<NativeFunction<_ActivityWriteNative>>('GatheringCreate')
+          .asFunction();
+      _attendanceSave = _lib!
+          .lookup<NativeFunction<_ActivityWriteNative>>('AttendanceSave')
           .asFunction();
       return true;
     } catch (e) {
@@ -190,6 +216,66 @@ class SyncEngine {
     final ptr = conflictId.toNativeUtf8();
     try {
       return _syncResolveConflict!(ptr, keepLocal ? 0 : 1);
+    } finally {
+      malloc.free(ptr);
+    }
+  }
+
+  // Writes a new member row + changelog entry atomically via Go store.
+  // jsonPayload: JSON-encoded memberPayload (see bridge.go).
+  // Returns 0 on success, negative on error, -99 if engine not loaded.
+  int memberCreate(String jsonPayload) {
+    if (_memberCreate == null) return -99;
+    final ptr = jsonPayload.toNativeUtf8();
+    try {
+      return _memberCreate!(ptr);
+    } finally {
+      malloc.free(ptr);
+    }
+  }
+
+  // Updates an existing member row + changelog entry atomically via Go store.
+  int memberUpdate(String jsonPayload) {
+    if (_memberUpdate == null) return -99;
+    final ptr = jsonPayload.toNativeUtf8();
+    try {
+      return _memberUpdate!(ptr);
+    } finally {
+      malloc.free(ptr);
+    }
+  }
+
+  // Writes a new activity row + changelog entry atomically.
+  int activityCreate(String jsonPayload) {
+    if (_activityCreate == null) return -99;
+    final ptr = jsonPayload.toNativeUtf8();
+    try {
+      return _activityCreate!(ptr);
+    } finally {
+      malloc.free(ptr);
+    }
+  }
+
+  // Updates an existing activity row atomically (upsert).
+  int activityUpdate(String jsonPayload) => activityCreate(jsonPayload);
+
+  // Dual-write: gathering Record + event Activity in one SQLite transaction.
+  int gatheringCreate(String jsonPayload) {
+    if (_gatheringCreate == null) return -99;
+    final ptr = jsonPayload.toNativeUtf8();
+    try {
+      return _gatheringCreate!(ptr);
+    } finally {
+      malloc.free(ptr);
+    }
+  }
+
+  // Saves attendance for a gathering atomically (delete prior + batch insert + mark complete).
+  int attendanceSave(String jsonPayload) {
+    if (_attendanceSave == null) return -99;
+    final ptr = jsonPayload.toNativeUtf8();
+    try {
+      return _attendanceSave!(ptr);
     } finally {
       malloc.free(ptr);
     }

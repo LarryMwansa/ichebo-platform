@@ -87,6 +87,7 @@ type Member struct {
 	CompetenceLevel  int
 	IsActive         bool
 	ShepherdID       *uuid.UUID
+	ServiceOrder     string
 	CustomFields     string // JSON
 	CreatedBy        uuid.UUID
 	CreatedAt        string
@@ -144,6 +145,8 @@ type TxStore interface {
 	Members() MemberStore
 	Records() RecordStore
 	Activities() ActivityStore
+	// SaveAttendance writes attendance log rows and marks the activity complete.
+	SaveAttendance(activityID, changedBy string, presentMemberIDs []string, now string) error
 }
 
 // Open opens (or creates) a SQLite database at path with the required pragmas.
@@ -255,6 +258,7 @@ func (s *sqliteStore) migrate() error {
 			competence_level  INTEGER NOT NULL DEFAULT 0,
 			is_active         INTEGER NOT NULL DEFAULT 1,
 			shepherd_id       TEXT,
+			service_order     TEXT,
 			custom_fields     TEXT NOT NULL DEFAULT '{}',
 			created_by        TEXT NOT NULL,
 			created_at        TEXT NOT NULL,
@@ -365,6 +369,41 @@ func (t *sqliteTxStore) ChangeLog() changelog.Writer {
 func (t *sqliteTxStore) Members() MemberStore      { return &sqliteMemberStore{q: t.tx} }
 func (t *sqliteTxStore) Records() RecordStore      { return &sqliteRecordStore{q: t.tx} }
 func (t *sqliteTxStore) Activities() ActivityStore { return &sqliteActivityStore{q: t.tx} }
+
+// SaveAttendance idempotently records attendance for a gathering:
+//  1. Deletes prior attendance_log rows for this activity
+//  2. Inserts one row per present member
+//  3. Marks the activity completed
+func (t *sqliteTxStore) SaveAttendance(activityID, changedBy string, presentMemberIDs []string, now string) error {
+	// 1. Clear prior attendance for idempotent re-save.
+	if _, err := t.tx.Exec(
+		`DELETE FROM activity_log WHERE activity_id = ? AND to_status = 'attendance'`,
+		activityID,
+	); err != nil {
+		return err
+	}
+
+	// 2. Insert one log row per present member.
+	for _, memberID := range presentMemberIDs {
+		logID := uuid.New().String()
+		if _, err := t.tx.Exec(
+			`INSERT INTO activity_log (id, activity_id, from_status, to_status, note, changed_by, changed_at)
+			 VALUES (?, ?, '', 'attendance', ?, ?, ?)`,
+			logID, activityID, memberID, changedBy, now,
+		); err != nil {
+			return err
+		}
+	}
+
+	// 3. Mark activity completed.
+	if _, err := t.tx.Exec(
+		`UPDATE activities SET status = 'completed', completed_at = ?, updated_at = ? WHERE id = ?`,
+		now, now, activityID,
+	); err != nil {
+		return err
+	}
+	return nil
+}
 
 // ── sqliteLog ─────────────────────────────────────────────────────────────────
 
@@ -510,7 +549,7 @@ func (s *sqliteMemberStore) Get(id uuid.UUID) (*Member, error) {
 	row := s.q.QueryRow(`
 		SELECT id, tenant_id, email, display_name, first_name, last_name,
 		       phone, avatar_url, competence_level, is_active, shepherd_id,
-		       custom_fields, created_by, created_at, updated_at, deleted_at
+		       service_order, custom_fields, created_by, created_at, updated_at, deleted_at
 		FROM members WHERE id = ?`, id.String())
 	return scanMember(row)
 }
@@ -519,7 +558,7 @@ func (s *sqliteMemberStore) List(tenantID uuid.UUID) ([]*Member, error) {
 	rows, err := s.q.Query(`
 		SELECT id, tenant_id, email, display_name, first_name, last_name,
 		       phone, avatar_url, competence_level, is_active, shepherd_id,
-		       custom_fields, created_by, created_at, updated_at, deleted_at
+		       service_order, custom_fields, created_by, created_at, updated_at, deleted_at
 		FROM members
 		WHERE tenant_id = ? AND deleted_at IS NULL
 		ORDER BY display_name ASC`, tenantID.String())
@@ -545,19 +584,20 @@ func (s *sqliteMemberStore) Upsert(m *Member) error {
 	}
 	_, err := s.q.Exec(`
 		INSERT INTO members (id, tenant_id, email, display_name, first_name, last_name,
-		    phone, avatar_url, competence_level, is_active, shepherd_id,
+		    phone, avatar_url, competence_level, is_active, shepherd_id, service_order,
 		    custom_fields, created_by, created_at, updated_at, deleted_at)
-		VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		ON CONFLICT(id) DO UPDATE SET
 		    email=excluded.email, display_name=excluded.display_name,
 		    first_name=excluded.first_name, last_name=excluded.last_name,
 		    phone=excluded.phone, avatar_url=excluded.avatar_url,
 		    competence_level=excluded.competence_level, is_active=excluded.is_active,
-		    shepherd_id=excluded.shepherd_id, custom_fields=excluded.custom_fields,
+		    shepherd_id=excluded.shepherd_id, service_order=excluded.service_order,
+		    custom_fields=excluded.custom_fields,
 		    updated_at=excluded.updated_at, deleted_at=excluded.deleted_at`,
 		m.ID.String(), m.TenantID.String(), m.Email, m.DisplayName,
 		m.FirstName, m.LastName, m.Phone, m.AvatarURL,
-		m.CompetenceLevel, m.IsActive, shepherdID,
+		m.CompetenceLevel, m.IsActive, shepherdID, m.ServiceOrder,
 		m.CustomFields, m.CreatedBy.String(), m.CreatedAt, m.UpdatedAt, m.DeletedAt,
 	)
 	return err
@@ -569,16 +609,17 @@ type memberScanner interface {
 
 func scanMember(row memberScanner) (*Member, error) {
 	var (
-		m          Member
-		id, tid, cb string
-		isActive   int
-		shepherdID sql.NullString
-		deletedAt  sql.NullString
+		m               Member
+		id, tid, cb     string
+		isActive        int
+		shepherdID      sql.NullString
+		serviceOrder    sql.NullString
+		deletedAt       sql.NullString
 	)
 	err := row.Scan(
 		&id, &tid, &m.Email, &m.DisplayName, &m.FirstName, &m.LastName,
 		&m.Phone, &m.AvatarURL, &m.CompetenceLevel, &isActive, &shepherdID,
-		&m.CustomFields, &cb, &m.CreatedAt, &m.UpdatedAt, &deletedAt,
+		&serviceOrder, &m.CustomFields, &cb, &m.CreatedAt, &m.UpdatedAt, &deletedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -588,6 +629,9 @@ func scanMember(row memberScanner) (*Member, error) {
 	m.CreatedBy = mustParseUUID(cb)
 	m.IsActive = isActive == 1
 	m.ShepherdID = nullableUUID(shepherdID)
+	if serviceOrder.Valid {
+		m.ServiceOrder = serviceOrder.String
+	}
 	m.DeletedAt = nullableString(deletedAt)
 	return &m, nil
 }
