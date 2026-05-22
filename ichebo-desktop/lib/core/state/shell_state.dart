@@ -105,17 +105,31 @@ class ShellNotifier extends StateNotifier<ShellState> {
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
-    final isDark = prefs.getString(_themeKey) != 'light';
+    final stored = prefs.getString(_themeKey);
+    final ThemeMode themeMode;
+    if (stored == 'dark') {
+      themeMode = ThemeMode.dark;
+    } else if (stored == 'light') {
+      themeMode = ThemeMode.light;
+    } else {
+      // 'system' stored, or first run — follow the OS.
+      final brightness =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness;
+      themeMode =
+          brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
+    }
     final contextOpen = prefs.getBool(_contextKey) ?? true;
-    state = state.copyWith(
-      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-      contextOpen: contextOpen,
-    );
+    state = state.copyWith(themeMode: themeMode, contextOpen: contextOpen);
   }
 
   Future<void> _persist() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_themeKey, state.themeMode == ThemeMode.dark ? 'dark' : 'light');
+    final themeStr = switch (state.themeMode) {
+      ThemeMode.dark   => 'dark',
+      ThemeMode.light  => 'light',
+      ThemeMode.system => 'system',
+    };
+    await prefs.setString(_themeKey, themeStr);
     await prefs.setBool(_contextKey, state.contextOpen);
   }
 
@@ -132,6 +146,11 @@ class ShellNotifier extends StateNotifier<ShellState> {
     state = state.copyWith(
       themeMode: state.themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark,
     );
+    _persist();
+  }
+
+  void setThemeMode(ThemeMode mode) {
+    state = state.copyWith(themeMode: mode);
     _persist();
   }
 

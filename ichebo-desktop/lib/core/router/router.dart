@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/activity/activity_screen.dart';
+import '../../features/governance/governance_screen.dart';
+import '../../features/home/home_screen.dart';
 import '../../features/people/people_screen.dart';
+import '../../features/settings/settings_screen.dart';
 import '../../features/sync/sync_screen.dart';
 import '../../features/wizard/wizard_screen.dart';
 import '../../shell/desktop_shell.dart';
@@ -42,10 +45,8 @@ class SectionPlaceholder extends StatelessWidget {
 // ── Router ────────────────────────────────────────────────────────────────────
 
 final appRouter = GoRouter(
-  initialLocation: '/community',
+  initialLocation: '/dashboard',
   redirect: (context, state) async {
-    // On every navigation, check if the wizard has been completed.
-    // If not, redirect to /wizard (unless already headed there).
     if (state.matchedLocation == '/wizard') return null;
     final prefs = await SharedPreferences.getInstance();
     final done = prefs.getBool('ics_wizard_done') ?? false;
@@ -61,6 +62,11 @@ final appRouter = GoRouter(
     ShellRoute(
       builder: (context, state, child) => DesktopShell(child: child),
       routes: [
+        // Dashboard / Home section — live
+        GoRoute(
+          path: '/dashboard',
+          builder: (context, state) => const HomeScreen(),
+        ),
         // People section — live
         GoRoute(
           path: '/community',
@@ -71,15 +77,27 @@ final appRouter = GoRouter(
           path: '/activity',
           builder: (context, state) => const ActivityScreen(),
         ),
+        // Governance section — live
+        GoRoute(
+          path: '/governance',
+          builder: (context, state) => const GovernanceScreen(),
+        ),
         // Sync section — live
         GoRoute(
           path: '/sync',
           builder: (context, state) => const SyncScreen(),
         ),
+        // Settings — live
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) => const SettingsScreen(),
+        ),
         // All other sections — placeholders
         for (final section in ShellSection.values)
-          if (section != ShellSection.community &&
+          if (section != ShellSection.dashboard &&
+              section != ShellSection.community &&
               section != ShellSection.activity &&
+              section != ShellSection.governance &&
               section != ShellSection.sync)
             GoRoute(
               path: section.route,
