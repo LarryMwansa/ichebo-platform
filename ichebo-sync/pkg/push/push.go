@@ -97,6 +97,12 @@ func (p *Pusher) Run(ctx context.Context) error {
 			return fmt.Errorf("push.Run: build payload: %w", err)
 		}
 
+		// Map entity UUID → changelog entry ID so we can mark the right rows.
+		entityToEntry := make(map[uuid.UUID]uuid.UUID, len(batch))
+		for _, e := range batch {
+			entityToEntry[e.EntityID] = e.ID
+		}
+
 		p.status.SetState(status.Syncing, status.WithProgress(len(batch), len(pending)))
 
 		respBytes, err := p.transport.Post(ctx, "/api/sync/push/", payload)
@@ -115,7 +121,9 @@ func (p *Pusher) Run(ctx context.Context) error {
 			eid, _ := uuid.Parse(result.EntityID)
 			switch result.Status {
 			case "success":
-				synced = append(synced, eid)
+				if entryID, ok := entityToEntry[eid]; ok {
+					synced = append(synced, entryID)
+				}
 			case "conflict":
 				// Conflict handed off to resolve package by caller
 			case "rejected":
