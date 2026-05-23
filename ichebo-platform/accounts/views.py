@@ -3,7 +3,6 @@ import json
 from django.contrib.auth import login as auth_login, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.mail import send_mail
 from django.conf import settings as django_settings
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -233,19 +232,15 @@ def _send_verification_email(user, token_obj, request):
     verify_url = request.build_absolute_uri(
         reverse('accounts:verify-email', kwargs={'token': token_obj.token})
     )
-    send_mail(
-        subject='Verify your Ichebo account',
-        message=(
-            f'Welcome to Ichebo.\n\n'
-            f'Please verify your email address by clicking the link below:\n\n'
-            f'{verify_url}\n\n'
-            f'This link expires in 24 hours.\n\n'
-            f'If you did not create this account, you can ignore this email.'
-        ),
-        from_email=django_settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        fail_silently=False,
+    message = (
+        f'Welcome to Ichebo.\n\n'
+        f'Please verify your email address by clicking the link below:\n\n'
+        f'{verify_url}\n\n'
+        f'This link expires in 24 hours.\n\n'
+        f'If you did not create this account, you can ignore this email.'
     )
+    from notifications.tasks import send_notification_email
+    send_notification_email.delay(user.email, 'Verify your Ichebo account', message)
 
 
 class SignUpView(View):

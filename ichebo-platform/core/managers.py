@@ -16,6 +16,7 @@ Exempt models (read-only seed data, no write path through the engine layer):
     BibleTranslation, BibleBook, BibleVerse, ParacletePrompt, SyncChangelog
 """
 
+from django.contrib.auth.models import UserManager
 from django.db import models
 from django.utils import timezone
 
@@ -33,7 +34,7 @@ class SoftDeleteQuerySet(models.QuerySet):
         return self.filter(deleted_at__isnull=False)
 
 
-class SoftDeleteManager(models.Manager):
+class SoftDeleteManager(UserManager):
     """
     Default manager — automatically excludes soft-deleted rows.
     Use Model.all_objects.all() to include deleted rows.
