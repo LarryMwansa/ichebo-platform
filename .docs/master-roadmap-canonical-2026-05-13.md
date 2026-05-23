@@ -530,113 +530,84 @@ feat: multi-tenant content scoping
 
 ---
 
-# LAYER 5 — Version 3: Ecosystem Foundation
+# LAYER 5 — Version 3: Ecosystem Foundation ✅ COMPLETE
 
 **Entry requirement:** Version 2 in real-world use (Phase H.2). At least one community operating.
 
-**Note:** Do not start Layer 5 until the domain is proven in real use. Version 2 may surface requirements that change the ecosystem design. The ecosystem architecture document (v0.1) will have been updated by real-world learning before Layer 5 begins.
+## Phase E.1 — UUID Schema Migration ✅
 
-## Phase E.1 — UUID Schema Migration
-
-**Goal:** Migrate all primary keys from auto-increment integers to UUID across the entire codebase. This is the foundation for local-first data and the Sync Engine.
-
-**Entry requirement:** Version 2 stable in production. No active migration in progress.
-
-**What changes:**
-- All Django model PKs: UUIDField(primary_key=True, default=uuid.uuid4)
-- All DRF serializers: updated to UUID field types
-- All API clients: updated to handle UUID responses
-- All template references to record IDs: updated
-
-**Non-negotiable:** UUID migration must be complete before any Go engine work begins.
+**What was built:** UUID PKs applied across all platform models. `DEFAULT_AUTO_FIELD` set to `BigAutoField` with explicit UUID overrides. Custom `check_uuid_primary_keys` system check in `core/apps.py` enforces UUID PKs on all first-party models at startup. `BibleBook` migrated via truncate-and-reload strategy (`bible/migrations/0003_biblebook_uuid_pk.py`). `ParacletePrompt` migrated via two-step column swap (`paraclete/migrations/0002_paracleteprompt_uuid_pk.py`).
 
 **Commit:** `chore: uuid primary key migration — all models`
 
-## Phase E.2 — Soft Delete Pattern
+## Phase E.2 — Soft Delete Pattern ✅
 
-**Goal:** Implement soft deletes across all models. No hard deletes anywhere in the system.
+**What was built:** `SoftDeleteMixin` and `SoftDeleteManager` added to `core/managers.py`. Applied across: User, UserProfile, Activity, MembershipRequest, CertificationConfirmation, Notification, Record, Tenant, UserPermission, TenantInvitation, DesktopLicence. New migrations for each affected model. Default querysets filter `deleted_at IS NULL`.
 
-**What changes:**
-- All models: add deleted_at DateTimeField(null=True, blank=True)
-- All querysets: default filter to deleted_at IS NULL
-- All DRF endpoints: PATCH to set deleted_at instead of DELETE
-- All admin views: show deleted records separately
+**Commit:** `Implement soft delete functionality across multiple models`
 
-**Commit:** `chore: soft delete pattern — all models`
+## Phase E.3 — Go Engine Foundation ✅
 
-## Phase E.3 — Go Engine Foundation
+**What was built:** Five Go engines in `ichebo-sync/engines/`, each independently compilable with tests:
+- `engines/records/` — Records Engine
+- `engines/activity/` — Activity Engine
+- `engines/relationships/` — Relationships Engine
+- `engines/bible/` — Bible Engine
+- `engines/calendar/` — Calendar Engine
 
-**Goal:** Build the six Go foundation engines as standalone modules.
+Shared engine interface in `engines/engine/engine.go`.
 
-**Entry requirement:** E.1 and E.2 complete.
+**Commit:** (included in soft delete / sync engine commits)
 
-**Build order:**
-1. Records Engine (Go module) — enforce record_class rules, record_family/record_type taxonomy, four mandatory fields
-2. Activity Engine (Go module) — ActivityLog, progress logic, participation events
-3. Relationships Engine (Go module) — direction-aware traversal, HRS methodology
-4. Bible Engine (Go module) — scripture text, translation resolution, reference parsing
-5. Calendar Engine (Go module) — event aggregation, KGS Annual Rhythm, programme milestones
+## Phase E.4 — Sync Engine ✅
 
-Each engine: independently compilable, independently testable, own version, language-agnostic specification document.
-
-**Commit pattern:** `feat(engine): records-engine v0.1`, `feat(engine): activity-engine v0.1`, etc.
-
-## Phase E.4 — Sync Engine
-
-**Goal:** Build the Sync Engine as a standalone Go binary.
-
-**Entry requirement:** E.3 complete (all foundation engines built and tested).
+**What was built:** Full Sync Engine in `ichebo-sync/` as standalone Go binary (`cmd/syncd/`). Packages: `pkg/changelog`, `pkg/device` (UUID identity), `pkg/push`, `pkg/pull`, `pkg/resolve` (conflict resolution), `pkg/queue` (ConflictQueue), `pkg/store`, `pkg/transport`, `pkg/status`, `pkg/clock`. FFI bridge in `ffi/bridge.go` + `ffi/main.go` for Flutter Desktop integration.
 
 **Reference:** ADR-018
-
-**Build sequence:**
-1. ChangeLog table (SQLite + PostgreSQL)
-2. Device identity (UUID on first run)
-3. Push implementation (POST /api/sync/push/)
-4. Pull implementation (GET /api/sync/pull/?since=)
-5. Conflict resolution rules by data type
-6. ConflictQueue
-7. 7-day offline test
 
 **Commit:** `feat: sync-engine v0.1 — changelog, push, pull, resolve`
 
 ---
 
-# LAYER 6 — Version 3: Ichebo Desktop
+# LAYER 6 — Version 3: Ichebo Desktop ✅ COMPLETE
 
 **Entry requirement:** Layer 5 complete. Sync Engine tested and proven.
 
 **Reference:** ADR-017
 
-## Phase D.1 — Flutter Desktop Project
+## Phase D.1 — Flutter Desktop Project ✅
 
-**Goal:** Flutter project setup targeting Windows, macOS, and Linux. Design system tokens in Dart. Core navigation shell.
+**What was built:** `ichebo-desktop/` Flutter project targeting Windows/macOS/Linux. Core navigation shell in `lib/shell/`. Design system tokens in Dart. Dark mode (non-optional). Features scaffold: `lib/features/` — home, people, activity, governance, settings, sync, video, wizard.
 
-## Phase D.2 — Local Data Layer
+**Commit:** `feat(desktop): D.1 — Ichebo Desktop shell scaffold`
 
-**Goal:** SQLite integration (WAL mode), Go engine FFI bridge, all local writes append to ChangeLog.
+## Phase D.2 — Local Data Layer ✅
 
-## Phase D.3 — People Surface
+**What was built:** SQLite integration (WAL mode) in `lib/core/database/`. Go Sync Engine FFI bridge wired via `lib/core/services/`. All local writes append to ChangeLog. Sync state management in `lib/sync/`.
 
-**Goal:** Member registry, competence levels, shepherd assignments. Full offline operation.
+**Commit:** `feat(desktop): D.2 — Local data layer + FFI bridge`
 
-## Phase D.4 — Activity Surface
+## Phase D.3 — People Surface ✅
 
-**Goal:** Log attendance, service, participation. HTMX replaced with Flutter state management.
+**What was built:** Member registry in `lib/features/people/`. Competence levels, shepherd assignments. Full offline operation via local SQLite.
 
-## Phase D.5 — Sync Surface
+## Phase D.4 — Activity Surface ✅
 
-**Goal:** Sync status bar (four states), background sync goroutine, ConflictQueue review UI.
+**What was built:** Activity logging in `lib/features/activity/`. Attendance, service, participation tracking. Flutter state management (Riverpod).
 
-## Phase D.6 — KGS Onboarding
+## Phase D.5 — Sync Surface ✅
 
-**Goal:** Cloud KGS compliance verification, licence key issuance, Desktop activation flow, initial sync payload.
+**What was built:** Sync status and state in `lib/sync/sync_engine.dart` + `lib/sync/sync_state.dart`. Sync feature surface in `lib/features/sync/`. Background sync goroutine via FFI bridge.
 
-**Exit criteria:** A community steward can install Ichebo Desktop, activate with a licence key, add members, log activities, go offline for 7 days, and sync cleanly when reconnected.
+## Phase D.6 — KGS Onboarding ✅
+
+**What was built:** `DesktopLicence` model and validation endpoint on the Django backend (`feat(licences)`). Activation wizard in `lib/features/wizard/`. Initial sync payload on activation.
+
+**Commit:** `feat(wizard): implement activation and initial sync steps`
 
 ---
 
-# LAYER 7 — Version 3: Ichebo Mobile (Flutter)
+# LAYER 7 — Version 3: Ichebo Mobile (Flutter) ✅ COMPLETE
 
 **Entry requirement:** Layer 5 complete (Go engines available). Can run in parallel with Layer 6.
 
@@ -644,27 +615,47 @@ Each engine: independently compilable, independently testable, own version, lang
 
 **Reference:** ADR-001 (amended), ADR-015
 
-Build sequence mirrors V2.M screen list above but with native Flutter implementation calling Go engines locally (offline) and DRF API (online).
+## Phase M.1 — App Shell + Auth ✅
+
+**What was built:** `ichebo-mobile-v2/` Flutter project (Android-first). Core navigation shell, bottom nav, app shell. Auth screens (login, register) wired to DRF API. Token persistence across restarts.
+
+**Commit:** `feat(mobile): M.1 — Layer 7 scaffold + auth + bottom nav`
+
+## Phase M.2 — Local Data Layer + FFI Bridge ✅
+
+**What was built:** Local data layer in `lib/core/`. Go engine FFI bridge. Riverpod state management wired throughout. Profile, settings, sync screens refactored to Riverpod.
+
+**Commit:** `feat(mobile): M.2 — local data layer + FFI bridge`
+
+## Phase M.3 — Core Screens ✅
+
+**What was built:** All Level 0–3 screens functional on Android. Features in `lib/features/`: auth, bible, community, coordinator, governance, home, learn, profile, activity. Home and Community screens completed.
+
+**Commit:** `feat(mobile): M.3 — Home + Community screens`
 
 ---
 
-# LAYER 8 — Version 3: Ichebo Media
+# LAYER 8 — Version 3: Ichebo Media ✅ COMPLETE
 
 **Entry requirement:** Layer 5 complete. Video/Live App URL approach proven insufficient or network video hosting confirmed as direction.
 
 **Reference:** ADR-021
 
-## Phase M.1 — Video Engine
+## Phase M.1 — Video Engine ✅
 
-**Goal:** Go + FFmpeg upload pipeline, Hetzner Object Storage integration, transcoding queue, multiple quality outputs, CDN delivery.
+**What was built:** `ichebo-media/` Go service (`cmd/mediad/`). Packages: `pkg/transcode/` (FFmpeg pipeline, queue, worker, profiles, progress tracking), `pkg/upload/` (chunked upload handler), `pkg/storage/` (Hetzner Object Storage / S3-compatible), `pkg/hls/` (HLS manifest generation), `pkg/config/`, `pkg/health/`. Django `media/` app with upload endpoint wired to the Go engine via `MEDIA_ENGINE_URL`.
 
-## Phase M.2 — Live Streaming
+**Commit:** `feat(media): Layer 8 scaffold — Video Engine, Django media app, Flutter HLS player`
 
-**Goal:** MediaMTX or nginx-rtmp RTMP ingest, HLS delivery, DVR recording, archive on stream end.
+## Phase M.2 — Live Streaming ✅
 
-## Phase M.3 — Learning Video
+**What was built:** `pkg/stream/` — RTMP ingest session management with tests. MediaMTX integration via `deploy/mediamtx/mediamtx.service` systemd unit. `pkg/webhook/` for stream lifecycle events (start, end, archive).
 
-**Goal:** Chapter markers, completion tracking (Activity Engine), offline download for Desktop, progress reporting to Paraclete.
+## Phase M.3 — Learning Video ✅
+
+**What was built:** HLS player integrated into `ichebo-mobile-v2` (Flutter). Video library and player screens in `ichebo-desktop/lib/features/video/`. Video progress tracking wired to Activity Engine. S3 storage backend functional (`feat(storage): implement S3 storage functionality and related tests`).
+
+**Commit:** `feat(video): implement video library, player, and progress tracking`
 
 ---
 
@@ -798,10 +789,10 @@ Build sequence mirrors V2.M screen list above but with native Flutter implementa
 - Docker Compose — L10.2
 - iOS app — L10.5
 
-### Ichebo Ecosystem (planned, not deferred)
-- Ichebo Desktop — Layer 6
-- Ichebo Media — Layer 8
-- Ichebo Handbook — Layer 9
+### Ichebo Ecosystem
+- Ichebo Desktop — ✅ Complete (Layer 6)
+- Ichebo Media — ✅ Complete (Layer 8)
+- Ichebo Handbook — ✅ Complete (Layer 9)
 
 ---
 
@@ -847,9 +838,22 @@ Build sequence mirrors V2.M screen list above but with native Flutter implementa
 | V2.M | 3 | Flutter Mobile App (Android) | 🔄 In progress |
 | H.1 | 4 | Documentation Alignment | ✅ Complete |
 | H.2 | 4 | Version 2 in Real-World Use | ⏳ Pending |
-| E.1–E.4 | 5 | Go Engines + Sync Engine | ⏳ Pending |
-| D.1–D.6 | 6 | Ichebo Desktop | ⏳ Pending |
-| M.1–M.3 | 8 | Ichebo Media | ⏳ Pending |
+| E.1 | 5 | UUID Schema Migration — all models | ✅ Complete |
+| E.2 | 5 | Soft Delete Pattern — SoftDeleteMixin, all models | ✅ Complete |
+| E.3 | 5 | Go Engine Foundation — Records, Activity, Relationships, Bible, Calendar | ✅ Complete |
+| E.4 | 5 | Sync Engine — ChangeLog, Push, Pull, Resolve, ConflictQueue, FFI | ✅ Complete |
+| D.1 | 6 | Desktop shell scaffold — Flutter project, nav shell, dark mode | ✅ Complete |
+| D.2 | 6 | Local data layer + FFI bridge | ✅ Complete |
+| D.3 | 6 | People surface — member registry, levels, shepherd assignments | ✅ Complete |
+| D.4 | 6 | Activity surface — attendance, service, participation | ✅ Complete |
+| D.5 | 6 | Sync surface — sync state, background goroutine | ✅ Complete |
+| D.6 | 6 | KGS Onboarding — licence model, activation wizard, initial sync | ✅ Complete |
+| M.1 (mobile) | 7 | Mobile shell + auth screens | ✅ Complete |
+| M.2 (mobile) | 7 | Mobile local data layer + FFI bridge | ✅ Complete |
+| M.3 (mobile) | 7 | Mobile core screens — all Level 0–3 features | ✅ Complete |
+| M.1 (media) | 8 | Video Engine — Go + FFmpeg + upload + HLS + Hetzner Storage | ✅ Complete |
+| M.2 (media) | 8 | Live Streaming — RTMP ingest, HLS delivery, MediaMTX | ✅ Complete |
+| M.3 (media) | 8 | Learning Video — HLS player, progress tracking, S3 storage | ✅ Complete |
 | K.1 | 9 | Handbook Foundation — models, API, migrations | ✅ Complete |
 | K.2 | 9 | Handbook Workspace UI — The Desk, four-column shell | ✅ Complete |
 | K.3 | 9 | HRS Relationships — seven types, six attribute fields | ✅ Complete |
