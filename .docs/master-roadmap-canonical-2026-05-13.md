@@ -668,39 +668,83 @@ Build sequence mirrors V2.M screen list above but with native Flutter implementa
 
 ---
 
-# LAYER 9 — Version 3: Ichebo Handbook
+# LAYER 9 — Version 3: Ichebo Handbook ✅ COMPLETE
 
 **Entry requirement:** Layer 5 complete. The Desk (ADR-014) proven design pattern. Handbook-as-tenant migration planned.
 
-**Reference:** ADR-020
+**Reference:** ADR-020, DOC F
 
-## Phase K.1 — Handbook Product Foundation
+## Phase K.1 — Handbook Product Foundation ✅
 
-**Goal:** Standalone Handbook product — own service, own data domain. HRS as first-class citizen. Version-controlled document management.
+**What was built:** Standalone `handbook` Django app. `HandbookRecord` (UUID PK, three branches, four status lifecycle, version chain), `HandbookRelationship` (HRS + scripture links in one model), `HandbookAccess` (reader/author/editor roles, global scope). Full DRF API: list/create, detail/patch, publish, lock, new-version, history. Migration `0001_initial` applied.
 
-## Phase K.2 — HRS Scripture Module
+**Commit:** `feat(handbook): K.1 — Handbook product foundation`
 
-**Goal:** Advanced scripture mapping for Level 5 architects. Links passages to governance documents. Bible Engine provides text. HRS layer is Handbook-exclusive.
+## Phase K.2 — Workspace UI + The Desk ✅
 
-## Phase K.3 — Handbook-as-Tenant Migration
+**What was built:** Four-column Apostolic Command Shell for the Handbook — `home.html` (branch navigator, record list grouped by type), `record.html` (four-tab Properties Sidecar: Props/HRS/Scripture/History, `HBDesk` JS object, auto-save on keystroke), `access.html` (editor-only access management). Sidebar nav entry added to `workspace_shell.html`. Template URLs registered at `/handbook/`.
 
-**Goal:** Export all existing Handbook records from the tenant context. Import into Handbook product. Remove handbook tier from tenant model. Update all references.
+**Commit:** `feat(handbook): K.2 — Workspace UI and The Desk`
+
+## Phase K.3 — HRS Relationships ✅
+
+**What was built:** `HandbookRelationship` model with seven relationship types (part_of, derived_from, aligns_with, authorised_by, references, has_symbol, matches_pattern), direction field, six HRS attribute fields on `HandbookRecord` (complexity, relationship_position, position, direction, speed, emotional_tone). `HandbookRelationshipListCreateView` + `HandbookRelationshipDeleteView`. HRS tab in The Desk with relationship list and add form.
+
+## Phase K.4 — Scripture Linking ✅
+
+**What was built:** `HandbookRelationship.bible_verse` FK to `bible.BibleVerse`. Scripture tab in The Desk with verse search and link/unlink workflow. `clean()` enforces exactly one of `to_record`/`bible_verse` per relationship.
+
+## Phase K.5 — Publish Feed ✅
+
+**What was built:** `GET /api/handbook/publish-feed/?since={timestamp}` — returns active/locked non-key records modified since timestamp, 100-record window, ordered by `updated_at`. Used by Sync Engine delta pull.
+
+## Phase K.6 — Keys Library Privacy ✅
+
+**What was built:** Keys Library isolation invariant — key records are personal (owner-only), no `HandbookAccess` required to create/read/edit, never visible to other users including editors, blocked from publish and lock lifecycle, excluded from the publish feed. Enforced via `_is_key_record()`, `_assert_can_access_record()`, `_assert_can_write_record()` helpers across all API views and workspace views. 13 passing tests covering all privacy invariants.
+
+**Commit:** `feat(handbook): K.6 — Keys Library privacy invariant`
 
 ---
 
 # LAYER 10 — Scale
 
-Do not build any of these until Version 3 is complete and in real-world use.
+**Entry requirement:** Do not build any of these until Version 3 is in real-world use and a specific bottleneck has been identified. Layer 10 is demand-driven, not time-driven.
 
-**Redis + Celery:** When background tasks are too slow to run synchronously (e.g. sending 500 push notifications at once, video transcoding jobs).
+## Phase L10.1 — Redis + Celery ✅ COMPLETE
 
-**Docker Compose:** When containerisation is needed for easier deployment, scaling, or handing off to another developer. Replaces Nginx + Gunicorn + systemd setup.
+**What was built:** Full async task queue infrastructure. Redis as broker (DB 0) and Django cache backend (DB 1, replaces FileBasedCache). Celery 5.3.6 with django-celery-beat 2.6.0. `ics_project/celery.py` entry point, `ics_project/__init__.py` wired. `notifications/tasks.py` — `send_notification_email` (async Brevo SMTP, 3 retries) + `send_fcm_push` (async FCM, 3 retries — FCM wired for the first time). `paraclete/tasks.py` — `refresh_paraclete_digest` + `refresh_all_active_digests` (scheduled every 10 minutes via CELERY_BEAT_SCHEDULE). All notification email and FCM calls now off the request thread. Paraclete digest pre-computed on schedule, cache TTL bumped to 600s. `deploy/ics-celery.service` and `deploy/ics-celery-beat.service` systemd units.
 
-**Django Channels + WebSockets:** For real-time features — live notification delivery (instead of polling), real-time community chat, live stream status updates.
+**ADR-008 lifted:** Celery deferred until Version 3 in real-world use. That gate is passed.
 
-**LLM integration for Paraclete:** When Paraclete needs AI-generated insights rather than rule-based prompts. Privacy implications, data boundaries, and cost management require significant architectural design.
+**Commit:** `feat(infra): L10.1 — Redis + Celery async task queue`
 
-**iOS (Flutter):** After Android is stable in production. Requires Mac + Apple Developer account ($99/year).
+## Phase L10.2 — Docker Compose ⏳
+
+**Goal:** Containerise the full stack (web, db, redis, celery-worker, celery-beat, nginx) for reproducible deployment and easier developer onboarding. Replaces the manual Nginx + Gunicorn + systemd setup.
+
+**Entry requirement:** Real-world production use proven stable. Actual need for easier deployment or horizontal scaling confirmed.
+
+**ADR-009 lifts** when this phase begins.
+
+## Phase L10.3 — Django Channels + WebSockets ⏳
+
+**Goal:** Replace HTMX 60-second notification polling with instant WebSocket delivery. Unlock real-time notification push, live stream status updates, and future community chat.
+
+**Entry requirement:** L10.1 complete (Redis already running as channel layer backend). Polling identified as a felt user problem — i.e., real users on the platform noticing the 60-second lag.
+
+## Phase L10.4 — Paraclete AI (LLM) ⏳
+
+**Goal:** LLM-generated formation insights via Celery async tasks. Rule-based fallback retained. New ADR-022 required before implementation (LLM provider, data boundary rules, cost management).
+
+**Entry requirement:** L10.1 complete. Real usage data showing formation patterns. ADR-022 written and approved.
+
+**ADR-010 lifts** when this phase begins.
+
+## Phase L10.5 — iOS (Flutter) ⏳
+
+**Goal:** iOS build of the Flutter mobile app submitted to App Store.
+
+**Entry requirement:** Android app stable in production. Mac with Xcode available. Apple Developer account ($99/year) active.
 
 ---
 
@@ -742,18 +786,17 @@ Do not build any of these until Version 3 is complete and in real-world use.
 - calendar record type (registered in governance family — Phase 2)
 
 ### Notifications
-- Real-time delivery (Django Channels + WebSockets) — Layer 10
-- Push notifications to iOS — when iOS app is built
+- Real-time delivery (Django Channels + WebSockets) — L10.3
+- Push notifications to iOS — when iOS app is built (L10.5)
 
 ### Paraclete
-- AI-assisted pattern detection (LLM) — Layer 10
-- Link suggestion engine — Layer 10
-- Prophetic prompt generation (LLM) — Layer 10
+- AI-assisted pattern detection (LLM) — L10.4 (requires ADR-022)
+- Link suggestion engine — L10.4
+- Prophetic prompt generation (LLM) — L10.4
 
 ### Infrastructure
-- Docker Compose — Layer 10
-- Redis + Celery — Layer 10
-- iOS app — Layer 7 Phase 2
+- Docker Compose — L10.2
+- iOS app — L10.5
 
 ### Ichebo Ecosystem (planned, not deferred)
 - Ichebo Desktop — Layer 6
@@ -807,8 +850,17 @@ Do not build any of these until Version 3 is complete and in real-world use.
 | E.1–E.4 | 5 | Go Engines + Sync Engine | ⏳ Pending |
 | D.1–D.6 | 6 | Ichebo Desktop | ⏳ Pending |
 | M.1–M.3 | 8 | Ichebo Media | ⏳ Pending |
-| K.1–K.3 | 9 | Ichebo Handbook | ⏳ Pending |
-| Layer 10 | 10 | Scale — Docker, Redis, Celery, AI, iOS | ⏳ Pending |
+| K.1 | 9 | Handbook Foundation — models, API, migrations | ✅ Complete |
+| K.2 | 9 | Handbook Workspace UI — The Desk, four-column shell | ✅ Complete |
+| K.3 | 9 | HRS Relationships — seven types, six attribute fields | ✅ Complete |
+| K.4 | 9 | Scripture Linking — BibleVerse FK, Scripture tab | ✅ Complete |
+| K.5 | 9 | Publish Feed — sync delta endpoint, excludes keys | ✅ Complete |
+| K.6 | 9 | Keys Library Privacy — owner-only, 13 passing tests | ✅ Complete |
+| L10.1 | 10 | Redis + Celery — async email, FCM, Paraclete schedule | ✅ Complete |
+| L10.2 | 10 | Docker Compose | ⏳ Pending |
+| L10.3 | 10 | Django Channels + WebSockets | ⏳ Pending |
+| L10.4 | 10 | Paraclete AI (LLM) | ⏳ Pending |
+| L10.5 | 10 | iOS (Flutter) | ⏳ Pending |
 
 ---
 

@@ -1,249 +1,221 @@
-# Changelog
+# Changelog — Ichebo Platform
 
-All notable changes to the ICS (Integrated Community System) project will be documented in this file.
+All notable changes to the Ichebo Platform are documented here.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
----
-
-## [Unreleased]
-
-### Added
-
-#### Bible UI Standardization & Library Expansion (2026-04-17)
-- **Contextual Search Drawer**: Real-time scriptural search moved from standalone page to integrated bottom sheet.
-- **Reference Jump Search**: RegEx-based parser recognizes canonical references (e.g., "Gen 1:1") for direct navigation.
-- **Multi-Step Selection Workflow**: Fluid drawer navigation between Passage Picker, Version Selector, and Language Selector with OOB header updates.
-- **Library Expansion (17 Versions)**: Ingested premium translations including ESV, NASB, NKJV, NLT, MSG, AMP, and TNIV.
-- **XML Import Infrastructure**: New `load_bible_xml` management command for specialized `<XMLBIBLE>` data schemas.
-- **Cross-Reference Engine**: Links tab in annotation panel now surfaces associations from Governance, Activity, and Learn apps.
-- **Dynamic Indicators**: Real-time verse "note dots" powered by HTMX OOB swaps (Primary for personal, Info for branch).
-- **Persistent Reading State**: Translation switches now maintain the user's exact reading position (book/chapter) via post-back context.
-
-#### Dashboard UI Improvements (2026-04-13)
-- **Scrollable pill tabs on dashboard home** — Overview, Governance, Calendar, Records tabs with horizontal scroll
-- **Dashboard tab switching** — Smooth fade-in animations between tab content panes
-- **Tab stylesheet** (`static/css/dashboard-tabs.css`) — Complete styling for scrollable pills, active states, animations
-- **Tab JavaScript** (`static/js/dashboard-tabs.js`) — Tab click handlers, scroll detection, responsive behavior
-
-#### Dashboard Drawer Refactor (2026-04-13)
-- **Context-aware drawer pattern** — Drawer header and content now use template blocks (`{% block drawer_title %}`, `{% block drawer_content %}`)
-- **Drawer API** — `window.ICSDrawer.open()` and `window.ICSDrawer.close()` for programmatic control
-- **Drawer activation per-page** — Pages/sections add their own drawer triggers instead of global button
-
-#### Bottom Navigation Simplification (2026-04-13)
-- **Unified app launcher** — Bottom nav now shows 5 primary apps (Home, Bible, Activity, Learn, Community)
-- **Removed redundant drawer button** — App launcher no longer in drawer, only in bottom nav
-- **Removed drawer handle** — Swipe-up handle removed; drawer activation is now contextual per-page
-
-#### Material Design Icons (2026-04-13)
-- **Material Symbols (M3) integration** — Added Google Fonts Material Symbols Outlined CDN to all templates
-- **Icon replacements across UI:**
-  - Bottom nav: `home`, `auto_stories`, `check_circle`, `school`, `group`
-  - Navbar: `notifications` (bell), `more_vert` (options menu)
-  - Dashboard tabs: `dashboard`, `gavel`, `calendar_month`, `description`
-  - Drawer: `person`, `settings`
-- **Material Symbols CSS** — Base styles with font variation settings (FILL, wght, GRAD, opsz)
-- **Icon styling** — Proper sizing, transitions, hover states across all UI elements
-
-#### Bible Reader UI Overhaul (2026-04-13)
-- **Full-screen chapter picker** (`/bible/pick/`) — Immersive cascading book/chapter/verse selector (no global chrome)
-- **Real-time search page** (`/bible/search/`) — HTMX-powered verse search with sticky input and instant results
-- **Refactored topbar** — Linear layout with passage chip + 3 action buttons (versions, search, settings)
-- **Sticky navigator strip** — Fixed above bottom bar with prev/chapter/next buttons
-- **Synchronized scroll hide behavior** — Topbar + nav strip + bottom bar hide together on scroll down, reappear on scroll up
-- **Drawer integration for notes** — Verse taps populate and open the context drawer (replaces annotation overlay)
-- **Bible settings drawer** — Settings button opens drawer for font/layout controls
-- **Chrome-free base template** (`templates/bible/base_bible_minimal.html`) — Immersive layout for picker and search
-- **Scroll watcher JS** (`static/js/bible.js`) — Detects scroll direction, 8px threshold, smooth CSS transitions
-
-#### Bible Search Backend (2026-04-13)
-- **`bible_search_view`** — GET endpoint for `/bible/search/` page
-- **`htmx_search`** — HTMX endpoint for real-time verse search with 30-verse limit per request
-- **Search results partial** (`_search_results.html`) — HTMX-rendered list with book, chapter:verse, and text snippets
-
-#### Bible Picker Backend (2026-04-13)
-- **`bible_picker_view`** — GET endpoint for `/bible/pick/` full-screen selector
-- **Cascading picker logic** — Step-by-step book → chapter → verse navigation
-- **Back URL preservation** — Picker accepts `back` param to return to original reader page
-
-### Changed
-
-#### Dashboard Structure (2026-04-13)
-- **Dashboard home now tabbed** — Content organized into 4 tabs instead of single scrolling page
-- **Tab placeholders** — Governance, Calendar, Records tabs have placeholder content (ready for future implementation)
-- **Better space utilization** — Tabs avoid squashing content, provide dedicated spaces per section
-
-#### Drawer Architecture (2026-04-13)
-- **From global app launcher to context panel** — Drawer is now page-specific, not always visible
-- **No permanent activation button** — Pages decide when/how to trigger drawer (reduced global UI clutter)
-- **Template block pattern** — Supports per-page customization via template inheritance
-
-#### Bottom Navigation (2026-04-13)
-- **From 5+center button to 5 apps** — Removed center drawer button, Activity moved to primary nav
-- **Center button removed** — Was a 56px circular button; space now free for topbar/bottom bar simplification
-- **Handle removed** — Swipe-up handle for drawer no longer in global UI
-
-#### Bible Reader Layout (2026-04-13)
-- **Removed annotation overlay** — Fixes mobile scroll conflicts (page was scrolling instead of panel)
-- **Removed side-by-side navigator** — Full-screen picker is more immersive and touch-friendly
-- **Topbar restructured** — Prev/next moved to sticky nav strip; action buttons moved to right side
-- **Translation row removed from reader** — Inline pills removed; versions functionality moved to dedicated page (future)
-- **Verse tap target changed** — Now opens drawer instead of overlay panel
-
-#### CSS & Theming (2026-04-13)
-- **Bible.css expanded** — Added topbar, nav strip, scroll-hidden styles (+145 lines)
-- **Global.css updated** — Added Material Symbols base styles, font variation settings
-- **Bottom bar CSS cleaned** — Removed center-btn and drawer-handle styles
-- **App drawer CSS simplified** — Removed drawer section/link styles, kept app-grid
-
-#### JavaScript Architecture (2026-04-13)
-- **Navbar.js refactored** — Removed drawer button/handle logic, added `window.ICSDrawer` API
-- **New bible.js created** — Scroll watcher with passive event listeners, 8px threshold
-- **New dashboard-tabs.js created** — Tab switching, scroll detection, responsive behavior
-
-### Fixed
-
-#### Mobile UX (2026-04-13)
-- **Annotation overlay scroll bug** — Removed overlay entirely, using drawer instead (fixes iOS/Android scroll conflicts)
-- **Bottom bar always visible** — Now hides on scroll, reclaims vertical space for reading
-- **Topbar always visible** — Now hides on scroll, maximizes readable area
-
-#### Icon Consistency (2026-04-13)
-- **Emoji icons removed** — All emoji replaced with Material Symbols (consistent, professional, scalable)
-- **Icon sizing standardized** — All icons use Material Symbols with proper sizing and transitions
-- **Icon colors consistent** — Primary color used for interactive icons, muted for inactive
-
-### Deprecated
-
-- **Annotation overlay pattern** — `#bible-annotation-overlay`, `#bible-annotation-panel` still in CSS but no longer used
-- **Sheet navigator pattern** (partial) — Book/chapter navigator sheet still in old code but replaced by picker page
-
-### Removed
-
-- **Drawer global button** — `#drawerToggle` removed from bottom nav
-- **Drawer swipe-up handle** — `#drawerHandle` removed from base template
-- **Drawer global activation** — No longer has a permanent button in chrome
-- **Inline translation selector row** — `bible-translation-row` removed from reader (moved to future versions page)
-- **Prev/next buttons from topbar** — Moved to sticky navigator strip above bottom bar
-
-### Security
-
-- **HTMX endpoints authenticated** — `@login_required` on all new Bible endpoints
-- **Search query validation** — Requires min 2 characters to prevent empty searches
-- **Drawer activation per-page** — Reduces attack surface (no global drawer trigger)
-
-### Performance
-
-- **Scroll listener optimized** — Uses `{ passive: true }` for better scroll performance
-- **Search debounce** — 300ms debounce on HTMX requests to reduce server load
-- **CSS transitions** — Hardware-accelerated transforms for smooth hide/show animations
-- **Tab switching animation** — Slide/fade transitions use `transform` and `opacity` (GPU-accelerated)
-
-### Documentation
-
-- **CHANGELOG.md created** — Comprehensive changelog for production tracking
-- **Plan file updated** — `/home/mantis/.claude/plans/fizzy-petting-pumpkin.md` documents full architecture
-- **Memory files updated** — `bible_ui_vision.md` documents Bible reader vision and requirements
+Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+Versioning: Build layers as defined in `master-roadmap-canonical-2026-05-13.md`
 
 ---
 
-## [2026-04-12] — Initial Dashboard & Auth Phase
+## [Layer 10 — Scale] — 2026-05-23
 
-### Added
+### L10.1 — Redis + Celery (async task queue)
 
-- **Dashboard app** — Main landing page with activity summary, reminders, learning progress
-- **User authentication** — Login, register, logout via Django auth
-- **User profile** — Display name, avatar, competence level, preferred Bible translation
-- **User preferences** — Theme preference (light/dark mode), stored in localStorage
-- **Tenant system** — Multi-tenant support with user permissions hierarchy
-- **Bible reader** (initial) — Basic reader with annotation overlay, side-by-side navigator
-- **Drawer system** — Slide-up modal for app launching and overlays
-- **Bottom navigation bar** — 5-item primary navigation
-- **Navbar** — Logo, notifications bell, theme toggle, profile dropdown, options menu
-- **Material Symbols** — Material Icons (partial) for navbar items
-- **Activity tracking** — Activity/task models with signals for event logging
-- **Learning system** — Courses, lessons, certifications, progress tracking
-- **Community management** — Announcements, gatherings, community updates
-- **Governance records** — Record storage for governance documents and decisions
-- **Calendar app** — Event calendar with gatherings integration
+**ADR-008 lifted.** Celery deferred until Version 3 in real-world use — that gate is passed.
 
-### Technical Stack
+#### Added
+- `ics_project/celery.py` — Celery app entry point, autodiscovers tasks from all apps
+- `ics_project/__init__.py` — wires `celery_app` into Django init so tasks load on startup
+- `notifications/tasks.py` — two async tasks:
+  - `send_notification_email` — Brevo SMTP delivery, 3 retries with 60s backoff
+  - `send_fcm_push` — FCM push delivery, 3 retries with 30s backoff; **FCM wired for the first time**
+- `paraclete/tasks.py` — two async tasks:
+  - `refresh_paraclete_digest` — pre-computes and caches digest for a single user (600s TTL)
+  - `refresh_all_active_digests` — fans out to all active users; scheduled every 10 minutes
+- `deploy/ics-celery.service` — systemd unit for Celery worker (2 concurrency slots)
+- `deploy/ics-celery-beat.service` — systemd unit for Celery Beat (DatabaseScheduler)
+- `requirements.txt` — added: `celery==5.3.6`, `redis==5.0.3`, `django-celery-beat==2.6.0` and their dependencies
 
-- **Backend:** Django 5.2 LTS, DRF, django-htmx, python-decouple
-- **Frontend:** HTMX + vanilla JS (IIFE modules), Material Icons (partial)
-- **Auth:** Django SessionAuthentication + DRF TokenAuthentication
-- **Database:** SQLite (dev), PostgreSQL (prod)
-- **CSS:** Custom design system with CSS variables, mobile-first
+#### Changed
+- `ics_project/settings/base.py`:
+  - `CACHES` backend swapped from `FileBasedCache` → `RedisCache` (DB 1)
+  - Added full `CELERY_*` config block (broker DB 0, acks late, prefetch multiplier 1)
+  - Added `CELERY_BEAT_SCHEDULE` — `refresh-paraclete-digests` every 10 minutes
+  - Added `django_celery_beat` to `INSTALLED_APPS`
+- `ics_project/settings/production.py` — removed stale `CACHES` file-path override (Redis config now in base)
+- `notifications/service.py`:
+  - `_send_email()` replaced synchronous `send_mail()` with `send_notification_email.delay()`
+  - `create_notification()` now dispatches `send_fcm_push.delay()` when user has `fcm_token`
+  - `notify_tenant_invitation()` non-registered-user path updated to use async task
+- `paraclete/views.py` — cache TTL bumped 300 → 600s to align with scheduled refresh interval
+- `core/apps.py` — `django_celery_beat` added to `EXEMPT_APP_LABELS` in UUID PK system check
 
----
-
-## [Unreleased — Future Enhancements]
-
-### Planned
-
-- **Bible versions page** — Browse/filter Bible translations by language
-- **Bible settings drawer** — Font size, family, line spacing controls
-- **Notification system** — Real-time notifications with drawer badge
-- **Search across all apps** — Global search spanning Bible, records, learning, community
-- **Offline support** — Service worker for offline Bible reading (PWA)
-- **Dark mode refinements** — Improved dark theme contrast and animations
-- **Accessibility audit** — WCAG 2.1 AA compliance review
-- **Mobile app** — Native mobile client (React Native or Flutter)
-- **API documentation** — OpenAPI/Swagger for all endpoints
-- **Admin panel** — Backend admin for managing users, tenants, content
-- **Analytics** — Usage tracking and reporting
-- **Integration testing** — E2E tests for critical user flows
+#### Migration
+- `django_celery_beat` migrations applied (18 migrations — schedule, interval, crontab, clocked, solar tables)
 
 ---
 
-## Version History
+## [Layer 9 — Ichebo Handbook] — 2026-05-22
 
-### Versioning Scheme
+Standalone Handbook product (ADR-020). Own data domain, no tenant FK. Apostolic Command Shell four-column UI. HRS as first-class citizen.
 
-This project uses [Semantic Versioning](https://semver.org/):
-- **MAJOR** — Incompatible API changes, significant new features, major refactors
-- **MINOR** — Backward-compatible new features, enhancements
-- **PATCH** — Backward-compatible bug fixes, minor improvements
+### K.1 — Handbook Foundation
 
-### Current Status
+#### Added
+- `handbook/` Django app, registered in `INSTALLED_APPS`
+- `HandbookRecord` model — UUID PK, three branches (reference/mandate/keys), fourteen record types, four status lifecycle (draft/active/locked/superseded), version chain (`previous_version`, `superseded_by` self FKs), six HRS attribute fields, `publish()` / `lock()` / `new_version()` methods
+- `HandbookRelationship` model — links `HandbookRecord` → `HandbookRecord` OR `HandbookRecord` → `BibleVerse`; seven relationship types; direction field; `clean()` enforces exactly one target
+- `HandbookAccess` model — reader/author/editor roles, global scope (no tenant), one record per user
+- `handbook/serializers.py` — write/list/detail serializers; `validate()` enforces branch/record_type pairing
+- `handbook/api_views.py` — full API: list/create, detail/patch, publish, lock, new-version, history, relationships (list/create/delete), publish feed, access management, access/me
+- `handbook/api_urls.py` — all API endpoints under `/api/handbook/`
+- `handbook/template_urls.py` — workspace routes under `/handbook/` (`app_name='handbook'`)
+- `handbook/migrations/0001_initial.py` — applied
+- `ics_project/urls.py` — both URL includes registered
 
-**Latest Release:** TBD (pre-1.0 in active development)  
-**Current Branch:** `production_instance`  
-**Development Lead:** Larry Mwansa  
+### K.2 — Workspace UI + The Desk
+
+#### Added
+- `templates/workspace/handbook/home.html` — branch navigator (Column 2), record list grouped by type (Column 3), role/access sidecar (Column 4)
+- `templates/workspace/handbook/record.html` — four-tab Properties Sidecar (Props / HRS / Scripture / History); `HBDesk` JS object handles all CRUD, lifecycle, relationship operations; auto-save on keystroke (3s debounce for drafts)
+- `templates/workspace/handbook/access.html` — editor-only access management page
+- `templates/workspace_shell.html` — Handbook `auto_stories` icon added to sidebar nav
+
+### K.3 — HRS Relationships + K.4 Scripture Linking
+
+Implemented together in `HandbookRelationship` — single model handles both.
+
+#### Added
+- Seven HRS relationship types on `HandbookRelationship`
+- Six HRS attribute fields on `HandbookRecord` (complexity, relationship_position, position, direction, speed, emotional_tone)
+- `HandbookRelationshipListCreateView` + `HandbookRelationshipDeleteView`
+- HRS tab in The Desk — relationship list, add form, bible verse search and link workflow
+- Scripture tab in The Desk — linked verses display, verse search, link/unlink
+
+### K.5 — Publish Feed
+
+#### Added
+- `HandbookPublishFeedView` — `GET /api/handbook/publish-feed/?since={timestamp}`
+- Returns active/locked non-key records modified since timestamp; 100-record window; ordered by `updated_at`
+
+### K.6 — Keys Library Privacy
+
+**Privacy invariant:** key records are personal — owner-only, no `HandbookAccess` required, never visible to other users, never published to network.
+
+#### Added
+- `_is_key_record()` sentinel function used throughout API layer
+- `_assert_can_access_record()` / `_assert_can_write_record()` helpers
+- `handbook/tests.py` — 13 tests covering all privacy invariants (creation without HandbookAccess, isolation from other users and editors, publish blocked, lock blocked, publish feed exclusion, history owner-only, relationship privacy, has_symbol link allowed to Reference Library)
+
+#### Changed
+- All six lifecycle API views hardened: keys 404 for non-owners, 400 on publish/lock attempts
+- `HandbookPublishFeedView` — `.exclude(branch=BRANCH_KEYS)` — keys never in sync feed
+- `views.py` (workspace) — `_shared_readable_qs()` excludes keys; `_keys_qs(user)` owner-scoped; all three workspace views handle Keys branch independently of `HandbookAccess`
 
 ---
 
-## How to Use This Changelog
+## [Layer 8 — Ichebo Media] — 2026-05-21
 
-- **For releases:** Copy the [Unreleased] section to a new version header before tagging
-- **For commits:** Reference the relevant section (Added, Changed, Fixed, etc.)
-- **For documentation:** Link to the CHANGELOG in pull request descriptions
-- **For issues:** Link to the CHANGELOG in issue descriptions to show related changes
+Video Engine scaffold (ADR-021). Go + FFmpeg + Hetzner Object Storage + HLS.
 
----
+### M.1 Scaffold — Video Engine + Django media app + Flutter HLS player
 
-## Contributing
-
-When contributing changes:
-
-1. **Update CHANGELOG.md** — Add your change to the [Unreleased] section
-2. **Use proper headings** — Added, Changed, Fixed, Deprecated, Removed, Security, Performance
-3. **Include date** — Format: `(YYYY-MM-DD)` after the feature name
-4. **Link to commits** — Reference commit hashes for traceability
-5. **Explain impact** — Describe why the change matters to users/developers
+#### Added
+- `ichebo-media/` — Go video engine service scaffold
+- `media/` Django app — upload handler, chunked video uploads
+- Flutter HLS player integration in `ichebo-mobile-v2`
+- Upload handler for chunked video uploads
 
 ---
 
-## Contact
+## [Layer 6 — Ichebo Desktop] — 2026-05-13
 
-- **Project Lead:** Larry Mwansa  
-- **Repository:** https://github.com/LarryMwansa/ics  
-- **Issues:** Report via GitHub Issues  
-- **Documentation:** See `/project_docs/` and `/.project_docs/`
+Flutter Desktop local-first community operating system (ADR-017).
+
+### D.1 — Flutter Desktop Shell Scaffold
+
+#### Added
+- `ichebo-desktop/` — Flutter project targeting Windows/macOS/Linux
+- Core navigation shell, design system tokens in Dart
+- Dark mode (non-optional per roadmap)
+
+### D.2 — Local Data Layer + FFI Bridge
+
+#### Added
+- SQLite integration (WAL mode)
+- Go engine FFI bridge
+- All local writes append to ChangeLog
 
 ---
 
-*Last Updated: 2026-04-17*  
-*Changelog Maintained By: Antigravity*
+## [Layer 4 — Stabilisation] — 2026-05-13
+
+### H.1 — Documentation Alignment
+
+#### Added
+- `master-roadmap-canonical-2026-05-13.md` — v7 canonical roadmap
+- `data-contract-v11-canonical-2026-05-13.md` — complete data contract
+- ADRs 012–021 — ecosystem architecture decisions
+- `2026-05-13-ichebo-ecosystem-architecture_v0.1.md`
+- `DESIGN.md` — locked design system authority
+- Full spec set: DOC A–I
+
+---
+
+## [Layer 3 — Version 2: Formation & Shell] — 2026-04 / 2026-05
+
+### Apostolic Command Shell (ADR-012)
+
+#### Added
+- `templates/workspace_shell.html` — four-column grid (Sidebar 72px / Context Bar 240px / Stage flexible / Options Bar 300px)
+- Dual-shell switching (Stage Mode / Mobile Mode)
+- DESIGN.md design system applied: Playfair Display + Inter, Ink + Stone + Red
+- All app templates updated with `{% block ws_content %}` and `{% block content %}` blocks
+- Ghost watermark via `data-watermark` CSS `::after`
+- Rule of Left — 3px `#AF3236` left border on active sidebar items
+
+### V2.1 — Learn: Programmes + Induction Course + Video Embed
+### V2.2 — Induction System
+### V2.3 — Formation UI + App Drawer Gating
+### V2.4 — Agency Tenants + Service Orders (6 tenants, 24 orders seeded)
+### V2.5 — Steward Dashboard + Tenant Self-Service
+### V2.6 — Notifications (Full — signals, Brevo email, FCM stub)
+### V2.7 — Video / Live App (broadcast scheduler, live stream, VOD)
+
+---
+
+## [Layer 2 — Version 1: MVP Apps] — 2026-03 / 2026-04
+
+### Phase 5.1 — Bible App
+### Phase 5.2 — Learn App (F1–F11 complete)
+### Phase 5.3 — Activity App UI
+### Phase 5.4 — Community App
+### Phase 5.5 — Governance App (full lifecycle + The Desk)
+### Phase 5.6 — Profile + Settings
+### Phase 5.7 — Notifications Stub
+### Phase 6.1 — Paraclete Service (rule-based)
+### Phase 6.2 — Dashboard (Command Centre)
+### Phase 7 — Production Hardening (SSL, Nginx, Gunicorn, systemd)
+
+---
+
+## [Layer 1 — Django Foundation] — 2026-02 / 2026-03
+
+### Phase 1 — Auth + Tenants + HTMX Shell
+
+#### Technical Stack (locked)
+- **Backend:** Django 4.2.30 LTS + DRF 3.17 + PostgreSQL
+- **Web frontend:** Django templates + HTMX (no React/Vue)
+- **Auth:** Django SessionAuthentication (web) + DRF ExpiringTokenAuthentication (mobile/API)
+- **Storage:** MinIO / Hetzner Object Storage (S3-compatible, bucket: `ics-media`)
+- **Email:** Brevo SMTP (300 emails/day free tier)
+- **Task queue:** Celery 5.3.6 + Redis (added L10.1)
+- **Server:** Hetzner VPS, Ubuntu 22.04, Nginx + Gunicorn + systemd
+
+### Phase 2 — Records Engine
+### Phase 3 — Activity Engine
+
+---
+
+## [Layer 0 — Server & Tools] — 2026-01 / 2026-02
+
+- Hetzner VPS provisioned, SSH, UFW, non-root deploy user
+- GitHub repository, SSH deploy key
+- MinIO object storage, bucket `ics-media`
+- Brevo SMTP configured
+- Nginx + Gunicorn + systemd + SSL (Let's Encrypt)
+
+---
+
+*Last updated: 2026-05-23*
+*Maintained by: Larry Mwansa (Chizola)*
