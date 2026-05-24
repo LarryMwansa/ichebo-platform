@@ -16,15 +16,23 @@ class SyncScreen extends ConsumerWidget {
     final conflicts = ref.watch(conflictsProvider);
     final isDark    = Theme.of(context).brightness == Brightness.dark;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _StatusHero(status: status, notifier: notifier, isDark: isDark),
-        const SizedBox(height: IcsSpacing.m),
-        _StatsStrip(status: status, isDark: isDark),
-        const SizedBox(height: IcsSpacing.l),
-        _ConflictQueue(conflicts: conflicts, isDark: isDark),
-      ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(IcsSpacing.l),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: IcsDimensions.canvasMaxWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _StatusHero(status: status, notifier: notifier, isDark: isDark),
+              const SizedBox(height: IcsSpacing.m),
+              _StatsStrip(status: status, isDark: isDark),
+              const SizedBox(height: IcsSpacing.l),
+              _ConflictQueue(conflicts: conflicts, isDark: isDark),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -46,7 +46,7 @@ class Stage extends ConsumerWidget {
                     ),
                   ),
                 ),
-                // Scrollable canvas
+                // Canvas — each screen manages its own scrolling
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
@@ -54,19 +54,7 @@ class Stage extends ConsumerWidget {
                         left: BorderSide(color: borderColor, width: 1),
                       ),
                     ),
-                    child: SingleChildScrollView(
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(
-                            maxWidth: IcsDimensions.canvasMaxWidth,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(IcsSpacing.l),
-                            child: child,
-                          ),
-                        ),
-                      ),
-                    ),
+                    child: child,
                   ),
                 ),
               ],

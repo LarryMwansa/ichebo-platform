@@ -72,6 +72,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
   final _focusNode = FocusNode();
   int _focusIndex = 0;
   List<_Command> _filtered = _defaultCommands;
+  bool _wasOpen = false;
 
   @override
   void initState() {
@@ -116,12 +117,16 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
   @override
   Widget build(BuildContext context) {
     final isOpen = ref.watch(shellProvider).commandPaletteOpen;
-    if (!isOpen) return const SizedBox.shrink();
 
-    // Focus the input when palette opens
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (isOpen) _focusNode.requestFocus();
-    });
+    if (isOpen && !_wasOpen) {
+      _wasOpen = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _focusNode.requestFocus();
+      });
+    } else if (!isOpen) {
+      _wasOpen = false;
+      return const SizedBox.shrink();
+    }
 
     return KeyboardListener(
       focusNode: FocusNode(),

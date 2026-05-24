@@ -12,24 +12,32 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _SyncHeroBanner(isDark: isDark),
-        const SizedBox(height: IcsSpacing.l),
-        _SnapshotStrip(isDark: isDark),
-        const SizedBox(height: IcsSpacing.l),
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(IcsSpacing.l),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: IcsDimensions.canvasMaxWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(child: _UpcomingGatheringsCard(isDark: isDark)),
-              const SizedBox(width: IcsSpacing.m),
-              Expanded(child: _RecentActivityCard(isDark: isDark)),
+              _SyncHeroBanner(isDark: isDark),
+              const SizedBox(height: IcsSpacing.l),
+              _SnapshotStrip(isDark: isDark),
+              const SizedBox(height: IcsSpacing.l),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: _UpcomingGatheringsCard(isDark: isDark)),
+                    const SizedBox(width: IcsSpacing.m),
+                    Expanded(child: _RecentActivityCard(isDark: isDark)),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

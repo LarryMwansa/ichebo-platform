@@ -22,7 +22,8 @@ class ContextBar extends ConsumerWidget {
       duration: IcsDuration.shell,
       curve: shellCurve,
       width: shell.contextOpen ? IcsDimensions.contextBarWidth : 0,
-      child: shell.contextOpen
+      child: ClipRect(
+        child: shell.contextOpen
           ? Container(
               decoration: BoxDecoration(
                 color: bgColor,
@@ -67,6 +68,7 @@ class ContextBar extends ConsumerWidget {
               ),
             )
           : const SizedBox.shrink(),
+      ),
     );
   }
 }

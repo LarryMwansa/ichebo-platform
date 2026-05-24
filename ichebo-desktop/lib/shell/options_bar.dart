@@ -30,7 +30,8 @@ class _OptionsBarState extends ConsumerState<OptionsBar> {
       duration: IcsDuration.shell,
       curve: shellCurve,
       width: shell.optionsOpen ? IcsDimensions.optionsBarWidth : 0,
-      child: shell.optionsOpen
+      child: ClipRect(
+        child: shell.optionsOpen
           ? Container(
               decoration: BoxDecoration(
                 color: bgColor,
@@ -128,6 +129,7 @@ class _OptionsBarState extends ConsumerState<OptionsBar> {
               ),
             )
           : const SizedBox.shrink(),
+      ),
     );
   }
 }

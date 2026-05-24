@@ -39,26 +39,28 @@ class DesktopShell extends ConsumerWidget {
         child: Material(
           type: MaterialType.transparency,
           child: Stack(
-          children: [
-            // ── Four-column shell ──────────────────────────────────────────
-            Row(
-              children: [
-                const PrimarySidebar(),
-                const ContextBar(),
-                Expanded(
-                  child: Stage(child: child),
+            children: [
+              // ── Four-column shell ──────────────────────────────────────────
+              Positioned.fill(
+                child: Row(
+                  children: [
+                    const PrimarySidebar(),
+                    const ContextBar(),
+                    Expanded(
+                      child: Stage(child: child),
+                    ),
+                    const OptionsBar(),
+                  ],
                 ),
-                const OptionsBar(),
-              ],
-            ),
+              ),
 
-            // ── Command palette (full-screen overlay) ─────────────────────
-            const CommandPalette(),
+              // ── Command palette (full-screen overlay) ─────────────────────
+              const CommandPalette(),
 
-            // ── Toast overlay (bottom-right, above everything) ────────────
-            const ToastContainer(),
-          ],
-        ),
+              // ── Toast overlay (bottom-right, above everything) ────────────
+              const ToastContainer(),
+            ],
+          ),
         ),
       ),
     );

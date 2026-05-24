@@ -13,18 +13,26 @@ class SettingsScreen extends ConsumerWidget {
     final notifier = ref.read(shellProvider.notifier);
     final isDark = shell.themeMode == ThemeMode.dark;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _SectionHeader(title: 'Appearance', isDark: isDark),
-        _ThemeRow(isDark: isDark, notifier: notifier, current: shell.themeMode),
-        _Divider(isDark: isDark),
-        _SectionHeader(title: 'Device', isDark: isDark),
-        _DeviceInfoRow(isDark: isDark),
-        _Divider(isDark: isDark),
-        _SectionHeader(title: 'About', isDark: isDark),
-        _AboutRow(isDark: isDark),
-      ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(IcsSpacing.l),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: IcsDimensions.canvasMaxWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _SectionHeader(title: 'Appearance', isDark: isDark),
+              _ThemeRow(isDark: isDark, notifier: notifier, current: shell.themeMode),
+              _Divider(isDark: isDark),
+              _SectionHeader(title: 'Device', isDark: isDark),
+              _DeviceInfoRow(isDark: isDark),
+              _Divider(isDark: isDark),
+              _SectionHeader(title: 'About', isDark: isDark),
+              _AboutRow(isDark: isDark),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
