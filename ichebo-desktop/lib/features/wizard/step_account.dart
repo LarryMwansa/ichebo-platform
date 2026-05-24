@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/config.dart';
 import '../../core/theme/tokens.dart';
 import 'wizard_state.dart';
 
@@ -51,7 +52,7 @@ class _StepAccountState extends ConsumerState<StepAccount> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://api.ichebo.org/api/auth/login/'),
+        Uri.parse(AppConfig.loginUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': _emailController.text.trim(),

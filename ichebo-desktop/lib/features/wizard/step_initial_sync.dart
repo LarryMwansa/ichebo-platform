@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import '../../core/config.dart';
 import '../../core/theme/tokens.dart';
 import 'wizard_state.dart';
 
@@ -31,7 +32,7 @@ class _StepInitialSyncState extends ConsumerState<StepInitialSync> {
 
     try {
       final uri = Uri.parse(
-        'https://api.ichebo.org/api/sync/pull/?since=1970-01-01T00:00:00Z'
+        '${AppConfig.syncPullUrl}?since=1970-01-01T00:00:00Z'
         '&device_id=$deviceId&tenant_id=$tenantId',
       );
       final response = await http.get(

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import '../../core/config.dart';
 import '../../core/theme/tokens.dart';
 import 'wizard_state.dart';
 
@@ -35,7 +36,7 @@ class _StepActivationState extends ConsumerState<StepActivation> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://api.ichebo.org/api/sync/validate-licence/'),
+        Uri.parse(AppConfig.validateLicenceUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'licence_key': key}),
       ).timeout(const Duration(seconds: 15));

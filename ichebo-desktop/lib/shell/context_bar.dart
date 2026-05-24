@@ -24,8 +24,8 @@ class ContextBar extends ConsumerWidget {
       width: shell.contextOpen ? IcsDimensions.contextBarWidth : 0,
       child: shell.contextOpen
           ? Container(
-              color: bgColor,
               decoration: BoxDecoration(
+                color: bgColor,
                 border: Border(
                   right: BorderSide(color: borderColor, width: 1),
                 ),

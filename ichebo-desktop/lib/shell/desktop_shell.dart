@@ -36,7 +36,9 @@ class DesktopShell extends ConsumerWidget {
       },
       child: Focus(
         autofocus: true,
-        child: Stack(
+        child: Material(
+          type: MaterialType.transparency,
+          child: Stack(
           children: [
             // ── Four-column shell ──────────────────────────────────────────
             Row(
@@ -56,6 +58,7 @@ class DesktopShell extends ConsumerWidget {
             // ── Toast overlay (bottom-right, above everything) ────────────
             const ToastContainer(),
           ],
+        ),
         ),
       ),
     );

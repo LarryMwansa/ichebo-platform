@@ -32,8 +32,8 @@ class _OptionsBarState extends ConsumerState<OptionsBar> {
       width: shell.optionsOpen ? IcsDimensions.optionsBarWidth : 0,
       child: shell.optionsOpen
           ? Container(
-              color: bgColor,
               decoration: BoxDecoration(
+                color: bgColor,
                 border: Border(
                   left: BorderSide(color: borderColor, width: 1),
                 ),
@@ -44,9 +44,9 @@ class _OptionsBarState extends ConsumerState<OptionsBar> {
                   // ── Header ────────────────────────────────────────────
                   Container(
                     height: IcsDimensions.topBarHeight,
-                    color: headerBgColor,
                     padding: const EdgeInsets.symmetric(horizontal: IcsSpacing.s),
                     decoration: BoxDecoration(
+                      color: headerBgColor,
                       border: Border(
                         bottom: BorderSide(color: borderColor, width: 1),
                       ),
@@ -73,8 +73,8 @@ class _OptionsBarState extends ConsumerState<OptionsBar> {
 
                   // ── Tabs ──────────────────────────────────────────────
                   Container(
-                    color: headerBgColor,
                     decoration: BoxDecoration(
+                      color: headerBgColor,
                       border: Border(
                         bottom: BorderSide(color: borderColor, width: 1),
                       ),
