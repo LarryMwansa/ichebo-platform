@@ -95,19 +95,19 @@ class _StepInitialSyncState extends ConsumerState<StepInitialSync> {
         'members',
         {
           'id': m['id'],
-          'tenant_id': m['tenant_id'] ?? tenantId,
+          'tenant_id': tenantId,
           'email': m['email'] ?? '',
           'display_name': m['display_name'] ?? '',
           'first_name': m['first_name'] ?? '',
           'last_name': m['last_name'] ?? '',
           'phone': m['phone'] ?? '',
-          'avatar_url': m['avatar_url'] ?? '',
+          'avatar_url': '',
           'competence_level': m['competence_level'] ?? 0,
           'is_active': (m['is_active'] == true) ? 1 : 0,
-          'shepherd_id': m['metadata']?['shepherd_id'],
-          'service_order': m['metadata']?['service_order'],
+          'shepherd_id': null,
+          'service_order': null,
           'custom_fields': '{}',
-          'created_by': m['created_by'] ?? m['id'],
+          'created_by': m['id'] ?? '',
           'created_at': m['created_at'] ?? now,
           'updated_at': m['updated_at'] ?? now,
           'deleted_at': m['deleted_at'],
@@ -125,20 +125,32 @@ class _StepInitialSyncState extends ConsumerState<StepInitialSync> {
 
     for (final raw in activities) {
       final a = raw as Map<String, dynamic>;
+      // assigned_to may be a UUID string or a nested user object from the API
+      final assignedTo = a['assigned_to'] is Map
+          ? (a['assigned_to'] as Map)['id'] as String?
+          : a['assigned_to'] as String?;
+      final linkedRecord = a['linked_record'] is Map
+          ? (a['linked_record'] as Map)['id'] as String?
+          : a['linked_record'] as String?;
       batch.insert(
         'activities',
         {
           'id': a['id'],
-          'tenant_id': a['tenant_id'] ?? tenantId,
-          'activity_type': a['activity_type'] ?? '',
+          'tenant_id': tenantId,
+          'activity_type': a['activity_type'] ?? 'task',
           'title': a['title'] ?? '',
           'description': a['description'] ?? '',
-          'status': a['status'] ?? 'active',
+          'status': a['status'] ?? 'pending',
           'progress': a['progress'] ?? 0,
-          'assigned_to': a['assigned_to'],
+          'assigned_to': assignedTo,
+          'linked_record_id': linkedRecord,
+          'scheduled_at': a['scheduled_at'],
+          'due_at': a['due_at'],
+          'completed_at': a['completed_at'],
+          'source_app': '',
           'custom_fields': jsonEncode(a['custom_fields'] ?? {}),
           'metadata': jsonEncode(a['metadata'] ?? {}),
-          'created_by': a['created_by'] ?? a['id'],
+          'created_by': a['created_by'] ?? '',
           'created_at': a['created_at'] ?? now,
           'updated_at': a['updated_at'] ?? now,
           'deleted_at': a['deleted_at'],
@@ -149,20 +161,23 @@ class _StepInitialSyncState extends ConsumerState<StepInitialSync> {
 
     for (final raw in records) {
       final r = raw as Map<String, dynamic>;
+      // API uses 'content' for body text; merge into metadata for Flutter queries
+      final meta = Map<String, dynamic>.from(r['metadata'] as Map? ?? {});
+      if (r['content'] != null) meta['body'] = r['content'];
       batch.insert(
         'records',
         {
           'id': r['id'],
-          'tenant_id': r['tenant_id'] ?? tenantId,
+          'tenant_id': tenantId,
           'record_class': r['record_class'] ?? 'organizational',
           'record_family': r['record_family'] ?? '',
           'record_type': r['record_type'] ?? '',
           'title': r['title'] ?? '',
           'status': r['status'] ?? 'active',
           'custom_fields': jsonEncode(r['custom_fields'] ?? {}),
-          'metadata': jsonEncode(r['metadata'] ?? {}),
-          'permissions': jsonEncode(r['permissions'] ?? {}),
-          'created_by': r['created_by'] ?? r['id'],
+          'metadata': jsonEncode(meta),
+          'permissions': jsonEncode(r['permissions_data'] ?? {}),
+          'created_by': r['created_by'] ?? '',
           'created_at': r['created_at'] ?? now,
           'updated_at': r['updated_at'] ?? now,
           'deleted_at': r['deleted_at'],

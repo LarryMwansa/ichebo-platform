@@ -21,6 +21,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.models import User
 from records.models import Record, Relationship
 from records.serializers import RecordSerializer, RelationshipSerializer
 from activity.models import Activity
@@ -161,6 +162,16 @@ class SyncPullView(APIView):
             activity_filter |= Q(tenant__path__startswith=path)
         activity_qs = activity_qs.filter(activity_filter).distinct().order_by('updated_at')
 
+        # ── Members ───────────────────────────────────────────────────────────
+        member_qs = User.objects.filter(is_active=True)
+        if tenant_id:
+            member_qs = member_qs.filter(
+                tenant_permissions__tenant_id=tenant_id
+            ).distinct()
+        if since:
+            member_qs = member_qs.filter(updated_at__gt=since)
+        member_qs = member_qs.order_by('updated_at')
+
         # ── Relationships ─────────────────────────────────────────────────────
         rel_qs = Relationship.objects.filter(deleted_at__isnull=True)
         if since:
@@ -180,18 +191,35 @@ class SyncPullView(APIView):
         activities_page = list(activity_qs[:PULL_PAGE_SIZE + 1])
         rels_page = list(rel_qs[:PULL_PAGE_SIZE + 1])
         notifs_page = list(notification_qs[:PULL_PAGE_SIZE + 1])
+        members_page = list(member_qs[:PULL_PAGE_SIZE + 1])
 
         has_more = any(
             len(p) > PULL_PAGE_SIZE
-            for p in (records_page, activities_page, rels_page, notifs_page)
+            for p in (records_page, activities_page, rels_page, notifs_page, members_page)
         )
 
         retrieved_at = timezone.now()
+
+        def _serialise_member(u):
+            return {
+                'id': str(u.id),
+                'email': u.email,
+                'display_name': u.display_name or '',
+                'first_name': u.first_name or '',
+                'last_name': u.last_name or '',
+                'competence_level': u.competence_level or 0,
+                'is_active': u.is_active,
+                'status': u.status or 'active',
+                'created_at': u.created_at.isoformat() if u.created_at else '',
+                'updated_at': u.updated_at.isoformat() if u.updated_at else '',
+                'deleted_at': None,
+            }
 
         return Response({
             'since': since_str,
             'retrieved_at': retrieved_at.isoformat(),
             'has_more': has_more,
+            'members': [_serialise_member(u) for u in members_page[:PULL_PAGE_SIZE]],
             'records': RecordSerializer(records_page[:PULL_PAGE_SIZE], many=True).data,
             'activities': ActivitySerializer(activities_page[:PULL_PAGE_SIZE], many=True).data,
             'relationships': RelationshipSerializer(rels_page[:PULL_PAGE_SIZE], many=True).data,

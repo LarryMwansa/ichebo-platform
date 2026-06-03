@@ -53,15 +53,18 @@ class _OptionsBarState extends ConsumerState<OptionsBar> {
                       ),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'DETAILS & RELATIONS',
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.08,
-                            color: mutedColor,
+                        Expanded(
+                          child: Text(
+                            'DETAILS & RELATIONS',
+                            overflow: TextOverflow.clip,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.08,
+                              color: mutedColor,
+                            ),
                           ),
                         ),
                         GestureDetector(
