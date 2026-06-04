@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ichebo Christian Services — A Kingdom Governance Agency</title>
+  <meta name="description" content="You stepped up. The call was real. Now get the tools to match it. Ichebo Christian Services exists to equip small gatherings with the structure, formation, and support to bring meaningful impact to their communities.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #AF3236; --primary-dark: #8C2A2D; --primary-light: rgba(175,50,54,0.09);
+      --secondary: #185ABC; --ink: #0E0E0E; --ink-2: #1A1A1A;
+      --stone: #F5F3F0; --stone-2: #ECE9E4; --white: #FFFFFF;
+      --muted: #6B6B6B; --muted-light: #9A9A9A;
+      --ff-display: 'Playfair Display', Georgia, serif;
+      --ff-body: 'Inter', system-ui, sans-serif;
+      --max-w: 1200px; --ease: cubic-bezier(0.4,0,0.2,1);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--ff-body); font-size: 16px; line-height: 1.6; color: var(--ink-2); background: var(--white); -webkit-font-smoothing: antialiased; }
+    a { text-decoration: none; color: inherit; }
+    .container { max-width: var(--max-w); margin-inline: auto; padding-inline: clamp(1.25rem,4vw,3rem); }
+
+    /* LABEL TAG */
+    .label-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--primary); }
+    .label-tag::before { content: ''; display: block; width: 20px; height: 2px; background: var(--primary); flex-shrink: 0; }
+    .label-tag--light { color: rgba(255,255,255,.35); }
+    .label-tag--light::before { background: rgba(255,255,255,.2); }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 3px; font-family: var(--ff-body); font-size: 14px; font-weight: 600; letter-spacing: .04em; cursor: pointer; transition: all .25s var(--ease); border: 2px solid transparent; white-space: nowrap; }
+    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); transform: translateY(-1px); }
+    .btn-outline-white { background: transparent; color: rgba(255,255,255,.8); border-color: rgba(255,255,255,.25); }
+    .btn-outline-white:hover { border-color: rgba(255,255,255,.6); color: #fff; }
+
+    /* NAV */
+    .site-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: background .3s var(--ease); }
+    .site-nav.scrolled { background: rgba(14,14,14,.97); backdrop-filter: blur(12px); box-shadow: 0 1px 0 rgba(255,255,255,.06); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; gap: 2rem; }
+    .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+    .nav-links a { font-size: 14px; font-weight: 500; color: rgba(255,255,255,.6); transition: color .2s var(--ease); }
+    .nav-links a:hover { color: #fff; }
+    .nav-join { font-size: 13px; font-weight: 600; color: #fff; background: var(--primary); padding: 9px 20px; border-radius: 3px; transition: background .2s var(--ease); white-space: nowrap; }
+    .nav-join:hover { background: var(--primary-dark); }
+    .nav-menu-btn { display: none; background: none; border: none; color: #fff; cursor: pointer; padding: 4px; }
+    .mobile-nav { display: none; position: fixed; inset: 0; background: var(--ink); z-index: 99; flex-direction: column; padding: 100px 2rem 2rem; transform: translateX(100%); transition: transform .35s var(--ease); }
+    .mobile-nav.open { transform: translateX(0); }
+    .mobile-nav a { display: block; font-size: 22px; font-family: var(--ff-display); font-weight: 700; color: rgba(255,255,255,.7); padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .mobile-nav .mobile-join { margin-top: 2rem; font-family: var(--ff-body); font-size: 15px; text-align: center; background: var(--primary); color: #fff; border-radius: 3px; padding: 16px; }
+    .nav-close-btn { position: fixed; top: 22px; right: 24px; background: none; border: none; color: rgba(255,255,255,.5); cursor: pointer; font-size: 28px; z-index: 200; display: none; line-height: 1; }
+    .nav-close-btn.open { display: block; }
+    @media (max-width: 768px) { .nav-links, .nav-join { display: none; } .nav-menu-btn { display: block; } .mobile-nav { display: flex; } }
+
+    /* FADE UP */
+    .fade-up { opacity: 0; transform: translateY(22px); transition: opacity .65s var(--ease), transform .65s var(--ease); }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ══════════════════════════════
+       1. HERO
+    ══════════════════════════════ */
+    .hero { background: var(--ink); min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden; padding: 120px 0 100px; }
+    .hero::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, transparent 0%, var(--primary) 20%, var(--primary) 80%, transparent 100%); }
+    .hero-watermark { position: absolute; bottom: -4%; right: -2%; font-family: var(--ff-display); font-size: clamp(120px,18vw,240px); font-weight: 900; color: rgba(175,50,54,.05); line-height: 1; pointer-events: none; user-select: none; white-space: nowrap; letter-spacing: -.02em; }
+    .hero-inner { position: relative; z-index: 1; max-width: 820px; }
+    .hero-eyebrow { margin-bottom: 2rem; }
+    .hero-headline { font-family: var(--ff-display); font-size: clamp(2.2rem,5.5vw,4rem); font-weight: 800; line-height: 1.1; letter-spacing: -.025em; color: var(--white); margin-bottom: 1.5rem; }
+    .hero-headline em { font-style: italic; color: var(--primary); }
+    .hero-sub { font-family: var(--ff-display); font-size: clamp(1.1rem,2.2vw,1.5rem); font-weight: 700; font-style: italic; line-height: 1.5; color: rgba(255,255,255,.65); max-width: 600px; margin-bottom: 2.5rem; letter-spacing: -.01em; }
+    .hero-sub em { font-style: normal; color: rgba(255,255,255,.9); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+    .scroll-hint { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; color: rgba(255,255,255,.18); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+    .scroll-hint::after { content: ''; display: block; width: 1px; height: 44px; background: linear-gradient(to bottom,rgba(255,255,255,.15),transparent); animation: scrollPulse 2.2s ease-in-out infinite; }
+    @keyframes scrollPulse { 0%,100%{opacity:.3} 50%{opacity:.9} }
+
+    /* ══════════════════════════════
+       2. WHO THIS IS FOR (STONE)
+       Three portraits. Plain language.
+    ══════════════════════════════ */
+    .portraits { background: var(--stone); padding: clamp(4rem,8vw,7rem) 0; }
+    .portraits-header { max-width: 640px; margin: 0 auto 3.5rem; text-align: center; }
+    .portraits-label { margin-bottom: 1.5rem; justify-content: center; }
+    .portraits-heading { font-family: var(--ff-display); font-size: clamp(1.7rem,3.2vw,2.6rem); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; color: var(--ink); margin-bottom: 1rem; }
+    .portraits-heading em { font-style: italic; color: var(--primary); }
+    .portraits-sub { font-size: 1rem; line-height: 1.8; color: var(--muted); }
+    .portraits-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+    .portrait-card { background: var(--white); border-radius: 3px; padding: 2rem; border-top: 3px solid transparent; transition: border-color .25s var(--ease), box-shadow .25s var(--ease); }
+    .portrait-card:hover { border-top-color: var(--primary); box-shadow: 0 4px 20px rgba(0,0,0,.07); }
+    .portrait-num { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--primary); margin-bottom: 12px; }
+    .portrait-text { font-size: 15px; line-height: 1.8; color: var(--muted); }
+    .portrait-text strong { color: var(--ink-2); font-weight: 600; display: block; margin-bottom: 8px; font-size: 16px; }
+    @media (max-width: 720px) { .portraits-grid { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════
+       3. THE PROBLEM (INK DARK)
+       One thing. Plainly named.
+    ══════════════════════════════ */
+    .problem { background: var(--ink-2); padding: clamp(4rem,8vw,7rem) 0; position: relative; overflow: hidden; }
+    .problem-watermark { position: absolute; top: -6%; left: -1%; font-family: var(--ff-display); font-size: clamp(100px,16vw,200px); font-weight: 900; color: rgba(255,255,255,.02); pointer-events: none; user-select: none; white-space: nowrap; line-height: 1; letter-spacing: -.02em; }
+    .problem-inner { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2.5rem,6vw,6rem); align-items: center; position: relative; z-index: 1; }
+    .problem-label { margin-bottom: 1.5rem; }
+    .problem-heading { font-family: var(--ff-display); font-size: clamp(1.7rem,3.2vw,2.6rem); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; color: var(--white); margin-bottom: 1.5rem; }
+    .problem-heading em { font-style: italic; color: var(--primary); }
+    .problem-body { font-size: 1rem; line-height: 1.85; color: rgba(255,255,255,.5); margin-bottom: 1.1rem; }
+    .problem-body strong { color: rgba(255,255,255,.82); font-weight: 500; }
+    .problem-right { display: flex; flex-direction: column; gap: 1px; }
+    .problem-item { background: rgba(255,255,255,.03); border-left: 3px solid transparent; padding: 1.4rem 1.6rem; transition: border-color .2s var(--ease), background .2s var(--ease); }
+    .problem-item:hover { border-left-color: var(--primary); background: rgba(255,255,255,.05); }
+    .problem-item-num { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--primary); margin-bottom: 6px; }
+    .problem-item-title { font-size: 15px; font-weight: 600; color: rgba(255,255,255,.85); margin-bottom: 5px; }
+    .problem-item-desc { font-size: 13.5px; line-height: 1.65; color: rgba(255,255,255,.4); }
+    @media (max-width: 768px) { .problem-inner { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════
+       4. THE ANSWER (WHITE)
+       What a Sceptre Community is.
+       Plain. No framework dump.
+    ══════════════════════════════ */
+    .answer { background: var(--white); padding: clamp(4rem,8vw,7rem) 0; border-top: 1px solid var(--stone-2); }
+    .answer-inner { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2.5rem,6vw,6rem); align-items: start; }
+    .answer-label { margin-bottom: 1.5rem; }
+    .answer-heading { font-family: var(--ff-display); font-size: clamp(1.7rem,3.2vw,2.6rem); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; color: var(--ink); margin-bottom: 1.25rem; }
+    .answer-heading em { font-style: italic; color: var(--primary); }
+    .answer-body { font-size: 1rem; line-height: 1.85; color: var(--muted); margin-bottom: 1.1rem; }
+    .answer-body strong { color: var(--ink-2); font-weight: 600; }
+    .answer-right { display: flex; flex-direction: column; gap: 1px; }
+    .answer-item { background: var(--stone); border-left: 3px solid transparent; padding: 1.4rem 1.6rem; transition: border-color .2s var(--ease); }
+    .answer-item:hover { border-left-color: var(--primary); }
+    .answer-item-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--primary); margin-bottom: 6px; }
+    .answer-item-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+    .answer-item-desc { font-size: 13.5px; line-height: 1.65; color: var(--muted); }
+    @media (max-width: 768px) { .answer-inner { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════
+       5. WAITING LIST (STONE)
+    ══════════════════════════════ */
+    .waitlist { background: var(--stone); padding: clamp(4rem,8vw,7rem) 0; }
+    .waitlist-inner { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2.5rem,6vw,6rem); align-items: start; }
+    .waitlist-label { margin-bottom: 1.5rem; }
+    .waitlist-heading { font-family: var(--ff-display); font-size: clamp(1.7rem,3.2vw,2.6rem); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; color: var(--ink); margin-bottom: 1.25rem; }
+    .waitlist-heading em { font-style: italic; color: var(--primary); }
+    .waitlist-body { font-size: 1rem; line-height: 1.85; color: var(--muted); margin-bottom: 2rem; }
+    .promises { display: flex; flex-direction: column; gap: 10px; }
+    .promise { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+    .promise-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--primary); flex-shrink: 0; margin-top: 6px; }
+    .form-card { background: var(--white); border-radius: 3px; padding: clamp(1.75rem,3vw,2.5rem); border: 1px solid var(--stone-2); }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .form-input { width: 100%; padding: 12px 14px; font-family: var(--ff-body); font-size: 15px; color: var(--ink-2); background: var(--stone); border: 1.5px solid var(--stone-2); border-radius: 3px; outline: none; transition: border-color .2s var(--ease), background .2s var(--ease); }
+    .form-input:focus { border-color: var(--primary); background: var(--white); }
+    .form-input::placeholder { color: var(--muted-light); }
+    .path-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.2rem; }
+    .path-opt { position: relative; }
+    .path-opt input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .path-opt-label { display: flex; flex-direction: column; gap: 2px; padding: 11px 13px; background: var(--stone); border: 1.5px solid var(--stone-2); border-radius: 3px; cursor: pointer; transition: border-color .2s var(--ease); }
+    .path-opt input:checked + .path-opt-label { border-color: var(--primary); background: rgba(175,50,54,.04); }
+    .path-opt-label:hover { border-color: rgba(175,50,54,.35); }
+    .path-opt-title { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+    .path-opt-sub { font-size: 11px; color: var(--muted-light); }
+    .consent-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 1.4rem; }
+    .consent-check { width: 16px; height: 16px; accent-color: var(--primary); flex-shrink: 0; margin-top: 2px; cursor: pointer; }
+    .consent-text { font-size: 12px; line-height: 1.65; color: var(--muted); }
+    .form-submit { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 3px; font-family: var(--ff-body); font-size: 14px; font-weight: 600; letter-spacing: .04em; cursor: pointer; transition: background .2s var(--ease), transform .15s var(--ease); }
+    .form-submit:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .form-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .form-success { display: none; text-align: center; padding: 2.5rem 1rem; }
+    .form-success.visible { display: block; }
+    .success-mark { width: 48px; height: 48px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .success-mark svg { width: 22px; height: 22px; stroke: var(--primary); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .success-title { font-family: var(--ff-display); font-size: 1.3rem; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .success-body { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .form-note { text-align: center; font-size: 11px; color: var(--muted-light); margin-top: 10px; }
+    @media (max-width: 768px) { .waitlist-inner { grid-template-columns: 1fr; } .path-selector { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════
+       6. INSTITUTION (INK DARK)
+    ══════════════════════════════ */
+    .institution { background: var(--ink); padding: clamp(4rem,8vw,7rem) 0; position: relative; overflow: hidden; }
+    .institution::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom,transparent 0%,var(--primary) 20%,var(--primary) 80%,transparent 100%); }
+    .institution-watermark { position: absolute; bottom: -8%; right: -1%; font-family: var(--ff-display); font-size: clamp(100px,16vw,210px); font-weight: 900; color: rgba(175,50,54,.04); pointer-events: none; user-select: none; white-space: nowrap; line-height: 1; letter-spacing: -.02em; }
+    .institution-inner { position: relative; z-index: 1; max-width: 720px; }
+    .institution-label { margin-bottom: 2.5rem; }
+    .institution-statement { font-family: var(--ff-display); font-size: clamp(1.4rem,3vw,2.1rem); font-weight: 700; font-style: italic; line-height: 1.5; color: var(--white); letter-spacing: -.015em; margin-bottom: 2rem; border: none; padding: 0; }
+    .institution-statement em { font-style: normal; color: var(--primary); }
+    .institution-sig { display: flex; align-items: center; gap: 14px; }
+    .institution-rule { width: 32px; height: 2px; background: var(--primary); flex-shrink: 0; }
+    .institution-name { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.35); }
+
+    /* FOOTER */
+    .site-footer { background: var(--ink-2); border-top: 1px solid rgba(255,255,255,.05); padding: 3rem 0 2rem; }
+    .footer-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .footer-tagline { font-size: 13px; color: rgba(255,255,255,.3); line-height: 1.65; max-width: 260px; margin-top: 10px; }
+    .footer-col-title { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 12px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .footer-links a { font-size: 13px; color: rgba(255,255,255,.45); transition: color .2s var(--ease); }
+    .footer-links a:hover { color: rgba(255,255,255,.85); }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,.05); padding-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-legal { font-size: 12px; color: rgba(255,255,255,.2); }
+    .footer-domain { font-size: 12px; font-weight: 600; color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="site-nav" id="siteNav" aria-label="Main navigation">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="/" aria-label="Ichebo Christian Services">
+          <svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg" style="height:26px;width:auto">
+            <polygon fill="#fff" fill-rule="evenodd" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42"/>
+            <path fill="#fff" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/>
+            <path fill="#fff" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z"/>
+            <path fill="#fff" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/>
+          </svg>
+        </a>
+        <ul class="nav-links">
+          <li><a href="/programme/">Programme</a></li>
+          <li><a href="/platform/">Platform</a></li>
+          <li><a href="/training/">Formation</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <a href="#waitlist" class="nav-join">Join the Waiting List</a>
+        <button class="nav-menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <button class="nav-close-btn" id="closeBtn" aria-label="Close menu">✕</button>
+  <nav class="mobile-nav" id="mobileNav" aria-hidden="true">
+    <a href="/programme/">Programme</a>
+    <a href="/platform/">Platform</a>
+    <a href="/training/">Formation</a>
+    <a href="/about/">About</a>
+    <a href="#waitlist" class="mobile-join">Join the Waiting List</a>
+  </nav>
+
+  <!-- ══════════════════════════════
+       1. HERO
+  ══════════════════════════════ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-watermark" aria-hidden="true">CALLED</div>
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-eyebrow fade-up">
+          <span class="label-tag label-tag--light">Ichebo Christian Services</span>
+        </div>
+        <h1 class="hero-headline fade-up" id="hero-heading" style="transition-delay:.1s">
+          You stepped up.<br>
+          The call was real.<br>
+          Now get the <em>tools</em> to match it.
+        </h1>
+        <p class="hero-sub fade-up" style="transition-delay:.2s">
+          Never doubt your faith or your commitment.<br>
+          <em>What you need is the ability to bring it home.</em>
+        </p>
+        <div class="hero-actions fade-up" style="transition-delay:.3s">
+          <a href="#waitlist" class="btn btn-primary">
+            Join the Waiting List
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="/programme/" class="btn btn-outline-white">About the Programme</a>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">Scroll</div>
+  </section>
+
+  <!-- ══════════════════════════════
+       2. WHO THIS IS FOR
+       Three portraits. Plain language.
+       No framework. Just recognition.
+  ══════════════════════════════ -->
+  <section class="portraits" aria-labelledby="portraits-heading">
+    <div class="container">
+      <div class="portraits-header">
+        <div class="portraits-label fade-up">
+          <span class="label-tag">Who This Is For</span>
+        </div>
+        <h2 class="portraits-heading fade-up" id="portraits-heading" style="transition-delay:.1s">
+          Do you recognise <em>yourself</em> here?
+        </h2>
+        <p class="portraits-sub fade-up" style="transition-delay:.15s">
+          You have stepped forward when no one else did. Find a path that speaks to you and unlock the beginning of something that can grow. Three or four people meeting in a home. A family studying together. A group of colleagues gathering before work.
+        </p>
+      </div>
+      <div class="portraits-grid">
+        <div class="portrait-card fade-up" style="transition-delay:.05s">
+          <div class="portrait-num">Portrait 01</div>
+          <div class="portrait-text">
+            <strong>You lead a small gathering. Ten, twenty, thirty people.</strong>
+            No denomination sent you. No institution supports you. You stepped into this because someone had to — because people around you had no one to care for them and raise them right. The call was real then. It is still real now. But you are carrying everything alone, and you were never meant to.
+          </div>
+        </div>
+        <div class="portrait-card fade-up" style="transition-delay:.12s">
+          <div class="portrait-num">Portrait 02</div>
+          <div class="portrait-text">
+            <strong>You have been in church your whole life and something is missing.</strong>
+            Not faith — faith is strong. But real belonging. A community that takes care of each other. People who get involved in the street outside the door. A gathering that sees the neighbourhood around it and steps into it, rather than staying separate from it.
+          </div>
+        </div>
+        <div class="portrait-card fade-up" style="transition-delay:.19s">
+          <div class="portrait-num">Portrait 03</div>
+          <div class="portrait-text">
+            <strong>You can see what your community needs. You know the church should be inside it.</strong>
+            Not above it. Not separate from it. Inside it — taking care of each other, getting involved, being present. You just have not found the people who operate that way. Or the structure that makes it possible to sustain it.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       3. THE PROBLEM (INK DARK)
+       Named plainly. Their words.
+  ══════════════════════════════ -->
+  <section class="problem" aria-labelledby="problem-heading">
+    <div class="problem-watermark" aria-hidden="true">ALONE</div>
+    <div class="container">
+      <div class="problem-inner">
+        <div>
+          <div class="problem-label fade-up">
+            <span class="label-tag label-tag--light">The Real Gap</span>
+          </div>
+          <h2 class="problem-heading fade-up" id="problem-heading" style="transition-delay:.1s">
+            The problem is not your faith.<br>
+            It is that you were sent out<br>
+            <em>without what you needed.</em>
+          </h2>
+          <p class="problem-body fade-up" style="transition-delay:.15s">
+            Across the body of Christ, there are committed people — leaders and individuals — who carry a genuine call to see their community transformed. What they lack is not devotion.
+          </p>
+          <p class="problem-body fade-up" style="transition-delay:.2s">
+            It is the <strong>structure, the support, and the connection</strong> to others doing the same thing — that turns what they carry into something that lasts and reaches beyond them.
+          </p>
+        </div>
+        <div class="problem-right">
+          <div class="problem-item fade-up" style="transition-delay:.05s">
+            <div class="problem-item-num">The weight of it</div>
+            <div class="problem-item-title">Everything depends on you</div>
+            <p class="problem-item-desc">When there is no structure, leadership is personal survival. Every decision, every crisis, every person — lands on one set of shoulders.</p>
+          </div>
+          <div class="problem-item fade-up" style="transition-delay:.12s">
+            <div class="problem-item-num">The ceiling you keep hitting</div>
+            <div class="problem-item-title">Your people grow — but only so far</div>
+            <p class="problem-item-desc">Without a clear path for people to walk, they plateau. Attendance without direction produces faithful people who never reach their potential.</p>
+          </div>
+          <div class="problem-item fade-up" style="transition-delay:.19s">
+            <div class="problem-item-num">The isolation of it</div>
+            <div class="problem-item-title">You are doing this alone</div>
+            <p class="problem-item-desc">No network. No shared resource. No one doing what you are doing, close enough to connect with. The small gathering was never meant to operate as an island.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       4. THE ANSWER (WHITE)
+       What Ichebo actually gives them.
+       One starting point. Plain words.
+  ══════════════════════════════ -->
+  <section class="answer" aria-labelledby="answer-heading">
+    <div class="container">
+      <div class="answer-inner">
+        <div>
+          <div class="answer-label fade-up">
+            <span class="label-tag">The Sceptre Community Programme</span>
+          </div>
+          <h2 class="answer-heading fade-up" id="answer-heading" style="transition-delay:.1s">
+            Recognises the smallest gathering<br>
+            as a legitimate unit of<br>
+            <em>Kingdom operation.</em>
+          </h2>
+          <p class="answer-body fade-up" style="transition-delay:.15s">
+            The Sceptre Community Programme begins not from the top down. From the ground up — with the smallest recognised unit of Kingdom life — and builds outward from there, through neighbourhoods, districts, provinces, and nations.
+          </p>
+          <p class="answer-body fade-up" style="transition-delay:.2s">
+            It gives your gathering the things it was never given — clear structure, a path for every person to grow along, and connection to a network of communities doing the same work.
+          </p>
+          <p class="answer-body fade-up" style="transition-delay:.25s">
+            A way of being a community — with the tools to sustain it, develop your people, and reach the neighbourhood around you. The Ichebo Platform is the digital infrastructure that makes it manageable, handling the governance, the formation records, and the connection to the wider network in one place.
+          </p>
+        </div>
+        <div class="answer-right">
+          <div class="answer-item fade-up" style="transition-delay:.05s">
+            <div class="answer-item-label">Structure</div>
+            <div class="answer-item-title">You stop carrying it alone</div>
+            <p class="answer-item-desc">Clear roles, defined responsibilities, and a governance framework that distributes the weight of leadership — so the community does not depend on one person to survive.</p>
+          </div>
+          <div class="answer-item fade-up" style="transition-delay:.12s">
+            <div class="answer-item-label">Formation</div>
+            <div class="answer-item-title">Every person has a path</div>
+            <p class="answer-item-desc">A structured journey from the moment someone joins — through growth stages that develop real capability, not just knowledge. People become stewards, not just attendees.</p>
+          </div>
+          <div class="answer-item fade-up" style="transition-delay:.19s">
+            <div class="answer-item-label">Network</div>
+            <div class="answer-item-title">You are not alone in this</div>
+            <p class="answer-item-desc">Connection to other communities doing the same work — sharing resources, accountability, and the collective capacity to produce impact no single gathering could achieve alone.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       5. WAITING LIST (STONE)
+  ══════════════════════════════ -->
+  <section class="waitlist" id="waitlist" aria-labelledby="waitlist-heading">
+    <div class="container">
+      <div class="waitlist-inner">
+        <div>
+          <div class="waitlist-label fade-up">
+            <span class="label-tag">Join the Waiting List</span>
+          </div>
+          <h2 class="waitlist-heading fade-up" id="waitlist-heading" style="transition-delay:.1s">
+            We are forming<br>
+            the <em>founding</em> communities.
+          </h2>
+          <p class="waitlist-body fade-up" style="transition-delay:.15s">
+            The Ichebo Platform is in active development. The first Sceptre Communities will be formed as it reaches completion. We are not looking for mass sign-ups — we are looking for the right people. Leaders and individuals who are ready to be part of building this from the ground up.
+          </p>
+          <div class="promises fade-up" style="transition-delay:.2s">
+            <div class="promise"><div class="promise-dot"></div><span>You will be contacted personally — not added to a newsletter</span></div>
+            <div class="promise"><div class="promise-dot"></div><span>Founding communities will shape how the programme rolls out</span></div>
+            <div class="promise"><div class="promise-dot"></div><span>No obligation — this is the start of a conversation</span></div>
+            <div class="promise"><div class="promise-dot"></div><span>Your information is held securely and used only for this purpose</span></div>
+          </div>
+        </div>
+        <div class="form-card fade-up" style="transition-delay:.15s">
+          <form id="waitlistForm" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="fullName">Full Name</label>
+              <input class="form-input" type="text" id="fullName" name="fullName" placeholder="Your full name" autocomplete="name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email">Email Address</label>
+              <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">I am joining as</label>
+              <div class="path-selector">
+                <div class="path-opt">
+                  <input type="radio" id="pathLeader" name="path" value="leader" required>
+                  <label class="path-opt-label" for="pathLeader">
+                    <span class="path-opt-title">Leader / Gatherer</span>
+                    <span class="path-opt-sub">I lead a small community</span>
+                  </label>
+                </div>
+                <div class="path-opt">
+                  <input type="radio" id="pathIndividual" name="path" value="individual">
+                  <label class="path-opt-label" for="pathIndividual">
+                    <span class="path-opt-title">Individual</span>
+                    <span class="path-opt-sub">I am looking for a community</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="consent-row">
+              <input class="consent-check" type="checkbox" id="consent" name="consent" required>
+              <label class="consent-text" for="consent">I consent to Ichebo Christian Services contacting me about the Sceptre Community Programme and related developments. My information will be held securely and will not be shared with third parties. I may withdraw consent at any time.</label>
+            </div>
+            <button class="form-submit" type="submit" id="submitBtn">Register My Interest</button>
+          </form>
+          <div class="form-success" id="formSuccess" role="alert">
+            <div class="success-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="success-title">You are on the list.</div>
+            <p class="success-body">We will be in touch personally when we are ready to bring the first communities on board.</p>
+          </div>
+          <p class="form-note">ichebo.org · Ichebo Christian Services</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       6. THE INSTITUTION SPEAKS
+  ══════════════════════════════ -->
+  <section class="institution" aria-label="Ichebo Christian Services">
+    <div class="institution-watermark" aria-hidden="true">MANDATE</div>
+    <div class="container">
+      <div class="institution-inner">
+        <div class="institution-label fade-up">
+          <span class="label-tag label-tag--light">Ichebo Christian Services</span>
+        </div>
+        <blockquote class="institution-statement fade-up" style="transition-delay:.1s">
+          "This was not built by people who discovered the church as a market. It was built by people who carry the <em>same mandate</em> — and grew tired of the absence of the tools to act on it."
+        </blockquote>
+        <div class="institution-sig fade-up" style="transition-delay:.2s">
+          <div class="institution-rule"></div>
+          <div class="institution-name">Ichebo Christian Services</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg" style="height:20px;width:auto;display:block" aria-label="Ichebo Christian Services">
+            <polygon fill="#fff" fill-rule="evenodd" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42"/>
+            <path fill="#fff" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/>
+            <path fill="#fff" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z"/>
+            <path fill="#fff" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/>
+          </svg>
+          <p class="footer-tagline">A Kingdom agency equipping gatherings with the structure, formation, and network to bring meaningful impact to their communities.</p>
+        </div>
+        <div>
+          <div class="footer-col-title">The Movement</div>
+          <ul class="footer-links">
+            <li><a href="/programme/">Sceptre Community Programme</a></li>
+            <li><a href="/platform/">Ichebo Platform</a></li>
+            <li><a href="/training/">Formation Pathways</a></li>
+            <li><a href="/about/">About</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Get Involved</div>
+          <ul class="footer-links">
+            <li><a href="#waitlist">Join the Waiting List</a></li>
+            <li><a href="mailto:info@ichebo.org">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-legal">© 2026 Ichebo Christian Services. All rights reserved.</div>
+        <div class="footer-domain">ichebo.org</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('siteNav');
+    window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 40); }, { passive: true });
+    const menuBtn = document.getElementById('menuBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const mobileNav = document.getElementById('mobileNav');
+    const closeMenu = () => { mobileNav.classList.remove('open'); mobileNav.setAttribute('aria-hidden','true'); closeBtn.classList.remove('open'); menuBtn.setAttribute('aria-expanded','false'); document.body.style.overflow=''; };
+    menuBtn.addEventListener('click', () => { mobileNav.classList.add('open'); mobileNav.setAttribute('aria-hidden','false'); closeBtn.classList.add('open'); menuBtn.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; });
+    closeBtn.addEventListener('click', closeMenu);
+    mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } }); }, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    const form = document.getElementById('waitlistForm');
+    const formSuccess = document.getElementById('formSuccess');
+    const submitBtn = document.getElementById('submitBtn');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const path = document.querySelector('input[name="path"]:checked');
+      const consent = document.getElementById('consent').checked;
+      if(!name) document.getElementById('fullName').style.borderColor='#AF3236';
+      if(!email) document.getElementById('email').style.borderColor='#AF3236';
+      if(!name||!email||!path||!consent) return;
+      submitBtn.disabled=true; submitBtn.textContent='Registering…';
+      try {
+        // PRODUCTION: replace with:
+        // await fetch('https://app.ichebo.org/api/waitlist/', { method:'POST',
+        //   headers:{'Content-Type':'application/json'},
+        //   body:JSON.stringify({name,email,path:path.value,consent:true}) });
+        await new Promise(r=>setTimeout(r,800));
+        form.style.display='none'; formSuccess.classList.add('visible');
+      } catch { submitBtn.disabled=false; submitBtn.textContent='Register My Interest'; alert('Something went wrong. Please email info@ichebo.org directly.'); }
+    });
+    ['fullName','email'].forEach(id=>{ document.getElementById(id).addEventListener('input',function(){ this.style.borderColor=''; }); });
+  </script>
+</body>
+</html>

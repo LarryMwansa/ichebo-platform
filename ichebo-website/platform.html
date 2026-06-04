@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ichebo Platform — Ichebo Christian Services</title>
+  <meta name="description" content="The tool behind the community. Ichebo gives every Sceptre Community governance, formation tracking, live video, and network connection — in one place, working offline.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --primary:#AF3236;--primary-dark:#8C2A2D;--primary-light:rgba(175,50,54,0.09);
+      --secondary:#185ABC;--ink:#0E0E0E;--ink-2:#1A1A1A;
+      --stone:#F5F3F0;--stone-2:#ECE9E4;--white:#FFFFFF;
+      --muted:#6B6B6B;--muted-light:#9A9A9A;
+      --ff-display:'Playfair Display',Georgia,serif;
+      --ff-body:'Inter',system-ui,sans-serif;
+      --max-w:1200px;--sp:clamp(4rem,8vw,7rem);--tr:0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:var(--ff-body);font-size:16px;line-height:1.6;color:var(--ink-2);background:var(--white);-webkit-font-smoothing:antialiased}
+    a{text-decoration:none;color:inherit}
+    .container{max-width:var(--max-w);margin-inline:auto;padding-inline:clamp(1.25rem,4vw,3rem)}
+    .label-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--primary)}
+    .label-tag::before{content:'';display:block;width:20px;height:2px;background:var(--primary);flex-shrink:0}
+    .label-tag--light{color:rgba(255,255,255,.35)}.label-tag--light::before{background:rgba(255,255,255,.2)}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:3px;font-family:var(--ff-body);font-size:14px;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:all var(--tr);border:2px solid transparent;white-space:nowrap}
+    .btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}.btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark);transform:translateY(-1px)}
+    .btn-outline-w{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}.btn-outline-w:hover{border-color:rgba(255,255,255,.7);color:#fff}
+    .btn-outline-d{background:transparent;color:var(--ink-2);border-color:rgba(0,0,0,.25)}.btn-outline-d:hover{background:var(--ink-2);color:#fff;border-color:var(--ink-2)}
+
+    /* NAV */
+    .site-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(14,14,14,.97);backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(255,255,255,.06)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px;gap:2rem}
+    .nav-links{display:flex;align-items:center;gap:2rem;list-style:none}
+    .nav-links a{font-size:14px;font-weight:500;color:rgba(255,255,255,.6);transition:color var(--tr)}
+    .nav-links a:hover,.nav-links a.active{color:#fff}
+    .nav-join{font-size:13px;font-weight:600;color:#fff;background:var(--primary);padding:9px 20px;border-radius:3px;transition:background var(--tr);white-space:nowrap}
+    .nav-join:hover{background:var(--primary-dark)}
+    .nav-menu-btn{display:none;background:none;border:none;color:#fff;cursor:pointer;padding:4px}
+    .mobile-nav{display:none;position:fixed;inset:0;background:var(--ink);z-index:99;flex-direction:column;padding:100px 2rem 2rem;transform:translateX(100%);transition:transform .35s var(--tr)}
+    .mobile-nav.open{transform:translateX(0)}
+    .mobile-nav a{display:block;font-size:22px;font-family:var(--ff-display);font-weight:700;color:rgba(255,255,255,.7);padding:16px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .mobile-nav .mobile-join{margin-top:2rem;font-family:var(--ff-body);font-size:15px;text-align:center;background:var(--primary);color:#fff;border-radius:3px;padding:16px}
+    .nav-close-btn{position:fixed;top:22px;right:24px;background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:28px;z-index:200;display:none;line-height:1}
+    .nav-close-btn.open{display:block}
+    @media(max-width:768px){.nav-links,.nav-join{display:none}.nav-menu-btn{display:block}.mobile-nav{display:flex}}
+
+    /* FADE */
+    .fade-up{opacity:0;transform:translateY(22px);transition:opacity .65s var(--tr),transform .65s var(--tr)}
+    .fade-up.visible{opacity:1;transform:translateY(0)}
+
+    /* ══════════════════════
+       1. HERO (INK)
+    ══════════════════════ */
+    .hero{background:var(--ink);min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:clamp(8rem,14vw,11rem) 0 clamp(4rem,8vw,7rem)}
+    .hero::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,transparent 0%,var(--primary) 20%,var(--primary) 80%,transparent 100%)}
+    .hero-watermark{position:absolute;bottom:-5%;right:-2%;font-family:var(--ff-display);font-size:clamp(100px,18vw,220px);font-weight:900;color:rgba(175,50,54,.05);line-height:1;pointer-events:none;user-select:none;white-space:nowrap;letter-spacing:-.02em}
+    .hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:clamp(3rem,6vw,6rem);align-items:center;width:100%}
+    .hero-crumb{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.3);margin-bottom:2rem}
+    .hero-crumb a{color:rgba(255,255,255,.4);transition:color var(--tr)}.hero-crumb a:hover{color:#fff}
+    .hero-crumb-sep{color:rgba(255,255,255,.2)}
+    .hero-eyebrow{margin-bottom:1.75rem}
+    .hero-headline{font-family:var(--ff-display);font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.1;letter-spacing:-.025em;color:var(--white);margin-bottom:1.5rem}
+    .hero-headline em{font-style:italic;color:var(--primary)}
+    .hero-sub{font-size:clamp(1rem,1.8vw,1.1rem);line-height:1.85;color:rgba(255,255,255,.5);max-width:520px;margin-bottom:2.5rem}
+    .hero-sub strong{color:rgba(255,255,255,.82);font-weight:500}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:1rem;align-items:center}
+
+    /* Platform mock */
+    .platform-mock{position:relative;z-index:1}
+    .mock-shell{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:1.25rem;box-shadow:0 32px 80px rgba(0,0,0,.5)}
+    .mock-bar{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;padding-bottom:.85rem;border-bottom:1px solid rgba(255,255,255,.06)}
+    .mock-dot{width:8px;height:8px;border-radius:50%}
+    .mock-dot.r{background:#FF5F57}.mock-dot.y{background:#FEBC2E}.mock-dot.g{background:#28C840}
+    .mock-title{font-size:11px;font-weight:500;color:rgba(255,255,255,.25);margin-left:auto;letter-spacing:.04em}
+    .mock-body{display:flex;gap:1rem}
+    .mock-sidebar{width:44px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+    .mock-icon{width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center}
+    .mock-icon.active{background:rgba(175,50,54,.2);border-color:rgba(175,50,54,.3)}
+    .mock-icon svg{width:16px;height:16px;stroke:rgba(255,255,255,.3);fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+    .mock-icon.active svg{stroke:var(--primary)}
+    .mock-content{flex:1;display:flex;flex-direction:column;gap:.75rem}
+    .mock-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:.85rem}
+    .mock-card-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:.5rem}
+    .mock-card-value{font-family:var(--ff-display);font-size:1.4rem;font-weight:700;color:var(--white);line-height:1}
+    .mock-card-sub{font-size:11px;color:rgba(255,255,255,.3);margin-top:3px}
+    .mock-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+    .mock-list{display:flex;flex-direction:column;gap:4px}
+    .mock-list-item{display:flex;align-items:center;gap:.5rem;font-size:11px;color:rgba(255,255,255,.4);padding:.4rem .6rem;background:rgba(255,255,255,.02);border-radius:3px}
+    .mock-list-dot{width:5px;height:5px;border-radius:50%;background:var(--primary);flex-shrink:0}
+    @media(max-width:768px){.hero-inner{grid-template-columns:1fr}.platform-mock{display:none}}
+
+    /* ══════════════════════
+       2. THREE SURFACES (STONE)
+    ══════════════════════ */
+    .surfaces{background:var(--stone);padding:var(--sp) 0}
+    .surfaces-header{max-width:640px;margin:0 auto 3rem;text-align:center}
+    .surfaces-label{margin-bottom:1.5rem;justify-content:center}
+    .surfaces-heading{font-family:var(--ff-display);font-size:clamp(1.7rem,3.2vw,2.6rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--ink);margin-bottom:1rem}
+    .surfaces-heading em{font-style:italic;color:var(--primary)}
+    .surfaces-sub{font-size:1rem;line-height:1.8;color:var(--muted)}
+    .surfaces-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    .surface-card{background:var(--white);border-radius:3px;padding:2rem;border-top:3px solid transparent;transition:border-color .25s var(--tr),box-shadow .25s var(--tr)}
+    .surface-card:hover{border-top-color:var(--primary);box-shadow:0 4px 20px rgba(0,0,0,.07)}
+    .surface-tag{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--primary);margin-bottom:10px}
+    .surface-name{font-family:var(--ff-display);font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.3}
+    .surface-desc{font-size:14px;line-height:1.75;color:var(--muted)}
+    .surface-note{font-size:12px;color:var(--muted-light);margin-top:12px;font-style:italic}
+    @media(max-width:720px){.surfaces-grid{grid-template-columns:1fr}}
+
+    /* ══════════════════════
+       3. LOCAL-FIRST (WHITE)
+    ══════════════════════ */
+    .local{background:var(--white);padding:var(--sp) 0;border-top:1px solid var(--stone-2)}
+    .local-inner{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2.5rem,6vw,6rem);align-items:center}
+    .local-label{margin-bottom:1.5rem}
+    .local-heading{font-family:var(--ff-display);font-size:clamp(1.7rem,3.2vw,2.6rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--ink);margin-bottom:1.25rem}
+    .local-heading em{font-style:italic;color:var(--primary)}
+    .local-body{font-size:1rem;line-height:1.85;color:var(--muted);margin-bottom:1.1rem}
+    .local-body strong{color:var(--ink-2);font-weight:600}
+    .local-right{display:flex;flex-direction:column;gap:1px}
+    .local-item{background:var(--stone);border-left:3px solid transparent;padding:1.3rem 1.5rem;transition:border-color .2s var(--tr)}
+    .local-item:hover{border-left-color:var(--primary)}
+    .local-item-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px}
+    .local-item-desc{font-size:13px;line-height:1.6;color:var(--muted)}
+    @media(max-width:768px){.local-inner{grid-template-columns:1fr}}
+
+    /* ══════════════════════
+       4. WHAT IT DOES (INK)
+    ══════════════════════ */
+    .capabilities{background:var(--ink-2);padding:var(--sp) 0;position:relative;overflow:hidden}
+    .capabilities-watermark{position:absolute;top:-5%;left:-1%;font-family:var(--ff-display);font-size:clamp(100px,16vw,200px);font-weight:900;color:rgba(255,255,255,.02);pointer-events:none;user-select:none;white-space:nowrap;line-height:1;letter-spacing:-.02em}
+    .capabilities-header{max-width:580px;margin:0 auto 3rem;text-align:center;position:relative;z-index:1}
+    .capabilities-label{margin-bottom:1.5rem;justify-content:center}
+    .capabilities-heading{font-family:var(--ff-display);font-size:clamp(1.7rem,3.2vw,2.6rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--white);margin-bottom:1rem}
+    .capabilities-heading em{font-style:italic;color:var(--primary)}
+    .capabilities-sub{font-size:1rem;line-height:1.8;color:rgba(255,255,255,.4)}
+    .cap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.05);position:relative;z-index:1}
+    .cap{background:var(--ink-2);padding:2rem 1.75rem;display:flex;flex-direction:column;gap:.75rem;transition:background var(--tr)}
+    .cap:hover{background:rgba(175,50,54,.06)}
+    .cap-num{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--primary)}
+    .cap-name{font-family:var(--ff-display);font-size:1.1rem;font-weight:700;color:var(--white);line-height:1.3}
+    .cap-desc{font-size:13.5px;line-height:1.65;color:rgba(255,255,255,.4)}
+    @media(max-width:720px){.cap-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:480px){.cap-grid{grid-template-columns:1fr}}
+
+    /* ══════════════════════
+       5. NEXT STEP (STONE)
+    ══════════════════════ */
+    .next{background:var(--stone);padding:var(--sp) 0;border-top:1px solid var(--stone-2)}
+    .next-inner{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2.5rem,6vw,6rem);align-items:center}
+    .next-label{margin-bottom:1.5rem}
+    .next-heading{font-family:var(--ff-display);font-size:clamp(1.7rem,3.2vw,2.6rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--ink);margin-bottom:1.25rem}
+    .next-heading em{font-style:italic;color:var(--primary)}
+    .next-body{font-size:1rem;line-height:1.85;color:var(--muted);margin-bottom:2rem}
+    .next-actions{display:flex;flex-wrap:wrap;gap:1rem}
+    .next-right{background:var(--ink);border-radius:3px;padding:2.5rem;position:relative;overflow:hidden}
+    .next-right::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,transparent,var(--primary) 30%,var(--primary) 70%,transparent)}
+    .next-quote{font-family:var(--ff-display);font-size:clamp(1.1rem,2vw,1.4rem);font-weight:700;font-style:italic;line-height:1.5;color:var(--white);margin-bottom:1.5rem;letter-spacing:-.01em}
+    .next-quote em{font-style:normal;color:var(--primary)}
+    .next-sig{display:flex;align-items:center;gap:12px}
+    .next-sig-rule{width:24px;height:2px;background:var(--primary);flex-shrink:0}
+    .next-sig-name{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+    @media(max-width:768px){.next-inner{grid-template-columns:1fr}}
+
+    /* ══════════════════════
+       VIDEO SECTION (STONE)
+    ══════════════════════ */
+    .video-section{background:var(--stone);padding:var(--sp) 0;border-top:1px solid var(--stone-2)}
+    .video-inner{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2.5rem,6vw,6rem);align-items:center}
+    .video-label{margin-bottom:1.5rem}
+    .video-heading{font-family:var(--ff-display);font-size:clamp(1.7rem,3.2vw,2.6rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--ink);margin-bottom:1.25rem}
+    .video-heading em{font-style:italic;color:var(--primary)}
+    .video-body{font-size:1rem;line-height:1.85;color:var(--muted);margin-bottom:1.1rem}
+    .video-body strong{color:var(--ink-2);font-weight:600}
+    .video-right{display:flex;flex-direction:column;gap:1px}
+    .video-item{background:var(--white);border-left:3px solid transparent;padding:1.3rem 1.5rem;transition:border-color .2s var(--tr)}
+    .video-item:hover{border-left-color:var(--primary)}
+    .video-item-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px}
+    .video-item-desc{font-size:13px;line-height:1.6;color:var(--muted)}
+    @media(max-width:768px){.video-inner{grid-template-columns:1fr}}
+
+    /* FOOTER */
+    .site-footer{background:var(--ink-2);border-top:1px solid rgba(255,255,255,.05);padding:3rem 0 2rem}
+    .footer-top{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;flex-wrap:wrap;margin-bottom:2.5rem}
+    .footer-tagline{font-size:13px;color:rgba(255,255,255,.3);line-height:1.65;max-width:240px;margin-top:10px}
+    .footer-col-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px}
+    .footer-links{list-style:none;display:flex;flex-direction:column;gap:8px}
+    .footer-links a{font-size:13px;color:rgba(255,255,255,.45);transition:color var(--tr)}.footer-links a:hover{color:rgba(255,255,255,.85)}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    .footer-legal{font-size:12px;color:rgba(255,255,255,.2)}
+    .footer-domain{font-size:12px;font-weight:600;color:var(--primary)}
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="/" aria-label="Ichebo Christian Services">
+          <svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg" style="height:26px;width:auto">
+            <polygon fill="#fff" fill-rule="evenodd" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42"/>
+            <path fill="#fff" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/>
+            <path fill="#fff" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z"/>
+            <path fill="#fff" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/>
+          </svg>
+        </a>
+        <ul class="nav-links">
+          <li><a href="/programme/">Programme</a></li>
+          <li><a href="/platform/" class="active">Platform</a></li>
+          <li><a href="/training/">Formation</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <a href="/#waitlist" class="nav-join">Join the Waiting List</a>
+        <button class="nav-menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <button class="nav-close-btn" id="closeBtn" aria-label="Close menu">✕</button>
+  <nav class="mobile-nav" id="mobileNav" aria-hidden="true">
+    <a href="/programme/">Programme</a>
+    <a href="/platform/">Platform</a>
+    <a href="/training/">Formation</a>
+    <a href="/about/">About</a>
+    <a href="/#waitlist" class="mobile-join">Join the Waiting List</a>
+  </nav>
+
+  <!-- ══════════════════════
+       1. HERO
+  ══════════════════════ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-watermark" aria-hidden="true">ICHEBO</div>
+    <div class="container" style="width:100%">
+      <div class="hero-inner">
+        <div>
+          <div class="hero-crumb">
+            <a href="/">Home</a>
+            <span class="hero-crumb-sep">→</span>
+            <span>Platform</span>
+          </div>
+          <div class="hero-eyebrow fade-up">
+            <span class="label-tag label-tag--light">The Ichebo Platform</span>
+          </div>
+          <h1 class="hero-headline fade-up" id="hero-heading" style="transition-delay:.1s">
+            The tool<br>
+            behind the <em>community.</em>
+          </h1>
+          <p class="hero-sub fade-up" style="transition-delay:.2s">
+            Running a Sceptre Community involves governance, formation records, people management, and connection to a wider network. <strong>Ichebo is the platform that makes all of it manageable</strong> — without requiring a technology team to operate it.
+          </p>
+          <div class="hero-actions fade-up" style="transition-delay:.3s">
+            <a href="/#waitlist" class="btn btn-primary">
+              Join the Waiting List
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="/programme/" class="btn btn-outline-w">Back to the Programme</a>
+          </div>
+        </div>
+
+        <!-- Platform mock UI -->
+        <div class="platform-mock fade-up" style="transition-delay:.2s" aria-hidden="true">
+          <div class="mock-shell">
+            <div class="mock-bar">
+              <div class="mock-dot r"></div>
+              <div class="mock-dot y"></div>
+              <div class="mock-dot g"></div>
+              <div class="mock-title">Ichebo · Community Dashboard</div>
+            </div>
+            <div class="mock-body">
+              <div class="mock-sidebar">
+                <div class="mock-icon active">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                </div>
+                <div class="mock-icon">
+                  <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                </div>
+                <div class="mock-icon">
+                  <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
+                <div class="mock-icon">
+                  <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div class="mock-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+                </div>
+              </div>
+              <div class="mock-content">
+                <div class="mock-row">
+                  <div class="mock-card">
+                    <div class="mock-card-label">Members</div>
+                    <div class="mock-card-value">24</div>
+                    <div class="mock-card-sub">Active in community</div>
+                  </div>
+                  <div class="mock-card">
+                    <div class="mock-card-label">In Formation</div>
+                    <div class="mock-card-value">18</div>
+                    <div class="mock-card-sub">Across 3 programmes</div>
+                  </div>
+                </div>
+                <div class="mock-card">
+                  <div class="mock-card-label">Formation Progress</div>
+                  <div class="mock-list" style="margin-top:4px">
+                    <div class="mock-list-item"><div class="mock-list-dot"></div>Sarah M. — Certificate · Week 6</div>
+                    <div class="mock-list-item"><div class="mock-list-dot"></div>James O. — Diploma · Week 14</div>
+                    <div class="mock-list-item"><div class="mock-list-dot"></div>Ruth K. — Certificate · Week 2</div>
+                    <div class="mock-list-item"><div class="mock-list-dot"></div>David N. — Induction · Week 8</div>
+                  </div>
+                </div>
+                <div class="mock-card">
+                  <div class="mock-card-label">Network Status</div>
+                  <div class="mock-card-value" style="font-size:1rem;color:rgba(255,255,255,.5);font-family:var(--ff-body);font-weight:500;margin-top:4px">Connected · Last sync 2 min ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════
+       2. THREE SURFACES (STONE)
+  ══════════════════════ -->
+  <section class="surfaces" aria-labelledby="surfaces-heading">
+    <div class="container">
+      <div class="surfaces-header">
+        <div class="surfaces-label fade-up">
+          <span class="label-tag">How You Access It</span>
+        </div>
+        <h2 class="surfaces-heading fade-up" id="surfaces-heading" style="transition-delay:.1s">
+          Three surfaces.<br>
+          <em>One community.</em>
+        </h2>
+        <p class="surfaces-sub fade-up" style="transition-delay:.15s">
+          Ichebo meets people where they are — on the desktop they use to govern, the phone they carry every day, and the browser they use when they need a full picture. Every surface connects to the same community, the same formation records, the same network.
+        </p>
+      </div>
+      <div class="surfaces-grid">
+        <div class="surface-card fade-up" style="transition-delay:.05s">
+          <div class="surface-tag">Ichebo Desktop</div>
+          <div class="surface-name">For the leader who governs.</div>
+          <p class="surface-desc">A standalone application for Windows, macOS, and Linux. Full governance workspace — records, formation management, community oversight, and network connection. Works offline. Syncs when connected.</p>
+          <p class="surface-note">The primary tool for Community Coordinators and stewards.</p>
+        </div>
+        <div class="surface-card fade-up" style="transition-delay:.12s">
+          <div class="surface-tag">Ichebo Mobile</div>
+          <div class="surface-name">For every member, every day.</div>
+          <p class="surface-desc">Android-first, iOS to follow. The daily companion for every level of community member — formation activities, community updates, personal records, and communication. Designed for the phone already in your pocket.</p>
+          <p class="surface-note">The everyday surface for all members, not just leaders.</p>
+        </div>
+        <div class="surface-card fade-up" style="transition-delay:.19s">
+          <div class="surface-tag">Ichebo Web</div>
+          <div class="surface-name">For the full picture.</div>
+          <p class="surface-desc">Browser-based access to the full platform at app.ichebo.org — governance records, formation dashboards, community management, and network oversight. For stewards who need the complete workspace.</p>
+          <p class="surface-note">Level 3 and above, on any browser, any device.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════
+       3. LOCAL-FIRST (WHITE)
+  ══════════════════════ -->
+  <section class="local" aria-labelledby="local-heading">
+    <div class="container">
+      <div class="local-inner">
+        <div>
+          <div class="local-label fade-up">
+            <span class="label-tag">Built for the Real World</span>
+          </div>
+          <h2 class="local-heading fade-up" id="local-heading" style="transition-delay:.1s">
+            Your community works<br>
+            whether you have<br>
+            <em>internet or not.</em>
+          </h2>
+          <p class="local-body fade-up" style="transition-delay:.15s">
+            Ichebo is built local-first. <strong>The device is the primary computer.</strong> Community records, formation data, and governance documents live on the device — not only in the cloud. The platform works fully offline and synchronises when a connection is available.
+          </p>
+          <p class="local-body fade-up" style="transition-delay:.2s">
+            This matters for communities operating in areas with unreliable connectivity. It means a community in a remote township, a village without consistent internet, or a gathering that meets in a space with no signal <strong>loses nothing</strong> — and operates with the same capability as any other.
+          </p>
+        </div>
+        <div class="local-right">
+          <div class="local-item fade-up" style="transition-delay:.05s">
+            <div class="local-item-title">Works fully offline</div>
+            <div class="local-item-desc">All core functions operate without internet. Records are stored locally and synced when connection returns.</div>
+          </div>
+          <div class="local-item fade-up" style="transition-delay:.1s">
+            <div class="local-item-title">Syncs automatically</div>
+            <div class="local-item-desc">When connectivity is available, the platform syncs changes across all devices and to the network — no manual steps.</div>
+          </div>
+          <div class="local-item fade-up" style="transition-delay:.15s">
+            <div class="local-item-title">No data loss</div>
+            <div class="local-item-desc">Conflict resolution is handled automatically. Work done offline is never overwritten without review.</div>
+          </div>
+          <div class="local-item fade-up" style="transition-delay:.2s">
+            <div class="local-item-title">Designed for the Global South</div>
+            <div class="local-item-desc">Built with the realities of sub-Saharan Africa, the Caribbean, and similar contexts in mind — not retrofitted from a Western-first product.</div>
+          </div>
+          <div class="local-item fade-up" style="transition-delay:.25s">
+            <div class="local-item-title">Cloud as coordination, not dependency</div>
+            <div class="local-item-desc">The cloud layer handles network connection and compliance verification. Communities do not depend on it to operate daily.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════
+       4. VIDEO (STONE)
+       The lead we nearly buried
+  ══════════════════════ -->
+  <section class="video-section" aria-labelledby="video-heading">
+    <div class="container">
+      <div class="video-inner">
+        <div>
+          <div class="video-label fade-up">
+            <span class="label-tag">Live & On-Demand Video</span>
+          </div>
+          <h2 class="video-heading fade-up" id="video-heading" style="transition-delay:.1s">
+            Your community is not<br>
+            limited by <em>distance</em><br>
+            or budget.
+          </h2>
+          <p class="video-body fade-up" style="transition-delay:.15s">
+            A small gathering of fifteen people should have access to the same teaching, formation content, and network gatherings as any other community. With Ichebo, they do.
+          </p>
+          <p class="video-body fade-up" style="transition-delay:.2s">
+            <strong>Live streaming and on-demand video</strong> are built into the platform — not added on. A community coordinator can broadcast a gathering, a teaching session, or a network event directly through Ichebo. Members watch live or on-demand, from any device, wherever they are.
+          </p>
+          <p class="video-body fade-up" style="transition-delay:.25s">
+            This means a community in a township, a remote area, or a diaspora context can access the same content as one in a well-resourced city centre. <strong>The network becomes real, not just a governance concept.</strong>
+          </p>
+        </div>
+        <div class="video-right">
+          <div class="video-item fade-up" style="transition-delay:.05s">
+            <div class="video-item-title">Live gatherings</div>
+            <div class="video-item-desc">Broadcast your community gathering, teaching session, or network event live — members watch in real time from any device.</div>
+          </div>
+          <div class="video-item fade-up" style="transition-delay:.1s">
+            <div class="video-item-title">On-demand library</div>
+            <div class="video-item-desc">Every recorded gathering and teaching session stored and accessible. Formation content, discipleship material, and network teachings — available any time.</div>
+          </div>
+          <div class="video-item fade-up" style="transition-delay:.15s">
+            <div class="video-item-title">Formation content delivery</div>
+            <div class="video-item-desc">Video lessons linked directly to formation programmes. Progress is tracked — watching a lesson advances a person's formation record automatically.</div>
+          </div>
+          <div class="video-item fade-up" style="transition-delay:.2s">
+            <div class="video-item-title">Network broadcasts</div>
+            <div class="video-item-desc">Ichebo Christian Services and network leadership can broadcast across all communities simultaneously — shared teaching, governance updates, and movement-wide gatherings.</div>
+          </div>
+          <div class="video-item fade-up" style="transition-delay:.25s">
+            <div class="video-item-title">No third-party platform needed</div>
+            <div class="video-item-desc">No YouTube. No Zoom. No separate subscription. Video is built into Ichebo — delivered through secure infrastructure owned by the movement.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════
+       5. WHAT IT DOES (INK)
+  ══════════════════════ -->
+  <section class="capabilities" aria-labelledby="cap-heading">
+    <div class="capabilities-watermark" aria-hidden="true">BUILT</div>
+    <div class="container">
+      <div class="capabilities-header fade-up">
+        <div class="capabilities-label">
+          <span class="label-tag label-tag--light">What It Gives You</span>
+        </div>
+        <h2 class="capabilities-heading" id="cap-heading" style="margin-top:1rem">
+          Seven things your community<br>
+          <em>no longer has to improvise.</em>
+        </h2>
+        <p class="capabilities-sub" style="margin-top:1rem">
+          Every Sceptre Community faces the same operational challenges. Ichebo addresses each one — so leaders can focus on people, not administration.
+        </p>
+      </div>
+      <div class="cap-grid">
+        <div class="cap fade-up" style="transition-delay:.03s">
+          <div class="cap-num">01</div>
+          <div class="cap-name">Governance records</div>
+          <div class="cap-desc">Every decision, every mandate, every governance document — stored, versioned, and accessible. No more losing institutional memory when a leader moves on.</div>
+        </div>
+        <div class="cap fade-up" style="transition-delay:.06s">
+          <div class="cap-num">02</div>
+          <div class="cap-name">Formation tracking</div>
+          <div class="cap-desc">Every person's journey recorded — which programme, which stage, steward notes, and pathway progress. Formation becomes visible, not assumed.</div>
+        </div>
+        <div class="cap fade-up" style="transition-delay:.09s">
+          <div class="cap-num">03</div>
+          <div class="cap-name">Community management</div>
+          <div class="cap-desc">Members, roles, gatherings, and activities — all in one place. No spreadsheets. No lost contact lists. A living picture of your community.</div>
+        </div>
+        <div class="cap fade-up" style="transition-delay:.12s">
+          <div class="cap-num">04</div>
+          <div class="cap-name">Network connection</div>
+          <div class="cap-desc">Your community is not an island. Ichebo connects each community to the wider movement — shared resources, accountability, and network governance.</div>
+        </div>
+        <div class="cap fade-up" style="transition-delay:.18s">
+          <div class="cap-num">06</div>
+          <div class="cap-name">Scripture and study</div>
+          <div class="cap-desc">An integrated Bible tool with personal annotations and community study records — connected to the Handbook and governance reference library.</div>
+        </div>
+        <div class="cap fade-up" style="transition-delay:.21s">
+          <div class="cap-num">07</div>
+          <div class="cap-name">Daily rhythm</div>
+          <div class="cap-desc">A personal digest — the Paraclete — that surfaces what matters each day: formation activities, community updates, and governance items that need attention.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════
+       6. NEXT STEP (STONE)
+  ══════════════════════ -->
+  <section class="next" aria-labelledby="next-heading">
+    <div class="container">
+      <div class="next-inner">
+        <div>
+          <div class="next-label fade-up">
+            <span class="label-tag">Who Built This</span>
+          </div>
+          <h2 class="next-heading fade-up" id="next-heading" style="transition-delay:.1s">
+            Built from<br>
+            <em>inside</em> the problem.
+          </h2>
+          <p class="next-body fade-up" style="transition-delay:.15s">
+            Ichebo was not built by a technology company that identified the church as a market. It was built by practitioners — people who carry the same mandate as the communities it serves, and who grew tired of the absence of tools to act on it properly.
+          </p>
+          <div class="next-actions fade-up" style="transition-delay:.2s">
+            <a href="/about/" class="btn btn-primary">
+              About Ichebo Christian Services
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="/#waitlist" class="btn btn-outline-d">Join the Waiting List</a>
+          </div>
+        </div>
+        <div class="next-right fade-up" style="transition-delay:.15s">
+          <blockquote class="next-quote">
+            "This was not built by people who discovered the church as a market. It was built by people who carry the <em>same mandate</em> — and grew tired of the absence of the tools to act on it."
+          </blockquote>
+          <div class="next-sig">
+            <div class="next-sig-rule"></div>
+            <div class="next-sig-name">Ichebo Christian Services</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg" style="height:20px;width:auto;display:block" aria-label="Ichebo Christian Services">
+            <polygon fill="#fff" fill-rule="evenodd" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42"/>
+            <path fill="#fff" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/>
+            <path fill="#fff" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z"/>
+            <path fill="#fff" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/>
+          </svg>
+          <p class="footer-tagline">A Kingdom agency equipping gatherings with the structure, formation, and network to bring meaningful impact to their communities.</p>
+        </div>
+        <div>
+          <div class="footer-col-title">The Movement</div>
+          <ul class="footer-links">
+            <li><a href="/programme/">Sceptre Community Programme</a></li>
+            <li><a href="/platform/">Ichebo Platform</a></li>
+            <li><a href="/training/">Formation Pathways</a></li>
+            <li><a href="/about/">About</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Get Involved</div>
+          <ul class="footer-links">
+            <li><a href="/#waitlist">Join the Waiting List</a></li>
+            <li><a href="mailto:info@ichebo.org">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-legal">© 2026 Ichebo Christian Services. All rights reserved.</div>
+        <div class="footer-domain">ichebo.org</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const menuBtn=document.getElementById('menuBtn'),closeBtn=document.getElementById('closeBtn'),mobileNav=document.getElementById('mobileNav');
+    const closeMenu=()=>{mobileNav.classList.remove('open');mobileNav.setAttribute('aria-hidden','true');closeBtn.classList.remove('open');menuBtn.setAttribute('aria-expanded','false');document.body.style.overflow=''};
+    menuBtn.addEventListener('click',()=>{mobileNav.classList.add('open');mobileNav.setAttribute('aria-hidden','false');closeBtn.classList.add('open');menuBtn.setAttribute('aria-expanded','true');document.body.style.overflow='hidden'});
+    closeBtn.addEventListener('click',closeMenu);
+    mobileNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
+    const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}}),{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.fade-up').forEach(el=>observer.observe(el));
+  </script>
+</body>
+</html>
