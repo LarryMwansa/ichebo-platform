@@ -1,170 +1,914 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Formation — Ichebo Christian Services</title>
-  <meta name="description" content="Everyone who joins a Sceptre Community deserves a clear path. Formation is structured, intentional, and built around the life of the community itself — not a classroom.">
+  <meta name="description"
+    content="Everyone who joins a Sceptre Community deserves a clear path. Formation is structured, intentional, and built around the life of the community itself — not a classroom.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --primary:#AF3236;--primary-dark:#8C2A2D;--primary-light:rgba(175,50,54,0.09);
-      --ink:#0E0E0E;--ink-2:#1A1A1A;
-      --stone:#F5F3F0;--stone-2:#ECE9E4;--white:#FFFFFF;
-      --muted:#6B6B6B;--muted-light:#9A9A9A;
-      --ff-display:'Playfair Display',Georgia,serif;
-      --ff-body:'Inter',system-ui,sans-serif;
-      --max-w:1200px;--sp:clamp(4rem,8vw,7rem);--tr:0.3s cubic-bezier(0.4,0,0.2,1);
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
     }
-    html{scroll-behavior:smooth}
-    body{font-family:var(--ff-body);font-size:16px;line-height:1.6;color:var(--ink-2);background:var(--white);-webkit-font-smoothing:antialiased}
-    a{text-decoration:none;color:inherit}
-    .container{max-width:var(--max-w);margin-inline:auto;padding-inline:clamp(1.25rem,4vw,3rem)}
-    .label-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--primary)}
-    .label-tag::before{content:'';display:block;width:20px;height:2px;background:var(--primary);flex-shrink:0}
-    .label-tag--light{color:rgba(255,255,255,.35)}.label-tag--light::before{background:rgba(255,255,255,.2)}
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:3px;font-family:var(--ff-body);font-size:14px;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:all var(--tr);border:2px solid transparent;white-space:nowrap}
-    .btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}.btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark);transform:translateY(-1px)}
-    .btn-outline-w{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}.btn-outline-w:hover{border-color:rgba(255,255,255,.7);color:#fff}
-    .btn-outline-d{background:transparent;color:var(--ink-2);border-color:rgba(0,0,0,.25)}.btn-outline-d:hover{background:var(--ink-2);color:#fff;border-color:var(--ink-2)}
+
+    :root {
+      --primary: #AF3236;
+      --primary-dark: #8C2A2D;
+      --primary-light: rgba(175, 50, 54, 0.09);
+      --ink: #0E0E0E;
+      --ink-2: #1A1A1A;
+      --stone: #F5F3F0;
+      --stone-2: #ECE9E4;
+      --white: #FFFFFF;
+      --muted: #6B6B6B;
+      --muted-light: #9A9A9A;
+      --ff-display: 'Playfair Display', Georgia, serif;
+      --ff-body: 'Inter', system-ui, sans-serif;
+      --max-w: 1200px;
+      --sp: clamp(4rem, 8vw, 7rem);
+      --tr: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      font-family: var(--ff-body);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink-2);
+      background: var(--white);
+      -webkit-font-smoothing: antialiased
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit
+    }
+
+    .container {
+      max-width: var(--max-w);
+      margin-inline: auto;
+      padding-inline: clamp(1.25rem, 4vw, 3rem)
+    }
+
+    .label-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--primary)
+    }
+
+    .label-tag::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--primary);
+      flex-shrink: 0
+    }
+
+    .label-tag--light {
+      color: rgba(255, 255, 255, .35)
+    }
+
+    .label-tag--light::before {
+      background: rgba(255, 255, 255, .2)
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 3px;
+      font-family: var(--ff-body);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      cursor: pointer;
+      transition: all var(--tr);
+      border: 2px solid transparent;
+      white-space: nowrap
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary)
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      border-color: var(--primary-dark);
+      transform: translateY(-1px)
+    }
+
+    .btn-outline-w {
+      background: transparent;
+      color: #fff;
+      border-color: rgba(255, 255, 255, .35)
+    }
+
+    .btn-outline-w:hover {
+      border-color: rgba(255, 255, 255, .7);
+      color: #fff
+    }
+
+    .btn-outline-d {
+      background: transparent;
+      color: var(--ink-2);
+      border-color: rgba(0, 0, 0, .25)
+    }
+
+    .btn-outline-d:hover {
+      background: var(--ink-2);
+      color: #fff;
+      border-color: var(--ink-2)
+    }
 
     /* NAV */
-    .site-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(14,14,14,.97);backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(255,255,255,.06)}
-    .nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px;gap:2rem}
-    .nav-links{display:flex;align-items:center;gap:2rem;list-style:none}
-    .nav-links a{font-size:14px;font-weight:500;color:rgba(255,255,255,.6);transition:color var(--tr)}
-    .nav-links a:hover,.nav-links a.active{color:#fff}
-    .nav-join{font-size:13px;font-weight:600;color:#fff;background:var(--primary);padding:9px 20px;border-radius:3px;transition:background var(--tr);white-space:nowrap}
-    .nav-join:hover{background:var(--primary-dark)}
-    .nav-menu-btn{display:none;background:none;border:none;color:#fff;cursor:pointer;padding:4px}
-    .mobile-nav{display:none;position:fixed;inset:0;background:var(--ink);z-index:99;flex-direction:column;padding:100px 2rem 2rem;transform:translateX(100%);transition:transform .35s var(--tr)}
-    .mobile-nav.open{transform:translateX(0)}
-    .mobile-nav a{display:block;font-size:22px;font-family:var(--ff-display);font-weight:700;color:rgba(255,255,255,.7);padding:16px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-    .mobile-nav .mobile-join{margin-top:2rem;font-family:var(--ff-body);font-size:15px;text-align:center;background:var(--primary);color:#fff;border-radius:3px;padding:16px}
-    .nav-close-btn{position:fixed;top:22px;right:24px;background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:28px;z-index:200;display:none;line-height:1}
-    .nav-close-btn.open{display:block}
-    @media(max-width:768px){.nav-links,.nav-join{display:none}.nav-menu-btn{display:block}.mobile-nav{display:flex}}
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(14, 14, 14, .97);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .06)
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      gap: 2rem
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, .6);
+      transition: color var(--tr)
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: #fff
+    }
+
+    .nav-join {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--primary);
+      padding: 9px 20px;
+      border-radius: 3px;
+      transition: background var(--tr);
+      white-space: nowrap
+    }
+
+    .nav-join:hover {
+      background: var(--primary-dark)
+    }
+
+    .nav-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      padding: 4px
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--ink);
+      z-index: 99;
+      flex-direction: column;
+      padding: 100px 2rem 2rem;
+      transform: translateX(100%);
+      transition: transform .35s var(--tr)
+    }
+
+    .mobile-nav.open {
+      transform: translateX(0)
+    }
+
+    .mobile-nav a {
+      display: block;
+      font-size: 22px;
+      font-family: var(--ff-display);
+      font-weight: 700;
+      color: rgba(255, 255, 255, .7);
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, .06)
+    }
+
+    .mobile-nav .mobile-join {
+      margin-top: 2rem;
+      font-family: var(--ff-body);
+      font-size: 15px;
+      text-align: center;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 3px;
+      padding: 16px
+    }
+
+    .nav-close-btn {
+      position: fixed;
+      top: 22px;
+      right: 24px;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, .5);
+      cursor: pointer;
+      font-size: 28px;
+      z-index: 200;
+      display: none;
+      line-height: 1
+    }
+
+    .nav-close-btn.open {
+      display: block
+    }
+
+    @media(max-width:768px) {
+
+      .nav-links,
+      .nav-join {
+        display: none
+      }
+
+      .nav-menu-btn {
+        display: block
+      }
+
+      .mobile-nav {
+        display: flex
+      }
+    }
 
     /* FADE */
-    .fade-up{opacity:0;transform:translateY(22px);transition:opacity .65s var(--tr),transform .65s var(--tr)}
-    .fade-up.visible{opacity:1;transform:translateY(0)}
+    .fade-up {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .65s var(--tr), transform .65s var(--tr)
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0)
+    }
 
     /* ══════════════════════
        1. HERO (INK)
     ══════════════════════ */
-    .hero{background:var(--ink);padding:clamp(8rem,14vw,11rem) 0 clamp(4rem,8vw,7rem);position:relative;overflow:hidden}
-    .hero::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,transparent 0%,var(--primary) 20%,var(--primary) 80%,transparent 100%)}
-    .hero-watermark{position:absolute;bottom:-5%;right:-2%;font-family:var(--ff-display);font-size:clamp(120px,20vw,240px);font-weight:900;color:rgba(175,50,54,.05);line-height:1;pointer-events:none;user-select:none;white-space:nowrap;letter-spacing:-.02em}
-    .hero-crumb{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.3);margin-bottom:2rem}
-    .hero-crumb a{color:rgba(255,255,255,.4);transition:color var(--tr)}.hero-crumb a:hover{color:#fff}
-    .hero-crumb-sep{color:rgba(255,255,255,.2)}
-    .hero-inner{position:relative;z-index:1;max-width:760px}
-    .hero-eyebrow{margin-bottom:1.75rem}
-    .hero-headline{font-family:var(--ff-display);font-size:clamp(2.4rem,5.5vw,4rem);font-weight:800;line-height:1.1;letter-spacing:-.025em;color:var(--white);margin-bottom:1.5rem}
-    .hero-headline em{font-style:italic;color:var(--primary)}
-    .hero-sub{font-size:clamp(1rem,1.8vw,1.1rem);line-height:1.85;color:rgba(255,255,255,.5);max-width:560px;margin-bottom:2.5rem}
-    .hero-sub strong{color:rgba(255,255,255,.82);font-weight:500}
-    .hero-actions{display:flex;flex-wrap:wrap;gap:1rem;align-items:center}
+    .hero {
+      background: var(--ink);
+      padding: clamp(8rem, 14vw, 11rem) 0 clamp(4rem, 8vw, 7rem);
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, transparent 0%, var(--primary) 20%, var(--primary) 80%, transparent 100%)
+    }
+
+    .hero-watermark {
+      position: absolute;
+      bottom: -5%;
+      right: -2%;
+      font-family: var(--ff-display);
+      font-size: clamp(120px, 20vw, 240px);
+      font-weight: 900;
+      color: rgba(175, 50, 54, .05);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+      letter-spacing: -.02em
+    }
+
+    .hero-crumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, .3);
+      margin-bottom: 2rem
+    }
+
+    .hero-crumb a {
+      color: rgba(255, 255, 255, .4);
+      transition: color var(--tr)
+    }
+
+    .hero-crumb a:hover {
+      color: #fff
+    }
+
+    .hero-crumb-sep {
+      color: rgba(255, 255, 255, .2)
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 760px
+    }
+
+    .hero-eyebrow {
+      margin-bottom: 1.75rem
+    }
+
+    .hero-headline {
+      font-family: var(--ff-display);
+      font-size: clamp(2.4rem, 5.5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.025em;
+      color: var(--white);
+      margin-bottom: 1.5rem
+    }
+
+    .hero-headline em {
+      font-style: italic;
+      color: var(--primary)
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 1.8vw, 1.1rem);
+      line-height: 1.85;
+      color: rgba(255, 255, 255, .5);
+      max-width: 560px;
+      margin-bottom: 2.5rem
+    }
+
+    .hero-sub strong {
+      color: rgba(255, 255, 255, .82);
+      font-weight: 500
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center
+    }
 
     /* ══════════════════════
        2. THE JOURNEY (STONE)
        Eight pathways, plain
     ══════════════════════ */
-    .journey{background:var(--stone);padding:var(--sp) 0}
-    .journey-header{max-width:640px;margin:0 auto 3rem;text-align:center}
-    .journey-label{margin-bottom:1.5rem;justify-content:center}
-    .journey-heading{font-family:var(--ff-display);font-size:clamp(1.7rem,3.2vw,2.6rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--ink);margin-bottom:1rem}
-    .journey-heading em{font-style:italic;color:var(--primary)}
-    .journey-sub{font-size:1rem;line-height:1.8;color:var(--muted)}
-    .pathways-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--stone-2)}
-    .pathway{background:var(--white);padding:1.75rem 1.5rem;display:flex;flex-direction:column;gap:6px;transition:background var(--tr);cursor:default}
-    .pathway:hover{background:var(--stone)}
-    .pathway-num{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--primary)}
-    .pathway-name{font-family:var(--ff-display);font-size:1.05rem;font-weight:700;color:var(--ink);line-height:1.3}
-    .pathway-desc{font-size:13px;line-height:1.6;color:var(--muted);margin-top:4px}
-    @media(max-width:720px){.pathways-grid{grid-template-columns:1fr 1fr}}
-    @media(max-width:480px){.pathways-grid{grid-template-columns:1fr}}
+    .journey {
+      background: var(--stone);
+      padding: var(--sp) 0
+    }
+
+    .journey-header {
+      max-width: 640px;
+      margin: 0 auto 3rem;
+      text-align: center
+    }
+
+    .journey-label {
+      margin-bottom: 1.5rem;
+      justify-content: center
+    }
+
+    .journey-heading {
+      font-family: var(--ff-display);
+      font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      color: var(--ink);
+      margin-bottom: 1rem
+    }
+
+    .journey-heading em {
+      font-style: italic;
+      color: var(--primary)
+    }
+
+    .journey-sub {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--muted)
+    }
+
+    .pathways-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--stone-2)
+    }
+
+    .pathway {
+      background: var(--white);
+      padding: 1.75rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: background var(--tr);
+      cursor: default
+    }
+
+    .pathway:hover {
+      background: var(--stone)
+    }
+
+    .pathway-num {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--primary)
+    }
+
+    .pathway-name {
+      font-family: var(--ff-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.3
+    }
+
+    .pathway-desc {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    @media(max-width:720px) {
+      .pathways-grid {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:480px) {
+      .pathways-grid {
+        grid-template-columns: 1fr
+      }
+    }
 
     /* ══════════════════════
        3. THE LEVELS (WHITE)
        Five programmes plainly
     ══════════════════════ */
-    .levels{background:var(--white);padding:var(--sp) 0;border-top:1px solid var(--stone-2)}
-    .levels-header{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2.5rem,6vw,6rem);align-items:start;margin-bottom:3rem}
-    .levels-label{margin-bottom:1.5rem}
-    .levels-heading{font-family:var(--ff-display);font-size:clamp(1.7rem,3.2vw,2.6rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--ink);margin-bottom:1.25rem}
-    .levels-heading em{font-style:italic;color:var(--primary)}
-    .levels-body{font-size:1rem;line-height:1.85;color:var(--muted)}
-    .levels-note{font-size:.9rem;line-height:1.75;color:var(--muted-light);margin-top:1rem;font-style:italic}
-    .levels-list{display:flex;flex-direction:column;gap:1px}
-    .level-item{display:grid;grid-template-columns:64px 1fr auto;gap:1.5rem;align-items:center;padding:1.75rem 1.5rem;background:var(--stone);border-left:3px solid transparent;transition:border-color .2s var(--tr),background .2s var(--tr)}
-    .level-item:hover{border-left-color:var(--primary);background:var(--stone-2)}
-    .level-badge{width:48px;height:48px;border-radius:50%;border:2px solid var(--primary-light);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;flex-shrink:0}
-    .level-badge-num{font-family:var(--ff-display);font-size:1.3rem;font-weight:800;color:var(--primary);line-height:1}
-    .level-badge-label{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-light)}
-    .level-name{font-family:var(--ff-display);font-size:1.15rem;font-weight:700;color:var(--ink-2);margin-bottom:4px}
-    .level-desc{font-size:13.5px;color:var(--muted);line-height:1.55;max-width:50ch}
-    .level-duration{font-size:12px;font-weight:600;color:var(--muted-light);white-space:nowrap;text-align:right}
-    .level-duration span{display:block;font-size:10px;font-weight:400;color:var(--muted-light);margin-top:2px}
-    @media(max-width:768px){
-      .levels-header{grid-template-columns:1fr}
-      .level-item{grid-template-columns:48px 1fr}
-      .level-duration{display:none}
+    .levels {
+      background: var(--white);
+      padding: var(--sp) 0;
+      border-top: 1px solid var(--stone-2)
+    }
+
+    .levels-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(2.5rem, 6vw, 6rem);
+      align-items: start;
+      margin-bottom: 3rem
+    }
+
+    .levels-label {
+      margin-bottom: 1.5rem
+    }
+
+    .levels-heading {
+      font-family: var(--ff-display);
+      font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      color: var(--ink);
+      margin-bottom: 1.25rem
+    }
+
+    .levels-heading em {
+      font-style: italic;
+      color: var(--primary)
+    }
+
+    .levels-body {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--muted)
+    }
+
+    .levels-note {
+      font-size: .9rem;
+      line-height: 1.75;
+      color: var(--muted-light);
+      margin-top: 1rem;
+      font-style: italic
+    }
+
+    .levels-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px
+    }
+
+    .level-item {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 1.5rem;
+      align-items: center;
+      padding: 1.75rem 1.5rem;
+      background: var(--stone);
+      border-left: 3px solid transparent;
+      transition: border-color .2s var(--tr), background .2s var(--tr)
+    }
+
+    .level-item:hover {
+      border-left-color: var(--primary);
+      background: var(--stone-2)
+    }
+
+    .level-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--primary-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      flex-shrink: 0
+    }
+
+    .level-badge-num {
+      font-family: var(--ff-display);
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1
+    }
+
+    .level-badge-label {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted-light)
+    }
+
+    .level-name {
+      font-family: var(--ff-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ink-2);
+      margin-bottom: 4px
+    }
+
+    .level-desc {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 50ch
+    }
+
+    .level-duration {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted-light);
+      white-space: nowrap;
+      text-align: right
+    }
+
+    .level-duration span {
+      display: block;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--muted-light);
+      margin-top: 2px
+    }
+
+    @media(max-width:768px) {
+      .levels-header {
+        grid-template-columns: 1fr
+      }
+
+      .level-item {
+        grid-template-columns: 48px 1fr
+      }
+
+      .level-duration {
+        display: none
+      }
     }
 
     /* ══════════════════════
        4. HOW IT WORKS (INK)
        Four steps. Plain.
     ══════════════════════ */
-    .process{background:var(--ink-2);padding:var(--sp) 0;position:relative;overflow:hidden}
-    .process-watermark{position:absolute;top:-5%;left:-1%;font-family:var(--ff-display);font-size:clamp(100px,16vw,200px);font-weight:900;color:rgba(255,255,255,.02);pointer-events:none;user-select:none;white-space:nowrap;line-height:1;letter-spacing:-.02em}
-    .process-header{max-width:580px;margin:0 auto 3rem;text-align:center;position:relative;z-index:1}
-    .process-label{margin-bottom:1.5rem;justify-content:center}
-    .process-heading{font-family:var(--ff-display);font-size:clamp(1.7rem,3.2vw,2.6rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--white);margin-bottom:1rem}
-    .process-heading em{font-style:italic;color:var(--primary)}
-    .process-sub{font-size:1rem;line-height:1.8;color:rgba(255,255,255,.4)}
-    .process-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.05);position:relative;z-index:1}
-    .process-step{background:var(--ink-2);padding:2rem 1.5rem;display:flex;flex-direction:column;gap:.75rem;transition:background var(--tr)}
-    .process-step:hover{background:rgba(175,50,54,.06)}
-    .ps-num{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--primary)}
-    .ps-name{font-family:var(--ff-display);font-size:1.1rem;font-weight:700;color:var(--white);line-height:1.3}
-    .ps-desc{font-size:13.5px;line-height:1.65;color:rgba(255,255,255,.4)}
-    @media(max-width:720px){.process-steps{grid-template-columns:1fr 1fr}}
-    @media(max-width:480px){.process-steps{grid-template-columns:1fr}}
+    .process {
+      background: var(--ink-2);
+      padding: var(--sp) 0;
+      position: relative;
+      overflow: hidden
+    }
+
+    .process-watermark {
+      position: absolute;
+      top: -5%;
+      left: -1%;
+      font-family: var(--ff-display);
+      font-size: clamp(100px, 16vw, 200px);
+      font-weight: 900;
+      color: rgba(255, 255, 255, .02);
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+      line-height: 1;
+      letter-spacing: -.02em
+    }
+
+    .process-header {
+      max-width: 580px;
+      margin: 0 auto 3rem;
+      text-align: center;
+      position: relative;
+      z-index: 1
+    }
+
+    .process-label {
+      margin-bottom: 1.5rem;
+      justify-content: center
+    }
+
+    .process-heading {
+      font-family: var(--ff-display);
+      font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      color: var(--white);
+      margin-bottom: 1rem
+    }
+
+    .process-heading em {
+      font-style: italic;
+      color: var(--primary)
+    }
+
+    .process-sub {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, .4)
+    }
+
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: rgba(255, 255, 255, .05);
+      position: relative;
+      z-index: 1
+    }
+
+    .process-step {
+      background: var(--ink-2);
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+      transition: background var(--tr)
+    }
+
+    .process-step:hover {
+      background: rgba(175, 50, 54, .06)
+    }
+
+    .ps-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--primary)
+    }
+
+    .ps-name {
+      font-family: var(--ff-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.3
+    }
+
+    .ps-desc {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, .4)
+    }
+
+    @media(max-width:720px) {
+      .process-steps {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:480px) {
+      .process-steps {
+        grid-template-columns: 1fr
+      }
+    }
 
     /* ══════════════════════
        5. NEXT STEP (STONE)
        Platform teaser
     ══════════════════════ */
-    .next{background:var(--stone);padding:var(--sp) 0;border-top:1px solid var(--stone-2)}
-    .next-inner{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2.5rem,6vw,6rem);align-items:center}
-    .next-label{margin-bottom:1.5rem}
-    .next-heading{font-family:var(--ff-display);font-size:clamp(1.7rem,3.2vw,2.6rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;color:var(--ink);margin-bottom:1.25rem}
-    .next-heading em{font-style:italic;color:var(--primary)}
-    .next-body{font-size:1rem;line-height:1.85;color:var(--muted);margin-bottom:2rem}
-    .next-actions{display:flex;flex-wrap:wrap;gap:1rem}
-    .next-right{display:flex;flex-direction:column;gap:1px}
-    .next-item{background:var(--white);border-left:3px solid transparent;padding:1.2rem 1.5rem;transition:border-color .2s var(--tr)}
-    .next-item:hover{border-left-color:var(--primary)}
-    .next-item-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px}
-    .next-item-desc{font-size:12.5px;color:var(--muted);line-height:1.5}
-    @media(max-width:768px){.next-inner{grid-template-columns:1fr}}
+    .next {
+      background: var(--stone);
+      padding: var(--sp) 0;
+      border-top: 1px solid var(--stone-2)
+    }
+
+    .next-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(2.5rem, 6vw, 6rem);
+      align-items: center
+    }
+
+    .next-label {
+      margin-bottom: 1.5rem
+    }
+
+    .next-heading {
+      font-family: var(--ff-display);
+      font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      color: var(--ink);
+      margin-bottom: 1.25rem
+    }
+
+    .next-heading em {
+      font-style: italic;
+      color: var(--primary)
+    }
+
+    .next-body {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--muted);
+      margin-bottom: 2rem
+    }
+
+    .next-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem
+    }
+
+    .next-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1px
+    }
+
+    .next-item {
+      background: var(--white);
+      border-left: 3px solid transparent;
+      padding: 1.2rem 1.5rem;
+      transition: border-color .2s var(--tr)
+    }
+
+    .next-item:hover {
+      border-left-color: var(--primary)
+    }
+
+    .next-item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 3px
+    }
+
+    .next-item-desc {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.5
+    }
+
+    @media(max-width:768px) {
+      .next-inner {
+        grid-template-columns: 1fr
+      }
+    }
 
     /* FOOTER */
-    .site-footer{background:var(--ink-2);border-top:1px solid rgba(255,255,255,.05);padding:3rem 0 2rem}
-    .footer-top{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;flex-wrap:wrap;margin-bottom:2.5rem}
-    .footer-tagline{font-size:13px;color:rgba(255,255,255,.3);line-height:1.65;max-width:240px;margin-top:10px}
-    .footer-col-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px}
-    .footer-links{list-style:none;display:flex;flex-direction:column;gap:8px}
-    .footer-links a{font-size:13px;color:rgba(255,255,255,.45);transition:color var(--tr)}.footer-links a:hover{color:rgba(255,255,255,.85)}
-    .footer-bottom{border-top:1px solid rgba(255,255,255,.05);padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-    .footer-legal{font-size:12px;color:rgba(255,255,255,.2)}
-    .footer-domain{font-size:12px;font-weight:600;color:var(--primary)}
+    .site-footer {
+      background: var(--ink-2);
+      border-top: 1px solid rgba(255, 255, 255, .05);
+      padding: 3rem 0 2rem
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem
+    }
+
+    .footer-tagline {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .3);
+      line-height: 1.65;
+      max-width: 240px;
+      margin-top: 10px
+    }
+
+    .footer-col-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .3);
+      margin-bottom: 12px
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .45);
+      transition: color var(--tr)
+    }
+
+    .footer-links a:hover {
+      color: rgba(255, 255, 255, .85)
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, .05);
+      padding-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem
+    }
+
+    .footer-legal {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .2)
+    }
+
+    .footer-domain {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary)
+    }
   </style>
 </head>
+
 <body>
 
   <!-- NAV -->
@@ -172,12 +916,7 @@
     <div class="container">
       <div class="nav-inner">
         <a href="/" aria-label="Ichebo Christian Services">
-          <svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg" style="height:26px;width:auto">
-            <polygon fill="#fff" fill-rule="evenodd" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42"/>
-            <path fill="#fff" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/>
-            <path fill="#fff" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z"/>
-            <path fill="#fff" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/>
-          </svg>
+          <img src="/public/logo.svg" alt="Ichebo Christian Services" style="height:26px;width:auto">
         </a>
         <ul class="nav-links">
           <li><a href="/programme/">Programme</a></li>
@@ -187,7 +926,12 @@
         </ul>
         <a href="/#waitlist" class="nav-join">Join the Waiting List</a>
         <button class="nav-menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
         </button>
       </div>
     </div>
@@ -224,14 +968,18 @@
           deserves a <em>clear path.</em>
         </h1>
         <p class="hero-sub fade-up" style="transition-delay:.2s">
-          Formation is not a classroom programme. It is the journey every person walks inside a Sceptre Community — from the moment they arrive to the moment they lead others.
+          Formation is not a classroom programme. It is the journey every person walks inside a Sceptre Community — from
+          the moment they arrive to the moment they lead others.
           <br><br>
           <strong>Structured. Intentional. Built around the life of the community itself.</strong>
         </p>
         <div class="hero-actions fade-up" style="transition-delay:.3s">
           <a href="#how" class="btn btn-primary">
             How It Works
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
           </a>
           <a href="/programme/" class="btn btn-outline-w">Back to the Programme</a>
         </div>
@@ -252,49 +1000,58 @@
           Growth is not just<br>one <em>dimension.</em>
         </h2>
         <p class="journey-sub fade-up" style="transition-delay:.15s">
-          Formation in a Sceptre Community develops a person in eight interconnected areas — so that growth is whole, not just spiritual knowledge. Every person touches each pathway at every stage of their journey.
+          Formation in a Sceptre Community develops a person in eight interconnected areas — so that growth is whole,
+          not just spiritual knowledge. Every person touches each pathway at every stage of their journey.
         </p>
       </div>
       <div class="pathways-grid">
         <div class="pathway fade-up" style="transition-delay:.03s">
           <div class="pathway-num">01</div>
           <div class="pathway-name">New Life</div>
-          <div class="pathway-desc">Arriving, belonging, and beginning. The first steps of a life lived as part of a community with purpose.</div>
+          <div class="pathway-desc">Arriving, belonging, and beginning. The first steps of a life lived as part of a
+            community with purpose.</div>
         </div>
         <div class="pathway fade-up" style="transition-delay:.06s">
           <div class="pathway-num">02</div>
           <div class="pathway-name">Spiritual Formation</div>
-          <div class="pathway-desc">Inner transformation. Prayer, Scripture, spiritual disciplines, and the development of character over time.</div>
+          <div class="pathway-desc">Inner transformation. Prayer, Scripture, spiritual disciplines, and the development
+            of character over time.</div>
         </div>
         <div class="pathway fade-up" style="transition-delay:.09s">
           <div class="pathway-num">03</div>
           <div class="pathway-name">Community Life</div>
-          <div class="pathway-desc">Learning to live with others. Accountability, shared values, and what it means to genuinely belong.</div>
+          <div class="pathway-desc">Learning to live with others. Accountability, shared values, and what it means to
+            genuinely belong.</div>
         </div>
         <div class="pathway fade-up" style="transition-delay:.12s">
           <div class="pathway-num">04</div>
           <div class="pathway-name">Service</div>
-          <div class="pathway-desc">Discovering gifts and beginning to contribute. Finding where your particular shape fits the work of the community.</div>
+          <div class="pathway-desc">Discovering gifts and beginning to contribute. Finding where your particular shape
+            fits the work of the community.</div>
         </div>
         <div class="pathway fade-up" style="transition-delay:.15s">
           <div class="pathway-num">05</div>
           <div class="pathway-name">Leadership</div>
-          <div class="pathway-desc">Taking responsibility for others. Learning to carry people, make decisions, and hold the community's direction.</div>
+          <div class="pathway-desc">Taking responsibility for others. Learning to carry people, make decisions, and hold
+            the community's direction.</div>
         </div>
         <div class="pathway fade-up" style="transition-delay:.18s">
           <div class="pathway-num">06</div>
           <div class="pathway-name">Learning</div>
-          <div class="pathway-desc">Structured development through the qualification programmes. Knowledge that is applied, not just acquired.</div>
+          <div class="pathway-desc">Structured development through the qualification programmes. Knowledge that is
+            applied, not just acquired.</div>
         </div>
         <div class="pathway fade-up" style="transition-delay:.21s">
           <div class="pathway-num">07</div>
           <div class="pathway-name">Mission</div>
-          <div class="pathway-desc">Carrying the community's calling outward. Engagement with the neighbourhood, the workplace, the street outside the door.</div>
+          <div class="pathway-desc">Carrying the community's calling outward. Engagement with the neighbourhood, the
+            workplace, the street outside the door.</div>
         </div>
         <div class="pathway fade-up" style="transition-delay:.24s">
           <div class="pathway-num">08</div>
           <div class="pathway-name">Stewardship</div>
-          <div class="pathway-desc">Oversight and governance. Caring for the structures and people that make the community able to sustain and multiply.</div>
+          <div class="pathway-desc">Oversight and governance. Caring for the structures and people that make the
+            community able to sustain and multiply.</div>
         </div>
       </div>
     </div>
@@ -315,54 +1072,78 @@
             One <em>continuous</em> journey.
           </h2>
           <p class="levels-body fade-up" style="transition-delay:.15s">
-            Formation progresses through five levels — each building on the last. Movement from one level to the next is confirmed by a steward, not just measured by time. Progression is tied to genuine growth, not attendance.
+            Formation progresses through five levels — each building on the last. Movement from one level to the next is
+            confirmed by a steward, not just measured by time. Progression is tied to genuine growth, not attendance.
           </p>
           <p class="levels-note fade-up" style="transition-delay:.2s">
-            All formation begins with a 12-week Induction — regardless of where a person comes from or what they already know. This is not remedial. It is the foundation everything else rests on.
+            All formation begins with a 12-week Induction — regardless of where a person comes from or what they already
+            know. This is not remedial. It is the foundation everything else rests on.
           </p>
         </div>
         <div class="fade-up" style="transition-delay:.1s;align-self:center">
-          <p style="font-size:.95rem;line-height:1.85;color:var(--muted)">Each programme develops a person across all eight pathways — so that qualification is not just a measure of knowledge, but of who the person is becoming inside their community.</p>
+          <p style="font-size:.95rem;line-height:1.85;color:var(--muted)">Each programme develops a person across all
+            eight pathways — so that qualification is not just a measure of knowledge, but of who the person is becoming
+            inside their community.</p>
         </div>
       </div>
       <div class="levels-list">
         <div class="level-item fade-up" style="transition-delay:.05s">
-          <div class="level-badge"><div class="level-badge-num">1</div><div class="level-badge-label">Cert</div></div>
+          <div class="level-badge">
+            <div class="level-badge-num">1</div>
+            <div class="level-badge-label">Cert</div>
+          </div>
           <div>
             <div class="level-name">Certificate</div>
-            <div class="level-desc">The first year of formation. Foundation in faith, community life, service, and personal stewardship. Every member begins here.</div>
+            <div class="level-desc">The first year of formation. Foundation in faith, community life, service, and
+              personal stewardship. Every member begins here.</div>
           </div>
           <div class="level-duration">Year 1<span>Foundation</span></div>
         </div>
         <div class="level-item fade-up" style="transition-delay:.1s">
-          <div class="level-badge"><div class="level-badge-num">2</div><div class="level-badge-label">Dip</div></div>
+          <div class="level-badge">
+            <div class="level-badge-num">2</div>
+            <div class="level-badge-label">Dip</div>
+          </div>
           <div>
             <div class="level-name">Diploma</div>
-            <div class="level-desc">Deepening discipleship and beginning to carry responsibility for others. Leadership principles and service domain placement.</div>
+            <div class="level-desc">Deepening discipleship and beginning to carry responsibility for others. Leadership
+              principles and service domain placement.</div>
           </div>
           <div class="level-duration">Year 2<span>Development</span></div>
         </div>
         <div class="level-item fade-up" style="transition-delay:.15s">
-          <div class="level-badge"><div class="level-badge-num">3</div><div class="level-badge-label">Deg</div></div>
+          <div class="level-badge">
+            <div class="level-badge-num">3</div>
+            <div class="level-badge-label">Deg</div>
+          </div>
           <div>
             <div class="level-name">Degree</div>
-            <div class="level-desc">Practitioner-level formation. Community governance, mission practice, and developing others through their own formation journey.</div>
+            <div class="level-desc">Practitioner-level formation. Community governance, mission practice, and developing
+              others through their own formation journey.</div>
           </div>
           <div class="level-duration">Years 3–4<span>Practice</span></div>
         </div>
         <div class="level-item fade-up" style="transition-delay:.2s">
-          <div class="level-badge"><div class="level-badge-num">4</div><div class="level-badge-label">Mas</div></div>
+          <div class="level-badge">
+            <div class="level-badge-num">4</div>
+            <div class="level-badge-label">Mas</div>
+          </div>
           <div>
             <div class="level-name">Masters</div>
-            <div class="level-desc">Strategic formation and oversight. Prepared to carry governance responsibility and guide others at the level of the wider network.</div>
+            <div class="level-desc">Strategic formation and oversight. Prepared to carry governance responsibility and
+              guide others at the level of the wider network.</div>
           </div>
           <div class="level-duration">Years 5–6<span>Oversight</span></div>
         </div>
         <div class="level-item fade-up" style="transition-delay:.25s">
-          <div class="level-badge"><div class="level-badge-num">5</div><div class="level-badge-label">Doc</div></div>
+          <div class="level-badge">
+            <div class="level-badge-num">5</div>
+            <div class="level-badge-label">Doc</div>
+          </div>
           <div>
             <div class="level-name">Doctorate</div>
-            <div class="level-desc">Apostolic-level stewardship. Guiding the formation and governance of the movement at institutional and generational scale.</div>
+            <div class="level-desc">Apostolic-level stewardship. Guiding the formation and governance of the movement at
+              institutional and generational scale.</div>
           </div>
           <div class="level-duration">Year 7<span>Stewardship</span></div>
         </div>
@@ -384,29 +1165,34 @@
           From arrival to <em>advancement.</em>
         </h2>
         <p class="process-sub" style="margin-top:1rem">
-          Formation is not self-directed. Every step is accompanied — by your community, your steward, and the structure of the programme itself.
+          Formation is not self-directed. Every step is accompanied — by your community, your steward, and the structure
+          of the programme itself.
         </p>
       </div>
       <div class="process-steps">
         <div class="process-step fade-up" style="transition-delay:.05s">
           <div class="ps-num">Step 01</div>
           <div class="ps-name">Begin with Induction</div>
-          <div class="ps-desc">Twelve weeks inside a Sceptre Community. Not a classroom — a lived experience of community life, with structured reflection alongside it.</div>
+          <div class="ps-desc">Twelve weeks inside a Sceptre Community. Not a classroom — a lived experience of
+            community life, with structured reflection alongside it.</div>
         </div>
         <div class="process-step fade-up" style="transition-delay:.1s">
           <div class="ps-num">Step 02</div>
           <div class="ps-name">Understand your shape</div>
-          <div class="ps-desc">During Induction, a gifting assessment maps your spiritual gifts, natural abilities, and vocational skills — and places you on the right pathway.</div>
+          <div class="ps-desc">During Induction, a gifting assessment maps your spiritual gifts, natural abilities, and
+            vocational skills — and places you on the right pathway.</div>
         </div>
         <div class="process-step fade-up" style="transition-delay:.15s">
           <div class="ps-num">Step 03</div>
           <div class="ps-name">Enter the Certificate</div>
-          <div class="ps-desc">Your steward confirms placement and enrolment begins. The Ichebo Platform carries your formation record and tracks your progress through the programme.</div>
+          <div class="ps-desc">Your steward confirms placement and enrolment begins. The Ichebo Platform carries your
+            formation record and tracks your progress through the programme.</div>
         </div>
         <div class="process-step fade-up" style="transition-delay:.2s">
           <div class="ps-num">Step 04</div>
           <div class="ps-name">Advance when ready</div>
-          <div class="ps-desc">Progression to each new level is confirmed by a steward — not just by time. Growth is measured, not assumed. Each level builds on what was genuinely formed in the last.</div>
+          <div class="ps-desc">Progression to each new level is confirmed by a steward — not just by time. Growth is
+            measured, not assumed. Each level builds on what was genuinely formed in the last.</div>
         </div>
       </div>
     </div>
@@ -427,12 +1213,17 @@
             <em>infrastructure</em> to sustain it.
           </h2>
           <p class="next-body fade-up" style="transition-delay:.15s">
-            The Ichebo Platform carries the formation record of every person inside every Sceptre Community — tracking progress, supporting steward confirmation, and connecting each community to the wider network. It is what makes formation manageable at any scale.
+            The Ichebo Platform carries the formation record of every person inside every Sceptre Community — tracking
+            progress, supporting steward confirmation, and connecting each community to the wider network. It is what
+            makes formation manageable at any scale.
           </p>
           <div class="next-actions fade-up" style="transition-delay:.2s">
             <a href="/platform/" class="btn btn-primary">
               See the Platform
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
             </a>
             <a href="/#waitlist" class="btn btn-outline-d">Join the Waiting List</a>
           </div>
@@ -440,7 +1231,8 @@
         <div class="next-right">
           <div class="next-item fade-up" style="transition-delay:.05s">
             <div class="next-item-name">Formation records for every person</div>
-            <div class="next-item-desc">Every member's journey tracked — pathway progress, steward notes, programme stage</div>
+            <div class="next-item-desc">Every member's journey tracked — pathway progress, steward notes, programme
+              stage</div>
           </div>
           <div class="next-item fade-up" style="transition-delay:.1s">
             <div class="next-item-name">Steward confirmation built in</div>
@@ -448,11 +1240,13 @@
           </div>
           <div class="next-item fade-up" style="transition-delay:.15s">
             <div class="next-item-name">Connected to the network</div>
-            <div class="next-item-desc">Your community's formation data connects to the wider movement — not siloed locally</div>
+            <div class="next-item-desc">Your community's formation data connects to the wider movement — not siloed
+              locally</div>
           </div>
           <div class="next-item fade-up" style="transition-delay:.2s">
             <div class="next-item-name">Works offline</div>
-            <div class="next-item-desc">The Ichebo Desktop app operates without an internet connection — syncing when available</div>
+            <div class="next-item-desc">The Ichebo Desktop app operates without an internet connection — syncing when
+              available</div>
           </div>
           <div class="next-item fade-up" style="transition-delay:.25s">
             <div class="next-item-name">Available on every device</div>
@@ -468,13 +1262,9 @@
     <div class="container">
       <div class="footer-top">
         <div>
-          <svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg" style="height:20px;width:auto;display:block" aria-label="Ichebo Christian Services">
-            <polygon fill="#fff" fill-rule="evenodd" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42"/>
-            <path fill="#fff" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/>
-            <path fill="#fff" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z"/>
-            <path fill="#fff" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/>
-          </svg>
-          <p class="footer-tagline">A Kingdom agency equipping gatherings with the structure, formation, and network to bring meaningful impact to their communities.</p>
+          <img src="/public/logo.svg" alt="Ichebo Christian Services" style="height:20px;width:auto;display:block">
+          <p class="footer-tagline">A Kingdom agency equipping gatherings with the structure, formation, and network to
+            bring meaningful impact to their communities.</p>
         </div>
         <div>
           <div class="footer-col-title">The Movement</div>
@@ -501,13 +1291,14 @@
   </footer>
 
   <script>
-    const menuBtn=document.getElementById('menuBtn'),closeBtn=document.getElementById('closeBtn'),mobileNav=document.getElementById('mobileNav');
-    const closeMenu=()=>{mobileNav.classList.remove('open');mobileNav.setAttribute('aria-hidden','true');closeBtn.classList.remove('open');menuBtn.setAttribute('aria-expanded','false');document.body.style.overflow=''};
-    menuBtn.addEventListener('click',()=>{mobileNav.classList.add('open');mobileNav.setAttribute('aria-hidden','false');closeBtn.classList.add('open');menuBtn.setAttribute('aria-expanded','true');document.body.style.overflow='hidden'});
-    closeBtn.addEventListener('click',closeMenu);
-    mobileNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
-    const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}}),{threshold:.08,rootMargin:'0px 0px -40px 0px'});
-    document.querySelectorAll('.fade-up').forEach(el=>observer.observe(el));
+    const menuBtn = document.getElementById('menuBtn'), closeBtn = document.getElementById('closeBtn'), mobileNav = document.getElementById('mobileNav');
+    const closeMenu = () => { mobileNav.classList.remove('open'); mobileNav.setAttribute('aria-hidden', 'true'); closeBtn.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); document.body.style.overflow = '' };
+    menuBtn.addEventListener('click', () => { mobileNav.classList.add('open'); mobileNav.setAttribute('aria-hidden', 'false'); closeBtn.classList.add('open'); menuBtn.setAttribute('aria-expanded', 'true'); document.body.style.overflow = 'hidden' });
+    closeBtn.addEventListener('click', closeMenu);
+    mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    const observer = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target) } }), { threshold: .08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
   </script>
 </body>
+
 </html>
