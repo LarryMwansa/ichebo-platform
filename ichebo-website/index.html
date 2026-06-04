@@ -554,11 +554,12 @@
       if(!name||!email||!path||!consent) return;
       submitBtn.disabled=true; submitBtn.textContent='Registering…';
       try {
-        // PRODUCTION: replace with:
-        // await fetch('https://app.ichebo.org/api/waitlist/', { method:'POST',
-        //   headers:{'Content-Type':'application/json'},
-        //   body:JSON.stringify({name,email,path:path.value,consent:true}) });
-        await new Promise(r=>setTimeout(r,800));
+        const res = await fetch('https://app.ichebo.org/api/waitlist/', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({name, email, path: path.value, consent: true})
+        });
+        if (!res.ok) throw new Error('server_error');
         form.style.display='none'; formSuccess.classList.add('visible');
       } catch { submitBtn.disabled=false; submitBtn.textContent='Register My Interest'; alert('Something went wrong. Please email info@ichebo.org directly.'); }
     });

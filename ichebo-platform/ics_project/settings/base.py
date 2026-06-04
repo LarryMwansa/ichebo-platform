@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'handbook',
     'encrypted_model_fields',
     'django_celery_beat',
+    'waitlist',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
