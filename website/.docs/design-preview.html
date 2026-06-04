@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ichebo Design System — Visual Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Inter:wght@300;400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#af3236; --primary-dark:#8c2a2d; --primary-light:rgba(175,50,54,0.12);
+  --secondary:#185abc; --ink:#0e0e0e; --ink-2:#1a1a1a; --ink-light:#2d2d2d;
+  --stone:#f5f3f0; --stone-2:#ece9e4; --white:#ffffff;
+  --text:#1a1a1a; --muted:#6b6b6b; --muted-lt:#9a9a9a;
+  --border:rgba(0,0,0,0.08); --border-dk:rgba(255,255,255,0.1);
+  --success:#16a34a; --warning:#ca8a04; --error:#dc2626; --info:#185abc;
+  --level-0:#9ca3af; --level-1:#16a34a; --level-2:#2563eb;
+  --level-3:#7c3aed; --level-4:#ea580c; --level-5:#dc2626;
+  --ff-d:'Playfair Display',Georgia,serif; --ff-b:'Inter',system-ui,sans-serif;
+  --tr:0.3s cubic-bezier(0.4,0,0.2,1); --tr-f:0.15s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--ff-b);background:#f0ede8;color:var(--text);-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.material-symbols-outlined{font-family:'Material Symbols Outlined';font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:inherit;line-height:1;display:inline-flex;align-items:center}
+
+/* ── PREVIEW CHROME ── */
+.preview-header{background:var(--ink);padding:2.5rem 3rem;position:relative;overflow:hidden}
+.preview-header::after{content:'ICHEBO';position:absolute;right:-1rem;top:50%;transform:translateY(-50%);font-family:var(--ff-d);font-size:12rem;font-weight:900;color:rgba(175,50,54,0.06);pointer-events:none;letter-spacing:-0.04em}
+.ph-label{font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--primary);display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+.ph-label::before{content:'';width:20px;height:2px;background:var(--primary)}
+.ph-title{font-family:var(--ff-d);font-size:clamp(2rem,5vw,3.5rem);font-weight:800;color:#fff;letter-spacing:-0.02em;line-height:1.1;margin-bottom:0.5rem}
+.ph-title em{font-style:italic;color:var(--primary)}
+.ph-sub{font-size:14px;color:rgba(255,255,255,0.5)}
+.preview-nav{background:var(--ink-2);border-bottom:1px solid rgba(255,255,255,0.06);padding:0 3rem;display:flex;gap:0;overflow-x:auto}
+.pnav-btn{flex-shrink:0;padding:1rem 1.5rem;font-size:13px;font-weight:500;color:rgba(255,255,255,0.5);border-bottom:2px solid transparent;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--ff-b);transition:all var(--tr-f)}
+.pnav-btn:hover,.pnav-btn.active{color:#fff;border-bottom-color:var(--primary)}
+.preview-body{max-width:1400px;margin:0 auto;padding:3rem}
+.section-title{font-family:var(--ff-d);font-size:1.8rem;font-weight:800;color:var(--ink);margin-bottom:0.5rem;letter-spacing:-0.02em}
+.section-sub{font-size:13px;color:var(--muted);margin-bottom:2rem}
+.panel{background:var(--white);border-radius:12px;padding:2rem;margin-bottom:2rem;border:1px solid var(--border)}
+.panel-dark{background:var(--ink);border-color:rgba(255,255,255,0.06)}
+.panel-stone{background:var(--stone);border-color:var(--stone-2)}
+.panel-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:block}
+.panel-label-w{color:rgba(255,255,255,0.35)}
+.preview-section{display:none}.preview-section.active{display:block}
+
+/* ── COLOUR SWATCHES ── */
+.swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+.swatch{border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.swatch-colour{height:72px}
+.swatch-info{padding:8px 10px;background:var(--white)}
+.swatch-name{font-size:11px;font-weight:600;color:var(--text)}
+.swatch-hex{font-size:10px;color:var(--muted);font-family:monospace}
+
+/* ── TYPE SPECIMENS ── */
+.type-row{padding:1.5rem 0;border-bottom:1px solid var(--border)}
+.type-row:last-child{border:none}
+.type-meta{font-size:11px;color:var(--muted);margin-bottom:0.5rem;font-family:monospace}
+.type-specimen-d{font-family:var(--ff-d);color:var(--ink)}
+.type-specimen-b{font-family:var(--ff-b);color:var(--ink)}
+
+/* ── COMPONENTS ── */
+.comp-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:1rem}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:0 24px;height:48px;border-radius:12px;font-family:var(--ff-b);font-size:14px;font-weight:500;cursor:pointer;border:2px solid transparent;transition:all var(--tr-f)}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:var(--stone);color:var(--text);border-color:var(--stone-2)}.btn-secondary:hover{background:var(--stone-2)}
+.btn-ghost{background:transparent;color:var(--primary);padding-inline:0}.btn-ghost:hover{opacity:0.8}
+.btn-danger{background:var(--error);color:#fff}
+.badge{display:inline-flex;align-items:center;justify-content:center;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap}
+.b-active{background:rgba(22,163,74,0.12);color:#16a34a}
+.b-warning{background:rgba(202,138,4,0.12);color:#ca8a04}
+.b-danger{background:rgba(220,38,38,0.12);color:#dc2626}
+.b-muted{background:var(--stone-2);color:var(--muted)}
+.b-info{background:rgba(24,90,188,0.12);color:#185abc}
+.badge-unit{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;padding:2px 8px;border-radius:3px;background:var(--stone-2);color:var(--muted)}
+.badge-unit.primary{background:var(--primary-light);color:var(--primary)}
+.input{display:block;width:100%;height:48px;padding:0 16px;border-radius:8px;border:1px solid var(--border);background:var(--stone);color:var(--text);font-family:var(--ff-b);font-size:16px;outline:none;transition:border-color var(--tr-f)}
+.input:focus{border-color:var(--primary);background:var(--white)}
+.label-caps{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:0.08em;margin-bottom:6px;display:block}
+.label-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary)}
+.label-tag::before{content:'';width:20px;height:2px;background:var(--primary)}
+.progress-wrap{height:6px;background:var(--stone-2);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:var(--primary);border-radius:999px}
+.level-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-size:11px;font-weight:800;color:#fff}
+.list-group{background:var(--stone);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.list-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--stone)}
+.list-item:last-child{border:none}
+.li-icon{width:40px;height:40px;border-radius:8px;background:var(--white);display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;font-size:20px}
+.li-content{flex:1;min-width:0}
+.li-title{font-size:15px;font-weight:500;color:var(--text)}
+.li-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.li-action{color:var(--muted);font-size:20px}
+
+/* ── PAGE HERO ── */
+.page-hero{background:var(--ink);padding:32px 24px 28px;position:relative;overflow:hidden;border-radius:8px}
+.page-hero::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,transparent,var(--primary) 25%,var(--primary) 75%,transparent);opacity:0.7}
+.page-hero::after{content:attr(data-w);position:absolute;right:-8px;bottom:-12px;font-family:var(--ff-d);font-size:8rem;font-weight:900;color:rgba(175,50,54,0.07);pointer-events:none;letter-spacing:-0.04em;line-height:1}
+.ph-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ph-line{width:20px;height:2px;background:var(--primary)}
+.ph-lbl{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--primary)}
+.ph-h1{font-family:var(--ff-d);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;color:#fff;letter-spacing:-0.02em;line-height:1.1;margin-bottom:8px}
+.ph-h1 em{font-style:italic;color:var(--primary)}
+.ph-p{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.65;max-width:48ch}
+
+/* ── WORKSPACE PREVIEW ── */
+.ws-mock{background:var(--stone);border-radius:12px;overflow:hidden;border:1px solid var(--border);display:flex;height:560px}
+.ws-sidebar{width:240px;background:var(--ink);flex-shrink:0;display:flex;flex-direction:column;padding:0}
+.ws-sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.ws-sidebar-logo svg{height:18px;width:auto;fill:#f5f3f0}
+.ws-nav-section{padding:16px 12px 8px}
+.ws-nav-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:0 8px;margin-bottom:6px}
+.ws-nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:4px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,0.55);position:relative;transition:all var(--tr-f)}
+.ws-nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.05)}
+.ws-nav-item.active{color:#fff;background:rgba(175,50,54,0.15)}
+.ws-nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--primary);border-radius:0 2px 2px 0}
+.ws-nav-item .material-symbols-outlined{font-size:18px}
+.ws-nav-spacer{flex:1}
+.ws-nav-user{padding:12px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px}
+.ws-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.ws-user-info small{font-size:11px;color:rgba(255,255,255,0.35);display:block}
+.ws-user-info strong{font-size:13px;color:rgba(255,255,255,0.75);font-weight:500}
+.ws-level-dot{width:20px;height:20px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;margin-left:auto;flex-shrink:0}
+.ws-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.ws-topbar{height:56px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
+.ws-breadcrumb{font-size:12px;color:var(--muted)}
+.ws-breadcrumb strong{color:var(--text);font-weight:600}
+.ws-topbar-actions{display:flex;gap:8px}
+.ws-icon-btn{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--stone);color:var(--muted);cursor:pointer;font-size:18px;border:1px solid var(--border)}
+.ws-content{flex:1;overflow-y:auto;padding:24px}
+.ws-page-title{font-family:var(--ff-d);font-size:1.6rem;font-weight:800;color:var(--ink);letter-spacing:-0.02em;margin-bottom:4px}
+.ws-page-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.ws-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.ws-stat{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:16px}
+.ws-stat-num{font-family:var(--ff-d);font-size:1.8rem;font-weight:800;color:var(--primary);line-height:1;margin-bottom:4px}
+.ws-stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
+.ws-table{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.ws-table-header{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0;background:var(--stone);padding:10px 16px;border-bottom:1px solid var(--border)}
+.ws-th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted)}
+.ws-table-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center}
+.ws-table-row:last-child{border:none}
+.ws-table-row:hover{background:var(--stone)}
+.ws-td{font-size:13px;color:var(--text)}
+.ws-td.muted{color:var(--muted)}
+
+/* ── MOBILE PREVIEW ── */
+.mobile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2rem}
+.phone-mock{background:var(--ink);border-radius:32px;overflow:hidden;border:6px solid var(--ink-2);box-shadow:0 32px 64px rgba(0,0,0,0.4);max-width:320px;margin:0 auto}
+.phone-screen{background:var(--stone)}
+.phone-topbar{background:var(--ink);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.phone-topbar svg{height:16px;fill:#f5f3f0}
+.phone-topbar-actions{display:flex;gap:4px}
+.phone-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.7);font-size:20px}
+.phone-hero{background:var(--ink);padding:20px 16px 20px;position:relative;overflow:hidden}
+.phone-hero::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,transparent,var(--primary) 25%,var(--primary) 75%,transparent);opacity:0.7}
+.phone-hero::after{content:attr(data-w);position:absolute;right:-4px;bottom:-8px;font-family:var(--ff-d);font-size:5rem;font-weight:900;color:rgba(175,50,54,0.08);pointer-events:none;letter-spacing:-0.04em;line-height:1}
+.ph-eyebrow-sm{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.ph-line-sm{width:14px;height:2px;background:var(--primary)}
+.ph-lbl-sm{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary)}
+.phone-h1{font-family:var(--ff-d);font-size:1.4rem;font-weight:800;color:#fff;letter-spacing:-0.02em;line-height:1.15;margin-bottom:6px}
+.phone-h1 em{font-style:italic;color:var(--primary)}
+.phone-sub{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.55}
+.phone-content{padding:16px;display:flex;flex-direction:column;gap:10px}
+.phone-card{background:var(--white);border-radius:12px;padding:14px;border:1px solid var(--border);position:relative;overflow:hidden}
+.phone-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--primary);opacity:0}
+.phone-card.accent::before{opacity:1}
+.pc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px}
+.pc-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.pc-meta{font-size:11px;color:var(--muted)}
+.phone-progress{margin-top:8px}
+.phone-progress-bar{height:4px;background:var(--stone-2);border-radius:999px;overflow:hidden}
+.phone-progress-fill{height:100%;background:var(--primary);border-radius:999px}
+.phone-bottom-nav{background:var(--white);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);height:64px;padding:0 8px}
+.phone-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--ff-b)}
+.phone-nav-item.active{color:var(--primary)}
+.phone-nav-item .material-symbols-outlined{font-size:22px}
+.phone-nav-item.active .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+
+/* ── FLUTTER TOKEN PANEL ── */
+.token-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.token-card{background:var(--stone);border:1px solid var(--stone-2);border-radius:8px;padding:16px}
+.token-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px;font-family:monospace}
+.token-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+.token-row:last-child{border:none}
+.token-name{font-size:11px;font-family:monospace;color:var(--muted)}
+.token-val{font-size:11px;font-family:monospace;color:var(--text);font-weight:600}
+.token-swatch{width:18px;height:18px;border-radius:4px;flex-shrink:0;border:1px solid var(--border)}
+
+/* ── MARKETING SURFACE ── */
+.mkt-preview{background:var(--stone);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.mkt-nav{background:rgba(14,14,14,0.96);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.mkt-nav-logo{display:flex;align-items:center;gap:10px}
+.mkt-nav-logo svg{height:18px;fill:#fff}
+.mkt-nav-links{display:flex;gap:28px}
+.mkt-nav-links a{font-size:13px;font-weight:500;color:rgba(255,255,255,0.7)}
+.mkt-nav-cta{background:var(--primary);color:#fff;padding:8px 20px;border-radius:3px;font-size:13px;font-weight:600}
+.mkt-hero{background:var(--ink);padding:64px 32px 48px;position:relative;overflow:hidden}
+.mkt-hero::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,transparent,var(--primary) 25%,var(--primary) 75%,transparent);opacity:0.5}
+.mkt-hero::after{content:'KINGDOM';position:absolute;right:-1rem;bottom:-2rem;font-family:var(--ff-d);font-size:10rem;font-weight:900;color:rgba(175,50,54,0.06);pointer-events:none;letter-spacing:-0.04em}
+.mkt-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.mkt-line{width:24px;height:2px;background:var(--primary)}
+.mkt-lbl{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--primary)}
+.mkt-h1{font-family:var(--ff-d);font-size:3.5rem;font-weight:800;color:#fff;letter-spacing:-0.02em;line-height:1.06;margin-bottom:16px;max-width:14ch}
+.mkt-h1 em{font-style:italic;color:var(--primary)}
+.mkt-p{font-size:15px;color:rgba(255,255,255,0.55);line-height:1.75;max-width:48ch;margin-bottom:28px}
+.mkt-actions{display:flex;gap:12px}
+.mkt-btn-p{background:var(--primary);color:#fff;padding:14px 28px;border-radius:3px;font-size:13px;font-weight:600}
+.mkt-btn-o{background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.35);padding:12px 26px;border-radius:3px;font-size:13px;font-weight:600}
+.mkt-strip{background:var(--primary);padding:12px 32px;display:flex;gap:32px}
+.mkt-strip-item{font-size:12px;font-weight:700;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:0.06em}
+.mkt-content{padding:40px 32px;background:var(--stone);display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.mkt-card{background:var(--white);padding:20px;border-radius:4px;border:1px solid var(--stone-2);position:relative}
+.mkt-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--primary);transform:scaleX(0);transform-origin:left;transition:transform var(--tr)}
+.mkt-card:hover::after{transform:scaleX(1)}
+.mc-icon{width:40px;height:40px;background:var(--primary-light);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:20px;margin-bottom:12px}
+.mc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:4px}
+.mc-title{font-family:var(--ff-d);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:8px}
+.mc-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ── TOGGLE ── */
+.dark-toggle{position:fixed;top:1.5rem;right:1.5rem;background:var(--ink);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--ff-b);display:flex;align-items:center;gap:6px;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.3);transition:background var(--tr-f)}
+.dark-toggle:hover{background:#1a1a1a}
+
+/* ── DARK MODE ── */
+body.dark{--stone:#1a1a1a;--stone-2:#2d2d2d;--white:#121212;--text:#f5f3f0;--muted:#9a9a9a;--border:rgba(255,255,255,0.08);--ink:#0e0e0e;background:#0a0a0a}
+body.dark .panel{background:#1a1a1a;border-color:rgba(255,255,255,0.06)}
+body.dark .ws-mock{background:#1a1a1a;border-color:rgba(255,255,255,0.06)}
+body.dark .ws-topbar{background:#1a1a1a;border-color:rgba(255,255,255,0.06)}
+body.dark .ws-stat,.ws-table{background:#0e0e0e;border-color:rgba(255,255,255,0.06)}
+body.dark .ws-table-header{background:#1a1a1a}
+body.dark .preview-header{background:#0a0a0a}
+body.dark .section-title{color:#f5f3f0}
+body.dark .token-card{background:#1a1a1a;border-color:rgba(255,255,255,0.06)}
+body.dark .mkt-preview,.mkt-content{background:#1a1a1a}
+body.dark .mkt-card{background:#0e0e0e;border-color:rgba(255,255,255,0.06)}
+body.dark .phone-screen{background:#1a1a1a}
+body.dark .phone-card{background:#0e0e0e;border-color:rgba(255,255,255,0.06)}
+body.dark .phone-bottom-nav{background:#0e0e0e;border-color:rgba(255,255,255,0.06)}
+body.dark .swatch-info{background:#1a1a1a}
+body.dark .swatch-name{color:#f5f3f0}
+body.dark .list-item,.list-group{background:#1a1a1a;border-color:rgba(255,255,255,0.06)}
+body.dark .input{background:#1a1a1a;border-color:rgba(255,255,255,0.1);color:#f5f3f0}
+body.dark .ws-icon-btn{background:#1a1a1a;border-color:rgba(255,255,255,0.06)}
+</style>
+</head>
+<body>
+
+<button class="dark-toggle" onclick="document.body.classList.toggle('dark')">
+  <span class="material-symbols-outlined" style="font-size:16px">dark_mode</span>
+  Toggle Dark
+</button>
+
+<!-- PREVIEW HEADER -->
+<div class="preview-header">
+  <div class="ph-label">Design System</div>
+  <h1 class="ph-title">Ichebo Platform — <em>Visual Preview</em></h1>
+  <p class="ph-sub">Three surfaces. One design language. ichebo.online · app.ichebo.org · Flutter Mobile</p>
+</div>
+
+<!-- NAV -->
+<div class="preview-nav">
+  <button class="pnav-btn active" onclick="showSection('colours')">Colours & Type</button>
+  <button class="pnav-btn" onclick="showSection('components')">Components</button>
+  <button class="pnav-btn" onclick="showSection('mobile')">Mobile (Flutter)</button>
+  <button class="pnav-btn" onclick="showSection('workspace')">Desktop Workspace</button>
+  <button class="pnav-btn" onclick="showSection('marketing')">Marketing Site</button>
+  <button class="pnav-btn" onclick="showSection('tokens')">Flutter Tokens</button>
+</div>
+
+<div class="preview-body">
+
+<!-- ══ COLOURS & TYPE ══ -->
+<div class="preview-section active" id="s-colours">
+
+  <p class="section-title">Brand Colours</p>
+  <p class="section-sub">Five signature decisions. Every component maps to these tokens.</p>
+  <div class="panel">
+    <span class="panel-label">Core Palette</span>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="swatch-colour" style="background:#af3236"></div><div class="swatch-info"><div class="swatch-name">Primary Red</div><div class="swatch-hex">#AF3236 — --primary</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#0e0e0e"></div><div class="swatch-info"><div class="swatch-name">Ink</div><div class="swatch-hex">#0E0E0E — --ink</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#1a1a1a"></div><div class="swatch-info"><div class="swatch-name">Ink 2</div><div class="swatch-hex">#1A1A1A — --ink-2</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#f5f3f0;border:1px solid #e0ddd9"></div><div class="swatch-info"><div class="swatch-name">Stone</div><div class="swatch-hex">#F5F3F0 — --card</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#ece9e4;border:1px solid #e0ddd9"></div><div class="swatch-info"><div class="swatch-name">Stone 2</div><div class="swatch-hex">#ECE9E4 — --card-2</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#185abc"></div><div class="swatch-info"><div class="swatch-name">Secondary Blue</div><div class="swatch-hex">#185ABC — --secondary</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#16a34a"></div><div class="swatch-info"><div class="swatch-name">Success</div><div class="swatch-hex">#16A34A — --success</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#dc2626"></div><div class="swatch-info"><div class="swatch-name">Error</div><div class="swatch-hex">#DC2626 — --error</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#ca8a04"></div><div class="swatch-info"><div class="swatch-name">Warning</div><div class="swatch-hex">#CA8A04 — --warning</div></div></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <span class="panel-label">KGS Competence Level Colours</span>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="swatch-colour" style="background:#9ca3af"></div><div class="swatch-info"><div class="swatch-name">Level 0 — Seeker</div><div class="swatch-hex">#9CA3AF</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#16a34a"></div><div class="swatch-info"><div class="swatch-name">Level 1 — Foundational</div><div class="swatch-hex">#16A34A</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#2563eb"></div><div class="swatch-info"><div class="swatch-name">Level 2 — Active</div><div class="swatch-hex">#2563EB</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#7c3aed"></div><div class="swatch-info"><div class="swatch-name">Level 3 — Minister</div><div class="swatch-hex">#7C3AED</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#ea580c"></div><div class="swatch-info"><div class="swatch-name">Level 4 — Leader</div><div class="swatch-hex">#EA580C</div></div></div>
+      <div class="swatch"><div class="swatch-colour" style="background:#dc2626"></div><div class="swatch-info"><div class="swatch-name">Level 5 — Apostolic</div><div class="swatch-hex">#DC2626</div></div></div>
+    </div>
+  </div>
+
+  <p class="section-title" style="margin-top:2rem">Typography</p>
+  <p class="section-sub">Playfair Display for display authority. Inter for everything structural.</p>
+
+  <div class="panel">
+    <span class="panel-label">Playfair Display — Display / Hero font</span>
+    <div class="type-row">
+      <div class="type-meta">Playfair Display 900 · --fz-6 (48px) · Display headline</div>
+      <div class="type-specimen-d" style="font-size:48px;font-weight:900;line-height:1.1;letter-spacing:-0.02em">A Faith That Is Not <em style="color:var(--primary);font-style:italic">Afraid.</em></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Playfair Display 800 · --fz-4 (32px) · Workspace page title</div>
+      <div class="type-specimen-d" style="font-size:32px;font-weight:800;line-height:1.15;letter-spacing:-0.02em">Community Governance <em style="color:var(--primary);font-style:italic">Dashboard</em></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Playfair Display 700 · --fz-3 (24px) · Section heading</div>
+      <div class="type-specimen-d" style="font-size:24px;font-weight:700;line-height:1.2">Formation & Discipleship</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Playfair Display 800 · stat number display</div>
+      <div style="display:flex;gap:3rem;align-items:baseline">
+        <span class="type-specimen-d" style="font-size:3rem;font-weight:800;color:var(--primary);line-height:1">24</span>
+        <span class="type-specimen-d" style="font-size:3rem;font-weight:800;color:var(--primary);line-height:1">7</span>
+        <span class="type-specimen-d" style="font-size:3rem;font-weight:800;color:var(--primary);line-height:1">∞</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <span class="panel-label">Inter — Body / UI font</span>
+    <div class="type-row">
+      <div class="type-meta">Inter 400 · 16px · Body base</div>
+      <div class="type-specimen-b" style="font-size:16px;color:var(--text);line-height:1.7">The Sceptre Community Programme is the living implementation of the Kingdom Governance System at the community level — not a programme alongside church, but a framework for returning church to where it belongs.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Inter 500 · 14px · UI label / nav item</div>
+      <div class="type-specimen-b" style="font-size:14px;font-weight:500">Community · Governance · Activity · Learn · Bible</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Inter 700 · 11px · uppercase · label-tag pattern</div>
+      <div class="label-tag">Kingdom Governance System</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Inter 700 · 11px · uppercase · label-caps pattern</div>
+      <div class="label-caps">Formation Programmes</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ COMPONENTS ══ -->
+<div class="preview-section" id="s-components">
+
+  <p class="section-title">Component Library</p>
+  <p class="section-sub">Shared across web and mobile surfaces. Rendered here in web CSS.</p>
+
+  <div class="panel">
+    <span class="panel-label">Buttons — 48px min height (strict touch target)</span>
+    <div class="comp-row">
+      <button class="btn btn-primary">Primary Action</button>
+      <button class="btn btn-secondary">Secondary</button>
+      <button class="btn btn-danger">Destructive</button>
+      <button class="btn btn-ghost">Ghost Action →</button>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <span class="panel-label">Status Badges & Unit Badges</span>
+    <div class="comp-row">
+      <span class="badge b-active">Active</span>
+      <span class="badge b-warning">Pending</span>
+      <span class="badge b-danger">Locked</span>
+      <span class="badge b-info">Awaiting Review</span>
+      <span class="badge b-muted">Draft</span>
+    </div>
+    <div class="comp-row" style="margin-top:8px">
+      <span class="badge-unit">Programme</span>
+      <span class="badge-unit">Lesson</span>
+      <span class="badge-unit primary">Certification</span>
+      <span class="badge-unit">Governance</span>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <span class="panel-label">Level Badges — KGS Competence</span>
+    <div class="comp-row">
+      <span class="level-badge" style="background:var(--level-0)">0</span>
+      <span class="level-badge" style="background:var(--level-1)">1</span>
+      <span class="level-badge" style="background:var(--level-2)">2</span>
+      <span class="level-badge" style="background:var(--level-3)">3</span>
+      <span class="level-badge" style="background:var(--level-4)">4</span>
+      <span class="level-badge" style="background:var(--level-5)">5</span>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <span class="panel-label">Page Hero — dark editorial header</span>
+    <div class="page-hero" data-w="LEARN">
+      <div class="ph-eyebrow"><div class="ph-line"></div><span class="ph-lbl">Learn</span></div>
+      <h2 class="ph-h1">Formation &amp; <em>Training</em></h2>
+      <p class="ph-p">Five qualification programmes — Certificate to Doctorate. Aligned with the Eight Kingdom Pathways.</p>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <span class="panel-label">Form Inputs</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div><span class="label-caps">Full Name</span><input class="input" type="text" placeholder="Paul Reuben"></div>
+      <div><span class="label-caps">Email Address</span><input class="input" type="email" placeholder="paul@ichebo.org"></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <span class="panel-label">List Group — dense list pattern</span>
+    <div class="list-group">
+      <div class="list-item">
+        <div class="li-icon"><span class="material-symbols-outlined">school</span></div>
+        <div class="li-content"><div class="li-title">Certificate of Kingdom Studies</div><div class="li-meta">Level 1 · 1 year · 4 courses enrolled</div></div>
+        <div class="li-action"><span class="material-symbols-outlined">chevron_right</span></div>
+      </div>
+      <div class="list-item">
+        <div class="li-icon"><span class="material-symbols-outlined">menu_book</span></div>
+        <div class="li-content"><div class="li-title">Introduction to Kingdom Governance</div><div class="li-meta">Course · 8 lessons · 65% complete</div></div>
+        <div class="li-action"><span class="badge b-active" style="font-size:9px">Active</span></div>
+      </div>
+      <div class="list-item">
+        <div class="li-icon"><span class="material-symbols-outlined">groups</span></div>
+        <div class="li-content"><div class="li-title">Sceptre Community — Pretoria North</div><div class="li-meta">14 members · Active · Sun 09:00</div></div>
+        <div class="li-action"><span class="material-symbols-outlined">chevron_right</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <span class="panel-label">Progress Bars</span>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div><div class="label-caps" style="margin-bottom:4px">Certificate — 65%</div><div class="progress-wrap"><div class="progress-fill" style="width:65%"></div></div></div>
+      <div><div class="label-caps" style="margin-bottom:4px">Diploma — 32%</div><div class="progress-wrap"><div class="progress-fill" style="width:32%"></div></div></div>
+      <div><div class="label-caps" style="margin-bottom:4px">Community Programme — 91%</div><div class="progress-wrap"><div class="progress-fill" style="width:91%"></div></div></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <span class="panel-label">Signature Pattern — Left Red Rule Cards</span>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="background:var(--stone);border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:0 8px 8px 0;padding:16px">
+        <div class="label-caps">The Church Node</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-top:4px">The Sceptre Community functions as a Church Node — the smallest recognised unit of church life, governance, discipleship, and Kingdom operation within the network.</p>
+      </div>
+      <div style="background:var(--stone);border:1px solid var(--border);border-left:3px solid var(--secondary);border-radius:0 8px 8px 0;padding:16px">
+        <div class="label-caps" style="color:var(--secondary)">Platform Note</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-top:4px">The Ichebo Platform is the digital twin of the Sceptre Community Programme. Core architecture is complete. Active feature development in Learn App.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ MOBILE ══ -->
+<div class="preview-section" id="s-mobile">
+
+  <p class="section-title">Flutter Mobile — Screen Designs</p>
+  <p class="section-sub">Android-first. Touch-native. Offline-first. Serves Level 0b–5.</p>
+
+  <div class="mobile-grid">
+
+    <!-- Learn App Home -->
+    <div>
+      <p style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">Learn App — Home</p>
+      <div class="phone-mock">
+        <div class="phone-screen">
+          <div class="phone-topbar">
+            <svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg"><polygon fill="#f5f3f0" fill-rule="evenodd" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42"/><path fill="#f5f3f0" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/><path fill="#f5f3f0" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z"/><path fill="#f5f3f0" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/></svg>
+            <div class="phone-topbar-actions">
+              <div class="phone-icon"><span class="material-symbols-outlined">notifications</span></div>
+              <div class="phone-icon"><span class="level-badge" style="background:var(--level-3);font-size:10px;width:28px;height:28px">3</span></div>
+            </div>
+          </div>
+          <div class="phone-hero" data-w="LEARN">
+            <div class="ph-eyebrow-sm"><div class="ph-line-sm"></div><span class="ph-lbl-sm">My Learning</span></div>
+            <div class="phone-h1">Formation &amp; <em>Training</em></div>
+            <div class="phone-sub">Certificate · Level 1 · 65% complete</div>
+          </div>
+          <div class="phone-content">
+            <div class="phone-card accent">
+              <div class="pc-label">Continue Learning</div>
+              <div class="pc-title">Introduction to Kingdom Governance</div>
+              <div class="pc-meta">Lesson 5 of 8 · 12 min read</div>
+              <div class="phone-progress"><div class="phone-progress-bar"><div class="phone-progress-fill" style="width:65%"></div></div></div>
+            </div>
+            <div class="phone-card">
+              <div class="pc-label">Certificate Programme</div>
+              <div class="pc-title">Kingdom Studies — Year 1</div>
+              <div class="pc-meta">4 courses · 3 in progress</div>
+              <div class="phone-progress"><div class="phone-progress-bar"><div class="phone-progress-fill" style="width:65%"></div></div></div>
+            </div>
+            <div class="phone-card">
+              <div class="pc-label">Up Next</div>
+              <div class="pc-title">The Collective Person Principle</div>
+              <div class="pc-meta">Lesson 6 · Starts after current lesson</div>
+            </div>
+          </div>
+          <div class="phone-bottom-nav">
+            <div class="phone-nav-item"><span class="material-symbols-outlined">home</span>Home</div>
+            <div class="phone-nav-item active"><span class="material-symbols-outlined">school</span>Learn</div>
+            <div class="phone-nav-item"><span class="material-symbols-outlined">groups</span>Community</div>
+            <div class="phone-nav-item"><span class="material-symbols-outlined">person</span>Profile</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Community App Home -->
+    <div>
+      <p style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">Community App — Home</p>
+      <div class="phone-mock">
+        <div class="phone-screen">
+          <div class="phone-topbar">
+            <svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg"><polygon fill="#f5f3f0" fill-rule="evenodd" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42"/><path fill="#f5f3f0" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/><path fill="#f5f3f0" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z"/><path fill="#f5f3f0" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/></svg>
+            <div class="phone-topbar-actions">
+              <div class="phone-icon"><span class="material-symbols-outlined">notifications</span></div>
+              <div class="phone-icon"><span class="level-badge" style="background:var(--level-2);font-size:10px;width:28px;height:28px">2</span></div>
+            </div>
+          </div>
+          <div class="phone-hero" data-w="COMM">
+            <div class="ph-eyebrow-sm"><div class="ph-line-sm"></div><span class="ph-lbl-sm">Community</span></div>
+            <div class="phone-h1">Sceptre <em>Community</em></div>
+            <div class="phone-sub">Pretoria North · 14 members · Active</div>
+          </div>
+          <div class="phone-content">
+            <div class="phone-card">
+              <div class="pc-label">Next Gathering</div>
+              <div class="pc-title">Kingdom Worship Service</div>
+              <div class="pc-meta">Sunday · 09:00 SAST · In-person</div>
+            </div>
+            <div class="phone-card accent">
+              <div class="pc-label">Announcement</div>
+              <div class="pc-title">Formation teaching this Friday at 19:00</div>
+              <div class="pc-meta">2 hours ago · Community Coordinator</div>
+            </div>
+            <div class="phone-card">
+              <div class="pc-label">Members</div>
+              <div class="pc-title">14 active · 2 pending placement</div>
+              <div class="pc-meta">Tap to view member directory</div>
+            </div>
+          </div>
+          <div class="phone-bottom-nav">
+            <div class="phone-nav-item"><span class="material-symbols-outlined">home</span>Home</div>
+            <div class="phone-nav-item"><span class="material-symbols-outlined">school</span>Learn</div>
+            <div class="phone-nav-item active"><span class="material-symbols-outlined">groups</span>Community</div>
+            <div class="phone-nav-item"><span class="material-symbols-outlined">person</span>Profile</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ DESKTOP WORKSPACE ══ -->
+<div class="preview-section" id="s-workspace">
+
+  <p class="section-title">Desktop Workspace — Governance Dashboard</p>
+  <p class="section-sub">Level 3–5 stewards and coordinators. Fixed left sidebar. Wide-screen, data-dense, keyboard-friendly.</p>
+
+  <div class="ws-mock">
+    <!-- Sidebar -->
+    <div class="ws-sidebar">
+      <div class="ws-sidebar-logo">
+        <svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg"><polygon fill="#f5f3f0" fill-rule="evenodd" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42"/><path fill="#f5f3f0" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/><path fill="#f5f3f0" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z"/><path fill="#f5f3f0" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/></svg>
+      </div>
+      <div class="ws-nav-section">
+        <div class="ws-nav-label">Workspace</div>
+        <div class="ws-nav-item active"><span class="material-symbols-outlined">dashboard</span>Dashboard</div>
+        <div class="ws-nav-item"><span class="material-symbols-outlined">groups</span>Community</div>
+        <div class="ws-nav-item"><span class="material-symbols-outlined">gavel</span>Governance</div>
+        <div class="ws-nav-item"><span class="material-symbols-outlined">school</span>Formation</div>
+        <div class="ws-nav-item"><span class="material-symbols-outlined">task_alt</span>Activity</div>
+      </div>
+      <div class="ws-nav-section">
+        <div class="ws-nav-label">Records</div>
+        <div class="ws-nav-item"><span class="material-symbols-outlined">menu_book</span>Bible</div>
+        <div class="ws-nav-item"><span class="material-symbols-outlined">auto_awesome</span>Paraclete</div>
+        <div class="ws-nav-item"><span class="material-symbols-outlined">live_tv</span>Video / Live</div>
+      </div>
+      <div class="ws-nav-spacer"></div>
+      <div class="ws-nav-user">
+        <div class="ws-avatar">PR</div>
+        <div class="ws-user-info">
+          <strong>Paul Reuben</strong>
+          <small>paul@ichebo.org</small>
+        </div>
+        <div class="ws-level-dot">5</div>
+      </div>
+    </div>
+
+    <!-- Main area -->
+    <div class="ws-main">
+      <div class="ws-topbar">
+        <div class="ws-breadcrumb">Workspace <span style="margin:0 6px;color:var(--muted)">·</span> <strong>Dashboard</strong></div>
+        <div class="ws-topbar-actions">
+          <div class="ws-icon-btn"><span class="material-symbols-outlined" style="font-size:18px">search</span></div>
+          <div class="ws-icon-btn"><span class="material-symbols-outlined" style="font-size:18px">notifications</span></div>
+          <div class="ws-icon-btn"><span class="material-symbols-outlined" style="font-size:18px">settings</span></div>
+        </div>
+      </div>
+      <div class="ws-content">
+        <div style="font-family:var(--ff-d);font-size:1.5rem;font-weight:800;color:var(--ink);letter-spacing:-0.02em;margin-bottom:2px">Governance Dashboard</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Pretoria North · Sceptre Community · Level 5</div>
+        <div class="ws-stat-grid">
+          <div class="ws-stat"><div class="ws-stat-num">14</div><div class="ws-stat-lbl">Active Members</div></div>
+          <div class="ws-stat"><div class="ws-stat-num">3</div><div class="ws-stat-lbl">Pending Certs</div></div>
+          <div class="ws-stat"><div class="ws-stat-num">7</div><div class="ws-stat-lbl">Activities Due</div></div>
+          <div class="ws-stat"><div class="ws-stat-num">91%</div><div class="ws-stat-lbl">Formation Rate</div></div>
+        </div>
+        <div class="ws-table">
+          <div class="ws-table-header">
+            <div class="ws-th">Member</div>
+            <div class="ws-th">Level</div>
+            <div class="ws-th">Programme</div>
+            <div class="ws-th">Status</div>
+          </div>
+          <div class="ws-table-row">
+            <div class="ws-td">Sarah Molefe</div>
+            <div class="ws-td"><span class="level-badge" style="background:var(--level-2);font-size:9px;width:22px;height:22px">2</span></div>
+            <div class="ws-td muted">Certificate · Yr 2</div>
+            <div class="ws-td"><span class="badge b-active">Active</span></div>
+          </div>
+          <div class="ws-table-row">
+            <div class="ws-td">James Okonkwo</div>
+            <div class="ws-td"><span class="level-badge" style="background:var(--level-1);font-size:9px;width:22px;height:22px">1</span></div>
+            <div class="ws-td muted">Certificate · Yr 1</div>
+            <div class="ws-td"><span class="badge b-warning">Pending</span></div>
+          </div>
+          <div class="ws-table-row">
+            <div class="ws-td">Grace Nkosi</div>
+            <div class="ws-td"><span class="level-badge" style="background:var(--level-3);font-size:9px;width:22px;height:22px">3</span></div>
+            <div class="ws-td muted">Diploma · Yr 2</div>
+            <div class="ws-td"><span class="badge b-active">Active</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MARKETING SITE ══ -->
+<div class="preview-section" id="s-marketing">
+  <p class="section-title">Marketing Site — ichebo.online</p>
+  <p class="section-sub">Already built (8 pages). Shown here for design continuity reference.</p>
+  <div class="mkt-preview">
+    <div class="mkt-nav">
+      <div class="mkt-nav-logo">
+        <svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg" style="height:18px"><polygon fill="#fff" fill-rule="evenodd" points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42"/><path fill="#fff" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z"/><path fill="#fff" d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z"/><path fill="#fff" d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z"/></svg>
+      </div>
+      <div class="mkt-nav-links"><a href="#">Programme</a><a href="#">Community</a><a href="#">Platform</a></div>
+      <div class="mkt-nav-cta">Get in Touch</div>
+    </div>
+    <div class="mkt-hero">
+      <div class="mkt-eyebrow"><div class="mkt-line"></div><span class="mkt-lbl">Ichebo Christian Services</span></div>
+      <h2 class="mkt-h1">A Faith That Is Not <em>Afraid.</em></h2>
+      <p class="mkt-p">A Kingdom governance agency advancing the rule of Christ through decentralised communities, structured formation, and digital infrastructure.</p>
+      <div class="mkt-actions"><div class="mkt-btn-p">Discover the Programme</div><div class="mkt-btn-o">Find a Community</div></div>
+    </div>
+    <div class="mkt-strip">
+      <div class="mkt-strip-item">Kingdom Governance System</div>
+      <div class="mkt-strip-item">Sceptre Community Programme</div>
+      <div class="mkt-strip-item">Ichebo Platform</div>
+    </div>
+    <div class="mkt-content">
+      <div class="mkt-card"><div class="mc-icon"><span class="material-symbols-outlined">search</span></div><div class="mc-label">Seekers</div><div class="mc-title">Find a Community Near You</div><div class="mc-desc">Search for a Church Node in your area.</div></div>
+      <div class="mkt-card"><div class="mc-icon"><span class="material-symbols-outlined">add_home</span></div><div class="mc-label">Church Planters</div><div class="mc-title">Start a Church Node</div><div class="mc-desc">Three people and a calling is enough to begin.</div></div>
+      <div class="mkt-card"><div class="mc-icon"><span class="material-symbols-outlined">school</span></div><div class="mc-label">Formation</div><div class="mc-title">Begin Your Training</div><div class="mc-desc">Certificate to Doctorate — five qualification programmes.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FLUTTER TOKENS ══ -->
+<div class="preview-section" id="s-tokens">
+  <p class="section-title">Flutter Design Tokens</p>
+  <p class="section-sub">All CSS custom properties translated to Dart constants. Drop directly into <code>tokens.dart</code>.</p>
+  <div class="token-grid">
+    <div class="token-card">
+      <div class="token-title">AppColors — Brand</div>
+      <div class="token-row"><span class="token-name">AppColors.primary</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#af3236"></div><span class="token-val">#AF3236</span></span></div>
+      <div class="token-row"><span class="token-name">AppColors.primaryDark</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#8c2a2d"></div><span class="token-val">#8C2A2D</span></span></div>
+      <div class="token-row"><span class="token-name">AppColors.secondary</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#185abc"></div><span class="token-val">#185ABC</span></span></div>
+      <div class="token-row"><span class="token-name">AppColors.ink</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#0e0e0e;border-color:rgba(255,255,255,0.2)"></div><span class="token-val">#0E0E0E</span></span></div>
+      <div class="token-row"><span class="token-name">AppColors.surface</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#f5f3f0"></div><span class="token-val">#F5F3F0</span></span></div>
+    </div>
+    <div class="token-card">
+      <div class="token-title">AppColors — Level</div>
+      <div class="token-row"><span class="token-name">AppColors.level0</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#9ca3af"></div><span class="token-val">#9CA3AF</span></span></div>
+      <div class="token-row"><span class="token-name">AppColors.level1</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#16a34a"></div><span class="token-val">#16A34A</span></span></div>
+      <div class="token-row"><span class="token-name">AppColors.level2</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#2563eb"></div><span class="token-val">#2563EB</span></span></div>
+      <div class="token-row"><span class="token-name">AppColors.level3</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#7c3aed"></div><span class="token-val">#7C3AED</span></span></div>
+      <div class="token-row"><span class="token-name">AppColors.level4</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#ea580c"></div><span class="token-val">#EA580C</span></span></div>
+      <div class="token-row"><span class="token-name">AppColors.level5</span><span style="display:flex;align-items:center;gap:6px"><div class="token-swatch" style="background:#dc2626"></div><span class="token-val">#DC2626</span></span></div>
+    </div>
+    <div class="token-card">
+      <div class="token-title">AppText — Type Scale</div>
+      <div class="token-row"><span class="token-name">AppText.caption</span><span class="token-val">11sp · Inter 700</span></div>
+      <div class="token-row"><span class="token-name">AppText.bodySmall</span><span class="token-val">12sp · Inter 400</span></div>
+      <div class="token-row"><span class="token-name">AppText.bodyMedium</span><span class="token-val">14sp · Inter 400</span></div>
+      <div class="token-row"><span class="token-name">AppText.bodyLarge</span><span class="token-val">16sp · Inter 400</span></div>
+      <div class="token-row"><span class="token-name">AppText.titleSmall</span><span class="token-val">16sp · Inter 500</span></div>
+      <div class="token-row"><span class="token-name">AppText.titleMedium</span><span class="token-val">18sp · Inter 600</span></div>
+      <div class="token-row"><span class="token-name">AppText.titleLarge</span><span class="token-val">20sp · Playfair 700</span></div>
+      <div class="token-row"><span class="token-name">AppText.displaySmall</span><span class="token-val">24sp · Playfair 800</span></div>
+      <div class="token-row"><span class="token-name">AppText.displayLarge</span><span class="token-val">32sp · Playfair 800</span></div>
+    </div>
+    <div class="token-card">
+      <div class="token-title">AppSpacing · AppRadius</div>
+      <div class="token-row"><span class="token-name">AppSpacing.xxs</span><span class="token-val">4.0dp</span></div>
+      <div class="token-row"><span class="token-name">AppSpacing.xs</span><span class="token-val">8.0dp</span></div>
+      <div class="token-row"><span class="token-name">AppSpacing.sm</span><span class="token-val">12.0dp</span></div>
+      <div class="token-row"><span class="token-name">AppSpacing.md</span><span class="token-val">16.0dp</span></div>
+      <div class="token-row"><span class="token-name">AppSpacing.lg</span><span class="token-val">24.0dp</span></div>
+      <div class="token-row"><span class="token-name">AppSpacing.xl</span><span class="token-val">32.0dp</span></div>
+      <div class="token-row"><span class="token-name">AppRadius.card</span><span class="token-val">12.0dp</span></div>
+      <div class="token-row"><span class="token-name">AppRadius.input</span><span class="token-val">8.0dp</span></div>
+      <div class="token-row"><span class="token-name">AppRadius.sheet</span><span class="token-val">20.0dp</span></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /preview-body -->
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.preview-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.pnav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
