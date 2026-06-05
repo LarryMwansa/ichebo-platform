@@ -164,15 +164,19 @@
 
 /* ── Dark Mode Overrides ── */
 .dark {
-    --bg:       #0e0e0e;
-    --card:     #1a1a1a;
-    --card-2:   #2d2d2d;
-    --hover:    #2d2d2d;
-    --text:     #f5f3f0;
-    --muted:    #9a9a9a;
-    --border:   rgba(255, 255, 255, 0.08);
-    --shadow:   rgba(0, 0, 0, 0.4);
-    
+    --bg:           #0e0e0e;
+    --bg-alpha:     rgba(14, 14, 14, 0.92);
+    --card:         #1a1a1a;
+    --card-2:       #2d2d2d;
+    --hover:        #2d2d2d;
+    --text:         #f5f3f0;
+    --muted:        #9a9a9a;
+    --muted-light:  #6b6b6b;
+    --border:       rgba(255, 255, 255, 0.08);
+    --border-dark:  rgba(255, 255, 255, 0.12);
+    --shadow:       rgba(0, 0, 0, 0.4);
+    --primary-alpha: rgba(175, 50, 54, 0.25);
+
     color-scheme: dark;
 }
 
