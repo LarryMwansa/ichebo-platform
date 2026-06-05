@@ -1,17 +1,13 @@
 <!-- Library list — type filter + record list -->
-<div style="padding: var(--space-s) var(--space-s) 0;">
-
-  {# Breadcrumb #}
-  <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
-              letter-spacing: 0.08em; color: var(--primary); margin-bottom: var(--space-xs);">
-    Reference Library
-    {% if record_type %} &rsaquo; {{ type_label|upper }}{% endif %}
+<div class="page-hero page-hero--watermark" data-watermark="{{ type_label|upper|default:'LIBRARY' }}">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Reference Library{% if record_type %} &rsaquo; {{ type_label }}{% endif %}</span>
   </div>
+  <h1 class="page-hero__title">{{ type_label|default:"Reference" }} <em>Library</em></h1>
+</div>
 
-  <h3 style="font-family: 'Playfair Display', serif; font-size: 1.375rem;
-             font-weight: 800; color: var(--text); margin: 0 0 var(--space-s);">
-    {{ type_label|default:"All Types" }}
-  </h3>
+<div style="padding: var(--space-s) var(--space-s) 0;">
 
   {# Filter tabs #}
   <div style="display: flex; gap: 6px; margin-bottom: var(--space-s);
