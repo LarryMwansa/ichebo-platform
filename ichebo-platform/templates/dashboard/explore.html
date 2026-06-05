@@ -167,6 +167,91 @@
 </div>
 {% endblock %}
 
+{% block content %}
+<div style="padding: 1rem 1rem 5rem;">
+
+    <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 0.25rem;">Explore</h1>
+    <p style="font-size: 0.875rem; color: var(--muted); margin-bottom: 1.5rem;">Browse references, resources & directories</p>
+
+    <div style="position: relative; margin-bottom: 1.5rem;">
+        <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 20px;">search</span>
+        <input type="text" placeholder="Search everything…"
+               style="width: 100%; height: 48px; padding: 0 1rem 0 2.75rem; border-radius: 12px;
+                      background: var(--card); border: 1px solid var(--border);
+                      font-size: 0.9375rem; color: var(--text); box-sizing: border-box; outline: none;">
+    </div>
+
+    <div class="label-caps" style="margin-bottom: 0.75rem;">Resources</div>
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem;">
+        <a href="{% url 'bible:reader' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:10px;background:#fff7ed;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="material-symbols-outlined" style="color:#c2410c;">auto_stories</span>
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Bible</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Read, search, and annotate scripture</div>
+            </div>
+            <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
+        </a>
+        <a href="{% url 'governance:home' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:10px;background:#faf5ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="material-symbols-outlined" style="color:#7e22ce;">account_balance</span>
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Governance Library</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Edicts, decrees, principles & ordinances</div>
+            </div>
+            <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
+        </a>
+        <a href="{% url 'records:records-home' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:10px;background:#ecfeff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="material-symbols-outlined" style="color:#0e7490;">description</span>
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Records & Journals</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Prayers, dreams, spirit entries & notes</div>
+            </div>
+            <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
+        </a>
+        <a href="{% url 'learn:learn-home' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:10px;background:#fdf2f8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="material-symbols-outlined" style="color:#be185d;">school</span>
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Course Catalogue</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Programmes, modules & lessons</div>
+            </div>
+            <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
+        </a>
+    </div>
+
+    <div class="label-caps" style="margin-bottom: 0.75rem;">People & Community</div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        <a href="{% url 'community:community-home' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:10px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="material-symbols-outlined" style="color:#15803d;">group</span>
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Community</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Your community, gatherings & members</div>
+            </div>
+            <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
+        </a>
+        <a href="{% url 'community:community-members' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="material-symbols-outlined" style="color:#1d4ed8;">contacts</span>
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Member Directory</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Find and connect with members</div>
+            </div>
+            <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
+        </a>
+    </div>
+
+</div>
+{% endblock %}
+
 {% block ws_options %}
 <div class="ws-options-section">
     <div class="ws-label-tag">Quick Jump</div>
