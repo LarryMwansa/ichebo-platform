@@ -27,9 +27,19 @@ const WorkspaceUI = {
         console.error('Failed to parse saved shell state', e);
       }
     }
+    // Theme is the canonical cross-shell key — always wins over shell state
+    const canonicalTheme = localStorage.getItem('ics_theme');
+    if (canonicalTheme) {
+      this.state.theme = canonicalTheme;
+    } else {
+      // First visit — write the default so mobile picks it up
+      localStorage.setItem('ics_theme', this.state.theme);
+    }
   },
 
   saveState() {
+    // Write theme to canonical key so mobile shell stays in sync
+    localStorage.setItem('ics_theme', this.state.theme);
     localStorage.setItem('ics_shell_v2_state', JSON.stringify(this.state));
   },
 

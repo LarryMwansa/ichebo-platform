@@ -11,15 +11,15 @@ const ICSStorage = (() => {
 
   // ── Theme — used by mobile/old-shell pages via navbar.js ─────────────────
   function getTheme() {
-    return localStorage.getItem(THEME_KEY) || 'light';
+    return localStorage.getItem(THEME_KEY) || 'dark';
   }
 
   function setTheme(theme) {
     localStorage.setItem(THEME_KEY, theme);
     if (theme === 'dark') {
-      document.body.classList.add('dark');
+      document.documentElement.classList.add('dark');
     } else {
-      document.body.classList.remove('dark');
+      document.documentElement.classList.remove('dark');
     }
   }
 

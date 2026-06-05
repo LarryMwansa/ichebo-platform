@@ -3,7 +3,7 @@
 ========================= */
 
 /* 🌙 DARK MODE */
-body.dark {
+html.dark body, html.dark {
     --bg:           #0e0e0e;
     --bg-alpha:     rgba(14, 14, 14, 0.92);
     --card:         #1a1a1a;
@@ -94,12 +94,12 @@ body.dark {
 }
 
 /* DARK MODE STATE */
-body.dark .sun {
+html.dark .sun {
     opacity: 0;
     transform: scale(0.6) rotate(90deg);
 }
 
-body.dark .moon {
+html.dark .moon {
     opacity: 1;
     transform: scale(1) translateX(0);
 }

@@ -138,11 +138,10 @@
     <script src="{% static 'js/htmx.min.js' %}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    <script><!-- Synchronous theme init — runs before paint to prevent flash of wrong theme -->
+    <script>/* Synchronous theme init — reads canonical ics_theme key, runs before paint */
       (function () {
         try {
-          var s = JSON.parse(localStorage.getItem('ics_shell_v2_state') || '{}');
-          var theme = s.theme || 'dark';
+          var theme = localStorage.getItem('ics_theme') || 'dark';
           if (theme === 'dark') document.documentElement.classList.add('dark');
         } catch (e) {}
       })();
