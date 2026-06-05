@@ -36,13 +36,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         'email':    _emailCtrl.text.trim(),
         'password': _passCtrl.text,
       });
-      // Expected: { token, email, competence_level, tenant_id, tenant_name }
+      final user = data['user'] as Map<String, dynamic>;
       await ref.read(authProvider.notifier).login(
         token:           data['token'] as String,
-        email:           data['email'] as String,
-        competenceLevel: (data['competence_level'] as num?)?.toInt() ?? 0,
-        tenantId:        data['tenant_id'] as String? ?? '',
-        tenantName:      data['tenant_name'] as String? ?? '',
+        email:           user['email'] as String,
+        competenceLevel: (user['competence_level'] as num?)?.toInt() ?? 0,
+        tenantId:        user['tenant_id'] as String? ?? '',
+        tenantName:      user['tenant_name'] as String? ?? '',
       );
       if (mounted) context.go('/home');
     } catch (e) {

@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-const _baseUrl = 'https://app.ichebo.org/api';
+const bool _kRelease = bool.fromEnvironment('dart.vm.product');
+const _baseUrl = _kRelease ? 'https://app.ichebo.org/api' : 'http://localhost:8001/api';
 
 class ApiException implements Exception {
   const ApiException(this.statusCode, this.message);
@@ -28,7 +29,10 @@ class ApiClient {
     );
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (res.statusCode >= 400) {
-      throw ApiException(res.statusCode, data['detail']?.toString() ?? res.body);
+      final msg = data['detail']
+          ?? (data['non_field_errors'] as List?)?.first
+          ?? res.body;
+      throw ApiException(res.statusCode, msg.toString());
     }
     return data;
   }
