@@ -166,85 +166,98 @@
 
 {# ── Mobile fallback (below 1024px) ── #}
 {% block content %}
-<div class="dashboard">
 
-  <div class="dash-header">
-    <div class="dash-greeting">
-      <span class="dash-name">My Activities</span>
-    </div>
-    <a href="#" class="btn-touch btn-primary-sm" style="text-decoration:none;">+ New</a>
+<div class="page-hero page-hero--watermark" data-watermark="ACTIVITY">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Sovereign Timeline</span>
   </div>
+  <h1 class="page-hero__title">My <em>Activity</em></h1>
+  <p class="page-hero__sub">Mandates, tasks &amp; ministry timeline</p>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
 
   {% if overdue %}
-  <section class="dash-section">
-    <div class="dash-widget dash-widget--danger">
-      <div class="dash-widget__label">Overdue</div>
-      <div class="list-group">
-        {% for item in overdue %}
-        <div class="list-item">
-          <div class="list-item__icon" style="color: var(--error);">
-            <span class="material-symbols-outlined">priority_high</span>
-          </div>
-          <div class="list-item__content">
-            <div class="list-item__title">{{ item.title }}</div>
-            <div class="list-item__meta">{{ item.activity_type|upper }} · Overdue</div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
+  <div style="margin-bottom: var(--space-m);">
+    <div class="label-caps" style="color: var(--error); margin-bottom: var(--space-xs);">
+      Overdue · {{ overdue|length }}
     </div>
-  </section>
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      {% for item in overdue %}
+      <div style="padding: var(--space-s); background: var(--card); border: 1px solid var(--border);
+                  border-left: 3px solid var(--error); border-radius: var(--radius-m);">
+        <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+          {{ item.title }}
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase;
+                       color: var(--error); letter-spacing: 0.05em;">{{ item.activity_type }}</span>
+          <span style="font-size: 11px; color: var(--muted);">Overdue</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
   {% endif %}
 
   {% if due_today %}
-  <section class="dash-section">
-    <div class="dash-widget">
-      <div class="dash-widget__label">Due Today</div>
-      <div class="list-group">
-        {% for item in due_today %}
-        <div class="list-item">
-          <div class="list-item__icon">
-            <span class="material-symbols-outlined">task_alt</span>
-          </div>
-          <div class="list-item__content">
-            <div class="list-item__title">{{ item.title }}</div>
-            <div class="list-item__meta">{{ item.activity_type|title }}</div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
+  <div style="margin-bottom: var(--space-m);">
+    <div class="label-caps" style="color: var(--primary); margin-bottom: var(--space-xs);">
+      Today · {{ due_today|length }}
     </div>
-  </section>
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      {% for item in due_today %}
+      <div style="padding: var(--space-s); background: var(--card); border: 1px solid var(--border);
+                  border-left: 3px solid var(--primary); border-radius: var(--radius-m);">
+        <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+          {{ item.title }}
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase;
+                       color: var(--primary); letter-spacing: 0.05em;">{{ item.activity_type }}</span>
+          {% if item.due_at %}
+          <span style="font-size: 11px; color: var(--muted);">{{ item.due_at|date:"d M" }}</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
   {% endif %}
 
   {% if upcoming %}
-  <section class="dash-section">
-    <div class="dash-widget">
-      <div class="dash-widget__label">Upcoming</div>
-      <div class="list-group">
-        {% for item in upcoming %}
-        <div class="list-item">
-          <div class="list-item__content">
-            <div class="list-item__title">{{ item.title }}</div>
-            <div class="list-item__meta">
-              {{ item.activity_type|title }}
-              {% if item.due_at %} · {{ item.due_at|date:"d M" }}{% endif %}
-            </div>
-          </div>
+  <div style="margin-bottom: var(--space-m);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Upcoming</div>
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      {% for item in upcoming %}
+      <div style="padding: var(--space-s); background: var(--card); border: 1px solid var(--border);
+                  border-radius: var(--radius-m);">
+        <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+          {{ item.title }}
         </div>
-        {% endfor %}
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase;
+                       color: var(--muted); letter-spacing: 0.05em;">{{ item.activity_type }}</span>
+          {% if item.due_at %}
+          <span style="font-size: 11px; color: var(--muted);">{{ item.due_at|date:"d M" }}</span>
+          {% endif %}
+        </div>
       </div>
+      {% endfor %}
     </div>
-  </section>
+  </div>
   {% endif %}
 
   {% if not overdue and not due_today and not upcoming %}
-  <section class="dash-section">
-    <div class="dash-widget" style="text-align: center; padding: 2rem;">
-      <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--border);">task_alt</span>
-      <p style="color: var(--muted); margin-top: 0.5rem;">No active activities</p>
-    </div>
-  </section>
+  <div style="text-align: center; padding: 3rem 1rem; color: var(--muted);">
+    <span class="material-symbols-outlined"
+          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.2;">
+      verified
+    </span>
+    <p style="font-size: 14px; font-weight: 500;">All mandates secured.</p>
+    <p style="font-size: 13px; margin-top: 4px;">You are in perfect momentum.</p>
+  </div>
   {% endif %}
 
 </div>

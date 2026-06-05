@@ -124,6 +124,21 @@
                 </div>
                 <span class="material-symbols-outlined" style="margin-left: auto; color: var(--muted); font-size: 18px;">chevron_right</span>
             </a>
+
+            <a href="{% url 'activity:activity-home' %}"
+               style="display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+                      background: var(--card); border: 1px solid var(--border);
+                      border-radius: 10px; text-decoration: none; transition: border-color 0.15s;">
+                <div style="width: 40px; height: 40px; border-radius: 8px; background: #f0fdf4;
+                            display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span class="material-symbols-outlined" style="color: #15803d;">task_alt</span>
+                </div>
+                <div>
+                    <div style="font-size: 14px; font-weight: 700; color: var(--text);">Activity</div>
+                    <div style="font-size: 12px; color: var(--muted);">Mandates, tasks & ministry timeline</div>
+                </div>
+                <span class="material-symbols-outlined" style="margin-left: auto; color: var(--muted); font-size: 18px;">chevron_right</span>
+            </a>
         </div>
     </div>
 
@@ -226,6 +241,16 @@
             <div style="flex:1;">
                 <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Course Catalogue</div>
                 <div style="font-size:0.75rem;color:var(--muted);">Programmes, modules & lessons</div>
+            </div>
+            <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
+        </a>
+        <a href="{% url 'activity:activity-home' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:10px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="material-symbols-outlined" style="color:#15803d;">task_alt</span>
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Activity</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Mandates, tasks &amp; ministry timeline</div>
             </div>
             <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
         </a>
