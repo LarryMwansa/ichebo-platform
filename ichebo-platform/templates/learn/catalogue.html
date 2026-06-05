@@ -79,6 +79,78 @@
 </div>
 {% endblock %}
 
+{% block content %}
+
+<div class="page-hero page-hero--watermark" data-watermark="CATALOGUE">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <a href="{% url 'learn:learn-home' %}"
+       style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none;
+              color: var(--primary); font-size: 11px; font-weight: 700;
+              text-transform: uppercase; letter-spacing: 0.08em;">
+      <span class="material-symbols-outlined" style="font-size: 14px;">arrow_back</span>
+      Catalogue
+    </a>
+  </div>
+  <h1 class="page-hero__title">Programmes</h1>
+  <p class="page-hero__sub">Expand your toolkit with certified missions</p>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+  {% if programmes %}
+  <div style="background: var(--card); border: 1px solid var(--border);
+              border-radius: var(--radius-l); overflow: hidden;">
+    {% for programme in programmes %}
+    <a href="{% url 'learn:learn-programme' programme.id %}"
+       style="display: flex; align-items: center; gap: var(--space-s); padding: 16px var(--space-m);
+              text-decoration: none; color: inherit;
+              {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}
+              {% if programme.is_locked %}opacity: 0.6;{% endif %}">
+      <div style="width: 40px; height: 40px; border-radius: var(--radius-m); background: var(--card-2);
+                  display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <span class="material-symbols-outlined"
+              style="font-size: 20px; color: {% if programme.is_locked %}var(--muted){% else %}var(--primary){% endif %};">
+          {% if programme.is_locked %}lock{% else %}school{% endif %}
+        </span>
+      </div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+          {{ programme.title }}
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                       letter-spacing: 0.06em; color: var(--primary);">
+            {{ programme.custom_fields.kgs_qualification|default:"Programme" }}
+          </span>
+          {% if programme.custom_fields.duration %}
+          <span style="font-size: 10px; color: var(--muted);">
+            {{ programme.custom_fields.duration }}
+          </span>
+          {% endif %}
+          {% if programme.is_locked %}
+          <span style="font-size: 10px; font-weight: 700; color: var(--muted);">
+            Level {{ programme.permissions_data.required_level|default:1 }} Required
+          </span>
+          {% endif %}
+        </div>
+      </div>
+      <span class="material-symbols-outlined" style="font-size: 20px; color: var(--muted); flex-shrink: 0;">
+        {% if programme.is_locked %}lock{% else %}chevron_right{% endif %}
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align: center; padding: 3rem 1rem; color: var(--muted);">
+    <span class="material-symbols-outlined"
+          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.2;">shelves</span>
+    <p style="font-size: 13px; font-weight: 500;">No programmes available yet.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
 {% block ws_options %}
 <div style="padding: 0 4px;">
 
