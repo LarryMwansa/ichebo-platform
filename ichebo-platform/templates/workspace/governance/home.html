@@ -2,29 +2,29 @@
 {% load static %}
 
 {% block governance_content %}
-<div class="page-hero page-hero--watermark" data-watermark="GOVERNANCE">
-  <div class="page-hero__eyebrow">
-    <div class="page-hero__eyebrow-line"></div>
-    <span class="page-hero__label">Apostolic Registry</span>
-  </div>
-  <h1 class="page-hero__title">Prophet's <em>Handbook</em></h1>
-  <p class="page-hero__sub">Governance records, mandate library &amp; steward keys</p>
-  {% if is_level5 %}
-  <a href="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type=class"
-     class="ws-topbar__cta" style="margin-top: var(--space-s); display: inline-flex; text-decoration: none;">
-    <span class="material-symbols-outlined">add</span>
-    New Official Act
-  </a>
-  {% endif %}
-</div>
+<div style="max-width: 860px; margin: 0 auto; padding: 20px 0 100px;">
 
-<div style="max-width: 860px; margin: 0 auto; padding: var(--space-m) 0 100px;">
-  <div style="height: 300px; border: 1px dashed var(--border); border-radius: 12px;
-              display: flex; flex-direction: column; align-items: center; justify-content: center;
-              gap: 16px; color: var(--muted);">
-    <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2;">account_balance</span>
-    <p style="font-size: 14px; font-weight: 500;">Select a registry from the context bar to begin review.</p>
-  </div>
+    <div class="ws-page-header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Apostolic Records</div>
+            <h1 class="ws-page-title">
+                {% if active_branch == 'library' %}Reference <em>Library</em>{% else %}Mandate <em>Branch</em>{% endif %}
+            </h1>
+        </div>
+        {% if is_level5 %}
+        <a href="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={% if active_branch == 'library' %}class{% else %}mandate{% endif %}"
+           class="ws-topbar__cta" style="flex-shrink: 0; text-decoration: none;">
+            <span class="material-symbols-outlined">add</span>
+            New Official Act
+        </a>
+        {% endif %}
+    </div>
+
+    <div style="height: 300px; border: 1px dashed var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--muted);">
+        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2;">account_balance</span>
+        <p style="font-size: 14px; font-weight: 500;">Select a registry from the context bar to begin review.</p>
+    </div>
+
 </div>
 {% endblock %}
 
