@@ -2,17 +2,17 @@
   <div class="gov-branch-label">Reference Library</div>
   <div class="gov-type-list">
     {% for slug, label in library_types.items %}
-    <a href="{% url 'governance:reference-list' slug %}"
+    <a href="{% url 'governance:library-list' slug %}"
        class="gov-type-pill"
-       hx-get="{% url 'governance:reference-list' slug %}"
+       hx-get="{% url 'governance:library-list' slug %}"
        hx-target="#governance-content"
        hx-push-url="true">
       {{ label }}
     </a>
     {% endfor %}
   </div>
-  <a href="{% url 'governance:reference-home' %}" class="gov-action-btn"
-     hx-get="{% url 'governance:reference-home' %}"
+  <a href="{% url 'governance:library-home' %}" class="gov-action-btn"
+     hx-get="{% url 'governance:library-home' %}"
      hx-target="#governance-content"
      hx-push-url="true">
     Open Library →

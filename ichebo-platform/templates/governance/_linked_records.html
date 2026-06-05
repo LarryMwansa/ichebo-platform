@@ -18,9 +18,9 @@
           </div>
         </div>
         {% elif entry.record %}
-        <a href="{% if entry.record.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' entry.record.id %}{% else %}{% url 'governance:mandate-detail' entry.record.id %}{% endif %}?via={{ record.id }}"
+        <a href="{% if entry.record.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' entry.record.id %}{% else %}{% url 'governance:mandate-detail' entry.record.id %}{% endif %}?via={{ record.id }}"
            class="ws-list-item"
-           hx-get="{% if entry.record.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' entry.record.id %}{% else %}{% url 'governance:mandate-detail' entry.record.id %}{% endif %}?via={{ record.id }}"
+           hx-get="{% if entry.record.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' entry.record.id %}{% else %}{% url 'governance:mandate-detail' entry.record.id %}{% endif %}?via={{ record.id }}"
            hx-target="#ws-detail"
            hx-push-url="true">
           <div class="ws-list-item__icon">

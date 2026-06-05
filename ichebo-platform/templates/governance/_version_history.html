@@ -16,9 +16,9 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
           <span style="opacity: 0.7; font-size: 10px; text-transform: uppercase;">{{ v.status }}</span>
           {% if v.id != record.id %}
-          <a href="{% if v.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' v.id %}{% else %}{% url 'governance:mandate-detail' v.id %}{% endif %}"
+          <a href="{% if v.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' v.id %}{% else %}{% url 'governance:mandate-detail' v.id %}{% endif %}"
              style="color: var(--primary); text-decoration: none;"
-             hx-get="{% if v.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' v.id %}{% else %}{% url 'governance:mandate-detail' v.id %}{% endif %}"
+             hx-get="{% if v.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' v.id %}{% else %}{% url 'governance:mandate-detail' v.id %}{% endif %}"
              hx-target="#ws-detail"
              hx-push-url="true">View</a>
           {% else %}

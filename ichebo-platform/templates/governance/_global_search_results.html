@@ -25,11 +25,11 @@
   <div class="ws-search-group">
     <div class="label-caps" style="padding: var(--space-s) var(--space-m); opacity: 0.5;">Apostolic Registry</div>
     {% for r in gov %}
-    <a href="{% if r.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' r.id %}{% else %}{% url 'governance:mandate-detail' r.id %}{% endif %}"
+    <a href="{% if r.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' r.id %}{% else %}{% url 'governance:mandate-detail' r.id %}{% endif %}"
        class="ws-command-item"
        style="border: none; background: transparent;"
        onclick="window.WorkspaceUI.closeSearch()"
-       hx-get="{% if r.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:reference-detail' r.id %}{% else %}{% url 'governance:mandate-detail' r.id %}{% endif %}"
+       hx-get="{% if r.record_type in 'class,principle,concept,divine_pattern,subject,entity,narrative,framework' %}{% url 'governance:library-detail' r.id %}{% else %}{% url 'governance:mandate-detail' r.id %}{% endif %}"
        hx-target="#main-stage"
        hx-push-url="true">
       <span class="material-symbols-outlined" style="color: var(--accent-red);">gavel</span>

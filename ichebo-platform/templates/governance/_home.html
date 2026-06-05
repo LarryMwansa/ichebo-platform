@@ -9,9 +9,9 @@
     <p class="gov-branch-desc">Apostolic Properties compiled from Scripture via HRS. Eight record types.</p>
     <div class="gov-type-list">
       {% for slug, label in library_types.items %}
-      <a href="{% url 'governance:reference-list' slug %}"
+      <a href="{% url 'governance:library-list' slug %}"
          class="gov-type-pill"
-         hx-get="{% url 'governance:reference-list' slug %}"
+         hx-get="{% url 'governance:library-list' slug %}"
          hx-target="#governance-content"
          hx-push-url="true">
         {{ label }}

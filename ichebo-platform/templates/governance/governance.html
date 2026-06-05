@@ -29,9 +29,9 @@
 
         {# Branch tabs: Reference / Mandate / Keys #}
         <div class="ws-list-group" style="gap: 4px;">
-          <a href="{% url 'governance:reference-home' %}"
+          <a href="{% url 'governance:library-home' %}"
              class="ws-list-item {% if active_branch == 'library' or not active_branch %}active{% endif %}"
-             hx-get="{% url 'governance:reference-home' %}"
+             hx-get="{% url 'governance:library-home' %}"
              hx-target="#ws-list-content"
              hx-push-url="true">
             <div class="ws-list-item__icon">

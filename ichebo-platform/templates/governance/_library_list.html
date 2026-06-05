@@ -5,17 +5,17 @@
 
     {# Compact Filter Tabs #}
     <div style="display: flex; gap: 8px; margin-bottom: var(--space-m); overflow-x: auto; padding-bottom: 4px;">
-      <a href="{% url 'governance:reference-home' %}"
+      <a href="{% url 'governance:library-home' %}"
          class="ws-btn ws-btn--secondary {% if not record_type %}active{% endif %}"
-         hx-get="{% url 'governance:reference-home' %}"
+         hx-get="{% url 'governance:library-home' %}"
          hx-target="#ws-list-content"
          style="font-size: 11px; padding: 4px 10px; flex-shrink: 0;">
         All
       </a>
       {% for slug, label in library_types.items %}
-      <a href="{% url 'governance:reference-list' slug %}"
+      <a href="{% url 'governance:library-list' slug %}"
          class="ws-btn ws-btn--secondary {% if slug == record_type %}active{% endif %}"
-         hx-get="{% url 'governance:reference-list' slug %}"
+         hx-get="{% url 'governance:library-list' slug %}"
          hx-target="#ws-list-content"
          style="font-size: 11px; padding: 4px 10px; flex-shrink: 0;">
         {{ label }}
@@ -30,7 +30,7 @@
         <input type="text" name="q" value="{{ search }}"
                placeholder="Search {{ type_label|lower }}…"
                style="width: 100%; padding: 8px 12px 8px 36px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 13px;"
-               hx-get="{% url 'governance:reference-list' record_type %}"
+               hx-get="{% url 'governance:library-list' record_type %}"
                hx-trigger="keyup changed delay:300ms"
                hx-target="#record-list"
                hx-swap="innerHTML">
@@ -40,9 +40,9 @@
 
   <div id="record-list" class="ws-list-group">
   {% for record in records %}
-  <a href="{% url 'governance:reference-detail' record.id %}"
+  <a href="{% url 'governance:library-detail' record.id %}"
      class="ws-list-item"
-     hx-get="{% url 'governance:reference-detail' record.id %}"
+     hx-get="{% url 'governance:library-detail' record.id %}"
      hx-target="#ws-detail"
      hx-push-url="true">
     <div class="ws-list-item__content">
