@@ -165,3 +165,84 @@
     </div>
 </div>
 {% endblock %}
+
+{% block content %}
+<div class="page-hero page-hero--watermark" data-watermark="INDUCTION">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Spiritual Formation</span>
+  </div>
+  <h1 class="page-hero__title">Induction <em>Review</em></h1>
+  <p class="page-hero__sub">Confirm inductees who have completed formation and advance them to Level 1</p>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+  {% if inductees %}
+  <div style="display: flex; flex-direction: column; gap: var(--space-s);">
+    {% for inductee in inductees %}
+    {% with profile=inductee.profile %}
+    <div id="inductee-m-{{ inductee.id }}"
+         style="background: var(--card); border: 1px solid var(--border);
+                border-radius: var(--radius-l); padding: var(--space-m);">
+      {# Header #}
+      <div style="display: flex; align-items: center; gap: var(--space-s); margin-bottom: var(--space-s);">
+        <div style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+                    background: var(--primary-light, rgba(175,50,54,0.1));
+                    color: var(--primary); display: flex; align-items: center;
+                    justify-content: center; font-weight: 800; font-size: 15px;">
+          {{ inductee.display_name|default:inductee.email|first|upper }}
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 14px; font-weight: 700; color: var(--text);">
+            {{ inductee.display_name|default:inductee.email }}
+          </div>
+          <div style="font-size: 11px; color: var(--muted);">
+            {{ inductee.email }}
+            {% if inductee.induction_enrolled_at %}
+            · Enrolled {{ inductee.induction_enrolled_at|date:"d M Y" }}
+            {% endif %}
+          </div>
+        </div>
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                     letter-spacing: 0.06em; flex-shrink: 0;
+                     color: {% if inductee.enrolment_status == 'completed' %}var(--primary){% else %}var(--muted){% endif %};">
+          {% if inductee.enrolment_status == 'completed' %}Complete
+          {% elif inductee.enrolment_status == 'in_progress' %}In Progress
+          {% else %}Not Started{% endif %}
+        </span>
+      </div>
+      {# Progress bar #}
+      <div style="height: 4px; background: var(--border); border-radius: 2px; margin-bottom: var(--space-s);">
+        <div style="height: 100%; width: {{ inductee.progress }}%;
+                    background: {% if inductee.progress == 100 %}var(--primary){% else %}var(--muted){% endif %};
+                    border-radius: 2px;"></div>
+      </div>
+      <div style="font-size: 11px; color: var(--muted); margin-bottom: var(--space-s);">
+        {{ inductee.progress }}% complete
+      </div>
+      {# Confirm button — only if complete #}
+      {% if inductee.enrolment_status == 'completed' %}
+      <button class="btn-touch btn-touch--primary"
+              hx-post="{% url 'learn:htmx-induction-confirm' inductee.id %}"
+              hx-target="#inductee-m-{{ inductee.id }}"
+              hx-swap="outerHTML"
+              style="width: 100%; justify-content: center;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">how_to_reg</span>
+        Confirm &amp; Advance to Level 1
+      </button>
+      {% endif %}
+    </div>
+    {% endwith %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align: center; padding: 3rem 1rem; color: var(--muted);">
+    <span class="material-symbols-outlined"
+          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.2;">
+      how_to_reg
+    </span>
+    <p style="font-size: 14px; font-weight: 500;">No active inductees.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

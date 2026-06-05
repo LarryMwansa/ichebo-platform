@@ -108,3 +108,75 @@
     </div>
 </div>
 {% endblock %}
+
+{% block content %}
+<div class="page-hero page-hero--watermark" data-watermark="REVIEW">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Spiritual Formation</span>
+  </div>
+  <h1 class="page-hero__title">Content <em>Review</em></h1>
+  <p class="page-hero__sub">Approve or return submitted formation content for publication</p>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+  {% if items %}
+  <div style="display: flex; flex-direction: column; gap: var(--space-s);">
+    {% for item in items %}
+    <div id="ws-review-m-{{ item.id }}"
+         style="background: var(--card); border: 1px solid var(--border);
+                border-radius: var(--radius-l); padding: var(--space-m);">
+      <div style="display: flex; align-items: flex-start; gap: var(--space-s); margin-bottom: var(--space-s);">
+        <span class="material-symbols-outlined"
+              style="font-size: 22px; color: var(--primary); flex-shrink: 0; margin-top: 2px;">
+          {% if item.record_type == 'programme' %}account_balance
+          {% elif item.record_type == 'course' %}menu_book
+          {% else %}draw{% endif %}
+        </span>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px;">
+            {{ item.title }}
+          </div>
+          <div style="font-size: 11px; color: var(--muted);">
+            <span style="text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;
+                         color: var(--primary);">{{ item.record_type }}</span>
+            · {{ item.author_display }} · {{ item.updated_at|date:"d M" }}
+          </div>
+        </div>
+      </div>
+      {% if item.content %}
+      <div style="font-size: 13px; line-height: 1.6; color: var(--text); padding: 12px 14px;
+                  background: var(--card-2); border: 1px solid var(--border);
+                  border-left: 3px solid var(--primary); border-radius: var(--radius-m);
+                  margin-bottom: var(--space-s);">
+        {{ item.content|truncatechars:200 }}
+      </div>
+      {% endif %}
+      <div style="display: flex; gap: var(--space-xs); border-top: 1px solid var(--border);
+                  padding-top: var(--space-s);">
+        <button class="btn-touch"
+                hx-post="{% url 'learn:htmx-return-content' item.id %}"
+                hx-target="#ws-review-m-{{ item.id }}" hx-swap="outerHTML swap:1s"
+                style="flex: 1; justify-content: center; font-size: 13px;">
+          Return
+        </button>
+        <button class="btn-touch btn-touch--primary"
+                hx-post="{% url 'learn:htmx-publish-content' item.id %}"
+                hx-target="#ws-review-m-{{ item.id }}" hx-swap="outerHTML swap:1s"
+                style="flex: 1; justify-content: center; font-size: 13px;">
+          <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span>
+          Publish
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align: center; padding: 3rem 1rem; color: var(--muted);">
+    <span class="material-symbols-outlined"
+          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.2;">rate_review</span>
+    <p style="font-size: 14px; font-weight: 500;">No content awaiting review.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

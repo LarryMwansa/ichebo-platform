@@ -87,3 +87,63 @@
     </div>
 </div>
 {% endblock %}
+
+{% block content %}
+<div class="page-hero page-hero--watermark" data-watermark="CERT">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Spiritual Formation</span>
+  </div>
+  <h1 class="page-hero__title">Certification <em>Queue</em></h1>
+  <p class="page-hero__sub">Review completed programmes and confirm member certifications</p>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+  {% if certifications %}
+  <div style="display: flex; flex-direction: column; gap: var(--space-s);">
+    {% for cert in certifications %}
+    <div id="cert-m-{{ cert.id }}"
+         style="background: var(--card); border: 1px solid var(--border);
+                border-radius: var(--radius-l); padding: var(--space-m);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;
+                  margin-bottom: var(--space-s);">
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+            {{ cert.title }}
+          </div>
+          <div style="font-size: 11px; color: var(--muted);">
+            Submitted {{ cert.created_at|date:"d M Y" }}
+          </div>
+        </div>
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                     letter-spacing: 0.06em; color: var(--primary); flex-shrink: 0; margin-left: 8px;">
+          Awaiting
+        </span>
+      </div>
+      <textarea name="notes" id="notes-m-{{ cert.id }}"
+                placeholder="Confirmation notes (optional)" rows="2"
+                class="form-input-touch"
+                style="width: 100%; margin-bottom: var(--space-s); box-sizing: border-box; resize: vertical;"></textarea>
+      <button class="btn-touch btn-touch--primary"
+              hx-post="{% url 'learn:htmx-confirm-cert' cert.id %}"
+              hx-target="#cert-m-{{ cert.id }}"
+              hx-swap="outerHTML"
+              hx-include="#notes-m-{{ cert.id }}"
+              style="width: 100%; justify-content: center;">
+        <span class="material-symbols-outlined">workspace_premium</span>
+        Confirm &amp; Advance Level
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align: center; padding: 3rem 1rem; color: var(--muted);">
+    <span class="material-symbols-outlined"
+          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.2;">
+      workspace_premium
+    </span>
+    <p style="font-size: 14px; font-weight: 500;">No certifications pending.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

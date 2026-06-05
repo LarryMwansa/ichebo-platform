@@ -148,3 +148,92 @@
                 font-family: 'Playfair Display', serif;">{{ user_records|length }}</div>
 </div>
 {% endblock %}
+
+{% block content %}
+<div class="page-hero page-hero--watermark" data-watermark="AUTHOR">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Curriculum Authorship</span>
+  </div>
+  <h1 class="page-hero__title">Create <em>Content</em></h1>
+  <p class="page-hero__sub">Author programmes, courses &amp; lessons</p>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+
+  {# Quick create buttons #}
+  <div style="display: flex; gap: var(--space-xs); margin-bottom: var(--space-m); flex-wrap: wrap;">
+    <a href="{% url 'learn:learn-author-programme' %}" class="btn-touch"
+       style="text-decoration: none; flex: 1; justify-content: center; min-width: 120px;">
+      <span class="material-symbols-outlined">account_balance</span>
+      Programme
+    </a>
+    <a href="{% url 'learn:learn-author-course' %}" class="btn-touch"
+       style="text-decoration: none; flex: 1; justify-content: center; min-width: 120px;">
+      <span class="material-symbols-outlined">menu_book</span>
+      Course
+    </a>
+    <a href="{% url 'learn:learn-author-lesson' %}" class="btn-touch btn-touch--primary"
+       style="text-decoration: none; flex: 1; justify-content: center; min-width: 120px;">
+      <span class="material-symbols-outlined">add</span>
+      Lesson
+    </a>
+  </div>
+
+  {# Work in progress #}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">Work in Progress</div>
+  {% if user_records %}
+  <div style="background: var(--card); border: 1px solid var(--border);
+              border-radius: var(--radius-l); overflow: hidden;">
+    {% for record in user_records %}
+    <div style="display: flex; align-items: center; gap: var(--space-s); padding: 14px var(--space-m);
+                {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
+      <span class="material-symbols-outlined"
+            style="font-size: 20px; color: var(--primary); flex-shrink: 0;">
+        {% if record.record_type == 'programme' %}account_balance
+        {% elif record.record_type == 'course' %}menu_book
+        {% else %}draw{% endif %}
+      </span>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 14px; font-weight: 700; color: var(--text);
+                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          {{ record.title }}
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 2px; align-items: center;">
+          <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                       letter-spacing: 0.06em; color: var(--primary);">{{ record.record_type }}</span>
+          <span style="font-size: 11px; color: {% if record.status == 'submitted' %}var(--muted){% else %}var(--primary){% endif %}; font-weight: 700;">
+            {% if record.status == 'submitted' %}Awaiting Review{% else %}Draft{% endif %}
+          </span>
+        </div>
+      </div>
+      {% if record.record_type == 'programme' %}
+      <a href="{% url 'learn:learn-author-programme-edit' record.id %}"
+         style="color: var(--muted); flex-shrink: 0; text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+      </a>
+      {% elif record.record_type == 'course' %}
+      <a href="{% url 'learn:learn-author-course-edit' record.id %}"
+         style="color: var(--muted); flex-shrink: 0; text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+      </a>
+      {% elif record.record_type == 'lesson' %}
+      <a href="{% url 'learn:learn-author-lesson-edit' record.id %}"
+         style="color: var(--muted); flex-shrink: 0; text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+      </a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align: center; padding: 2rem 1rem; background: var(--card);
+              border: 1px solid var(--border); border-radius: var(--radius-l);">
+    <span class="material-symbols-outlined"
+          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.15;">draw</span>
+    <p style="font-size: 13px; color: var(--muted);">No content in progress.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
