@@ -97,3 +97,101 @@
   </div>
 </div>
 {% endblock %}
+
+{% block content %}
+<div class="dashboard">
+
+  <div class="dash-header">
+    <div class="dash-greeting">
+      <span class="dash-name">Formation Journey</span>
+      <span class="dash-role">Level {{ user.competence_level }} · {{ user_level_name }}</span>
+    </div>
+  </div>
+
+  {# Level badge #}
+  <section class="dash-section">
+    <div class="dash-widget" style="display: flex; align-items: center; gap: 1rem;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--primary); color: #fff;
+                  display: flex; align-items: center; justify-content: center;
+                  font-size: 1.5rem; font-weight: 900; flex-shrink: 0;">
+        {{ user.competence_level }}
+      </div>
+      <div>
+        <div style="font-weight: 800; font-size: 1rem;">{{ user_level_name }}</div>
+        <div style="font-size: 0.75rem; color: var(--muted);">Apostolic Registry Standing</div>
+      </div>
+    </div>
+  </section>
+
+  {# Active programme #}
+  {% if active_enrolment %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Active Programme</div>
+      <div style="font-weight: 700; margin-bottom: 0.5rem;">{{ active_enrolment.title }}</div>
+      <div style="height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 0.25rem;">
+        <div style="width: {{ active_enrolment.progress }}%; height: 100%; background: var(--primary); border-radius: 3px;"></div>
+      </div>
+      <div style="font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">
+        {{ active_enrolment.progress }}% complete
+      </div>
+      {% if active_enrolment.linked_record %}
+      <a href="{% url 'learn:learn-programme' active_enrolment.linked_record.id %}"
+         class="btn-touch btn-touch--primary" style="margin-top: 0.75rem; width: 100%; justify-content: center; text-decoration: none;">
+        Continue Programme
+      </a>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# Next level #}
+  {% if next_programme %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Path to Level {{ user.competence_level|add:1 }}</div>
+      <p style="font-size: 0.875rem; line-height: 1.6; color: var(--text); margin: 0;">
+        Complete <strong>{{ next_programme.0 }}</strong> ({{ next_programme.1 }}, ~{{ next_programme.2 }})
+        and receive steward confirmation to advance.
+      </p>
+    </div>
+  </section>
+  {% endif %}
+
+  {# Advancement history #}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Advancement History</div>
+      {% if history %}
+      <div class="list-group">
+        {% for entry in history %}
+        <div class="list-item">
+          <div class="list-item__icon">
+            <span class="status-badge status-badge--active" style="font-size: 0.75rem; padding: 4px 8px;">
+              {{ entry.previous_competence_level }} → {{ entry.new_competence_level }}
+            </span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">Level {{ entry.previous_competence_level }} → Level {{ entry.new_competence_level }}</div>
+            <div class="list-item__meta">
+              {{ entry.confirmed_by.display_name|default:entry.confirmed_by.email }}
+              {% if entry.notes %} · {{ entry.notes|truncatechars:50 }}{% endif %}
+            </div>
+          </div>
+          <div style="font-size: 0.65rem; color: var(--muted); text-transform: uppercase; white-space: nowrap;">
+            {{ entry.confirmed_at|date:"d M Y" }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="text-align: center; padding: 2rem 1rem; color: var(--muted);">
+        <span class="material-symbols-outlined" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.3;">history_edu</span>
+        No advancements recorded yet.
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}
