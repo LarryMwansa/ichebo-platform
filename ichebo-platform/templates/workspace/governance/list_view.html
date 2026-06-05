@@ -2,27 +2,25 @@
 {% load static %}
 
 {% block governance_content %}
-<div style="max-width: 860px; margin: 0 auto; padding: 20px 0 100px;">
+<div class="page-hero page-hero--watermark" data-watermark="{{ type_label|upper|default:'REGISTRY' }}">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">{{ active_branch|title }} Registry{% if record_type %} &rsaquo; {{ type_label }}{% endif %}</span>
+  </div>
+  <h1 class="page-hero__title">
+    {% if record_type %}{{ type_label }} <em>{% if active_branch == 'library' %}Library{% elif active_branch == 'keys' %}Keys{% else %}Branch{% endif %}</em>
+    {% else %}Registry <em>Browse</em>{% endif %}
+  </h1>
+  {% if is_level5 %}
+  <a href="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={{ record_type|default:'mandate' }}"
+     class="ws-topbar__cta" style="margin-top: var(--space-s); display: inline-flex; text-decoration: none;">
+    <span class="material-symbols-outlined">add</span>
+    New {% if active_branch == 'keys' %}Key{% else %}Act{% endif %}
+  </a>
+  {% endif %}
+</div>
 
-    <div class="ws-page-header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
-        <div>
-            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">{{ active_branch|title }} Registry</div>
-            <h1 class="ws-page-title">
-                {% if record_type %}
-                    {{ type_label }}
-                {% else %}
-                    Registry <em>Browse</em>
-                {% endif %}
-            </h1>
-        </div>
-        {% if is_level5 %}
-        <a href="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={{ record_type|default:'mandate' }}"
-           class="ws-topbar__cta" style="flex-shrink: 0; text-decoration: none;">
-            <span class="material-symbols-outlined">add</span>
-            New {% if active_branch == 'keys' %}Key{% else %}Act{% endif %}
-        </a>
-        {% endif %}
-    </div>
+<div style="max-width: 860px; margin: 0 auto; padding: var(--space-m) 0 100px;">
 
     <div>
         {# Registry Grid #}
