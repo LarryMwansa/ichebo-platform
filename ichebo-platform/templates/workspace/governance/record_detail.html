@@ -43,41 +43,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard">
-  <div style="padding:1rem 1rem 5rem;">
-    <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--primary);font-weight:700;margin-bottom:0.5rem;">
-      {{ record.get_record_type_display }}
-    </div>
-    <h1 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--text);margin:0 0 1rem;">
-      {{ record.title }}
-    </h1>
-    {% if record.summary %}
-    <p style="font-size:0.9rem;color:var(--muted);line-height:1.6;margin-bottom:1.5rem;padding-left:0.75rem;border-left:2px solid var(--border);">
-      {{ record.summary }}
-    </p>
-    {% endif %}
-    <div style="font-size:0.9375rem;line-height:1.8;color:var(--text);">
-      {{ record.content|linebreaks }}
-    </div>
-    {% with cf=record.custom_fields %}
-    {% if cf.complexity or cf.polarity %}
-    <div class="dash-widget" style="margin-top:1.5rem;">
-      <div class="dash-widget__label">Stewardship Attributes</div>
-      {% if cf.complexity %}
-      <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);">
-        <span style="font-size:0.8125rem;color:var(--muted);">Complexity</span>
-        <span style="font-size:0.8125rem;font-weight:600;color:var(--text);">{{ cf.complexity }}</span>
-      </div>
-      {% endif %}
-      {% if cf.polarity %}
-      <div style="display:flex;justify-content:space-between;padding:0.5rem 0;">
-        <span style="font-size:0.8125rem;color:var(--muted);">Polarity</span>
-        <span style="font-size:0.8125rem;font-weight:600;color:var(--text);">{{ cf.polarity|title }}</span>
-      </div>
-      {% endif %}
-    </div>
-    {% endif %}
-    {% endwith %}
+<div class="gov-shell">
+  <div id="governance-content" class="gov-content">
+    {% include partial_tpl %}
   </div>
 </div>
 {% endblock %}

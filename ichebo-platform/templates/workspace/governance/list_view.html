@@ -84,37 +84,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard">
-  <div class="dash-header">
-    <div class="dash-greeting">
-      <span class="dash-name">{{ type_label|default:"Registry" }}</span>
-      <span class="dash-role">{{ active_branch|title }} · Governance</span>
-    </div>
+<div class="gov-shell">
+  <div id="governance-content" class="gov-content">
+    {% include partial_tpl %}
   </div>
-  <section class="dash-section">
-    <div class="dash-widget">
-      {% if records %}
-      <div class="list-group">
-        {% for record in records %}
-        <a href="{% if active_branch == 'keys' %}{% url 'governance:keys-detail' record.id %}{% elif active_branch == 'library' %}{% url 'governance:library-detail' record.id %}{% else %}{% url 'governance:mandate-detail' record.id %}{% endif %}"
-           class="list-item" style="text-decoration:none; color:inherit;">
-          <div class="list-item__content">
-            <div class="list-item__title">{{ record.title }}</div>
-            {% if record.summary %}
-            <div class="list-item__meta">{{ record.summary|truncatechars:80 }}</div>
-            {% endif %}
-          </div>
-          <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;flex-shrink:0;">chevron_right</span>
-        </a>
-        {% endfor %}
-      </div>
-      {% else %}
-      <div style="text-align:center;padding:2rem;color:var(--muted);">
-        <span class="material-symbols-outlined" style="font-size:2rem;display:block;margin-bottom:0.5rem;opacity:0.3;">inventory_2</span>
-        No records found.
-      </div>
-      {% endif %}
-    </div>
-  </section>
 </div>
 {% endblock %}
