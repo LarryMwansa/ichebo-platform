@@ -27,7 +27,7 @@ def _htmx(request):
     return bool(request.headers.get('HX-Request'))
 
 
-def _shell_or_partial(request, partial_template, context, shell_template='workspace/governance/home.html'):
+def _shell_or_partial(request, partial_template, context, shell_template='governance/governance.html'):
     """Return partial HTML for HTMX requests, full shell for desktop workspace."""
     if _htmx(request):
         return render(request, partial_template, context)
@@ -114,7 +114,7 @@ def library_list(request, record_type):
         'mandate_types': MANDATE_TYPE_LABELS,
         'is_level5':     _level(request.user) >= 5,
         'active_branch': 'library',
-    }, shell_template='workspace/governance/list_view.html')
+    }, shell_template='governance/governance.html')
 
 
 @login_required
@@ -139,7 +139,7 @@ def library_detail(request, record_id):
         'is_level5':   _level(request.user) >= 5,
         'active_branch': 'library',
         'record_type': record.record_type,
-    }, shell_template='workspace/governance/record_detail.html')
+    }, shell_template='governance/governance.html')
 
 
 # ── Mandate branch ─────────────────────────────────────────────────────────────
@@ -175,7 +175,7 @@ def mandate_list(request, record_type):
         'mandate_types': MANDATE_TYPE_LABELS,
         'is_level5':     _level(request.user) >= 5,
         'active_branch': 'mandate',
-    }, shell_template='workspace/governance/list_view.html')
+    }, shell_template='governance/governance.html')
 
 
 @login_required
@@ -200,7 +200,7 @@ def mandate_detail(request, record_id):
         'is_level5':     _level(request.user) >= 5,
         'active_branch': 'mandate',
         'record_type': record.record_type,
-    }, shell_template='workspace/governance/record_detail.html')
+    }, shell_template='governance/governance.html')
 
 
 # ── My Keys ────────────────────────────────────────────────────────────────────
@@ -219,7 +219,7 @@ def keys_list(request):
         'active_branch': 'keys',
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
-    }, shell_template='workspace/governance/list_view.html')
+    }, shell_template='governance/governance.html')
 
 
 @login_required
