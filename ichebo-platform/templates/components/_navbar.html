@@ -1,11 +1,12 @@
 <!-- components/_navbar.html -->
+{% load static %}
 <div class="navbar">
 
   <!-- LEFT: Slot (Logo or Back button) -->
   <div class="nav-left" id="nav-left-content">
     {% block nav_left %}
     <a href="{% url 'dashboard:index' %}" class="logo-link">
-       <div class="logo-container">🏛️ <span class="logo-text">ICS</span></div>
+       <img src="{% static 'images/logo.svg' %}" alt="ICS Logo" class="nav-logo" style="height:28px; width:auto; display:block">
     </a>
     {% endblock %}
   </div>

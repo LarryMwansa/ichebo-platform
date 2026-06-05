@@ -52,6 +52,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding: 1.25rem 1rem;
   transition: transform 0.2s;
 }
 
@@ -385,6 +386,13 @@
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+}
+
+/* Center the right-side content in small inline dash widgets (badge + text) */
+.dash-section .dash-widget[style*="display: flex"] > div:last-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /* ── Registry Activity — Journal Grid ───────────────────────────────── */

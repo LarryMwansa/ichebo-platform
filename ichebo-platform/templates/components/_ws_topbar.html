@@ -1,6 +1,11 @@
 {# components/_ws_topbar.html — Desktop workspace topbar. Context: ws_breadcrumb_links, ws_page_title, ws_show_search. #}
+{% load static %}
 
 <div class="ws-topbar" role="banner">
+
+  <a href="{% url 'dashboard:index' %}" class="ws-topbar__logo" style="display:inline-block;margin-right:12px;">
+    <img src="{% static 'images/logo-2.svg' %}" alt="ICS Logo" style="height:28px; width:auto; display:block">
+  </a>
 
   {# ── Left: breadcrumb ── #}
   <nav class="ws-topbar__breadcrumb" aria-label="Page breadcrumb">
