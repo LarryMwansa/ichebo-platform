@@ -88,69 +88,117 @@
 
 {# ── Mobile fallback (below 1024px) ── #}
 {% block content %}
-<div class="dashboard">
 
-  <div class="dash-header">
-    <div class="dash-greeting">
-      <span class="dash-name">Formation</span>
-    </div>
+<div class="page-hero page-hero--watermark" data-watermark="LEARN">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Spiritual Formation</span>
   </div>
+  <h1 class="page-hero__title">My <em>Learning</em></h1>
+  <p class="page-hero__sub">Kingdom Growth System — formation &amp; certification</p>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+
+  {# Active pathway banner #}
+  {% if active_pathway %}
+  <div style="background: var(--card); border: 1px solid var(--border);
+              border-left: 3px solid var(--primary); border-radius: var(--radius-l);
+              padding: var(--space-s) var(--space-m); margin-bottom: var(--space-m);
+              display: flex; align-items: center; justify-content: space-between;">
+    <div>
+      <div class="label-tag" style="margin-bottom: 4px;">Active Pathway</div>
+      <div style="font-family: 'Playfair Display', serif; font-size: 1.125rem;
+                  font-weight: 700; color: var(--text);">
+        {{ active_qualification|default:active_pathway|title }}
+      </div>
+    </div>
+    <span class="material-symbols-outlined"
+          style="font-size: 36px; opacity: 0.15; color: var(--text);">school</span>
+  </div>
+  {% endif %}
+
+  {# Active programmes #}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">Active Programmes</div>
 
   {% if enrolments %}
-  <section class="dash-section">
-    <div class="dash-widget">
-      <div class="dash-widget__label">Active Enrolments</div>
-      <div class="list-group">
-        {% for enrolment in enrolments %}
-        <div class="list-item">
-          <div class="list-item__icon"><span class="material-symbols-outlined">school</span></div>
-          <div class="list-item__content">
-            <div class="list-item__title">
-              {{ enrolment.metadata.programme_title|default:"Programme" }}
-            </div>
-            <div class="list-item__meta">{{ enrolment.status|title }}</div>
-          </div>
+  <div style="display: flex; flex-direction: column; gap: var(--space-xs); margin-bottom: var(--space-m);">
+    {% for enrolment in enrolments %}
+    <a href="{% if enrolment.metadata.programme_record_id %}{% url 'learn:learn-programme' enrolment.metadata.programme_record_id %}{% else %}#{% endif %}"
+       style="display: block; text-decoration: none; background: var(--card);
+              border: 1px solid var(--border); border-radius: var(--radius-l);
+              padding: var(--space-s) var(--space-m);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;
+                  margin-bottom: 10px; gap: var(--space-s);">
+        <div style="font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.4;">
+          {{ enrolment.title }}
         </div>
-        {% endfor %}
+        <div style="font-size: 14px; font-weight: 800; color: var(--primary); flex-shrink: 0;">
+          {{ enrolment.progress|default:0 }}%
+        </div>
       </div>
-    </div>
-  </section>
+      <div style="height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 8px;">
+        <div style="height: 100%; width: {{ enrolment.progress|default:0 }}%;
+                    background: var(--primary); border-radius: 2px;"></div>
+      </div>
+      <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                  color: {% if enrolment.progress == 100 %}var(--primary){% else %}var(--muted){% endif %};">
+        {% if enrolment.progress == 100 %}Awaiting Certification{% else %}In Progress{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align: center; padding: 2rem 1rem; margin-bottom: var(--space-m);
+              background: var(--card); border: 1px solid var(--border);
+              border-radius: var(--radius-l);">
+    <span class="material-symbols-outlined"
+          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.15;">school</span>
+    <p style="font-size: 13px; color: var(--muted); margin-bottom: var(--space-s);">
+      No active enrolments. Your formation awaits.
+    </p>
+    <a href="{% url 'learn:learn-catalogue' %}" class="btn-touch btn-touch--primary"
+       style="text-decoration: none;">
+      Browse Catalogue
+    </a>
+  </div>
   {% endif %}
 
+  {# Certifications #}
   {% if certifications %}
-  <section class="dash-section">
-    <div class="dash-widget">
-      <div class="dash-widget__label">Certifications</div>
-      <div class="list-group">
-        {% for cert in certifications %}
-        <div class="list-item">
-          <div class="list-item__icon" style="color: #d97706;">
-            <span class="material-symbols-outlined">workspace_premium</span>
-          </div>
-          <div class="list-item__content">
-            <div class="list-item__title">{{ cert.title }}</div>
-          </div>
-        </div>
-        {% endfor %}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">Certifications</div>
+  <div style="background: var(--card); border: 1px solid var(--border);
+              border-radius: var(--radius-l); overflow: hidden; margin-bottom: var(--space-m);">
+    {% for cert in certifications %}
+    <div style="display: flex; align-items: center; gap: var(--space-s);
+                padding: 14px var(--space-m);
+                {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
+      <span class="material-symbols-outlined" style="color: #d97706; font-size: 20px; flex-shrink: 0;">
+        workspace_premium
+      </span>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 14px; font-weight: 700; color: var(--text);">{{ cert.title }}</div>
+        <div style="font-size: 11px; color: var(--muted);">Issued {{ cert.created_at|date:"M Y" }}</div>
       </div>
     </div>
-  </section>
+    {% endfor %}
+  </div>
   {% endif %}
 
-  <section class="dash-section">
-    <div class="list-group">
-      <a href="{% url 'learn:learn-catalogue' %}" class="list-item" style="text-decoration:none; color: inherit;">
-        <div class="list-item__icon"><span class="material-symbols-outlined">library_books</span></div>
-        <div class="list-item__content"><div class="list-item__title">Browse Catalogue</div></div>
-        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
-      </a>
-      <a href="{% url 'learn:learn-home' %}" class="list-item" style="text-decoration:none; color: inherit;">
-        <div class="list-item__icon"><span class="material-symbols-outlined">school</span></div>
-        <div class="list-item__content"><div class="list-item__title">Full Formation Hub</div></div>
-        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
-      </a>
-    </div>
-  </section>
+  {# Quick links #}
+  <div class="list-group">
+    <a href="{% url 'learn:learn-catalogue' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon">
+        <span class="material-symbols-outlined">library_books</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">Browse Catalogue</div>
+        <div class="list-item__meta">Programmes, modules &amp; lessons</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </a>
+  </div>
 
 </div>
 {% endblock %}
