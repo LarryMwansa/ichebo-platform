@@ -249,11 +249,11 @@
 
 /* ─── DARK MODE ADJUSTMENTS ──────────────────────────────── */
 
-body.dark .programme-card {
+html.dark .programme-card {
   background: var(--card);   /* #1a1a1a in dark */
 }
 
-body.dark .lesson-type-tag {
+html.dark .lesson-type-tag {
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.5);
 }

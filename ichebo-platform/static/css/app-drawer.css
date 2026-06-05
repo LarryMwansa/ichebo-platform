@@ -146,14 +146,14 @@
 }
 
 /* Dark Mode Icon Overrides */
-body.dark .icon-blue   { --icon-bg: rgba(29, 78, 216, 0.15);   --icon-fg: #60a5fa; }
-body.dark .icon-orange { --icon-bg: rgba(194, 65, 12, 0.15);   --icon-fg: #fb923c; }
-body.dark .icon-pink   { --icon-bg: rgba(190, 24, 93, 0.15);   --icon-fg: #f472b6; }
-body.dark .icon-green  { --icon-bg: rgba(21, 128, 61, 0.15);   --icon-fg: #4ade80; }
-body.dark .icon-purple { --icon-bg: rgba(126, 34, 206, 0.15);  --icon-fg: #c084fc; }
-body.dark .icon-cyan   { --icon-bg: rgba(14, 116, 144, 0.15);  --icon-fg: #22d3ee; }
-body.dark .icon-teal   { --icon-bg: rgba(15, 118, 110, 0.15);  --icon-fg: #2dd4bf; }
-body.dark .icon-slate  { --icon-bg: rgba(51, 65, 85, 0.15);    --icon-fg: #94a3b8; }
+html.dark .icon-blue   { --icon-bg: rgba(29, 78, 216, 0.15);   --icon-fg: #60a5fa; }
+html.dark .icon-orange { --icon-bg: rgba(194, 65, 12, 0.15);   --icon-fg: #fb923c; }
+html.dark .icon-pink   { --icon-bg: rgba(190, 24, 93, 0.15);   --icon-fg: #f472b6; }
+html.dark .icon-green  { --icon-bg: rgba(21, 128, 61, 0.15);   --icon-fg: #4ade80; }
+html.dark .icon-purple { --icon-bg: rgba(126, 34, 206, 0.15);  --icon-fg: #c084fc; }
+html.dark .icon-cyan   { --icon-bg: rgba(14, 116, 144, 0.15);  --icon-fg: #22d3ee; }
+html.dark .icon-teal   { --icon-bg: rgba(15, 118, 110, 0.15);  --icon-fg: #2dd4bf; }
+html.dark .icon-slate  { --icon-bg: rgba(51, 65, 85, 0.15);    --icon-fg: #94a3b8; }
 
 /* =========================
    APP GRID

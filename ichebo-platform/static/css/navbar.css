@@ -69,7 +69,7 @@
 }
 
 /* In dark mode the logo stays readable */
-body.dark .logo-svg {
+html.dark .logo-svg {
   fill: #f5f3f0;
 }
 
@@ -332,8 +332,8 @@ body.dark .logo-svg {
   display: none;
 }
 
-body:not(.dark) .theme-icon-sun  { display: block; }
-body.dark       .theme-icon-moon { display: block; }
+html:not(.dark) .theme-icon-sun  { display: block; }
+html.dark       .theme-icon-moon { display: block; }
 
 .options-menu {
   position: absolute;

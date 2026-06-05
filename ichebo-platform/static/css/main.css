@@ -489,7 +489,7 @@ select.form-input-touch {
   color: var(--text);
 }
 
-body.dark .form-input-touch option {
+html.dark .form-input-touch option {
   background-color: #1a1a1a;
   color: #f5f3f0;
 }
