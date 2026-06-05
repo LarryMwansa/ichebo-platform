@@ -18,6 +18,10 @@
     <link rel="stylesheet" href="{% static 'css/workspace.css' %}?v=1">
     <link rel="stylesheet" href="{% static 'css/shell_v2.css' %}?v=1">
     <link rel="stylesheet" href="{% static 'css/workspace_v2.css' %}?v=1">
+    <!-- Mobile nav — used by #ws-mobile-shell below 1024px -->
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bottom_bar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/app-drawer.css' %}">
     
     {% block extra_css %}
 <style>
@@ -417,7 +421,13 @@
 
     {# ── Mobile shell: visible below 1024px, hidden on desktop via shell_v2.css ── #}
     <div id="ws-mobile-shell" style="display:none;">
-        {% block content %}{% endblock %}
+        {% include "components/_navbar.html" %}
+        {% include "components/_app_drawer.html" %}
+        <main class="ics-main" role="main">
+            <div id="toast-container-mobile" aria-live="polite" aria-atomic="true"></div>
+            {% block content %}{% endblock %}
+        </main>
+        {% include "components/_bottom_nav.html" %}
     </div>
 
 </body>
