@@ -171,77 +171,154 @@
 
 {# ── Mobile fallback (below 1024px) ── #}
 {% block content %}
-<div class="dashboard">
 
-  <div class="dash-header">
-    <div class="dash-greeting">
-      <span class="dash-name">Community</span>
-      {% if primary_perm %}
-      <span class="dash-role">{{ primary_perm.tenant.name }}</span>
-      {% endif %}
+{% if not primary_perm %}
+<div style="padding: var(--space-xl) var(--space-s); text-align: center; color: var(--muted);">
+  <span class="material-symbols-outlined" style="font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.2;">groups</span>
+  <p style="font-size: 14px; font-weight: 500;">You are not yet part of a community.</p>
+</div>
+{% else %}
+
+{# Tenant header card #}
+<div style="padding: var(--space-s);">
+  <div style="display: flex; align-items: center; gap: var(--space-m); padding: var(--space-m);
+              background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l);">
+    <div style="width: 52px; height: 52px; border-radius: var(--radius-m); flex-shrink: 0;
+                background: var(--card-2); display: flex; align-items: center; justify-content: center;">
+      <span class="material-symbols-outlined" style="font-size: 26px; color: var(--muted);">account_balance</span>
+    </div>
+    <div>
+      <div style="font-size: 17px; font-weight: 800; color: var(--text);">
+        {{ primary_perm.tenant.name }}
+      </div>
+      <div style="display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+        <span class="material-symbols-outlined" style="font-size: 13px; color: var(--muted);">hub</span>
+        <span style="font-size: 12px; color: var(--muted); text-transform: uppercase;
+                     letter-spacing: 0.06em; font-weight: 700;">{{ primary_perm.tenant.tier|upper }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="padding: 0 var(--space-s) var(--space-2xl);">
+
+  {# Formation stage #}
+  <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l);
+              padding: var(--space-m); margin-bottom: var(--space-s);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Formation Stage</div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+      <div style="font-size: 22px; font-weight: 900; font-family: 'Playfair Display', serif;
+                  color: var(--text);">{{ stage_name }}</div>
+      <span style="font-size: 10px; font-weight: 800; text-transform: uppercase;
+                   letter-spacing: 0.06em; color: var(--primary);">{{ level_label }}</span>
+    </div>
+    <div style="display: flex; gap: 5px;">
+      {% for i in participation_steps %}
+      <div style="flex: 1; height: 4px; border-radius: 2px;
+                  background: {% if i <= level %}var(--primary){% else %}var(--border){% endif %};"></div>
+      {% endfor %}
     </div>
   </div>
 
-  {% if not primary_perm %}
-  <section class="dash-section">
-    <div class="dash-widget" style="text-align: center; padding: 2rem;">
-      <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--border);">groups</span>
-      <p style="color: var(--muted); margin-top: 0.5rem;">You are not yet part of a community</p>
-    </div>
-  </section>
-  {% else %}
-
-  {% if announcements %}
-  <section class="dash-section">
-    <div class="dash-widget">
-      <div class="dash-widget__label">Announcements</div>
-      <div class="list-group">
-        {% for a in announcements|slice:":3" %}
-        <div class="list-item">
-          <div class="list-item__icon"><span class="material-symbols-outlined">campaign</span></div>
-          <div class="list-item__content">
-            <div class="list-item__title">{{ a.title }}</div>
-            <div class="list-item__meta">{{ a.created_at|date:"d M" }}</div>
-          </div>
-        </div>
-        {% endfor %}
+  {# Spiritual gifts #}
+  <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l);
+              padding: var(--space-m); margin-bottom: var(--space-s);
+              display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <div class="label-caps" style="margin-bottom: 4px;">Spiritual Gifts</div>
+      <div style="font-size: 16px; font-weight: 700; color: var(--text);">
+        {{ gifts_count }} Active Gift{{ gifts_count|pluralize }}
       </div>
     </div>
-  </section>
-  {% endif %}
+    <span class="material-symbols-outlined" style="font-size: 28px; color: var(--primary); opacity: 0.6;">
+      auto_awesome
+    </span>
+  </div>
 
-  {% if upcoming_gatherings %}
-  <section class="dash-section">
-    <div class="dash-widget">
-      <div class="dash-widget__label">Upcoming Gatherings</div>
-      <div class="list-group">
-        {% for g in upcoming_gatherings|slice:":3" %}
-        <div class="list-item">
-          <div class="list-item__icon"><span class="material-symbols-outlined">event</span></div>
-          <div class="list-item__content">
-            <div class="list-item__title">{{ g.title }}</div>
-            <div class="list-item__meta">
-              {% if g.scheduled_at %}{{ g.scheduled_at|date:"D d M · H:i" }}{% endif %}
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </section>
-  {% endif %}
-
-  <section class="dash-section">
-    <div class="list-group">
-      <a href="{% url 'community:community-home' %}" class="list-item" style="text-decoration:none; color: inherit;">
-        <div class="list-item__icon"><span class="material-symbols-outlined">groups</span></div>
-        <div class="list-item__content"><div class="list-item__title">Full Community Hub</div></div>
-        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+  {# Upcoming gatherings #}
+  <div style="margin-bottom: var(--space-s);">
+    <div style="display: flex; justify-content: space-between; align-items: center;
+                margin-bottom: var(--space-xs);">
+      <div class="label-caps">Upcoming Gatherings</div>
+      <a href="{% url 'community:community-gatherings' %}"
+         style="font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: none;">
+        View All
       </a>
     </div>
-  </section>
+    {% if upcoming_gatherings %}
+    <div style="background: var(--card); border: 1px solid var(--border);
+                border-radius: var(--radius-l); overflow: hidden;">
+      {% for g in upcoming_gatherings|slice:":3" %}
+      <div style="padding: 12px var(--space-m);
+                  {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
+        <div style="font-size: 14px; font-weight: 600; color: var(--text);">{{ g.title }}</div>
+        {% with meta=g.metadata %}
+        {% if meta.scheduled_at %}
+        <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+          {{ meta.scheduled_at|slice:":10" }}
+        </div>
+        {% endif %}
+        {% endwith %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding: 1rem; text-align: center; color: var(--muted);
+                background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l);">
+      <p style="font-size: 13px;">No upcoming gatherings.</p>
+    </div>
+    {% endif %}
+  </div>
 
-  {% endif %}
+  {# Announcements #}
+  <div style="margin-bottom: var(--space-m);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Announcements</div>
+    {% if announcements %}
+    <div style="background: var(--card); border: 1px solid var(--border);
+                border-radius: var(--radius-l); overflow: hidden;">
+      {% for a in announcements|slice:":3" %}
+      <div style="padding: 12px var(--space-m);
+                  {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
+        <div style="font-size: 13px; font-weight: 600; color: var(--text);">{{ a.title|truncatechars:60 }}</div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">{{ a.created_at|date:"d M Y" }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding: 1rem; text-align: center; color: var(--muted);
+                background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l);">
+      <p style="font-size: 13px;">No announcements yet.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  {# Navigation to all community sub-pages #}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">Community</div>
+  <div class="list-group">
+    <a href="{% url 'community:community-gatherings' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">calendar_month</span></div>
+      <div class="list-item__content"><div class="list-item__title">Gatherings</div></div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </a>
+    {% if level >= 3 %}
+    <a href="{% url 'community:community-members' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">groups</span></div>
+      <div class="list-item__content"><div class="list-item__title">Member Directory</div></div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </a>
+    <a href="{% url 'community:community-management' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">settings_suggest</span></div>
+      <div class="list-item__content"><div class="list-item__title">Management</div></div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </a>
+    <a href="{% url 'community:community-pipeline' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">analytics</span></div>
+      <div class="list-item__content"><div class="list-item__title">Formation Pipeline</div></div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </a>
+    {% endif %}
+  </div>
 
 </div>
+{% endif %}
 {% endblock %}
