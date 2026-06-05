@@ -1,20 +1,23 @@
-<div class="gov-branch-card">
-  <div class="gov-branch-label">Mandate</div>
-  <div class="gov-type-list">
+<div class="card" style="border-radius: var(--radius-l); padding: var(--space-s);">
+  <div class="label-caps" style="color: var(--primary); margin-bottom: var(--space-xs);">Mandate</div>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3xs); margin-bottom: var(--space-s);">
     {% for slug, label in mandate_types.items %}
     <a href="{% url 'governance:mandate-list' slug %}"
-       class="gov-type-pill"
+       style="display: flex; align-items: center; justify-content: center;
+              padding: 8px 4px; background: var(--card-2); border: 1px solid var(--border);
+              border-radius: var(--radius-m); font-size: 12px; font-weight: 600;
+              text-decoration: none; color: var(--muted); text-align: center;"
        hx-get="{% url 'governance:mandate-list' slug %}"
-       hx-target="#governance-content"
-       hx-push-url="true">
+       hx-target="#governance-content" hx-push-url="true">
       {{ label }}
     </a>
     {% endfor %}
   </div>
-  <a href="{% url 'governance:mandate-home' %}" class="gov-action-btn"
+  <a href="{% url 'governance:mandate-home' %}"
+     class="btn-touch" style="width: 100%; justify-content: center; text-decoration: none;"
      hx-get="{% url 'governance:mandate-home' %}"
-     hx-target="#governance-content"
-     hx-push-url="true">
-    Open Mandate →
+     hx-target="#governance-content" hx-push-url="true">
+    Open Mandate
+    <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
   </a>
 </div>

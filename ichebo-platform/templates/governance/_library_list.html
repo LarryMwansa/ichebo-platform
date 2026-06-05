@@ -1,65 +1,89 @@
-<div class="ws-list-panel__content">
-  <div style="padding: var(--space-m) var(--space-m) 0;">
-    <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Reference Library</div>
-    <h3 style="font-family: var(--ff-serif); font-size: 1.25rem; margin-bottom: var(--space-m);">{{ type_label }}</h3>
+<!-- Library list — type filter + record list -->
+<div style="padding: var(--space-s) var(--space-s) 0;">
 
-    {# Compact Filter Tabs #}
-    <div style="display: flex; gap: 8px; margin-bottom: var(--space-m); overflow-x: auto; padding-bottom: 4px;">
-      <a href="{% url 'governance:library-home' %}"
-         class="ws-btn ws-btn--secondary {% if not record_type %}active{% endif %}"
-         hx-get="{% url 'governance:library-home' %}"
-         hx-target="#ws-list-content"
-         style="font-size: 11px; padding: 4px 10px; flex-shrink: 0;">
-        All
-      </a>
-      {% for slug, label in library_types.items %}
-      <a href="{% url 'governance:library-list' slug %}"
-         class="ws-btn ws-btn--secondary {% if slug == record_type %}active{% endif %}"
-         hx-get="{% url 'governance:library-list' slug %}"
-         hx-target="#ws-list-content"
-         style="font-size: 11px; padding: 4px 10px; flex-shrink: 0;">
-        {{ label }}
-      </a>
-      {% endfor %}
-    </div>
+  {# Breadcrumb #}
+  <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
+              letter-spacing: 0.08em; color: var(--primary); margin-bottom: var(--space-xs);">
+    Reference Library
+    {% if record_type %} &rsaquo; {{ type_label|upper }}{% endif %}
+  </div>
 
-    {# Search #}
-    <div style="margin-bottom: var(--space-m);">
-      <div style="position: relative;">
-        <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--muted);">search</span>
-        <input type="text" name="q" value="{{ search }}"
-               placeholder="Search {{ type_label|lower }}…"
-               style="width: 100%; padding: 8px 12px 8px 36px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 13px;"
-               hx-get="{% url 'governance:library-list' record_type %}"
-               hx-trigger="keyup changed delay:300ms"
-               hx-target="#record-list"
-               hx-swap="innerHTML">
+  <h3 style="font-family: 'Playfair Display', serif; font-size: 1.375rem;
+             font-weight: 800; color: var(--text); margin: 0 0 var(--space-s);">
+    {{ type_label|default:"All Types" }}
+  </h3>
+
+  {# Filter tabs #}
+  <div style="display: flex; gap: 6px; margin-bottom: var(--space-s);
+              overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
+    <a href="{% url 'governance:library-home' %}"
+       style="flex-shrink: 0; padding: 6px 14px; border-radius: var(--radius-pill);
+              font-size: 12px; font-weight: 700; text-decoration: none;
+              border: 1px solid var(--border); white-space: nowrap;
+              {% if not record_type %}background: var(--primary); color: #fff; border-color: var(--primary);
+              {% else %}background: var(--card-2); color: var(--muted);{% endif %}"
+       hx-get="{% url 'governance:library-home' %}"
+       hx-target="#governance-content" hx-push-url="true">
+      All
+    </a>
+    {% for slug, label in library_types.items %}
+    <a href="{% url 'governance:library-list' slug %}"
+       style="flex-shrink: 0; padding: 6px 14px; border-radius: var(--radius-pill);
+              font-size: 12px; font-weight: 700; text-decoration: none;
+              border: 1px solid var(--border); white-space: nowrap;
+              {% if slug == record_type %}background: var(--primary); color: #fff; border-color: var(--primary);
+              {% else %}background: var(--card-2); color: var(--muted);{% endif %}"
+       hx-get="{% url 'governance:library-list' slug %}"
+       hx-target="#governance-content" hx-push-url="true">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  {# Search #}
+  <div style="position: relative; margin-bottom: var(--space-s);">
+    <span class="material-symbols-outlined"
+          style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+                 font-size: 18px; color: var(--muted);">search</span>
+    <input type="text" name="q" value="{{ search }}"
+           placeholder="Search {{ type_label|lower }}…"
+           class="form-input-touch"
+           style="width: 100%; padding-left: 40px; box-sizing: border-box;"
+           hx-get="{% url 'governance:library-list' record_type %}"
+           hx-trigger="keyup changed delay:300ms"
+           hx-target="#record-list"
+           hx-swap="innerHTML">
+  </div>
+
+</div>
+
+{# Record list #}
+<div id="record-list">
+  {% if records %}
+  <div class="list-group" style="padding: 0 var(--space-s) var(--space-2xl);">
+    {% for record in records %}
+    <a href="{% url 'governance:library-detail' record.id %}"
+       class="list-item" style="text-decoration: none; color: inherit;"
+       hx-get="{% url 'governance:library-detail' record.id %}"
+       hx-target="#governance-content" hx-push-url="true">
+      <div class="list-item__content">
+        <div class="list-item__title">{{ record.title }}</div>
+        {% if record.summary %}
+        <div class="list-item__meta">{{ record.summary|truncatechars:72 }}</div>
+        {% endif %}
       </div>
-    </div>
+      <span class="material-symbols-outlined"
+            style="font-size: 18px; color: var(--muted); flex-shrink: 0;">chevron_right</span>
+    </a>
+    {% endfor %}
   </div>
-
-  <div id="record-list" class="ws-list-group">
-  {% for record in records %}
-  <a href="{% url 'governance:library-detail' record.id %}"
-     class="ws-list-item"
-     hx-get="{% url 'governance:library-detail' record.id %}"
-     hx-target="#ws-detail"
-     hx-push-url="true">
-    <div class="ws-list-item__content">
-      <div class="ws-list-item__title">{{ record.title }}</div>
-      {% if record.summary %}
-        <div class="ws-list-item__meta">{{ record.summary|truncatechars:60 }}</div>
-      {% endif %}
-    </div>
-    <div class="ws-list-item__action">
-      <span class="material-symbols-outlined" style="font-size: 18px; opacity: 0.3;">chevron_right</span>
-    </div>
-  </a>
-  {% empty %}
+  {% else %}
   <div style="padding: 3rem 1rem; text-align: center; color: var(--muted);">
-    <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.1; display: block; margin-bottom: 1rem;">search_off</span>
-    <p style="font-size: 13px;">No results found</p>
+    <span class="material-symbols-outlined"
+          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.2;">
+      search_off
+    </span>
+    <p style="font-size: 13px; font-weight: 500;">No records found.</p>
   </div>
-  {% endfor %}
-  </div>
+  {% endif %}
 </div>

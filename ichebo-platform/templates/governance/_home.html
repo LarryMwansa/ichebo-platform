@@ -1,16 +1,22 @@
 <!-- Governance home — branch-selector landing -->
-<div class="label-caps gov-section-heading">Prophet's Handbook</div>
+<div class="label-caps" style="margin-bottom: var(--space-xs);">Prophet's Handbook</div>
 
-<div class="gov-branch-grid">
+<div style="display: grid; grid-template-columns: 1fr; gap: var(--space-s);">
 
   <!-- Reference Library -->
-  <div class="gov-branch-card">
-    <div class="label-caps gov-branch-label" style="color: var(--gov-accent);">Reference Library</div>
-    <p class="gov-branch-desc">Apostolic Properties compiled from Scripture via HRS. Eight record types.</p>
-    <div class="gov-type-list">
+  <div class="card" style="border-radius: var(--radius-l); padding: var(--space-s);">
+    <div class="label-caps" style="color: var(--primary); margin-bottom: var(--space-3xs);">Reference Library</div>
+    <p style="font-size: 13px; color: var(--muted); margin-bottom: var(--space-s); line-height: 1.5;">
+      Apostolic Properties compiled from Scripture via HRS. Eight record types.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3xs); margin-bottom: var(--space-s);">
       {% for slug, label in library_types.items %}
       <a href="{% url 'governance:library-list' slug %}"
-         class="gov-type-pill"
+         style="display: flex; align-items: center; justify-content: center;
+                padding: 8px 4px; background: var(--card-2); border: 1px solid var(--border);
+                border-radius: var(--radius-m); font-size: 12px; font-weight: 600;
+                text-decoration: none; color: var(--muted); text-align: center;
+                transition: border-color 0.15s, color 0.15s;"
          hx-get="{% url 'governance:library-list' slug %}"
          hx-target="#governance-content"
          hx-push-url="true">
@@ -22,13 +28,19 @@
 
   <!-- Mandate branch (Level 4+) -->
   {% if request.user.competence_level >= 4 %}
-  <div class="gov-branch-card">
-    <div class="label-caps gov-branch-label" style="color: var(--gov-accent);">Mandate</div>
-    <p class="gov-branch-desc">Received directives, governance documents, versioned protocols.</p>
-    <div class="gov-type-list">
+  <div class="card" style="border-radius: var(--radius-l); padding: var(--space-s);">
+    <div class="label-caps" style="color: var(--primary); margin-bottom: var(--space-3xs);">Mandate</div>
+    <p style="font-size: 13px; color: var(--muted); margin-bottom: var(--space-s); line-height: 1.5;">
+      Received directives, governance documents, versioned protocols.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3xs); margin-bottom: var(--space-s);">
       {% for slug, label in mandate_types.items %}
       <a href="{% url 'governance:mandate-list' slug %}"
-         class="gov-type-pill"
+         style="display: flex; align-items: center; justify-content: center;
+                padding: 8px 4px; background: var(--card-2); border: 1px solid var(--border);
+                border-radius: var(--radius-m); font-size: 12px; font-weight: 600;
+                text-decoration: none; color: var(--muted); text-align: center;
+                transition: border-color 0.15s, color 0.15s;"
          hx-get="{% url 'governance:mandate-list' slug %}"
          hx-target="#governance-content"
          hx-push-url="true">
@@ -40,16 +52,19 @@
   {% endif %}
 
   <!-- My Keys -->
-  <div class="gov-branch-card">
-    <div class="label-caps gov-branch-label" style="color: var(--gov-accent);">My Keys</div>
-    <p class="gov-branch-desc">Personal symbol-to-meaning mappings drawn from your journal records.</p>
-    <a href="{% url 'governance:keys-list' %}" class="btn-touch" 
-       style="background: var(--gov-accent); color: #fff; width: 100%;"
+  <div class="card" style="border-radius: var(--radius-l); padding: var(--space-s);">
+    <div class="label-caps" style="color: var(--primary); margin-bottom: var(--space-3xs);">My Keys</div>
+    <p style="font-size: 13px; color: var(--muted); margin-bottom: var(--space-s); line-height: 1.5;">
+      Personal symbol-to-meaning mappings drawn from your journal records.
+    </p>
+    <a href="{% url 'governance:keys-list' %}"
+       class="btn-touch btn-touch--primary"
+       style="width: 100%; justify-content: center; text-decoration: none;"
        hx-get="{% url 'governance:keys-list' %}"
        hx-target="#governance-content"
        hx-push-url="true">
       Open My Keys
-      <span class="material-symbols-outlined" style="margin-left: 8px; font-size: 18px;">chevron_right</span>
+      <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
     </a>
   </div>
 
