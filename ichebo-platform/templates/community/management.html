@@ -198,3 +198,57 @@
 
 </div>
 {% endblock %}
+
+{% block content %}
+<div class="page-hero page-hero--watermark" data-watermark="MANAGE">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">{{ scope_tenant.name|default:"Local Node" }}</span>
+  </div>
+  <h1 class="page-hero__title">Community <em>Management</em></h1>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+  <div class="list-group">
+    <a href="{% url 'community:community-members' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">groups</span></div>
+      <div class="list-item__content">
+        <div class="list-item__title">Member Directory</div>
+        <div class="list-item__meta">{{ member_count }} members in scope</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </a>
+    <a href="{% url 'community:community-gatherings' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">calendar_month</span></div>
+      <div class="list-item__content">
+        <div class="list-item__title">Gatherings</div>
+        <div class="list-item__meta">Schedule &amp; manage events</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </a>
+    <a href="{% url 'community:community-pipeline' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">analytics</span></div>
+      <div class="list-item__content">
+        <div class="list-item__title">Formation Pipeline</div>
+        <div class="list-item__meta">Steward advancement overview</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </a>
+  </div>
+
+  {% if announcements %}
+  <div class="label-caps" style="margin-top: var(--space-m); margin-bottom: var(--space-xs);">
+    Announcements
+  </div>
+  <div style="background: var(--card); border: 1px solid var(--border);
+              border-radius: var(--radius-l); overflow: hidden;">
+    {% for ann in announcements|slice:":5" %}
+    <div style="padding: 12px var(--space-m);
+                {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
+      <div style="font-size: 13px; font-weight: 600; color: var(--text);">{{ ann.title|truncatechars:60 }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

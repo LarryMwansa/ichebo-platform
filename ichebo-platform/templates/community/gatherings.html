@@ -72,3 +72,34 @@
 
 </div>
 {% endblock %}
+
+{% block content %}
+<div class="page-hero page-hero--watermark" data-watermark="GATHER">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Upcoming Events</span>
+  </div>
+  <h1 class="page-hero__title">Community <em>Gatherings</em></h1>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+  {% if is_steward %}
+  <button class="btn-touch" style="width: 100%; justify-content: center; margin-bottom: var(--space-m);"
+          hx-get="{% url 'community:htmx-create-gathering' %}"
+          hx-target="#gathering-form-slot-m" hx-swap="innerHTML">
+    <span class="material-symbols-outlined">calendar_add_on</span>
+    Schedule Gathering
+  </button>
+  <div id="gathering-form-slot-m"></div>
+  {% endif %}
+
+  <div id="gatherings-list-m"
+       hx-get="{% url 'community:htmx-gatherings-list' %}"
+       hx-trigger="load" hx-swap="innerHTML">
+    <div style="text-align: center; padding: 2rem; color: var(--muted);">
+      <span class="material-symbols-outlined" style="font-size: 2rem; opacity: 0.2; display: block; margin-bottom: 0.5rem;">calendar_month</span>
+      Loading…
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -165,3 +165,85 @@
 </div>
 
 {% endblock %}
+
+{% block community_content_mobile %}
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+
+  {# Profile header #}
+  <div style="display: flex; align-items: center; gap: var(--space-m); margin-bottom: var(--space-m);">
+    <div style="width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
+                background: var(--primary-light, rgba(175,50,54,0.1));
+                display: flex; align-items: center; justify-content: center;
+                font-size: 20px; font-weight: 800; color: var(--primary);">
+      {{ member_user.display_name|default:member_user.email|first|upper }}
+    </div>
+    <div>
+      <div style="font-size: 18px; font-weight: 800; color: var(--text);">
+        {{ member_user.display_name|default:member_user.email }}
+      </div>
+      <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
+        {{ level_label }} · {{ stage_info.1 }}
+      </div>
+    </div>
+  </div>
+
+  {# Formation stage #}
+  <div class="card" style="border-radius: var(--radius-l); margin-bottom: var(--space-s);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Formation Stage</div>
+    <div style="font-size: 22px; font-weight: 900; font-family: 'Playfair Display', serif;
+                color: var(--text); margin-bottom: 4px;">
+      {{ member_user.display_name|default:"Member" }}
+    </div>
+    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
+                letter-spacing: 0.06em; color: var(--primary);">
+      {{ level_label }}
+    </div>
+    {# Level progress dots #}
+    <div style="display: flex; gap: 6px; margin-top: 10px;">
+      {% for i in "012345"|make_list %}
+      <div style="flex: 1; height: 4px; border-radius: 2px;
+                  background: {% if forloop.counter0 <= member_user.competence_level %}var(--primary){% else %}var(--border){% endif %};"></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Spiritual gifts #}
+  <div class="card" style="border-radius: var(--radius-l); margin-bottom: var(--space-s);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Spiritual Gifts</div>
+    <div style="font-size: 18px; font-weight: 700; color: var(--text);">
+      {{ gifts|length }} Active Gift{{ gifts|length|pluralize }}
+    </div>
+  </div>
+
+  {# Certifications #}
+  {% if certifications %}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">Certifications</div>
+  <div style="background: var(--card); border: 1px solid var(--border);
+              border-radius: var(--radius-l); overflow: hidden; margin-bottom: var(--space-s);">
+    {% for cert in certifications %}
+    <div style="display: flex; align-items: center; gap: var(--space-s); padding: 12px var(--space-m);
+                {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
+      <span class="material-symbols-outlined" style="color: #d97706; font-size: 18px; flex-shrink: 0;">
+        workspace_premium
+      </span>
+      <div style="font-size: 13px; font-weight: 600; color: var(--text);">{{ cert.title }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# Admin actions #}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">Administrative Actions</div>
+  <button class="btn-touch"
+          style="width: 100%; justify-content: center; background: #fef2f2;
+                 color: #991b1b; border-color: #fee2e2;"
+          hx-post="{% url 'community:htmx-deactivate-member' member_perm.id %}"
+          hx-target="#deactivate-slot-m" hx-swap="innerHTML"
+          hx-confirm="Deactivate this member's community membership?">
+    <span class="material-symbols-outlined" style="font-size: 18px;">person_off</span>
+    Deactivate Membership
+  </button>
+  <div id="deactivate-slot-m"></div>
+
+</div>
+{% endblock %}
