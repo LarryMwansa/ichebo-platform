@@ -82,43 +82,93 @@
 
 {# ── Mobile fallback (below 1024px) ── #}
 {% block content %}
-<div class="dashboard">
 
-  <div class="dash-header">
-    <div class="dash-greeting">
-      <span class="dash-name">My Records</span>
-    </div>
-    <a href="{% url 'governance:desk' %}" class="btn-touch btn-primary-sm" style="text-decoration:none;">+ New</a>
+<div class="page-hero page-hero--watermark" data-watermark="JOURNAL">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Permanent Record</span>
   </div>
+  <h1 class="page-hero__title">My <em>Journal</em></h1>
+  <p class="page-hero__sub">Prayers, reflections &amp; spiritual notes</p>
+</div>
 
+{# Filter tabs #}
+<div style="display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
+            border-bottom: 1px solid var(--border); padding: 0 var(--space-s);">
+  <a href="{% url 'records:records-home' %}"
+     style="flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 700;
+            text-decoration: none; white-space: nowrap;
+            border-bottom: 2px solid {% if not active_type %}var(--primary){% else %}transparent{% endif %};
+            color: {% if not active_type %}var(--primary){% else %}var(--muted){% endif %};">
+    All
+  </a>
+  {% for slug, label in record_types %}
+  <a href="?type={{ slug }}"
+     style="flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 700;
+            text-decoration: none; white-space: nowrap;
+            border-bottom: 2px solid {% if active_type == slug %}var(--primary){% else %}transparent{% endif %};
+            color: {% if active_type == slug %}var(--primary){% else %}var(--muted){% endif %};">
+    {{ label }}
+  </a>
+  {% endfor %}
+</div>
+
+{# Record list #}
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
   {% if records %}
-  <section class="dash-section">
-    <div class="dash-widget">
-      <div class="dash-widget__label">Recent Entries</div>
-      <div class="list-group">
-        {% for record in records|slice:":10" %}
-        <div class="list-item">
-          <div class="list-item__icon">
-            <span class="material-symbols-outlined">{% if record.record_type == 'journal' %}book{% elif record.record_type == 'dar' %}assignment{% else %}article{% endif %}</span>
+  <div style="display: flex; flex-direction: column; gap: 2px;">
+    {% for record in records %}
+    <a href="{% url 'records:records-detail' record.id %}"
+       style="display: block; padding: var(--space-s) 0;
+              border-bottom: 1px solid var(--border); text-decoration: none;
+              position: relative;">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-s);">
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 15px; font-weight: 700; color: var(--text);
+                      margin-bottom: 4px; line-height: 1.3;">
+            {{ record.title|truncatechars:60 }}
           </div>
-          <div class="list-item__content">
-            <div class="list-item__title">{{ record.title|truncatechars:40 }}</div>
-            <div class="list-item__meta">{{ record.record_type|title }} · {{ record.updated_at|date:"d M" }}</div>
+          {% if record.content %}
+          <p style="font-size: 13px; color: var(--muted); line-height: 1.5;
+                    margin: 0 0 8px; display: -webkit-box;
+                    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            {{ record.content|striptags|truncatechars:120 }}
+          </p>
+          {% endif %}
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="display: inline-flex; align-items: center; padding: 2px 8px;
+                         background: var(--primary-light); color: var(--primary);
+                         border-radius: var(--radius-pill); font-size: 10px;
+                         font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">
+              {{ record.record_type|upper }}
+            </span>
+            <span style="font-size: 11px; color: var(--muted);">
+              {{ record.updated_at|date:"d M Y" }}
+            </span>
           </div>
         </div>
-        {% endfor %}
+        <a href="{% url 'records:htmx-edit' record.id %}"
+           style="flex-shrink: 0; color: var(--muted); padding: 4px;"
+           onclick="event.stopPropagation();">
+          <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+        </a>
       </div>
-    </div>
-  </section>
+    </a>
+    {% endfor %}
+  </div>
   {% else %}
-  <section class="dash-section">
-    <div class="dash-widget" style="text-align: center; padding: 2rem;">
-      <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--border);">article</span>
-      <p style="color: var(--muted); margin-top: 0.5rem;">No records yet</p>
-      <a href="{% url 'governance:desk' %}" class="btn-touch btn-primary-sm" style="text-decoration:none; display:inline-block; margin-top: 1rem;">Open The Desk →</a>
-    </div>
-  </section>
+  <div style="text-align: center; padding: 3rem 1rem; color: var(--muted);">
+    <span class="material-symbols-outlined"
+          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.2;">
+      auto_stories
+    </span>
+    <p style="font-size: 14px; font-weight: 500; margin-bottom: 1rem;">No entries yet</p>
+    <a href="{% url 'governance:desk' %}" class="btn-touch btn-touch--primary"
+       style="text-decoration: none;">
+      Open The Desk
+    </a>
+  </div>
   {% endif %}
-
 </div>
+
 {% endblock %}
