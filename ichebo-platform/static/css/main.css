@@ -62,11 +62,15 @@
 ─────────────────────────────────────────────────────────── */
 
 .page-hero {
-  background: var(--ink);
+  background: var(--card-2);
   padding: var(--space-l) var(--space-s) var(--space-m);
   margin: calc(-1 * var(--space-s)) calc(-1 * var(--space-s)) var(--space-m);
   position: relative;
   overflow: hidden;
+}
+
+html.dark .page-hero {
+  background: var(--ink);
 }
 
 /* Subtle red left rule — the website's signature vertical line */
@@ -96,7 +100,7 @@
   font-family: var(--ff-display);
   font-size: clamp(5rem, 18vw, 9rem);
   font-weight: 900;
-  color: rgba(175, 50, 54, 0.07);
+  color: rgba(175, 50, 54, 0.08);
   pointer-events: none;
   user-select: none;
   letter-spacing: -0.04em;
@@ -131,7 +135,7 @@
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  color: var(--text);
   margin-bottom: var(--space-xs);
   text-wrap: balance;
 }
@@ -143,7 +147,7 @@
 
 .page-hero__sub {
   font-size: var(--fz--1);
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--muted);
   line-height: 1.7;
   max-width: 48ch;
 }
