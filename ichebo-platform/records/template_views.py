@@ -69,9 +69,11 @@ def record_detail(request, record_id):
             'via_record': via_record,
         })
 
-    return render(request, 'workspace/records/record_detail.html', {
+    return render(request, 'workspace/records/record_detail_mobile.html', {
         'record': record,
         'via_record': via_record,
+        'active_app': 'records',
+        'ws_page_title': record.title,
     })
 
 
@@ -100,12 +102,12 @@ def htmx_create_record(request):
             content=request.POST.get('content', '').strip(),
             metadata=metadata,
         )
-        # Drawer submit → fire trigger so navbar.js closes the drawer
+        # Drawer submit → close drawer, reload records list
         if request.headers.get('HX-Target') == 'drawerInner':
             from django.urls import reverse
             response = HttpResponse(status=204)
             response['HX-Trigger'] = 'recordCreated'
-            response['HX-Redirect'] = reverse('records:records-detail', kwargs={'record_id': record.id})
+            response['HX-Redirect'] = reverse('records:records-home')
             return response
         # Desktop editorial — transition to detail view
         return render(request, 'workspace/records/record_detail.html', {
