@@ -186,3 +186,105 @@
     </div>
 </div>
 {% endblock %}
+
+{% block content %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+  <div class="page-hero page-hero--watermark" data-watermark="AUTHOR">
+    <a href="{% url 'learn:learn-author' %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+      Authorship
+    </a>
+    <div class="page-hero__eyebrow">
+      <div class="page-hero__eyebrow-line"></div>
+      <span class="page-hero__label">Curriculum Authorship</span>
+    </div>
+    <h1 class="page-hero__title" style="font-size:1.6rem;">
+      {% if record %}Edit Programme{% else %}New Programme{% endif %}
+    </h1>
+  </div>
+
+  <div style="padding: var(--space-s);">
+    <form method="post"
+          action="{% if record %}{% url 'learn:learn-author-programme-edit' record.id %}{% else %}{% url 'learn:learn-author-programme' %}{% endif %}">
+      {% csrf_token %}
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-m);">
+
+        {% if can_create_induction %}
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Classification</label>
+          <select name="programme_type" class="form-input-touch" style="width:100%;">
+            <option value="programme" {% if record and record.record_type != 'induction' %}selected{% endif %}>Standard Programme</option>
+            <option value="induction" {% if record and record.record_type == 'induction' %}selected{% endif %}>Global Induction</option>
+          </select>
+        </div>
+        {% endif %}
+
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Title</label>
+          <input type="text" name="title" required maxlength="500"
+                 value="{{ record.title|default:'' }}"
+                 placeholder="e.g. Bachelor of Divinity"
+                 class="form-input-touch" style="width:100%;">
+        </div>
+
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Qualification Level</label>
+          <select name="qualification" class="form-input-touch" style="width:100%;">
+            <option value="Certificate" {% if record.metadata.qualification == 'Certificate' %}selected{% endif %}>Certificate</option>
+            <option value="Diploma" {% if record.metadata.qualification == 'Diploma' %}selected{% endif %}>Diploma</option>
+            <option value="Degree" {% if record.metadata.qualification == 'Degree' %}selected{% endif %}>Degree</option>
+            <option value="Masters" {% if record.metadata.qualification == 'Masters' %}selected{% endif %}>Masters</option>
+            <option value="Doctorate" {% if record.metadata.qualification == 'Doctorate' %}selected{% endif %}>Doctorate</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Vision &amp; Scope</label>
+          <textarea name="description" rows="6"
+                    placeholder="Describe the aims of this programme…"
+                    class="form-input-touch" style="width:100%;resize:vertical;padding-top:12px;padding-bottom:12px;">{{ record.content|default:'' }}</textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Duration (Years)</label>
+            <input type="number" name="duration_years" min="1" max="10"
+                   value="{{ record.metadata.duration_years|default:'' }}"
+                   class="form-input-touch" style="width:100%;">
+          </div>
+          {% if not record %}
+          <div>
+            <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Required Level</label>
+            <input type="number" name="required_level" min="1" max="5" value="1"
+                   class="form-input-touch" style="width:100%;">
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Meta Pathways (Tags)</label>
+          <input type="text" name="pathways"
+                 value="{{ record.metadata.pathways|default:'' }}"
+                 placeholder="e.g. Leadership, Governance"
+                 class="form-input-touch" style="width:100%;">
+        </div>
+
+        <div style="display:flex;gap:8px;padding-top:var(--space-s);border-top:1px solid var(--border);">
+          <button type="submit" name="action" value="save" class="btn-touch" style="flex:1;">
+            {% if record %}Save Draft{% else %}Save as Draft{% endif %}
+          </button>
+          <button type="submit" name="action" value="submit" class="btn-touch btn-touch--primary" style="flex:2;">
+            <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+            Submit for Review
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

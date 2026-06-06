@@ -222,3 +222,104 @@
     {% endif %}
 </div>
 {% endblock %}
+
+{% block content %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+  <div class="page-hero page-hero--watermark" data-watermark="AUTHOR">
+    <a href="{% url 'learn:learn-author' %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+      Authorship
+    </a>
+    <div class="page-hero__eyebrow">
+      <div class="page-hero__eyebrow-line"></div>
+      <span class="page-hero__label">Curriculum Authorship</span>
+    </div>
+    <h1 class="page-hero__title" style="font-size:1.6rem;">
+      {% if record %}Edit {{ record.record_type|title }}{% else %}Draft Content Unit{% endif %}
+    </h1>
+  </div>
+
+  <div style="padding: var(--space-s);">
+    <form method="post"
+          action="{% if record %}{% url 'learn:learn-author-lesson-edit' record.id %}{% else %}{% url 'learn:learn-author-lesson' %}{% endif %}">
+      {% csrf_token %}
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-m);">
+
+        {% if not record %}
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Unit Type</label>
+          <select name="record_type" class="form-input-touch" style="width:100%;">
+            <option value="lesson">Lesson — Standard Content</option>
+            <option value="quiz">Quiz — Automated Assessment</option>
+            <option value="assignment">Assignment — Submission-based</option>
+          </select>
+        </div>
+        {% endif %}
+
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Unit Title</label>
+          <input type="text" name="title" required maxlength="500"
+                 value="{{ record.title|default:'' }}"
+                 placeholder="e.g. Chapter 1: The Nature of Being"
+                 class="form-input-touch" style="width:100%;">
+        </div>
+
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">
+            Instructional Content
+            <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);"> (Markdown)</span>
+          </label>
+          <textarea name="content" rows="12"
+                    placeholder="Draft your lesson content using Markdown…"
+                    class="form-input-touch"
+                    style="width:100%;resize:vertical;padding-top:12px;padding-bottom:12px;font-family:ui-monospace,'Cascadia Code','Fira Code',monospace;line-height:1.6;">{{ record.content|default:'' }}</textarea>
+        </div>
+
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">
+            Video URL
+            <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);"> (optional)</span>
+          </label>
+          <input type="url" name="video_url"
+                 value="{{ record.custom_fields.video_url|default:'' }}"
+                 placeholder="https://www.youtube.com/watch?v=…"
+                 class="form-input-touch" style="width:100%;">
+        </div>
+
+        {% if not record %}
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Course Context</label>
+          <select name="course_id" class="form-input-touch" style="width:100%;">
+            <option value="">— Independent Content —</option>
+            {% for c in courses %}
+            <option value="{{ c.id }}">{{ c.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+
+        <div style="display:flex;gap:8px;padding-top:var(--space-s);border-top:1px solid var(--border);">
+          <a href="{% url 'learn:learn-author' %}" class="btn-touch" style="flex:1;text-decoration:none;display:flex;align-items:center;justify-content:center;">
+            Cancel
+          </a>
+          <button type="submit" name="action" value="draft" class="btn-touch" style="flex:1;">
+            <span class="material-symbols-outlined" style="font-size:17px;">save</span>
+            {% if record %}Save{% else %}Save Draft{% endif %}
+          </button>
+          {% if not record or record.status == 'draft' %}
+          <button type="submit" name="action" value="submit" class="btn-touch btn-touch--primary" style="flex:2;">
+            <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+            Submit
+          </button>
+          {% endif %}
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

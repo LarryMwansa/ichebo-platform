@@ -130,3 +130,72 @@
     {% endif %}
 </div>
 {% endblock %}
+
+{% block content %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+  <div class="page-hero page-hero--watermark" data-watermark="AUTHOR">
+    <a href="{% url 'learn:learn-author' %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+      Authorship
+    </a>
+    <div class="page-hero__eyebrow">
+      <div class="page-hero__eyebrow-line"></div>
+      <span class="page-hero__label">Curriculum Authorship</span>
+    </div>
+    <h1 class="page-hero__title" style="font-size:1.6rem;">
+      {% if record %}Edit Course{% else %}New Course{% endif %}
+    </h1>
+  </div>
+
+  <div style="padding: var(--space-s);">
+    <form method="post"
+          action="{% if record %}{% url 'learn:learn-author-course-edit' record.id %}{% else %}{% url 'learn:learn-author-course' %}{% endif %}">
+      {% csrf_token %}
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-m);">
+
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Course Title</label>
+          <input type="text" name="title" required maxlength="500"
+                 value="{{ record.title|default:'' }}"
+                 placeholder="e.g. Introduction to Systematic Theology"
+                 class="form-input-touch" style="width:100%;">
+        </div>
+
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Course Summary</label>
+          <textarea name="description" rows="5"
+                    placeholder="Objective and scope of the course…"
+                    class="form-input-touch" style="width:100%;resize:vertical;padding-top:12px;padding-bottom:12px;">{{ record.content|default:'' }}</textarea>
+        </div>
+
+        {% if not record %}
+        <div>
+          <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Parent Programme</label>
+          <select name="programme_id" class="form-input-touch" style="width:100%;">
+            <option value="">— Independent Course —</option>
+            {% for p in programmes %}
+            <option value="{{ p.id }}">{{ p.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+
+        <div style="display:flex;gap:8px;padding-top:var(--space-s);border-top:1px solid var(--border);">
+          <button type="submit" name="action" value="save" class="btn-touch" style="flex:1;">
+            {% if record %}Save Draft{% else %}Save as Draft{% endif %}
+          </button>
+          <button type="submit" name="action" value="submit" class="btn-touch btn-touch--primary" style="flex:2;">
+            <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+            Submit for Review
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
