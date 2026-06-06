@@ -166,7 +166,7 @@
           Return
         </button>
         <button class="btn-touch btn-touch--primary"
-                hx-post="{% url 'learn:htmx-publish-content' item.id %}"
+                hx-post="{% url 'learn:htmx-approve-content' item.id %}"
                 hx-target="#ws-review-m-{{ item.id }}" hx-swap="outerHTML swap:1s"
                 style="flex: 1; justify-content: center; font-size: 13px;">
           <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span>

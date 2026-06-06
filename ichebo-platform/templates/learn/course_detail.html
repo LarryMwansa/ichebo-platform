@@ -140,6 +140,72 @@
 </div>
 {% endblock %}
 
+{% block content %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+  <div class="page-hero page-hero--watermark" data-watermark="COURSE">
+    {% if programme %}
+    <a href="{% url 'learn:learn-programme' programme.id %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+      {{ programme.title|truncatechars:28 }}
+    </a>
+    {% else %}
+    <a href="{% url 'learn:learn-catalogue' %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+      Catalogue
+    </a>
+    {% endif %}
+    <div class="page-hero__eyebrow">
+      <div class="page-hero__eyebrow-line"></div>
+      <span class="page-hero__label">Course · {{ lessons|length }} lesson{{ lessons|length|pluralize }}</span>
+    </div>
+    <h1 class="page-hero__title" style="font-size:1.6rem;">{{ course.title }}</h1>
+    {% if course.content %}
+    <p class="page-hero__sub">{{ course.content|truncatechars:120 }}</p>
+    {% endif %}
+  </div>
+
+  <div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+
+    <div class="label-caps" style="color:var(--primary);margin-bottom:var(--space-xs);">Lessons</div>
+
+    {% if lessons %}
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-l);overflow:hidden;">
+      {% for lesson in lessons %}
+      <a href="{% url 'learn:learn-lesson' lesson.id %}"
+         style="display:flex;align-items:center;gap:12px;padding:16px var(--space-s);
+                text-decoration:none;border-bottom:{% if not forloop.last %}1px solid var(--border){% else %}none{% endif %};">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--card-2);
+                    border:1px solid var(--border);display:flex;align-items:center;
+                    justify-content:center;font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0;">
+          {{ forloop.counter }}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;color:var(--text);
+                      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ lesson.title }}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+            {{ lesson.record_type|title }}{% if lesson.custom_fields.duration %} · {{ lesson.custom_fields.duration }}{% endif %}
+          </div>
+        </div>
+        <span class="material-symbols-outlined" style="font-size:20px;color:var(--primary);flex-shrink:0;">
+          {% if lesson.record_type == 'assignment' %}assignment{% elif lesson.record_type == 'quiz' %}quiz{% else %}play_circle{% endif %}
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:3rem 1rem;color:var(--muted);">
+      <span class="material-symbols-outlined" style="font-size:2.5rem;display:block;margin-bottom:0.75rem;opacity:0.2;">auto_stories</span>
+      <p style="font-size:14px;font-weight:500;">Lessons pending publication.</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+
 {% block ws_options %}
 <div style="padding: 0 4px;">
 
