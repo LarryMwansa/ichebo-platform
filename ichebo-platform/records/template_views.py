@@ -100,7 +100,14 @@ def htmx_create_record(request):
             content=request.POST.get('content', '').strip(),
             metadata=metadata,
         )
-        # Transition to Detail view after save
+        # Drawer submit → fire trigger so navbar.js closes the drawer
+        if request.headers.get('HX-Target') == 'drawerInner':
+            from django.urls import reverse
+            response = HttpResponse(status=204)
+            response['HX-Trigger'] = 'recordCreated'
+            response['HX-Redirect'] = reverse('records:records-detail', kwargs={'record_id': record.id})
+            return response
+        # Desktop editorial — transition to detail view
         return render(request, 'workspace/records/record_detail.html', {
             'record': record,
             'is_desk': False
@@ -109,10 +116,12 @@ def htmx_create_record(request):
     # GET — partial for HTMX, full shell for direct navigation
     ctx = {
         'record_types': JOURNAL_RECORD_TYPES,
-        'active_type': request.GET.get('record_type', 'note'),
+        'active_type': request.GET.get('record_type', 'prayer'),
         'active_app': 'records',
     }
     if request.headers.get('HX-Request'):
+        if request.headers.get('HX-Target') == 'drawerInner':
+            return render(request, 'records/partials/create_form.html', ctx)
         return render(request, 'workspace/records/partials/editorial_form.html', ctx)
     return render(request, 'workspace/records/create.html', ctx)
 

@@ -1,9 +1,6 @@
-<div hx-swap-oob="innerHTML:#nav-left-content">
-  <div class="nav-left" style="display: none;"></div>
-</div>
-
 <form class="record-drawer-form"
       hx-post="{% url 'records:htmx-create' %}"
+      hx-target="#drawerInner"
       hx-swap="none">
   {% csrf_token %}
 
@@ -21,7 +18,7 @@
   <div class="record-form-group">
     <label class="label-caps" style="color: var(--muted); margin-bottom: 8px; display: block;">Title</label>
     <input type="text" name="title" placeholder="Entry title…"
-           class="form-input-touch" style="width: 100%;" required autofill="off">
+           class="form-input-touch" style="width: 100%;" required autocomplete="off">
   </div>
 
   <div class="record-form-group">
@@ -31,11 +28,11 @@
   </div>
 
   <div style="margin-top: 2rem; display: flex; gap: 8px;">
-    <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; flex: 2; font-weight: 600;">
+    <button type="submit" class="btn-touch btn-touch--primary" style="flex: 2;">
       Save Entry
     </button>
-    <button type="button" class="btn-touch" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); flex: 1;"
-            onclick="window.ICSDrawer.close(); htmx.ajax('GET', '{% url 'records:records-home' %}', { target: '#main-content', swap: 'innerHTML', pushUrl: true });">
+    <button type="button" class="btn-touch" style="flex: 1;"
+            onclick="window.ICSDrawer.close()">
       Cancel
     </button>
   </div>
