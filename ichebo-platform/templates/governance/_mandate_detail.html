@@ -18,6 +18,11 @@
 <div class="page-hero page-hero--watermark"
      data-watermark="{{ record.record_type|upper|cut:'_' }}"
      style="margin-bottom: var(--space-s);">
+  <a href="{% url 'governance:mandate-list' record.record_type %}"
+     hx-get="{% url 'governance:mandate-list' record.record_type %}" hx-target="#governance-content" hx-push-url="true"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>{{ record.get_record_type_display|default:record.record_type|title }}
+  </a>
   <div class="page-hero__eyebrow">
     <div class="page-hero__eyebrow-line"></div>
     <span class="page-hero__label">Mandate › {{ record.get_record_type_display|default:record.record_type|title }}</span>

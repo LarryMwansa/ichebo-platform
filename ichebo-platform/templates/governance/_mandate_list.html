@@ -1,5 +1,18 @@
 <!-- Mandate list — type filter + record list -->
 <div class="page-hero page-hero--watermark" data-watermark="{{ type_label|upper|default:'MANDATE' }}">
+  {% if record_type %}
+  <a href="{% url 'governance:mandate-home' %}"
+     hx-get="{% url 'governance:mandate-home' %}" hx-target="#governance-content" hx-push-url="true"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>All Mandate
+  </a>
+  {% else %}
+  <a href="{% url 'governance:home' %}"
+     hx-get="{% url 'governance:home' %}" hx-target="#governance-content" hx-push-url="true"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>Governance
+  </a>
+  {% endif %}
   <div class="page-hero__eyebrow">
     <div class="page-hero__eyebrow-line"></div>
     <span class="page-hero__label">Mandate{% if record_type %} &rsaquo; {{ type_label }}{% endif %}</span>

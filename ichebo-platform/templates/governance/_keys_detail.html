@@ -17,6 +17,11 @@
 {# ── Hero ── #}
 <div class="page-hero page-hero--watermark" data-watermark="KEY"
      style="margin-bottom: var(--space-s);">
+  <a href="{% url 'governance:keys-list' %}"
+     hx-get="{% url 'governance:keys-list' %}" hx-target="#governance-content" hx-push-url="true"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>Steward Keys
+  </a>
   <div class="page-hero__eyebrow">
     <div class="page-hero__eyebrow-line"></div>
     <span class="page-hero__label">Personal Library › Steward Keys</span>
