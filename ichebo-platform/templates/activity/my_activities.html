@@ -207,7 +207,7 @@
   <div style="background: var(--card); border: 1px solid var(--border);
               border-radius: var(--radius-l); overflow: hidden; margin-bottom: var(--space-m);">
     {% for item in overdue %}
-    <div style="display: flex; align-items: center; gap: var(--space-s);
+    <div id="activity-{{ item.id }}" style="display: flex; align-items: center; gap: var(--space-s);
                 padding: 14px var(--space-s);
                 {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
       {# Type badge #}
@@ -254,7 +254,7 @@
   <div style="background: var(--card); border: 1px solid var(--border);
               border-radius: var(--radius-l); overflow: hidden; margin-bottom: var(--space-m);">
     {% for item in due_today %}
-    <div style="display: flex; align-items: center; gap: var(--space-s);
+    <div id="activity-{{ item.id }}" style="display: flex; align-items: center; gap: var(--space-s);
                 padding: 14px var(--space-s);
                 {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
       <div style="width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
@@ -296,7 +296,7 @@
   <div style="background: var(--card); border: 1px solid var(--border);
               border-radius: var(--radius-l); overflow: hidden; margin-bottom: var(--space-m);">
     {% for item in upcoming %}
-    <div style="display: flex; align-items: center; gap: var(--space-s);
+    <div id="activity-{{ item.id }}" style="display: flex; align-items: center; gap: var(--space-s);
                 padding: 14px var(--space-s);
                 {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
       <div style="width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
