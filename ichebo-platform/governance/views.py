@@ -214,8 +214,8 @@ def keys_list(request):
     keys = get_key_records(request.user, search=search)
 
     return _shell_or_partial(request, 'governance/_keys_list.html', {
-        'records': keys, # Rename for consistency with other lists
-        'search':  search,
+        'keys':   keys,
+        'search': search,
         'active_branch': 'keys',
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
@@ -321,12 +321,9 @@ def htmx_record_create(request):
         tags       = [t.strip() for t in request.POST.get('tags', '').split(',') if t.strip()]
         categories = [c.strip() for c in request.POST.get('categories', '').split(',') if c.strip()]
 
-        from tenants.models import Tenant
-        handbook = Tenant.objects.filter(tier='handbook').first()
-
         record = Record.objects.create(
             created_by=request.user,
-            tenant=handbook if record_family == 'governance' else None,
+            tenant=None,
             record_class='governance' if record_family == 'governance' else 'personal',
             record_family=record_family,
             record_type=record_type,

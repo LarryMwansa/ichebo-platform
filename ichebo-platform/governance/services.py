@@ -51,11 +51,10 @@ RELATIONSHIP_TYPES = [
 
 
 def get_handbook_records(record_type, search='', status_filter=None):
-    """Returns QS of governance records of a given type scoped to the Handbook tenant."""
+    """Returns QS of governance records of a given type."""
     qs = Record.objects.filter(
         record_family='governance',
         record_type=record_type,
-        tenant__tier='handbook',
         deleted_at__isnull=True,
     ).order_by('-created_at')
 
