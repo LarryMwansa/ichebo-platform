@@ -1,9 +1,9 @@
 /* governance.css — ICS Governance App */
 
 :root {
-  --gov-accent:     #7B5EA7;
-  --gov-light:      color-mix(in srgb, var(--gov-accent) 10%, transparent);
-  --gov-border:     color-mix(in srgb, var(--gov-accent) 30%, transparent);
+  --gov-accent:     var(--primary);
+  --gov-light:      var(--primary-light);
+  --gov-border:     var(--primary-alpha);
 }
 
 .gov-shell {
