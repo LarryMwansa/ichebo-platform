@@ -104,6 +104,7 @@ def library_list(request, record_type):
     if tag_filter:
         records = [r for r in records if tag_filter in (r.tags or [])]
 
+    is_level5 = _level(request.user) >= 5
     return _shell_or_partial(request, 'governance/_library_list.html', {
         'records':       records,
         'record_type':   record_type,
@@ -112,7 +113,8 @@ def library_list(request, record_type):
         'tag_filter':    tag_filter,
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
-        'is_level5':     _level(request.user) >= 5,
+        'is_level5':     is_level5,
+        'fab_hidden':    not is_level5,
         'active_branch': 'library',
     }, shell_template='workspace/governance/home.html')
 
@@ -166,6 +168,7 @@ def mandate_list(request, record_type):
     search = request.GET.get('q', '').strip()
     records = get_handbook_records(record_type, search=search)
 
+    is_level5 = _level(request.user) >= 5
     return _shell_or_partial(request, 'governance/_mandate_list.html', {
         'records':       records,
         'record_type':   record_type,
@@ -173,7 +176,8 @@ def mandate_list(request, record_type):
         'search':        search,
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
-        'is_level5':     _level(request.user) >= 5,
+        'is_level5':     is_level5,
+        'fab_hidden':    not is_level5,
         'active_branch': 'mandate',
     }, shell_template='workspace/governance/home.html')
 

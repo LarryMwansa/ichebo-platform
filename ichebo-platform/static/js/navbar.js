@@ -177,25 +177,25 @@ document.addEventListener('DOMContentLoaded', () => {
       createUrl = '/community/htmx/fab-sheet/';
       title = 'Community';
     } else if (path.startsWith('/governance')) {
-      // Extract record_type and record_family from governance URL paths
-      // Paths: /governance/reference/{type}/, /governance/mandate/{type}/, /governance/keys/
-      const match = path.match(/\/governance\/(reference|mandate|keys)(?:\/([a-z_-]+))?/);
+      // Paths: /governance/library/{type}/, /governance/mandate/{type}/, /governance/keys/
+      const match = path.match(/\/governance\/(library|mandate|keys)(?:\/([a-z_-]+))?/);
       let recordFamily = 'reference';
       let recordType = 'key';
-      let titlePrefix = 'New';
+      let titlePrefix = 'New Key';
 
       if (match) {
         const branch = match[1];
         const type = match[2];
+        const label = type ? type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : '';
 
-        if (branch === 'reference' && type) {
+        if (branch === 'library' && type) {
           recordFamily = 'governance';
           recordType = type;
-          titlePrefix = `New ${type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}`;
+          titlePrefix = `New ${label}`;
         } else if (branch === 'mandate' && type) {
           recordFamily = 'governance';
           recordType = type;
-          titlePrefix = `New ${type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}`;
+          titlePrefix = `New ${label}`;
         } else if (branch === 'keys') {
           recordFamily = 'reference';
           recordType = 'key';
