@@ -204,23 +204,13 @@
 
     <div class="label-caps" style="margin-bottom: 0.75rem;">Resources</div>
     <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem;">
-        <a href="{% url 'bible:reader' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
-            <div style="width:44px;height:44px;border-radius:10px;background:#fff7ed;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <span class="material-symbols-outlined" style="color:#c2410c;">auto_stories</span>
+        <a href="{% url 'activity:activity-home' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:10px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="material-symbols-outlined" style="color:#15803d;">task_alt</span>
             </div>
             <div style="flex:1;">
-                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Bible</div>
-                <div style="font-size:0.75rem;color:var(--muted);">Read, search, and annotate scripture</div>
-            </div>
-            <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
-        </a>
-        <a href="{% url 'governance:home' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
-            <div style="width:44px;height:44px;border-radius:10px;background:#faf5ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <span class="material-symbols-outlined" style="color:#7e22ce;">account_balance</span>
-            </div>
-            <div style="flex:1;">
-                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Governance Library</div>
-                <div style="font-size:0.75rem;color:var(--muted);">Edicts, decrees, principles & ordinances</div>
+                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Activity</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Mandates, tasks &amp; ministry timeline</div>
             </div>
             <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
         </a>
@@ -244,13 +234,23 @@
             </div>
             <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
         </a>
-        <a href="{% url 'activity:activity-home' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
-            <div style="width:44px;height:44px;border-radius:10px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <span class="material-symbols-outlined" style="color:#15803d;">task_alt</span>
+        <a href="{% url 'governance:home' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:10px;background:#faf5ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="material-symbols-outlined" style="color:#7e22ce;">account_balance</span>
             </div>
             <div style="flex:1;">
-                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Activity</div>
-                <div style="font-size:0.75rem;color:var(--muted);">Mandates, tasks &amp; ministry timeline</div>
+                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Governance Library</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Edicts, decrees, principles & ordinances</div>
+            </div>
+            <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
+        </a>
+        <a href="{% url 'bible:reader' %}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:10px;background:#fff7ed;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span class="material-symbols-outlined" style="color:#c2410c;">auto_stories</span>
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:0.9375rem;font-weight:700;color:var(--text);">Bible</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Read, search, and annotate scripture</div>
             </div>
             <span class="material-symbols-outlined" style="color:var(--muted);font-size:18px;">chevron_right</span>
         </a>
