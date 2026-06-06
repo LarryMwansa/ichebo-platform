@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Context-aware: determine create URL based on current page
     const path = window.location.pathname;
-    let createUrl = '/records/htmx/fab-sheet/';
+    let createUrl = '/records/htmx/create/?record_type=prayer';
     let title = 'New Entry';
 
     if (path.startsWith('/activity')) {
