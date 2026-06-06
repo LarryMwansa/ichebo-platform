@@ -7,7 +7,7 @@
   <h1 class="page-hero__title">{{ type_label|default:"Reference" }} <em>Library</em></h1>
 </div>
 
-<div style="padding: var(--space-m) var(--space-s) 0;">
+<div style="padding: var(--space-s) var(--space-s) 0;">
 
   {# Filter tabs #}
   <div style="display: flex; gap: 6px; margin-bottom: var(--space-s);
@@ -45,7 +45,7 @@
            placeholder="Search {{ type_label|lower }}…"
            class="form-input-touch"
            style="width: 100%; padding-left: 40px; box-sizing: border-box;"
-           hx-get="{% if record_type %}{% url 'governance:library-list' record_type %}{% else %}{% url 'governance:library-home' %}{% endif %}"
+           hx-get="{% url 'governance:library-list' record_type %}"
            hx-trigger="keyup changed delay:300ms"
            hx-target="#record-list"
            hx-swap="innerHTML">
@@ -56,7 +56,7 @@
 {# Record list #}
 <div id="record-list">
   {% if records %}
-  <div class="list-group" style="padding: 0 var(--space-s) var(--space-2xl);">
+  <div class="list-group" style="padding: var(--space-l) var(--space-s);">
     {% for record in records %}
     <a href="{% url 'governance:library-detail' record.id %}"
        class="list-item" style="text-decoration: none; color: inherit;"

@@ -55,7 +55,7 @@
 
 <div id="mandate-record-list">
   {% if records %}
-  <div class="list-group" style="padding: 0 var(--space-s) var(--space-2xl);">
+  <div class="list-group" style="padding: var(--space-l) var(--space-s);">
     {% for record in records %}
     <a href="{% url 'governance:mandate-detail' record.id %}"
        class="list-item" style="text-decoration: none; color: inherit;"
