@@ -148,13 +148,18 @@ def htmx_edit_record(request, record_id):
         if rtype:
             record.record_type = rtype
         record.save(update_fields=['title', 'content', 'record_type', 'updated_at'])
-        # Redirect to detail page after saving
         from django.urls import reverse
         response = HttpResponse(status=204)
+        response['HX-Trigger'] = 'recordCreated'
         response['HX-Redirect'] = reverse('records:records-detail', kwargs={'record_id': record.id})
         return response
 
-    # GET — return edit form pre-populated
+    # GET — drawer gets mobile form, desktop gets editorial stage
+    if request.headers.get('HX-Target') == 'drawerInner':
+        return render(request, 'records/partials/edit_form.html', {
+            'record': record,
+            'record_types': JOURNAL_RECORD_TYPES,
+        })
     return render(request, 'workspace/records/partials/editorial_form.html', {
         'record': record,
         'record_types': JOURNAL_RECORD_TYPES,
