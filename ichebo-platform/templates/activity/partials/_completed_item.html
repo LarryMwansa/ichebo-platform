@@ -9,8 +9,10 @@
                 text-decoration:line-through;opacity:0.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
       {{ activity.title }}
     </div>
-    <div style="font-size:11px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">
-      Completed
+    <div style="margin-top:4px;">
+      <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;
+                   color:var(--success);background:rgba(74,222,128,0.1);
+                   padding:2px 8px;border-radius:4px;">Completed</span>
     </div>
   </div>
   <button hx-post="{% url 'activity:htmx-delete' activity.id %}"

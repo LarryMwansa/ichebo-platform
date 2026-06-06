@@ -131,10 +131,10 @@ def htmx_create_activity(request):
             metadata={'source_app': 'activity'},
         )
 
-        response = render(request, 'activity/partials/activity_card.html', {
-            'activity': activity,
-        })
+        from django.urls import reverse
+        response = HttpResponse(status=204)
         response['HX-Trigger'] = 'activityCreated'
+        response['HX-Redirect'] = reverse('activity:activity-home')
         return response
 
     activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
