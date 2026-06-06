@@ -82,12 +82,28 @@ def governance_home(request):
 def library_home(request):
     if _level(request.user) < 3:
         raise PermissionDenied
-    return _shell_or_partial(request, 'governance/_home.html', {
+    search = request.GET.get('q', '').strip()
+    from records.models import Record as _R
+    records = _R.objects.filter(
+        record_family='governance',
+        record_type__in=LIBRARY_TYPES,
+        deleted_at__isnull=True,
+    ).order_by('-created_at')
+    if search:
+        records = records.filter(title__icontains=search)
+    records = records.exclude(status='superseded')
+    is_level5 = _level(request.user) >= 5
+    return _shell_or_partial(request, 'governance/_library_list.html', {
+        'records':       records,
+        'record_type':   None,
+        'type_label':    'All',
+        'search':        search,
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
+        'is_level5':     is_level5,
+        'fab_hidden':    not is_level5,
         'active_branch': 'library',
-        'is_level5':     _level(request.user) >= 5,
-    })
+    }, shell_template='workspace/governance/home.html')
 
 
 @login_required
@@ -150,12 +166,28 @@ def library_detail(request, record_id):
 def mandate_home(request):
     if _level(request.user) < 4:
         raise PermissionDenied
-    return _shell_or_partial(request, 'governance/_home.html', {
+    search = request.GET.get('q', '').strip()
+    from records.models import Record as _R
+    records = _R.objects.filter(
+        record_family='governance',
+        record_type__in=MANDATE_TYPES,
+        deleted_at__isnull=True,
+    ).order_by('-created_at')
+    if search:
+        records = records.filter(title__icontains=search)
+    records = records.exclude(status='superseded')
+    is_level5 = _level(request.user) >= 5
+    return _shell_or_partial(request, 'governance/_mandate_list.html', {
+        'records':       records,
+        'record_type':   None,
+        'type_label':    'All',
+        'search':        search,
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
+        'is_level5':     is_level5,
+        'fab_hidden':    not is_level5,
         'active_branch': 'mandate',
-        'is_level5':     _level(request.user) >= 5,
-    })
+    }, shell_template='workspace/governance/home.html')
 
 
 @login_required

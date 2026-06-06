@@ -45,7 +45,7 @@
            placeholder="Search {{ type_label|lower }}…"
            class="form-input-touch"
            style="width: 100%; padding-left: 40px; box-sizing: border-box;"
-           hx-get="{% url 'governance:library-list' record_type %}"
+           hx-get="{% if record_type %}{% url 'governance:library-list' record_type %}{% else %}{% url 'governance:library-home' %}{% endif %}"
            hx-trigger="keyup changed delay:300ms"
            hx-target="#record-list"
            hx-swap="innerHTML">
