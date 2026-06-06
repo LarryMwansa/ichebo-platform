@@ -30,6 +30,7 @@
 }
 @media (min-width: 1024px) {
   #ws-mobile-shell { display: none !important; }
+  .fab { display: none !important; }
 }
 
 /* ── Shell Container ────────────────────────────────────────── */

@@ -40,6 +40,9 @@ urlpatterns = [
     path('community/htmx/gatherings/',
          views.htmx_gatherings_list, name='htmx-gatherings-list'),
 
+    path('community/htmx/fab-sheet/',
+         views.htmx_fab_sheet, name='htmx-fab-sheet'),
+
     # ── Membership request flow ───────────────────────────────────────────────
     path('community/htmx/membership/request/',
          views.htmx_request_membership, name='htmx-membership-request'),

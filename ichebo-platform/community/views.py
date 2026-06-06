@@ -948,3 +948,10 @@ def htmx_review_request(request, request_id):
         'req': membership_req,
         'reviewed': True,
     })
+
+
+# ── HTMX: FAB action sheet ────────────────────────────────────────────────────
+
+@login_required
+def htmx_fab_sheet(request):
+    return render(request, 'community/partials/_fab_sheet.html')

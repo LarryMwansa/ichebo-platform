@@ -322,3 +322,10 @@ def htmx_graph_data(request):
         'nodes': nodes,
         'links': links,
     })
+
+
+# ── HTMX: FAB action sheet ────────────────────────────────────────────────────
+
+@login_required
+def htmx_fab_sheet(request):
+    return render(request, 'records/partials/_fab_sheet.html')

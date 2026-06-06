@@ -1,0 +1,60 @@
+<!-- records/partials/_fab_sheet.html — type picker for FAB bottom sheet -->
+<div style="padding: var(--space-m) var(--space-m) var(--space-s);">
+  <div class="label-caps" style="margin-bottom: var(--space-s);">New Journal Entry</div>
+  <div style="background: var(--card); border: 1px solid var(--border);
+              border-radius: var(--radius-l); overflow: hidden;">
+
+    <button class="list-item" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;"
+            hx-get="{% url 'records:htmx-create' %}?record_type=prayer"
+            hx-target="#drawerInner" hx-swap="innerHTML">
+      <div class="list-item__icon" style="background:rgba(175,50,54,0.1);color:var(--primary);">
+        <span class="material-symbols-outlined">volunteer_activism</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">Prayer</div>
+        <div class="list-item__meta">Log a prayer request or answer</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </button>
+
+    <button class="list-item" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;border-top:1px solid var(--border);"
+            hx-get="{% url 'records:htmx-create' %}?record_type=spirit"
+            hx-target="#drawerInner" hx-swap="innerHTML">
+      <div class="list-item__icon" style="background:rgba(109,40,217,0.1);color:#6d28d9;">
+        <span class="material-symbols-outlined">auto_awesome</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">Spirit Note</div>
+        <div class="list-item__meta">Record a spiritual insight</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </button>
+
+    <button class="list-item" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;border-top:1px solid var(--border);"
+            hx-get="{% url 'records:htmx-create' %}?record_type=dream"
+            hx-target="#drawerInner" hx-swap="innerHTML">
+      <div class="list-item__icon" style="background:rgba(14,116,144,0.1);color:#0e7490;">
+        <span class="material-symbols-outlined">bedtime</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">Dream</div>
+        <div class="list-item__meta">Record a dream or vision</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </button>
+
+    <button class="list-item" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;border-top:1px solid var(--border);"
+            hx-get="{% url 'records:htmx-create' %}?record_type=note"
+            hx-target="#drawerInner" hx-swap="innerHTML">
+      <div class="list-item__icon" style="background:rgba(21,128,61,0.1);color:#15803d;">
+        <span class="material-symbols-outlined">description</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">General Note</div>
+        <div class="list-item__meta">Write a general journal entry</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </button>
+
+  </div>
+</div>

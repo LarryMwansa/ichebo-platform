@@ -167,12 +167,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Context-aware: determine create URL based on current page
     const path = window.location.pathname;
-    let createUrl = '/records/htmx/create/';
+    let createUrl = '/records/htmx/fab-sheet/';
     let title = 'New Entry';
 
     if (path.startsWith('/activity')) {
       createUrl = '/activity/htmx/create/';
       title = 'New Activity';
+    } else if (path.startsWith('/community')) {
+      createUrl = '/community/htmx/fab-sheet/';
+      title = 'Community';
     } else if (path.startsWith('/governance')) {
       // Extract record_type and record_family from governance URL paths
       // Paths: /governance/reference/{type}/, /governance/mandate/{type}/, /governance/keys/

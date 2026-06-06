@@ -1,0 +1,41 @@
+<!-- community/partials/_fab_sheet.html — FAB action sheet for community pages -->
+<div style="padding: var(--space-m) var(--space-m) var(--space-s);">
+  <div class="label-caps" style="margin-bottom: var(--space-s);">Community Actions</div>
+  <div style="background: var(--card); border: 1px solid var(--border);
+              border-radius: var(--radius-l); overflow: hidden;">
+
+    {% if request.user.competence_level >= 3 %}
+    <button class="list-item" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;"
+            hx-get="{% url 'community:htmx-create-announcement' %}"
+            hx-target="#drawerInner" hx-swap="innerHTML">
+      <div class="list-item__icon" style="background:rgba(175,50,54,0.1);color:var(--primary);">
+        <span class="material-symbols-outlined">campaign</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">Post Announcement</div>
+        <div class="list-item__meta">Broadcast to all community members</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </button>
+
+    <button class="list-item" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;border-top:1px solid var(--border);"
+            hx-get="{% url 'community:htmx-create-gathering' %}"
+            hx-target="#drawerInner" hx-swap="innerHTML">
+      <div class="list-item__icon" style="background:rgba(14,116,144,0.1);color:#0e7490;">
+        <span class="material-symbols-outlined">calendar_add_on</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">Schedule Gathering</div>
+        <div class="list-item__meta">Add an event to the community calendar</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </button>
+    {% else %}
+    <div style="padding: var(--space-m); text-align: center; color: var(--muted); font-size: 13px;">
+      <span class="material-symbols-outlined" style="display:block;font-size:2rem;opacity:0.3;margin-bottom:8px;">lock</span>
+      Steward actions require Level 3+
+    </div>
+    {% endif %}
+
+  </div>
+</div>
