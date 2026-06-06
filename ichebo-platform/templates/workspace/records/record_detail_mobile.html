@@ -6,20 +6,16 @@
 {% block content %}
 <div style="padding: 0 0 var(--space-2xl);">
 
-  {# Back nav #}
-  <div style="display: flex; align-items: center; gap: var(--space-xs);
-              padding: var(--space-s) var(--space-s) 0;">
+  {# Hero with back link #}
+  <div class="page-hero" style="padding-bottom: var(--space-s);">
     <a href="{% url 'records:records-home' %}"
-       style="display: flex; align-items: center; gap: 4px;
-              color: var(--muted); font-size: 13px; font-weight: 600;
-              text-decoration: none;">
-      <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back_ios</span>
+       style="display: inline-flex; align-items: center; gap: 2px;
+              color: var(--muted); font-size: 12px; font-weight: 600;
+              text-decoration: none; margin-bottom: var(--space-xs);
+              letter-spacing: 0.02em;">
+      <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back_ios</span>
       Records
     </a>
-  </div>
-
-  {# Hero #}
-  <div class="page-hero" style="padding-bottom: var(--space-s);">
     <div class="page-hero__eyebrow">
       <div class="page-hero__eyebrow-line"></div>
       <span class="page-hero__label">{{ record.record_type|upper }}</span>
