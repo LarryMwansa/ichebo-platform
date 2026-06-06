@@ -1,72 +1,71 @@
-<div class="ws-detail-panel__inner">
-  <div class="ws-detail-header">
-    <div class="ws-detail-header__left">
-      <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Prophet's Handbook &rsaquo; Personal Keys</div>
-      <h2 class="ws-page-title">{{ record.title }}</h2>
-    </div>
-    <div class="ws-detail-header__actions">
-      <span class="badge b-muted">{{ record.status|upper }}</span>
+<!-- governance/_keys_detail.html — steward key detail (desktop + mobile) -->
+
+{# ── Back nav ── #}
+<div style="display: flex; align-items: center; gap: var(--space-xs);
+            padding: var(--space-xs) 0 0; margin-bottom: var(--space-xs);">
+  <a href="{% url 'governance:keys-list' %}"
+     hx-get="{% url 'governance:keys-list' %}"
+     hx-target="#governance-content" hx-push-url="true"
+     style="display: flex; align-items: center; gap: 4px;
+            font-size: 12px; font-weight: 700; color: var(--muted);
+            text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em;">
+    <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+    My Keys
+  </a>
+</div>
+
+{# ── Hero ── #}
+<div class="page-hero page-hero--watermark" data-watermark="KEY"
+     style="margin-bottom: var(--space-s);">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Personal Library › Steward Keys</span>
+  </div>
+  {% if record.custom_fields.symbol %}
+  <div style="font-size: 3rem; line-height: 1; margin-bottom: var(--space-xs);">
+    {{ record.custom_fields.symbol }}
+  </div>
+  {% endif %}
+  <h1 class="page-hero__title">{{ record.title }}</h1>
+
+  <div style="display: flex; align-items: center; gap: var(--space-s); margin-top: var(--space-xs);">
+    <span class="badge b-muted">{{ record.status|upper }}</span>
+    <button class="btn-touch btn-sm"
+            style="background: var(--gov-accent); color: #fff; border-color: var(--gov-accent);"
+            hx-get="{% url 'governance:htmx-record-edit' record.id %}"
+            hx-target="#drawerInner" hx-swap="innerHTML"
+            onclick="window.ICSDrawer.open('Edit Key')">
+      <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+      Edit
+    </button>
+  </div>
+</div>
+
+<div style="padding: 0 var(--space-s) var(--space-2xl);">
+
+  {# ── Content ── #}
+  {% if record.content %}
+  <div class="gov-content-body" style="margin-bottom: var(--space-m);">{{ record.content|linebreaks }}</div>
+  {% endif %}
+
+  {# ── Key metadata ── #}
+  <div class="gov-panel" style="margin-bottom: var(--space-m);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Key Details</div>
+    <dl class="gov-attrs">
+      {% if record.custom_fields.symbol %}<dt>Symbol</dt><dd>{{ record.custom_fields.symbol }}</dd>{% endif %}
+      {% if record.custom_fields.source_context %}<dt>Context</dt><dd>{{ record.custom_fields.source_context }}</dd>{% endif %}
+      <dt>Updated</dt><dd>{{ record.updated_at|date:"d M Y" }}</dd>
+    </dl>
+  </div>
+
+  {# ── Symbolic mappings ── #}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">Symbolic Mappings</div>
+  <div id="ws-linked-records"
+       hx-get="{% url 'governance:htmx-linked-records' record.id %}"
+       hx-trigger="load" hx-swap="innerHTML">
+    <div style="color: var(--muted); font-size: 13px; padding: var(--space-xs) 0;">
+      Analyzing mappings…
     </div>
   </div>
 
-  <div class="ws-detail-body">
-    <div class="ws-detail-main">
-      {% if record.custom_fields.symbol %}
-      <div style="font-size: 4rem; margin-bottom: var(--space-m); line-height: 1; color: var(--primary);">
-        {{ record.custom_fields.symbol }}
-      </div>
-      {% endif %}
-
-      <div class="ws-editorial-content" style="font-family: var(--ff-serif); font-size: 1.15rem; line-height: 1.8; color: var(--text);">
-        {{ record.content|linebreaks }}
-      </div>
-
-      {# Linked Records #}
-      <div style="margin-top: var(--space-xl); border-top: 1px solid var(--border); padding-top: var(--space-l);">
-        <div class="label-caps" style="margin-bottom: var(--space-s);">Symbolic Mappings</div>
-        <div id="ws-linked-records"
-             hx-get="{% url 'governance:htmx-linked-records' record.id %}"
-             hx-trigger="load"
-             hx-swap="innerHTML">
-          <div style="color: var(--muted); font-size: 13px;">Analyzing mappings…</div>
-        </div>
-      </div>
-    </div>
-
-    <aside class="ws-detail-sidebar">
-      <div class="ws-sidebar-block">
-        <div class="label-caps">Key Metadata</div>
-        <div class="ws-sidebar-data">
-          <div class="ws-data-row">
-            <span class="ws-data-label">Identity</span>
-            <span class="ws-data-value">{{ record.id|truncatechars:8 }}</span>
-          </div>
-          <div class="ws-data-row">
-            <span class="ws-data-label">Mapping</span>
-            <span class="ws-data-value">{{ record.custom_fields.symbol|default:"None" }}</span>
-          </div>
-        </div>
-      </div>
-
-      {% if record.custom_fields.source_context %}
-      <div class="ws-sidebar-block">
-        <div class="label-caps">Source Context</div>
-        <div style="font-size: 12px; color: var(--text); line-height: 1.5;">
-          {{ record.custom_fields.source_context }}
-        </div>
-      </div>
-      {% endif %}
-
-      <div class="ws-sidebar-block">
-        <div class="label-caps">Actions</div>
-        <button class="ws-btn ws-btn--secondary" style="width: 100%;"
-                hx-get="{% url 'governance:htmx-record-edit' record.id %}"
-                hx-target="#drawerContent"
-                hx-swap="innerHTML"
-                onclick="window.ICSDrawer.open('Edit Key')">
-          Edit Key
-        </button>
-      </div>
-    </aside>
-  </div>
 </div>

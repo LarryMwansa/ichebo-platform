@@ -1,118 +1,124 @@
-<div class="ws-detail-panel__inner">
-  <div class="ws-detail-header">
-    <div class="ws-detail-header__left">
-      <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Protocol Mandate &rsaquo; {{ record.get_record_type_display|default:record.record_type|title }}</div>
-      <h2 class="ws-page-title">{{ record.title }}</h2>
-    </div>
-    <div class="ws-detail-header__actions">
-      <div id="record-status-area">
-        <span class="badge {% if record.status == 'active' or record.status == 'locked' %}b-primary{% else %}b-warning{% endif %}">
-          {% if record.status == 'locked' %}🔒 {% endif %}{{ record.status|upper }}
-          {% if record.version %} · V{{ record.version }}{% endif %}
-        </span>
-      </div>
+<!-- governance/_mandate_detail.html — mandate record detail (desktop + mobile) -->
+
+{# ── Back nav ── #}
+<div style="display: flex; align-items: center; gap: var(--space-xs);
+            padding: var(--space-xs) 0 0; margin-bottom: var(--space-xs);">
+  <a href="{% url 'governance:mandate-list' record.record_type %}"
+     hx-get="{% url 'governance:mandate-list' record.record_type %}"
+     hx-target="#governance-content" hx-push-url="true"
+     style="display: flex; align-items: center; gap: 4px;
+            font-size: 12px; font-weight: 700; color: var(--muted);
+            text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em;">
+    <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+    {{ record.get_record_type_display|default:record.record_type|title }}
+  </a>
+</div>
+
+{# ── Hero ── #}
+<div class="page-hero page-hero--watermark"
+     data-watermark="{{ record.record_type|upper|cut:'_' }}"
+     style="margin-bottom: var(--space-s);">
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Mandate › {{ record.get_record_type_display|default:record.record_type|title }}</span>
+  </div>
+  <h1 class="page-hero__title">{{ record.title }}</h1>
+
+  <div style="display: flex; align-items: center; gap: var(--space-s); margin-top: var(--space-xs);">
+    <span class="badge {% if record.status == 'active' or record.status == 'locked' %}b-primary{% else %}b-warning{% endif %}"
+          id="record-status-area">
+      {% if record.status == 'locked' %}🔒 {% endif %}{{ record.status|upper }}
+      {% if record.version %} · V{{ record.version }}{% endif %}
+    </span>
+    {% if is_level5 and record.status != 'locked' %}
+    <button class="btn-touch btn-sm"
+            style="background: var(--gov-accent); color: #fff; border-color: var(--gov-accent);"
+            hx-get="{% url 'governance:htmx-record-edit' record.id %}"
+            hx-target="#drawerInner" hx-swap="innerHTML"
+            onclick="window.ICSDrawer.open('Edit Mandate')">
+      <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+      Edit
+    </button>
+    {% endif %}
+  </div>
+</div>
+
+<div style="padding: 0 var(--space-s) var(--space-2xl);">
+
+  {% if record.summary %}
+  <p class="gov-detail-summary" style="margin-bottom: var(--space-m);">{{ record.summary }}</p>
+  {% endif %}
+
+  {% if record.content %}
+  <div class="gov-content-body" style="margin-bottom: var(--space-m);">{{ record.content|linebreaks }}</div>
+  {% endif %}
+
+  {# ── Record metadata ── #}
+  <div class="gov-panel" style="margin-bottom: var(--space-m);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Record Details</div>
+    <dl class="gov-attrs">
+      <dt>Type</dt><dd>{{ record.get_record_type_display|default:record.record_type|title }}</dd>
+      <dt>Version</dt><dd>{{ record.version|default:"1" }}</dd>
+      <dt>Status</dt><dd>{{ record.status|title }}</dd>
+      <dt>Effective</dt><dd>{{ record.updated_at|date:"d M Y" }}</dd>
+      {% if record.tags %}<dt>Tags</dt><dd>{{ record.tags|join:", " }}</dd>{% endif %}
+    </dl>
+  </div>
+
+  {# ── Signatory info ── #}
+  {% if record.locked_by %}
+  <div class="gov-panel" style="margin-bottom: var(--space-m);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Signatory</div>
+    <dl class="gov-attrs">
+      <dt>Locked By</dt><dd>{{ record.locked_by.display_name|default:record.locked_by.email }}</dd>
+      <dt>Lock Date</dt><dd>{{ record.locked_at|date:"d M Y" }}</dd>
+    </dl>
+  </div>
+  {% endif %}
+
+  {# ── Version chain ── #}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">Version Chain</div>
+  <div id="ws-version-history"
+       hx-get="{% url 'governance:htmx-version-history' record.id %}"
+       hx-trigger="load" hx-swap="innerHTML">
+    <div style="color: var(--muted); font-size: 13px; padding: var(--space-xs) 0;">Loading history…</div>
+  </div>
+
+  {# ── Mandate dependencies ── #}
+  <div class="label-caps" style="margin-top: var(--space-m); margin-bottom: var(--space-xs);">
+    Mandate Dependencies
+  </div>
+  <div id="ws-linked-records"
+       hx-get="{% url 'governance:htmx-linked-records' record.id %}"
+       hx-trigger="load" hx-swap="innerHTML">
+    <div style="color: var(--muted); font-size: 13px; padding: var(--space-xs) 0;">
+      Analyzing dependencies…
     </div>
   </div>
 
-  <div class="ws-detail-body">
-    {# Main Content #}
-    <div class="ws-detail-main">
-      {% if record.summary %}
-      <p class="ws-detail-summary" style="font-size: 1.1rem; color: var(--muted); margin-bottom: var(--space-l); font-style: italic;">
-        {{ record.summary }}
-      </p>
-      {% endif %}
-
-      <div class="ws-editorial-content" style="font-family: var(--ff-serif); font-size: 1.15rem; line-height: 1.8; color: var(--text);">
-        {{ record.content|linebreaks }}
-      </div>
-
-      {# Linked Records #}
-      <div style="margin-top: var(--space-xl); border-top: 1px solid var(--border); padding-top: var(--space-l);">
-        <div class="label-caps" style="margin-bottom: var(--space-s);">Mandate Dependencies</div>
-        <div id="ws-linked-records"
-             hx-get="{% url 'governance:htmx-linked-records' record.id %}"
-             hx-trigger="load"
-             hx-swap="innerHTML">
-          <div style="color: var(--muted); font-size: 13px;">Analyzing dependencies…</div>
-        </div>
-      </div>
-    </div>
-
-    {# Sidebar #}
-    <aside class="ws-detail-sidebar">
-      <div class="ws-sidebar-block">
-        <div class="label-caps">Record Metadata</div>
-        <div class="ws-sidebar-data">
-          <div class="ws-data-row">
-            <span class="ws-data-label">Version</span>
-            <span class="ws-data-value">{{ record.version|default:"1" }}</span>
-          </div>
-          <div class="ws-data-row">
-            <span class="ws-data-label">Status</span>
-            <span class="ws-data-value">{{ record.status|title }}</span>
-          </div>
-          <div class="ws-data-row">
-            <span class="ws-data-label">Effective</span>
-            <span class="ws-data-value">{{ record.updated_at|date:"d M Y" }}</span>
-          </div>
-        </div>
-      </div>
-
-      {% if record.locked_by %}
-      <div class="ws-sidebar-block">
-        <div class="label-caps">Signatory Info</div>
-        <div class="ws-sidebar-data">
-          <div class="ws-data-row">
-            <span class="ws-data-label">Locked By</span>
-            <span class="ws-data-value">{{ record.locked_by.display_name|default:record.locked_by.email }}</span>
-          </div>
-          <div class="ws-data-row">
-            <span class="ws-data-label">Lock Date</span>
-            <span class="ws-data-value">{{ record.locked_at|date:"d M Y" }}</span>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-
-      <div class="ws-sidebar-block">
-        <div class="label-caps">Version Chain</div>
-        <div id="ws-version-history"
-             hx-get="{% url 'governance:htmx-version-history' record.id %}"
-             hx-trigger="load"
-             hx-swap="innerHTML">
-          <div style="color: var(--muted); font-size: 11px;">Loading history…</div>
-        </div>
-      </div>
-
-      {% if is_level5 %}
-      <div class="ws-sidebar-block">
-        <div class="label-caps">Governance Actions</div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button class="ws-btn ws-btn--secondary" style="width: 100%;"
-                  hx-get="{% url 'governance:htmx-record-edit' record.id %}"
-                  hx-target="#drawerContent"
-                  hx-swap="innerHTML"
-                  onclick="window.ICSDrawer.open('Edit Mandate')">
-            Edit Mandate
-          </button>
-          {% if record.status != 'locked' %}
-          <button class="ws-btn ws-btn--secondary" style="width: 100%; color: var(--error);"
-                  hx-post="{% url 'governance:htmx-record-lock' record.id %}"
-                  hx-target="#record-status-area"
-                  hx-swap="outerHTML"
-                  hx-confirm="Lock this record?">
-            Lock Record
-          </button>
-          {% endif %}
-          <button class="ws-btn ws-btn--secondary" style="width: 100%;"
-                  hx-post="{% url 'governance:htmx-record-supersede' record.id %}"
-                  hx-confirm="Supersede this version?">
-            New Version
-          </button>
-        </div>
-      </div>
-      {% endif %}
-    </aside>
+  {# ── Admin actions ── #}
+  {% if is_level5 %}
+  <div style="margin-top: var(--space-l); display: flex; flex-direction: column; gap: var(--space-xs);">
+    <button class="btn-touch"
+            style="width: 100%; justify-content: center; background: var(--gov-accent);
+                   color: #fff; border-color: var(--gov-accent);"
+            hx-post="{% url 'governance:htmx-record-supersede' record.id %}"
+            hx-confirm="Create a new version of this mandate?">
+      <span class="material-symbols-outlined" style="font-size: 18px;">fork_right</span>
+      New Version
+    </button>
+    {% if record.status != 'locked' %}
+    <button class="btn-touch"
+            style="width: 100%; justify-content: center;
+                   background: #fef2f2; color: #991b1b; border-color: #fee2e2;"
+            hx-post="{% url 'governance:htmx-record-lock' record.id %}"
+            hx-target="#record-status-area" hx-swap="outerHTML"
+            hx-confirm="Lock this mandate? It cannot be edited after locking.">
+      <span class="material-symbols-outlined" style="font-size: 18px;">lock</span>
+      Lock Mandate
+    </button>
+    {% endif %}
   </div>
+  {% endif %}
+
 </div>
