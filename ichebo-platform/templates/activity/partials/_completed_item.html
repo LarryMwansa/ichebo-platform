@@ -1,16 +1,25 @@
 <div id="activity-{{ activity.id }}"
-     style="display:flex;align-items:center;gap:var(--space-s);padding:14px var(--space-s);opacity:0.55;">
+     style="display:flex;align-items:center;gap:var(--space-s);padding:14px var(--space-s);">
   <div style="width:40px;height:40px;border-radius:10px;flex-shrink:0;
               background:var(--card-2);display:flex;align-items:center;justify-content:center;">
     <span class="material-symbols-outlined" style="font-size:20px;color:var(--success);">check_circle</span>
   </div>
   <div style="flex:1;min-width:0;">
     <div style="font-size:14px;font-weight:700;color:var(--text);
-                text-decoration:line-through;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                text-decoration:line-through;opacity:0.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
       {{ activity.title }}
     </div>
     <div style="font-size:11px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">
       Completed
     </div>
   </div>
+  <button hx-post="{% url 'activity:htmx-delete' activity.id %}"
+          hx-target="#activity-{{ activity.id }}"
+          hx-swap="outerHTML"
+          hx-confirm="Delete this activity?"
+          style="width:40px;height:40px;border-radius:10px;flex-shrink:0;border:none;cursor:pointer;
+                 background:var(--card-2);display:flex;align-items:center;justify-content:center;
+                 color:var(--error);">
+    <span class="material-symbols-outlined" style="font-size:20px;">delete</span>
+  </button>
 </div>
