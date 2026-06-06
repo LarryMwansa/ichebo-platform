@@ -368,7 +368,7 @@ def htmx_record_create(request):
     record_type   = request.GET.get('record_type', 'key')
     record_family = request.GET.get('record_family', 'reference')
 
-    return render(request, 'workspace/governance/editorial_form.html', {
+    ctx = {
         'record':           None,
         'record_type':      record_type,
         'record_family':    record_family,
@@ -382,7 +382,14 @@ def htmx_record_create(request):
         'is_level5':        level >= 5,
         'allowed_families': allowed_families,
         'active_branch':    'library' if record_type in LIBRARY_TYPES else 'mandate',
-    })
+    }
+
+    # HTMX requests (drawer/partial) use the standalone form without the page shell
+    if request.headers.get('HX-Request'):
+        ctx['drawer_mode'] = True
+        return render(request, 'governance/_record_form.html', ctx)
+
+    return render(request, 'workspace/governance/editorial_form.html', ctx)
 
 
 @login_required
@@ -418,7 +425,7 @@ def htmx_record_edit(request, record_id):
             if record.record_type in LIBRARY_TYPES \
             else redirect('governance:mandate-detail', record_id=record.id)
 
-    return render(request, 'workspace/governance/editorial_form.html', {
+    ctx = {
         'record':          record,
         'record_type':     record.record_type,
         'record_family':   record.record_family,
@@ -431,7 +438,11 @@ def htmx_record_edit(request, record_id):
         'speed_opts':      HRS_SPEED_CHOICES,
         'is_level5':       True,
         'active_branch':   'library' if record.record_type in LIBRARY_TYPES else 'mandate',
-    })
+    }
+    if request.headers.get('HX-Request'):
+        ctx['drawer_mode'] = True
+        return render(request, 'governance/_record_form.html', ctx)
+    return render(request, 'workspace/governance/editorial_form.html', ctx)
 
 
 # ── Lock record ────────────────────────────────────────────────────────────────
