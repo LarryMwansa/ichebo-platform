@@ -35,10 +35,12 @@ def activity_detail(request, activity_id):
         from records.models import Record
         via_record = Record.objects.filter(id=via_id).first()
 
-    return render(request, 'activity/activity_detail.html', {
+    return render(request, 'activity/activity_detail_mobile.html', {
         'activity': activity,
         'via_record': via_record,
         'user_level': _user_level(request.user),
+        'active_app': 'activity',
+        'ws_page_title': activity.title,
     })
 
 
@@ -211,14 +213,25 @@ def htmx_edit_activity(request, activity_id):
             created_by=request.user,
             event_type='edited',
         )
+        # Drawer save → close drawer, stay on page
+        if request.headers.get('HX-Target') == 'drawerInner':
+            from django.urls import reverse
+            response = HttpResponse(status=204)
+            response['HX-Trigger'] = 'activityCreated'
+            response['HX-Redirect'] = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
+            return response
         return render(request, 'activity/partials/activity_card.html', {'activity': activity})
 
     activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
-    # GET — return edit form pre-populated
-    return render(request, 'activity/partials/edit_form.html', {
-        'activity': activity,
-        'activity_types': activity_types,
-    })
+    # Drawer GET → mobile form; direct URL → redirect to detail page
+    if request.headers.get('HX-Target') == 'drawerInner':
+        return render(request, 'activity/partials/edit_form.html', {
+            'activity': activity,
+            'activity_types': activity_types,
+        })
+    # Direct URL access — redirect to detail page with edit intent
+    from django.shortcuts import redirect
+    return redirect('activity:activity-detail', activity_id=activity.id)
 
 
 # ── HTMX: delete activity ─────────────────────────────────────────────────────
