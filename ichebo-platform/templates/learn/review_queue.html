@@ -61,25 +61,34 @@
             </div>
             {% endif %}
 
-            <div style="display: flex; gap: 10px; justify-content: flex-end;
+            <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center;
                         border-top: 1px solid var(--border); padding-top: 16px;">
-                <button style="display: flex; align-items: center; gap: 6px; padding: 0 16px; height: 36px;
-                               background: none; border: 1px solid var(--border); border-radius: 8px;
-                               font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer;"
-                        hx-post="{% url 'learn:htmx-return-content' item.id %}"
-                        hx-target="#ws-review-{{ item.id }}"
-                        hx-swap="outerHTML swap:1s">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">undo</span>
-                    Return to Author
-                </button>
-                <button class="ws-topbar__cta"
-                        hx-post="{% url 'learn:htmx-approve-content' item.id %}"
-                        hx-target="#ws-review-{{ item.id }}"
-                        hx-swap="outerHTML swap:1s"
-                        style="background: var(--primary); color: #fff; border: none; cursor: pointer;">
-                    <span class="material-symbols-outlined">check_circle</span>
-                    Approve for Publication
-                </button>
+                <a href="{% if item.record_type == 'programme' %}{% url 'learn:learn-author-programme-edit' item.id %}{% elif item.record_type == 'course' %}{% url 'learn:learn-author-course-edit' item.id %}{% else %}{% url 'learn:learn-author-lesson-edit' item.id %}{% endif %}"
+                   style="display: flex; align-items: center; gap: 6px; padding: 0 14px; height: 36px;
+                          background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                          font-size: 12px; font-weight: 700; color: var(--muted); text-decoration: none;">
+                    <span class="material-symbols-outlined" style="font-size: 15px;">edit</span>
+                    Edit
+                </a>
+                <div style="display: flex; gap: 10px;">
+                    <button style="display: flex; align-items: center; gap: 6px; padding: 0 16px; height: 36px;
+                                   background: none; border: 1px solid var(--border); border-radius: 8px;
+                                   font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer;"
+                            hx-post="{% url 'learn:htmx-return-content' item.id %}"
+                            hx-target="#ws-review-{{ item.id }}"
+                            hx-swap="outerHTML swap:1s">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">undo</span>
+                        Return to Author
+                    </button>
+                    <button class="ws-topbar__cta"
+                            hx-post="{% url 'learn:htmx-approve-content' item.id %}"
+                            hx-target="#ws-review-{{ item.id }}"
+                            hx-swap="outerHTML swap:1s"
+                            style="background: var(--primary); color: #fff; border: none; cursor: pointer;">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        Approve for Publication
+                    </button>
+                </div>
             </div>
         </div>
         {% endfor %}
@@ -157,21 +166,28 @@
         {{ item.content|truncatechars:200 }}
       </div>
       {% endif %}
-      <div style="display: flex; gap: var(--space-xs); border-top: 1px solid var(--border);
-                  padding-top: var(--space-s);">
-        <button class="btn-touch"
-                hx-post="{% url 'learn:htmx-return-content' item.id %}"
-                hx-target="#ws-review-m-{{ item.id }}" hx-swap="outerHTML swap:1s"
-                style="flex: 1; justify-content: center; font-size: 13px;">
-          Return
-        </button>
-        <button class="btn-touch btn-touch--primary"
-                hx-post="{% url 'learn:htmx-approve-content' item.id %}"
-                hx-target="#ws-review-m-{{ item.id }}" hx-swap="outerHTML swap:1s"
-                style="flex: 1; justify-content: center; font-size: 13px;">
-          <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span>
-          Publish
-        </button>
+      <div style="border-top: 1px solid var(--border); padding-top: var(--space-s);">
+        <a href="{% if item.record_type == 'programme' %}{% url 'learn:learn-author-programme-edit' item.id %}{% elif item.record_type == 'course' %}{% url 'learn:learn-author-course-edit' item.id %}{% else %}{% url 'learn:learn-author-lesson-edit' item.id %}{% endif %}"
+           class="btn-touch"
+           style="width:100%;justify-content:center;text-decoration:none;margin-bottom:var(--space-xs);">
+          <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
+          Edit {{ item.record_type|title }}
+        </a>
+        <div style="display:flex;gap:var(--space-xs);">
+          <button class="btn-touch"
+                  hx-post="{% url 'learn:htmx-return-content' item.id %}"
+                  hx-target="#ws-review-m-{{ item.id }}" hx-swap="outerHTML swap:1s"
+                  style="flex:1;justify-content:center;font-size:13px;">
+            Return
+          </button>
+          <button class="btn-touch btn-touch--primary"
+                  hx-post="{% url 'learn:htmx-approve-content' item.id %}"
+                  hx-target="#ws-review-m-{{ item.id }}" hx-swap="outerHTML swap:1s"
+                  style="flex:1;justify-content:center;font-size:13px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span>
+            Publish
+          </button>
+        </div>
       </div>
     </div>
     {% endfor %}

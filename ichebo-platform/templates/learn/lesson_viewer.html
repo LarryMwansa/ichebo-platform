@@ -156,6 +156,29 @@
 {% block ws_options %}
 <div style="padding: 0 4px;">
 
+    {% if is_author %}
+    <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;">
+        <a href="{% url 'learn:learn-author-lesson-edit' lesson.id %}"
+           style="display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+                  background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                  font-size: 12px; font-weight: 700; color: var(--text); text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">edit</span>
+            Edit Lesson
+        </a>
+        {% if can_delete %}
+        <button hx-post="{% url 'learn:htmx-author-delete' lesson.id %}"
+                hx-confirm="Delete "{{ lesson.title }}"? This cannot be undone."
+                style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer;
+                       background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px;
+                       font-size: 12px; font-weight: 700; color: #991b1b; text-align: left; width: 100%;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+            Delete Lesson
+        </button>
+        {% endif %}
+    </div>
+    <div style="height: 1px; background: var(--border); margin-bottom: 16px;"></div>
+    {% endif %}
+
     {# ── Lesson progress in course ── #}
     {% if siblings %}
     <div class="ws-label-tag" style="margin-bottom: 12px;">In This Course</div>
@@ -189,5 +212,110 @@
         <div style="font-size: 12px; color: var(--muted); font-style: italic;">Loading…</div>
     </div>
 
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+  <div class="page-hero page-hero--watermark" data-watermark="{{ lesson.record_type|upper }}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xs);">
+      {% if course %}
+      <a href="{% url 'learn:learn-course' course.id %}"
+         style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.02em;">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+        {{ course.title|truncatechars:22 }}
+      </a>
+      {% elif programme %}
+      <a href="{% url 'learn:learn-programme' programme.id %}"
+         style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.02em;">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+        {{ programme.title|truncatechars:22 }}
+      </a>
+      {% else %}
+      <a href="{% url 'learn:learn-catalogue' %}"
+         style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.02em;">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+        Catalogue
+      </a>
+      {% endif %}
+      {% if is_author %}
+      <div style="display:flex;gap:6px;">
+        <a href="{% url 'learn:learn-author-lesson-edit' lesson.id %}"
+           style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;
+                  background:var(--card-2);border:1px solid var(--border);border-radius:7px;
+                  font-size:11px;font-weight:700;color:var(--text);text-decoration:none;">
+          <span class="material-symbols-outlined" style="font-size:14px;">edit</span>Edit
+        </a>
+        {% if can_delete %}
+        <button hx-post="{% url 'learn:htmx-author-delete' lesson.id %}"
+                hx-confirm="Delete "{{ lesson.title }}"? This cannot be undone."
+                style="display:inline-flex;align-items:center;padding:5px 8px;cursor:pointer;
+                       background:#fef2f2;border:1px solid #fee2e2;border-radius:7px;color:#991b1b;">
+          <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
+        </button>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="page-hero__eyebrow">
+      <div class="page-hero__eyebrow-line"></div>
+      <span class="page-hero__label">{{ lesson.record_type|title }}</span>
+    </div>
+    <h1 class="page-hero__title" style="font-size:1.4rem;">{{ lesson.title }}</h1>
+  </div>
+
+  <div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+
+    {% if video_url %}
+    {% include "video/_player.html" with title=lesson.title embed_url=embed_url video_type=video_type %}
+    {% endif %}
+
+    {% if lesson.content %}
+    <div style="font-size:15px;line-height:1.8;color:var(--text);margin-bottom:var(--space-m);">
+      {{ lesson.content|linebreaks }}
+    </div>
+    {% endif %}
+
+    {% if lesson.record_type == 'quiz' and lesson.custom_fields.questions %}
+    {% include "learn/partials/quiz.html" %}
+    {% endif %}
+
+    <div style="display:flex;align-items:center;justify-content:space-between;
+                padding:var(--space-s) 0;border-top:1px solid var(--border);gap:var(--space-s);">
+      <div>
+        {% if prev_lesson %}
+        <a href="{% url 'learn:learn-lesson' prev_lesson.id %}"
+           class="btn-touch" style="text-decoration:none;">
+          <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+          Prev
+        </a>
+        {% endif %}
+      </div>
+      <div id="complete-section-m">
+        {% if is_completed %}
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;
+                    background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;
+                    font-size:13px;font-weight:700;color:#2e7d32;">
+          <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span>Done
+        </div>
+        {% elif lesson.record_type == 'assignment' %}
+        {% include "learn/partials/assignment_form.html" %}
+        {% else %}
+        {% include "learn/partials/lesson_complete_btn.html" %}
+        {% endif %}
+      </div>
+      <div>
+        {% if next_lesson %}
+        <a href="{% url 'learn:learn-lesson' next_lesson.id %}"
+           class="btn-touch btn-touch--primary" style="text-decoration:none;">
+          Next
+          <span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
 </div>
 {% endblock %}

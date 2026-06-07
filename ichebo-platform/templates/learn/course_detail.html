@@ -43,6 +43,28 @@
         {% endif %}
     </div>
 
+    {% if is_author %}
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+        <a href="{% url 'learn:learn-author-course-edit' course.id %}"
+           style="display: flex; align-items: center; gap: 6px; padding: 7px 14px;
+                  background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                  font-size: 12px; font-weight: 700; color: var(--text); text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 15px;">edit</span>
+            Edit Course
+        </a>
+        {% if can_delete %}
+        <button hx-post="{% url 'learn:htmx-author-delete' course.id %}"
+                hx-confirm="Delete "{{ course.title }}"? This cannot be undone."
+                style="display: flex; align-items: center; gap: 6px; padding: 7px 12px; cursor: pointer;
+                       background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px;
+                       font-size: 12px; font-weight: 700; color: #991b1b;">
+            <span class="material-symbols-outlined" style="font-size: 15px;">delete</span>
+            Delete
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+
     {# ── Hero ── #}
     <div style="margin-bottom: 36px;">
         <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;">
@@ -123,6 +145,15 @@
                 {% elif lesson.record_type == 'quiz' %}quiz
                 {% else %}play_circle{% endif %}
             </span>
+            {% if is_author %}
+            <a href="{% url 'learn:learn-author-lesson-edit' lesson.id %}"
+               onclick="event.stopPropagation();"
+               style="display: flex; align-items: center; padding: 4px 6px; margin-left: 4px;
+                      background: var(--card-2); border: 1px solid var(--border); border-radius: 5px;
+                      color: var(--muted); text-decoration: none; flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 13px;">edit</span>
+            </a>
+            {% endif %}
         </a>
         {% endfor %}
     </div>
@@ -144,19 +175,39 @@
 <div style="padding: 0 0 var(--space-2xl);">
 
   <div class="page-hero page-hero--watermark" data-watermark="COURSE">
-    {% if programme %}
-    <a href="{% url 'learn:learn-programme' programme.id %}"
-       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
-      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
-      {{ programme.title|truncatechars:28 }}
-    </a>
-    {% else %}
-    <a href="{% url 'learn:learn-catalogue' %}"
-       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
-      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
-      Catalogue
-    </a>
-    {% endif %}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xs);">
+      {% if programme %}
+      <a href="{% url 'learn:learn-programme' programme.id %}"
+         style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.02em;">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+        {{ programme.title|truncatechars:22 }}
+      </a>
+      {% else %}
+      <a href="{% url 'learn:learn-catalogue' %}"
+         style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.02em;">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+        Catalogue
+      </a>
+      {% endif %}
+      {% if is_author %}
+      <div style="display:flex;gap:6px;">
+        <a href="{% url 'learn:learn-author-course-edit' course.id %}"
+           style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;
+                  background:var(--card-2);border:1px solid var(--border);border-radius:7px;
+                  font-size:11px;font-weight:700;color:var(--text);text-decoration:none;">
+          <span class="material-symbols-outlined" style="font-size:14px;">edit</span>Edit
+        </a>
+        {% if can_delete %}
+        <button hx-post="{% url 'learn:htmx-author-delete' course.id %}"
+                hx-confirm="Delete "{{ course.title }}"? This cannot be undone."
+                style="display:inline-flex;align-items:center;padding:5px 8px;cursor:pointer;
+                       background:#fef2f2;border:1px solid #fee2e2;border-radius:7px;color:#991b1b;">
+          <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
+        </button>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
     <div class="page-hero__eyebrow">
       <div class="page-hero__eyebrow-line"></div>
       <span class="page-hero__label">Course · {{ lessons|length }} lesson{{ lessons|length|pluralize }}</span>
@@ -192,6 +243,15 @@
         <span class="material-symbols-outlined" style="font-size:20px;color:var(--primary);flex-shrink:0;">
           {% if lesson.record_type == 'assignment' %}assignment{% elif lesson.record_type == 'quiz' %}quiz{% else %}play_circle{% endif %}
         </span>
+        {% if is_author %}
+        <a href="{% url 'learn:learn-author-lesson-edit' lesson.id %}"
+           onclick="event.stopPropagation();"
+           style="display:inline-flex;align-items:center;padding:4px 6px;flex-shrink:0;
+                  background:var(--card-2);border:1px solid var(--border);border-radius:5px;
+                  color:var(--muted);text-decoration:none;">
+          <span class="material-symbols-outlined" style="font-size:13px;">edit</span>
+        </a>
+        {% endif %}
       </a>
       {% endfor %}
     </div>

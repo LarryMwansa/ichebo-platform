@@ -142,10 +142,17 @@ def programme_detail(request, programme_id):
         metadata__programme_record_id=str(programme_id)
     ).exists()
 
+    is_author = user_level >= 4
+    is_owner = is_author and programme.created_by_id == user.id
+    can_delete = (user_level >= 5) or (is_owner and programme.status in ('draft', 'submitted'))
+
     return render(request, 'learn/programme_detail.html', {
         'programme': programme,
         'curriculum': curriculum,
         'already_enrolled': already_enrolled,
+        'is_author': is_author,
+        'is_owner': is_owner,
+        'can_delete': can_delete,
     })
 
 
@@ -178,10 +185,18 @@ def course_detail(request, course_id):
     ).select_related('to_record').first()
     programme = programme_rel.to_record if programme_rel else None
 
+    user_level = _user_level(request.user)
+    is_author = user_level >= 4
+    is_owner = is_author and course.created_by_id == request.user.id
+    can_delete = (user_level >= 5) or (is_owner and course.status in ('draft', 'submitted'))
+
     return render(request, 'learn/course_detail.html', {
         'course': course,
         'lessons': lessons,
         'programme': programme,
+        'is_author': is_author,
+        'is_owner': is_owner,
+        'can_delete': can_delete,
         'ws_page_title': 'Learn',
     })
 
@@ -238,6 +253,11 @@ def lesson_viewer(request, lesson_id):
     embed_url = get_embed_url(raw_video_url) if raw_video_url else None
     video_type = get_video_type(raw_video_url) if raw_video_url else None
 
+    user_level = _user_level(request.user)
+    is_author = user_level >= 4
+    is_owner = is_author and lesson.created_by_id == request.user.id
+    can_delete = (user_level >= 5) or (is_owner and lesson.status in ('draft', 'submitted'))
+
     return render(request, 'learn/lesson_viewer.html', {
         'lesson': lesson,
         'course': course,
@@ -249,6 +269,9 @@ def lesson_viewer(request, lesson_id):
         'video_url': raw_video_url,
         'embed_url': embed_url,
         'video_type': video_type,
+        'is_author': is_author,
+        'is_owner': is_owner,
+        'can_delete': can_delete,
     })
 
 
@@ -535,14 +558,25 @@ def htmx_author_delete(request, record_id):
     if request.method != 'POST':
         return HttpResponse('', status=405)
 
-    record = get_object_or_404(
-        Record,
-        id=record_id,
-        created_by=request.user,
-        record_family='learning',
-        status__in=['draft', 'submitted'],
-        deleted_at__isnull=True,
-    )
+    user_level = _user_level(request.user)
+    if user_level >= 5:
+        # Architects can delete any learning record regardless of owner or status
+        record = get_object_or_404(
+            Record,
+            id=record_id,
+            record_family='learning',
+            deleted_at__isnull=True,
+        )
+    else:
+        # Level 4 authors can only delete their own draft/submitted records
+        record = get_object_or_404(
+            Record,
+            id=record_id,
+            created_by=request.user,
+            record_family='learning',
+            status__in=['draft', 'submitted'],
+            deleted_at__isnull=True,
+        )
     record.soft_delete()
     response = HttpResponse('', status=200)
     response['HX-Redirect'] = '/learn/author/'
