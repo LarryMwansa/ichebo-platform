@@ -399,6 +399,38 @@
             });
         });
 
+        // Custom HTMX confirm — inline toast-style bar instead of browser dialog
+        document.addEventListener('htmx:confirm', (e) => {
+            if (!e.detail.question) return;
+            e.preventDefault();
+
+            const existing = document.getElementById('ws-confirm-bar');
+            if (existing) existing.remove();
+
+            const bar = document.createElement('div');
+            bar.id = 'ws-confirm-bar';
+            bar.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;align-items:center;gap:12px;padding:14px 20px;border-radius:12px;background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.22);font-size:13px;color:var(--text);pointer-events:all;animation:ws-toast-in 0.18s ease;white-space:nowrap;';
+            bar.innerHTML = `
+                <span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;color:#d97706;">warning</span>
+                <span style="flex:1;line-height:1.4;">${e.detail.question}</span>
+                <button id="ws-confirm-ok" style="display:flex;align-items:center;gap:5px;padding:7px 14px;background:#991b1b;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
+                    <span class="material-symbols-outlined" style="font-size:15px;">check</span>Confirm
+                </button>
+                <button id="ws-confirm-cancel" style="display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--card-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
+                    Cancel
+                </button>`;
+            document.body.appendChild(bar);
+
+            const cleanup = () => bar.remove();
+            bar.querySelector('#ws-confirm-ok').addEventListener('click', () => {
+                cleanup();
+                e.detail.issueRequest(true);
+            });
+            bar.querySelector('#ws-confirm-cancel').addEventListener('click', cleanup);
+            // Auto-dismiss after 10s if no action
+            setTimeout(cleanup, 10000);
+        });
+
         // Inject HTMX-triggered toasts into the container
         document.addEventListener('htmx:afterRequest', (e) => {
             const toastJson = e.detail.xhr.getResponseHeader('X-WS-Toast');
