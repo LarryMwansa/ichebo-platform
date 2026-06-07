@@ -1,0 +1,336 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block title %}Manage {{ record.title }} — Ichebo{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Formation</span>
+    <span class="ws-topbar__breadcrumb-sep">›</span>
+    {% if programme %}
+    <a href="{% url 'learn:learn-programme-manage' programme.id %}"
+       class="ws-topbar__breadcrumb-item" style="text-decoration: none; color: inherit;">
+        {{ programme.title|truncatechars:24 }}
+    </a>
+    <span class="ws-topbar__breadcrumb-sep">›</span>
+    {% endif %}
+    <span class="ws-topbar__breadcrumb-item">Manage Course</span>
+{% endblock %}
+{% block context_header %}Formation Ops{% endblock %}
+{% block context_content %}
+    {% include "learn/partials/learn_sidebar.html" %}
+{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 860px;">
+
+    {# ── Back ── #}
+    <div style="margin-bottom: 24px;">
+        {% if programme %}
+        <a href="{% url 'learn:learn-programme-manage' programme.id %}"
+           style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px;
+                  font-weight: 700; color: var(--muted); text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 15px;">arrow_back</span>
+            {{ programme.title|truncatechars:32 }}
+        </a>
+        {% else %}
+        <a href="{% url 'learn:learn-author' %}"
+           style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px;
+                  font-weight: 700; color: var(--muted); text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 15px;">arrow_back</span>
+            Authorship
+        </a>
+        {% endif %}
+    </div>
+
+    {# ── Hero ── #}
+    <div style="margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border);">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;">
+            <div style="flex: 1; min-width: 0;">
+                <div class="ws-label-tag" style="margin-bottom: 10px;">Course Management</div>
+                <h1 class="ws-page-title" style="margin-bottom: 12px;">{{ record.title }}</h1>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                    <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                 letter-spacing: 0.06em; padding: 3px 8px; border-radius: 4px;
+                                 background: {% if record.status == 'active' %}var(--primary){% elif record.status == 'approved' %}#dcfce7{% elif record.status == 'submitted' %}#fff3cd{% else %}var(--card-2){% endif %};
+                                 color: {% if record.status == 'active' %}#fff{% elif record.status == 'approved' %}#15803d{% elif record.status == 'submitted' %}#92400e{% else %}var(--muted){% endif %};">
+                        {{ record.status|title }}
+                    </span>
+                    <span style="font-size: 10px; color: var(--muted);">·</span>
+                    <span style="font-size: 10px; color: var(--muted);">{{ lessons|length }} lesson{{ lessons|length|pluralize }}</span>
+                </div>
+                {% if record.custom_fields.start_date or record.custom_fields.end_date %}
+                <div style="display: flex; align-items: center; gap: 5px; margin-top: 8px;">
+                    <span class="material-symbols-outlined" style="font-size: 13px; color: var(--muted);">calendar_month</span>
+                    <span style="font-size: 11px; color: var(--muted);">
+                        {% if record.custom_fields.start_date and record.custom_fields.end_date %}
+                            {{ record.custom_fields.start_date }} – {{ record.custom_fields.end_date }}
+                        {% elif record.custom_fields.start_date %}
+                            From {{ record.custom_fields.start_date }}
+                        {% else %}
+                            Until {{ record.custom_fields.end_date }}
+                        {% endif %}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+            <a href="{% url 'learn:learn-author-course-edit' record.id %}"
+               style="display: flex; align-items: center; gap: 6px; padding: 9px 16px; flex-shrink: 0;
+                      background: var(--primary); color: #fff; border: none; border-radius: 8px;
+                      font-size: 13px; font-weight: 700; text-decoration: none;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                Edit Course
+            </a>
+        </div>
+        {% if record.content %}
+        <p style="font-size: 13px; color: var(--muted); margin-top: 16px; line-height: 1.7; max-width: 680px;">
+            {{ record.content }}
+        </p>
+        {% endif %}
+    </div>
+
+    {# ── Lessons ── #}
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Lessons</div>
+
+    {% if lessons %}
+    <div style="background: var(--card); border: 1px solid var(--border);
+                border-radius: 12px; overflow: hidden; margin-bottom: 40px;">
+        {% for lesson in lessons %}
+        <div style="display: flex; align-items: center; gap: 14px; padding: 14px 20px;
+                    border-bottom: {% if not forloop.last %}1px solid var(--border){% else %}none{% endif %};">
+            <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--card-2);
+                        border: 1px solid var(--border); display: flex; align-items: center;
+                        justify-content: center; font-size: 10px; font-weight: 800;
+                        color: var(--muted); flex-shrink: 0;">
+                {{ forloop.counter }}
+            </div>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 600; color: var(--text);
+                            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ lesson.title }}
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center; margin-top: 3px;">
+                    <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                 letter-spacing: 0.05em; color: var(--primary);">{{ lesson.record_type|title }}</span>
+                    <span style="font-size: 10px; color: var(--muted);">·</span>
+                    <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                 letter-spacing: 0.05em;
+                                 color: {% if lesson.status == 'active' %}var(--primary){% elif lesson.status == 'approved' %}#15803d{% elif lesson.status == 'submitted' %}#92400e{% else %}var(--muted){% endif %};">
+                        {{ lesson.status|title }}
+                    </span>
+                </div>
+            </div>
+            <a href="{% url 'learn:learn-author-lesson-edit' lesson.id %}"
+               style="display: flex; align-items: center; gap: 4px; padding: 5px 10px; flex-shrink: 0;
+                      background: var(--card-2); border: 1px solid var(--border); border-radius: 6px;
+                      font-size: 11px; font-weight: 700; color: var(--muted); text-decoration: none;">
+                <span class="material-symbols-outlined" style="font-size: 13px;">edit</span>Edit
+            </a>
+            {% if user_level >= 5 or lesson.created_by_id == request.user.id and lesson.status in 'draft,submitted,approved' %}
+            <button hx-post="{% url 'learn:htmx-author-delete' lesson.id %}"
+                    hx-confirm="Delete "{{ lesson.title }}"? This cannot be undone."
+                    style="display: flex; align-items: center; padding: 5px 8px; cursor: pointer;
+                           background: #fef2f2; border: 1px solid #fee2e2; border-radius: 6px;
+                           color: #991b1b; flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 14px;">delete</span>
+            </button>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding: 40px 0; text-align: center; margin-bottom: 40px;">
+        <span class="material-symbols-outlined"
+              style="font-size: 40px; opacity: 0.1; display: block; color: var(--text);">auto_stories</span>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 12px;">No lessons yet.</p>
+        <a href="{% url 'learn:learn-author-lesson' %}"
+           style="display: inline-flex; align-items: center; gap: 6px; margin-top: 12px;
+                  padding: 8px 16px; background: var(--primary); color: #fff;
+                  border: none; border-radius: 8px; font-size: 12px; font-weight: 700;
+                  text-decoration: none;">
+            <span class="material-symbols-outlined" style="font-size: 15px;">add</span>
+            New Lesson
+        </a>
+    </div>
+    {% endif %}
+
+    {# ── Danger Zone ── #}
+    {% if can_delete %}
+    <div style="padding: 20px 24px; border: 1px dashed #fee2e2; border-radius: 10px;
+                display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+        <div>
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.06em; color: #991b1b; margin-bottom: 4px;">Danger Zone</div>
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">
+                Permanently removes this course record. Lessons are <em>not</em> deleted.
+            </div>
+        </div>
+        <button hx-post="{% url 'learn:htmx-author-delete' record.id %}"
+                hx-confirm="Delete "{{ record.title }}"? This cannot be undone."
+                style="display: flex; align-items: center; gap: 6px; padding: 9px 16px; cursor: pointer;
+                       background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px;
+                       font-size: 12px; font-weight: 700; color: #991b1b; flex-shrink: 0; white-space: nowrap;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+            Delete Course
+        </button>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Course Info</div>
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+        <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                    padding: 12px 14px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Lessons</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--text);
+                        font-family: 'Playfair Display', serif;">{{ lessons|length }}</div>
+        </div>
+    </div>
+    {% if programme %}
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 10px;">Programme</div>
+    <a href="{% url 'learn:learn-programme-manage' programme.id %}"
+       style="display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+              background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+              text-decoration: none; font-size: 12px; font-weight: 600; color: var(--text);">
+        <span class="material-symbols-outlined" style="font-size: 15px; color: var(--primary);">school</span>
+        {{ programme.title|truncatechars:32 }}
+    </a>
+    {% endif %}
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Quick Actions</div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+        <a href="{% url 'learn:learn-author-course-edit' record.id %}"
+           style="display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+                  background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                  text-decoration: none; font-size: 12px; font-weight: 700; color: var(--text);">
+            <span class="material-symbols-outlined" style="font-size: 15px; color: var(--primary);">edit</span>
+            Edit Course
+        </a>
+        <a href="{% url 'learn:learn-author-lesson' %}"
+           style="display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+                  background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                  text-decoration: none; font-size: 12px; font-weight: 700; color: var(--text);">
+            <span class="material-symbols-outlined" style="font-size: 15px; color: var(--primary);">add</span>
+            New Lesson
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+  <div class="page-hero page-hero--watermark" data-watermark="MANAGE">
+    {% if programme %}
+    <a href="{% url 'learn:learn-programme-manage' programme.id %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+      {{ programme.title|truncatechars:22 }}
+    </a>
+    {% else %}
+    <a href="{% url 'learn:learn-author' %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+      Authorship
+    </a>
+    {% endif %}
+    <div class="page-hero__eyebrow">
+      <div class="page-hero__eyebrow-line"></div>
+      <span class="page-hero__label">Course Management</span>
+    </div>
+    <h1 class="page-hero__title" style="font-size:1.5rem;">{{ record.title }}</h1>
+    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;
+                 padding:3px 8px;border-radius:4px;margin-top:var(--space-xs);display:inline-block;
+                 background:{% if record.status == 'active' %}var(--primary){% elif record.status == 'approved' %}#dcfce7{% elif record.status == 'submitted' %}#fff3cd{% else %}var(--card-2){% endif %};
+                 color:{% if record.status == 'active' %}#fff{% elif record.status == 'approved' %}#15803d{% elif record.status == 'submitted' %}#92400e{% else %}var(--muted){% endif %};">
+      {{ record.status|title }}
+    </span>
+  </div>
+
+  <div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+
+    {# Quick actions #}
+    <div style="display:flex;gap:var(--space-xs);margin-bottom:var(--space-m);">
+      <a href="{% url 'learn:learn-author-course-edit' record.id %}"
+         class="btn-touch btn-touch--primary" style="flex:1;text-decoration:none;justify-content:center;">
+        <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
+        Edit
+      </a>
+      <a href="{% url 'learn:learn-author-lesson' %}"
+         class="btn-touch" style="flex:1;text-decoration:none;justify-content:center;">
+        <span class="material-symbols-outlined" style="font-size:16px;">add</span>
+        New Lesson
+      </a>
+    </div>
+
+    {# Lessons list #}
+    <div class="label-caps" style="margin-bottom:var(--space-xs);">Lessons</div>
+
+    {% if lessons %}
+    <div style="background:var(--card);border:1px solid var(--border);
+                border-radius:var(--radius-l);overflow:hidden;margin-bottom:var(--space-m);">
+      {% for lesson in lessons %}
+      <div style="display:flex;align-items:center;gap:10px;padding:12px var(--space-s);
+                  border-bottom:{% if not forloop.last %}1px solid var(--border){% else %}none{% endif %};">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--card-2);
+                    border:1px solid var(--border);display:flex;align-items:center;
+                    justify-content:center;font-size:9px;font-weight:800;color:var(--muted);flex-shrink:0;">
+          {{ forloop.counter }}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);
+                      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ lesson.title }}</div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;
+                      color:{% if lesson.status == 'active' %}var(--primary){% elif lesson.status == 'approved' %}#15803d{% else %}var(--muted){% endif %};">
+            {{ lesson.record_type|title }} · {{ lesson.status|title }}
+          </div>
+        </div>
+        <a href="{% url 'learn:learn-author-lesson-edit' lesson.id %}"
+           style="display:inline-flex;align-items:center;padding:4px 8px;flex-shrink:0;
+                  background:var(--card-2);border:1px solid var(--border);border-radius:5px;
+                  color:var(--muted);text-decoration:none;font-size:11px;font-weight:700;gap:3px;">
+          <span class="material-symbols-outlined" style="font-size:13px;">edit</span>
+        </a>
+        {% if user_level >= 5 or lesson.created_by_id == request.user.id and lesson.status in 'draft,submitted,approved' %}
+        <button hx-post="{% url 'learn:htmx-author-delete' lesson.id %}"
+                hx-confirm="Delete "{{ lesson.title }}"? This cannot be undone."
+                style="background:none;border:none;padding:4px;cursor:pointer;
+                       color:#dc2626;flex-shrink:0;display:flex;align-items:center;">
+          <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+        </button>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:2rem 1rem;background:var(--card);
+                border:1px solid var(--border);border-radius:var(--radius-l);margin-bottom:var(--space-m);">
+      <p style="font-size:13px;color:var(--muted);">No lessons yet.</p>
+    </div>
+    {% endif %}
+
+    {# Danger Zone #}
+    {% if can_delete %}
+    <div style="padding:var(--space-m);border:1px dashed #fee2e2;border-radius:var(--radius-l);">
+      <div class="label-caps" style="color:#991b1b;margin-bottom:var(--space-xs);">Danger Zone</div>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 var(--space-xs);">
+        Removes this course record. Lessons are not deleted.
+      </p>
+      <button hx-post="{% url 'learn:htmx-author-delete' record.id %}"
+              hx-confirm="Delete "{{ record.title }}"? This cannot be undone."
+              class="btn-touch"
+              style="width:100%;justify-content:center;background:#fef2f2;color:#991b1b;border-color:#fee2e2;">
+        <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+        Delete Course
+      </button>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

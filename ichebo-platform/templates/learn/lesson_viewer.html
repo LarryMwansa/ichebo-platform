@@ -156,25 +156,15 @@
 {% block ws_options %}
 <div style="padding: 0 4px;">
 
-    {% if is_author %}
-    <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;">
-        <a href="{% url 'learn:learn-author-lesson-edit' lesson.id %}"
+    {% if is_author and course %}
+    <div style="margin-bottom: 16px;">
+        <a href="{% url 'learn:learn-course-manage' course.id %}"
            style="display: flex; align-items: center; gap: 8px; padding: 10px 12px;
                   background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
                   font-size: 12px; font-weight: 700; color: var(--text); text-decoration: none;">
-            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">edit</span>
-            Edit Lesson
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary);">settings</span>
+            Manage Course
         </a>
-        {% if can_delete %}
-        <button hx-post="{% url 'learn:htmx-author-delete' lesson.id %}"
-                hx-confirm="Delete "{{ lesson.title }}"? This cannot be undone."
-                style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer;
-                       background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px;
-                       font-size: 12px; font-weight: 700; color: #991b1b; text-align: left; width: 100%;">
-            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
-            Delete Lesson
-        </button>
-        {% endif %}
     </div>
     <div style="height: 1px; background: var(--border); margin-bottom: 16px;"></div>
     {% endif %}
@@ -239,23 +229,13 @@
         Catalogue
       </a>
       {% endif %}
-      {% if is_author %}
-      <div style="display:flex;gap:6px;">
-        <a href="{% url 'learn:learn-author-lesson-edit' lesson.id %}"
-           style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;
-                  background:var(--card-2);border:1px solid var(--border);border-radius:7px;
-                  font-size:11px;font-weight:700;color:var(--text);text-decoration:none;">
-          <span class="material-symbols-outlined" style="font-size:14px;">edit</span>Edit
-        </a>
-        {% if can_delete %}
-        <button hx-post="{% url 'learn:htmx-author-delete' lesson.id %}"
-                hx-confirm="Delete "{{ lesson.title }}"? This cannot be undone."
-                style="display:inline-flex;align-items:center;padding:5px 8px;cursor:pointer;
-                       background:#fef2f2;border:1px solid #fee2e2;border-radius:7px;color:#991b1b;">
-          <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
-        </button>
-        {% endif %}
-      </div>
+      {% if is_author and course %}
+      <a href="{% url 'learn:learn-course-manage' course.id %}"
+         style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;
+                background:var(--card-2);border:1px solid var(--border);border-radius:7px;
+                font-size:11px;font-weight:700;color:var(--text);text-decoration:none;">
+        <span class="material-symbols-outlined" style="font-size:14px;">settings</span>Manage
+      </a>
       {% endif %}
     </div>
     <div class="page-hero__eyebrow">

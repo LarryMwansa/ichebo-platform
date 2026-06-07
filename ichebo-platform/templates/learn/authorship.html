@@ -82,6 +82,13 @@
             </button>
             {% endif %}
             {% if record.record_type == 'programme' %}
+            <a href="{% url 'learn:learn-programme-manage' record.id %}"
+               style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
+                      color: var(--muted); text-decoration: none; padding: 6px 12px;
+                      background: var(--card-2); border: 1px solid var(--border);
+                      border-radius: 6px; flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">settings</span>Manage
+            </a>
             <a href="{% url 'learn:learn-author-programme-edit' record.id %}"
                style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
                       color: var(--text); text-decoration: none; padding: 6px 12px;
@@ -90,6 +97,13 @@
                 <span class="material-symbols-outlined" style="font-size: 15px;">edit</span>Edit
             </a>
             {% elif record.record_type == 'course' %}
+            <a href="{% url 'learn:learn-course-manage' record.id %}"
+               style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
+                      color: var(--muted); text-decoration: none; padding: 6px 12px;
+                      background: var(--card-2); border: 1px solid var(--border);
+                      border-radius: 6px; flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">settings</span>Manage
+            </a>
             <a href="{% url 'learn:learn-author-course-edit' record.id %}"
                style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
                       color: var(--text); text-decoration: none; padding: 6px 12px;
@@ -245,11 +259,19 @@
       </button>
       {% else %}
       {% if record.record_type == 'programme' %}
+      <a href="{% url 'learn:learn-programme-manage' record.id %}"
+         style="color: var(--muted); flex-shrink: 0; text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">settings</span>
+      </a>
       <a href="{% url 'learn:learn-author-programme-edit' record.id %}"
          style="color: var(--muted); flex-shrink: 0; text-decoration: none;">
         <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
       </a>
       {% elif record.record_type == 'course' %}
+      <a href="{% url 'learn:learn-course-manage' record.id %}"
+         style="color: var(--muted); flex-shrink: 0; text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">settings</span>
+      </a>
       <a href="{% url 'learn:learn-author-course-edit' record.id %}"
          style="color: var(--muted); flex-shrink: 0; text-decoration: none;">
         <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>

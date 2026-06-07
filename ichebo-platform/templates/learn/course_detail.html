@@ -44,24 +44,14 @@
     </div>
 
     {% if is_author %}
-    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
-        <a href="{% url 'learn:learn-author-course-edit' course.id %}"
-           style="display: flex; align-items: center; gap: 6px; padding: 7px 14px;
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'learn:learn-course-manage' course.id %}"
+           style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
                   background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
                   font-size: 12px; font-weight: 700; color: var(--text); text-decoration: none;">
-            <span class="material-symbols-outlined" style="font-size: 15px;">edit</span>
-            Edit Course
+            <span class="material-symbols-outlined" style="font-size: 15px;">settings</span>
+            Manage Course
         </a>
-        {% if can_delete %}
-        <button hx-post="{% url 'learn:htmx-author-delete' course.id %}"
-                hx-confirm="Delete "{{ course.title }}"? This cannot be undone."
-                style="display: flex; align-items: center; gap: 6px; padding: 7px 12px; cursor: pointer;
-                       background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px;
-                       font-size: 12px; font-weight: 700; color: #991b1b;">
-            <span class="material-symbols-outlined" style="font-size: 15px;">delete</span>
-            Delete
-        </button>
-        {% endif %}
     </div>
     {% endif %}
 
@@ -159,15 +149,6 @@
                 {% elif lesson.record_type == 'quiz' %}quiz
                 {% else %}play_circle{% endif %}
             </span>
-            {% if is_author %}
-            <a href="{% url 'learn:learn-author-lesson-edit' lesson.id %}"
-               onclick="event.stopPropagation();"
-               style="display: flex; align-items: center; padding: 4px 6px; margin-left: 4px;
-                      background: var(--card-2); border: 1px solid var(--border); border-radius: 5px;
-                      color: var(--muted); text-decoration: none; flex-shrink: 0;">
-                <span class="material-symbols-outlined" style="font-size: 13px;">edit</span>
-            </a>
-            {% endif %}
         </a>
         {% endfor %}
     </div>
@@ -204,22 +185,12 @@
       </a>
       {% endif %}
       {% if is_author %}
-      <div style="display:flex;gap:6px;">
-        <a href="{% url 'learn:learn-author-course-edit' course.id %}"
-           style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;
-                  background:var(--card-2);border:1px solid var(--border);border-radius:7px;
-                  font-size:11px;font-weight:700;color:var(--text);text-decoration:none;">
-          <span class="material-symbols-outlined" style="font-size:14px;">edit</span>Edit
-        </a>
-        {% if can_delete %}
-        <button hx-post="{% url 'learn:htmx-author-delete' course.id %}"
-                hx-confirm="Delete "{{ course.title }}"? This cannot be undone."
-                style="display:inline-flex;align-items:center;padding:5px 8px;cursor:pointer;
-                       background:#fef2f2;border:1px solid #fee2e2;border-radius:7px;color:#991b1b;">
-          <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
-        </button>
-        {% endif %}
-      </div>
+      <a href="{% url 'learn:learn-course-manage' course.id %}"
+         style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;
+                background:var(--card-2);border:1px solid var(--border);border-radius:7px;
+                font-size:11px;font-weight:700;color:var(--text);text-decoration:none;">
+        <span class="material-symbols-outlined" style="font-size:14px;">settings</span>Manage
+      </a>
       {% endif %}
     </div>
     <div class="page-hero__eyebrow">
@@ -271,15 +242,6 @@
         <span class="material-symbols-outlined" style="font-size:20px;color:var(--primary);flex-shrink:0;">
           {% if lesson.record_type == 'assignment' %}assignment{% elif lesson.record_type == 'quiz' %}quiz{% else %}play_circle{% endif %}
         </span>
-        {% if is_author %}
-        <a href="{% url 'learn:learn-author-lesson-edit' lesson.id %}"
-           onclick="event.stopPropagation();"
-           style="display:inline-flex;align-items:center;padding:4px 6px;flex-shrink:0;
-                  background:var(--card-2);border:1px solid var(--border);border-radius:5px;
-                  color:var(--muted);text-decoration:none;">
-          <span class="material-symbols-outlined" style="font-size:13px;">edit</span>
-        </a>
-        {% endif %}
       </a>
       {% endfor %}
     </div>
