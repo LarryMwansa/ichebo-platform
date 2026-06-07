@@ -5,14 +5,15 @@
 
   {% if tenants %}
   <div style="display:flex;flex-direction:column;gap:0.4rem;margin-top:0.75rem">
-    <label for="tenant-select" style="font-size:0.8125rem;font-weight:600;color:var(--muted)">Community</label>
-    <select id="tenant-select" name="tenant_id"
+    <label for="tenant-select{% if mobile %}-m{% endif %}"
+           style="font-size:0.8125rem;font-weight:600;color:var(--muted)">Community</label>
+    <select id="tenant-select{% if mobile %}-m{% endif %}" name="tenant_id"
             style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:0.9375rem;font-family:inherit;appearance:none;cursor:pointer"
-            hx-get="{% url 'community:htmx-orientation-check' %}"
-            hx-target="#orientation-check-area"
+            hx-get="{% url 'community:htmx-orientation-check' %}{% if mobile %}?mobile=1{% endif %}"
+            hx-target="{% if mobile %}#orientation-check-area-m{% else %}#orientation-check-area{% endif %}"
             hx-swap="innerHTML"
             hx-trigger="change"
-            hx-include="[name='tenant_id']">
+            hx-include="this"
       <option value="">— Choose a community —</option>
       {% for tenant in tenants %}
       <option value="{{ tenant.id }}">{{ tenant.name }}{% if tenant.tier != 'church_node' %} ({{ tenant.get_tier_display }}){% endif %}</option>

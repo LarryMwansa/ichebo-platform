@@ -249,17 +249,18 @@
     <div style="background: var(--card); border: 1px solid var(--border);
                 border-radius: var(--radius-l); overflow: hidden;">
       {% for g in upcoming_gatherings|slice:":3" %}
-      <div style="padding: 12px var(--space-m);
-                  {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
+      <a href="{% url 'community:community-detail' g.id %}"
+         style="display:block;padding: 12px var(--space-m);text-decoration:none;
+                {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
         <div style="font-size: 14px; font-weight: 600; color: var(--text);">{{ g.title }}</div>
-        {% with meta=g.metadata %}
+        {% with meta=g.custom_fields %}
         {% if meta.scheduled_at %}
         <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
-          {{ meta.scheduled_at|slice:":10" }}
+          {{ meta.scheduled_at|slice:":10" }}{% if meta.format %} · {{ meta.format|title|cut:"_" }}{% endif %}
         </div>
         {% endif %}
         {% endwith %}
-      </div>
+      </a>
       {% endfor %}
     </div>
     {% else %}
@@ -272,16 +273,22 @@
 
   {# Announcements #}
   <div style="margin-bottom: var(--space-m);">
-    <div class="label-caps" style="margin-bottom: var(--space-xs);">Announcements</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-xs);">
+      <div class="label-caps">Announcements</div>
+      {% if announcements.count > 3 %}
+      <span style="font-size:12px;font-weight:700;color:var(--primary);">{{ announcements.count }} total</span>
+      {% endif %}
+    </div>
     {% if announcements %}
     <div style="background: var(--card); border: 1px solid var(--border);
                 border-radius: var(--radius-l); overflow: hidden;">
-      {% for a in announcements|slice:":3" %}
-      <div style="padding: 12px var(--space-m);
-                  {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
+      {% for a in announcements|slice:":5" %}
+      <a href="{% url 'community:community-detail' a.id %}"
+         style="display:block;padding: 12px var(--space-m);text-decoration:none;
+                {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
         <div style="font-size: 13px; font-weight: 600; color: var(--text);">{{ a.title|truncatechars:60 }}</div>
         <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">{{ a.created_at|date:"d M Y" }}</div>
-      </div>
+      </a>
       {% endfor %}
     </div>
     {% else %}

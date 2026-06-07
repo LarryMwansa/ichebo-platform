@@ -22,6 +22,7 @@ urlpatterns = [
     path('author/course/<uuid:record_id>/', views.author_course_form, name='learn-author-course-edit'),
     path('author/lesson/', views.author_lesson_form, name='learn-author-lesson'),
     path('author/lesson/<uuid:record_id>/', views.author_lesson_form, name='learn-author-lesson-edit'),
+    path('author/<uuid:record_id>/delete/', views.htmx_author_delete, name='htmx-author-delete'),
 
     # Review queue (Level 5)
     path('review/', views.review_queue, name='learn-review'),

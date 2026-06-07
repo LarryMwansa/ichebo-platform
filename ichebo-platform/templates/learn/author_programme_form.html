@@ -128,7 +128,8 @@
                                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
                         Required Level
                     </label>
-                    <input type="number" name="required_level" min="1" max="5" value="1"
+                    <input type="number" name="required_level" min="0" max="5"
+                           value="{{ record.permissions_data.required_level|default:1 }}"
                            style="display: block; width: 100%; height: 40px; padding: 0 12px;
                                   background: var(--card-2); border: 1px solid var(--border);
                                   border-radius: 8px; font-size: 13px; color: var(--text);
@@ -172,6 +173,25 @@
 
         </div>
     </form>
+
+    {% if record %}
+    <div style="margin-top: 24px; padding: 16px; border: 1px dashed #fee2e2;
+                border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.06em; color: #991b1b; margin-bottom: 2px;">Danger Zone</div>
+            <div style="font-size: 12px; color: var(--muted);">Permanently remove this programme and its record.</div>
+        </div>
+        <button hx-post="{% url 'learn:htmx-author-delete' record.id %}"
+                hx-confirm="Delete "{{ record.title }}"? This cannot be undone."
+                style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; cursor: pointer;
+                       background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px;
+                       font-size: 12px; font-weight: 700; color: #991b1b; flex-shrink: 0;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+            Delete Programme
+        </button>
+    </div>
+    {% endif %}
 
 </div>
 {% endblock %}
@@ -258,7 +278,7 @@
           {% if not record %}
           <div>
             <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Required Level</label>
-            <input type="number" name="required_level" min="1" max="5" value="1"
+            <input type="number" name="required_level" min="0" max="5" value="1"
                    class="form-input-touch" style="width:100%;">
           </div>
           {% endif %}
@@ -284,6 +304,20 @@
 
       </div>
     </form>
+
+    {% if record %}
+    <div style="margin-top:var(--space-m);padding:var(--space-m);border:1px dashed #fee2e2;border-radius:var(--radius-l);">
+      <div class="label-caps" style="color:#991b1b;margin-bottom:var(--space-xs);">Danger Zone</div>
+      <button hx-post="{% url 'learn:htmx-author-delete' record.id %}"
+              hx-confirm="Delete "{{ record.title }}"? This cannot be undone."
+              class="btn-touch"
+              style="width:100%;justify-content:center;background:#fef2f2;color:#991b1b;border-color:#fee2e2;">
+        <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+        Delete Programme
+      </button>
+    </div>
+    {% endif %}
+
   </div>
 
 </div>

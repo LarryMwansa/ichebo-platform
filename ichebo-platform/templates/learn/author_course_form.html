@@ -107,6 +107,25 @@
         </div>
     </form>
 
+    {% if record %}
+    <div style="margin-top: 24px; padding: 16px; border: 1px dashed #fee2e2;
+                border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: 0.06em; color: #991b1b; margin-bottom: 2px;">Danger Zone</div>
+            <div style="font-size: 12px; color: var(--muted);">Permanently remove this course and its record.</div>
+        </div>
+        <button hx-post="{% url 'learn:htmx-author-delete' record.id %}"
+                hx-confirm="Delete "{{ record.title }}"? This cannot be undone."
+                style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; cursor: pointer;
+                       background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px;
+                       font-size: 12px; font-weight: 700; color: #991b1b; flex-shrink: 0;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+            Delete Course
+        </button>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}
 
@@ -195,6 +214,20 @@
 
       </div>
     </form>
+
+    {% if record %}
+    <div style="margin-top:var(--space-m);padding:var(--space-m);border:1px dashed #fee2e2;border-radius:var(--radius-l);">
+      <div class="label-caps" style="color:#991b1b;margin-bottom:var(--space-xs);">Danger Zone</div>
+      <button hx-post="{% url 'learn:htmx-author-delete' record.id %}"
+              hx-confirm="Delete "{{ record.title }}"? This cannot be undone."
+              class="btn-touch"
+              style="width:100%;justify-content:center;background:#fef2f2;color:#991b1b;border-color:#fee2e2;">
+        <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+        Delete Course
+      </button>
+    </div>
+    {% endif %}
+
   </div>
 
 </div>

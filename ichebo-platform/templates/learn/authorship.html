@@ -94,6 +94,13 @@
                 <span class="material-symbols-outlined" style="font-size: 15px;">edit</span>Edit
             </a>
             {% endif %}
+            <button hx-post="{% url 'learn:htmx-author-delete' record.id %}"
+                    hx-confirm="Delete "{{ record.title }}"? This cannot be undone."
+                    style="display: flex; align-items: center; padding: 6px 10px; cursor: pointer;
+                           background: #fef2f2; border: 1px solid #fee2e2; border-radius: 6px;
+                           color: #991b1b; flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">delete</span>
+            </button>
         </div>
         {% endfor %}
     </div>
@@ -228,6 +235,12 @@
         <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
       </a>
       {% endif %}
+      <button hx-post="{% url 'learn:htmx-author-delete' record.id %}"
+              hx-confirm="Delete "{{ record.title }}"? This cannot be undone."
+              style="background: none; border: none; padding: 0; cursor: pointer;
+                     color: #dc2626; flex-shrink: 0; display: flex; align-items: center;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+      </button>
     </div>
     {% endfor %}
   </div>

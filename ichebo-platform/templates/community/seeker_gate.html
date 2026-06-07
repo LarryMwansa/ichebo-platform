@@ -23,3 +23,42 @@
 <!-- Phase 2: orientation / request form swaps into here after tenant selection -->
 <div id="orientation-check-area" style="margin-top:1rem;max-width:480px;margin-left:auto;margin-right:auto;width:100%"></div>
 {% endblock %}
+
+{% block community_content_mobile %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+  <div class="page-hero page-hero--watermark" data-watermark="COMMUNITY">
+    <div class="page-hero__eyebrow">
+      <div class="page-hero__eyebrow-line"></div>
+      <span class="page-hero__label">Kingdom Governance</span>
+    </div>
+    <h1 class="page-hero__title">Community</h1>
+    <p class="page-hero__sub">You are at the beginning of the pathway.</p>
+  </div>
+
+  <div style="padding: var(--space-s);">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-l);
+                padding:var(--space-m);text-align:center;">
+      <span class="material-symbols-outlined"
+            style="font-size:3rem;display:block;margin-bottom:var(--space-s);color:var(--primary);opacity:0.6;">
+        eco
+      </span>
+      <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:var(--space-xs);">
+        Welcome to the Pathway
+      </div>
+      <p style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:var(--space-m);">
+        Complete the platform induction, then submit a request to join a community.
+        A steward will review your request and issue your Induction Certification.
+      </p>
+      <div id="membership-request-area-m"
+           hx-get="{% url 'community:htmx-membership-request' %}?mobile=1"
+           hx-trigger="load"
+           hx-swap="innerHTML">
+        <div style="font-size:13px;color:var(--muted);">Loading&hellip;</div>
+      </div>
+      <div id="orientation-check-area-m" style="margin-top:var(--space-s);"></div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

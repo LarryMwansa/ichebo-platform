@@ -791,6 +791,7 @@ def htmx_orientation_check(request):
         return HttpResponse('<p class="form-error">Community not found.</p>')
 
     required, pending = _induction_status(user)
+    mobile = request.GET.get('mobile') == '1'
 
     already_pending = MembershipRequest.objects.filter(
         user=user, tenant=tenant, status='pending'
@@ -802,6 +803,7 @@ def htmx_orientation_check(request):
         'pending':         pending,
         'all_done':        len(pending) == 0,
         'already_pending': already_pending,
+        'mobile':          mobile,
     })
 
 
@@ -862,9 +864,11 @@ def htmx_request_membership(request):
         )
 
     # GET — tenant picker; orientation check loads via HTMX on tenant change
+    mobile = request.GET.get('mobile') == '1'
     tenants = Tenant.objects.filter(status='active').order_by('name')[:50]
     return render(request, 'community/partials/membership_request_form.html', {
         'tenants': tenants,
+        'mobile':  mobile,
     })
 
 

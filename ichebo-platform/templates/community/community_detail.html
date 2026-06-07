@@ -83,3 +83,83 @@
 
 </div>
 {% endblock %}
+
+{% block community_content_mobile %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+  <div class="page-hero page-hero--watermark"
+       data-watermark="{{ record.record_type|upper }}">
+    <a href="{% if record.record_type == 'gathering' %}{% url 'community:community-gatherings' %}{% else %}{% url 'community:community-home' %}{% endif %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+      {% if record.record_type == 'gathering' %}Gatherings{% else %}Community{% endif %}
+    </a>
+    <div class="page-hero__eyebrow">
+      <div class="page-hero__eyebrow-line"></div>
+      <span class="page-hero__label">{{ record.record_type|title }}</span>
+    </div>
+    <h1 class="page-hero__title" style="font-size:1.6rem;">{{ record.title }}</h1>
+  </div>
+
+  <div style="padding: var(--space-s);">
+
+    {% if record.content %}
+    <div style="font-size:15px;line-height:1.8;color:var(--text);margin-bottom:var(--space-m);
+                white-space:pre-wrap;word-break:break-word;">
+      {{ record.content }}
+    </div>
+    {% endif %}
+
+    {% if record.record_type == 'gathering' %}
+    {% with cf=record.custom_fields %}
+    <div class="gov-panel" style="margin-bottom:var(--space-m);">
+      <dl class="gov-attrs">
+        {% if cf.format %}
+        <dt>Format</dt>
+        <dd>{{ cf.format|title|cut:"_" }}</dd>
+        {% endif %}
+        {% if cf.scheduled_at %}
+        <dt>Date &amp; Time</dt>
+        <dd>{{ cf.scheduled_at }}</dd>
+        {% endif %}
+        {% if cf.location %}
+        <dt>Location</dt>
+        <dd>{{ cf.location }}</dd>
+        {% endif %}
+        {% if cf.capacity %}
+        <dt>Capacity</dt>
+        <dd>{{ cf.capacity }}</dd>
+        {% endif %}
+      </dl>
+    </div>
+
+    {% if cf.stream_url %}
+    <a href="{{ cf.stream_url }}" target="_blank" rel="noopener"
+       class="btn-touch btn-touch--primary"
+       style="width:100%;justify-content:center;text-decoration:none;margin-bottom:var(--space-s);">
+      <span class="material-symbols-outlined" style="font-size:18px;">video_call</span>
+      Join Online
+    </a>
+    {% endif %}
+
+    {% if is_steward and record.status == 'active' %}
+    <button class="btn-touch"
+            style="width:100%;justify-content:center;color:#991b1b;border-color:#fee2e2;background:#fef2f2;"
+            hx-post="{% url 'community:htmx-cancel-gathering' record.id %}"
+            hx-confirm="Cancel this gathering?"
+            hx-target="body"
+            hx-push-url="{% url 'community:community-gatherings' %}">
+      <span class="material-symbols-outlined" style="font-size:18px;">event_busy</span>
+      Cancel Gathering
+    </button>
+    {% endif %}
+    {% endwith %}
+    {% endif %}
+
+    <div style="font-size:11px;color:var(--muted);margin-top:var(--space-m);">
+      Posted {{ record.created_at|date:"d M Y" }}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

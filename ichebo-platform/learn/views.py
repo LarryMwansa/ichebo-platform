@@ -103,7 +103,7 @@ def programme_detail(request, programme_id):
 
     programme = get_object_or_404(
         Record, id=programme_id,
-        record_family='learning', record_type='programme',
+        record_family='learning', record_type__in=['programme', 'induction'],
         status__in=['active', 'locked']
     )
 
@@ -527,6 +527,27 @@ def author_lesson_form(request, record_id=None):
 
 
 # ── Handbook Review Queue (Level 5) ──────────────────────────────────────────
+
+@login_required
+def htmx_author_delete(request, record_id):
+    if _user_level(request.user) < 4:
+        return HttpResponse('', status=403)
+    if request.method != 'POST':
+        return HttpResponse('', status=405)
+
+    record = get_object_or_404(
+        Record,
+        id=record_id,
+        created_by=request.user,
+        record_family='learning',
+        status__in=['draft', 'submitted'],
+        deleted_at__isnull=True,
+    )
+    record.soft_delete()
+    response = HttpResponse('', status=200)
+    response['HX-Redirect'] = '/learn/author/'
+    return response
+
 
 @login_required
 def review_queue(request):
