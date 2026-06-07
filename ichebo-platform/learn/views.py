@@ -315,7 +315,7 @@ def authorship(request):
     for record in user_records:
         rtype = record.record_type
         if rtype not in by_type:
-            by_type[rtype] = {'draft': [], 'submitted': []}
+            by_type[rtype] = {'draft': [], 'submitted': [], 'approved': []}
         by_type[rtype][record.status].append(record)
 
     return render(request, 'learn/authorship.html', {
