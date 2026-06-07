@@ -221,13 +221,30 @@ def notify_content_approved(record, approved_by):
     create_notification(
         user=record.created_by,
         notification_type='mandate_published',
-        title=f'Your {rtype} has been approved: {record.title}',
-        body=f'Approved by {approver}. It is now live and visible to learners.',
+        title=f'Your {rtype} is approved: {record.title}',
+        body=f'Approved by {approver}. Go to your Authorship page to publish it when ready.',
         data={
             'record_id': str(record.id),
             'record_type': record.record_type,
-            'url': f'/learn/lesson/{record.id}/' if record.record_type in ('lesson', 'assignment', 'quiz')
-                   else f'/learn/course/{record.id}/' if record.record_type == 'course'
-                   else f'/learn/programme/{record.id}/',
+            'url': '/learn/author/',
         },
     )
+
+
+def notify_content_published(record, published_by):
+    publisher = getattr(published_by, 'display_name', None) or published_by.email
+    rtype = record.record_type.title()
+    detail_url = (
+        f'/learn/lesson/{record.id}/' if record.record_type in ('lesson', 'assignment', 'quiz')
+        else f'/learn/course/{record.id}/' if record.record_type == 'course'
+        else f'/learn/programme/{record.id}/'
+    )
+    # Notify author only if someone else published on their behalf
+    if published_by.id != record.created_by_id:
+        create_notification(
+            user=record.created_by,
+            notification_type='mandate_published',
+            title=f'Your {rtype} is now live: {record.title}',
+            body=f'Published by {publisher}. Learners can now access it.',
+            data={'record_id': str(record.id), 'record_type': record.record_type, 'url': detail_url},
+        )

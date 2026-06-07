@@ -83,6 +83,20 @@
                     <span style="font-size: 10px; color: var(--muted);">·</span>
                     <span style="font-size: 10px; color: var(--muted);">{{ lessons|length }} lesson{{ lessons|length|pluralize }}</span>
                 </div>
+                {% if course.custom_fields.start_date or course.custom_fields.end_date %}
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 13px; color: var(--muted);">calendar_month</span>
+                    <span style="font-size: 11px; color: var(--muted);">
+                        {% if course.custom_fields.start_date and course.custom_fields.end_date %}
+                            {{ course.custom_fields.start_date }} – {{ course.custom_fields.end_date }}
+                        {% elif course.custom_fields.start_date %}
+                            From {{ course.custom_fields.start_date }}
+                        {% else %}
+                            Until {{ course.custom_fields.end_date }}
+                        {% endif %}
+                    </span>
+                </div>
+                {% endif %}
             </div>
             <span class="material-symbols-outlined"
                   style="font-size: 48px; opacity: 0.08; flex-shrink: 0; color: var(--text);">menu_book</span>
@@ -215,6 +229,20 @@
     <h1 class="page-hero__title" style="font-size:1.6rem;">{{ course.title }}</h1>
     {% if course.content %}
     <p class="page-hero__sub">{{ course.content|truncatechars:120 }}</p>
+    {% endif %}
+    {% if course.custom_fields.start_date or course.custom_fields.end_date %}
+    <div style="display:inline-flex;align-items:center;gap:5px;margin-top:var(--space-xs);">
+      <span class="material-symbols-outlined" style="font-size:13px;color:var(--muted);">calendar_month</span>
+      <span style="font-size:11px;color:var(--muted);">
+        {% if course.custom_fields.start_date and course.custom_fields.end_date %}
+          {{ course.custom_fields.start_date }} – {{ course.custom_fields.end_date }}
+        {% elif course.custom_fields.start_date %}
+          From {{ course.custom_fields.start_date }}
+        {% else %}
+          Until {{ course.custom_fields.end_date }}
+        {% endif %}
+      </span>
+    </div>
     {% endif %}
   </div>
 

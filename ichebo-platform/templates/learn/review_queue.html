@@ -78,15 +78,25 @@
                             hx-target="#ws-review-{{ item.id }}"
                             hx-swap="outerHTML swap:1s">
                         <span class="material-symbols-outlined" style="font-size: 16px;">undo</span>
-                        Return to Author
+                        Return
+                    </button>
+                    <button style="display: flex; align-items: center; gap: 6px; padding: 0 16px; height: 36px;
+                                   background: #dcfce7; border: 1px solid #86efac; border-radius: 8px;
+                                   font-size: 13px; font-weight: 700; color: #15803d; cursor: pointer;"
+                            hx-post="{% url 'learn:htmx-approve-content' item.id %}"
+                            hx-target="#ws-review-{{ item.id }}"
+                            hx-swap="outerHTML swap:1s">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">thumb_up</span>
+                        Approve
                     </button>
                     <button class="ws-topbar__cta"
-                            hx-post="{% url 'learn:htmx-approve-content' item.id %}"
+                            hx-post="{% url 'learn:htmx-publish-content' item.id %}"
+                            hx-confirm="Publish "{{ item.title }}" live now? Learners will see it immediately."
                             hx-target="#ws-review-{{ item.id }}"
                             hx-swap="outerHTML swap:1s"
                             style="background: var(--primary); color: #fff; border: none; cursor: pointer;">
-                        <span class="material-symbols-outlined">check_circle</span>
-                        Approve for Publication
+                        <span class="material-symbols-outlined">rocket_launch</span>
+                        Publish Now
                     </button>
                 </div>
             </div>
@@ -177,15 +187,24 @@
           <button class="btn-touch"
                   hx-post="{% url 'learn:htmx-return-content' item.id %}"
                   hx-target="#ws-review-m-{{ item.id }}" hx-swap="outerHTML swap:1s"
-                  style="flex:1;justify-content:center;font-size:13px;">
+                  style="flex:1;justify-content:center;font-size:12px;">
             Return
           </button>
-          <button class="btn-touch btn-touch--primary"
+          <button class="btn-touch"
                   hx-post="{% url 'learn:htmx-approve-content' item.id %}"
                   hx-target="#ws-review-m-{{ item.id }}" hx-swap="outerHTML swap:1s"
-                  style="flex:1;justify-content:center;font-size:13px;">
-            <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span>
-            Publish
+                  style="flex:1;justify-content:center;font-size:12px;
+                         background:#dcfce7;border-color:#86efac;color:#15803d;">
+            <span class="material-symbols-outlined" style="font-size:15px;">thumb_up</span>
+            Approve
+          </button>
+          <button class="btn-touch btn-touch--primary"
+                  hx-post="{% url 'learn:htmx-publish-content' item.id %}"
+                  hx-confirm="Publish "{{ item.title }}" live now?"
+                  hx-target="#ws-review-m-{{ item.id }}" hx-swap="outerHTML swap:1s"
+                  style="flex:1;justify-content:center;font-size:12px;">
+            <span class="material-symbols-outlined" style="font-size:15px;">rocket_launch</span>
+            Live
           </button>
         </div>
       </div>

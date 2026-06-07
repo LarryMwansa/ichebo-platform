@@ -302,11 +302,11 @@ def authorship(request):
     if _user_level(request.user) < 4:
         return redirect('learn:learn-home')
 
-    # Get user's draft and submitted records
+    # Get user's in-progress and approved records
     user_records = Record.objects.filter(
         created_by=request.user,
         record_family='learning',
-        status__in=['draft', 'submitted'],
+        status__in=['draft', 'submitted', 'approved'],
         deleted_at__isnull=True,
     ).order_by('-updated_at')
 
@@ -323,6 +323,92 @@ def authorship(request):
         'by_type': by_type,
         'active_app': 'formation',
         'ws_page_title': 'Learn',
+    })
+
+
+@login_required
+def programme_manage(request, record_id):
+    user = request.user
+    user_level = _user_level(user)
+    if user_level < 4:
+        return redirect('learn:learn-home')
+
+    record = get_object_or_404(
+        Record, id=record_id,
+        record_family='learning', record_type__in=['programme', 'induction'],
+        deleted_at__isnull=True,
+    )
+    is_owner = record.created_by_id == user.id
+    if user_level < 5 and not is_owner:
+        return redirect('learn:learn-home')
+
+    can_delete = (user_level >= 5) or (is_owner and record.status in ('draft', 'submitted', 'approved'))
+
+    # Build course+lesson tree
+    course_ids = Relationship.objects.filter(
+        to_record_id=record_id, relationship_type='part_of'
+    ).values_list('from_record_id', flat=True)
+    courses = Record.objects.filter(
+        id__in=course_ids, record_type='course', deleted_at__isnull=True
+    ).order_by('created_at')
+    curriculum = []
+    for course in courses:
+        lesson_ids = Relationship.objects.filter(
+            to_record_id=course.id, relationship_type='part_of'
+        ).values_list('from_record_id', flat=True)
+        lessons = Record.objects.filter(
+            id__in=lesson_ids,
+            record_type__in=['lesson', 'assignment', 'quiz'],
+            deleted_at__isnull=True,
+        ).order_by('created_at')
+        curriculum.append({'course': course, 'lessons': list(lessons)})
+
+    return render(request, 'learn/programme_manage.html', {
+        'record': record,
+        'curriculum': curriculum,
+        'can_delete': can_delete,
+        'is_owner': is_owner,
+        'user_level': user_level,
+    })
+
+
+@login_required
+def course_manage(request, record_id):
+    user = request.user
+    user_level = _user_level(user)
+    if user_level < 4:
+        return redirect('learn:learn-home')
+
+    record = get_object_or_404(
+        Record, id=record_id, record_type='course', deleted_at__isnull=True
+    )
+    is_owner = record.created_by_id == user.id
+    if user_level < 5 and not is_owner:
+        return redirect('learn:learn-home')
+
+    can_delete = (user_level >= 5) or (is_owner and record.status in ('draft', 'submitted', 'approved'))
+
+    lesson_ids = Relationship.objects.filter(
+        to_record_id=record_id, relationship_type='part_of'
+    ).values_list('from_record_id', flat=True)
+    lessons = Record.objects.filter(
+        id__in=lesson_ids,
+        record_type__in=['lesson', 'assignment', 'quiz'],
+        deleted_at__isnull=True,
+    ).order_by('created_at')
+
+    programme_rel = Relationship.objects.filter(
+        from_record_id=record_id, relationship_type='part_of'
+    ).select_related('to_record').first()
+    programme = programme_rel.to_record if programme_rel else None
+
+    return render(request, 'learn/course_manage.html', {
+        'record': record,
+        'lessons': list(lessons),
+        'programme': programme,
+        'can_delete': can_delete,
+        'is_owner': is_owner,
+        'user_level': user_level,
     })
 
 
@@ -358,6 +444,10 @@ def author_programme_form(request, record_id=None):
                 'pathways': request.POST.get('pathways', ''),
             })
             record.metadata = meta
+            cf = record.custom_fields or {}
+            cf['start_date'] = request.POST.get('start_date', '').strip()
+            cf['end_date'] = request.POST.get('end_date', '').strip()
+            record.custom_fields = cf
             if is_submit:
                 record.status = 'submitted'
                 # Associate with Handbook when submitted
@@ -367,7 +457,7 @@ def author_programme_form(request, record_id=None):
                     record.tenant = handbook
                 except Tenant.DoesNotExist:
                     pass
-            record.save(update_fields=['title', 'content', 'record_type', 'metadata', 'updated_at', 'status', 'tenant'])
+            record.save(update_fields=['title', 'content', 'record_type', 'metadata', 'custom_fields', 'updated_at', 'status', 'tenant'])
         else:
             status = 'submitted' if is_submit else 'draft'
             tenant_id = None
@@ -394,6 +484,10 @@ def author_programme_form(request, record_id=None):
                     'qualification': request.POST.get('qualification', ''),
                     'duration_years': request.POST.get('duration_years', ''),
                     'pathways': request.POST.get('pathways', ''),
+                },
+                custom_fields={
+                    'start_date': request.POST.get('start_date', '').strip(),
+                    'end_date': request.POST.get('end_date', '').strip(),
                 },
                 permissions_data={
                     'visibility': 'tenant',
@@ -432,6 +526,10 @@ def author_course_form(request, record_id=None):
         if record:
             record.title = request.POST.get('title', '').strip()
             record.content = request.POST.get('description', '').strip()
+            cf = record.custom_fields or {}
+            cf['start_date'] = request.POST.get('start_date', '').strip()
+            cf['end_date'] = request.POST.get('end_date', '').strip()
+            record.custom_fields = cf
             if is_submit:
                 record.status = 'submitted'
                 from tenants.models import Tenant
@@ -440,7 +538,7 @@ def author_course_form(request, record_id=None):
                     record.tenant = handbook
                 except Tenant.DoesNotExist:
                     pass
-            record.save(update_fields=['title', 'content', 'updated_at', 'status', 'tenant'])
+            record.save(update_fields=['title', 'content', 'custom_fields', 'updated_at', 'status', 'tenant'])
         else:
             status = 'submitted' if is_submit else 'draft'
             tenant_id = None
@@ -463,6 +561,10 @@ def author_course_form(request, record_id=None):
                 content=request.POST.get('description', '').strip(),
                 status=status,
                 metadata={'source_app': 'learn'},
+                custom_fields={
+                    'start_date': request.POST.get('start_date', '').strip(),
+                    'end_date': request.POST.get('end_date', '').strip(),
+                },
                 permissions_data={'visibility': 'tenant', 'required_level': 1,
                                   'roles_allowed': [], 'can_edit': []},
             )
@@ -1049,37 +1151,76 @@ def htmx_confirm_cert(request, cert_id):
 
 @login_required
 def htmx_approve_content(request, record_id):
-    """HTMX POST: Level 5 approves submitted learning content."""
+    """HTMX POST: Level 5 approves submitted content → status becomes 'approved', author notified."""
     if request.method != 'POST':
         return HttpResponse(status=405)
-
     if _user_level(request.user) < 5:
-        return HttpResponse('<div class="review-card">Permission denied.</div>', status=403)
+        return HttpResponse('<p class="form-error">Permission denied.</p>', status=403)
 
     record = get_object_or_404(Record, id=record_id, status='submitted')
-    record.status = 'active'
+    record.status = 'approved'
     record.save(update_fields=['status', 'updated_at'])
 
     from notifications.signals import content_approved
     content_approved.send(sender=record.__class__, record=record, approved_by=request.user)
 
-    # Return HTMX fragment that fades out
     html = f'''
-    <div class="review-card" style="opacity: 0.5; background: var(--success-light); border: 1px solid var(--success); transition: all 0.3s ease;">
-      <div style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <span class="lesson-type-tag" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; background: var(--success-light); color: var(--success);">
-            {record.record_type.title()}
-          </span>
-          <h4 style="margin: 0; font-size: 14px; font-weight: 600;">{record.title}</h4>
-        </div>
+    <div id="ws-review-{record.id}"
+         style="background:var(--card);border:1px solid var(--border);border-radius:12px;
+                padding:22px 24px;opacity:0.6;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;
+                     color:#16a34a;background:#dcfce7;padding:3px 8px;border-radius:4px;">
+          {record.record_type.title()}
+        </span>
+        <span style="font-size:14px;font-weight:700;color:var(--text);">{record.title}</span>
       </div>
-      <div style="margin-top: 12px; padding: 8px 12px; background: var(--success); color: #fff; border-radius: 4px; font-size: 12px; font-weight: 600;">
-        ✓ Approved
+      <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;
+                  font-weight:700;color:#16a34a;">
+        <span style="font-size:16px;" class="material-symbols-outlined">check_circle</span>
+        Approved — author notified to publish
       </div>
     </div>
     '''
     return HttpResponse(html)
+
+
+@login_required
+def htmx_publish_content(request, record_id):
+    """HTMX POST: publish approved content → status becomes 'active'.
+    Level 4 owner of an approved record, or Level 5 for any record.
+    """
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    user_level = _user_level(request.user)
+    if user_level >= 5:
+        # Level 5 can publish from submitted or approved
+        record = get_object_or_404(
+            Record, id=record_id,
+            record_family='learning', status__in=['submitted', 'approved'],
+            deleted_at__isnull=True,
+        )
+    elif user_level >= 4:
+        # Level 4 author can only publish their own approved records
+        record = get_object_or_404(
+            Record, id=record_id,
+            created_by=request.user,
+            record_family='learning', status='approved',
+            deleted_at__isnull=True,
+        )
+    else:
+        return HttpResponse('', status=403)
+
+    record.status = 'active'
+    record.save(update_fields=['status', 'updated_at'])
+
+    from notifications.signals import content_published
+    content_published.send(sender=record.__class__, record=record, published_by=request.user)
+
+    response = HttpResponse('', status=200)
+    response['HX-Redirect'] = '/learn/author/'
+    return response
 
 
 @login_required

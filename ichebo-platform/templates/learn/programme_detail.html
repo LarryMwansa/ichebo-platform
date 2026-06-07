@@ -67,6 +67,20 @@
                     <span style="font-size: 10px; color: var(--muted);">{{ programme.custom_fields.duration }}</span>
                     {% endif %}
                 </div>
+                {% if programme.custom_fields.start_date or programme.custom_fields.end_date %}
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 13px; color: var(--muted);">calendar_month</span>
+                    <span style="font-size: 11px; color: var(--muted);">
+                        {% if programme.custom_fields.start_date and programme.custom_fields.end_date %}
+                            {{ programme.custom_fields.start_date }} – {{ programme.custom_fields.end_date }}
+                        {% elif programme.custom_fields.start_date %}
+                            From {{ programme.custom_fields.start_date }}
+                        {% else %}
+                            Until {{ programme.custom_fields.end_date }}
+                        {% endif %}
+                    </span>
+                </div>
+                {% endif %}
             </div>
             <span class="material-symbols-outlined"
                   style="font-size: 48px; opacity: 0.08; flex-shrink: 0; color: var(--text);">school</span>
@@ -245,6 +259,20 @@
     <h1 class="page-hero__title" style="font-size:1.6rem;">{{ programme.title }}</h1>
     {% if programme.content or programme.summary %}
     <p class="page-hero__sub">{{ programme.content|default:programme.summary|truncatechars:120 }}</p>
+    {% endif %}
+    {% if programme.custom_fields.start_date or programme.custom_fields.end_date %}
+    <div style="display:inline-flex;align-items:center;gap:5px;margin-top:var(--space-xs);">
+      <span class="material-symbols-outlined" style="font-size:13px;color:var(--muted);">calendar_month</span>
+      <span style="font-size:11px;color:var(--muted);">
+        {% if programme.custom_fields.start_date and programme.custom_fields.end_date %}
+          {{ programme.custom_fields.start_date }} – {{ programme.custom_fields.end_date }}
+        {% elif programme.custom_fields.start_date %}
+          From {{ programme.custom_fields.start_date }}
+        {% else %}
+          Until {{ programme.custom_fields.end_date }}
+        {% endif %}
+      </span>
+    </div>
     {% endif %}
   </div>
 

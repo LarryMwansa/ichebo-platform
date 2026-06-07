@@ -66,9 +66,21 @@
             </div>
             <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
                          letter-spacing: 0.06em; flex-shrink: 0;
-                         color: {% if record.status == 'submitted' %}var(--muted){% else %}var(--primary){% endif %};">
-                {% if record.status == 'submitted' %}Awaiting Review{% else %}Draft{% endif %}
+                         color: {% if record.status == 'approved' %}#15803d{% elif record.status == 'submitted' %}var(--muted){% else %}var(--primary){% endif %};">
+                {% if record.status == 'approved' %}Ready to Publish
+                {% elif record.status == 'submitted' %}Awaiting Review
+                {% else %}Draft{% endif %}
             </span>
+            {% if record.status == 'approved' %}
+            <button hx-post="{% url 'learn:htmx-publish-content' record.id %}"
+                    hx-confirm="Publish "{{ record.title }}" now? It will become visible to learners."
+                    style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; cursor: pointer;
+                           background: var(--primary); border: none; border-radius: 6px;
+                           font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">rocket_launch</span>
+                Publish
+            </button>
+            {% endif %}
             {% if record.record_type == 'programme' %}
             <a href="{% url 'learn:learn-author-programme-edit' record.id %}"
                style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
@@ -214,11 +226,24 @@
         <div style="display: flex; gap: 8px; margin-top: 2px; align-items: center;">
           <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
                        letter-spacing: 0.06em; color: var(--primary);">{{ record.record_type }}</span>
-          <span style="font-size: 11px; color: {% if record.status == 'submitted' %}var(--muted){% else %}var(--primary){% endif %}; font-weight: 700;">
-            {% if record.status == 'submitted' %}Awaiting Review{% else %}Draft{% endif %}
+          <span style="font-size: 11px; font-weight: 700;
+                       color: {% if record.status == 'approved' %}#15803d{% elif record.status == 'submitted' %}var(--muted){% else %}var(--primary){% endif %};">
+            {% if record.status == 'approved' %}Ready to Publish
+            {% elif record.status == 'submitted' %}Awaiting Review
+            {% else %}Draft{% endif %}
           </span>
         </div>
       </div>
+      {% if record.status == 'approved' %}
+      <button hx-post="{% url 'learn:htmx-publish-content' record.id %}"
+              hx-confirm="Publish "{{ record.title }}" now?"
+              style="display:flex;align-items:center;gap:4px;padding:6px 10px;cursor:pointer;
+                     background:var(--primary);border:none;border-radius:6px;
+                     font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="font-size:15px;">rocket_launch</span>
+        Publish
+      </button>
+      {% else %}
       {% if record.record_type == 'programme' %}
       <a href="{% url 'learn:learn-author-programme-edit' record.id %}"
          style="color: var(--muted); flex-shrink: 0; text-decoration: none;">
@@ -234,6 +259,7 @@
          style="color: var(--muted); flex-shrink: 0; text-decoration: none;">
         <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
       </a>
+      {% endif %}
       {% endif %}
       <button hx-post="{% url 'learn:htmx-author-delete' record.id %}"
               hx-confirm="Delete "{{ record.title }}"? This cannot be undone."

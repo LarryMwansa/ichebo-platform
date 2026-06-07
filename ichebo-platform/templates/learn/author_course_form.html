@@ -89,6 +89,37 @@
             </div>
             {% endif %}
 
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                   letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                        Start Date
+                    </label>
+                    <input type="date" name="start_date"
+                           value="{{ record.custom_fields.start_date|default:'' }}"
+                           style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                                  background: var(--card-2); border: 1px solid var(--border);
+                                  border-radius: 8px; font-size: 13px; color: var(--text);
+                                  outline: none; box-sizing: border-box;"
+                           onfocus="this.style.borderColor='var(--primary)'"
+                           onblur="this.style.borderColor='var(--border)'">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                   letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                        End Date
+                    </label>
+                    <input type="date" name="end_date"
+                           value="{{ record.custom_fields.end_date|default:'' }}"
+                           style="display: block; width: 100%; height: 40px; padding: 0 12px;
+                                  background: var(--card-2); border: 1px solid var(--border);
+                                  border-radius: 8px; font-size: 13px; color: var(--text);
+                                  outline: none; box-sizing: border-box;"
+                           onfocus="this.style.borderColor='var(--primary)'"
+                           onblur="this.style.borderColor='var(--border)'">
+                </div>
+            </div>
+
             <div style="display: flex; gap: 10px; padding-top: 8px;
                         border-top: 1px solid var(--border); margin-top: 8px;">
                 <button type="submit" name="action" value="save"
@@ -201,6 +232,21 @@
           </select>
         </div>
         {% endif %}
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Start Date</label>
+            <input type="date" name="start_date"
+                   value="{{ record.custom_fields.start_date|default:'' }}"
+                   class="form-input-touch" style="width:100%;">
+          </div>
+          <div>
+            <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">End Date</label>
+            <input type="date" name="end_date"
+                   value="{{ record.custom_fields.end_date|default:'' }}"
+                   class="form-input-touch" style="width:100%;">
+          </div>
+        </div>
 
         <div style="display:flex;gap:8px;padding-top:var(--space-s);border-top:1px solid var(--border);">
           <button type="submit" name="action" value="save" class="btn-touch" style="flex:1;">

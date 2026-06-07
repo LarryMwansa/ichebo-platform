@@ -17,6 +17,9 @@ member_removed_signal = Signal()  # kwargs: user, tenant
 # Custom signal fired by learn/views.py htmx_approve_content
 content_approved = Signal()  # kwargs: record, approved_by
 
+# Custom signal fired by learn/views.py htmx_publish_content
+content_published = Signal()  # kwargs: record, published_by
+
 
 # ---------------------------------------------------------------------------
 # MembershipRequest — approval / denial
@@ -140,3 +143,12 @@ def on_member_removed(sender, user, tenant, **kwargs):
 def on_content_approved(sender, record, approved_by, **kwargs):
     from notifications.service import notify_content_approved
     notify_content_approved(record=record, approved_by=approved_by)
+
+
+# Learn — content published (made live)
+# ---------------------------------------------------------------------------
+
+@receiver(content_published)
+def on_content_published(sender, record, published_by, **kwargs):
+    from notifications.service import notify_content_published
+    notify_content_published(record=record, published_by=published_by)

@@ -28,12 +28,13 @@ class Record(SoftDeleteMixin, models.Model):
     ]
     STATUS_CHOICES = [
         ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
         ('active', 'Active'),
+        ('locked', 'Locked'),
         ('completed', 'Completed'),
         ('archived', 'Archived'),
-        ('locked', 'Locked'),
         ('superseded', 'Superseded'),
-        ('submitted', 'Submitted'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
