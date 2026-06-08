@@ -201,6 +201,11 @@
 
 {% block content %}
 <div class="page-hero page-hero--watermark" data-watermark="MANAGE">
+  <a href="{% url 'community:community-home' %}"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    Community
+  </a>
   <div class="page-hero__eyebrow">
     <div class="page-hero__eyebrow-line"></div>
     <span class="page-hero__label">{{ scope_tenant.name|default:"Local Node" }}</span>

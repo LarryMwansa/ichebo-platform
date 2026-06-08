@@ -102,6 +102,9 @@
 <div class="dashboard">
 
   <div class="dash-header">
+    <a href="{% url 'dashboard:you' %}" class="dash-back">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
     <div class="dash-greeting">
       <span class="dash-name">Formation Journey</span>
       <span class="dash-role">Level {{ user.competence_level }} · {{ user_level_name }}</span>

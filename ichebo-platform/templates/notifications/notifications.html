@@ -112,6 +112,12 @@
 {% block content %}
 <div style="max-width:640px;margin:0 auto;padding:1.25rem 1rem 5rem;">
 
+  <a href="{% url 'dashboard:index' %}"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);letter-spacing:0.02em;">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    Home
+  </a>
+
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
     <h1 style="font-size:1.125rem;font-weight:700;">Notifications</h1>
     {% if unread_count %}

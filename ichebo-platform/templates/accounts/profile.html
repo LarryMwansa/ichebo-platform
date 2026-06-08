@@ -86,6 +86,11 @@
 {% block content %}
 <div class="ws-layout--full-page">
   <div class="ws-full-page-inner">
+  <a href="{% url 'dashboard:you' %}"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;padding:var(--space-s) var(--space-m) 0;letter-spacing:0.02em;">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    You
+  </a>
     <div class="card-dark" style="padding: var(--space-l); margin-bottom: var(--space-xl); background: var(--ink); border: none; display: flex; align-items: center; gap: var(--space-l);">
       <div style="width: 80px; height: 80px; border-radius: var(--radius-m); overflow: hidden; background: var(--stone-2); display: flex; align-items: center; justify-content: center; border: 2px solid var(--primary); flex-shrink: 0;">
         {% if profile_user.avatar_url %}

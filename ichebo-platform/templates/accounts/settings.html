@@ -25,6 +25,11 @@
 
 {% block content %}
 <div class="ws-full-page-inner" style="padding: var(--space-l) 0;">
+    <a href="{% url 'dashboard:you' %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);padding:0 var(--space-m);letter-spacing:0.02em;">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+      You
+    </a>
     <div class="ws-page-header" style="margin-bottom: var(--space-l);">
       <div class="ws-page-header__left">
         <div class="label-tag" style="margin-bottom: var(--space-xs);">Configuration</div>
