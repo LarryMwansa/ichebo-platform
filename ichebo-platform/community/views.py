@@ -61,12 +61,92 @@ def _get_scope_permissions(scope_tenant, filters=None):
 # ── My Community surface (C) ──────────────────────────────────────────────────
 
 @login_required
+def _render_induction_hub(request, user, induction_perm):
+    """Render the Induction Hub for a Level 0 seeker who is placed in the induction tenant."""
+    from django.db.models import Q
+
+    induction_tenant = induction_perm.tenant
+
+    # Active induction programmes
+    programmes = list(
+        Record.objects.filter(
+            record_family='learning',
+            record_type='induction',
+            status='active',
+            deleted_at__isnull=True,
+        ).order_by('title')
+    )
+
+    # User's enrolment activities for those programmes
+    programme_ids = [str(p.id) for p in programmes]
+    enrolments = {
+        a.metadata.get('programme_record_id'): a
+        for a in Activity.objects.filter(
+            assigned_to=user,
+            activity_type='programme',
+            metadata__programme_record_id__in=programme_ids,
+        )
+    }
+
+    # Build programme cards with enrolment state
+    programme_cards = []
+    for p in programmes:
+        enrolment = enrolments.get(str(p.id))
+        programme_cards.append({
+            'programme': p,
+            'enrolment': enrolment,
+            'progress': enrolment.progress if enrolment else 0,
+            'status': enrolment.status if enrolment else 'not_enrolled',
+        })
+
+    # Induction announcements scoped to the induction tenant
+    announcements = list(
+        Record.objects.filter(
+            record_family='community',
+            record_type='announcement',
+            status='active',
+            deleted_at__isnull=True,
+        ).filter(
+            Q(tenant_id=induction_tenant.id) | Q(tenant_id__isnull=True)
+        ).order_by('-created_at')[:3]
+    )
+
+    all_complete = bool(programme_cards) and all(
+        c['status'] == 'completed' for c in programme_cards
+    )
+
+    return render(request, 'community/induction_hub.html', {
+        'induction_perm':   induction_perm,
+        'induction_tenant': induction_tenant,
+        'programme_cards':  programme_cards,
+        'announcements':    announcements,
+        'all_complete':     all_complete,
+        'user':             user,
+        'active_app':       'community',
+        'ws_page_title':    'Induction Hub',
+        'active_community_tab': 'home',
+    })
+
+
+# ── My Community surface (C) ──────────────────────────────────────────────────
+
+@login_required
 def my_community(request):
-    """My Community — member surface. Level 1+ only."""
+    """My Community — member surface. Level 0 sees Induction Hub; Level 1+ sees full hub."""
     user = request.user
     level = _user_level(user)
 
     if level < 1:
+        # Level 0 — check for induction tenant membership before showing seeker gate
+        induction_perm = UserPermission.objects.filter(
+            user=user,
+            tenant__tier='induction',
+            is_active=True,
+        ).select_related('tenant').first()
+
+        if induction_perm:
+            return _render_induction_hub(request, user, induction_perm)
+
         return render(request, 'community/seeker_gate.html', {
             'active_app': 'community',
             'ws_page_title': 'Community',

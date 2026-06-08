@@ -1,0 +1,368 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/community.css' %}">
+{% endblock %}
+
+{% block watermark %}INDUCTION{% endblock %}
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Induction Hub</span>{% endblock %}
+
+{% block context_header %}Induction{% endblock %}
+{% block context_content %}
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Your Journey</div>
+    <a href="{% url 'community:community-home' %}" class="ctx-btn active">
+        <span class="material-symbols-outlined">eco</span>
+        Induction Hub
+    </a>
+    <a href="{% url 'learn:learn-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">school</span>
+        Learn
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Community</div>
+    {% for card in programme_cards %}
+    <div style="padding: 10px 12px; background: var(--card-2); border: 1px solid var(--border);
+                border-radius: 8px; margin-bottom: 4px;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--text);
+                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+                    margin-bottom: 6px;">
+            {{ card.programme.title|truncatechars:28 }}
+        </div>
+        <div style="height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;">
+            <div style="height: 100%; width: {{ card.progress }}%;
+                        background: {% if card.status == 'completed' %}var(--primary){% else %}var(--primary){% endif %};
+                        border-radius: 2px; transition: width 0.3s;"></div>
+        </div>
+        <div style="font-size: 10px; color: var(--muted); margin-top: 4px;">
+            {% if card.status == 'completed' %}Complete{% elif card.status == 'not_enrolled' %}Not started{% else %}{{ card.progress }}% complete{% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div style="padding: 8px 12px; font-size: 12px; color: var(--muted);">
+        No programmes assigned yet.
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 16px;">{{ induction_tenant.name }}</div>
+
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 8px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Your Status</div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--text);">Seeker</div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">Level 0 — Induction Phase</div>
+    </div>
+
+    {% if all_complete %}
+    <div style="background: var(--card-2); border: 1px solid var(--primary); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 8px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--primary); margin-bottom: 4px;">Induction Complete</div>
+        <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">
+            You have completed all induction programmes. A steward will review and issue your certification.
+        </div>
+    </div>
+    {% else %}
+    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                padding: 14px 16px; margin-bottom: 8px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Next Step</div>
+        <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">
+            Complete your induction programme to unlock community membership.
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 860px;">
+
+    {# ── Hero ── #}
+    <div style="margin-bottom: 40px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">
+            {{ induction_tenant.name }} · Induction Phase
+        </div>
+        <h1 class="ws-page-title">Welcome to <em>Ichebo</em></h1>
+        <p style="font-size: 14px; color: var(--muted); line-height: 1.7; margin-top: 12px; max-width: 540px;">
+            You are at the beginning of the Kingdom Governance pathway. Complete your induction
+            programme below to unlock full community membership.
+        </p>
+    </div>
+
+    {# ── Induction Programmes ── #}
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Induction Programme</div>
+
+    {% if programme_cards %}
+    <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px;">
+        {% for card in programme_cards %}
+        <div style="background: var(--card); border: 1px solid var(--border);
+                    {% if card.status == 'completed' %}border-left: 3px solid var(--primary);{% endif %}
+                    border-radius: 12px; padding: 24px 28px;">
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;
+                        margin-bottom: 16px;">
+                <div>
+                    <div style="font-size: 16px; font-weight: 800; color: var(--text);
+                                margin-bottom: 4px;">{{ card.programme.title }}</div>
+                    {% if card.programme.content %}
+                    <div style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 480px;">
+                        {{ card.programme.content|truncatechars:160 }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% if card.status == 'completed' %}
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                             letter-spacing: 0.07em; color: var(--primary); flex-shrink: 0;
+                             margin-left: 16px; padding: 4px 10px; background: var(--primary-alpha, rgba(180,24,24,0.08));
+                             border-radius: 20px;">
+                    Complete
+                </span>
+                {% elif card.status == 'not_enrolled' %}
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                             letter-spacing: 0.07em; color: var(--muted); flex-shrink: 0;
+                             margin-left: 16px;">
+                    Not Started
+                </span>
+                {% else %}
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                             letter-spacing: 0.07em; color: var(--text); flex-shrink: 0;
+                             margin-left: 16px;">
+                    {{ card.progress }}%
+                </span>
+                {% endif %}
+            </div>
+
+            {# Progress bar #}
+            {% if card.status != 'not_enrolled' %}
+            <div style="height: 5px; background: var(--border); border-radius: 3px;
+                        overflow: hidden; margin-bottom: 20px;">
+                <div style="height: 100%; width: {{ card.progress }}%;
+                            background: var(--primary); border-radius: 3px;
+                            transition: width 0.4s;"></div>
+            </div>
+            {% endif %}
+
+            {# CTA #}
+            <div style="display: flex; gap: 12px; align-items: center;">
+                {% if card.status == 'completed' %}
+                <a href="{% url 'learn:learn-programme' card.programme.id %}"
+                   style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+                          font-weight: 700; color: var(--primary); text-decoration: none;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">visibility</span>
+                    Review Programme
+                </a>
+                {% elif card.status == 'not_enrolled' %}
+                <a href="{% url 'learn:learn-programme' card.programme.id %}"
+                   class="ws-topbar__cta"
+                   style="text-decoration: none;">
+                    <span class="material-symbols-outlined">play_arrow</span>
+                    Start Induction
+                </a>
+                {% else %}
+                <a href="{% url 'learn:learn-programme' card.programme.id %}"
+                   class="ws-topbar__cta"
+                   style="text-decoration: none;">
+                    <span class="material-symbols-outlined">play_arrow</span>
+                    Continue
+                </a>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div style="padding: 60px 0; text-align: center; margin-bottom: 40px;">
+        <span class="material-symbols-outlined"
+              style="font-size: 48px; opacity: 0.1; display: block; color: var(--text);">school</span>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 16px;">
+            No induction programmes have been assigned yet.
+        </p>
+        <p style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+            Check back soon — a steward will assign your induction programme.
+        </p>
+    </div>
+    {% endif %}
+
+    {# ── Completion notice ── #}
+    {% if all_complete %}
+    <div style="background: var(--card); border: 1px solid var(--primary);
+                border-left: 4px solid var(--primary); border-radius: 12px;
+                padding: 24px 28px; margin-bottom: 40px;">
+        <div class="ws-label-tag" style="color: var(--primary); margin-bottom: 8px;">Induction Complete</div>
+        <p style="font-size: 13px; color: var(--muted); line-height: 1.7; margin: 0;">
+            You have completed all required induction programmes. A steward will review your
+            record and issue your Induction Certification — the first step on the Kingdom
+            Governance pathway. You will be notified when your account is advanced.
+        </p>
+    </div>
+    {% endif %}
+
+    {# ── Announcements ── #}
+    {% if announcements %}
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Announcements</div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for ann in announcements %}
+        <div style="background: var(--card); border: 1px solid var(--border);
+                    border-radius: 10px; padding: 18px 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <div style="font-weight: 700; font-size: 13px; color: var(--text);">{{ ann.title }}</div>
+                <div style="font-size: 10px; color: var(--muted); flex-shrink: 0; margin-left: 12px;">
+                    {{ ann.created_at|date:"d M" }}
+                </div>
+            </div>
+            <div style="font-size: 13px; color: var(--muted); line-height: 1.6;">
+                {{ ann.content|truncatechars:200 }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{# ── Mobile ── #}
+{% block content %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+    <div class="page-hero page-hero--watermark" data-watermark="INDUCTION">
+        <div class="page-hero__eyebrow">
+            <div class="page-hero__eyebrow-line"></div>
+            <span class="page-hero__label">{{ induction_tenant.name }}</span>
+        </div>
+        <h1 class="page-hero__title">Induction <em>Hub</em></h1>
+        <p class="page-hero__sub">Complete your induction to unlock community membership.</p>
+    </div>
+
+    <div style="padding: var(--space-s);">
+
+        {# Status card #}
+        <div style="background: var(--card); border: 1px solid var(--border);
+                    border-radius: var(--radius-l); padding: var(--space-m);
+                    margin-bottom: var(--space-s); display: flex; align-items: center; gap: var(--space-m);">
+            <span class="material-symbols-outlined"
+                  style="font-size: 32px; color: var(--primary); opacity: 0.7; flex-shrink: 0;">eco</span>
+            <div>
+                <div style="font-size: 14px; font-weight: 800; color: var(--text);">Seeker · Level 0</div>
+                <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">Induction Phase</div>
+            </div>
+            {% if all_complete %}
+            <span style="margin-left: auto; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                         letter-spacing: 0.07em; color: var(--primary); flex-shrink: 0;
+                         padding: 4px 10px; background: var(--primary-alpha, rgba(180,24,24,0.08));
+                         border-radius: 20px;">Done</span>
+            {% endif %}
+        </div>
+
+        {# Programme cards #}
+        {% if programme_cards %}
+        <div class="label-caps" style="margin-bottom: var(--space-xs);">Induction Programme</div>
+        <div style="display: flex; flex-direction: column; gap: var(--space-s); margin-bottom: var(--space-m);">
+            {% for card in programme_cards %}
+            <div style="background: var(--card); border: 1px solid var(--border);
+                        {% if card.status == 'completed' %}border-left: 3px solid var(--primary);{% endif %}
+                        border-radius: var(--radius-l); padding: var(--space-m);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;
+                            margin-bottom: 10px;">
+                    <div style="font-size: 14px; font-weight: 800; color: var(--text); flex: 1;
+                                margin-right: 12px;">{{ card.programme.title }}</div>
+                    {% if card.status == 'completed' %}
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--primary); flex-shrink: 0;">check_circle</span>
+                    {% elif card.status != 'not_enrolled' %}
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text); flex-shrink: 0;">{{ card.progress }}%</span>
+                    {% endif %}
+                </div>
+
+                {% if card.status != 'not_enrolled' %}
+                <div style="height: 4px; background: var(--border); border-radius: 2px;
+                            overflow: hidden; margin-bottom: 14px;">
+                    <div style="height: 100%; width: {{ card.progress }}%;
+                                background: var(--primary); border-radius: 2px;"></div>
+                </div>
+                {% endif %}
+
+                {% if card.status == 'completed' %}
+                <a href="{% url 'learn:learn-programme' card.programme.id %}"
+                   style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px;
+                          font-weight: 700; color: var(--primary); text-decoration: none;">
+                    <span class="material-symbols-outlined" style="font-size: 15px;">visibility</span>
+                    Review
+                </a>
+                {% else %}
+                <a href="{% url 'learn:learn-programme' card.programme.id %}"
+                   class="btn-touch btn-primary-sm"
+                   style="text-decoration: none; display: inline-flex;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">play_arrow</span>
+                    {% if card.status == 'not_enrolled' %}Start Induction{% else %}Continue{% endif %}
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div style="padding: 2rem; text-align: center; background: var(--card);
+                    border: 1px solid var(--border); border-radius: var(--radius-l);
+                    margin-bottom: var(--space-m);">
+            <span class="material-symbols-outlined" style="font-size: 2.5rem; color: var(--border); display: block; margin-bottom: 0.75rem;">school</span>
+            <p style="font-size: 13px; color: var(--muted);">No induction programme assigned yet. Check back soon.</p>
+        </div>
+        {% endif %}
+
+        {# Completion notice #}
+        {% if all_complete %}
+        <div style="background: var(--card); border: 1px solid var(--primary);
+                    border-left: 3px solid var(--primary); border-radius: var(--radius-l);
+                    padding: var(--space-m); margin-bottom: var(--space-m);">
+            <div class="label-caps" style="color: var(--primary); margin-bottom: 6px;">Induction Complete</div>
+            <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0;">
+                All programmes complete. A steward will review your record and issue your
+                Induction Certification. You will be notified when your account is advanced.
+            </p>
+        </div>
+        {% endif %}
+
+        {# Announcements #}
+        {% if announcements %}
+        <div class="label-caps" style="margin-bottom: var(--space-xs);">Announcements</div>
+        <div style="background: var(--card); border: 1px solid var(--border);
+                    border-radius: var(--radius-l); overflow: hidden; margin-bottom: var(--space-m);">
+            {% for ann in announcements %}
+            <div style="padding: 12px var(--space-m);
+                        {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
+                <div style="font-size: 13px; font-weight: 600; color: var(--text);">{{ ann.title|truncatechars:60 }}</div>
+                <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">{{ ann.created_at|date:"d M Y" }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {# Nav to Learn #}
+        <div class="label-caps" style="margin-bottom: var(--space-xs);">Explore</div>
+        <div class="list-group">
+            <a href="{% url 'learn:learn-home' %}" class="list-item" style="text-decoration:none;color:inherit;">
+                <div class="list-item__icon"><span class="material-symbols-outlined">school</span></div>
+                <div class="list-item__content">
+                    <div class="list-item__title">Learn</div>
+                    <div class="list-item__meta">Browse your induction content</div>
+                </div>
+                <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
