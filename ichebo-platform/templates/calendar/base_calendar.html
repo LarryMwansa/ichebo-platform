@@ -98,3 +98,48 @@ document.addEventListener('htmx:afterSwap', function(evt) {
 });
 </script>
 {% endblock %}
+
+{# ── MOBILE ── #}
+{% block content %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+  {# App-level tab nav (Personal / Ministry / Calendar) #}
+  <nav style="display: flex; border-bottom: 1px solid var(--border); padding: 0 var(--space-s);">
+    <a href="{% url 'activity:activity-home' %}"
+       style="padding: 10px 14px; font-size: 13px; font-weight: 600; text-decoration: none;
+              color: var(--muted); border-bottom: 2px solid transparent;">Personal</a>
+    <a href="{% url 'activity:ministry' %}"
+       style="padding: 10px 14px; font-size: 13px; font-weight: 600; text-decoration: none;
+              color: var(--muted); border-bottom: 2px solid transparent;">Ministry</a>
+    <a href="{% url 'calendar:month' %}"
+       style="padding: 10px 14px; font-size: 13px; font-weight: 700; text-decoration: none;
+              color: var(--primary); border-bottom: 2px solid var(--primary);">Calendar</a>
+  </nav>
+
+  {# Month / Week sub-tabs + nav controls #}
+  <div style="display: flex; align-items: center; justify-content: space-between;
+              padding: var(--space-s) var(--space-s) 0;">
+    <div style="display: flex; gap: 6px;">
+      <a href="{% url 'calendar:month' %}"
+         style="height: 30px; padding: 0 14px; display: flex; align-items: center;
+                font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+                border: 1px solid {% if view == 'month' %}var(--primary){% else %}var(--border){% endif %};
+                background: {% if view == 'month' %}var(--primary){% else %}var(--card){% endif %};
+                color: {% if view == 'month' %}#fff{% else %}var(--text){% endif %};">Month</a>
+      <a href="{% url 'calendar:week' %}"
+         style="height: 30px; padding: 0 14px; display: flex; align-items: center;
+                font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+                border: 1px solid {% if view == 'week' %}var(--primary){% else %}var(--border){% endif %};
+                background: {% if view == 'week' %}var(--primary){% else %}var(--card){% endif %};
+                color: {% if view == 'week' %}#fff{% else %}var(--text){% endif %};">Week</a>
+    </div>
+
+    {# Prev / Today / Next — injected per sub-template #}
+    {% block cal_mobile_nav %}{% endblock %}
+  </div>
+
+  {# Per-view content #}
+  {% block cal_mobile_body %}{% endblock %}
+
+</div>
+{% endblock %}

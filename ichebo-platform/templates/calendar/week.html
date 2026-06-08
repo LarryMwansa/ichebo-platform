@@ -37,3 +37,81 @@
 {% block cal_body %}
 {% include "calendar/_week_grid.html" %}
 {% endblock %}
+
+{% block cal_mobile_nav %}
+<div style="display: flex; align-items: center; gap: 6px;">
+  <a href="{% url 'calendar:week' %}?date={{ prev_date }}"
+     style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+            border-radius: 50%; border: 1px solid var(--border); background: var(--card);
+            color: var(--muted); text-decoration: none;">
+    <span class="material-symbols-outlined" style="font-size: 16px;">chevron_left</span>
+  </a>
+  <a href="{% url 'calendar:week' %}"
+     style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none;">Today</a>
+  <a href="{% url 'calendar:week' %}?date={{ next_date }}"
+     style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+            border-radius: 50%; border: 1px solid var(--border); background: var(--card);
+            color: var(--muted); text-decoration: none;">
+    <span class="material-symbols-outlined" style="font-size: 16px;">chevron_right</span>
+  </a>
+</div>
+{% endblock %}
+
+{% block cal_mobile_body %}
+<div style="padding: var(--space-s);">
+
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">{{ week_label }}</div>
+
+  {% for wd in week_days %}
+  {% if wd.events %}
+  <div style="margin-bottom: var(--space-m);">
+    {# Day header #}
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+      <div style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+                  display: flex; align-items: center; justify-content: center;
+                  background: {% if wd.is_today %}var(--primary){% else %}transparent{% endif %};
+                  font-size: 13px; font-weight: 800;
+                  color: {% if wd.is_today %}#fff{% else %}var(--text){% endif %};">
+        {{ wd.day }}
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: {% if wd.is_today %}var(--primary){% else %}var(--muted){% endif %};">
+        {{ wd.weekday_short }}{% if wd.is_today %} · Today{% endif %}
+      </div>
+    </div>
+    {# Events #}
+    <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 36px;">
+      {% for ev in wd.events %}
+      <a href="/activity/{{ ev.id }}/"
+         style="display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+                background: var(--card); border: 1px solid var(--border);
+                {% if wd.is_today %}border-left: 3px solid var(--primary);{% endif %}
+                border-radius: 8px; text-decoration: none; color: inherit;">
+        {% if ev.time %}
+        <div style="font-size: 12px; font-weight: 700; color: var(--primary);
+                    flex-shrink: 0; min-width: 36px; font-family: 'Playfair Display', serif;">{{ ev.time }}</div>
+        {% endif %}
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--text);
+                      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ ev.title }}</div>
+          {% if ev.kgs_pathway %}
+          <div style="font-size: 11px; color: var(--muted); margin-top: 1px;">{{ ev.kgs_pathway|title|cut:"_" }}</div>
+          {% endif %}
+        </div>
+        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 14px; flex-shrink: 0;">chevron_right</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+
+  {# Empty week #}
+  {% if week_event_count == 0 %}
+  <div style="padding: 3rem 0; text-align: center;">
+    <span class="material-symbols-outlined" style="font-size: 2.5rem; color: var(--border); display: block; margin-bottom: 0.75rem;">calendar_month</span>
+    <p style="font-size: 13px; color: var(--muted);">Nothing scheduled this week.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

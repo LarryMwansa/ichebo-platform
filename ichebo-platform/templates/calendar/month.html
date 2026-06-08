@@ -41,3 +41,112 @@
 {% block cal_body %}
 {% include "calendar/_month_grid.html" %}
 {% endblock %}
+
+{% block cal_mobile_nav %}
+<div style="display: flex; align-items: center; gap: 6px;">
+  <span style="font-size: 13px; font-weight: 700; color: var(--text);">{{ month_name }} {{ year }}</span>
+  <a href="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+     style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+            border-radius: 50%; border: 1px solid var(--border); background: var(--card);
+            color: var(--muted); text-decoration: none;">
+    <span class="material-symbols-outlined" style="font-size: 16px;">chevron_left</span>
+  </a>
+  <a href="{% url 'calendar:month' %}{% if cal_filter %}?filter={{ cal_filter }}{% endif %}"
+     style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none;">Today</a>
+  <a href="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+     style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+            border-radius: 50%; border: 1px solid var(--border); background: var(--card);
+            color: var(--muted); text-decoration: none;">
+    <span class="material-symbols-outlined" style="font-size: 16px;">chevron_right</span>
+  </a>
+</div>
+{% endblock %}
+
+{% block cal_mobile_body %}
+<div style="padding: var(--space-s);">
+
+  {# Filter pills #}
+  <div style="display: flex; gap: 6px; margin-bottom: var(--space-s); overflow-x: auto;
+              scrollbar-width: none; -webkit-overflow-scrolling: touch;">
+    <a href="?year={{ year }}&month={{ month }}"
+       style="flex-shrink: 0; height: 28px; padding: 0 12px; display: flex; align-items: center;
+              font-size: 11px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid {% if not cal_filter %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if not cal_filter %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if not cal_filter %}#fff{% else %}var(--text){% endif %};">All</a>
+    <a href="?year={{ year }}&month={{ month }}&filter=personal"
+       style="flex-shrink: 0; height: 28px; padding: 0 12px; display: flex; align-items: center;
+              font-size: 11px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid {% if cal_filter == 'personal' %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if cal_filter == 'personal' %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if cal_filter == 'personal' %}#fff{% else %}var(--text){% endif %};">Personal</a>
+    <a href="?year={{ year }}&month={{ month }}&filter=institutional"
+       style="flex-shrink: 0; height: 28px; padding: 0 12px; display: flex; align-items: center;
+              font-size: 11px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid {% if cal_filter == 'institutional' %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if cal_filter == 'institutional' %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if cal_filter == 'institutional' %}#fff{% else %}var(--text){% endif %};">Institutional</a>
+  </div>
+
+  {# Day-by-day event list #}
+  {% with has_any=False %}
+  {% for week in grid %}
+    {% for cell in week %}
+      {% if cell.in_month and cell.events %}
+      {% with has_any=True %}
+      <div style="margin-bottom: var(--space-s);">
+        {# Day header #}
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+          <div style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+                      display: flex; align-items: center; justify-content: center;
+                      background: {% if cell.is_today %}var(--primary){% else %}transparent{% endif %};
+                      font-size: 13px; font-weight: 800;
+                      color: {% if cell.is_today %}#fff{% else %}var(--text){% endif %};">
+            {{ cell.day }}
+          </div>
+          <div style="font-size: 11px; color: var(--muted);">
+            {{ cell.date|date:"D, d M" }}{% if cell.is_today %} <span style="color: var(--primary); font-weight: 700;">· Today</span>{% endif %}
+          </div>
+        </div>
+        {# Events for this day #}
+        <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 36px;">
+          {% for ev in cell.events %}
+          <a href="/activity/{{ ev.id }}/"
+             style="display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+                    background: var(--card); border: 1px solid var(--border);
+                    {% if ev.is_overdue %}border-left: 3px solid var(--accent-red);{% elif cell.is_today %}border-left: 3px solid var(--primary);{% endif %}
+                    border-radius: 8px; text-decoration: none; color: inherit;">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 13px; font-weight: 700; color: var(--text);
+                          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ ev.title }}</div>
+              {% if ev.activity_type %}
+              <div style="font-size: 11px; color: var(--muted); margin-top: 1px;">{{ ev.activity_type|title }}</div>
+              {% endif %}
+            </div>
+            {% if ev.is_overdue %}
+            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                         color: var(--accent-red); flex-shrink: 0;">Overdue</span>
+            {% endif %}
+            <span class="material-symbols-outlined" style="color: var(--muted); font-size: 14px; flex-shrink: 0;">chevron_right</span>
+          </a>
+          {% endfor %}
+          {% if cell.overflow %}
+          <div style="font-size: 11px; color: var(--muted); padding: 4px 12px;">+{{ cell.overflow }} more</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endwith %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+  {% endwith %}
+
+  {% if month_event_count == 0 %}
+  <div style="padding: 3rem 0; text-align: center;">
+    <span class="material-symbols-outlined" style="font-size: 2.5rem; color: var(--border); display: block; margin-bottom: 0.75rem;">calendar_month</span>
+    <p style="font-size: 13px; color: var(--muted);">No activities in {{ month_name }} {{ year }}.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

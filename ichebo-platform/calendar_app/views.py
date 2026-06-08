@@ -137,6 +137,8 @@ def month_view(request):
     prev_first = first - timedelta(days=1)
     next_first = (first.replace(day=28) + timedelta(days=4)).replace(day=1)
 
+    month_event_count = sum(len(cell['events']) for week in grid for cell in week if cell['in_month'])
+
     ctx = {
         'view': 'month',
         'year': year,
@@ -150,6 +152,7 @@ def month_view(request):
         'prev_month': prev_first.month,
         'next_year': next_first.year,
         'next_month': next_first.month,
+        'month_event_count': month_event_count,
     }
 
     if request.headers.get('HX-Request'):
@@ -193,6 +196,8 @@ def week_view(request):
     prev_monday = monday - timedelta(days=7)
     next_monday = monday + timedelta(days=7)
 
+    week_event_count = sum(len(wd['events']) for wd in week_days)
+
     ctx = {
         'view': 'week',
         'monday': monday,
@@ -202,6 +207,7 @@ def week_view(request):
         'next_date': next_monday.isoformat(),
         'today_date': today.isoformat(),
         'week_label': f'{monday.strftime("%-d %b")} – {days[6].strftime("%-d %b %Y")}',
+        'week_event_count': week_event_count,
     }
 
     if request.headers.get('HX-Request'):
