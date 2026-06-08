@@ -147,7 +147,7 @@
 </style>
 {% endblock %}
 
-{% block activity_content_mobile %}
+{% block content %}
 <div class="page-hero page-hero--watermark" data-watermark="MINISTRY">
   <div class="page-hero__eyebrow">
     <div class="page-hero__eyebrow-line"></div>
@@ -155,6 +155,19 @@
   </div>
   <h1 class="page-hero__title">Ministry <em>Hub</em></h1>
 </div>
+
+{# App-level tab nav #}
+<nav style="display: flex; border-bottom: 1px solid var(--border); padding: 0 var(--space-s);">
+  <a href="{% url 'activity:activity-home' %}"
+     style="padding: 10px 14px; font-size: 13px; font-weight: 600; text-decoration: none;
+            color: var(--muted); border-bottom: 2px solid transparent;">Personal</a>
+  <a href="{% url 'activity:ministry' %}"
+     style="padding: 10px 14px; font-size: 13px; font-weight: 700; text-decoration: none;
+            color: var(--primary); border-bottom: 2px solid var(--primary);">Ministry</a>
+  <a href="{% url 'calendar:month' %}"
+     style="padding: 10px 14px; font-size: 13px; font-weight: 600; text-decoration: none;
+            color: var(--muted); border-bottom: 2px solid transparent;">Calendar</a>
+</nav>
 
 <div style="padding: 0 var(--space-s) var(--space-2xl);">
 
@@ -248,4 +261,4 @@
   {% endif %}
 
 </div>
-{% endblock %}
+{% endblock content %}
