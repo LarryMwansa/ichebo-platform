@@ -65,7 +65,7 @@ class Command(BaseCommand):
             defaults={
                 'name':                meta.get('name', code),
                 'language':            meta.get('lang_short', 'en'),
-                'language_full':       meta.get('lang') or 'English',
+                'language_full':       meta.get('lang', 'English'),
                 'year':                meta.get('year'),
                 'description':         meta.get('description'),
                 'copyright_statement': meta.get('copyright_statement'),

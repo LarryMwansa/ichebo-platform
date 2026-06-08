@@ -1,12 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .services import (
     get_user_translation, get_chapter_verses, get_all_books,
-    get_book_chapters, get_chapter_note_verse_numbers,
-    save_reading_position, get_reading_position,
+    get_book_chapters, get_chapter_note_verse_numbers
 )
 from .models import BibleBook, BibleTranslation
 
@@ -21,19 +20,11 @@ class BibleReaderView(LoginRequiredMixin, View):
     """
 
     def get(self, request, book_code=DEFAULT_BOOK, chapter=DEFAULT_CHAPTER):
-        # If user landed on the bare /bible/ URL, resume from their last position
-        if book_code == DEFAULT_BOOK and chapter == DEFAULT_CHAPTER:
-            position = get_reading_position(request.user)
-            if position:
-                book_code, chapter = position
-
         translation = get_user_translation(request.user)
         books = get_all_books()
         book = BibleBook.objects.filter(code=book_code).first()
         if not book:
-            if book_code != DEFAULT_BOOK:
-                return redirect('bible:reader')
-            raise Http404("Bible data is not loaded. Please run the Bible import management command.")
+            return redirect('bible:reader')
 
         chapters = get_book_chapters(book_code)
         verses = get_chapter_verses(translation, book_code, chapter)
@@ -52,14 +43,8 @@ class BibleReaderView(LoginRequiredMixin, View):
             'verses': verses,
             'personal_noted': personal_noted,
             'tenant_noted': tenant_noted,
-            'active_app': 'bible',
         }
-
-        template_name = 'bible/reader.html'
-        if request.GET.get('view') == 'sidecar':
-            template_name = 'bible/sidecar_reader.html'
-
-        return render(request, template_name, context)
+        return render(request, 'bible/reader.html', context)
 
 
 @login_required
@@ -84,20 +69,9 @@ def htmx_chapter(request):
         chapter = DEFAULT_CHAPTER
         verses = get_chapter_verses(translation, book_code, chapter)
 
-    save_reading_position(request.user, book_code, chapter)
-
     personal_noted, tenant_noted = get_chapter_note_verse_numbers(
         request.user, translation, book_code, chapter
     )
-
-    from records.models import Relationship
-    linked_noted = list(Relationship.objects.filter(
-        bible_verse__translation=translation,
-        bible_verse__book__code=book_code,
-        bible_verse__chapter=chapter,
-        deleted_at__isnull=True
-    ).values_list('bible_verse__verse', flat=True).distinct())
-
     book = BibleBook.objects.filter(code=book_code).first()
 
     context = {
@@ -107,7 +81,6 @@ def htmx_chapter(request):
         'verses': verses,
         'personal_noted': personal_noted,
         'tenant_noted': tenant_noted,
-        'linked_noted': linked_noted,
     }
     return render(request, 'bible/_chapter.html', context)
 
@@ -165,27 +138,14 @@ def htmx_annotation_panel(request, verse_id):
         custom_fields__scripture_reference__icontains=verse_ref_str,
     ).values('id', 'title', 'metadata')[:5]
 
-    # All formal relationships (Linking Governance, Activities, etc)
-    relationships = Relationship.objects.filter(
-        bible_verse=verse,
-        deleted_at__isnull=True,
-    ).select_related('from_record')
-
-    # Group by family for cleaner UI
-    links = {
-        'governance': [r for r in relationships if r.from_record.record_family == 'governance'],
-        'activity': [r for r in relationships if r.from_record.record_family == 'activity'],
-        'other': [r for r in relationships if r.from_record.record_family not in ['governance', 'activity']],
-    }
-
-    # Learn cross-references (Smart search in lessons)
-    verse_ref_str = f"{verse.book.code} {verse.chapter}:{verse.verse}"
-    learn_references = Record.objects.filter(
-        record_family='learning',
-        record_type='lesson',
-        status='active',
-        custom_fields__scripture_reference__icontains=verse_ref_str,
-    ).values('id', 'title', 'metadata')[:10]
+    # Handbook references (Level 5 only)
+    handbook_references = []
+    if competence_level >= 5:
+        handbook_references = Relationship.objects.filter(
+            bible_verse=verse,
+            relationship_type='references',
+            deleted_at__isnull=True,
+        ).select_related('from_record')[:10]
 
     context = {
         'verse': verse,
@@ -193,14 +153,9 @@ def htmx_annotation_panel(request, verse_id):
         'personal_note': personal_note,
         'tenant_notes': tenant_notes,
         'learn_references': learn_references,
-        'links': links,
-        'total_links': relationships.count(),
-        'has_links': relationships.exists(),
+        'handbook_references': handbook_references,
         'competence_level': competence_level,
         'can_publish_tenant_note': competence_level >= 3,
-        'book': verse.book,
-        'chapter': verse.chapter,
-        'active_tab': request.GET.get('active_tab', 'bible-note-tab'),
     }
     return render(request, 'bible/_annotation_panel.html', context)
 
@@ -215,7 +170,7 @@ def htmx_save_note(request):
         return HttpResponse(status=405)
 
     from .models import BibleVerse
-    from records.models import Record, Relationship
+    from records.models import Record
 
     verse_id = request.POST.get('verse_id')
     content = request.POST.get('content', '').strip()
@@ -286,247 +241,11 @@ def htmx_save_note(request):
 
     has_tenant = note_class == 'organizational' or False
 
-    has_links = Relationship.objects.filter(bible_verse=verse, deleted_at__isnull=True).exists()
-
     return render(request, 'bible/_verse_indicators.html', {
         'verse': verse,
         'has_personal_note': has_personal,
         'has_tenant_note': has_tenant,
-        'has_links': has_links,
     })
-
-
-@login_required
-def htmx_relationship_create(request):
-    """
-    HTMX: create a relationship between a Record and a BibleVerse.
-    """
-    if request.method != 'POST':
-        return HttpResponse(status=405)
-
-    from records.models import Record, Relationship
-    from .models import BibleVerse
-
-    from_record_id = request.POST.get('from_record_id')
-    bible_verse_id = request.POST.get('bible_verse_id')
-    rel_type = request.POST.get('relationship_type', 'references')
-    notes = request.POST.get('notes', '').strip() or None
-
-    from_record = get_object_or_404(Record, id=from_record_id)
-    bible_verse = get_object_or_404(BibleVerse, id=bible_verse_id)
-
-    Relationship.objects.get_or_create(
-        from_record=from_record,
-        bible_verse=bible_verse,
-        defaults={
-            'created_by': request.user,
-            'relationship_type': rel_type,
-            'direction': 'directed',
-            'notes': notes,
-        },
-    )
-
-    # Return refreshed links list for the Links pane
-    return htmx_verse_links(request, bible_verse_id)
-
-
-@login_required
-def htmx_verse_links(request, verse_id):
-    """HTMX: return existing record links for a verse (for the Links pane)."""
-    from .models import BibleVerse
-    from records.models import Relationship
-
-    verse = get_object_or_404(BibleVerse, id=verse_id)
-    relationships = Relationship.objects.filter(
-        bible_verse=verse,
-        deleted_at__isnull=True,
-    ).select_related('from_record').order_by('from_record__record_family', '-created_at')
-
-    return render(request, 'bible/_verse_links.html', {
-        'verse': verse,
-        'relationships': relationships,
-    })
-
-
-@login_required
-def htmx_bible_record_search(request):
-    """HTMX: search records for Bible link pane — results include a Link button."""
-    from records.models import Record
-
-    q      = request.GET.get('q', '').strip()
-    family = request.GET.get('family', '').strip()
-
-    qs = Record.objects.filter(deleted_at__isnull=True).order_by('-updated_at')
-    if q:
-        qs = qs.filter(title__icontains=q)
-    if family:
-        qs = qs.filter(record_family=family)
-
-    return render(request, 'bible/_link_search_results.html', {
-        'results': qs[:40],
-        'query': q,
-    })
-
-
-@login_required
-def bible_search_view(request):
-    """
-    Full-page Bible search view.
-    Template handles HTMX search requests.
-    """
-    return render(request, 'bible/search.html')
-
-
-@login_required
-def htmx_search(request):
-    """
-    HTMX: search verses in real-time.
-    Supports: Reference Jump (e.g. 'Gen 1:1') and Full-Text search.
-    """
-    from .models import BibleVerse
-    import re
-
-    query = request.GET.get('q', '').strip()
-    results = []
-    is_reference = False
-
-    if len(query) >= 2:
-        translation = get_user_translation(request.user)
-        
-        # 1. Try Reference Detection (e.g. "Gen 1:1" or "Gen 1")
-        # Pattern: [Book] [Chap](:[Verse])?
-        ref_match = re.match(r'^([1-3]?\s*[A-Za-z]+)\s*(\d+)(?::(\d+))?$', query)
-        
-        if ref_match:
-            book_str = ref_match.group(1).upper().replace(' ', '')
-            chapter_num = int(ref_match.group(2))
-            verse_num = int(ref_match.group(3)) if ref_match.group(3) else None
-            
-            # Map common abbreviations or search by prefix
-            book_obj = BibleBook.objects.filter(code__icontains=book_str).first()
-            if not book_obj:
-                book_obj = BibleBook.objects.filter(name__icontains=book_str).first()
-            
-            if book_obj:
-                verse_filter = {
-                    'translation': translation,
-                    'book': book_obj,
-                    'chapter': chapter_num
-                }
-                if verse_num:
-                    verse_filter['verse'] = verse_num
-                
-                ref_results = BibleVerse.objects.filter(**verse_filter).select_related('book', 'translation')
-                if ref_results.exists():
-                    results = list(ref_results)
-                    is_reference = True
-
-        # 2. If no reference match or we want to append keyword results
-        if not is_reference:
-            results = BibleVerse.objects.filter(
-                text__icontains=query,
-                translation=translation
-            ).select_related('book', 'translation')[:20]
-
-    return render(request, 'bible/_search_results.html', {
-        'results': results,
-        'query': query,
-        'is_reference': is_reference,
-    })
-
-
-@login_required
-def bible_picker_view(request):
-    """
-    Book/chapter/verse picker. Handles both full-page and HTMX partials.
-    """
-    back_url = request.GET.get('back', '/bible/')
-    book_code = request.GET.get('book_code', DEFAULT_BOOK)
-    try:
-        chapter = int(request.GET.get('chapter', DEFAULT_CHAPTER))
-    except (ValueError, TypeError):
-        chapter = DEFAULT_CHAPTER
-
-    books = get_all_books()
-    book = BibleBook.objects.filter(code=book_code).first()
-    chapters = get_book_chapters(book_code)
-
-    all_chapters = {}
-    for b in books:
-        all_chapters[b.code] = list(get_book_chapters(b.code))
-
-    context = {
-        'books': books,
-        'book': book,
-        'chapter': chapter,
-        'chapters': list(chapters),
-        'all_chapters': all_chapters,
-        'back_url': back_url,
-        'translation': get_user_translation(request.user),
-    }
-
-    if request.headers.get('HX-Request'):
-        return render(request, 'bible/partials/_picker_sheet.html', context)
-    return render(request, 'bible/picker.html', context)
-
-
-@login_required
-def bible_versions_view(request):
-    """
-    Bible versions list. Handles both full-page and HTMX partials.
-    """
-    book_code = request.GET.get('book_code', DEFAULT_BOOK)
-    try:
-        chapter = int(request.GET.get('chapter', DEFAULT_CHAPTER))
-    except (ValueError, TypeError):
-        chapter = DEFAULT_CHAPTER
-
-    current_translation = get_user_translation(request.user)
-    translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
-
-    versions_by_language = {}
-    for trans in translations:
-        lang = trans.language_full or 'Unknown'
-        if lang not in versions_by_language:
-            versions_by_language[lang] = []
-        versions_by_language[lang].append(trans)
-
-    context = {
-        'current_translation': current_translation,
-        'versions_by_language': versions_by_language,
-        'all_translations': translations,
-        'book_code': book_code,
-        'chapter': chapter,
-    }
-
-    if request.headers.get('HX-Request'):
-        return render(request, 'bible/partials/_versions_sheet.html', context)
-    return render(request, 'bible/versions.html', context)
-
-
-@login_required
-def bible_languages_view(request):
-    """
-    Bible languages list. Handles both full-page and HTMX partials.
-    """
-    translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
-    languages_data = {}
-    for trans in translations:
-        lang = trans.language_full or 'Unknown'
-        if lang not in languages_data:
-            languages_data[lang] = {
-                'name': lang,
-                'count': 0,
-                'short_code': trans.language,
-            }
-        languages_data[lang]['count'] += 1
-
-    languages_list = sorted(languages_data.values(), key=lambda x: x['name'])
-    context = {'languages': languages_list}
-
-    if request.headers.get('HX-Request'):
-        return render(request, 'bible/partials/_languages_sheet.html', context)
-    return render(request, 'bible/languages.html', context)
 
 
 @login_required
@@ -541,20 +260,7 @@ def htmx_delete_note(request, note_id):
     note = Record.objects.get(id=note_id, created_by=request.user)
     note.deleted_at = timezone.now()
     note.save(update_fields=['deleted_at'])
-    # Return OOB to clear indicator + success message for drawer
-    verse = note.custom_fields.get('verse') # This might be tricky if custom_fields is JSON
-    # Better: get the verse from the record metadata or lookup
-    from .models import BibleVerse
-    verse_obj = BibleVerse.objects.filter(
-        translation__code=note.custom_fields.get('translation_code', 'ESV'), # Fallback
-        book__code=note.custom_fields.get('book_code'),
-        chapter=note.custom_fields.get('chapter'),
-        verse=note.custom_fields.get('verse'),
-    ).first()
-
-    response_html = f'<div id="indicators-{verse_obj.id}" hx-swap-oob="innerHTML"></div>' if verse_obj else ''
-    response_html += '<div class="alert alert-info">Note deleted.</div>'
-    return HttpResponse(response_html)
+    return HttpResponse('')
 
 
 @login_required
@@ -580,7 +286,6 @@ def htmx_set_translation(request):
     if translation:
         request.user.preferred_bible_translation = translation
         request.user.save(update_fields=['preferred_bible_translation'])
-        save_reading_position(request.user, book_code, chapter)
 
     verses = get_chapter_verses(translation, book_code, chapter)
     personal_noted, tenant_noted = get_chapter_note_verse_numbers(
@@ -597,18 +302,3 @@ def htmx_set_translation(request):
         'tenant_noted': tenant_noted,
     }
     return render(request, 'bible/_chapter.html', context)
-
-@login_required
-def htmx_appearance_sheet(request):
-    """
-    Returns appearance settings bottom sheet.
-    """
-    return render(request, 'bible/partials/_appearance_sheet.html')
-
-
-@login_required
-def htmx_search_sheet(request):
-    """
-    Returns the scripture search bottom sheet.
-    """
-    return render(request, 'bible/partials/_search_sheet.html')
