@@ -76,12 +76,22 @@ def steward_dashboard(request):
 
     # Agency tenants (Prime Tenancy oversight — Level 5 only)
     agency_tenants = []
-    if level >= 5:
+    is_prime = level >= 5 or user.is_superuser
+    if is_prime:
         agency_tenants = (
             Tenant.objects
             .filter(is_agency=True, tier='global')
             .exclude(slug='prime')
             .order_by('name')
+        )
+
+    # System tenants (induction + handbook) — visible to Level 5 / superuser for oversight
+    system_tenants = []
+    if is_prime:
+        system_tenants = list(
+            Tenant.objects
+            .filter(tier__in=['induction', 'handbook'])
+            .order_by('tier')
         )
 
     # Pending invitations across steward tenants
@@ -95,9 +105,10 @@ def steward_dashboard(request):
     return render(request, 'tenants/steward_dashboard.html', {
         'my_tenants': my_tenants,
         'agency_tenants': agency_tenants,
+        'system_tenants': system_tenants,
         'pending_invitations': pending_invitations,
         'can_create': level >= 3,
-        'is_prime': level >= 5,
+        'is_prime': is_prime,
         'active_app': 'tenancy',
         'active_tenants_tab': 'dashboard',
     })
