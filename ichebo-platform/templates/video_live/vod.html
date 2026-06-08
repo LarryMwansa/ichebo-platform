@@ -2,26 +2,30 @@
 
 {% block title %}Recordings{% endblock %}
 
-{% block video_content %}
-<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem">All Recordings</h2>
-
-{% if vod %}
-<div class="vod-grid">
-{% for event in vod %}
-<a href="{% url 'video_live:watch' event.id %}" class="event-card event-card--link">
-  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem">
-    <span class="material-symbols-outlined" style="font-size:1.1rem;color:var(--muted)">play_circle</span>
-    <div class="event-card__title" style="font-size:0.9rem">{{ event.title }}</div>
+{% block mobile_video_content %}
+<div style="padding: var(--space-s);">
+  {% if vod %}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">All Recordings</div>
+  <div class="list-group">
+    {% for event in vod %}
+    <a href="{% url 'video_live:watch' event.id %}" class="list-item" style="text-decoration: none; color: inherit;">
+      <div class="list-item__icon" style="color: var(--muted);">
+        <span class="material-symbols-outlined">play_circle</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">{{ event.title }}</div>
+        <div class="list-item__meta">{{ event.scheduled_at|date:"d M Y" }} · {{ event.duration }} min</div>
+      </div>
+      <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px; flex-shrink: 0;">chevron_right</span>
+    </a>
+    {% endfor %}
   </div>
-  <div class="event-card__meta">{{ event.scheduled_at|date:"d M Y" }} · {{ event.duration }} min</div>
-</a>
-{% endfor %}
+  {% else %}
+  <div style="padding: 3rem 0; text-align: center;">
+    <span class="material-symbols-outlined" style="font-size: 2.5rem; color: var(--border); display: block; margin-bottom: 0.75rem;">video_library</span>
+    <p style="font-weight: 600; color: var(--text); margin-bottom: 4px;">No recordings yet</p>
+    <p style="font-size: 13px; color: var(--muted);">Past broadcasts will appear here automatically.</p>
+  </div>
+  {% endif %}
 </div>
-{% else %}
-<div style="text-align:center;padding:3rem 1rem;color:var(--muted)">
-  <span class="material-symbols-outlined" style="font-size:2.5rem;display:block;margin-bottom:0.5rem">video_library</span>
-  <p style="font-weight:600;color:var(--text);margin-bottom:0.25rem">No recordings yet</p>
-  <p style="font-size:0.85rem">Past broadcasts will appear here automatically.</p>
-</div>
-{% endif %}
 {% endblock %}

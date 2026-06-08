@@ -2,12 +2,13 @@
 
 {% block title %}Live{% endblock %}
 
-{% block video_content %}
-<div id="live-player"
+{% block mobile_video_content %}
+<div id="live-player-m"
      hx-get="{% url 'video_live:live' %}"
      hx-trigger="every 60s"
      hx-swap="innerHTML"
-     hx-target="#live-player">
+     hx-target="#live-player-m"
+     style="padding: var(--space-s);">
   {% include "video_live/_live_player.html" %}
 </div>
 {% endblock %}

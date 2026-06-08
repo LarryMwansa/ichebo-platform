@@ -2,6 +2,105 @@
 
 {% block title %}Broadcast Schedule{% endblock %}
 
+{% block mobile_video_content %}
+<div style="padding: var(--space-s);">
+
+  {# Week selector #}
+  <div style="display: flex; gap: 6px; margin-bottom: var(--space-m); overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;">
+    {% for w in "1234" %}{% with wn=forloop.counter %}
+    <a href="?weeks={{ wn }}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 6px; text-decoration: none;
+              border: 1px solid {% if weeks == wn %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if weeks == wn %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if weeks == wn %}#fff{% else %}var(--text){% endif %};">
+      {{ wn }}w
+    </a>
+    {% endwith %}{% endfor %}
+  </div>
+
+  {# Live now banner #}
+  {% if live %}
+  <a href="{% url 'video_live:watch' live.0.id %}"
+     style="display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+            background: var(--card); border: 1px solid var(--border);
+            border-left: 3px solid #e53e3e; border-radius: var(--radius-l);
+            text-decoration: none; margin-bottom: var(--space-s);">
+    <span style="display: flex; align-items: center; gap: 5px; font-size: 10px;
+                 font-weight: 700; text-transform: uppercase; color: #e53e3e; flex-shrink: 0;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: #e53e3e; animation: m-live-pulse 1.2s infinite;"></span>
+      Live
+    </span>
+    <div style="flex: 1; min-width: 0;">
+      <div style="font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ live.0.title }}</div>
+      <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">{{ live.0.duration }} min</div>
+    </div>
+    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--primary); flex-shrink: 0;">play_circle</span>
+  </a>
+  {% endif %}
+
+  {# Day-by-day list #}
+  {% if upcoming %}
+  <div style="display: flex; flex-direction: column; gap: 4px;">
+    {% for day in days %}
+    <div style="border-radius: var(--radius-l); overflow: hidden;
+                border: 1px solid {% if day.is_today %}var(--primary){% else %}var(--border){% endif %};
+                {% if not day.events %}opacity: 0.45;{% endif %}
+                margin-bottom: 4px;">
+      <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+                  background: {% if day.is_today %}var(--primary){% else %}var(--card-2){% endif %};">
+        <div style="font-size: 13px; font-weight: 800; color: {% if day.is_today %}#fff{% else %}var(--text){% endif %};">{{ day.label }}</div>
+        <div style="font-size: 11px; color: {% if day.is_today %}rgba(255,255,255,0.7){% else %}var(--muted){% endif %};">{{ day.short }}</div>
+        {% if day.is_today %}
+        <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+                     background: rgba(255,255,255,0.2); color: #fff; padding: 2px 7px; border-radius: 4px; margin-left: auto;">Today</span>
+        {% else %}
+        <span style="font-size: 11px; color: var(--muted); margin-left: auto;">{{ day.events|length }} broadcast{% if day.events|length != 1 %}s{% endif %}</span>
+        {% endif %}
+      </div>
+      {% if day.events %}
+      <div style="background: var(--card);">
+        {% for event in day.events %}
+        <a href="{% url 'video_live:watch' event.id %}"
+           style="display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+                  text-decoration: none; border-top: 1px solid var(--border);">
+          <div style="font-size: 13px; font-weight: 800; color: var(--primary);
+                      font-family: 'Playfair Display', serif; flex-shrink: 0; min-width: 40px;">
+            {{ event.scheduled_at|date:"H:i" }}
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 13px; font-weight: 700; color: var(--text);
+                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ event.title }}</div>
+            <div style="font-size: 11px; color: var(--muted); margin-top: 1px;">{{ event.duration }} min</div>
+          </div>
+          <span class="material-symbols-outlined" style="font-size: 16px; color: var(--muted); flex-shrink: 0;">chevron_right</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="padding: 10px 14px; background: var(--card); border-top: 1px solid var(--border);
+                  font-size: 12px; color: var(--muted); font-style: italic;">No broadcasts</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div style="padding: 3rem 0; text-align: center;">
+    <span class="material-symbols-outlined" style="font-size: 2.5rem; color: var(--border); display: block; margin-bottom: 0.75rem;">calendar_month</span>
+    <p style="font-size: 13px; font-weight: 600; color: var(--text);">Nothing scheduled for the next {{ weeks }} week{% if weeks != 1 %}s{% endif %}</p>
+    {% if can_manage %}
+    <a href="{% url 'video_live:manage' %}" class="btn-touch btn-primary-sm" style="margin-top: var(--space-m); display: inline-flex;">
+      Schedule a Broadcast
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+<style>@keyframes m-live-pulse{0%,100%{opacity:1}50%{opacity:.3}}</style>
+{% endblock %}
+
 {% block video_content %}
 <div style="padding: 40px 48px; max-width: 860px;">
 

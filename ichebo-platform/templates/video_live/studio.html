@@ -208,3 +208,128 @@ document.body.addEventListener('studioRefresh', function() {
 {% endblock %}
 
 {% endblock %}
+
+{# ── MOBILE ── #}
+{% block content %}
+<div style="padding: 0 0 var(--space-2xl);">
+
+  {# Nav pills — same pattern as base_video.html but standalone since studio extends workspace_shell directly #}
+  <div style="display: flex; gap: 6px; padding: var(--space-s) var(--space-s) 0;
+              overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;">
+    <a href="{% url 'video_live:home' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid var(--border); background: var(--card); color: var(--text);">Home</a>
+    <a href="{% url 'video_live:live' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid var(--border); background: var(--card); color: var(--text);">Live</a>
+    <a href="{% url 'video_live:schedule' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid var(--border); background: var(--card); color: var(--text);">Schedule</a>
+    <a href="{% url 'video_live:vod' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid var(--border); background: var(--card); color: var(--text);">Recordings</a>
+    <a href="{% url 'video_live:manage' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid var(--border); background: var(--card); color: var(--text);">Manage</a>
+    <a href="{% url 'video_live:studio' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid var(--primary); background: var(--primary); color: #fff;">Studio</a>
+  </div>
+
+  <div style="padding: var(--space-s);">
+
+    {# Programme clock #}
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Programme Clock</div>
+    <div id="m-studio-clock"
+         hx-get="{% url 'video_live:studio-now-playing' %}"
+         hx-trigger="every 30s"
+         hx-swap="none"
+         style="background: var(--card); border: 1px solid var(--border);
+                border-radius: var(--radius-l); padding: var(--space-m); margin-bottom: var(--space-m);">
+      {% if live %}
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700;
+                  text-transform: uppercase; letter-spacing: 0.07em; color: #e53e3e; margin-bottom: 6px;">
+        <span style="width: 7px; height: 7px; border-radius: 50%; background: #e53e3e;
+                     animation: m-live-pulse 1.2s infinite;"></span>
+        On Air
+      </div>
+      <div style="font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px;">{{ live.0.title|truncatechars:40 }}</div>
+      <div style="font-size: 12px; color: var(--muted);">{{ live.0.duration }} min</div>
+      {% elif upcoming %}
+      <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                  letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Next Up</div>
+      <div style="font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px;">{{ upcoming.0.title|truncatechars:40 }}</div>
+      <div style="font-size: 12px; color: var(--muted);">{{ upcoming.0.scheduled_at|date:"H:i" }} · {{ upcoming.0.duration }} min</div>
+      {% else %}
+      <div style="font-size: 12px; color: var(--muted); font-style: italic;">No broadcasts today</div>
+      {% endif %}
+    </div>
+
+    {# Stats row #}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xs); margin-bottom: var(--space-m);">
+      <div style="background: var(--card); border: 1px solid var(--border);
+                  border-radius: var(--radius-l); padding: var(--space-m); text-align: center;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px;">Upcoming</div>
+        <div style="font-size: 28px; font-weight: 800; color: var(--text);
+                    font-family: 'Playfair Display', serif;">{{ upcoming|length }}</div>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border);
+                  border-radius: var(--radius-l); padding: var(--space-m); text-align: center;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px;">Recordings</div>
+        <div style="font-size: 28px; font-weight: 800; color: var(--text);
+                    font-family: 'Playfair Display', serif;">{{ vod_count }}</div>
+      </div>
+    </div>
+
+    {# Quick Schedule CTA #}
+    <a href="{% url 'video_live:manage' %}" class="btn-touch btn-primary-sm"
+       style="width: 100%; justify-content: center; text-decoration: none;
+              display: flex; margin-bottom: var(--space-m);">
+      <span class="material-symbols-outlined" style="font-size: 16px;">add_circle</span>
+      Schedule a Broadcast
+    </a>
+
+    {# Timeline as vertical list #}
+    <div id="m-studio-timeline"
+         hx-get="{% url 'video_live:studio-timeline' %}"
+         hx-trigger="load, studioRefresh from:body"
+         hx-swap="innerHTML">
+      <div style="font-size: 12px; color: var(--muted); font-style: italic; padding: 8px 0;">Loading timeline…</div>
+    </div>
+
+    {# Fallback settings #}
+    <div style="height: 1px; background: var(--border); margin: var(--space-m) 0;"></div>
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Fallback Video</div>
+    <div id="m-studio-fallback"
+         hx-get="{% url 'video_live:studio-set-fallback' %}"
+         hx-trigger="load">
+      <div style="font-size: 12px; color: var(--muted); font-style: italic;">Loading…</div>
+    </div>
+
+    {# Quick nav #}
+    <div style="height: 1px; background: var(--border); margin: var(--space-m) 0;"></div>
+    <div class="list-group">
+      <a href="{% url 'video_live:schedule' %}" class="list-item" style="text-decoration: none; color: inherit;">
+        <div class="list-item__icon"><span class="material-symbols-outlined">calendar_month</span></div>
+        <div class="list-item__content"><div class="list-item__title">Week Schedule</div></div>
+        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+      </a>
+      <a href="{% url 'video_live:vod' %}" class="list-item" style="text-decoration: none; color: inherit;">
+        <div class="list-item__icon"><span class="material-symbols-outlined">video_library</span></div>
+        <div class="list-item__content"><div class="list-item__title">Recordings Archive</div></div>
+        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+      </a>
+    </div>
+
+  </div>
+</div>
+<style>@keyframes m-live-pulse{0%,100%{opacity:1}50%{opacity:.3}}</style>
+{% endblock %}

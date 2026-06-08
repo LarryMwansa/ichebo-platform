@@ -73,60 +73,85 @@
 {% endblock %}
 
 
-{% block video_content %}
-<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem">Schedule a Broadcast</h2>
+{% block mobile_video_content %}
+<div style="padding: var(--space-s);">
 
-{% if error %}
-<div style="background:var(--error-muted,#fde8e8);border:1px solid var(--error);border-radius:6px;padding:0.65rem 1rem;color:var(--error);font-size:0.85rem;margin-bottom:1rem">
-  {{ error }}
-</div>
-{% endif %}
+  <div class="label-caps" style="margin-bottom: var(--space-s);">Schedule a Broadcast</div>
 
-<div class="manage-form">
-  <form method="post">
-    {% csrf_token %}
-
-    <label for="id_title">Title *</label>
-    <input type="text" id="id_title" name="title" required placeholder="e.g. Sunday Service — 4 May">
-
-    <label for="id_stream_url">Stream URL * <span style="font-weight:400;color:var(--muted)">(YouTube, Vimeo, or .mp4)</span></label>
-    <input type="url" id="id_stream_url" name="stream_url" required placeholder="https://youtube.com/watch?v=...">
-
-    <label for="id_scheduled_at">Date &amp; Time *</label>
-    <input type="datetime-local" id="id_scheduled_at" name="scheduled_at" required>
-
-    <label for="id_duration">Duration (minutes)</label>
-    <input type="number" id="id_duration" name="duration_minutes" value="60" min="5" max="480">
-
-    <label for="id_description">Description <span style="font-weight:400">(optional)</span></label>
-    <textarea id="id_description" name="description" placeholder="Brief description of this broadcast…"></textarea>
-
-    <div style="margin-top:1.25rem">
-      <button type="submit" class="btn btn-primary">Schedule Broadcast</button>
-    </div>
-  </form>
-</div>
-
-{% if events %}
-<div class="video-section-title" style="margin-top:0.5rem">All Broadcasts</div>
-{% for event in events %}
-<div class="event-card" style="display:flex;align-items:center;gap:0.75rem">
-  <div style="flex:1">
-    <div class="event-card__title" style="font-size:0.9rem">{{ event.title }}</div>
-    <div class="event-card__meta">
-      {{ event.scheduled_at|date:"d M Y · H:i" }} · {{ event.duration }} min
-      {% if event.is_live %}<span class="live-badge" style="margin-left:0.4rem"><span class="live-dot"></span>Live</span>{% endif %}
-      {% if event.is_past %}<span style="color:var(--success);font-size:0.75rem;margin-left:0.4rem">Past</span>{% endif %}
-    </div>
+  {% if error %}
+  <div style="background: var(--card); border: 1px solid var(--primary); border-radius: 8px;
+              padding: 10px 14px; color: var(--primary); font-size: 12px; margin-bottom: var(--space-s);">
+    {{ error }}
   </div>
-  <a href="{% url 'video_live:watch' event.id %}" style="color:var(--primary);font-size:0.82rem;text-decoration:none;flex-shrink:0">View</a>
-  <form method="post" action="{% url 'video_live:delete-event' event.id %}"
-        onsubmit="return confirm('Delete {{ event.title }}?')" style="margin:0">
-    {% csrf_token %}
-    <button type="submit" style="background:none;border:none;color:var(--error);font-size:0.82rem;cursor:pointer;padding:0">Delete</button>
-  </form>
-</div>
-{% endfor %}
-{% endif %}
+  {% endif %}
 
+  <div style="background: var(--card); border: 1px solid var(--border);
+              border-radius: var(--radius-l); padding: var(--space-m); margin-bottom: var(--space-m);">
+    <form method="post" style="display: flex; flex-direction: column; gap: 14px;">
+      {% csrf_token %}
+      <div>
+        <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px;">Title *</label>
+        <input type="text" name="title" required placeholder="e.g. Sunday Service — 4 May"
+               class="form-input-touch">
+      </div>
+      <div>
+        <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px;">Stream URL *</label>
+        <input type="url" name="stream_url" required placeholder="https://youtube.com/watch?v=..."
+               class="form-input-touch">
+      </div>
+      <div>
+        <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px;">Date &amp; Time *</label>
+        <input type="datetime-local" name="scheduled_at" required class="form-input-touch">
+      </div>
+      <div>
+        <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px;">Duration (minutes)</label>
+        <input type="number" name="duration_minutes" value="60" min="5" max="480" class="form-input-touch">
+      </div>
+      <div>
+        <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px;">Description</label>
+        <textarea name="description" placeholder="Brief description…" rows="3"
+                  class="form-input-touch" style="resize: vertical;"></textarea>
+      </div>
+      <button type="submit" class="btn-touch btn-primary-sm" style="width: 100%; justify-content: center;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">video_call</span>
+        Schedule Broadcast
+      </button>
+    </form>
+  </div>
+
+  {% if events %}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">All Broadcasts</div>
+  <div class="list-group">
+    {% for event in events %}
+    <div class="list-item" style="align-items: flex-start;">
+      <div class="list-item__content" style="flex: 1;">
+        <div class="list-item__title">{{ event.title }}</div>
+        <div class="list-item__meta">
+          {{ event.scheduled_at|date:"d M Y · H:i" }} · {{ event.duration }} min
+          {% if event.is_live %}<span style="color: #e53e3e; font-weight: 700;"> · Live</span>{% endif %}
+          {% if event.is_past %}<span style="color: var(--primary);"> · Past</span>{% endif %}
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0; margin-left: 8px;">
+        <a href="{% url 'video_live:watch' event.id %}"
+           style="font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: none;">View</a>
+        <form method="post" action="{% url 'video_live:delete-event' event.id %}"
+              hx-confirm="Delete {{ event.title }}?" style="margin: 0;">
+          {% csrf_token %}
+          <button type="submit"
+                  style="background: none; border: none; color: var(--primary); font-size: 12px;
+                         font-weight: 700; cursor: pointer; padding: 0; opacity: 0.6;">Delete</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
 {% endblock %}

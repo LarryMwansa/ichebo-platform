@@ -461,4 +461,8 @@ def video_library(request):
         record_family='media',
         deleted_at__isnull=True,
     ).order_by('-created_at')[:50]
-    return render(request, 'video_live/library.html', {'videos': videos})
+    return render(request, 'video_live/library.html', {
+        'videos': videos,
+        'can_manage': request.user.competence_level >= 3,
+        'active_video_tab': 'library',
+    })

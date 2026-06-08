@@ -143,6 +143,10 @@
     <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">live_tv</span>
     Studio
   </a>
+  <a href="{% url 'video_live:library' %}"
+     class="ws-tab {% if request.resolver_match.url_name == 'library' %}active{% endif %}">
+    Library
+  </a>
   {% endif %}
 </div>
 {% endblock %}
@@ -151,16 +155,76 @@
 
 
 
-{# ── MOBILE — unchanged ── #}
+{# ── MOBILE ── #}
 {% block content %}
-<div class="video-shell">
-  <nav class="video-nav">
-    <a href="{% url 'video_live:home' %}" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>Home</a>
-    <a href="{% url 'video_live:live' %}" {% if request.resolver_match.url_name == 'live' %}class="active"{% endif %}>Live</a>
-    <a href="{% url 'video_live:schedule' %}" {% if request.resolver_match.url_name == 'schedule' %}class="active"{% endif %}>Schedule</a>
-    <a href="{% url 'video_live:vod' %}" {% if request.resolver_match.url_name == 'vod' %}class="active"{% endif %}>Recordings</a>
-    {% if can_manage %}<a href="{% url 'video_live:manage' %}" {% if request.resolver_match.url_name == 'manage' %}class="active"{% endif %}>Manage</a>{% endif %}
-  </nav>
+<div style="padding: 0 0 var(--space-2xl);">
+
+  {# Mobile nav — horizontal pill row #}
+  <div style="display: flex; gap: 6px; padding: var(--space-s) var(--space-s) 0;
+              overflow-x: auto; -webkit-overflow-scrolling: touch;
+              scrollbar-width: none;">
+    <a href="{% url 'video_live:home' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid {% if active_video_tab == 'home' %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if active_video_tab == 'home' %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if active_video_tab == 'home' %}#fff{% else %}var(--text){% endif %};">
+      Home
+    </a>
+    <a href="{% url 'video_live:live' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid {% if active_video_tab == 'live' %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if active_video_tab == 'live' %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if active_video_tab == 'live' %}#fff{% else %}var(--text){% endif %};">
+      Live
+    </a>
+    <a href="{% url 'video_live:schedule' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid {% if active_video_tab == 'schedule' %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if active_video_tab == 'schedule' %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if active_video_tab == 'schedule' %}#fff{% else %}var(--text){% endif %};">
+      Schedule
+    </a>
+    <a href="{% url 'video_live:vod' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid {% if active_video_tab == 'vod' %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if active_video_tab == 'vod' %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if active_video_tab == 'vod' %}#fff{% else %}var(--text){% endif %};">
+      Recordings
+    </a>
+    {% if can_manage %}
+    <a href="{% url 'video_live:manage' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid {% if active_video_tab == 'manage' %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if active_video_tab == 'manage' %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if active_video_tab == 'manage' %}#fff{% else %}var(--text){% endif %};">
+      Manage
+    </a>
+    <a href="{% url 'video_live:studio' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid {% if active_video_tab == 'studio' %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if active_video_tab == 'studio' %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if active_video_tab == 'studio' %}#fff{% else %}var(--text){% endif %};">
+      Studio
+    </a>
+    <a href="{% url 'video_live:library' %}"
+       style="flex-shrink: 0; height: 30px; padding: 0 14px; display: flex; align-items: center;
+              font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+              border: 1px solid {% if active_video_tab == 'library' %}var(--primary){% else %}var(--border){% endif %};
+              background: {% if active_video_tab == 'library' %}var(--primary){% else %}var(--card){% endif %};
+              color: {% if active_video_tab == 'library' %}#fff{% else %}var(--text){% endif %};">
+      Library
+    </a>
+    {% endif %}
+  </div>
+
+  {# Per-page mobile content #}
   {% block mobile_video_content %}{% endblock %}
+
 </div>
 {% endblock %}
