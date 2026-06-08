@@ -33,6 +33,8 @@ urlpatterns = [
          views.htmx_set_order, name='htmx-set-order'),
     path('community/htmx/member/<uuid:permission_id>/deactivate/',
          views.htmx_deactivate_member, name='htmx-deactivate-member'),
+    path('community/htmx/member/<uuid:member_id>/verify/',
+         views.htmx_verify_member, name='htmx-verify-member'),
     path('community/htmx/members/search/',
          views.htmx_member_search, name='htmx-member-search'),
     path('community/htmx/announcements/',

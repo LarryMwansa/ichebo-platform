@@ -335,6 +335,7 @@ def member_profile(request, member_id):
         'order_choices':       KGS_SERVICE_ORDER_CHOICES,
         'level_label':         level_label,
         'stage_info':          stage_info,
+        'user_level':          _user_level(request.user),
         'active_app':          'community',
         'ws_page_title':       member_user.display_name or member_user.email,
         'active_community_tab': 'members',
@@ -707,6 +708,36 @@ def htmx_deactivate_member(request, permission_id):
     return HttpResponse(
         '<div class="announcement-card" style="border-color:var(--error)">'
         '<div class="announcement-title" style="color:var(--error)">Membership deactivated.</div>'
+        '</div>'
+    )
+
+
+# ── HTMX: manual email verification (Level 4+) ───────────────────────────────
+
+@login_required
+def htmx_verify_member(request, member_id):
+    """Manually verify a user stuck in pending_verification. Level 4+ only."""
+    if not _require_level(request, 4) or request.method != 'POST':
+        return HttpResponse('')
+
+    try:
+        member = User.objects.get(id=member_id)
+    except User.DoesNotExist:
+        return HttpResponse('')
+
+    if member.status != 'pending_verification':
+        return HttpResponse(
+            '<div style="font-size:12px;color:var(--muted);padding:8px 0;">Already verified.</div>'
+        )
+
+    member.status = 'seeker'
+    member.save(update_fields=['status'])
+    member.verification_tokens.all().delete()
+
+    return HttpResponse(
+        '<div style="font-size:12px;font-weight:700;color:var(--primary);padding:8px 0;">'
+        '<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px;">verified</span>'
+        'Email verified manually. Account is now active.'
         '</div>'
     )
 
