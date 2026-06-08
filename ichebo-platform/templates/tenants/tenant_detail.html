@@ -205,6 +205,162 @@
 </div>
 {% endblock %}
 
+{% block content %}
+<div class="dashboard">
+
+  <div class="dash-header">
+    <a href="{% url 'tenants:steward-dashboard' %}" class="dash-back">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <div class="dash-greeting">
+      <span class="dash-name">{{ tenant.name }}</span>
+    </div>
+  </div>
+
+  {# Meta chips #}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+          <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 2px;">Tier</div>
+          <div style="font-size: 13px; font-weight: 700; color: var(--text);">{{ tenant.get_tier_display }}</div>
+        </div>
+        <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+          <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 2px;">Members</div>
+          <div style="font-size: 13px; font-weight: 700; color: var(--text);">{{ members.count }}</div>
+        </div>
+        {% if tenant.parent %}
+        <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
+          <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 2px;">Parent</div>
+          <div style="font-size: 13px; font-weight: 700; color: var(--text);">{{ tenant.parent.name }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  {# Members #}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Members</div>
+      {% if members %}
+      <div class="list-group">
+        {% for m in members %}
+        <div class="list-item">
+          <div class="list-item__icon">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-alpha, rgba(180,24,24,0.1));
+                        color: var(--primary); display: flex; align-items: center; justify-content: center;
+                        font-weight: 800; font-size: 12px;">
+              {{ m.user.display_name|first|upper|default:"?" }}
+            </div>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ m.user.display_name|default:m.user.email }}</div>
+            <div class="list-item__meta">{{ m.get_role_display }}{% if m.metadata.service_order %} · {{ m.metadata.service_order|title|cut:"-" }}{% endif %}</div>
+          </div>
+          {% if is_steward %}
+          <details style="position: relative; flex-shrink: 0;">
+            <summary style="list-style: none; cursor: pointer; color: var(--muted);">
+              <span class="material-symbols-outlined" style="font-size: 20px; vertical-align: middle;">more_vert</span>
+            </summary>
+            <div style="position: absolute; right: 0; top: 1.5rem; background: var(--card);
+                        border: 1px solid var(--border); border-radius: 10px; padding: 12px;
+                        min-width: 220px; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.12);">
+              <form method="post" action="{% url 'tenants:assign-member-role' tenant.id m.id %}">
+                {% csrf_token %}
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Role</div>
+                <select name="role" class="form-input-touch" style="margin-bottom: 10px;">
+                  {% for val, label in m.ROLE_CHOICES %}
+                  <option value="{{ val }}" {% if m.role == val %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Service Order</div>
+                <select name="service_order" class="form-input-touch" style="margin-bottom: 10px;">
+                  <option value="">— None —</option>
+                  {% for so in service_orders %}
+                  <option value="{{ so.slug }}" {% if m.metadata.service_order == so.slug %}selected{% endif %}>{{ so.order_number }}. {{ so.name }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit" class="btn-touch btn-primary-sm" style="width: 100%;">Save Changes</button>
+              </form>
+              <form method="post" action="{% url 'tenants:remove-member' tenant.id m.id %}"
+                    hx-confirm="Remove {{ m.user.display_name|default:m.user.email }} from {{ tenant.name }}?"
+                    style="margin-top: 8px;">
+                {% csrf_token %}
+                <button type="submit" style="width: 100%; background: none; border: none; color: var(--primary);
+                                             font-size: 12px; cursor: pointer; padding: 6px; font-weight: 600;">
+                  Remove member
+                </button>
+              </form>
+            </div>
+          </details>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="padding: 2rem; text-align: center;">
+        <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--border);">group_off</span>
+        <p style="color: var(--muted); margin-top: 0.5rem; font-size: 13px;">No active members yet.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  {# Invite #}
+  {% if can_invite %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Invite a Member</div>
+      <p style="font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.6;">
+        Invitations are for existing Level 1+ members only.
+      </p>
+      {% if invite_error %}
+      <div style="background: var(--card-2); border: 1px solid var(--primary); border-radius: 8px;
+                  padding: 10px 14px; color: var(--primary); font-size: 12px; margin-bottom: 12px;">
+        {{ invite_error }}
+      </div>
+      {% endif %}
+      <form method="post" action="{% url 'tenants:invite-member' tenant.id %}" style="display: flex; flex-direction: column; gap: 10px;">
+        {% csrf_token %}
+        <input type="email" name="email" value="{{ invite_email|default:'' }}"
+               placeholder="member@email.com" required class="form-input-touch">
+        <button type="submit" class="btn-touch btn-primary-sm">
+          <span class="material-symbols-outlined" style="font-size: 16px;">send</span>
+          Send Invite
+        </button>
+      </form>
+    </div>
+  </section>
+  {% endif %}
+
+  {# Invitations #}
+  {% if invitations %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">Invitations</div>
+      <div class="list-group">
+        {% for inv in invitations %}
+        <div class="list-item">
+          <div class="list-item__icon">
+            <span class="material-symbols-outlined" style="color: {% if inv.status == 'accepted' %}var(--primary){% else %}var(--muted){% endif %};">
+              {% if inv.status == 'accepted' %}check_circle{% elif inv.status == 'pending' %}schedule{% else %}cancel{% endif %}
+            </span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ inv.email }}</div>
+            <div class="list-item__meta">{{ inv.created_at|date:"d M Y" }} · {{ inv.get_status_display }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}
+
 {% block tenants_options %}
 <div>
     <div class="ws-label-tag" style="margin-bottom: 16px;">{{ tenant.name }}</div>
