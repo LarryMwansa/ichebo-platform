@@ -103,6 +103,14 @@ document.addEventListener('htmx:afterSwap', function(evt) {
 {% block content %}
 <div style="padding: 0 0 var(--space-2xl);">
 
+  <div class="page-hero page-hero--watermark" data-watermark="CALENDAR">
+    <div class="page-hero__eyebrow">
+      <div class="page-hero__eyebrow-line"></div>
+      <span class="page-hero__label">Kingdom Momentum</span>
+    </div>
+    <h1 class="page-hero__title">Activity <em>Calendar</em></h1>
+  </div>
+
   {# App-level tab nav (Personal / Ministry / Calendar) #}
   <nav style="display: flex; border-bottom: 1px solid var(--border); padding: 0 var(--space-s);">
     <a href="{% url 'activity:activity-home' %}"
