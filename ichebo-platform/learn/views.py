@@ -76,7 +76,7 @@ def catalogue(request):
     programmes = sorted(
         Record.objects.filter(
             record_family='learning',
-            record_type='programme',
+            record_type__in=['programme', 'induction'],
             status='active',
             deleted_at__isnull=True,
         ),
