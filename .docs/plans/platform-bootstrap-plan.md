@@ -127,6 +127,14 @@ class PlatformConfig(models.Model):
     bootstrapped_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     bootstrap_version = models.CharField(max_length=20, default='')
 
+    # ── Email verification toggle (L10.6) ──────────────────────────────────────
+    # When True: new users are created with status='pending_verification' and
+    # receive a verification email before they can log in.
+    # When False: new users are created with status='seeker' immediately (dev/test default).
+    # Managed via the Platform Admin Shell at /platform/ by Level 5 / superuser.
+    # The accounts/views.py register flow reads this flag at signup time.
+    require_email_verification = models.BooleanField(default=True)
+
     class Meta:
         # Enforce singleton
         def save(self, *args, **kwargs):
@@ -155,6 +163,7 @@ A new page at `/platform/` (Level 5 / superuser only) shows the live state of ev
 | Active induction programmes | count |
 | Active catalogue programmes | count |
 | Level 0 users without induction placement | count |
+| Email verification required | ON / OFF toggle |
 
 ---
 
@@ -174,6 +183,7 @@ These are recorded here so they are not forgotten:
 
 | Extension | When | Notes |
 |-----------|------|-------|
+| `require_email_verification` toggle | L10.6 | Platform Admin Shell toggle. When ON: new users start as `pending_verification` and must verify before login. When OFF: users start as `seeker` immediately (default for dev). Managed via `PlatformConfig.require_email_verification`. The `accounts/views.py` register flow reads this flag. Manual verification via Level 4+ member profile button remains available regardless of this toggle. |
 | Tenant onboarding checklist | Version 3+ | Per-tenant version of the platform setup checklist. Steward sees what their community needs to complete (induction programme, first announcement, etc.) |
 | Demo content seeding | Version 3+ | `--demo` flag seeds sample programmes, lessons, and a sample community for evaluation environments |
 | Health check endpoint | Version 3+ | `GET /api/health/` returns platform bootstrap state, DB connectivity, cache status, Celery worker status. Used by monitoring (Uptime Kuma, etc.) |
