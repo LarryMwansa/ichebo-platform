@@ -149,9 +149,11 @@ def tenant_detail(request, tenant_id):
     user = request.user
     level = _user_level(user)
 
-    # Must be steward of this tenant, or Level 5 for agency tenants
+    # Must be steward, or Level 5 / superuser for agency + system tenants
     is_steward = _is_steward_of(user, tenant)
-    if not is_steward and not (level >= 5 and tenant.is_agency):
+    is_prime = level >= 5 or user.is_superuser
+    SYSTEM_TIERS = {'induction', 'handbook'}
+    if not is_steward and not (is_prime and (tenant.is_agency or tenant.tier in SYSTEM_TIERS)):
         return redirect('tenants:steward-dashboard')
 
     members = (

@@ -45,13 +45,19 @@ This is a compounding risk: every new deployment, every staging refresh, every d
 
 ## Proposed Solution
 
-### Phase L10.6 — Platform Bootstrap
+### Phase L10.6 — Platform Admin Shell + Bootstrap
 
-A single idempotent management command — `bootstrap_platform` — that wraps all seed commands, detects what is already done, and reports clearly on every step. Paired with:
+A single idempotent management command — `bootstrap_platform` — that wraps all seed commands, detects what is already done, and reports clearly on every step. Paired with a **Platform Admin Shell** — a UI surface at `/platform/` that abstracts terminal-only operations into a browser-accessible management panel.
 
-1. A **first-run detection flag** that shows a setup banner in the admin surface when the platform has not been bootstrapped
-2. A **bootstrap status API endpoint** that the admin surface can poll
-3. A **setup checklist page** in the Apostolic Command Shell (Level 5 only) showing the state of every platform singleton
+Access gate: Level 5 OR `user.is_superuser`.
+
+The shell covers three surfaces:
+
+1. **Setup Checklist** (`/platform/`) — live health status of every bootstrap step. Red banner shown in the workspace shell when `PlatformConfig.bootstrapped_at` is null.
+2. **System Tenants** (`/platform/tenants/`) — induction, handbook, and prime. Click-through to assign stewards, view members, manage without terminal access.
+3. **Bootstrap Actions** — buttons that trigger seed logic (idempotent). Equivalent to running seed commands but from the browser.
+
+**Prerequisite patch (done — 2026-06-08):** System tenants (induction, handbook) are now visible on the Steward Dashboard and manageable via `tenant_detail` for Level 5 / superuser. This unblocks steward assignment immediately without waiting for L10.6.
 
 ---
 
@@ -136,7 +142,7 @@ When `bootstrapped_at` is null, the Apostolic Command Shell shows a red banner i
 
 ## Setup Checklist Page
 
-A new page at `/admin/setup/` (Level 5 only) shows the live state of every platform singleton. No actions — read-only status display. Lets a steward confirm the platform is healthy without shell access.
+A new page at `/platform/` (Level 5 / superuser only) shows the live state of every platform singleton. No actions — read-only status display. Lets a steward confirm the platform is healthy without shell access.
 
 | Item | Status indicator |
 |------|-----------------|
@@ -197,8 +203,9 @@ Track 1 (induction tenant auto-placement signal) must be complete before L10.6 b
 - [ ] `python manage.py bootstrap_platform` runs end-to-end on a fresh database with 0 errors
 - [ ] `python manage.py bootstrap_platform` is idempotent — running it twice produces the same output with no duplicate records
 - [ ] `--dry-run` flag prints the plan without writing anything
-- [ ] Setup checklist page renders at `/admin/setup/` for Level 5 users
-- [ ] Red banner appears in shell when `PlatformConfig.bootstrapped_at` is null
+- [ ] Platform Admin Shell renders at `/platform/` for Level 5 / superuser
+- [ ] System Tenants list renders at `/platform/tenants/` with induction + handbook
+- [ ] Red banner appears in workspace shell when `PlatformConfig.bootstrapped_at` is null
 - [ ] All existing seed commands still work independently (backwards compatible)
 - [ ] `python manage.py check` — 0 issues
 
@@ -215,16 +222,17 @@ feat(infra): L10.6 — platform bootstrap command and setup checklist
 Add the following row to the Layer 10 table in `master-roadmap-canonical-2026-05-13.md`:
 
 ```
-| L10.6 | 10 | Platform Bootstrap — idempotent seed command, first-run detection, setup checklist | ⏳ Pending |
+| L10.6 | 10 | Platform Admin Shell — bootstrap command, system tenant oversight UI, setup checklist at /platform/ | ⏳ Pending |
 ```
 
 Add the following entry after L10.5 in the Layer 10 phase list:
 
 ```
-## Phase L10.6 — Platform Bootstrap ⏳
+## Phase L10.6 — Platform Admin Shell ⏳
 
-**Goal:** Single idempotent `bootstrap_platform` management command wrapping all
-seed commands. First-run detection. Setup checklist page at /admin/setup/.
+**Goal:** Platform Admin Shell at /platform/ (Level 5 / superuser) with setup
+checklist, system tenant management (induction + handbook), and bootstrap
+actions. Backed by idempotent `bootstrap_platform` management command.
 See .docs/plans/platform-bootstrap-plan.md for full specification.
 
 **Entry requirement:** Track 1 (induction tenant auto-placement) complete.

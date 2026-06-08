@@ -76,6 +76,42 @@
     </div>
     {% endif %}
 
+    {# ── System Tenants (Level 5 / superuser oversight) ── #}
+    {% if system_tenants %}
+    <div style="height: 1px; background: var(--border); margin-bottom: 36px;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 12px;">System Tenants — Platform Oversight</div>
+    <div style="background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--warning, #f59e0b);
+                border-radius: 10px; padding: 18px 22px; margin-bottom: 16px;">
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--warning, #f59e0b); margin-bottom: 8px;">Platform Singletons</div>
+        <p style="font-size: 13px; color: var(--muted); margin: 0; line-height: 1.6;">
+            Core system tenants. Assign stewards here to delegate day-to-day management.
+        </p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px;">
+        {% for st in system_tenants %}
+        <a href="{% url 'tenants:tenant-detail' st.id %}"
+           style="display: flex; align-items: center; gap: 16px; background: var(--card);
+                  border: 1px solid var(--border); border-left: 3px solid var(--warning, #f59e0b);
+                  border-radius: 10px; padding: 18px 20px; text-decoration: none;
+                  transition: border-color 0.15s;">
+            <span class="material-symbols-outlined" style="font-size: 22px; color: var(--warning, #f59e0b); flex-shrink: 0;">
+                {% if st.tier == 'induction' %}school{% else %}auto_stories{% endif %}
+            </span>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 14px; font-weight: 800; color: var(--text);">{{ st.name }}</div>
+                <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;
+                            letter-spacing: 0.05em; margin-top: 2px;">
+                    {{ st.get_tier_display }} · {{ st.path }}
+                </div>
+            </div>
+            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                         letter-spacing: 0.06em; color: var(--warning, #f59e0b); flex-shrink: 0;">System</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     {# ── Agency Tenants (Level 5+) ── #}
     {% if agency_tenants %}
     <div style="height: 1px; background: var(--border); margin-bottom: 36px;"></div>
@@ -166,6 +202,28 @@
             <div class="list-item__meta">{{ inv.tenant.name }} · {{ inv.created_at|date:"d M" }}</div>
           </div>
         </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if system_tenants %}
+  <section class="dash-section">
+    <div class="dash-widget">
+      <div class="dash-widget__label">System Tenants</div>
+      <div class="list-group">
+        {% for st in system_tenants %}
+        <a href="{% url 'tenants:tenant-detail' st.id %}" class="list-item" style="text-decoration:none; color: inherit;">
+          <div class="list-item__icon" style="color: var(--warning, #f59e0b);">
+            <span class="material-symbols-outlined">{% if st.tier == 'induction' %}school{% else %}auto_stories{% endif %}</span>
+          </div>
+          <div class="list-item__content">
+            <div class="list-item__title">{{ st.name }}</div>
+            <div class="list-item__meta">{{ st.get_tier_display }} · System</div>
+          </div>
+          <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+        </a>
         {% endfor %}
       </div>
     </div>
