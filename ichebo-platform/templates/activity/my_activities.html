@@ -172,182 +172,79 @@
     <div class="page-hero__eyebrow-line"></div>
     <span class="page-hero__label">Sovereign Timeline</span>
   </div>
-  <h1 class="page-hero__title">Activity <em>Timeline</em></h1>
-  <p class="page-hero__sub">Timeline, habits &amp; focus pathways</p>
+  <h1 class="page-hero__title">Activity <em>Hub</em></h1>
 </div>
 
-{# Filter tabs — All + each activity type #}
-<div style="display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
-            border-bottom: 1px solid var(--border); padding: 0 var(--space-s);">
-  <a href="{% url 'activity:activity-home' %}"
-     style="flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 700;
-            text-decoration: none; white-space: nowrap;
-            border-bottom: 2px solid {% if not active_type %}var(--primary){% else %}transparent{% endif %};
-            color: {% if not active_type %}var(--primary){% else %}var(--muted){% endif %};">
-    All
+{# App-level tab nav — Personal / Ministry / Calendar #}
+<nav id="m-activity-tabs" style="display: flex; border-bottom: 1px solid var(--border); padding: 0 var(--space-s);">
+  <a id="m-tab-personal" href="#"
+     hx-get="{% url 'activity:activity-home' %}?tab=personal"
+     hx-target="#m-activity-body"
+     hx-push-url="{% url 'activity:activity-home' %}"
+     style="padding: 10px 14px; font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap;
+            border-bottom: 2px solid {% if active_tab == 'personal' or not active_tab %}var(--primary){% else %}transparent{% endif %};
+            color: {% if active_tab == 'personal' or not active_tab %}var(--primary){% else %}var(--muted){% endif %};">
+    Personal
   </a>
-  {% for slug, label in activity_types %}
-  <a href="?type={{ slug }}"
-     style="flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 700;
-            text-decoration: none; white-space: nowrap;
-            border-bottom: 2px solid {% if active_type == slug %}var(--primary){% else %}transparent{% endif %};
-            color: {% if active_type == slug %}var(--primary){% else %}var(--muted){% endif %};">
-    {{ label }}
+  <a id="m-tab-ministry" href="#"
+     hx-get="{% url 'activity:activity-home' %}?tab=ministry"
+     hx-target="#m-activity-body"
+     hx-push-url="{% url 'activity:ministry' %}"
+     style="padding: 10px 14px; font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap;
+            border-bottom: 2px solid {% if active_tab == 'ministry' %}var(--primary){% else %}transparent{% endif %};
+            color: {% if active_tab == 'ministry' %}var(--primary){% else %}var(--muted){% endif %};">
+    Ministry
   </a>
-  {% endfor %}
+  <a id="m-tab-calendar" href="#"
+     hx-get="{% url 'activity:activity-home' %}?tab=calendar"
+     hx-target="#m-activity-body"
+     hx-push-url="{% url 'calendar:month' %}"
+     style="padding: 10px 14px; font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap;
+            border-bottom: 2px solid {% if active_tab == 'calendar' %}var(--primary){% else %}transparent{% endif %};
+            color: {% if active_tab == 'calendar' %}var(--primary){% else %}var(--muted){% endif %};">
+    Calendar
+  </a>
+</nav>
+
+{# Tab body — swapped by HTMX #}
+<div id="m-activity-body"
+     hx-get="{% url 'activity:activity-home' %}?tab={{ active_tab|default:'personal' }}"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+  {# Spinner shown during initial load #}
+  <div style="padding: 3rem; text-align: center;">
+    <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--border); animation: spin 1s linear infinite;">sync</span>
+  </div>
 </div>
 
-{# Activity groups #}
-<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
 
-  {% if overdue %}
-  <div class="label-caps" style="color: var(--error); margin-bottom: var(--space-xs);">
-    Overdue
-  </div>
-  <div style="background: var(--card); border: 1px solid var(--border);
-              border-radius: var(--radius-l); overflow: hidden; margin-bottom: var(--space-m);">
-    {% for item in overdue %}
-    <div id="activity-{{ item.id }}" style="display: flex; align-items: center; gap: var(--space-s);
-                padding: 14px var(--space-s);
-                {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
-      {# Type badge #}
-      <div style="width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
-                  background: var(--card-2); display: flex; flex-direction: column;
-                  align-items: center; justify-content: center;">
-        <span style="font-size: 10px; font-weight: 800; color: var(--error);
-                     letter-spacing: 0.03em; line-height: 1;">
-          {{ item.activity_type|upper|slice:":3" }}
-        </span>
-      </div>
-      {# Content #}
-      <div style="flex: 1; min-width: 0;">
-        <div style="font-size: 14px; font-weight: 700; color: var(--text);
-                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-          {{ item.title }}
-        </div>
-        {% if item.due_at %}
-        <div style="display: flex; align-items: center; gap: 4px; margin-top: 3px;">
-          <span class="material-symbols-outlined" style="font-size: 12px; color: var(--muted);">calendar_today</span>
-          <span style="font-size: 12px; color: var(--muted);">{{ item.due_at|date:"d M" }}</span>
-        </div>
-        {% endif %}
-      </div>
-      {# Actions #}
-      <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-        <button hx-post="{% url 'activity:htmx-complete' item.id %}"
-                hx-target="#activity-{{ item.id }}" hx-swap="outerHTML"
-                style="background: none; border: none; cursor: pointer; padding: 4px; display: flex;">
-          <span class="material-symbols-outlined" style="font-size: 22px; color: var(--success);">check_circle</span>
-        </button>
-        <a href="{% url 'activity:htmx-edit' item.id %}"
-           style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; color: var(--muted);">
-          <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
-        </a>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-  {% endif %}
+{# Update the tab nav active state after each HTMX swap #}
+<script>
+(function () {
+  function setActiveTab(tab) {
+    ['personal', 'ministry', 'calendar'].forEach(function (t) {
+      var el = document.getElementById('m-tab-' + t);
+      if (!el) return;
+      var active = (t === tab);
+      el.style.borderBottom = active ? '2px solid var(--primary)' : '2px solid transparent';
+      el.style.color = active ? 'var(--primary)' : 'var(--muted)';
+      el.style.fontWeight = active ? '700' : '600';
+    });
+  }
+  document.body.addEventListener('htmx:afterSwap', function (evt) {
+    if (evt.detail.target.id !== 'm-activity-body') return;
+    var src = evt.detail.requestConfig && evt.detail.requestConfig.path || '';
+    var t = 'personal';
+    if (src.indexOf('tab=ministry') !== -1) t = 'ministry';
+    else if (src.indexOf('tab=calendar') !== -1) t = 'calendar';
+    setActiveTab(t);
+  });
+  // Activate the correct tab on initial server-rendered page
+  setActiveTab('{{ active_tab|default:"personal" }}');
+})();
+</script>
 
-  {% if due_today %}
-  <div class="label-caps" style="margin-bottom: var(--space-xs);">Today</div>
-  <div style="background: var(--card); border: 1px solid var(--border);
-              border-radius: var(--radius-l); overflow: hidden; margin-bottom: var(--space-m);">
-    {% for item in due_today %}
-    <div id="activity-{{ item.id }}" style="display: flex; align-items: center; gap: var(--space-s);
-                padding: 14px var(--space-s);
-                {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
-      <div style="width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
-                  background: var(--card-2); display: flex; align-items: center; justify-content: center;">
-        <span style="font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: 0.03em;">
-          {{ item.activity_type|upper|slice:":3" }}
-        </span>
-      </div>
-      <div style="flex: 1; min-width: 0;">
-        <div style="font-size: 14px; font-weight: 700; color: var(--text);
-                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-          {{ item.title }}
-        </div>
-        {% if item.due_at %}
-        <div style="display: flex; align-items: center; gap: 4px; margin-top: 3px;">
-          <span class="material-symbols-outlined" style="font-size: 12px; color: var(--muted);">calendar_today</span>
-          <span style="font-size: 12px; color: var(--muted);">{{ item.due_at|date:"d M" }}</span>
-        </div>
-        {% endif %}
-      </div>
-      <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-        <button hx-post="{% url 'activity:htmx-complete' item.id %}"
-                hx-target="#activity-{{ item.id }}" hx-swap="outerHTML"
-                style="background: none; border: none; cursor: pointer; padding: 4px; display: flex;">
-          <span class="material-symbols-outlined" style="font-size: 22px; color: var(--success);">check_circle</span>
-        </button>
-        <a href="{% url 'activity:htmx-edit' item.id %}"
-           style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; color: var(--muted);">
-          <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
-        </a>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  {% if upcoming %}
-  <div class="label-caps" style="margin-bottom: var(--space-xs);">Upcoming</div>
-  <div style="background: var(--card); border: 1px solid var(--border);
-              border-radius: var(--radius-l); overflow: hidden; margin-bottom: var(--space-m);">
-    {% for item in upcoming %}
-    <div id="activity-{{ item.id }}" style="display: flex; align-items: center; gap: var(--space-s);
-                padding: 14px var(--space-s);
-                {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
-      <div style="width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
-                  background: var(--card-2); display: flex; align-items: center; justify-content: center;">
-        <span style="font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: 0.03em;">
-          {{ item.activity_type|upper|slice:":3" }}
-        </span>
-      </div>
-      <div style="flex: 1; min-width: 0;">
-        <div style="font-size: 14px; font-weight: 700; color: var(--text);
-                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-          {{ item.title }}
-        </div>
-        {% if item.due_at %}
-        <div style="display: flex; align-items: center; gap: 4px; margin-top: 3px;">
-          <span class="material-symbols-outlined" style="font-size: 12px; color: var(--muted);">calendar_today</span>
-          <span style="font-size: 12px; color: var(--muted);">{{ item.due_at|date:"d M" }}</span>
-        </div>
-        {% elif item.activity_type == 'reminder' %}
-        <div style="display: flex; align-items: center; gap: 4px; margin-top: 3px;">
-          <span class="material-symbols-outlined" style="font-size: 12px; color: var(--muted);">sync</span>
-          <span style="font-size: 12px; color: var(--muted);">Daily</span>
-        </div>
-        {% endif %}
-      </div>
-      <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-        <button hx-post="{% url 'activity:htmx-complete' item.id %}"
-                hx-target="#activity-{{ item.id }}" hx-swap="outerHTML"
-                style="background: none; border: none; cursor: pointer; padding: 4px; display: flex;">
-          <span class="material-symbols-outlined" style="font-size: 22px; color: var(--success);">check_circle</span>
-        </button>
-        <a href="{% url 'activity:htmx-edit' item.id %}"
-           style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; color: var(--muted);">
-          <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
-        </a>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  {% if not overdue and not due_today and not upcoming %}
-  <div style="text-align: center; padding: 3rem 1rem; color: var(--muted);">
-    <span class="material-symbols-outlined"
-          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.2;">
-      verified
-    </span>
-    <p style="font-size: 14px; font-weight: 500;">All mandates secured.</p>
-    <p style="font-size: 13px; margin-top: 4px;">You are in perfect momentum.</p>
-  </div>
-  {% endif %}
-
-</div>
 {% endblock %}

@@ -1,0 +1,263 @@
+{# Mobile: Calendar tab body — loaded into #m-activity-body via HTMX #}
+
+<div style="padding: 0 0 var(--space-2xl);">
+
+  {# Month / Week sub-tabs + nav controls #}
+  <div style="display: flex; align-items: center; justify-content: space-between;
+              padding: var(--space-s) var(--space-s) 0; border-bottom: 1px solid var(--border); padding-bottom: var(--space-s);">
+    <div style="display: flex; gap: 6px;">
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=month"
+         hx-target="#m-activity-body" hx-push-url="{% url 'calendar:month' %}"
+         style="height: 30px; padding: 0 14px; display: flex; align-items: center;
+                font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+                border: 1px solid {% if cal_view == 'week' %}var(--border){% else %}var(--primary){% endif %};
+                background: {% if cal_view == 'week' %}var(--card){% else %}var(--primary){% endif %};
+                color: {% if cal_view == 'week' %}var(--text){% else %}#fff{% endif %};">Month</a>
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=week"
+         hx-target="#m-activity-body" hx-push-url="{% url 'calendar:week' %}"
+         style="height: 30px; padding: 0 14px; display: flex; align-items: center;
+                font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none;
+                border: 1px solid {% if cal_view == 'week' %}var(--primary){% else %}var(--border){% endif %};
+                background: {% if cal_view == 'week' %}var(--primary){% else %}var(--card){% endif %};
+                color: {% if cal_view == 'week' %}#fff{% else %}var(--text){% endif %};">Week</a>
+    </div>
+    {# Prev / Today / Next #}
+    <div style="display: flex; align-items: center; gap: 6px;">
+      {% if cal_view == 'week' %}
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=week&date={{ prev_date }}"
+         hx-target="#m-activity-body" hx-push-url="{% url 'calendar:week' %}?date={{ prev_date }}"
+         style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+                border-radius: 50%; border: 1px solid var(--border); background: var(--card); color: var(--muted); text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">chevron_left</span>
+      </a>
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=week"
+         hx-target="#m-activity-body"
+         style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none;">Today</a>
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=week&date={{ next_date }}"
+         hx-target="#m-activity-body" hx-push-url="{% url 'calendar:week' %}?date={{ next_date }}"
+         style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+                border-radius: 50%; border: 1px solid var(--border); background: var(--card); color: var(--muted); text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">chevron_right</span>
+      </a>
+      {% else %}
+      <span style="font-size: 13px; font-weight: 700; color: var(--text);">{{ month_name }} {{ year }}</span>
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=month&year={{ prev_year }}&month={{ prev_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+         hx-target="#m-activity-body"
+         style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+                border-radius: 50%; border: 1px solid var(--border); background: var(--card); color: var(--muted); text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">chevron_left</span>
+      </a>
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=month{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+         hx-target="#m-activity-body"
+         style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none;">Today</a>
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=month&year={{ next_year }}&month={{ next_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+         hx-target="#m-activity-body"
+         style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+                border-radius: 50%; border: 1px solid var(--border); background: var(--card); color: var(--muted); text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">chevron_right</span>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div style="padding: var(--space-s);">
+
+    {% if cal_view == 'week' %}
+
+    {# ── Week view ── #}
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">{{ week_label }}</div>
+
+    {% for wd in week_days %}
+    {% if wd.events %}
+    <div style="margin-bottom: var(--space-m);">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+        <div style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+                    display: flex; align-items: center; justify-content: center;
+                    background: {% if wd.is_today %}var(--primary){% else %}transparent{% endif %};
+                    font-size: 13px; font-weight: 800;
+                    color: {% if wd.is_today %}#fff{% else %}var(--text){% endif %};">
+          {{ wd.day }}
+        </div>
+        <div style="font-size: 11px; font-weight: 700;
+                    color: {% if wd.is_today %}var(--primary){% else %}var(--muted){% endif %};">
+          {{ wd.weekday_short }}{% if wd.is_today %} · Today{% endif %}
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 36px;">
+        {% for ev in wd.events %}
+        <a href="/activity/{{ ev.id }}/"
+           style="display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+                  background: var(--card); border: 1px solid var(--border);
+                  {% if wd.is_today %}border-left: 3px solid var(--primary);{% endif %}
+                  border-radius: 8px; text-decoration: none; color: inherit;">
+          {% if ev.time %}
+          <div style="font-size: 12px; font-weight: 700; color: var(--primary);
+                      flex-shrink: 0; min-width: 36px; font-family: 'Playfair Display', serif;">{{ ev.time }}</div>
+          {% endif %}
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 13px; font-weight: 700; color: var(--text);
+                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ ev.title }}</div>
+            {% if ev.kgs_pathway %}
+            <div style="font-size: 11px; color: var(--muted); margin-top: 1px;">{{ ev.kgs_pathway|title|cut:"_" }}</div>
+            {% endif %}
+          </div>
+          <span class="material-symbols-outlined" style="color: var(--muted); font-size: 14px; flex-shrink: 0;">chevron_right</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+    {% if week_event_count == 0 %}
+    <div style="padding: 3rem 0; text-align: center;">
+      <span class="material-symbols-outlined" style="font-size: 2.5rem; color: var(--border); display: block; margin-bottom: 0.75rem;">calendar_month</span>
+      <p style="font-size: 13px; color: var(--muted);">Nothing scheduled this week.</p>
+    </div>
+    {% endif %}
+
+    {% else %}
+
+    {# ── Month view ── #}
+    <div style="display: flex; gap: 6px; margin-bottom: var(--space-s); overflow-x: auto;
+                scrollbar-width: none; -webkit-overflow-scrolling: touch;">
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=month&year={{ year }}&month={{ month }}"
+         hx-target="#m-activity-body"
+         style="flex-shrink: 0; height: 28px; padding: 0 12px; display: flex; align-items: center;
+                font-size: 11px; font-weight: 700; border-radius: 20px; text-decoration: none;
+                border: 1px solid {% if not cal_filter %}var(--primary){% else %}var(--border){% endif %};
+                background: {% if not cal_filter %}var(--primary){% else %}var(--card){% endif %};
+                color: {% if not cal_filter %}#fff{% else %}var(--text){% endif %};">All</a>
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=month&year={{ year }}&month={{ month }}&filter=personal"
+         hx-target="#m-activity-body"
+         style="flex-shrink: 0; height: 28px; padding: 0 12px; display: flex; align-items: center;
+                font-size: 11px; font-weight: 700; border-radius: 20px; text-decoration: none;
+                border: 1px solid {% if cal_filter == 'personal' %}var(--primary){% else %}var(--border){% endif %};
+                background: {% if cal_filter == 'personal' %}var(--primary){% else %}var(--card){% endif %};
+                color: {% if cal_filter == 'personal' %}#fff{% else %}var(--text){% endif %};">Personal</a>
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=calendar&view=month&year={{ year }}&month={{ month }}&filter=institutional"
+         hx-target="#m-activity-body"
+         style="flex-shrink: 0; height: 28px; padding: 0 12px; display: flex; align-items: center;
+                font-size: 11px; font-weight: 700; border-radius: 20px; text-decoration: none;
+                border: 1px solid {% if cal_filter == 'institutional' %}var(--primary){% else %}var(--border){% endif %};
+                background: {% if cal_filter == 'institutional' %}var(--primary){% else %}var(--card){% endif %};
+                color: {% if cal_filter == 'institutional' %}#fff{% else %}var(--text){% endif %};">Institutional</a>
+    </div>
+
+    {% for week in grid %}
+      {% for cell in week %}
+        {% if cell.in_month and cell.events %}
+        <div style="margin-bottom: var(--space-s);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <div style="width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+                        display: flex; align-items: center; justify-content: center;
+                        background: {% if cell.is_today %}var(--primary){% else %}transparent{% endif %};
+                        font-size: 13px; font-weight: 800;
+                        color: {% if cell.is_today %}#fff{% else %}var(--text){% endif %};">
+              {{ cell.day }}
+            </div>
+            <div style="font-size: 11px; color: var(--muted);">
+              {{ cell.date|date:"D, d M" }}{% if cell.is_today %} <span style="color: var(--primary); font-weight: 700;">· Today</span>{% endif %}
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 36px;">
+            {% for ev in cell.events %}
+            <a href="/activity/{{ ev.id }}/"
+               style="display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+                      background: var(--card); border: 1px solid var(--border);
+                      {% if ev.is_overdue %}border-left: 3px solid var(--accent-red);{% elif cell.is_today %}border-left: 3px solid var(--primary);{% endif %}
+                      border-radius: 8px; text-decoration: none; color: inherit;">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 700; color: var(--text);
+                            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ ev.title }}</div>
+                {% if ev.activity_type %}
+                <div style="font-size: 11px; color: var(--muted); margin-top: 1px;">{{ ev.activity_type|title }}</div>
+                {% endif %}
+              </div>
+              {% if ev.is_overdue %}
+              <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                           color: var(--accent-red); flex-shrink: 0;">Overdue</span>
+              {% endif %}
+              <span class="material-symbols-outlined" style="color: var(--muted); font-size: 14px; flex-shrink: 0;">chevron_right</span>
+            </a>
+            {% endfor %}
+            {% if cell.overflow %}
+            <div style="font-size: 11px; color: var(--muted); padding: 4px 12px;">+{{ cell.overflow }} more</div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+    {% if month_event_count == 0 %}
+    <div style="padding: 3rem 0; text-align: center;">
+      <span class="material-symbols-outlined" style="font-size: 2.5rem; color: var(--border); display: block; margin-bottom: 0.75rem;">calendar_month</span>
+      <p style="font-size: 13px; color: var(--muted);">No activities in {{ month_name }} {{ year }}.</p>
+    </div>
+    {% endif %}
+
+    {% endif %}
+
+  </div>
+
+  {# Options panel — Field Intel + Navigate + Guidelines #}
+  <div style="padding: 0 var(--space-s) var(--space-m);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Field Intel</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xs); margin-bottom: var(--space-m);">
+      <div style="background: var(--card); border: 1px solid var(--border);
+                  border-radius: var(--radius-l); padding: var(--space-m);">
+        <div style="font-size: 9px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px;">Active</div>
+        <div style="display: flex; align-items: baseline; gap: 6px;">
+          <div style="font-size: 24px; font-weight: 800; color: var(--text);
+                      font-family: 'Playfair Display', serif;">{{ active_count|default:0 }}</div>
+          <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted);">rocket_launch</span>
+        </div>
+      </div>
+      <div style="background: {% if overdue_count > 0 %}rgba(175,50,54,0.06){% else %}var(--card){% endif %};
+                  border: 1px solid {% if overdue_count > 0 %}rgba(175,50,54,0.2){% else %}var(--border){% endif %};
+                  border-radius: var(--radius-l); padding: var(--space-m);">
+        <div style="font-size: 9px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                    color: {% if overdue_count > 0 %}var(--accent-red){% else %}var(--muted){% endif %};
+                    margin-bottom: 4px;">Overdue</div>
+        <div style="display: flex; align-items: baseline; gap: 6px;">
+          <div style="font-size: 24px; font-weight: 800;
+                      color: {% if overdue_count > 0 %}var(--accent-red){% else %}var(--text){% endif %};
+                      font-family: 'Playfair Display', serif;">{{ overdue_count|default:0 }}</div>
+          <span class="material-symbols-outlined" style="font-size: 14px;
+                color: {% if overdue_count > 0 %}var(--accent-red){% else %}var(--muted){% endif %};">priority_high</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Navigate</div>
+    <div class="list-group" style="margin-bottom: var(--space-m);">
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=personal"
+         hx-target="#m-activity-body"
+         class="list-item" style="text-decoration: none; color: inherit;">
+        <div class="list-item__icon"><span class="material-symbols-outlined">all_inclusive</span></div>
+        <div class="list-item__content"><div class="list-item__title">Personal Activity</div></div>
+        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+      </a>
+      <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=ministry"
+         hx-target="#m-activity-body"
+         class="list-item" style="text-decoration: none; color: inherit;">
+        <div class="list-item__icon"><span class="material-symbols-outlined">hub</span></div>
+        <div class="list-item__content"><div class="list-item__title">Ministry Hub</div></div>
+        <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px;">chevron_right</span>
+      </a>
+    </div>
+
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Guidelines</div>
+    <div style="background: var(--card); border: 1px solid var(--border);
+                border-radius: var(--radius-l); padding: var(--space-m);">
+      <p style="font-size: 12px; color: var(--muted); line-height: 1.7; margin: 0;">
+        Missions require <strong style="color: var(--text);">L3 Stewardship</strong> for closure.
+        Habits are self-attested and contribute to your overall competence level.
+      </p>
+    </div>
+  </div>
+
+</div>

@@ -49,6 +49,17 @@ def activity_detail(request, activity_id):
 @login_required
 def my_activities(request):
     user = request.user
+    tab = request.GET.get('tab', 'personal')
+    is_htmx = bool(request.headers.get('HX-Request'))
+
+    # ── HTMX tab dispatch: return only the body partial ──────────────────────
+    if is_htmx and tab == 'ministry':
+        return _ministry_partial(request)
+
+    if is_htmx and tab == 'calendar':
+        return _calendar_partial(request)
+
+    # ── Personal tab (default) ────────────────────────────────────────────────
     active_type = request.GET.get('type', '')
 
     qs = Activity.objects.filter(
@@ -69,26 +80,158 @@ def my_activities(request):
                list(due_today.values_list('id', flat=True))
     )
 
-    if request.headers.get('HX-Request'):
-        return render(request, 'activity/partials/activity_list.html', {
-            'activities': qs,
-            'active_type': active_type,
-        })
-
     activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
 
-    return render(request, 'activity/my_activities.html', {
+    personal_ctx = {
         'overdue':        overdue,
         'due_today':      due_today,
         'upcoming':       upcoming,
         'active_type':    active_type,
         'activity_types': activity_types,
-        'user_level':     _user_level(user),
-        'active_app':     'activity',
-        'ws_page_title':  'Activity',
         'overdue_count':  overdue.count(),
         'active_count':   qs.count(),
         'due_today_count': due_today.count(),
+    }
+
+    if is_htmx:
+        return render(request, 'activity/partials/_m_personal.html', personal_ctx)
+
+    return render(request, 'activity/my_activities.html', {
+        **personal_ctx,
+        'user_level':    _user_level(user),
+        'active_app':    'activity',
+        'ws_page_title': 'Activity',
+        'active_tab':    tab,
+    })
+
+
+def _ministry_partial(request):
+    """Return the ministry tab body partial (used by HTMX tab dispatch)."""
+    user = request.user
+    active_type = request.GET.get('type', '')
+    assigned_tab = request.GET.get('assigned', 'all')
+
+    qs = Activity.objects.filter(
+        deleted_at__isnull=True,
+        activity_type__in=MINISTRY_TYPES,
+        status__in=['pending', 'in_progress'],
+    ).order_by('due_at', '-created_at')
+
+    if assigned_tab == 'mine':
+        qs = qs.filter(assigned_to=user)
+    if active_type and active_type in MINISTRY_TYPES:
+        qs = qs.filter(activity_type=active_type)
+
+    overdue_qs = qs.filter(due_at__isnull=False, due_at__lt=timezone.now())
+
+    return render(request, 'activity/partials/_m_ministry.html', {
+        'activities':    qs,
+        'active_type':   active_type,
+        'assigned_tab':  assigned_tab,
+        'ministry_types': [(slug, TYPE_LABELS.get(slug, slug)) for slug in MINISTRY_TYPES],
+        'now':           timezone.now(),
+        'active_count':  qs.count(),
+        'overdue_count': overdue_qs.count(),
+    })
+
+
+def _calendar_partial(request):
+    """Return the calendar tab body partial (used by HTMX tab dispatch)."""
+    from calendar_app.views import _MONTH_NAMES, _DAY_HEADERS, _events_by_date, _event_time
+    from calendar_app.service import get_calendar_events
+    import calendar as cal_module
+    from datetime import date, timedelta
+
+    cal_view = request.GET.get('view', 'month')
+    today = date.today()
+
+    if cal_view == 'week':
+        date_str = request.GET.get('date', '')
+        try:
+            base = date.fromisoformat(date_str) if date_str else today
+        except ValueError:
+            base = today
+        monday = base - timedelta(days=base.weekday())
+        days = [monday + timedelta(days=i) for i in range(7)]
+        raw_events = get_calendar_events(request.user, days[0], days[6])
+        grouped = _events_by_date(raw_events)
+        week_days = []
+        for d in days:
+            ev_list = grouped.get(d.isoformat(), [])
+            week_days.append({
+                'date': d,
+                'iso': d.isoformat(),
+                'day': d.day,
+                'weekday_short': _DAY_HEADERS[d.weekday()],
+                'is_today': d == today,
+                'events': [{**ev, 'time': _event_time(ev)} for ev in ev_list],
+            })
+        prev_monday = monday - timedelta(days=7)
+        next_monday = monday + timedelta(days=7)
+        return render(request, 'activity/partials/_m_calendar.html', {
+            'cal_view':          'week',
+            'week_days':         week_days,
+            'week_event_count':  sum(len(wd['events']) for wd in week_days),
+            'week_label':        f'{monday.strftime("%-d %b")} – {days[6].strftime("%-d %b %Y")}',
+            'prev_date':         prev_monday.isoformat(),
+            'next_date':         next_monday.isoformat(),
+            'today':             today,
+            'active_count':      0,
+            'overdue_count':     0,
+        })
+
+    # Month view (default)
+    try:
+        year = int(request.GET.get('year', today.year))
+        month = int(request.GET.get('month', today.month))
+    except ValueError:
+        year, month = today.year, today.month
+    month = max(1, min(12, month))
+    cal_filter = request.GET.get('filter', '')
+
+    cal_obj = cal_module.Calendar(firstweekday=0)
+    weeks = cal_obj.monthdatescalendar(year, month)
+    from_date, to_date = weeks[0][0], weeks[-1][6]
+    raw_events = get_calendar_events(request.user, from_date, to_date)
+    if cal_filter == 'personal':
+        raw_events = [e for e in raw_events if not e.get('tenant_id')]
+    elif cal_filter == 'institutional':
+        raw_events = [e for e in raw_events if e.get('tenant_id')]
+    now_iso = today.isoformat()
+    for ev in raw_events:
+        ev_date = (ev.get('scheduled_at') or ev.get('due_at') or '')[:10]
+        ev['is_overdue'] = bool(ev_date and ev_date < now_iso and ev.get('status') != 'completed')
+    grouped = _events_by_date(raw_events)
+    grid = []
+    for week in weeks:
+        row = []
+        for d in week:
+            ev_list = grouped.get(d.isoformat(), [])
+            row.append({
+                'date': d, 'iso': d.isoformat(), 'day': d.day,
+                'in_month': d.month == month, 'is_today': d == today,
+                'events': ev_list[:3], 'overflow': max(0, len(ev_list) - 3),
+            })
+        grid.append(row)
+    first = date(year, month, 1)
+    prev_first = first - timedelta(days=1)
+    next_first = (first.replace(day=28) + timedelta(days=4)).replace(day=1)
+    month_event_count = sum(len(cell['events']) for week in grid for cell in week if cell['in_month'])
+    return render(request, 'activity/partials/_m_calendar.html', {
+        'cal_view':          'month',
+        'year':              year,
+        'month':             month,
+        'month_name':        _MONTH_NAMES[month],
+        'grid':              grid,
+        'today':             today,
+        'cal_filter':        cal_filter,
+        'prev_year':         prev_first.year,
+        'prev_month':        prev_first.month,
+        'next_year':         next_first.year,
+        'next_month':        next_first.month,
+        'month_event_count': month_event_count,
+        'active_count':      0,
+        'overdue_count':     0,
     })
 
 
