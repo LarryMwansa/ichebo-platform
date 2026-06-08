@@ -220,19 +220,32 @@
     </div>
   </div>
 
-  {# Spiritual gifts #}
+  {# Shepherding context — mirrors ws_options panel #}
   <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l);
-              padding: var(--space-m); margin-bottom: var(--space-s);
-              display: flex; justify-content: space-between; align-items: center;">
-    <div>
-      <div class="label-caps" style="margin-bottom: 4px;">Spiritual Gifts</div>
-      <div style="font-size: 16px; font-weight: 700; color: var(--text);">
-        {{ gifts_count }} Active Gift{{ gifts_count|pluralize }}
+              padding: var(--space-m); margin-bottom: var(--space-s);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">Shepherding Context</div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 120px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 3px;">Shepherd</div>
+        <div style="font-size: 13px; font-weight: 600; color: var(--text);">
+          {% if shepherd %}{{ shepherd.display_name|default:shepherd.email }}{% else %}<span style="color:var(--muted);">Not assigned</span>{% endif %}
+        </div>
+      </div>
+      <div style="flex: 1; min-width: 120px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 3px;">Service Order</div>
+        <div style="font-size: 13px; font-weight: 600; color: var(--text);">
+          {% if service_order %}{{ service_order }}{% else %}<span style="color:var(--muted);">Not assigned</span>{% endif %}
+        </div>
+      </div>
+      <div style="flex: 1; min-width: 80px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 3px;">Active Gifts</div>
+        <div style="font-size: 20px; font-weight: 900; color: var(--text);
+                    font-family: 'Playfair Display', serif;">{{ gifts_count }}</div>
       </div>
     </div>
-    <span class="material-symbols-outlined" style="font-size: 28px; color: var(--primary); opacity: 0.6;">
-      auto_awesome
-    </span>
   </div>
 
   {# Upcoming gatherings #}
@@ -250,16 +263,14 @@
                 border-radius: var(--radius-l); overflow: hidden;">
       {% for g in upcoming_gatherings|slice:":3" %}
       <a href="{% url 'community:community-detail' g.id %}"
-         style="display:block;padding: 12px var(--space-m);text-decoration:none;
+         style="display:block; padding: 12px var(--space-m); text-decoration:none;
                 {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
         <div style="font-size: 14px; font-weight: 600; color: var(--text);">{{ g.title }}</div>
-        {% with meta=g.custom_fields %}
-        {% if meta.scheduled_at %}
+        {% if g.scheduled_at %}
         <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
-          {{ meta.scheduled_at|slice:":10" }}{% if meta.format %} · {{ meta.format|title|cut:"_" }}{% endif %}
+          {{ g.scheduled_at|date:"D, d M · H:i" }}
         </div>
         {% endif %}
-        {% endwith %}
       </a>
       {% endfor %}
     </div>
@@ -267,28 +278,37 @@
     <div style="padding: 1rem; text-align: center; color: var(--muted);
                 background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l);">
       <p style="font-size: 13px;">No upcoming gatherings.</p>
+      {% if level >= 3 %}
+      <a href="{% url 'community:community-gatherings' %}"
+         style="font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: none;">
+        Schedule one →
+      </a>
+      {% endif %}
     </div>
     {% endif %}
   </div>
 
   {# Announcements #}
   <div style="margin-bottom: var(--space-m);">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-xs);">
+    <div style="display: flex; justify-content: space-between; align-items: center;
+                margin-bottom: var(--space-xs);">
       <div class="label-caps">Announcements</div>
-      {% if announcements.count > 3 %}
-      <span style="font-size:12px;font-weight:700;color:var(--primary);">{{ announcements.count }} total</span>
+      {% if level >= 3 %}
+      <a href="{% url 'community:community-management' %}"
+         style="font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: none;">
+        Post →
+      </a>
       {% endif %}
     </div>
     {% if announcements %}
     <div style="background: var(--card); border: 1px solid var(--border);
                 border-radius: var(--radius-l); overflow: hidden;">
       {% for a in announcements|slice:":5" %}
-      <a href="{% url 'community:community-detail' a.id %}"
-         style="display:block;padding: 12px var(--space-m);text-decoration:none;
-                {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
+      <div style="padding: 12px var(--space-m);
+                  {% if not forloop.last %}border-bottom: 1px solid var(--border);{% endif %}">
         <div style="font-size: 13px; font-weight: 600; color: var(--text);">{{ a.title|truncatechars:60 }}</div>
         <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">{{ a.created_at|date:"d M Y" }}</div>
-      </a>
+      </div>
       {% endfor %}
     </div>
     {% else %}
@@ -299,28 +319,43 @@
     {% endif %}
   </div>
 
-  {# Navigation to all community sub-pages #}
-  <div class="label-caps" style="margin-bottom: var(--space-xs);">Community</div>
-  <div class="list-group">
-    <a href="{% url 'community:community-gatherings' %}" class="list-item" style="text-decoration:none;color:inherit;">
-      <div class="list-item__icon"><span class="material-symbols-outlined">calendar_month</span></div>
-      <div class="list-item__content"><div class="list-item__title">Gatherings</div></div>
+  {# ── Shepherding Ops nav — mirrors desktop sidebar ── #}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">Shepherding Ops</div>
+  <div class="list-group" style="margin-bottom: var(--space-m);">
+    <a href="{% url 'community:community-home' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">hub</span></div>
+      <div class="list-item__content"><div class="list-item__title">Community Hub</div></div>
       <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
     </a>
     {% if level >= 3 %}
     <a href="{% url 'community:community-members' %}" class="list-item" style="text-decoration:none;color:inherit;">
-      <div class="list-item__icon"><span class="material-symbols-outlined">groups</span></div>
+      <div class="list-item__icon"><span class="material-symbols-outlined">badge</span></div>
       <div class="list-item__content"><div class="list-item__title">Member Directory</div></div>
       <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
     </a>
-    <a href="{% url 'community:community-management' %}" class="list-item" style="text-decoration:none;color:inherit;">
-      <div class="list-item__icon"><span class="material-symbols-outlined">settings_suggest</span></div>
-      <div class="list-item__content"><div class="list-item__title">Management</div></div>
+    <a href="{% url 'community:community-pipeline' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">account_tree</span></div>
+      <div class="list-item__content"><div class="list-item__title">Formation Pipeline</div></div>
       <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
     </a>
-    <a href="{% url 'community:community-pipeline' %}" class="list-item" style="text-decoration:none;color:inherit;">
-      <div class="list-item__icon"><span class="material-symbols-outlined">analytics</span></div>
-      <div class="list-item__content"><div class="list-item__title">Formation Pipeline</div></div>
+    {% endif %}
+  </div>
+
+  {# ── Gatherings nav ── #}
+  <div class="label-caps" style="margin-bottom: var(--space-xs);">Gatherings</div>
+  <div class="list-group" style="margin-bottom: var(--space-m);">
+    <a href="{% url 'community:community-gatherings' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">event_available</span></div>
+      <div class="list-item__content"><div class="list-item__title">Upcoming Events</div></div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </a>
+    {% if level >= 3 %}
+    <a href="{% url 'community:community-management' %}" class="list-item" style="text-decoration:none;color:inherit;">
+      <div class="list-item__icon"><span class="material-symbols-outlined">settings_account_box</span></div>
+      <div class="list-item__content">
+        <div class="list-item__title">Management</div>
+        <div class="list-item__meta">Announcements · Membership Requests</div>
+      </div>
       <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
     </a>
     {% endif %}
