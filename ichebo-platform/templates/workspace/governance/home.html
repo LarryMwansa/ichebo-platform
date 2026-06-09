@@ -11,13 +11,11 @@
                 {% if active_branch == 'library' %}Reference <em>Library</em>{% else %}Mandate <em>Branch</em>{% endif %}
             </h1>
         </div>
-        {% if is_level5 %}
-        <a href="{% url 'governance:htmx-record-create' %}?record_family=governance&record_type={% if active_branch == 'library' %}class{% else %}mandate{% endif %}"
-           class="ws-topbar__cta" style="flex-shrink: 0; text-decoration: none;">
-            <span class="material-symbols-outlined">add</span>
-            New Official Act
+        <a href="{% url 'handbook:home' %}"
+           class="ws-topbar__cta" style="flex-shrink: 0; text-decoration: none; background: none; border: 1px solid var(--border-ink);">
+            <span class="material-symbols-outlined">auto_stories</span>
+            Open Handbook
         </a>
-        {% endif %}
     </div>
 
     <div style="height: 300px; border: 1px dashed var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--muted);">

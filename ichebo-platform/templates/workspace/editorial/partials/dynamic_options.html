@@ -285,7 +285,7 @@
                             {% endif %}
                         </div>
                         {% if rel.to_record %}
-                        <a href="{% url 'governance:desk-edit' rel.to_record.id %}"
+                        <a href="{% url 'handbook:record' rel.to_record.id %}"
                            style="color: var(--muted); flex-shrink: 0;"
                            title="Open in Desk">
                             <span class="material-symbols-outlined" style="font-size: 15px;">open_in_new</span>
@@ -312,7 +312,7 @@
         <div class="dopt-section" style="margin-bottom: 16px;">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Journals</div>
             {% for draft in journal_drafts %}
-            <a href="{% url 'governance:desk-edit' draft.id %}"
+            <a href="{% url 'handbook:record' draft.id %}"
                class="dopt-recent-item">
                 <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">edit_square</span>
                 <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
@@ -332,7 +332,7 @@
         <div class="dopt-section" style="margin-bottom: 16px;">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Governance</div>
             {% for draft in gov_drafts %}
-            <a href="{% url 'governance:desk-edit' draft.id %}"
+            <a href="{% url 'handbook:record' draft.id %}"
                class="dopt-recent-item">
                 <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">gavel</span>
                 <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
@@ -352,7 +352,7 @@
         <div class="dopt-section">
             <div class="ws-label-tag" style="margin-bottom: 8px;">All Recent</div>
             {% for rec in recent_records %}
-            <a href="{% url 'governance:desk-edit' rec.id %}"
+            <a href="{% url 'handbook:record' rec.id %}"
                class="dopt-recent-item">
                 <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">history_edu</span>
                 <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">

@@ -169,10 +169,10 @@
                    data-tooltip="Dashboard" hx-boost="false">
                     <span class="material-symbols-outlined">dashboard</span>
                 </a>
-                <a href="{% url 'governance:desk' %}"
-                   class="ics-sidebar__item {% if active_app == 'desk' %}active{% endif %}"
-                   data-tooltip="The Desk" hx-boost="false">
-                    <span class="material-symbols-outlined">edit_note</span>
+                <a href="{% url 'handbook:home' %}"
+                   class="ics-sidebar__item {% if active_app == 'handbook' %}active{% endif %}"
+                   data-tooltip="Handbook" hx-boost="false">
+                    <span class="material-symbols-outlined">auto_stories</span>
                 </a>
                 <a href="{% url 'governance:home' %}"
                    class="ics-sidebar__item {% if active_app == 'governance' %}active{% endif %}"
@@ -203,11 +203,6 @@
                    class="ics-sidebar__item {% if active_app == 'video' %}active{% endif %}"
                    data-tooltip="Video & Broadcast" hx-boost="false">
                     <span class="material-symbols-outlined">live_tv</span>
-                </a>
-                <a href="{% url 'handbook:home' %}"
-                   class="ics-sidebar__item {% if active_app == 'handbook' %}active{% endif %}"
-                   data-tooltip="Handbook" hx-boost="false">
-                    <span class="material-symbols-outlined">auto_stories</span>
                 </a>
             </nav>
 

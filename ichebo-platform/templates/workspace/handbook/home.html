@@ -6,7 +6,7 @@
 {% block extra_css %}
 {{ block.super }}
 <style>
-    .hb-branch-btn {
+    .hb-nav-btn {
         display: flex; align-items: center; gap: 10px;
         width: 100%; padding: 9px 12px;
         border: none; background: transparent;
@@ -15,13 +15,13 @@
         text-decoration: none; transition: all 0.15s;
         position: relative;
     }
-    .hb-branch-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
-    .hb-branch-btn.active {
+    .hb-nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .hb-nav-btn.active {
         background: rgba(255,255,255,0.08); color: #fff;
         border-left: 3px solid var(--accent-red);
         padding-left: 9px;
     }
-    .hb-branch-btn .material-symbols-outlined { font-size: 16px; }
+    .hb-nav-btn .material-symbols-outlined { font-size: 16px; }
 
     .hb-type-section { margin-bottom: 24px; }
     .hb-type-header {
@@ -51,25 +51,25 @@
     .hb-status.active     { background: rgba(0,184,148,0.12); color: #00b894; }
     .hb-status.locked     { background: rgba(175,50,54,0.12); color: var(--accent-red); }
     .hb-status.superseded { background: rgba(253,203,110,0.12); color: #e17055; }
+    .hb-status.submitted  { background: rgba(116,185,255,0.15); color: #0984e3; }
 </style>
 {% endblock %}
 
-{# ── Column 2: Branch Navigator ── #}
 {% block context_header %}Handbook{% endblock %}
 
 {% block context_content %}
 <div style="padding: 0 4px;">
     <div class="ws-label-tag" style="margin-bottom: 8px;">Branches</div>
 
-    <a href="?branch=reference" class="hb-branch-btn {% if active_branch == 'reference' %}active{% endif %}">
+    <a href="?branch=reference" class="hb-nav-btn {% if active_branch == 'reference' %}active{% endif %}">
         <span class="material-symbols-outlined">library_books</span>
         Reference Library
     </a>
-    <a href="?branch=mandate" class="hb-branch-btn {% if active_branch == 'mandate' %}active{% endif %}">
+    <a href="?branch=mandate" class="hb-nav-btn {% if active_branch == 'mandate' %}active{% endif %}">
         <span class="material-symbols-outlined">gavel</span>
         Mandate Branch
     </a>
-    <a href="?branch=keys" class="hb-branch-btn {% if active_branch == 'keys' %}active{% endif %}">
+    <a href="?branch=keys" class="hb-nav-btn {% if active_branch == 'keys' %}active{% endif %}">
         <span class="material-symbols-outlined">key</span>
         Keys Library
     </a>
@@ -77,98 +77,136 @@
     <div class="ctx-divider" style="margin: 12px 0;"></div>
     <div class="ws-label-tag" style="margin-bottom: 8px;">Filter</div>
 
-    <a href="?branch={{ active_branch }}&status=draft"     class="hb-branch-btn {% if status_filter == 'draft' %}active{% endif %}"><span style="width:6px;height:6px;border-radius:50%;background:#636e72;flex-shrink:0;"></span>Drafts</a>
-    <a href="?branch={{ active_branch }}&status=active"    class="hb-branch-btn {% if status_filter == 'active' %}active{% endif %}"><span style="width:6px;height:6px;border-radius:50%;background:#00b894;flex-shrink:0;"></span>Active</a>
-    <a href="?branch={{ active_branch }}&status=locked"    class="hb-branch-btn {% if status_filter == 'locked' %}active{% endif %}"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent-red);flex-shrink:0;"></span>Locked</a>
+    <a href="?branch={{ active_branch }}&status=draft"
+       class="hb-nav-btn {% if status_filter == 'draft' %}active{% endif %}">
+        <span style="width:6px;height:6px;border-radius:50%;background:#636e72;flex-shrink:0;"></span>Drafts
+    </a>
+    <a href="?branch={{ active_branch }}&status=active"
+       class="hb-nav-btn {% if status_filter == 'active' %}active{% endif %}">
+        <span style="width:6px;height:6px;border-radius:50%;background:#00b894;flex-shrink:0;"></span>Active
+    </a>
+    <a href="?branch={{ active_branch }}&status=locked"
+       class="hb-nav-btn {% if status_filter == 'locked' %}active{% endif %}">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-red);flex-shrink:0;"></span>Locked
+    </a>
 
     {% if can_write %}
-        <div class="ctx-divider" style="margin: 12px 0;"></div>
-        <a href="{% url 'handbook:new' %}?branch={{ active_branch }}" class="hb-branch-btn">
-            <span class="material-symbols-outlined">add_circle</span>
-            New Record
-        </a>
+    <div class="ctx-divider" style="margin: 12px 0;"></div>
+    <a href="{% url 'handbook:new' %}?branch={{ active_branch }}" class="hb-nav-btn">
+        <span class="material-symbols-outlined">add_circle</span>
+        New Record
+    </a>
     {% endif %}
+
     {% if is_editor %}
-        <a href="{% url 'handbook:access' %}" class="hb-branch-btn">
-            <span class="material-symbols-outlined">manage_accounts</span>
-            Manage Access
-        </a>
+    <a href="{% url 'handbook:access' %}" class="hb-nav-btn">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        Manage Access
+    </a>
     {% endif %}
+
+    <div class="ctx-divider" style="margin: 12px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 8px;">Recent</div>
+    <div id="hb-recent"
+         hx-get="{% url 'handbook:htmx-recent' %}"
+         hx-trigger="load"
+         style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="padding: var(--space-s); font-size: 12px; color: rgba(255,255,255,0.3);">Loading…</div>
+    </div>
 </div>
 {% endblock %}
 
-{# ── Column 3: Knowledge Explorer ── #}
 {% block ws_content %}
 <div class="ics-stage__content" data-watermark="Handbook" style="height:100%;overflow-y:auto;">
 
     <div style="padding: 28px 24px 12px; border-bottom: 1px solid var(--border-ink);">
-        <h1 class="ws-page-title" style="font-size: 22px; margin: 0 0 4px;">
+        <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: 8px;">
             {% if active_branch == 'reference' %}Reference Library
             {% elif active_branch == 'mandate' %}Mandate Branch
             {% else %}Keys Library{% endif %}
+        </div>
+        <h1 class="ws-page-title" style="font-size: 22px; margin: 0;">
+            {% if active_branch == 'reference' %}Principles, Classes &amp; Concepts
+            {% elif active_branch == 'mandate' %}Mandates, Frameworks &amp; Procedures
+            {% else %}My Keys{% endif %}
         </h1>
-        {% if not access %}
-            <p style="font-size: 13px; color: var(--text-muted-ink);">
-                You do not have access to the Handbook workspace. Contact an editor to be granted access.
-            </p>
-        {% endif %}
     </div>
 
-    {% if access %}
-        {% if records_by_type %}
-            {% for rtype, records in records_by_type.items %}
-                <div class="hb-type-section" style="margin-top: 20px;">
-                    <div class="hb-type-header">{{ rtype|title|cut:"_" }}</div>
-                    {% for record in records %}
-                        <a href="{% url 'handbook:record' record.id %}" class="hb-row">
-                            <span class="hb-row__title">{{ record.title }}</span>
-                            <span class="hb-status {{ record.status }}">{{ record.get_status_display }}</span>
-                            <span class="hb-row__meta">v{{ record.version_number }}</span>
-                            <span class="hb-row__meta">{{ record.updated_at|date:"d M Y" }}</span>
-                        </a>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-        {% else %}
-            <div style="padding: 60px 24px; text-align: center;">
-                <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.15; display: block; margin-bottom: 16px;">auto_stories</span>
-                <p style="font-size: 13px; color: var(--text-muted-ink);">
-                    No records in this branch yet.
-                    {% if can_write %}
-                        <a href="{% url 'handbook:new' %}?branch={{ active_branch }}" style="color: var(--accent-red);">Create the first.</a>
-                    {% endif %}
-                </p>
+    {% if not has_access and active_branch != 'keys' %}
+    <div style="padding: 80px 24px; text-align: center;">
+        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.15; display: block; margin-bottom: 16px;">lock</span>
+        <p style="font-size: 14px; color: var(--text-muted-ink); margin-bottom: 8px;">
+            The Handbook is for invited architects.
+        </p>
+        <p style="font-size: 12px; color: var(--text-muted-ink);">
+            Contact an editor to request access.
+        </p>
+    </div>
+    {% elif records_by_type %}
+        {% for rtype, records in records_by_type.items %}
+        <div class="hb-type-section" style="margin-top: 20px;">
+            <div class="hb-type-header">
+                {% if active_branch == 'reference' %}
+                    {{ library_type_labels|get_item:rtype|default:rtype }}
+                {% elif active_branch == 'mandate' %}
+                    {{ mandate_type_labels|get_item:rtype|default:rtype }}
+                {% else %}
+                    Keys
+                {% endif %}
             </div>
-        {% endif %}
-    {% else %}
-        <div style="padding: 80px 24px; text-align: center;">
-            <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.15; display: block; margin-bottom: 16px;">lock</span>
-            <p style="font-size: 14px; color: var(--text-muted-ink);">Access to the Handbook is by invitation only.</p>
+            {% for record in records %}
+            <a href="{% url 'handbook:record' record.id %}" class="hb-row">
+                <span class="hb-row__title">{{ record.title }}</span>
+                <span class="hb-status {{ record.status }}">{{ record.get_status_display }}</span>
+                <span class="hb-row__meta">{{ record.updated_at|date:"d M Y" }}</span>
+            </a>
+            {% endfor %}
         </div>
+        {% endfor %}
+    {% else %}
+    <div style="padding: 60px 24px; text-align: center;">
+        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.15; display: block; margin-bottom: 16px;">auto_stories</span>
+        <p style="font-size: 13px; color: var(--text-muted-ink);">
+            No records in this branch yet.
+            {% if can_write %}
+            <a href="{% url 'handbook:new' %}?branch={{ active_branch }}" style="color: var(--accent-red);">Create the first.</a>
+            {% endif %}
+        </p>
+    </div>
     {% endif %}
 
 </div>
 {% endblock %}
 
-{# ── Column 4: Properties Sidecar ── #}
 {% block ws_options %}
 <div style="padding: 16px;">
     <div class="ws-label-tag" style="margin-bottom: 12px;">Handbook</div>
     {% if access %}
-        <div style="font-size: 12px; line-height: 1.8; color: var(--text-muted-ink);">
-            <div><strong style="color: var(--text-ink);">Role</strong></div>
-            <div style="text-transform: capitalize; margin-bottom: 10px;">{{ access.role }}</div>
-
-            <div><strong style="color: var(--text-ink);">Branches</strong></div>
-            {% if access.role == 'reader' %}
-                <div>Reference Library (read)</div>
-                <div>Mandate Branch (read)</div>
-            {% else %}
-                <div>All branches (write)</div>
-            {% endif %}
-        </div>
+    <div style="font-size: 12px; line-height: 1.8; color: var(--text-muted-ink);">
+        <div><strong style="color: var(--text-ink);">Role</strong></div>
+        <div style="text-transform: capitalize; margin-bottom: 10px;">{{ access.role }}</div>
+        <div><strong style="color: var(--text-ink);">Access</strong></div>
+        {% if access.role == 'reader' %}
+        <div>Reference Library — read</div>
+        <div>Mandate Branch — read</div>
+        {% else %}
+        <div>All branches — read &amp; write</div>
+        {% endif %}
+    </div>
+    {% elif active_branch == 'keys' %}
+    <p style="font-size: 12px; color: var(--text-muted-ink);">Keys are personal — no access grant needed.</p>
     {% else %}
-        <p style="font-size: 12px; color: var(--text-muted-ink);">No access.</p>
+    <p style="font-size: 12px; color: var(--text-muted-ink);">No access. Contact an editor.</p>
+    {% endif %}
+
+    {% if can_write %}
+    <div style="height: 1px; background: var(--border-ink); margin: 16px 0;"></div>
+    <a href="{% url 'handbook:new' %}?branch={{ active_branch }}"
+       style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700;
+              color: var(--accent-red); text-decoration: none;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">add_circle</span>
+        New {{ active_branch|title }} Record
+    </a>
     {% endif %}
 </div>
 {% endblock %}

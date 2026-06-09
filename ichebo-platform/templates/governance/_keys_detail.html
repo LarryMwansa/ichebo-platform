@@ -35,14 +35,12 @@
 
   <div style="display: flex; align-items: center; gap: var(--space-s); margin-top: var(--space-xs);">
     <span class="badge b-muted">{{ record.status|upper }}</span>
-    <button class="btn-touch btn-sm"
-            style="background: var(--gov-accent); color: #fff; border-color: var(--gov-accent);"
-            hx-get="{% url 'governance:htmx-record-edit' record.id %}"
-            hx-target="#drawerInner" hx-swap="innerHTML"
-            onclick="window.ICSDrawer.open('Edit Key')">
+    <a href="{% url 'handbook:record' record.id %}"
+       class="btn-touch btn-sm"
+       style="background: var(--gov-accent); color: #fff; border-color: var(--gov-accent); text-decoration: none;">
       <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
-      Edit
-    </button>
+      Edit in Handbook
+    </a>
   </div>
 </div>
 

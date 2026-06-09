@@ -3,84 +3,204 @@
 
 {% block title %}Manage Access — Handbook{% endblock %}
 
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .hb-nav-btn {
+        display: flex; align-items: center; gap: 10px;
+        width: 100%; padding: 9px 12px;
+        border: none; background: transparent;
+        font-size: 13px; color: rgba(255,255,255,0.55);
+        cursor: pointer; border-radius: 6px;
+        text-decoration: none; transition: all 0.15s;
+    }
+    .hb-nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .hb-nav-btn .material-symbols-outlined { font-size: 16px; }
+
+    .hb-access-table { width: 100%; border-collapse: collapse; }
+    .hb-access-table th {
+        text-align: left; font-size: 10px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.07em;
+        color: var(--text-muted-ink); padding: 0 16px 10px;
+        border-bottom: 2px solid var(--border-ink);
+    }
+    .hb-access-table td {
+        padding: 14px 16px; border-bottom: 1px solid var(--border-ink);
+        font-size: 13px; color: var(--text-ink); vertical-align: middle;
+    }
+    .hb-role-badge {
+        display: inline-block; font-size: 10px; font-weight: 700;
+        letter-spacing: 0.05em; text-transform: uppercase;
+        padding: 2px 7px; border-radius: 4px;
+    }
+    .hb-role-badge.reader { background: rgba(99,110,114,0.12); color: #636e72; }
+    .hb-role-badge.author { background: rgba(0,184,148,0.12); color: #00b894; }
+    .hb-role-badge.editor { background: rgba(175,50,54,0.12); color: var(--accent-red); }
+
+    .hb-grant-form {
+        background: var(--card-bg, rgba(0,0,0,0.03));
+        border: 1px solid var(--border-ink); border-radius: 12px;
+        padding: 24px; margin-bottom: 32px;
+    }
+    .dark .hb-grant-form { background: rgba(255,255,255,0.03); }
+</style>
+{% endblock %}
+
 {% block context_header %}Handbook{% endblock %}
 
 {% block context_content %}
-    <div style="padding: 0 4px;">
-        <a href="{% url 'handbook:home' %}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;font-size:13px;color:rgba(255,255,255,0.6);text-decoration:none;">
-            <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
-            All Records
-        </a>
-    </div>
+<div style="padding: 0 4px;">
+    <a href="{% url 'handbook:home' %}" class="hb-nav-btn">
+        <span class="material-symbols-outlined">arrow_back</span>
+        All Records
+    </a>
+    <a href="{% url 'handbook:new' %}" class="hb-nav-btn">
+        <span class="material-symbols-outlined">add_circle</span>
+        New Record
+    </a>
+</div>
 {% endblock %}
 
 {% block ws_content %}
-    <div class="ics-stage__content" data-watermark="Access" style="height:100%;overflow-y:auto;">
-        <div style="max-width:700px;margin:0 auto;padding:32px 24px;">
-            <h1 class="ws-page-title" style="font-size:22px;margin:0 0 24px;">Manage Handbook Access</h1>
-            <div id="hb-access-list">
-                <p style="font-size:13px;color:var(--text-muted-ink);">Loading…</p>
+<div class="ics-stage__content" data-watermark="Handbook" style="height:100%;overflow-y:auto;">
+
+    <div style="padding: 28px 24px 16px; border-bottom: 1px solid var(--border-ink);">
+        <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: 8px;">Editor View</div>
+        <h1 class="ws-page-title" style="font-size: 22px; margin: 0;">Manage Access</h1>
+    </div>
+
+    <div style="padding: 28px 24px; max-width: 700px;">
+
+        {# ── Grant Access Form ── #}
+        <div class="hb-grant-form">
+            <div style="font-size: 13px; font-weight: 700; margin-bottom: 16px;">Grant Access</div>
+            <form method="post" action="{% url 'handbook:access' %}"
+                  style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+                {% csrf_token %}
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                  letter-spacing: 0.07em; color: var(--text-muted-ink);
+                                  display: block; margin-bottom: 6px;">User Email</label>
+                    <input type="email" name="email" required autocomplete="off"
+                           placeholder="user@example.com"
+                           style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-ink);
+                                  border-radius: 8px; background: transparent;
+                                  color: var(--text-ink); font-size: 13px; outline: none;
+                                  box-sizing: border-box;">
+                </div>
+                <div style="min-width: 140px;">
+                    <label style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                  letter-spacing: 0.07em; color: var(--text-muted-ink);
+                                  display: block; margin-bottom: 6px;">Role</label>
+                    <select name="role"
+                            style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-ink);
+                                   border-radius: 8px; background: var(--stone-bg);
+                                   color: var(--text-ink); font-size: 13px;">
+                        <option value="reader">Reader</option>
+                        <option value="author">Author</option>
+                        <option value="editor">Editor</option>
+                    </select>
+                </div>
+                <button type="submit" class="ws-topbar__cta"
+                        style="background: var(--accent-red); color: #fff; border: none;
+                               cursor: pointer; align-self: flex-end;">
+                    <span class="material-symbols-outlined">add</span>
+                    Grant
+                </button>
+            </form>
+            <div style="margin-top: 12px; font-size: 11px; color: var(--text-muted-ink); line-height: 1.6;">
+                <strong>Reader</strong> — read-only access to Reference Library and Mandate Branch.<br>
+                <strong>Author</strong> — create, draft, publish, and lock governance records.<br>
+                <strong>Editor</strong> — all Author permissions plus access management.
             </div>
         </div>
+
+        {# ── Access Table ── #}
+        <div style="font-size: 13px; font-weight: 700; margin-bottom: 16px;">
+            Current Access
+            <span style="font-size: 11px; font-weight: 400; color: var(--text-muted-ink); margin-left: 8px;">
+                {{ all_access|length }} member{{ all_access|length|pluralize }}
+            </span>
+        </div>
+
+        {% if all_access %}
+        <table class="hb-access-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Granted By</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in all_access %}
+                <tr>
+                    <td>
+                        <div style="font-weight: 600;">
+                            {{ entry.user.display_name|default:entry.user.email }}
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-muted-ink); margin-top: 2px;">
+                            {{ entry.user.email }}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="hb-role-badge {{ entry.role }}">{{ entry.role }}</span>
+                    </td>
+                    <td style="font-size: 12px; color: var(--text-muted-ink);">
+                        {% if entry.granted_by %}
+                            {{ entry.granted_by.display_name|default:entry.granted_by.email }}
+                        {% else %}—{% endif %}
+                    </td>
+                    <td style="font-size: 12px; color: var(--text-muted-ink);">
+                        {{ entry.granted_at|date:"d M Y" }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="padding: 40px 0; text-align: center;">
+            <span class="material-symbols-outlined"
+                  style="font-size: 40px; opacity: 0.15; display: block; margin-bottom: 12px;">
+                manage_accounts
+            </span>
+            <p style="font-size: 13px; color: var(--text-muted-ink);">
+                No one has been granted Handbook access yet.
+            </p>
+        </div>
+        {% endif %}
+
     </div>
+</div>
 {% endblock %}
 
 {% block ws_options %}
-    <div style="padding:14px;">
-        <div class="ws-label-tag" style="margin-bottom:12px;">Grant Access</div>
-        <div style="font-size:12px;color:var(--text-muted-ink);margin-bottom:10px;">
-            Enter the User ID (UUID) and select a role.
+<div style="padding: 16px;">
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Access Summary</div>
+
+    {% regroup all_access by role as role_groups %}
+    {% for group in role_groups %}
+    <div style="margin-bottom: 12px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.07em; color: var(--text-muted-ink); margin-bottom: 6px;">
+            {{ group.grouper|title }}
         </div>
-        <div style="margin-bottom:8px;">
-            <label style="font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted-ink);display:block;margin-bottom:4px;">User ID</label>
-            <input id="hb-grant-user" type="text" style="width:100%;padding:6px 8px;border:1px solid var(--border-ink);border-radius:5px;font-size:12px;background:transparent;color:var(--text-ink);" placeholder="UUID">
+        {% for entry in group.list %}
+        <div style="font-size: 12px; color: var(--text-ink); padding: 3px 0;
+                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            {{ entry.user.display_name|default:entry.user.email }}
         </div>
-        <div style="margin-bottom:12px;">
-            <label style="font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted-ink);display:block;margin-bottom:4px;">Role</label>
-            <select id="hb-grant-role" style="width:100%;padding:6px 8px;border:1px solid var(--border-ink);border-radius:5px;font-size:12px;background:var(--stone-bg);color:var(--text-ink);">
-                <option value="reader">Reader</option>
-                <option value="author">Author</option>
-                <option value="editor">Editor</option>
-            </select>
-        </div>
-        <button onclick="HBAccess.grant()" style="width:100%;padding:8px;background:var(--accent-red);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
-            Grant Access
-        </button>
+        {% endfor %}
     </div>
-{% endblock %}
+    {% empty %}
+    <p style="font-size: 12px; color: var(--text-muted-ink);">No members yet.</p>
+    {% endfor %}
 
-{% block extra_js %}
-<script>
-const HBAccess = {
-    async load() {
-        const r = await fetch('/api/handbook/access/');
-        const data = await r.json();
-        const list = document.getElementById('hb-access-list');
-        if (!data.length) { list.innerHTML = '<p style="font-size:13px;color:var(--text-muted-ink);">No access grants yet.</p>'; return; }
-        list.innerHTML = data.map(a => `
-            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-ink);font-size:13px;">
-                <div style="flex:1;">
-                    <div style="font-weight:600;">${a.user_name || a.user}</div>
-                    <div style="font-size:11px;color:var(--text-muted-ink);">${a.user_email || ''}</div>
-                </div>
-                <span style="font-size:11px;font-weight:600;text-transform:capitalize;padding:3px 8px;border-radius:4px;background:rgba(0,0,0,0.06);">${a.role}</span>
-            </div>
-        `).join('');
-    },
-
-    async grant() {
-        const user = document.getElementById('hb-grant-user').value.trim();
-        const role = document.getElementById('hb-grant-role').value;
-        if (!user) return;
-        const csrf = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
-        const r = await fetch('/api/handbook/access/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
-            body: JSON.stringify({ user, role }),
-        });
-        if (r.ok) { document.getElementById('hb-grant-user').value = ''; this.load(); }
-    },
-};
-HBAccess.load();
-</script>
+    <div style="height: 1px; background: var(--border-ink); margin: 16px 0;"></div>
+    <div style="font-size: 11px; color: var(--text-muted-ink); line-height: 1.6;">
+        <strong style="color: var(--text-ink);">Your Role</strong><br>
+        Editor — full access
+    </div>
+</div>
 {% endblock %}

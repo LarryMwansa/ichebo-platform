@@ -15,13 +15,11 @@
                 <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; color: var(--text); margin: 0; line-height: 1.2;">{{ record.title }}</h1>
             </div>
             <div class="ws-page-header__actions" style="flex-shrink: 0;">
-                {% if is_level5 and record.status != 'locked' %}
-                <a href="{% url 'governance:htmx-record-edit' record.id %}"
-                   class="ws-topbar__cta" style="text-decoration: none;">
-                    <span class="material-symbols-outlined">edit_note</span>
-                    Edit Decree
+                <a href="{% url 'handbook:home' %}"
+                   class="ws-topbar__cta" style="text-decoration: none; background: none; border: 1px solid var(--border-ink);">
+                    <span class="material-symbols-outlined">auto_stories</span>
+                    Open Handbook
                 </a>
-                {% endif %}
             </div>
         </div>
 

@@ -72,7 +72,6 @@ def governance_home(request):
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
         'active_branch': 'library',
-        'is_level5':     _level(request.user) >= 5,
     })
 
 
@@ -91,8 +90,7 @@ def library_home(request):
     ).order_by('-created_at')
     if search:
         records = records.filter(title__icontains=search)
-    records = records.exclude(status='superseded')
-    is_level5 = _level(request.user) >= 5
+    records = records.filter(status__in=['active', 'locked'])
     return _shell_or_partial(request, 'governance/_library_list.html', {
         'records':       records,
         'record_type':   None,
@@ -100,8 +98,6 @@ def library_home(request):
         'search':        search,
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
-        'is_level5':     is_level5,
-        'fab_hidden':    not is_level5,
         'active_branch': 'library',
     }, shell_template='workspace/governance/home.html')
 
@@ -120,7 +116,6 @@ def library_list(request, record_type):
     if tag_filter:
         records = [r for r in records if tag_filter in (r.tags or [])]
 
-    is_level5 = _level(request.user) >= 5
     return _shell_or_partial(request, 'governance/_library_list.html', {
         'records':       records,
         'record_type':   record_type,
@@ -129,8 +124,6 @@ def library_list(request, record_type):
         'tag_filter':    tag_filter,
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
-        'is_level5':     is_level5,
-        'fab_hidden':    not is_level5,
         'active_branch': 'library',
     }, shell_template='workspace/governance/home.html')
 
@@ -151,12 +144,11 @@ def library_detail(request, record_id):
         via_record = Record.objects.filter(id=via_id).first()
 
     return _shell_or_partial(request, 'governance/_library_detail.html', {
-        'record':      record,
-        'via_record':  via_record,
+        'record':        record,
+        'via_record':    via_record,
         'library_types': LIBRARY_TYPE_LABELS,
-        'is_level5':   _level(request.user) >= 5,
         'active_branch': 'library',
-        'record_type': record.record_type,
+        'record_type':   record.record_type,
     }, shell_template='workspace/governance/record_detail.html')
 
 
@@ -175,8 +167,7 @@ def mandate_home(request):
     ).order_by('-created_at')
     if search:
         records = records.filter(title__icontains=search)
-    records = records.exclude(status='superseded')
-    is_level5 = _level(request.user) >= 5
+    records = records.filter(status__in=['active', 'locked'])
     return _shell_or_partial(request, 'governance/_mandate_list.html', {
         'records':       records,
         'record_type':   None,
@@ -184,8 +175,6 @@ def mandate_home(request):
         'search':        search,
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
-        'is_level5':     is_level5,
-        'fab_hidden':    not is_level5,
         'active_branch': 'mandate',
     }, shell_template='workspace/governance/home.html')
 
@@ -200,7 +189,6 @@ def mandate_list(request, record_type):
     search = request.GET.get('q', '').strip()
     records = get_handbook_records(record_type, search=search)
 
-    is_level5 = _level(request.user) >= 5
     return _shell_or_partial(request, 'governance/_mandate_list.html', {
         'records':       records,
         'record_type':   record_type,
@@ -208,8 +196,6 @@ def mandate_list(request, record_type):
         'search':        search,
         'library_types': LIBRARY_TYPE_LABELS,
         'mandate_types': MANDATE_TYPE_LABELS,
-        'is_level5':     is_level5,
-        'fab_hidden':    not is_level5,
         'active_branch': 'mandate',
     }, shell_template='workspace/governance/home.html')
 
@@ -233,9 +219,8 @@ def mandate_detail(request, record_id):
         'record':        record,
         'via_record':    via_record,
         'mandate_types': MANDATE_TYPE_LABELS,
-        'is_level5':     _level(request.user) >= 5,
         'active_branch': 'mandate',
-        'record_type': record.record_type,
+        'record_type':   record.record_type,
     }, shell_template='workspace/governance/record_detail.html')
 
 

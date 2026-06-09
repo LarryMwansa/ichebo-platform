@@ -16,18 +16,16 @@
       </div>
     </button>
 
-    <button class="list-item" 
-            hx-get="{% url 'governance:htmx-record-create' %}" 
-            hx-target="#drawerInner"
-            style="width: 100%; text-align: left; background: none; border: none;">
+    <a class="list-item" href="{% url 'handbook:new' %}"
+       style="text-decoration: none;">
       <div class="list-item__icon" style="background: rgba(126, 34, 206, 0.1); color: #7e22ce;">
-        <span class="material-symbols-outlined">account_balance</span>
+        <span class="material-symbols-outlined">auto_stories</span>
       </div>
       <div class="list-item__content">
-        <div class="list-item__title">Governance Record</div>
-        <div class="list-item__meta">Draft a decree, principle or edict</div>
+        <div class="list-item__title">Handbook Record</div>
+        <div class="list-item__meta">Draft a principle, mandate or framework</div>
       </div>
-    </button>
+    </a>
 
     <button class="list-item" 
             hx-get="{% url 'activity:htmx-create' %}" 

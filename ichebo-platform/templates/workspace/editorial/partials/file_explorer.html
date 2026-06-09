@@ -3,7 +3,7 @@
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Recent</div>
     {% for rec in recent_records %}
-        <a href="{% url 'governance:desk-edit' rec.id %}" class="ctx-btn {% if record.id == rec.id %}active{% endif %}">
+        <a href="{% url 'handbook:record' rec.id %}" class="ctx-btn {% if record.id == rec.id %}active{% endif %}">
             <span class="material-symbols-outlined">history_edu</span>
             {{ rec.title|default:'Untitled' }}
         </a>
@@ -15,7 +15,7 @@
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Journals</div>
     {% for draft in journal_drafts %}
-    <a href="{% url 'governance:desk-edit' draft.id %}" class="ctx-btn">
+    <a href="{% url 'handbook:record' draft.id %}" class="ctx-btn">
         <span class="material-symbols-outlined">edit_square</span>
         {{ draft.title|default:'Draft' }}
     </a>
@@ -25,7 +25,7 @@
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Governance</div>
     {% for draft in gov_drafts %}
-    <a href="{% url 'governance:desk-edit' draft.id %}" class="ctx-btn">
+    <a href="{% url 'handbook:record' draft.id %}" class="ctx-btn">
         <span class="material-symbols-outlined">gavel</span>
         {{ draft.title|default:'Act' }}
     </a>
@@ -35,7 +35,7 @@
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Missions</div>
     {% for mission in active_missions %}
-    <a href="{% url 'governance:desk' %}?family=activity&type={{ mission.activity_type }}" class="ctx-btn">
+    <a href="{% url 'handbook:home' %}?family=activity&type={{ mission.activity_type }}" class="ctx-btn">
         <span class="material-symbols-outlined">rocket_launch</span>
         {{ mission.title|default:'Task' }}
     </a>

@@ -45,27 +45,4 @@
   </div>
   {% endif %}
 
-  {# Level 5: Quick Link Form #}
-  {% if is_level5 %}
-  <div style="margin-top: var(--space-xl); background: var(--bg-secondary); padding: var(--space-m); border-radius: var(--radius-m); border: 1px solid var(--border);">
-    <div class="label-caps" style="margin-bottom: var(--space-s);">Establish Connection</div>
-    <form hx-post="{% url 'governance:htmx-relationship-create' %}"
-          hx-target="#ws-linked-records"
-          hx-swap="innerHTML"
-          style="display: flex; flex-direction: column; gap: 8px;">
-      {% csrf_token %}
-      <input type="hidden" name="from_record_id" value="{{ record.id }}">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <select name="relationship_type" style="padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); font-size: 12px;">
-          {% for rt in relationship_types %}
-          <option value="{{ rt }}">{{ rt|title|cut:"_" }}</option>
-          {% endfor %}
-        </select>
-        <input type="text" name="to_record_id" placeholder="Target Record ID" style="padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); font-size: 12px;">
-      </div>
-      <input type="text" name="notes" placeholder="Notes (optional)" style="padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); font-size: 12px;">
-      <button type="submit" class="ws-btn ws-btn--primary" style="font-size: 12px;">Create Link</button>
-    </form>
-  </div>
-  {% endif %}
 </div>

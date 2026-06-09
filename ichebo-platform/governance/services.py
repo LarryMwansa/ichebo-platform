@@ -64,7 +64,7 @@ def get_handbook_records(record_type, search='', status_filter=None):
     if status_filter:
         qs = qs.filter(status=status_filter)
     else:
-        qs = qs.exclude(status='superseded')
+        qs = qs.filter(status__in=['active', 'locked'])
 
     return qs
 

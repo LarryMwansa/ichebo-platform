@@ -1,0 +1,35 @@
+{% for rel in outgoing %}
+<a href="{% url 'handbook:record' rel.to_record.id %}"
+   style="display:flex;align-items:center;gap:8px;padding:10px 0;
+          border-bottom:1px solid var(--border-ink);text-decoration:none;color:var(--text-ink);">
+    <span class="material-symbols-outlined" style="font-size:15px;color:var(--muted);">link</span>
+    <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            {{ rel.to_record.title|truncatechars:44 }}
+        </div>
+        {% if rel.label %}
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;">{{ rel.label }}</div>
+        {% endif %}
+    </div>
+    <span class="material-symbols-outlined" style="font-size:13px;color:var(--muted);flex-shrink:0;">arrow_forward_ios</span>
+</a>
+{% empty %}
+<p style="font-size:12px;color:var(--muted);padding:10px 0;">No linked records.</p>
+{% endfor %}
+
+{% if incoming %}
+<div style="margin-top:12px;">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+                color:var(--muted);margin-bottom:6px;">Referenced By</div>
+    {% for rel in incoming %}
+    <a href="{% url 'handbook:record' rel.from_record.id %}"
+       style="display:flex;align-items:center;gap:8px;padding:8px 0;
+              border-bottom:1px solid var(--border-ink);text-decoration:none;color:var(--text-ink);">
+        <span class="material-symbols-outlined" style="font-size:15px;color:var(--muted);">subdirectory_arrow_right</span>
+        <div style="flex:1;min-width:0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            {{ rel.from_record.title|truncatechars:44 }}
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
