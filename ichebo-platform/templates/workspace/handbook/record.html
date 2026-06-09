@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
 <style>
     .hb-nav-btn {
         display: flex; align-items: center; gap: 10px;
@@ -17,28 +18,6 @@
     .hb-nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
     .hb-nav-btn .material-symbols-outlined { font-size: 16px; }
 
-    .hb-canvas { max-width: 700px; margin: 0 auto; padding: 32px 24px 100px; }
-
-    .hb-title-input {
-        width: 100%; font-family: 'Playfair Display', serif;
-        font-size: 28px; font-weight: 800;
-        border: none; outline: none; background: transparent;
-        color: var(--text-ink); padding: 0; margin-bottom: 8px;
-    }
-    .hb-title-input::placeholder { opacity: 0.3; }
-
-    .hb-record-id {
-        font-family: 'Fira Code', monospace; font-size: 10px;
-        color: var(--text-muted-ink); margin-bottom: 16px; display: block;
-    }
-
-    .hb-canvas__editor {
-        width: 100%; min-height: 420px; border: none; outline: none;
-        background: transparent; font-size: 14px; color: var(--text-ink);
-        line-height: 1.85; resize: none; font-family: 'Inter', sans-serif;
-    }
-    .hb-canvas__editor:focus { outline: none; }
-
     .hb-status {
         font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
         text-transform: uppercase; padding: 2px 7px; border-radius: 4px;
@@ -47,13 +26,6 @@
     .hb-status.active     { background: rgba(0,184,148,0.12); color: #00b894; }
     .hb-status.locked     { background: rgba(175,50,54,0.12); color: var(--accent-red); }
     .hb-status.superseded { background: rgba(253,203,110,0.12); color: #e17055; }
-
-    .hb-save-bar {
-        position: sticky; bottom: 0; left: 0; right: 0;
-        background: var(--stone-bg); border-top: 1px solid var(--border-ink);
-        padding: 12px 24px; display: flex; align-items: center; gap: 10px;
-        z-index: 10;
-    }
 </style>
 {% endblock %}
 
@@ -61,29 +33,15 @@
 
 {% block context_content %}
 <div style="padding: 0 4px;">
+
     <a href="{% url 'handbook:home' %}" class="hb-nav-btn">
         <span class="material-symbols-outlined">arrow_back</span>
         All Records
     </a>
-
-    {% if record %}
-    <div class="ctx-divider" style="margin: 10px 0;"></div>
-    <div class="ws-label-tag" style="margin-bottom: 8px;">Branch</div>
-    <div class="hb-nav-btn" style="cursor: default; color: rgba(255,255,255,0.7);">
-        {% if is_reference %}<span class="material-symbols-outlined">library_books</span>Reference Library
-        {% elif is_key %}<span class="material-symbols-outlined">key</span>Keys Library
-        {% else %}<span class="material-symbols-outlined">gavel</span>Mandate Branch{% endif %}
-    </div>
-    {% endif %}
-
-    {% if can_write %}
-    <div class="ctx-divider" style="margin: 10px 0;"></div>
-    <a href="{% url 'handbook:new' %}?branch={% if is_key %}keys{% elif is_reference %}reference{% else %}mandate{% endif %}"
-       class="hb-nav-btn">
+    <a href="{% url 'handbook:new' %}" class="hb-nav-btn">
         <span class="material-symbols-outlined">add_circle</span>
         New Record
     </a>
-    {% endif %}
 
     {% if is_editor %}
     <a href="{% url 'handbook:access' %}" class="hb-nav-btn">
@@ -91,237 +49,131 @@
         Manage Access
     </a>
     {% endif %}
-</div>
-{% endblock %}
 
-{% block ws_content %}
-<div class="ics-stage__content" data-watermark="Handbook" style="height:100%;overflow-y:auto;display:flex;flex-direction:column;">
+    <div class="ctx-divider" style="margin: 10px 0;"></div>
 
-    <form id="hb-record-form"
-          hx-post="{% url 'handbook:save' %}"
-          hx-target="#hb-save-status"
-          hx-swap="innerHTML"
-          style="flex:1;display:flex;flex-direction:column;">
-        {% csrf_token %}
-        {% if record %}<input type="hidden" name="record_id" value="{{ record.id }}">{% endif %}
-        <input type="hidden" name="active_branch" value="{% if is_key %}keys{% elif is_reference %}reference{% else %}mandate{% endif %}">
-        <input type="hidden" id="hb-record-type-input" name="record_type" value="{{ record.record_type|default:'' }}">
-
-        <div class="hb-canvas">
-            {% if record %}
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
-                <span class="hb-status {{ record.status }}">{{ record.get_status_display }}</span>
-                <span style="font-size:11px;color:var(--text-muted-ink);">
-                    {{ record.record_type|title|cut:"_" }}
-                </span>
-                {% if record.previous_version_id %}
-                <span style="font-size:11px;color:var(--text-muted-ink);">
-                    Updated from earlier version
-                </span>
-                {% endif %}
-                <span style="font-size:11px;color:var(--text-muted-ink);margin-left:auto;">
-                    Last saved {{ record.updated_at|date:"d M Y · H:i" }}
-                </span>
-            </div>
-            {% endif %}
-
-            <input type="text" name="title" class="hb-title-input"
-                   placeholder="Record title…"
-                   value="{{ record.title|default:'' }}"
-                   {% if record and record.status == 'locked' %}readonly{% endif %}>
-
-            {% if record %}
-            <span class="hb-record-id">{{ record.id }}</span>
-            {% endif %}
-
-            <textarea name="content" class="hb-canvas__editor"
-                      placeholder="Write the record content here…"
-                      {% if record and record.status == 'locked' %}readonly{% endif %}>{{ record.content|default:'' }}</textarea>
-        </div>
-
-        {% if can_write %}
-        <div class="hb-save-bar">
-            {% if not record or record.status != 'locked' %}
-            <button type="submit" class="ws-topbar__cta"
-                    style="background: var(--accent-red); color: #fff; border: none; cursor: pointer;">
-                <span class="material-symbols-outlined">save</span>
-                Save
-            </button>
-            {% endif %}
-            <span id="hb-save-status" style="font-size:12px;color:var(--text-muted-ink);"></span>
-            {% if record and record.status == 'draft' %}
-            <button type="button"
-                    hx-post="{% url 'handbook:htmx-publish' record.id %}"
-                    hx-target="#hb-save-status"
-                    hx-swap="innerHTML"
-                    class="ws-topbar__cta" style="background:none;border:1px solid #00b894;color:#00b894;cursor:pointer;">
-                <span class="material-symbols-outlined">publish</span>
-                Publish
-            </button>
-            {% endif %}
-            {% if record and record.status == 'active' and not is_key %}
-            <button type="button"
-                    hx-post="{% url 'handbook:htmx-lock' record.id %}"
-                    hx-target="#hb-save-status"
-                    hx-swap="innerHTML"
-                    class="ws-topbar__cta" style="background:none;border:1px solid var(--border-ink);cursor:pointer;">
-                <span class="material-symbols-outlined">lock</span>
-                Lock
-            </button>
-            {% endif %}
-            {% if record and record.status == 'locked' and not is_key %}
-            <button type="button"
-                    hx-post="{% url 'handbook:htmx-new-version' record.id %}"
-                    hx-confirm="Create a new version? The current record will be superseded."
-                    class="ws-topbar__cta" style="background:none;border:1px solid var(--border-ink);cursor:pointer;">
-                <span class="material-symbols-outlined">fork_right</span>
-                New Version
-            </button>
-            {% endif %}
-        </div>
-        {% endif %}
-    </form>
-
-</div>
-{% endblock %}
-
-{% block ws_options %}
-<div class="ics-options-bar__inner">
-
-    {% block ws_options_tabs %}
-    <div class="ics-options-tabs">
-        <button class="ics-options-tab active" id="hbtab-meta" onclick="hbSwitchTab('meta')">Details</button>
-        <button class="ics-options-tab" id="hbtab-links" onclick="hbSwitchTab('links')">Links</button>
-        {% if record and history|length > 1 %}
-        <button class="ics-options-tab" id="hbtab-history" onclick="hbSwitchTab('history')">History</button>
-        {% endif %}
+    {# ── Governance type dial — scoped to governance only ── #}
+    {% if can_write and not record or can_write and record and record.status != 'locked' %}
+    <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Record Type</div>
+    <div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--space-s);" id="hb-type-nav">
+        {% for rt in record_types_reference %}
+        <button type="button"
+                class="ctx-btn {% if record and record.record_type == rt or not record and forloop.first and is_reference %}active{% endif %}"
+                data-type="{{ rt }}"
+                onclick="HBDial.setType(this, '{{ rt }}')">
+            <span class="material-symbols-outlined">
+                {% if rt == 'class' %}category
+                {% elif rt == 'principle' %}lightbulb
+                {% elif rt == 'concept' %}psychology
+                {% elif rt == 'divine_pattern' %}pattern
+                {% else %}article{% endif %}
+            </span>
+            {{ rt|title|cut:"_" }}
+        </button>
+        {% endfor %}
+        <div class="ctx-divider" style="margin: 4px 0;"></div>
+        {% for rt in record_types_mandate %}
+        <button type="button"
+                class="ctx-btn {% if record and record.record_type == rt %}active{% endif %}"
+                data-type="{{ rt }}"
+                onclick="HBDial.setType(this, '{{ rt }}')">
+            <span class="material-symbols-outlined">
+                {% if rt == 'mandate' %}gavel
+                {% elif rt == 'statement' %}format_quote
+                {% elif rt == 'framework' %}account_tree
+                {% elif rt == 'narrative' %}history_edu
+                {% elif rt == 'protocol' %}rule
+                {% elif rt == 'procedure' %}checklist
+                {% elif rt == 'programme' %}school
+                {% elif rt == 'subject' %}topic
+                {% elif rt == 'entity' %}badge
+                {% else %}description{% endif %}
+            </span>
+            {{ rt|title|cut:"_" }}
+        </button>
+        {% endfor %}
     </div>
-    {% endblock %}
 
-    <div class="ics-options-bar__content">
+    <div class="ctx-divider" style="margin: 10px 0;"></div>
+    {% endif %}
 
-        {# ── Details Pane ── #}
-        <div class="ws-options-pane active" id="hbpane-meta" style="padding: var(--space-m);">
-            <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: var(--space-s);">Record Type</div>
-
-            {% if can_write and not record or can_write and record and record.status != 'locked' %}
-            <select id="hb-type-selector"
-                    onchange="document.getElementById('hb-record-type-input').value=this.value"
-                    style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
-                           background:var(--bg);color:var(--text);font-size:12px;margin-bottom:var(--space-m);">
-                {% if is_reference or not record %}
-                <optgroup label="Reference Library">
-                    {% for rt in record_types_by_branch.reference %}
-                    <option value="{{ rt }}" {% if record and record.record_type == rt %}selected{% endif %}>{{ library_type_labels|default:'' }}{{ rt|title|cut:"_" }}</option>
-                    {% endfor %}
-                </optgroup>
-                <optgroup label="Mandate Branch">
-                    {% for rt in record_types_by_branch.mandate %}
-                    <option value="{{ rt }}" {% if record and record.record_type == rt %}selected{% endif %}>{{ rt|title|cut:"_" }}</option>
-                    {% endfor %}
-                </optgroup>
-                {% elif is_key %}
-                <option value="key" selected>Key</option>
-                {% else %}
-                {% for rt in record_types_by_branch.mandate %}
-                <option value="{{ rt }}" {% if record and record.record_type == rt %}selected{% endif %}>{{ rt|title|cut:"_" }}</option>
-                {% endfor %}
-                {% endif %}
-            </select>
-            {% elif record %}
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:var(--space-m);">
-                {{ record.record_type|title|cut:"_" }}
-            </div>
-            {% endif %}
-
-            {% if is_reference and can_write %}
-            <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: var(--space-s);">HRS Attributes</div>
-            {% for field, label in hrs_attrs %}
-            <div style="margin-bottom: 10px;">
-                <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
-                              color:var(--muted);display:block;margin-bottom:4px;">{{ label }}</label>
-                <input type="text" name="{{ field }}" form="hb-record-form"
-                       value="{{ record.custom_fields|default:'{}'|get_item:field|default:'' }}"
-                       style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;
-                              background:var(--bg);color:var(--text);font-size:12px;">
-            </div>
-            {% endfor %}
-            {% elif record and is_reference %}
-            <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: var(--space-s);">HRS Attributes</div>
-            {% for field, label in hrs_attrs %}
-            {% with val=record.custom_fields|default:'{}'|get_item:field %}{% if val %}
-            <div style="margin-bottom:8px;">
-                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);">{{ label }}</div>
-                <div style="font-size:12px;color:var(--text);margin-top:2px;">{{ val }}</div>
-            </div>
-            {% endif %}{% endwith %}
-            {% endfor %}
-            {% endif %}
-
-            {% if record %}
-            <div style="height:1px;background:var(--border);margin:16px 0;"></div>
-            <div class="ws-label-tag" style="margin-bottom:8px;">Status</div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">
-                {{ record.get_status_display }}
-            </div>
-            <div style="font-size:11px;color:var(--muted);">
-                Created {{ record.created_at|date:"d M Y" }}
-            </div>
-            {% if record.created_by %}
-            <div style="font-size:11px;color:var(--muted);">
-                By {{ record.created_by.display_name|default:record.created_by.email }}
-            </div>
-            {% endif %}
-            {% endif %}
-        </div>
-
-        {# ── Links Pane ── #}
-        <div class="ws-options-pane" id="hbpane-links" style="display:none;padding:var(--space-m);">
-            {% if record %}
-            <div class="ws-label-tag" style="color:var(--accent-red);margin-bottom:var(--space-s);">Linked Records</div>
-            <div id="hb-links-panel"
-                 hx-get="{% url 'handbook:htmx-links' record.id %}"
-                 hx-trigger="intersect once">
-                <div style="font-size:12px;color:var(--muted);padding:12px 0;">Loading…</div>
-            </div>
-            {% else %}
-            <p style="font-size:12px;color:var(--muted);">Save the record first to manage links.</p>
-            {% endif %}
-        </div>
-
-        {# ── History Pane ── #}
-        {% if record and history|length > 1 %}
-        <div class="ws-options-pane" id="hbpane-history" style="display:none;padding:var(--space-m);">
-            <div class="ws-label-tag" style="color:var(--accent-red);margin-bottom:var(--space-s);">Version Chain</div>
-            {% for h in history %}
-            <a href="{% url 'handbook:record' h.id %}"
-               style="display:flex;align-items:center;gap:8px;padding:10px 0;
-                      border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);">
-                <span class="material-symbols-outlined" style="font-size:15px;color:var(--muted);">
-                    {% if h.id == record.id %}radio_button_checked{% else %}radio_button_unchecked{% endif %}
-                </span>
-                <div style="flex:1;min-width:0;">
-                    <div style="font-size:12px;font-weight:600;">{{ h.title|truncatechars:40 }}</div>
-                    <div style="font-size:10px;color:var(--muted);margin-top:2px;">
-                        {{ h.get_status_display }} · {{ h.updated_at|date:"d M Y" }}
-                    </div>
-                </div>
-            </a>
-            {% endfor %}
-        </div>
-        {% endif %}
-
+    {# ── Recent governance records ── #}
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Recent</div>
+    <div id="hb-recent"
+         hx-get="{% url 'handbook:htmx-recent' %}"
+         hx-trigger="load"
+         style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="padding: var(--space-s); font-size: 12px; color: rgba(255,255,255,0.3);">Loading…</div>
     </div>
+
 </div>
 
 <script>
-function hbSwitchTab(name) {
-    ['meta', 'links', 'history'].forEach(t => {
-        const btn = document.getElementById('hbtab-' + t);
-        const pane = document.getElementById('hbpane-' + t);
-        if (btn) btn.classList.toggle('active', t === name);
-        if (pane) pane.style.display = (t === name) ? 'block' : 'none';
-    });
-}
+const HBDial = {
+    setType(btn, type) {
+        document.querySelectorAll('#hb-type-nav .ctx-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        const fi = document.getElementById('hidden-record-family');
+        const ti = document.getElementById('hidden-record-type');
+        const st = document.getElementById('save-status');
+        if (fi) fi.value = 'governance';
+        if (ti) ti.value = type;
+        if (st) st.textContent = 'Handbook · ' + type.replace(/_/g, ' ');
+    }
+};
+document.addEventListener('DOMContentLoaded', () => {
+    const ti = document.getElementById('hidden-record-type');
+    if (ti && ti.value) {
+        const btn = document.querySelector(`[data-type="${ti.value}"]`);
+        if (btn) HBDial.setType(btn, ti.value);
+    }
+});
 </script>
+{% endblock %}
+
+{% block ws_content %}
+    {# ── Full Desk editor canvas — toolbar + writing area + preview ── #}
+    {% with save_url=handbook_save_url %}
+        {% include "workspace/editorial/partials/editor.html" %}
+    {% endwith %}
+
+    {# ── Lifecycle action bar below the canvas (publish / lock / new version) ── #}
+    {% if can_write and record %}
+    <div style="display: flex; align-items: center; gap: 10px; padding: 10px 24px;
+                border-top: 1px solid var(--border-ink); background: var(--stone-bg);">
+        {% if record.status == 'draft' %}
+        <button hx-post="{% url 'handbook:htmx-publish' record.id %}"
+                hx-target="#hb-lifecycle-status" hx-swap="innerHTML"
+                class="ws-topbar__cta"
+                style="background: none; border: 1px solid #00b894; color: #00b894; cursor: pointer;">
+            <span class="material-symbols-outlined">publish</span>
+            Publish
+        </button>
+        {% endif %}
+        {% if record.status == 'active' %}
+        <button hx-post="{% url 'handbook:htmx-lock' record.id %}"
+                hx-target="#hb-lifecycle-status" hx-swap="innerHTML"
+                class="ws-topbar__cta"
+                style="background: none; border: 1px solid var(--border-ink); cursor: pointer;">
+            <span class="material-symbols-outlined">lock</span>
+            Lock
+        </button>
+        {% endif %}
+        {% if record.status == 'locked' %}
+        <button hx-post="{% url 'handbook:htmx-new-version' record.id %}"
+                hx-confirm="Create a new version? The current record will be superseded."
+                class="ws-topbar__cta"
+                style="background: none; border: 1px solid var(--border-ink); cursor: pointer;">
+            <span class="material-symbols-outlined">fork_right</span>
+            New Version
+        </button>
+        {% endif %}
+        <span class="hb-status {{ record.status }}" style="margin-left: 4px;">{{ record.get_status_display }}</span>
+        <span id="hb-lifecycle-status" style="font-size: 12px; color: var(--text-muted-ink);"></span>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block ws_options %}
+    {% include "workspace/editorial/partials/dynamic_options.html" %}
 {% endblock %}

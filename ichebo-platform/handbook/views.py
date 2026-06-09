@@ -189,21 +189,43 @@ def handbook_record(request, record_id):
         'to_record', 'bible_verse', 'bible_verse__book'
     )
 
+    from django.urls import reverse
+    recent_records = Record.objects.filter(
+        created_by=request.user,
+        record_family='governance',
+        deleted_at__isnull=True,
+    ).order_by('-updated_at')[:8]
+    gov_drafts = Record.objects.filter(
+        created_by=request.user,
+        record_family='governance',
+        status='draft',
+        deleted_at__isnull=True,
+    ).order_by('-updated_at')[:5]
+
     return render(request, 'workspace/handbook/record.html', {
-        'active_app':      'handbook',
-        'ws_page_title':   record.title,
-        'access':          access,
-        'record':          record,
-        'history':         history,
-        'outgoing':        outgoing,
-        'can_write':       can_write,
-        'is_editor':       _is_editor(access),
-        'is_reference':    record.record_type in LIBRARY_TYPES,
-        'is_key':          record.record_type == 'key',
-        'hrs_attrs':       HRS_ATTRS,
-        'record_types_by_branch': json.dumps(RECORD_TYPES_BY_BRANCH),
-        'library_type_labels': LIBRARY_TYPE_LABELS,
-        'mandate_type_labels': MANDATE_TYPE_LABELS,
+        'active_app':           'handbook',
+        'ws_page_title':        record.title,
+        'access':               access,
+        'record':               record,
+        'history':              history,
+        'outgoing':             outgoing,
+        'can_write':            can_write,
+        'is_editor':            _is_editor(access),
+        'is_reference':         record.record_type in LIBRARY_TYPES,
+        'is_key':               record.record_type == 'key',
+        'hrs_attrs':            HRS_ATTRS,
+        'record_types_reference': LIBRARY_TYPES,
+        'record_types_mandate':   MANDATE_TYPES,
+        # Editor canvas context
+        'save_url':             reverse('handbook:save'),
+        'handbook_save_url':    reverse('handbook:save'),
+        'active_family':        'governance',
+        'active_type':          record.record_type,
+        'is_desk':              True,
+        'recent_records':       recent_records,
+        'gov_drafts':           gov_drafts,
+        'journal_drafts':       [],
+        'active_missions':      [],
     })
 
 
@@ -226,29 +248,46 @@ def handbook_new(request):
             return HttpResponseForbidden()
         can_write = True
 
+    from django.urls import reverse
     recent_records = Record.objects.filter(
         created_by=request.user,
         record_family='governance',
         deleted_at__isnull=True,
     ).order_by('-updated_at')[:8]
+    gov_drafts = Record.objects.filter(
+        created_by=request.user,
+        record_family='governance',
+        status='draft',
+        deleted_at__isnull=True,
+    ).order_by('-updated_at')[:5]
+
+    default_type = LIBRARY_TYPES[0] if active_branch == 'reference' else MANDATE_TYPES[0]
 
     return render(request, 'workspace/handbook/record.html', {
-        'active_app':      'handbook',
-        'ws_page_title':   'New Record',
-        'access':          access,
-        'record':          None,
-        'history':         [],
-        'outgoing':        [],
-        'can_write':       can_write,
-        'is_editor':       _is_editor(access),
-        'is_key':          active_branch == 'keys',
-        'is_reference':    active_branch == 'reference',
-        'active_branch':   active_branch,
-        'hrs_attrs':       HRS_ATTRS,
-        'record_types_by_branch': json.dumps(RECORD_TYPES_BY_BRANCH),
-        'library_type_labels':   LIBRARY_TYPE_LABELS,
-        'mandate_type_labels':   MANDATE_TYPE_LABELS,
-        'recent_records':  recent_records,
+        'active_app':             'handbook',
+        'ws_page_title':          'New Record',
+        'access':                 access,
+        'record':                 None,
+        'history':                [],
+        'outgoing':               [],
+        'can_write':              can_write,
+        'is_editor':              _is_editor(access),
+        'is_key':                 active_branch == 'keys',
+        'is_reference':           active_branch == 'reference',
+        'active_branch':          active_branch,
+        'hrs_attrs':              HRS_ATTRS,
+        'record_types_reference': LIBRARY_TYPES,
+        'record_types_mandate':   MANDATE_TYPES,
+        # Editor canvas context
+        'save_url':               reverse('handbook:save'),
+        'handbook_save_url':      reverse('handbook:save'),
+        'active_family':          'governance',
+        'active_type':            default_type,
+        'is_desk':                True,
+        'recent_records':         recent_records,
+        'gov_drafts':             gov_drafts,
+        'journal_drafts':         [],
+        'active_missions':        [],
     })
 
 
