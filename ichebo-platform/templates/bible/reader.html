@@ -838,6 +838,9 @@ async function mNavChapter(offset) {
 
 {% block extra_css %}
 <style>
+    /* Mobile reader: chapter title already shown in the sticky hero — hide the duplicate from _chapter.html */
+    #m-bible-chapter .bible-chapter-header { display: none; }
+
     #ics-options-bar .ics-options-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
     #ics-options-bar .ics-options-tabs::-webkit-scrollbar { display: none; }
     #ics-options-bar .ics-options-tab { flex-shrink: 0; }
