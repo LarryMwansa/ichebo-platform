@@ -150,7 +150,7 @@
             <div id="dashboard-learn-panel"
                  hx-get="{% url 'dashboard:htmx-learn' %}"
                  hx-trigger="load"
-                 hx-on:htmx:response-error="this.innerHTML='<div style=\'padding:20px;text-align:center;font-size:12px;opacity:0.5;\'>Formation data unavailable.<br><a href=\'{% url \'learn:learn-home\' %}\' style=\'color:var(--primary);text-decoration:none;font-weight:700;\'>Open Formation →</a></div>'">
+                 data-error-learn-url="{% url 'learn:learn-home' %}">
                 <div style="padding: 32px; text-align: center;">
                     <span class="material-symbols-outlined" style="font-size: 28px; opacity: 0.1; animation: pulse 2s infinite;">school</span>
                 </div>
@@ -163,7 +163,7 @@
             <div id="dashboard-schedule"
                  hx-get="{% url 'dashboard:htmx-schedule' %}"
                  hx-trigger="load"
-                 hx-on:htmx:response-error="this.innerHTML='<div style=\'padding:20px;text-align:center;font-size:12px;opacity:0.5;\'>Schedule unavailable.<br><a href=\'{% url \'calendar:month\' %}\' style=\'color:var(--primary);text-decoration:none;font-weight:700;\'>Open Calendar →</a></div>'">
+                 data-error-cal-url="{% url 'calendar:month' %}">
                 <div style="padding: 32px; text-align: center;">
                     <span class="material-symbols-outlined" style="font-size: 28px; opacity: 0.1; animation: pulse 2s infinite;">today</span>
                 </div>
@@ -173,6 +173,19 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('htmx:responseError', function(e) {
+  var el = e.detail.elt;
+  var learnUrl = el.dataset.errorLearnUrl;
+  var calUrl = el.dataset.errorCalUrl;
+  if (learnUrl) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;font-size:12px;opacity:0.5;">Formation data unavailable.<br><a href="' + learnUrl + '" style="color:var(--primary);text-decoration:none;font-weight:700;">Open Formation →</a></div>';
+  } else if (calUrl) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;font-size:12px;opacity:0.5;">Schedule unavailable.<br><a href="' + calUrl + '" style="color:var(--primary);text-decoration:none;font-weight:700;">Open Calendar →</a></div>';
+  }
+});
+</script>
 
 <style>
 @keyframes pulse {
