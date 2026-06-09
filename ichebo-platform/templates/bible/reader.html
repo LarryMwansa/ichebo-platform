@@ -315,32 +315,39 @@ function bibleLinkLoadVerse(verseId, ref) {
 {# ── Mobile: content block (below 1024px, renders in #ws-mobile-shell) ── #}
 {% block content %}
 
-{# Page hero with watermark #}
-<div class="page-hero page-hero--watermark" data-watermark="BIBLE">
-  <div class="page-hero__eyebrow">
-    <div class="page-hero__eyebrow-line"></div>
-    <span class="page-hero__label">Scripture</span>
-  </div>
-  <h1 class="page-hero__title">{{ book.name }} <em>{{ chapter }}</em></h1>
-</div>
+{# Hero + action strip as one fused sticky unit #}
+<div style="position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border);">
 
-{# Topbar strip: appearance | version badge | search #}
-<div id="m-bible-topbar" style="display: flex; align-items: center; justify-content: space-between;
-     padding: 8px 16px; background: var(--card); border-bottom: 1px solid var(--border);
-     position: sticky; top: 0; z-index: 50;">
-  <button hx-get="{% url 'bible:htmx-appearance' %}"
-          hx-target="#drawerContent"
-          onclick="window.ICSDrawer && window.ICSDrawer.open('Display')"
-          style="display: flex; align-items: center; gap: 6px; background: transparent; border: none;
-                 color: var(--muted); padding: 6px 8px; border-radius: 8px; cursor: pointer;">
-    <span class="material-symbols-outlined" style="font-size: 20px;">text_fields</span>
-  </button>
-  <span class="status-badge" style="font-size: 10px; font-weight: 800; letter-spacing: 0.05em;">{{ translation.code }}</span>
-  <button onclick="window.location='{% url 'bible:search' %}'"
-          style="display: flex; align-items: center; gap: 6px; background: transparent; border: none;
-                 color: var(--muted); padding: 6px 8px; border-radius: 8px; cursor: pointer;">
-    <span class="material-symbols-outlined" style="font-size: 20px;">search</span>
-  </button>
+  {# Page hero — override background and margins so it blends with the strip below #}
+  <div class="page-hero page-hero--watermark" data-watermark="BIBLE"
+       style="margin: 0; background: var(--card); border-bottom: none;">
+    <div class="page-hero__eyebrow">
+      <div class="page-hero__eyebrow-line"></div>
+      <span class="page-hero__label">Scripture</span>
+    </div>
+    <h1 class="page-hero__title">{{ book.name }} <em>{{ chapter }}</em></h1>
+  </div>
+
+  {# Action strip: version left | spacer | search | appearance right #}
+  <div id="m-bible-topbar"
+       style="display: flex; align-items: center; padding: 4px 12px 8px; background: var(--card);">
+    <span class="status-badge"
+          style="font-size: 10px; font-weight: 800; letter-spacing: 0.05em;">{{ translation.code }}</span>
+    <div style="flex: 1;"></div>
+    <button onclick="window.location='{% url 'bible:search' %}'"
+            style="display: flex; align-items: center; background: transparent; border: none;
+                   color: var(--muted); padding: 6px 8px; border-radius: 8px; cursor: pointer;">
+      <span class="material-symbols-outlined" style="font-size: 20px;">search</span>
+    </button>
+    <button hx-get="{% url 'bible:htmx-appearance' %}"
+            hx-target="#drawerContent"
+            onclick="window.ICSDrawer && window.ICSDrawer.open('Display')"
+            style="display: flex; align-items: center; background: transparent; border: none;
+                   color: var(--muted); padding: 6px 8px; border-radius: 8px; cursor: pointer;">
+      <span class="material-symbols-outlined" style="font-size: 20px;">text_fields</span>
+    </button>
+  </div>
+
 </div>
 
 {# Chapter content area — verse tap opens annotation drawer #}
