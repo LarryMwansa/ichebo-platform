@@ -204,6 +204,11 @@
                    data-tooltip="Video & Broadcast" hx-boost="false">
                     <span class="material-symbols-outlined">live_tv</span>
                 </a>
+                <a href="{% url 'records:records-home' %}"
+                   class="ics-sidebar__item {% if active_app == 'records' %}active{% endif %}"
+                   data-tooltip="My Journal" hx-boost="false">
+                    <span class="material-symbols-outlined">history_edu</span>
+                </a>
             </nav>
 
             <div class="ics-sidebar__bottom">
