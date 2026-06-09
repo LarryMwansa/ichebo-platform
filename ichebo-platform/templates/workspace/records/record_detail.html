@@ -1,80 +1,144 @@
-{% extends "workspace/records/base.html" %}
+{% extends "workspace_shell.html" %}
 {% load static %}
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% block title %}{{ record.title }} — Journal{% endblock %}
 
-{% block records_content %}
-<div class="editorial-stage">
-    <div class="editorial-canvas" style="padding-top: 40px; display: flex; flex-direction: column; align-items: center;">
-        
-        {# 1. Record Header #}
-        <div class="editorial-hero" style="width: 100%; max-width: 900px; padding: 0 var(--space-m); margin-bottom: 30px;">
-            <div class="ws-label-tag" style="margin-bottom: 8px; color: var(--accent-red);">Registry Archive</div>
-            <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; color: var(--text); margin: 0 0 12px; line-height: 1.2;">{{ record.title }}</h1>
-            <div class="editorial-meta" style="display: flex; gap: 12px; font-size: 13px; color: var(--muted);">
-                <span class="ws-tag-outline">{{ record.get_record_type_display|default:record.record_type|title }}</span>
-                <span>·</span>
-                <span>{{ record.updated_at|date:"d M Y" }}</span>
-            </div>
-        </div>
-
-        {# 2. The Markdown Body #}
-        <div class="editorial-workspace" style="width: 100%; max-width: 900px; padding: 0 var(--space-m);">
-            <div id="markdown-viewer" class="editorial-body" style="font-size: 16px; line-height: 1.8; color: var(--text-main);">
-                {{ record.content|default:"" }}
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const viewer = document.getElementById('markdown-viewer');
-        if (viewer) {
-            viewer.innerHTML = marked.parse(viewer.textContent.trim());
-        }
-    });
-</script>
-
+{% block extra_css %}
+{{ block.super }}
 <style>
-.editorial-body h1 { font-size: 2em; margin: 1em 0 0.5em; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.3em; }
-.editorial-body h2 { font-size: 1.5em; margin: 1em 0 0.5em; }
-.editorial-body p { margin-bottom: 1.2em; }
-.editorial-body ul, .editorial-body ol { margin-bottom: 1.2em; padding-left: 2em; }
-.editorial-body blockquote { border-left: 4px solid var(--border-subtle); padding-left: 1em; color: var(--muted); font-style: italic; margin: 1.5em 0; }
-.editorial-body code { background: var(--surface-3); padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+    .rec-nav-btn {
+        display: flex; align-items: center; gap: 10px;
+        width: 100%; padding: 9px 12px; border: none; background: transparent;
+        font-size: 13px; color: rgba(255,255,255,0.55); cursor: pointer;
+        border-radius: 6px; text-decoration: none; transition: all 0.15s;
+    }
+    .rec-nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .rec-nav-btn .material-symbols-outlined { font-size: 16px; }
+
+    .rec-canvas { max-width: 720px; margin: 0 auto; padding: 36px 28px 100px; }
+    .rec-title {
+        font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900;
+        color: var(--text-ink); line-height: 1.2; margin: 0 0 10px;
+    }
+    .rec-body {
+        font-size: 15px; line-height: 1.85; color: var(--text-ink);
+    }
+    .rec-body p { margin-bottom: 1.3em; }
+    .rec-body h1,h2,h3 { font-family: 'Playfair Display', serif; margin: 1.2em 0 0.5em; }
+    .rec-body blockquote {
+        border-left: 3px solid var(--accent-red); padding-left: 1em;
+        color: var(--text-muted-ink); font-style: italic; margin: 1.5em 0;
+    }
 </style>
 {% endblock %}
 
+{% block context_header %}My Journal{% endblock %}
+
+{% block context_content %}
+<div style="padding: 0 4px;">
+    <a href="{% url 'records:records-home' %}" class="rec-nav-btn">
+        <span class="material-symbols-outlined">arrow_back</span>
+        All Records
+    </a>
+    {% for value, label in record_types %}
+    <a href="{% url 'records:records-home' %}?type={{ value }}" class="rec-nav-btn">
+        <span class="material-symbols-outlined">
+            {% if value == 'prayer' %}church
+            {% elif value == 'spirit' %}self_improvement
+            {% elif value == 'dream' %}bedtime
+            {% elif value == 'dar' %}summarize
+            {% elif value == 'note' %}description
+            {% else %}history_edu{% endif %}
+        </span>
+        {{ label }}
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block ws_content %}
+<div class="ics-stage__content" data-watermark="Journal"
+     style="height: 100%; overflow-y: auto;">
+    <div class="rec-canvas">
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap;">
+            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+                         padding: 2px 8px; border-radius: 20px;
+                         background: rgba(175,50,54,0.08); color: var(--accent-red);">
+                {{ record.record_type }}
+            </span>
+            <span style="font-size: 11px; color: var(--text-muted-ink);">
+                {{ record.updated_at|date:"d M Y · H:i" }}
+            </span>
+            <span style="font-size: 11px; color: var(--text-muted-ink); margin-left: auto;">
+                {{ record.status|title }}
+            </span>
+        </div>
+
+        <h1 class="rec-title">{{ record.title }}</h1>
+
+        <div class="rec-body" id="rec-content-body" data-raw="{{ record.content|default:'' }}">
+            {{ record.content|linebreaks }}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
 {% block ws_options %}
-    <div class="ws-options-section">
-        <div class="ws-label-tag">Record Actions</div>
-        <div style="display: flex; flex-direction: column; gap: var(--space-xs); margin: var(--space-s) 0;">
-            {% if record.created_by == request.user %}
-            <button class="ws-icon-btn" style="width: 100%; justify-content: flex-start; gap: 8px; padding: 0 12px; font-size: 13px;"
-                    hx-get="{% url 'records:htmx-edit' record.id %}"
-                    hx-target="#drawerContent"
-                    onclick="window.ICSDrawer.open('Edit Record')">
-                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
-                Edit Record
-            </button>
-            {% endif %}
-            <button class="ws-icon-btn" style="width: 100%; justify-content: flex-start; gap: 8px; padding: 0 12px; font-size: 13px;">
-                <span class="material-symbols-outlined" style="font-size: 18px;">share</span>
-                Share Access
-            </button>
-        </div>
+<div style="padding: 14px;">
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Record</div>
+
+    <div style="font-size: 12px; line-height: 1.8; color: var(--text-muted-ink); margin-bottom: 14px;">
+        <div><strong style="color: var(--text-ink);">Type</strong></div>
+        <div style="text-transform: capitalize; margin-bottom: 8px;">{{ record.record_type }}</div>
+        <div><strong style="color: var(--text-ink);">Status</strong></div>
+        <div style="margin-bottom: 8px; text-transform: capitalize;">{{ record.status }}</div>
+        <div><strong style="color: var(--text-ink);">Created</strong></div>
+        <div>{{ record.created_at|date:"d M Y" }}</div>
     </div>
 
-    <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
+    {% if record.created_by == request.user %}
+    <div style="height: 1px; background: var(--border-ink); margin: 14px 0;"></div>
+    <button class="rec-nav-btn"
+            style="color: var(--text-ink); padding: 9px 0;"
+            hx-get="{% url 'records:htmx-edit' record.id %}"
+            hx-target="#drawerContent"
+            onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Entry')">
+        <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+        Edit Entry
+    </button>
+    {% endif %}
 
-    <div class="ws-options-section">
-        <div class="ws-label-tag">Linked Connections</div>
-        <div id="ws-linked-records" style="margin-top: var(--space-s);"
-             hx-get="{% url 'records:htmx-linked-records' record.id %}"
-             hx-trigger="load"
-             hx-swap="innerHTML">
-            <div style="color: var(--muted); font-size: 13px;">Seeking connections…</div>
-        </div>
+    <div style="height: 1px; background: var(--border-ink); margin: 14px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 10px;">Connections</div>
+    <div id="ws-linked-records"
+         hx-get="{% url 'records:htmx-linked-records' record.id %}"
+         hx-trigger="load"
+         hx-swap="innerHTML"
+         style="font-size: 12px; color: var(--text-muted-ink);">
+        Loading…
     </div>
+</div>
+{% endblock %}
+
+{# ── Mobile shell ── #}
+{% block content %}
+<div class="page-hero" style="padding: var(--space-l) var(--space-m) var(--space-m);">
+    <a href="{% url 'records:records-home' %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
+              font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+        Journal
+    </a>
+    <h1 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;
+               color:var(--text);line-height:1.2;margin:0 0 8px;">{{ record.title }}</h1>
+    <div style="font-size:12px;color:var(--muted);">
+        {{ record.record_type|title }} · {{ record.updated_at|date:"d M Y" }}
+    </div>
+</div>
+<div style="padding:var(--space-m) var(--space-m) var(--space-2xl);
+            font-size:15px;line-height:1.8;color:var(--text);">
+    {{ record.content|linebreaks }}
+</div>
 {% endblock %}

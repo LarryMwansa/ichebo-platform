@@ -133,17 +133,25 @@ def htmx_create_record(request):
             content=request.POST.get('content', '').strip(),
             metadata=metadata,
         )
-        # Drawer submit → close drawer, reload records list
+        from django.urls import reverse
+        detail_url = reverse('records:records-detail', kwargs={'record_id': record.pk})
+        # Drawer submit
         if request.headers.get('HX-Target') == 'drawerInner':
-            from django.urls import reverse
             response = HttpResponse(status=204)
             response['HX-Trigger'] = 'recordCreated'
             response['HX-Redirect'] = reverse('records:records-home')
             return response
-        # Desktop editorial — transition to detail view
+        # Any HTMX call (e.g. compose form) → redirect browser to detail
+        if request.headers.get('HX-Request'):
+            response = HttpResponse(status=204)
+            response['HX-Redirect'] = detail_url
+            return response
         return render(request, 'workspace/records/record_detail.html', {
             'record': record,
-            'is_desk': False
+            'is_desk': False,
+            'active_app': 'records',
+            'ws_page_title': record.title,
+            'record_types': JOURNAL_RECORD_TYPES,
         })
 
     # GET — partial for HTMX, full shell for direct navigation

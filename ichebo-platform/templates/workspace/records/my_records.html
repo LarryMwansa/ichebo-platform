@@ -1,176 +1,304 @@
 {% extends "workspace_shell.html" %}
 {% load static %}
 
-{% block title %}Registry Archive — Ichebo{% endblock %}
+{% block title %}My Journal — Ichebo{% endblock %}
 
-{# Zone 2: Registry Explorer #}
-{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Records</span>{% endblock %}
-{% block context_header %}Registry Browser{% endblock %}
-{% block context_content %}
-    {% include "workspace/records/partials/records_sidebar.html" %}
-{% endblock %}
-
-{# Zone 3: The Authoritative Archive #}
-{% block ws_content %}
-<div class="registry-archive-v2">
-    
-    <div class="ws-page-header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
-        <div>
-            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Permanent Record</div>
-            <h1 class="ws-page-title">Steward <em>Registry</em></h1>
-        </div>
-        <a href="{% url 'handbook:home' %}" class="ws-topbar__cta" style="text-decoration: none; flex-shrink: 0;">
-            <span class="material-symbols-outlined">add</span>
-            New Entry
-        </a>
-    </div>
-
-    {# The Registry List #}
-    <div id="record-list" style="display: flex; flex-direction: column; gap: 8px; max-width: 860px;">
-        {% include "workspace/records/partials/record_list.html" %}
-    </div>
-</div>
-
+{% block extra_css %}
+{{ block.super }}
 <style>
-.registry-archive-v2 {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 20px 0 100px;
-}
+    .rec-nav-btn {
+        display: flex; align-items: center; gap: 10px;
+        width: 100%; padding: 9px 12px;
+        border: none; background: transparent;
+        font-size: 13px; color: rgba(255,255,255,0.55);
+        cursor: pointer; border-radius: 6px;
+        text-decoration: none; transition: all 0.15s;
+    }
+    .rec-nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .rec-nav-btn.active {
+        background: rgba(255,255,255,0.08); color: #fff;
+        border-left: 3px solid var(--accent-red); padding-left: 9px;
+    }
+    .rec-nav-btn .material-symbols-outlined { font-size: 16px; flex-shrink: 0; }
+
+    .rec-row {
+        display: flex; align-items: flex-start; gap: 14px;
+        padding: 16px 24px; border-bottom: 1px solid var(--border-ink);
+        text-decoration: none; color: var(--text-ink); transition: background 0.1s;
+    }
+    .rec-row:hover { background: rgba(0,0,0,0.025); }
+    .dark .rec-row:hover { background: rgba(255,255,255,0.025); }
+    .rec-row__icon {
+        width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(175,50,54,0.08);
+    }
+    .rec-row__icon .material-symbols-outlined { font-size: 18px; color: var(--accent-red); }
+    .rec-row__body { flex: 1; min-width: 0; }
+    .rec-row__title { font-size: 14px; font-weight: 700; color: var(--text-ink); line-height: 1.3; margin-bottom: 4px; }
+    .rec-row__excerpt {
+        font-size: 12px; color: var(--text-muted-ink); line-height: 1.5;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        margin-bottom: 6px;
+    }
+    .rec-row__meta { font-size: 11px; color: var(--text-muted-ink); display: flex; align-items: center; gap: 8px; }
+    .rec-type-pill {
+        font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+        padding: 2px 7px; border-radius: 20px;
+        background: rgba(175,50,54,0.08); color: var(--accent-red);
+    }
+
+    .rec-compose-form textarea {
+        width: 100%; min-height: 140px; padding: 10px 12px;
+        border: 1px solid var(--border-ink); border-radius: 8px;
+        background: transparent; color: var(--text-ink);
+        font-size: 13px; line-height: 1.7; resize: vertical;
+        font-family: 'Inter', sans-serif; outline: none; box-sizing: border-box;
+    }
+    .rec-compose-form textarea:focus { border-color: var(--accent-red); }
+    .rec-compose-form input[type="text"] {
+        width: 100%; padding: 8px 12px;
+        border: 1px solid var(--border-ink); border-radius: 8px;
+        background: transparent; color: var(--text-ink);
+        font-size: 13px; outline: none; box-sizing: border-box; margin-bottom: 8px;
+    }
+    .rec-compose-form input[type="text"]:focus { border-color: var(--accent-red); }
+    .rec-compose-form select {
+        width: 100%; padding: 8px 12px;
+        border: 1px solid var(--border-ink); border-radius: 8px;
+        background: var(--stone-bg); color: var(--text-ink);
+        font-size: 12px; margin-bottom: 10px;
+    }
 </style>
 {% endblock %}
 
-{# Zone 4: Registry Vitals #}
-{% block ws_options %}
-    <div class="ws-options-section">
-        <div class="ws-label-tag" style="margin-bottom: 16px;">Registry Stats</div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-            <div style="padding: 14px; background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;">
-                <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px;">ENTRIES</div>
-                <div style="font-size: 22px; font-weight: 800; color: var(--text);">{{ records.count|default:0 }}</div>
-            </div>
-            <div style="padding: 14px; background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;">
-                <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px;">FAMILY</div>
-                <div style="font-size: 13px; font-weight: 700; color: var(--text);">Journal</div>
-            </div>
-        </div>
-    </div>
+{% block context_header %}My Journal{% endblock %}
 
-    <div class="ws-sidebar__divider" style="margin: 20px 0;"></div>
+{% block context_content %}
+<div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 8px;">Filter</div>
 
-    <div class="ws-options-section">
-        <div class="ws-label-tag" style="margin-bottom: 12px;">Quick Actions</div>
-        <a href="{% url 'handbook:home' %}" class="ctx-btn" style="text-decoration: none;">
-            <span class="material-symbols-outlined">draw</span>
-            Open The Desk
-        </a>
-        <a href="{% url 'governance:home' %}" class="ctx-btn" style="text-decoration: none; margin-top: 4px;">
-            <span class="material-symbols-outlined">account_balance</span>
-            Governance Portal
-        </a>
-    </div>
-
-    <div class="ws-sidebar__divider" style="margin: 20px 0;"></div>
-
-    <div class="ws-options-section">
-        <div class="ws-label-tag" style="margin-bottom: 12px;">Guidelines</div>
-        <p style="font-size: 12px; color: var(--muted); line-height: 1.6;">
-            The Registry is your permanent memory. Journals are private. Acts are subject to apostolic review.
-        </p>
-    </div>
-{% endblock %}
-
-{# ── Mobile fallback (below 1024px) ── #}
-{% block content %}
-
-<div class="page-hero page-hero--watermark" data-watermark="JOURNAL">
-  <a href="{% url 'dashboard:index' %}"
-     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
-    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
-    Home
-  </a>
-  <div class="page-hero__eyebrow">
-    <div class="page-hero__eyebrow-line"></div>
-    <span class="page-hero__label">Permanent Record</span>
-  </div>
-  <h1 class="page-hero__title">My <em>Journal</em></h1>
-  <p class="page-hero__sub">Prayers, reflections &amp; spiritual notes</p>
-</div>
-
-{# Filter tabs #}
-<div style="display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
-            border-bottom: 1px solid var(--border); padding: 0 var(--space-s);">
-  <a href="{% url 'records:records-home' %}"
-     style="flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 700;
-            text-decoration: none; white-space: nowrap;
-            border-bottom: 2px solid {% if not active_type %}var(--primary){% else %}transparent{% endif %};
-            color: {% if not active_type %}var(--primary){% else %}var(--muted){% endif %};">
-    All
-  </a>
-  {% for slug, label in record_types %}
-  <a href="?type={{ slug }}"
-     style="flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 700;
-            text-decoration: none; white-space: nowrap;
-            border-bottom: 2px solid {% if active_type == slug %}var(--primary){% else %}transparent{% endif %};
-            color: {% if active_type == slug %}var(--primary){% else %}var(--muted){% endif %};">
-    {{ label }}
-  </a>
-  {% endfor %}
-</div>
-
-{# Record list #}
-<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
-  {% if records %}
-  <div style="display: flex; flex-direction: column; gap: 2px;">
-    {% for record in records %}
-    <a href="{% url 'records:records-detail' record.id %}"
-       style="display: block; padding: var(--space-s) 0;
-              border-bottom: 1px solid var(--border); text-decoration: none;
-              position: relative;">
-      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-s);">
-        <div style="flex: 1; min-width: 0;">
-          <div style="font-size: 15px; font-weight: 700; color: var(--text);
-                      margin-bottom: 4px; line-height: 1.3;">
-            {{ record.title|truncatechars:60 }}
-          </div>
-          {% if record.content %}
-          <p style="font-size: 13px; color: var(--muted); line-height: 1.5;
-                    margin: 0 0 8px; display: -webkit-box;
-                    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-            {{ record.content|striptags|truncatechars:120 }}
-          </p>
-          {% endif %}
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="display: inline-flex; align-items: center; padding: 2px 8px;
-                         background: var(--primary-light); color: var(--primary);
-                         border-radius: var(--radius-pill); font-size: 10px;
-                         font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">
-              {{ record.record_type|upper }}
-            </span>
-            <span style="font-size: 11px; color: var(--muted);">
-              {{ record.updated_at|date:"d M Y" }}
-            </span>
-          </div>
-        </div>
-        <a href="{% url 'records:htmx-edit' record.id %}"
-           style="flex-shrink: 0; color: var(--muted); padding: 4px;"
-           onclick="event.stopPropagation();">
-          <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
-        </a>
-      </div>
+    <a href="{% url 'records:records-home' %}"
+       class="rec-nav-btn {% if not active_type %}active{% endif %}">
+        <span class="material-symbols-outlined">all_inclusive</span>
+        All Records
+    </a>
+    {% for value, label in record_types %}
+    <a href="{% url 'records:records-home' %}?type={{ value }}"
+       class="rec-nav-btn {% if active_type == value %}active{% endif %}">
+        <span class="material-symbols-outlined">
+            {% if value == 'prayer' %}church
+            {% elif value == 'spirit' %}self_improvement
+            {% elif value == 'dream' %}bedtime
+            {% elif value == 'dar' %}summarize
+            {% elif value == 'note' %}description
+            {% else %}history_edu{% endif %}
+        </span>
+        {{ label }}
     </a>
     {% endfor %}
-  </div>
-  {% else %}
-  <div style="text-align: center; padding: 3rem 1rem; color: var(--muted);">
-    <span class="material-symbols-outlined"
-          style="font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.2;">
-      auto_stories
-    </span>
-    <p style="font-size: 14px; font-weight: 500; margin-bottom: 0.5rem;">No entries yet</p>
-    <p style="font-size: 13px; opacity: 0.7;">Tap the <strong style="color: var(--primary);">+</strong> button to write your first entry.</p>
-  </div>
-  {% endif %}
+
+    <div class="ctx-divider" style="margin: 12px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 8px;">Recent</div>
+    <div id="rec-recent"
+         hx-get="{% url 'records:htmx-recent-drafts' %}"
+         hx-trigger="load"
+         style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="padding: var(--space-s); font-size: 12px; color: rgba(255,255,255,0.3);">Loading…</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block ws_content %}
+<div class="ics-stage__content" data-watermark="Journal"
+     style="height: 100%; overflow-y: auto;">
+
+    <div style="padding: 28px 24px 12px; border-bottom: 1px solid var(--border-ink);
+                display: flex; align-items: flex-end; justify-content: space-between;">
+        <div>
+            <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: 8px;">Personal Record</div>
+            <h1 class="ws-page-title" style="font-size: 22px; margin: 0;">
+                {% if active_type %}
+                    {% for v, l in record_types %}{% if v == active_type %}{{ l }}{% endif %}{% endfor %}
+                {% else %}
+                    My Journal
+                {% endif %}
+            </h1>
+        </div>
+        <span style="font-size: 12px; color: var(--text-muted-ink);">
+            {{ records.count }} entr{% if records.count == 1 %}y{% else %}ies{% endif %}
+        </span>
+    </div>
+
+    <div id="record-list">
+        {% if records %}
+            {% for record in records %}
+            <a href="{% url 'records:records-detail' record.id %}" class="rec-row">
+                <div class="rec-row__icon">
+                    <span class="material-symbols-outlined">
+                        {% if record.record_type == 'prayer' %}church
+                        {% elif record.record_type == 'spirit' %}self_improvement
+                        {% elif record.record_type == 'dream' %}bedtime
+                        {% elif record.record_type == 'dar' %}summarize
+                        {% elif record.record_type == 'note' %}description
+                        {% else %}history_edu{% endif %}
+                    </span>
+                </div>
+                <div class="rec-row__body">
+                    <div class="rec-row__title">{{ record.title|truncatechars:72 }}</div>
+                    {% if record.content %}
+                    <div class="rec-row__excerpt">{{ record.content|striptags|truncatechars:140 }}</div>
+                    {% endif %}
+                    <div class="rec-row__meta">
+                        <span class="rec-type-pill">{{ record.record_type }}</span>
+                        <span>{{ record.updated_at|date:"d M Y" }}</span>
+                        {% if record.status == 'draft' %}
+                        <span style="color: #636e72; font-weight: 600;">Draft</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        {% else %}
+        <div style="padding: 80px 24px; text-align: center;">
+            <span class="material-symbols-outlined"
+                  style="font-size: 48px; opacity: 0.12; display: block; margin-bottom: 16px;">
+                history_edu
+            </span>
+            <p style="font-size: 14px; color: var(--text-muted-ink); margin-bottom: 8px; font-weight: 500;">
+                No entries yet
+            </p>
+            <p style="font-size: 12px; color: var(--text-muted-ink);">
+                Use the compose panel on the right to write your first entry.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block ws_options %}
+<div style="padding: 14px;">
+    <div class="ws-label-tag" style="margin-bottom: 14px; color: var(--accent-red);">Compose</div>
+
+    <form class="rec-compose-form"
+          hx-post="{% url 'records:htmx-create' %}">
+        {% csrf_token %}
+        <input type="hidden" name="record_family" value="journal">
+        <input type="text" name="title" placeholder="Entry title…" required>
+
+        <select name="record_type">
+            {% for value, label in record_types %}
+            <option value="{{ value }}"
+                    {% if active_type == value %}selected{% endif %}>
+                {{ label }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <textarea name="content" placeholder="Write…"></textarea>
+
+        <button type="submit" class="ws-topbar__cta"
+                style="width: 100%; justify-content: center; margin-top: 4px;
+                       background: var(--accent-red); color: #fff; border: none; cursor: pointer;">
+            <span class="material-symbols-outlined">save</span>
+            Save Entry
+        </button>
+    </form>
+
+    <div style="height: 1px; background: var(--border-ink); margin: 18px 0;"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: 10px;">Stats</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div style="padding: 12px; background: var(--card-2, rgba(0,0,0,0.03)); border: 1px solid var(--border-ink); border-radius: 8px;">
+            <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-ink); margin-bottom: 4px;">Entries</div>
+            <div style="font-size: 22px; font-weight: 800; color: var(--text-ink);">{{ records.count|default:0 }}</div>
+        </div>
+        <div style="padding: 12px; background: var(--card-2, rgba(0,0,0,0.03)); border: 1px solid var(--border-ink); border-radius: 8px;">
+            <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-ink); margin-bottom: 4px;">Type</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-ink); text-transform: capitalize;">
+                {{ active_type|default:"All" }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{# ── Mobile shell ── #}
+{% block content %}
+<div class="page-hero page-hero--watermark" data-watermark="JOURNAL">
+    <a href="{% url 'dashboard:index' %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;
+              font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+        Home
+    </a>
+    <div class="page-hero__eyebrow">
+        <div class="page-hero__eyebrow-line"></div>
+        <span class="page-hero__label">Personal Record</span>
+    </div>
+    <h1 class="page-hero__title">My <em>Journal</em></h1>
+    <p class="page-hero__sub">Prayers, reflections &amp; spiritual notes</p>
 </div>
 
+<div style="display:flex;gap:0;overflow-x:auto;scrollbar-width:none;
+            border-bottom:1px solid var(--border);padding:0 var(--space-s);">
+    <a href="{% url 'records:records-home' %}"
+       style="flex-shrink:0;padding:10px 14px;font-size:13px;font-weight:700;
+              text-decoration:none;white-space:nowrap;
+              border-bottom:2px solid {% if not active_type %}var(--primary){% else %}transparent{% endif %};
+              color:{% if not active_type %}var(--primary){% else %}var(--muted){% endif %};">
+        All
+    </a>
+    {% for slug, label in record_types %}
+    <a href="?type={{ slug }}"
+       style="flex-shrink:0;padding:10px 14px;font-size:13px;font-weight:700;
+              text-decoration:none;white-space:nowrap;
+              border-bottom:2px solid {% if active_type == slug %}var(--primary){% else %}transparent{% endif %};
+              color:{% if active_type == slug %}var(--primary){% else %}var(--muted){% endif %};">
+        {{ label }}
+    </a>
+    {% endfor %}
+</div>
+
+<div style="padding:var(--space-s) var(--space-s) var(--space-2xl);">
+    {% if records %}
+    <div style="display:flex;flex-direction:column;gap:2px;">
+        {% for record in records %}
+        <a href="{% url 'records:records-detail' record.id %}"
+           style="display:block;padding:var(--space-s) 0;
+                  border-bottom:1px solid var(--border);text-decoration:none;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-s);">
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:15px;font-weight:700;color:var(--text);
+                                margin-bottom:4px;line-height:1.3;">
+                        {{ record.title|truncatechars:60 }}
+                    </div>
+                    {% if record.content %}
+                    <p style="font-size:13px;color:var(--muted);line-height:1.5;
+                              margin:0 0 8px;display:-webkit-box;
+                              -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                        {{ record.content|striptags|truncatechars:120 }}
+                    </p>
+                    {% endif %}
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span class="rec-type-pill">{{ record.record_type }}</span>
+                        <span style="font-size:11px;color:var(--muted);">{{ record.updated_at|date:"d M Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:3rem 1rem;color:var(--muted);">
+        <span class="material-symbols-outlined"
+              style="font-size:2.5rem;display:block;margin-bottom:0.75rem;opacity:0.2;">
+            auto_stories
+        </span>
+        <p style="font-size:14px;font-weight:500;margin-bottom:0.5rem;">No entries yet</p>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
