@@ -86,7 +86,8 @@
             <div id="membership-requests-list"
                  hx-get="{% url 'community:htmx-pending-requests' %}"
                  hx-trigger="load"
-                 hx-swap="innerHTML">
+                 hx-swap="innerHTML"
+                 data-htmx-error-msg="Could not load membership requests.">
                 <div style="padding: 40px 0; text-align: center;">
                     <span class="material-symbols-outlined"
                           style="font-size: 40px; opacity: 0.1; display: block; color: var(--text);">person_add</span>
@@ -112,7 +113,8 @@
             <div id="announcement-list"
                  hx-get="{% url 'community:htmx-announcement-list' %}"
                  hx-trigger="load"
-                 hx-swap="innerHTML">
+                 hx-swap="innerHTML"
+                 data-htmx-error-msg="Could not load announcements.">
                 <div style="padding: 40px 0; text-align: center;">
                     <span class="material-symbols-outlined"
                           style="font-size: 40px; opacity: 0.1; display: block; color: var(--text);">campaign</span>
@@ -172,6 +174,16 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('htmx:responseError', function(e) {
+  var el = e.detail.elt;
+  var msg = el.dataset.htmxErrorMsg;
+  if (msg) {
+    el.innerHTML = '<div style="padding:20px 0;text-align:center;font-size:12px;color:var(--muted);">' + msg + '</div>';
+  }
+});
+</script>
 {% endblock %}
 
 {% block ws_options %}
