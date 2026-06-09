@@ -43,7 +43,7 @@
     const fontSizeDisplay = document.getElementById('sheetFontSizeDisplay');
     
     function getReaderElement() {
-      return document.getElementById('bible-chapter');
+      return document.getElementById('m-bible-chapter') || document.getElementById('bible-chapter');
     }
 
     let size = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
@@ -51,7 +51,10 @@
     function applySize(newSize) {
       size = Math.max(80, Math.min(180, newSize));
       const el = getReaderElement();
-      if (el) el.style.fontSize = `${size / 100}em`;
+      if (el) {
+        el.style.setProperty('--bible-font-size', `${size / 100}em`);
+        el.style.fontSize = `${size / 100}em`;
+      }
       if (fontSizeDisplay) fontSizeDisplay.textContent = `${size}%`;
       ICSStorage.setUIState('bible_font_size', size);
     }
@@ -78,10 +81,18 @@
     if (ffSelect) {
       ffSelect.onchange = (e) => {
         const el = getReaderElement();
-        if (el) el.style.fontFamily = ffMap[e.target.value] || 'inherit';
+        const resolved = ffMap[e.target.value] || 'inherit';
+        if (el) {
+          el.style.setProperty('--bible-font-family', resolved);
+          el.style.fontFamily = resolved;
+        }
         ICSStorage.setUIState('bible_font_family', e.target.value);
       };
-      ffSelect.value = ICSStorage.getUIState('bible_font_family', 'system');
+      const savedFf = ICSStorage.getUIState('bible_font_family', 'system');
+      ffSelect.value = savedFf;
+      const el2 = getReaderElement();
+      const resolved2 = ffMap[savedFf] || 'inherit';
+      if (el2) { el2.style.setProperty('--bible-font-family', resolved2); el2.style.fontFamily = resolved2; }
     }
     
     // Theme toggle helpers
