@@ -56,6 +56,7 @@ class BibleReaderView(LoginRequiredMixin, View):
             'tenant_noted': tenant_noted,
             'all_chapters': all_chapters,
             'active_app': 'bible',
+            'fab_hidden': True,
         }
 
         template_name = 'bible/reader.html'
