@@ -334,8 +334,11 @@ function bibleLinkLoadVerse(verseId, ref) {
   <div id="m-bible-topbar"
        style="display: flex; align-items: center; width: 100%;
               padding: 4px 16px 8px; background: var(--card);">
-    <span class="status-badge"
-          style="font-size: 10px; font-weight: 800; letter-spacing: 0.05em;">{{ translation.code }}</span>
+    <button class="status-badge"
+            hx-get="{% url 'bible:versions' %}?book_code={{ book.code }}&chapter={{ chapter }}"
+            hx-target="#drawerContent"
+            onclick="window.ICSDrawer && window.ICSDrawer.open('Select Version')"
+            style="font-size: 10px; font-weight: 800; letter-spacing: 0.05em; border: none; cursor: pointer;">{{ translation.code }}</button>
     <div style="flex: 1;"></div>
     <button onclick="window.location='{% url 'bible:search' %}'"
             style="display: flex; align-items: center; background: transparent; border: none;

@@ -17,13 +17,9 @@
       <div class="label-caps" style="padding: 0 1rem;">{{ language }}</div>
       <div class="list-group">
         {% for ver in lang_versions %}
-        <button class="list-item {% if ver == current_translation %}bible-picker-item--active{% endif %}" 
-                hx-post="{% url 'bible:htmx-set-translation' %}"
-                hx-vals='{"translation_code": "{{ ver.code }}", "book_code": "{{ book_code }}", "chapter": "{{ chapter }}"}'
-                hx-target="#bible-chapter"
-                hx-swap="innerHTML"
-                onclick="window.ICSDrawer.close()"
-                style="width: 100%; border:none; text-align:left; background: transparent;">
+        <button class="list-item {% if ver == current_translation %}bible-picker-item--active{% endif %}"
+                onclick="mSelectVersion('{{ ver.code }}', '{{ book_code }}', {{ chapter }})"
+                style="width: 100%; border:none; text-align:left; background: transparent; cursor: pointer;">
           <div class="list-item__content">
             <div class="list-item__title" style="color: {% if ver == current_translation %}var(--primary){% else %}var(--text){% endif %}; font-weight: {% if ver == current_translation %}700{% else %}500{% endif %};">{{ ver.name }}</div>
             <div class="list-item__meta">{{ ver.code }}</div>
@@ -39,11 +35,55 @@
   </div>
 
   <div style="padding: 1rem; border-top: 1px solid var(--border); background: var(--card);">
-    <button class="btn-touch" 
-            hx-get="{% url 'bible:languages' %}?book_code={{ book_code }}&chapter={{ chapter }}" 
+    <button class="btn-touch"
+            hx-get="{% url 'bible:languages' %}?book_code={{ book_code }}&chapter={{ chapter }}"
             hx-target="#drawerContent"
             style="width: 100%; background: var(--bg); color: var(--primary); border: 1px solid var(--border); border-radius: 8px;">
       Change Language
     </button>
   </div>
 </div>
+
+<script>
+async function mSelectVersion(translationCode, bookCode, chapter) {
+  const chapterDiv = document.getElementById('m-bible-chapter')
+                  || document.getElementById('bible-chapter');
+
+  const formData = new FormData();
+  formData.append('translation_code', translationCode);
+  formData.append('book_code', bookCode);
+  formData.append('chapter', chapter);
+  formData.append('csrfmiddlewaretoken', document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '');
+
+  try {
+    const res = await fetch('{% url "bible:htmx-set-translation" %}', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '' },
+      body: formData,
+    });
+    if (!res.ok) return;
+    const html = await res.text();
+
+    if (chapterDiv) {
+      chapterDiv.innerHTML = html;
+      chapterDiv.dataset.bookCode = bookCode;
+      chapterDiv.dataset.chapter  = chapter;
+      htmx.process(chapterDiv);
+    }
+
+    // Update mobile version badge
+    const badge = document.querySelector('#m-bible-topbar .status-badge');
+    if (badge) badge.textContent = translationCode;
+
+    // Update desktop options bar active version display
+    const desktopVersion = document.getElementById('bible-active-version');
+    if (desktopVersion) {
+      desktopVersion.querySelector('[style*="font-size: 22px"]').textContent = translationCode;
+    }
+
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  } catch(e) { console.error(e); }
+
+  window.ICSDrawer && window.ICSDrawer.close();
+}
+</script>
