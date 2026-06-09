@@ -69,12 +69,43 @@ def record_detail(request, record_id):
             'via_record': via_record,
         })
 
-    return render(request, 'workspace/records/record_detail_mobile.html', {
+    return render(request, 'workspace/records/record_detail.html', {
         'record': record,
         'via_record': via_record,
         'active_app': 'records',
         'ws_page_title': record.title,
+        'record_types': JOURNAL_RECORD_TYPES,
     })
+
+
+# ── HTMX: recent drafts sidebar widget ───────────────────────────────────────
+
+@login_required
+def htmx_recent_drafts(request):
+    drafts = Record.objects.filter(
+        created_by=request.user,
+        record_family='journal',
+        status__in=['draft', 'active'],
+        deleted_at__isnull=True,
+    ).order_by('-updated_at')[:5]
+
+    if not drafts.exists():
+        return HttpResponse(
+            '<div style="padding: var(--space-s); font-size: 12px; color: var(--muted);">'
+            'No recent entries.</div>'
+        )
+
+    items = ''.join(
+        f'<a href="/records/{r.id}/" class="ctx-btn" style="height: auto; padding: 6px 8px; '
+        f'flex-direction: column; align-items: flex-start; gap: 2px; text-decoration: none;">'
+        f'<span style="font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; '
+        f'overflow: hidden; text-overflow: ellipsis; max-width: 180px;">{r.title[:36]}</span>'
+        f'<span style="font-size: 10px; color: var(--muted); text-transform: uppercase; '
+        f'letter-spacing: 0.06em;">{r.get_record_type_display() if hasattr(r, "get_record_type_display") else r.record_type}</span>'
+        f'</a>'
+        for r in drafts
+    )
+    return HttpResponse(items)
 
 
 # ── HTMX: create record ───────────────────────────────────────────────────────

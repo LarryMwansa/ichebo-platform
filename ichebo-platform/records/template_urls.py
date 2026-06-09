@@ -13,6 +13,7 @@ urlpatterns = [
     path('htmx/<uuid:record_id>/linked-records/', template_views.htmx_linked_records, name='htmx-linked-records'),
     path('htmx/relationship/create/', template_views.htmx_relationship_create, name='htmx-relationship-create'),
     path('htmx/search/', template_views.htmx_record_search, name='htmx-record-search'),
+    path('htmx/recent-drafts/', template_views.htmx_recent_drafts, name='htmx-recent-drafts'),
     
     # ── Knowledge Graph ──
     path('graph/', template_views.graph_view, name='graph'),
