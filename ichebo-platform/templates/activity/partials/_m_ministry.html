@@ -2,36 +2,6 @@
 
 <div style="padding: 0 var(--space-s) var(--space-2xl);">
 
-  {# Field Intel strip #}
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xs);
-              margin: var(--space-s) 0 var(--space-m);">
-    <div style="background: var(--card); border: 1px solid var(--border);
-                border-radius: var(--radius-l); padding: var(--space-m);">
-      <div style="font-size: 9px; font-weight: 700; text-transform: uppercase;
-                  letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px;">Active</div>
-      <div style="display: flex; align-items: baseline; gap: 6px;">
-        <div style="font-size: 24px; font-weight: 800; color: var(--text);
-                    font-family: 'Playfair Display', serif;">{{ active_count|default:0 }}</div>
-        <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted);">campaign</span>
-      </div>
-    </div>
-    <div style="background: {% if overdue_count > 0 %}rgba(175,50,54,0.06){% else %}var(--card){% endif %};
-                border: 1px solid {% if overdue_count > 0 %}rgba(175,50,54,0.2){% else %}var(--border){% endif %};
-                border-radius: var(--radius-l); padding: var(--space-m);">
-      <div style="font-size: 9px; font-weight: 700; text-transform: uppercase;
-                  letter-spacing: 0.08em;
-                  color: {% if overdue_count > 0 %}var(--accent-red){% else %}var(--muted){% endif %};
-                  margin-bottom: 4px;">Overdue</div>
-      <div style="display: flex; align-items: baseline; gap: 6px;">
-        <div style="font-size: 24px; font-weight: 800;
-                    color: {% if overdue_count > 0 %}var(--accent-red){% else %}var(--text){% endif %};
-                    font-family: 'Playfair Display', serif;">{{ overdue_count|default:0 }}</div>
-        <span class="material-symbols-outlined" style="font-size: 14px;
-              color: {% if overdue_count > 0 %}var(--accent-red){% else %}var(--muted){% endif %};">priority_high</span>
-      </div>
-    </div>
-  </div>
-
   {# Filter pills #}
   <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: var(--space-s);
               scrollbar-width: none; -webkit-overflow-scrolling: touch;">
