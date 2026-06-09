@@ -35,12 +35,13 @@ def activity_detail(request, activity_id):
         from records.models import Record
         via_record = Record.objects.filter(id=via_id).first()
 
-    return render(request, 'activity/activity_detail_mobile.html', {
+    return render(request, 'activity/activity_detail.html', {
         'activity': activity,
         'via_record': via_record,
         'user_level': _user_level(request.user),
         'active_app': 'activity',
         'ws_page_title': activity.title,
+        'now': timezone.now(),
     })
 
 
