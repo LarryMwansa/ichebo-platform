@@ -427,6 +427,7 @@ async function mNavChapter(offset) {
     const html = await res.text();
     el.innerHTML = html;
     el.dataset.chapter = chapter;
+    htmx.process(el);  // wire hx-get on all new verse elements
 
     const navBtn = document.getElementById('m-bible-nav-btn');
     const titleEl = el.querySelector('.bible-chapter-title');
@@ -440,9 +441,30 @@ async function mNavChapter(offset) {
     if (window.location.pathname !== newUrl) {
       window.history.pushState({ bookCode, chapter }, '', newUrl);
     }
+    mRestoreAppearance(el);
     window.scrollTo({ top: 0, behavior: 'instant' });
   } catch(e) { console.error(e); }
 }
+
+function mRestoreAppearance(el) {
+  if (!el) return;
+  const _ffMap = {
+    system: 'inherit',
+    serif: 'Georgia, "Times New Roman", serif',
+    'sans-serif': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    monospace: '"Courier New", monospace',
+  };
+  const size = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
+  const ff   = ICSStorage.getUIState('bible_font_family', 'system');
+  el.style.setProperty('--bible-font-size',   `${size / 100}em`);
+  el.style.fontSize  = `${size / 100}em`;
+  el.style.setProperty('--bible-font-family', _ffMap[ff] || 'inherit');
+  el.style.fontFamily = _ffMap[ff] || 'inherit';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  mRestoreAppearance(document.getElementById('m-bible-chapter'));
+});
 </script>
 
 {% endblock %}

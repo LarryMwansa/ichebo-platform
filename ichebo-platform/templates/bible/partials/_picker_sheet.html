@@ -137,6 +137,7 @@
             chapterDiv.dataset.bookCode = bookCode;
             chapterDiv.dataset.chapter  = chapter;
             htmx.process(chapterDiv);
+            if (window.mRestoreAppearance) mRestoreAppearance(chapterDiv);
 
             // Update mobile nav button label
             const titleEl  = chapterDiv.querySelector('.bible-chapter-title');

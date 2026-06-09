@@ -69,6 +69,7 @@ async function mSelectVersion(translationCode, bookCode, chapter) {
       chapterDiv.dataset.bookCode = bookCode;
       chapterDiv.dataset.chapter  = chapter;
       htmx.process(chapterDiv);
+      if (window.mRestoreAppearance) mRestoreAppearance(chapterDiv);
     }
 
     // Update mobile version badge
