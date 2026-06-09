@@ -157,7 +157,7 @@ def library_detail(request, record_id):
         'is_level5':   _level(request.user) >= 5,
         'active_branch': 'library',
         'record_type': record.record_type,
-    }, shell_template='workspace/governance/home.html')
+    }, shell_template='workspace/governance/record_detail.html')
 
 
 # ── Mandate branch ─────────────────────────────────────────────────────────────
@@ -236,7 +236,7 @@ def mandate_detail(request, record_id):
         'is_level5':     _level(request.user) >= 5,
         'active_branch': 'mandate',
         'record_type': record.record_type,
-    }, shell_template='workspace/governance/home.html')
+    }, shell_template='workspace/governance/record_detail.html')
 
 
 # ── My Keys ────────────────────────────────────────────────────────────────────
@@ -269,9 +269,14 @@ def keys_detail(request, record_id):
     )
     linked = get_linked_records(record_id)
     return _shell_or_partial(request, 'governance/_keys_detail.html', {
-        'record': record,
-        'linked': linked,
-    })
+        'record':        record,
+        'linked':        linked,
+        'active_branch': 'keys',
+        'library_types': LIBRARY_TYPE_LABELS,
+        'mandate_types': MANDATE_TYPE_LABELS,
+        'is_level5':     _level(request.user) >= 5,
+        'record_type':   record.record_type,
+    }, shell_template='workspace/governance/record_detail.html')
 
 
 # ── HTMX partials ──────────────────────────────────────────────────────────────
