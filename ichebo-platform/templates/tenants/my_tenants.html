@@ -20,21 +20,29 @@
     {% if perms %}
     <div style="display: flex; flex-direction: column; gap: 10px;">
         {% for perm in perms %}
-        <div style="display: flex; align-items: center; gap: 16px; background: var(--card);
-                    border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;">
+        {% with child_count=perm.tenant.children.count %}
+        <a href="{% url 'tenants:tenant-detail' perm.tenant.id %}"
+           style="display: flex; align-items: center; gap: 16px; background: var(--card);
+                  border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;
+                  text-decoration: none; transition: border-color 0.15s;">
             <span class="material-symbols-outlined" style="font-size: 22px; color: var(--primary); flex-shrink: 0;">account_balance</span>
             <div style="flex: 1; min-width: 0;">
                 <div style="font-size: 14px; font-weight: 800; color: var(--text);">{{ perm.tenant.name }}</div>
                 <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;
                             letter-spacing: 0.05em; margin-top: 2px;">
                     {{ perm.tenant.get_tier_display }} · {{ perm.tenant.get_affiliation_display }}
+                    {% if child_count %} · {{ child_count }} sub-node{{ child_count|pluralize }}{% endif %}
                 </div>
             </div>
-            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
-                         letter-spacing: 0.06em; color: var(--primary); flex-shrink: 0;">
-                {{ perm.get_role_display }}
-            </span>
-        </div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                             letter-spacing: 0.06em; color: var(--primary);">
+                    {{ perm.get_role_display }}
+                </span>
+                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--muted);">arrow_forward_ios</span>
+            </div>
+        </a>
+        {% endwith %}
         {% endfor %}
     </div>
     {% else %}

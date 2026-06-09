@@ -15,6 +15,28 @@
       </div>
     </div>
 
+    {% if live %}
+    <div style="background: rgba(229,57,53,0.07); border: 1px solid var(--primary); border-radius: 10px;
+                padding: 16px 20px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;">
+        <span class="live-badge" style="flex-shrink: 0;"><span class="live-dot"></span>Live Now</span>
+        <div style="flex: 1; min-width: 0;">
+            {% for ev in live %}
+            <div style="font-size: 14px; font-weight: 700; color: var(--text);">{{ ev.title }}</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
+                Started {{ ev.scheduled_at|date:"H:i" }} · {{ ev.duration }} min window
+            </div>
+            {% endfor %}
+        </div>
+        {% for ev in live %}
+        <a href="{% url 'video_live:watch' ev.id %}" class="ws-topbar__cta"
+           style="background: var(--primary); color: #fff; border: none; text-decoration: none; flex-shrink: 0;">
+            <span class="material-symbols-outlined">play_circle</span>
+            Watch
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     {% if error %}
     <div style="background: var(--error-muted, #fde8e8); border: 1px solid var(--error); border-radius: 6px; padding: 0.65rem 1rem; color: var(--error); font-size: var(--fz--1); margin-bottom: var(--space-m);">
       {{ error }}
