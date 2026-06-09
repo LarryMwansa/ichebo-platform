@@ -246,6 +246,25 @@
   color: var(--text);
 }
 
+/* ─── Desktop/mobile mutual exclusion ────────────────────────────────────── */
+
+/* Hide the desktop reader shell on mobile */
+@media (max-width: 1023px) {
+  .bible-reader-shell.desktop-only { display: none !important; }
+}
+
+/* Hide the mobile bible shell on desktop */
+@media (min-width: 1024px) {
+  #m-bible-shell { display: none !important; }
+  #m-bible-nav-strip { display: none !important; }
+  #m-sheet-overlay { display: none !important; }
+  #m-nav-sheet,
+  #m-annotation-sheet,
+  #m-display-sheet { display: none !important; }
+  #m-verse-toolbar { display: none !important; }
+  #m-copy-toast { display: none !important; }
+}
+
 /* ─── Responsive Adjustments ──────────────────────────────────────────────── */
 
 @media (min-width: 768px) {
@@ -262,4 +281,292 @@
     padding: 12px 1.5rem;
     border-radius: 12px;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE BIBLE READER  (<1024px — standalone base.html shell)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1023px) {
+
+  /* ── Shell ── */
+  #m-bible-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--bg);
+    /* bottom padding: nav-strip (56px) + bottom-nav (64px) + safe area */
+    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* ── Sticky topbar ── */
+  #m-bible-topbar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+    padding: 0 8px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    z-index: 200;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    gap: 4px;
+  }
+
+  #m-bible-topbar-back {
+    display: flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 10px;
+    background: none; border: none; cursor: pointer;
+    color: var(--text); flex-shrink: 0;
+  }
+
+  #m-bible-title-btn {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    background: none; border: none; cursor: pointer;
+    font-size: 15px; font-weight: 700; color: var(--text);
+    padding: 8px 4px; border-radius: 8px;
+    min-width: 0;
+  }
+  #m-bible-title-btn:active { background: var(--hover); }
+
+  .m-bible-version-badge {
+    font-size: 10px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    padding: 2px 6px; border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .m-bible-topbar-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px; border-radius: 10px;
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); flex-shrink: 0;
+    text-decoration: none;
+  }
+  .m-bible-topbar-icon:active { background: var(--hover); }
+  .m-bible-topbar-icon .material-symbols-outlined { font-size: 22px; }
+
+  /* ── Chapter content area ── */
+  #m-bible-chapter {
+    flex: 1;
+    padding: 0 0 1rem;
+  }
+
+  /* ── Bottom nav strip (prev / title / next) ── */
+  #m-bible-nav-strip {
+    position: fixed;
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    left: 0; right: 0;
+    height: 56px;
+    display: flex; align-items: center;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    z-index: 190;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform 0.28s ease;
+    padding: 0 8px;
+    gap: 8px;
+  }
+
+  #m-bible-nav-strip.strip-hidden {
+    transform: translateY(calc(100% + 64px));
+  }
+
+  .m-nav-strip-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 48px; height: 40px; flex-shrink: 0;
+    background: var(--card-2); border: 1px solid var(--border);
+    border-radius: 10px; cursor: pointer; color: var(--text);
+    transition: background 0.15s;
+  }
+  .m-nav-strip-btn:active { background: var(--hover); }
+  .m-nav-strip-btn .material-symbols-outlined { font-size: 20px; }
+
+  #m-nav-strip-chapter-btn {
+    flex: 1; height: 40px;
+    background: none; border: none; cursor: pointer;
+    font-size: 14px; font-weight: 700; color: var(--text);
+    border-radius: 8px; padding: 0 8px;
+    transition: background 0.15s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #m-nav-strip-chapter-btn:active { background: var(--hover); }
+
+  /* ── Bottom sheet base ── */
+  .m-sheet {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--card);
+    border-radius: 20px 20px 0 0;
+    max-height: 88vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 800;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    overscroll-behavior: contain;
+  }
+
+  .m-sheet--open {
+    transform: translateY(0);
+  }
+
+  .m-sheet__handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 12px auto 0;
+    flex-shrink: 0;
+  }
+
+  .m-sheet__header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: var(--card);
+    z-index: 1;
+  }
+
+  .m-sheet__title {
+    font-size: 14px; font-weight: 700; color: var(--text);
+  }
+
+  .m-sheet__close {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--card-2); border: 1px solid var(--border);
+    cursor: pointer; color: var(--muted);
+  }
+  .m-sheet__close .material-symbols-outlined { font-size: 16px; }
+
+  /* ── Sheet overlay ── */
+  #m-sheet-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 799;
+  }
+  #m-sheet-overlay.visible { display: block; }
+
+  /* ── Navigator sheet: 2-column book+chapter layout ── */
+  #m-nav-sheet-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: calc(72vh - 60px);
+    overflow: hidden;
+  }
+
+  #m-nav-books-col {
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px 0;
+  }
+
+  .m-nav-book-btn {
+    display: block; width: 100%;
+    padding: 10px 14px; text-align: left;
+    background: none; border: none; cursor: pointer;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    transition: background 0.12s;
+  }
+  .m-nav-book-btn:active,
+  .m-nav-book-btn--active { background: var(--hover); font-weight: 700; color: var(--primary); }
+
+  #m-nav-chapters-col {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px;
+  }
+
+  #m-nav-chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    gap: 6px;
+  }
+
+  .m-nav-ch-btn {
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--card-2); border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer;
+    font-size: 12px; font-weight: 600; color: var(--text);
+    transition: background 0.12s;
+  }
+  .m-nav-ch-btn:active { background: var(--hover); }
+  .m-nav-ch-btn--active {
+    background: var(--primary); color: #fff; border-color: var(--primary);
+  }
+
+  /* ── Annotation sheet ── */
+  #m-annotation-sheet {
+    max-height: 80vh;
+  }
+
+  /* ── Verse toolbar (above nav strip) ── */
+  #m-verse-toolbar {
+    position: fixed;
+    bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+    left: 50%; transform: translateX(-50%);
+    background: var(--ink);
+    color: #fff;
+    border-radius: 12px;
+    padding: 6px 10px;
+    display: none;
+    align-items: center;
+    gap: 4px;
+    z-index: 700;
+    white-space: nowrap;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .m-vtb-btn {
+    display: flex; align-items: center; gap: 4px;
+    padding: 5px 8px; border-radius: 7px;
+    background: transparent; border: none;
+    color: #fff; cursor: pointer;
+    font-size: 12px; font-weight: 600;
+    transition: background 0.1s;
+  }
+  .m-vtb-btn:active { background: rgba(255,255,255,0.15); }
+  .m-vtb-btn .material-symbols-outlined { font-size: 17px; }
+
+  .m-vtb-divider {
+    width: 1px; height: 20px;
+    background: rgba(255,255,255,0.15);
+    margin: 0 2px;
+    flex-shrink: 0;
+  }
+
+  .m-vtb-hl-swatch {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.1s;
+    flex-shrink: 0;
+  }
+  .m-vtb-hl-swatch:active { transform: scale(1.25); border-color: #fff; }
+
+  /* ── Copy toast ── */
+  #m-copy-toast {
+    display: none;
+    position: fixed;
+    bottom: calc(185px + env(safe-area-inset-bottom, 0px));
+    left: 50%; transform: translateX(-50%);
+    background: var(--primary); color: #fff;
+    font-size: 12px; font-weight: 700;
+    padding: 8px 18px; border-radius: 20px;
+    z-index: 710;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    pointer-events: none;
+  }
+
 }

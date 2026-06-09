@@ -38,8 +38,8 @@
   {% endfor %}
 </div>
 
-{# OOB: update topbar version badge and options bar active version badge on translation change #}
-{% if translation %}
+{# OOB: update desktop workspace version badges — skipped on the mobile reader #}
+{% if translation and not mobile_reader %}
 <span id="bible-topbar-version" hx-swap-oob="true"
       class="status-badge" style="margin-left: var(--space-s); font-size: 9px;">{{ translation.code }}</span>
 <div id="bible-active-version" hx-swap-oob="true"

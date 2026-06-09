@@ -12,7 +12,7 @@
 {% block bible_topbar %}{% endblock %}
 
 {% block content %}
-<div class="bible-reader-shell" id="reader-shell">
+<div class="bible-reader-shell desktop-only" id="reader-shell">
   <div id="bible-chapter"
        data-book-code="{{ book.code }}"
        data-chapter="{{ chapter }}">
@@ -50,6 +50,11 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+  if (window.innerWidth < 1024) {
+    window.location.replace('{% url "bible:mobile-reader-chapter" book.code chapter %}');
+  }
+</script>
 <script>
   async function navChapter(offset) {
     const chapterDiv = document.getElementById('bible-chapter');
@@ -102,3 +107,450 @@
   }
 </script>
 {% endblock %}
+
+{# ══════════════════════════════════════════════════════════════════════════
+   MOBILE BIBLE READER — rendered into workspace_shell's mobile_fullscreen slot
+   Only visible below 1024px. Desktop content above is untouched.
+   ══════════════════════════════════════════════════════════════════════════ #}
+{% block mobile_fullscreen %}
+
+<div id="m-bible-shell">
+
+  {# ── Sticky top bar ── #}
+  <div id="m-bible-topbar">
+    <a href="/" id="m-bible-topbar-back" aria-label="Back">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+
+    <button id="m-bible-title-btn" aria-label="Select book and chapter"
+            onclick="mNavOpen()">
+      <span id="m-title-text">{{ book.name }} {{ chapter }}</span>
+      <span class="m-bible-version-badge" id="m-version-badge">{{ translation.code }}</span>
+    </button>
+
+    <a href="{% url 'bible:search' %}" class="m-bible-topbar-icon" aria-label="Search">
+      <span class="material-symbols-outlined">search</span>
+    </a>
+    <button class="m-bible-topbar-icon" aria-label="Display settings" onclick="mBibleOpenSheet('m-display-sheet')">
+      <span class="material-symbols-outlined">tune</span>
+    </button>
+  </div>
+
+  {# ── Chapter content area ── #}
+  <div id="m-bible-chapter" data-book-code="{{ book.code }}" data-chapter="{{ chapter }}">
+    {% include "bible/_chapter.html" %}
+  </div>
+
+</div>
+
+{# ── Bottom nav strip: prev · Genesis 1 · next ── #}
+<div id="m-bible-nav-strip">
+  <button class="m-nav-strip-btn" id="m-prev-btn" onclick="mNavChapter(-1)" aria-label="Previous chapter">
+    <span class="material-symbols-outlined">chevron_left</span>
+  </button>
+  <button id="m-nav-strip-chapter-btn" onclick="mNavOpen()">{{ book.name }} {{ chapter }}</button>
+  <button class="m-nav-strip-btn" id="m-next-btn" onclick="mNavChapter(1)" aria-label="Next chapter">
+    <span class="material-symbols-outlined">chevron_right</span>
+  </button>
+</div>
+
+{# ── Sheet overlay ── #}
+<div id="m-sheet-overlay" onclick="mBibleCloseSheet()"></div>
+
+{# ── Navigator sheet: Book + Chapter ── #}
+<div id="m-nav-sheet" class="m-sheet" role="dialog" aria-modal="true" aria-label="Select passage">
+  <div class="m-sheet__handle"></div>
+  <div class="m-sheet__header">
+    <span class="m-sheet__title">Select Passage</span>
+    <button class="m-sheet__close" onclick="mBibleCloseSheet()" aria-label="Close">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+  <div id="m-nav-sheet-body">
+    <div id="m-nav-books-col">
+      {% for b in books %}
+      <button class="m-nav-book-btn {% if b.code == book.code %}m-nav-book-btn--active{% endif %}"
+              data-code="{{ b.code }}"
+              onclick="mNavSelectBook('{{ b.code }}', '{{ b.name|escapejs }}')">
+        {{ b.name }}
+      </button>
+      {% endfor %}
+    </div>
+    <div id="m-nav-chapters-col">
+      <div id="m-nav-chapter-grid">
+        {% for ch in chapters %}
+        <button class="m-nav-ch-btn {% if ch == chapter %}m-nav-ch-btn--active{% endif %}"
+                onclick="mNavSelectChapter({{ ch }})">
+          {{ ch }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Annotation sheet: verse tap ── #}
+<div id="m-annotation-sheet" class="m-sheet" role="dialog" aria-modal="true" aria-label="Verse note">
+  <div class="m-sheet__handle"></div>
+  {# Populated by HTMX on verse tap #}
+</div>
+
+{# ── Display / appearance sheet ── #}
+<div id="m-display-sheet" class="m-sheet" role="dialog" aria-modal="true" aria-label="Display settings">
+  <div class="m-sheet__handle"></div>
+  <div class="m-sheet__header">
+    <span class="m-sheet__title">Display</span>
+    <button class="m-sheet__close" onclick="mBibleCloseSheet()" aria-label="Close">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+  <div style="padding: 16px;">
+
+    <div class="label-caps" style="margin-bottom: 8px;">Font Size</div>
+    <div style="display: flex; align-items: center; gap: 10px; background: var(--card-2);
+                border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 20px;">
+      <button onclick="mBibleApplySize(_mBibleSize - 10)"
+              style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border);
+                     background:var(--bg);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <span class="material-symbols-outlined">remove</span>
+      </button>
+      <div id="m-font-size-label" style="flex:1;text-align:center;font-size:14px;font-weight:700;">100%</div>
+      <button onclick="mBibleApplySize(_mBibleSize + 10)"
+              style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border);
+                     background:var(--bg);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+    </div>
+
+    <div class="label-caps" style="margin-bottom: 8px;">Line Spacing</div>
+    <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+      <button class="m-lh-btn" data-lh="1.5" onclick="mBibleApplyLh('1.5')"
+              style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);
+                     background:var(--card-2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;">Compact</button>
+      <button class="m-lh-btn" data-lh="1.8" onclick="mBibleApplyLh('1.8')"
+              style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);
+                     background:var(--card-2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;">Normal</button>
+      <button class="m-lh-btn" data-lh="2.2" onclick="mBibleApplyLh('2.2')"
+              style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);
+                     background:var(--card-2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;">Open</button>
+    </div>
+
+    <div class="label-caps" style="margin-bottom: 8px;">Version</div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      {% for t in translations %}
+      <button style="display:flex;align-items:center;gap:10px;padding:10px 14px;
+                     border-radius:10px;border:1px solid {% if t == translation %}var(--primary){% else %}var(--border){% endif %};
+                     background:{% if t == translation %}color-mix(in srgb,var(--primary) 8%,transparent){% else %}var(--card-2){% endif %};
+                     color:var(--text);cursor:pointer;text-align:left;"
+              hx-post="{% url 'bible:htmx-set-translation' %}"
+              hx-vals='{"translation_code":"{{ t.code }}","book_code":"{{ book.code }}","chapter":"{{ chapter }}"}'
+              hx-target="#m-bible-chapter"
+              hx-swap="innerHTML"
+              onclick="mBibleCloseSheet()">
+        <span style="font-size:13px;font-weight:800;color:{% if t == translation %}var(--primary){% else %}var(--text){% endif %};">{{ t.code }}</span>
+        <span style="font-size:12px;color:var(--muted);flex:1;text-align:left;">{{ t.name }}</span>
+        {% if t == translation %}<span class="material-symbols-outlined" style="font-size:16px;color:var(--primary);">check</span>{% endif %}
+      </button>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+{# ── Verse action toolbar ── #}
+<div id="m-verse-toolbar">
+  <span id="m-vtb-ref" style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);
+                               padding:0 8px 0 4px;border-right:1px solid rgba(255,255,255,0.12);margin-right:2px;">v.1</span>
+  <button class="m-vtb-btn" title="Copy" onclick="mBibleCopy()">
+    <span class="material-symbols-outlined">content_copy</span>
+  </button>
+  <div class="m-vtb-divider"></div>
+  <button class="m-vtb-hl-swatch" title="Yellow" onclick="mBibleHighlight('hl-yellow')" style="background:#fde68a;"></button>
+  <button class="m-vtb-hl-swatch" title="Green"  onclick="mBibleHighlight('hl-green')"  style="background:#bbf7d0;"></button>
+  <button class="m-vtb-hl-swatch" title="Blue"   onclick="mBibleHighlight('hl-blue')"   style="background:#bfdbfe;"></button>
+  <button class="m-vtb-hl-swatch" title="Pink"   onclick="mBibleHighlight('hl-pink')"   style="background:#fecdd3;"></button>
+  <div class="m-vtb-divider"></div>
+  <button class="m-vtb-btn" title="Note" onclick="mBibleOpenNote()">
+    <span class="material-symbols-outlined">edit_note</span>
+  </button>
+  <button class="m-vtb-btn" title="Dismiss" onclick="mDismissToolbar()">
+    <span class="material-symbols-outlined" style="font-size:16px;">close</span>
+  </button>
+</div>
+
+{# ── Copy toast ── #}
+<div id="m-copy-toast">Copied!</div>
+
+{# ── All chapter data for the navigator (JS dict) ── #}
+<script>
+const _mAllChapters = {
+  {% for code, chaps in all_chapters.items %}'{{ code }}': {{ chaps|safe }},
+  {% endfor %}
+};
+</script>
+
+{# ── Mobile reader JS ── #}
+<script>
+(function () {
+'use strict';
+
+/* ── State ── */
+let _mActiveSheet  = null;
+let _mSelectedVerse = null;   // { num, id, text }
+let _mVerseMap     = {};      // verse num → { id, text, el }
+let _mBookCode     = '{{ book.code }}';
+let _mChapter      = {{ chapter }};
+let _mNavBook      = _mBookCode;
+let _mBibleSize    = 100;
+let _mBibleLh      = '1.8';
+
+/* ── Sheet open / close ── */
+window.mBibleOpenSheet = function (id) {
+  if (_mActiveSheet) document.getElementById(_mActiveSheet)?.classList.remove('m-sheet--open');
+  _mActiveSheet = id;
+  document.getElementById(id)?.classList.add('m-sheet--open');
+  document.getElementById('m-sheet-overlay').classList.add('visible');
+};
+
+window.mBibleCloseSheet = function () {
+  if (_mActiveSheet) document.getElementById(_mActiveSheet)?.classList.remove('m-sheet--open');
+  _mActiveSheet = null;
+  document.getElementById('m-sheet-overlay').classList.remove('visible');
+};
+
+window.mNavOpen = function () { mBibleOpenSheet('m-nav-sheet'); };
+
+/* ── Chapter navigation ── */
+window.mNavChapter = async function (offset) {
+  const chDiv = document.getElementById('m-bible-chapter');
+  const inner = chDiv?.querySelector('[data-book-code]');
+  if (!inner) return;
+  const book    = inner.dataset.bookCode || _mBookCode;
+  const chapter = parseInt(inner.dataset.chapter || _mChapter);
+  const newCh   = Math.max(1, chapter + offset);
+  await _mLoadChapter(book, newCh);
+};
+
+window.mNavSelectBook = function (code, name) {
+  _mNavBook = code;
+  // Highlight active book
+  document.querySelectorAll('.m-nav-book-btn').forEach(b => {
+    b.classList.toggle('m-nav-book-btn--active', b.dataset.code === code);
+  });
+  // Populate chapter grid
+  const grid = document.getElementById('m-nav-chapter-grid');
+  const chaps = _mAllChapters[code] || [];
+  grid.innerHTML = chaps.map(ch =>
+    `<button class="m-nav-ch-btn${(code === _mBookCode && ch === _mChapter) ? ' m-nav-ch-btn--active' : ''}"
+             onclick="mNavSelectChapter(${ch})">${ch}</button>`
+  ).join('');
+};
+
+window.mNavSelectChapter = async function (ch) {
+  mBibleCloseSheet();
+  await _mLoadChapter(_mNavBook, ch);
+};
+
+async function _mLoadChapter(bookCode, chapter) {
+  try {
+    const res = await fetch(`/bible/htmx/chapter/?book_code=${bookCode}&chapter=${chapter}`);
+    if (!res.ok) return;
+    const html = await res.text();
+    const chDiv = document.getElementById('m-bible-chapter');
+    chDiv.innerHTML = html;
+    _mBookCode = bookCode;
+    _mChapter  = chapter;
+    _mOnChapterSwap();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Update URL without reload
+    window.history.pushState({}, '', `/bible/${bookCode}/${chapter}/`);
+  } catch (e) { console.error(e); }
+}
+
+function _mOnChapterSwap() {
+  // Update topbar title + nav strip label
+  const label = `${_mBookCode} ${_mChapter}`;
+  const titleEl = document.querySelector('[data-book-code]');
+  const bookName = titleEl?.closest('#m-bible-chapter')
+    ? titleEl.parentElement?.querySelector('.bible-chapter-title')?.textContent?.trim()
+    : null;
+  const display = bookName || label;
+
+  const titleBtn = document.getElementById('m-title-text');
+  if (titleBtn) titleBtn.textContent = display;
+  const stripBtn = document.getElementById('m-nav-strip-chapter-btn');
+  if (stripBtn) stripBtn.textContent = display;
+
+  // Update version badge from OOB swap if present
+  const oobBadge = document.getElementById('bible-topbar-version');
+  const mBadge   = document.getElementById('m-version-badge');
+  if (oobBadge && mBadge) mBadge.textContent = oobBadge.textContent;
+
+  // Re-apply appearance
+  mBibleApplySize(_mBibleSize);
+  mBibleApplyLh(_mBibleLh);
+  _mBuildVerseMap();
+  mDismissToolbar();
+
+  // Save position to localStorage
+  localStorage.setItem('ics_ui.bible_last_position', JSON.stringify({ bookCode: _mBookCode, chapter: _mChapter }));
+}
+
+/* ── Verse map ── */
+function _mBuildVerseMap() {
+  _mVerseMap = {};
+  document.querySelectorAll('#m-bible-chapter .bible-verse').forEach(el => {
+    const num  = parseInt(el.querySelector('.bible-verse__num')?.textContent?.trim() || '0');
+    const text = el.querySelector('.bible-verse__text')?.textContent?.trim() || '';
+    const id   = el.id?.replace('verse-', '') || '';
+    if (num) _mVerseMap[num] = { id, text, num, el };
+    // Wire tap → annotation sheet + toolbar
+    el.addEventListener('click', () => _mVerseTap(num));
+  });
+  _mApplyAllHighlights();
+}
+
+/* ── Verse tap ── */
+function _mVerseTap(num) {
+  const entry = _mVerseMap[num];
+  if (!entry) return;
+  _mSelectedVerse = entry;
+
+  // Show toolbar
+  document.getElementById('m-vtb-ref').textContent = `v.${num}`;
+  const tb = document.getElementById('m-verse-toolbar');
+  if (tb) tb.style.display = 'flex';
+
+  // Open annotation sheet via HTMX
+  htmx.ajax('GET', `/bible/htmx/annotation/${entry.id}/`, {
+    target: '#m-annotation-sheet',
+    swap: 'innerHTML',
+  });
+}
+
+window.mDismissToolbar = function () {
+  _mSelectedVerse = null;
+  const tb = document.getElementById('m-verse-toolbar');
+  if (tb) tb.style.display = 'none';
+};
+
+/* ── Annotation sheet open after HTMX swap ── */
+document.addEventListener('htmx:afterSwap', (e) => {
+  if (e.detail.target.id === 'm-annotation-sheet') {
+    mBibleOpenSheet('m-annotation-sheet');
+  }
+  if (e.detail.target.id === 'm-bible-chapter') {
+    _mOnChapterSwap();
+  }
+});
+
+/* ── Copy ── */
+window.mBibleCopy = function () {
+  if (!_mSelectedVerse) return;
+  const { text, num } = _mSelectedVerse;
+  const ref = `${_mBookCode} ${_mChapter}:${num}`;
+  navigator.clipboard.writeText(`${text}\n— ${ref}`).then(() => {
+    const t = document.getElementById('m-copy-toast');
+    if (!t) return;
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 1600);
+  });
+};
+
+/* ── Highlights ── */
+const _M_HL_COLORS = {
+  'hl-yellow': { bg: '#fef9c3', border: '#fde68a' },
+  'hl-green':  { bg: '#f0fdf4', border: '#bbf7d0' },
+  'hl-blue':   { bg: '#eff6ff', border: '#bfdbfe' },
+  'hl-pink':   { bg: '#fff1f2', border: '#fecdd3' },
+};
+
+function _mHlKey(num) { return `bible_hl_${_mBookCode}_${_mChapter}_${num}`; }
+
+window.mBibleHighlight = function (color) {
+  if (!_mSelectedVerse) return;
+  const { num, el } = _mSelectedVerse;
+  if (color) localStorage.setItem(_mHlKey(num), color);
+  else       localStorage.removeItem(_mHlKey(num));
+  _mApplyHighlightToEl(el, color);
+};
+
+function _mApplyHighlightToEl(el, color) {
+  Object.keys(_M_HL_COLORS).forEach(c => el.classList.remove(c));
+  if (color && _M_HL_COLORS[color]) el.classList.add(color);
+}
+
+function _mApplyAllHighlights() {
+  Object.values(_mVerseMap).forEach(({ num, el }) => {
+    const color = localStorage.getItem(_mHlKey(num));
+    if (color) _mApplyHighlightToEl(el, color);
+  });
+}
+
+/* ── Note shortcut: opens annotation sheet scrolled to note tab ── */
+window.mBibleOpenNote = function () {
+  if (!_mSelectedVerse) return;
+  htmx.ajax('GET', `/bible/htmx/annotation/${_mSelectedVerse.id}/?tab=bible-note-tab`, {
+    target: '#m-annotation-sheet',
+    swap: 'innerHTML',
+  });
+};
+
+/* ── Appearance ── */
+window._mBibleSize = 100;
+window._mBibleLh   = '1.8';
+
+window.mBibleApplySize = function (s) {
+  _mBibleSize = Math.max(80, Math.min(200, s));
+  const el = document.getElementById('m-bible-chapter');
+  if (el) el.style.setProperty('--bible-font-size', `${_mBibleSize / 100}em`);
+  const label = document.getElementById('m-font-size-label');
+  if (label) label.textContent = `${_mBibleSize}%`;
+  if (window.ICSStorage) ICSStorage.setUIState('bible_font_size', _mBibleSize);
+};
+
+window.mBibleApplyLh = function (lh) {
+  _mBibleLh = lh;
+  const el = document.getElementById('m-bible-chapter');
+  if (el) el.style.setProperty('--bible-line-height', lh);
+  document.querySelectorAll('.m-lh-btn').forEach(b =>
+    b.style.background = (b.dataset.lh === lh) ? 'var(--primary-light)' : 'var(--card-2)'
+  );
+  if (window.ICSStorage) ICSStorage.setUIState('bible_line_height', lh);
+};
+
+/* ── Scroll hide / show ── */
+let _mLastScroll = 0;
+window.addEventListener('scroll', () => {
+  const y   = window.scrollY;
+  const dir = y > _mLastScroll ? 'down' : 'up';
+  _mLastScroll = y;
+  const topbar = document.getElementById('m-bible-topbar');
+  const strip  = document.getElementById('m-bible-nav-strip');
+  if (dir === 'down' && y > 80) {
+    topbar?.classList.add('scroll-hidden');
+    strip?.classList.add('strip-hidden');
+  } else if (dir === 'up') {
+    topbar?.classList.remove('scroll-hidden');
+    strip?.classList.remove('strip-hidden');
+  }
+}, { passive: true });
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore saved appearance
+  if (window.ICSStorage) {
+    _mBibleSize = parseInt(ICSStorage.getUIState('bible_font_size', '100')) || 100;
+    _mBibleLh   = ICSStorage.getUIState('bible_line_height', '1.8');
+  }
+  mBibleApplySize(_mBibleSize);
+  mBibleApplyLh(_mBibleLh);
+  _mBuildVerseMap();
+  // Pre-select current book in navigator
+  _mNavBook = _mBookCode;
+});
+
+})();
+</script>
+
+{% endblock mobile_fullscreen %}

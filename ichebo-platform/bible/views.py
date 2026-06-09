@@ -42,6 +42,12 @@ class BibleReaderView(LoginRequiredMixin, View):
         )
         translations = BibleTranslation.objects.filter(is_public=True)
 
+        # Build all_chapters dict for the mobile navigator sheet (JS-driven, no extra queries)
+        all_books = list(books)
+        all_chapters = {
+            b.code: list(get_book_chapters(b.code)) for b in all_books
+        }
+
         context = {
             'translation': translation,
             'translations': translations,
@@ -53,6 +59,7 @@ class BibleReaderView(LoginRequiredMixin, View):
             'personal_noted': personal_noted,
             'tenant_noted': tenant_noted,
             'active_app': 'bible',
+            'all_chapters': all_chapters,
         }
 
         template_name = 'bible/reader.html'
@@ -100,6 +107,9 @@ def htmx_chapter(request):
 
     book = BibleBook.objects.filter(code=book_code).first()
 
+    # Detect mobile reader by HX-Target header — mobile uses '#m-bible-chapter'
+    mobile_reader = request.headers.get('HX-Target') == 'm-bible-chapter'
+
     context = {
         'translation': translation,
         'book': book,
@@ -108,6 +118,7 @@ def htmx_chapter(request):
         'personal_noted': personal_noted,
         'tenant_noted': tenant_noted,
         'linked_noted': linked_noted,
+        'mobile_reader': mobile_reader,
     }
     return render(request, 'bible/_chapter.html', context)
 
@@ -368,6 +379,57 @@ def htmx_bible_record_search(request):
     })
 
 
+class MobileBibleReaderView(LoginRequiredMixin, View):
+    """
+    Standalone mobile Bible reader — no workspace shell.
+    Served at /bible/m/<book_code>/<chapter>/
+    """
+
+    def get(self, request, book_code=DEFAULT_BOOK, chapter=DEFAULT_CHAPTER):
+        if book_code == DEFAULT_BOOK and chapter == DEFAULT_CHAPTER:
+            position = get_reading_position(request.user)
+            if position:
+                book_code, chapter = position
+
+        translation = get_user_translation(request.user)
+        books = get_all_books()
+        book = BibleBook.objects.filter(code=book_code).first()
+        if not book:
+            if book_code != DEFAULT_BOOK:
+                return redirect('bible:mobile-reader')
+            raise Http404("Bible data is not loaded.")
+
+        chapters = get_book_chapters(book_code)
+        verses = get_chapter_verses(translation, book_code, chapter)
+        personal_noted, tenant_noted = get_chapter_note_verse_numbers(
+            request.user, translation, book_code, chapter
+        )
+        translations = BibleTranslation.objects.filter(is_public=True)
+
+        all_books = list(books)
+        all_chapters = {
+            b.code: list(get_book_chapters(b.code)) for b in all_books
+        }
+
+        save_reading_position(request.user, book_code, chapter)
+
+        context = {
+            'translation': translation,
+            'translations': translations,
+            'books': books,
+            'book': book,
+            'chapters': list(chapters),
+            'chapter': chapter,
+            'verses': verses,
+            'personal_noted': personal_noted,
+            'tenant_noted': tenant_noted,
+            'active_app': 'bible',
+            'all_chapters': all_chapters,
+            'mobile_reader': True,
+        }
+        return render(request, 'bible/reader_mobile.html', context)
+
+
 @login_required
 def bible_search_view(request):
     """
@@ -588,6 +650,8 @@ def htmx_set_translation(request):
     )
     book = BibleBook.objects.filter(code=book_code).first()
 
+    mobile_reader = request.headers.get('HX-Target') == 'm-bible-chapter'
+
     context = {
         'translation': translation,
         'book': book,
@@ -595,6 +659,7 @@ def htmx_set_translation(request):
         'verses': verses,
         'personal_noted': personal_noted,
         'tenant_noted': tenant_noted,
+        'mobile_reader': mobile_reader,
     }
     return render(request, 'bible/_chapter.html', context)
 

@@ -6,6 +6,9 @@ app_name = 'bible'
 urlpatterns = [
     path('', views.BibleReaderView.as_view(), name='reader'),
     path('<str:book_code>/<int:chapter>/', views.BibleReaderView.as_view(), name='reader-chapter'),
+    # Mobile standalone reader
+    path('m/', views.MobileBibleReaderView.as_view(), name='mobile-reader'),
+    path('m/<str:book_code>/<int:chapter>/', views.MobileBibleReaderView.as_view(), name='mobile-reader-chapter'),
     # New pages
     path('search/', views.bible_search_view, name='search'),
     path('pick/', views.bible_picker_view, name='picker'),
