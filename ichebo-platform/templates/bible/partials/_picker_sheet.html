@@ -126,15 +126,37 @@
       },
 
       fetchChapterContent: async function(bookCode, chapter) {
-        const chapterDiv = document.getElementById('bible-chapter');
+        const chapterDiv = document.getElementById('m-bible-chapter')
+                        || document.getElementById('bible-chapter');
         try {
           const response = await fetch(`/bible/htmx/chapter/?book_code=${bookCode}&chapter=${chapter}`);
           if (!response.ok) return;
           const html = await response.text();
           if (chapterDiv) {
             chapterDiv.innerHTML = html;
-            htmx.process(chapterDiv); // Essential: process new verses for HTMX triggers
+            chapterDiv.dataset.bookCode = bookCode;
+            chapterDiv.dataset.chapter  = chapter;
+            htmx.process(chapterDiv);
+
+            // Update mobile nav button label
+            const titleEl  = chapterDiv.querySelector('.bible-chapter-title');
+            const titleText = titleEl?.textContent?.trim() || `${bookCode} ${chapter}`;
+            const mNavBtn = document.getElementById('m-bible-nav-btn');
+            if (mNavBtn) mNavBtn.textContent = titleText;
+
+            // Update mobile hero title
+            const heroTitle = document.querySelector('.page-hero__title');
+            if (heroTitle) heroTitle.innerHTML = titleText.replace(/(\d+)$/, '<em>$1</em>');
+
+            // Update desktop nav button if present
             if (window.updateNavDisplay) window.updateNavDisplay();
+
+            // Update URL
+            const newUrl = `/bible/${bookCode}/${chapter}/`;
+            if (window.location.pathname !== newUrl) {
+              window.history.pushState({ bookCode, chapter }, '', newUrl);
+            }
+
             window.scrollTo({ top: 0, behavior: 'instant' });
           }
         } catch (error) { console.error(error); }
