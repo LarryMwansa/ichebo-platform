@@ -94,6 +94,7 @@
     <button class="ics-options-tab" id="btab-notes" onclick="bibleSwitchTab('notes')">Notes</button>
     <button class="ics-options-tab" id="btab-links" onclick="bibleSwitchTab('links')">Links</button>
     <button class="ics-options-tab" id="btab-appear" onclick="bibleSwitchTab('appear')">Display</button>
+    <button class="ics-options-tab" id="btab-history" onclick="bibleSwitchTab('history')">History</button>
 </div>
 
 <div class="ics-options-bar__content">
@@ -259,11 +260,31 @@
         </div>
     </div>
 
+    {# ── History Pane ── #}
+    <div class="ws-options-pane" id="bpane-history" style="padding: var(--space-m); display: none;">
+        <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: var(--space-s);">Reading History</div>
+        <div id="bhistory-list" style="display: flex; flex-direction: column; gap: 4px; max-height: calc(100vh - 260px); overflow-y: auto;">
+            <div style="padding: 24px 0; text-align: center;">
+                <span class="material-symbols-outlined" style="font-size: 36px; opacity: 0.15; display: block;">history</span>
+                <p style="font-size: 12px; color: var(--muted); margin-top: var(--space-s);">No chapters visited yet.</p>
+            </div>
+        </div>
+        <div style="margin-top: var(--space-m); border-top: 1px solid var(--border); padding-top: var(--space-s);">
+            <button onclick="bibleClearHistory()"
+                    style="width: 100%; background: none; border: 1px solid var(--border); border-radius: 8px;
+                           padding: 8px 12px; font-size: 11px; color: var(--muted); cursor: pointer;
+                           display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span class="material-symbols-outlined" style="font-size: 14px;">delete_sweep</span>
+                Clear History
+            </button>
+        </div>
+    </div>
+
 </div>
 
 <script>
 function bibleSwitchTab(name) {
-    ['versions', 'notes', 'links', 'appear'].forEach(t => {
+    ['versions', 'notes', 'links', 'appear', 'history'].forEach(t => {
         document.getElementById('btab-' + t)?.classList.toggle('active', t === name);
         const pane = document.getElementById('bpane-' + t);
         if (pane) {
@@ -271,10 +292,82 @@ function bibleSwitchTab(name) {
             else { pane.style.display = 'none'; }
         }
     });
-    if (name === 'appear') bibleInitAppearPane();
-    if (name === 'notes')  bibleRefreshHighlightChips();
-    if (name === 'links')  bibleLinkSearch('');
+    if (name === 'appear')  bibleInitAppearPane();
+    if (name === 'notes')   bibleRefreshHighlightChips();
+    if (name === 'links')   bibleLinkSearch('');
+    if (name === 'history') bibleRenderHistory();
 }
+
+// ── Reading History (localStorage) ──────────────────────────────────────────
+const _BHIST_KEY = 'bible_reading_history';
+const _BHIST_MAX = 30;
+
+function bibleRecordHistory(bookCode, bookName, chapter) {
+    try {
+        const raw = localStorage.getItem(_BHIST_KEY);
+        const history = raw ? JSON.parse(raw) : [];
+        const entry = { bookCode, bookName, chapter, url: `/bible/${bookCode}/${chapter}/`, ts: Date.now() };
+        const filtered = history.filter(h => !(h.bookCode === bookCode && h.chapter === chapter));
+        filtered.unshift(entry);
+        if (filtered.length > _BHIST_MAX) filtered.length = _BHIST_MAX;
+        localStorage.setItem(_BHIST_KEY, JSON.stringify(filtered));
+    } catch(e) {}
+}
+
+function bibleRenderHistory() {
+    const list = document.getElementById('bhistory-list');
+    if (!list) return;
+    try {
+        const raw = localStorage.getItem(_BHIST_KEY);
+        const history = raw ? JSON.parse(raw) : [];
+        if (!history.length) {
+            list.innerHTML = '<div style="padding:24px 0;text-align:center;">' +
+                '<span class="material-symbols-outlined" style="font-size:36px;opacity:0.15;display:block;">history</span>' +
+                '<p style="font-size:12px;color:var(--muted);margin-top:8px;">No chapters visited yet.</p></div>';
+            return;
+        }
+        const now = Date.now();
+        list.innerHTML = history.map(h => {
+            const age = now - h.ts;
+            const label = age < 60000 ? 'Just now'
+                : age < 3600000 ? Math.floor(age/60000) + 'm ago'
+                : age < 86400000 ? Math.floor(age/3600000) + 'h ago'
+                : new Date(h.ts).toLocaleDateString(undefined, {month:'short',day:'numeric'});
+            return `<a href="${h.url}" class="ctx-btn" style="text-decoration:none;display:flex;align-items:center;gap:8px;min-height:38px;">
+                <span class="material-symbols-outlined" style="font-size:15px;color:var(--muted);flex-shrink:0;">menu_book</span>
+                <span style="flex:1;font-weight:600;font-size:12px;">${h.bookName} ${h.chapter}</span>
+                <span style="font-size:10px;color:var(--muted);flex-shrink:0;">${label}</span>
+            </a>`;
+        }).join('');
+    } catch(e) {
+        list.innerHTML = '<p style="font-size:12px;color:var(--muted);padding:12px 0;">Could not load history.</p>';
+    }
+}
+
+function bibleClearHistory() {
+    try { localStorage.removeItem(_BHIST_KEY); } catch(e) {}
+    bibleRenderHistory();
+}
+
+// Record current chapter on page load
+(function() {
+    const bookCode = '{{ book.code }}';
+    const bookName = '{{ book.name }}';
+    const chapter  = {{ chapter }};
+    bibleRecordHistory(bookCode, bookName, chapter);
+})();
+
+// Record history on desktop chapter navigation
+document.addEventListener('bible:chapterSwapped', function() {
+    const innerDiv = document.querySelector('#bible-chapter [data-book-code]');
+    if (!innerDiv) return;
+    const bookCode = innerDiv.dataset.bookCode || '';
+    const chapter  = parseInt(innerDiv.dataset.chapter || '1');
+    const titleEl  = document.querySelector('#bible-chapter .bible-chapter-title');
+    const raw      = titleEl?.textContent?.trim() || '';
+    const bookName = raw.replace(/\s*\d+$/, '').trim() || bookCode;
+    bibleRecordHistory(bookCode, bookName, chapter);
+});
 
 let _bibleLinkDebounce = null;
 function bibleLinkSearch(q) {
