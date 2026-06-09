@@ -316,11 +316,13 @@ function bibleLinkLoadVerse(verseId, ref) {
 {% block content %}
 
 {# Hero + action strip as one fused sticky unit #}
-<div style="position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border);">
+<div style="position: sticky; top: 0; z-index: 50; width: 100%;
+            background: var(--card); border-bottom: 1px solid var(--border);">
 
-  {# Page hero — override background and margins so it blends with the strip below #}
+  {# Page hero — full width, margins zeroed, padding aligned to strip #}
   <div class="page-hero page-hero--watermark" data-watermark="BIBLE"
-       style="margin: 0; background: var(--card); border-bottom: none;">
+       style="margin: 0; width: 100%; background: var(--card); border-bottom: none;
+              padding: var(--space-l) 16px var(--space-m);">
     <div class="page-hero__eyebrow">
       <div class="page-hero__eyebrow-line"></div>
       <span class="page-hero__label">Scripture</span>
@@ -330,7 +332,8 @@ function bibleLinkLoadVerse(verseId, ref) {
 
   {# Action strip: version left | spacer | search | appearance right #}
   <div id="m-bible-topbar"
-       style="display: flex; align-items: center; padding: 4px 12px 8px; background: var(--card);">
+       style="display: flex; align-items: center; width: 100%;
+              padding: 4px 16px 8px; background: var(--card);">
     <span class="status-badge"
           style="font-size: 10px; font-weight: 800; letter-spacing: 0.05em;">{{ translation.code }}</span>
     <div style="flex: 1;"></div>
