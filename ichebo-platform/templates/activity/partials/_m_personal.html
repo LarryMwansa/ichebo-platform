@@ -2,7 +2,7 @@
 
 {# Filter pills #}
 <div style="display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
-            border-bottom: 1px solid var(--border); padding: 0 var(--space-s);">
+            border-bottom: 1px solid var(--border); padding: var(--space-s) var(--space-s) 0;">
   <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=personal"
      hx-target="#m-activity-body" hx-push-url="{% url 'activity:activity-home' %}"
      style="flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 700;
