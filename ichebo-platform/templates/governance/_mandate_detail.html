@@ -45,7 +45,16 @@
   {% endif %}
 
   {% if record.content %}
-  <div class="gov-content-body" style="margin-bottom: var(--space-m);">{{ record.content|linebreaks }}</div>
+  <div class="gov-content-body editorial-preview-pane" id="gov-content-body-{{ record.id }}" style="margin-bottom: var(--space-m);">{{ record.content }}</div>
+  <script>
+    (function() {
+      var el = document.getElementById('gov-content-body-{{ record.id }}');
+      if (el && typeof marked !== 'undefined') {
+        marked.setOptions({ breaks: true, gfm: true });
+        el.innerHTML = marked.parse(el.textContent);
+      }
+    })();
+  </script>
   {% endif %}
 
   {# ── Record metadata ── #}
