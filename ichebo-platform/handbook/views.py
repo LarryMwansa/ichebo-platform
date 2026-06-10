@@ -552,6 +552,80 @@ def handbook_linked_records(request, record_id):
     })
 
 
+# ── HTMX: Create relationship ────────────────────────────────────────────────
+
+@login_required
+def handbook_relationship_create(request):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    access = _get_access(request.user)
+    is_superuser = request.user.is_staff or request.user.is_superuser
+    if not _can_write(access) and not is_superuser:
+        return HttpResponseForbidden()
+
+    from_id  = request.POST.get('from_record_id', '').strip()
+    to_id    = request.POST.get('to_record_id', '').strip()
+    rel_type = request.POST.get('relationship_type', 'references').strip()
+    notes    = request.POST.get('notes', '').strip()
+
+    if not from_id or not to_id:
+        return HttpResponse('Missing record IDs', status=400)
+
+    from_record = get_object_or_404(Record, pk=from_id, deleted_at__isnull=True)
+    to_record   = get_object_or_404(Record, pk=to_id,   deleted_at__isnull=True)
+
+    Relationship.objects.get_or_create(
+        from_record=from_record,
+        to_record=to_record,
+        relationship_type=rel_type,
+        defaults={'notes': notes},
+    )
+    return HttpResponse(status=204)
+
+
+# ── HTMX: List relationships for a record ────────────────────────────────────
+
+@login_required
+def handbook_relationship_list(request, record_id):
+    record = get_object_or_404(Record, pk=record_id, deleted_at__isnull=True)
+    access = _get_access(request.user)
+    is_superuser = request.user.is_staff or request.user.is_superuser
+    can_write = is_superuser or _can_write(access) or record.record_family == 'reference'
+    outgoing = record.outgoing_relationships.select_related('to_record').order_by('relationship_type')
+    incoming = record.incoming_relationships.select_related('from_record').order_by('relationship_type')
+
+    rows = ''
+    for rel in outgoing:
+        rows += f'''
+        <div class="dopt-rel-card">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;
+                        letter-spacing:0.06em;margin-bottom:2px;">{rel.relationship_type.replace("_"," ")}</div>
+            <a href="/handbook/records/{rel.to_record.pk}/"
+               style="font-size:13px;font-weight:600;color:var(--text);text-decoration:none;">
+               {rel.to_record.title[:60]}
+            </a>
+        </div>'''
+    for rel in incoming:
+        rows += f'''
+        <div class="dopt-rel-card">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;
+                        letter-spacing:0.06em;margin-bottom:2px;">← {rel.relationship_type.replace("_"," ")}</div>
+            <a href="/handbook/records/{rel.from_record.pk}/"
+               style="font-size:13px;font-weight:600;color:var(--text);text-decoration:none;">
+               {rel.from_record.title[:60]}
+            </a>
+        </div>'''
+
+    if not rows:
+        rows = '''<div style="padding:24px 0;text-align:center;">
+            <span class="material-symbols-outlined" style="font-size:36px;opacity:0.12;display:block;">link_off</span>
+            <p style="font-size:12px;color:var(--muted);margin-top:8px;">No established links yet.</p>
+        </div>'''
+
+    return HttpResponse(rows)
+
+
 # ── HTMX: Recent governance records for context bar ──────────────────────────
 
 @login_required

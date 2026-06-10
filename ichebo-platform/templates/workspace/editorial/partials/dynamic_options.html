@@ -705,17 +705,22 @@ const RelPanel = {
         form.append('notes',             notes);
         form.append('csrfmiddlewaretoken', csrf);
 
-        fetch('/governance/htmx/relationship/create/', {
+        const isHandbook = window.location.pathname.startsWith('/handbook/');
+        const createUrl  = isHandbook
+            ? '/handbook/htmx/relationship/create/'
+            : '/governance/htmx/relationship/create/';
+        const listUrl    = isHandbook
+            ? `/handbook/htmx/${recordId}/relationships/`
+            : `/governance/htmx/desk/relationships/${recordId}/`;
+
+        fetch(createUrl, {
             method: 'POST',
             body: form,
             headers: { 'HX-Request': 'true' }
         })
         .then(r => {
             if (!r.ok) throw new Error(r.status);
-            // Refresh the desk rel cards via the lightweight partial
-            return fetch(`/governance/htmx/desk/relationships/${recordId}/`, {
-                headers: { 'HX-Request': 'true' }
-            });
+            return fetch(listUrl, { headers: { 'HX-Request': 'true' } });
         })
         .then(r => r.text())
         .then(html => {

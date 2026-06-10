@@ -18,5 +18,7 @@ urlpatterns = [
     path('htmx/<uuid:record_id>/new-version/', views.handbook_new_version, name='htmx-new-version'),
     path('htmx/<uuid:record_id>/set-status/', views.handbook_set_status, name='htmx-set-status'),
     path('htmx/<uuid:record_id>/links/', views.handbook_linked_records, name='htmx-links'),
+    path('htmx/<uuid:record_id>/relationships/', views.handbook_relationship_list, name='htmx-relationship-list'),
+    path('htmx/relationship/create/', views.handbook_relationship_create, name='htmx-relationship-create'),
     path('htmx/recent/', views.handbook_recent, name='htmx-recent'),
 ]

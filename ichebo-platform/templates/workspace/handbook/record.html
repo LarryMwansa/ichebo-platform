@@ -295,6 +295,12 @@ document.addEventListener('DOMContentLoaded', () => {
     {% endif %}
 {% endblock %}
 
-{% block ws_options %}
-    {% include "workspace/editorial/partials/dynamic_options.html" %}
+{% block ws_options_tabs %}
+<div class="ics-options-bar__content">
+    <div class="ws-options-pane active" id="pane-relations">
+        <div style="padding: var(--space-m);">
+            {% include "workspace/editorial/partials/dynamic_options.html" %}
+        </div>
+    </div>
+</div>
 {% endblock %}
