@@ -9,6 +9,9 @@
         <div class="ws-label-tag" style="margin-bottom: var(--space-s);">Mandate Library</div>
         <div style="display: flex; flex-direction: column; gap: 4px;">
             <a href="{% url 'governance:mandate-home' %}"
+               hx-get="{% url 'governance:mandate-home' %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
                class="ctx-btn {% if active_branch == 'mandate' and not record_type %}active{% endif %}">
                 <span class="material-symbols-outlined">gavel</span>
                 All Mandates
@@ -25,6 +28,9 @@
                     scrollbar-width: thin; scrollbar-color: var(--border) transparent;">
             {% for slug, label in mandate_types.items %}
             <a href="{% url 'governance:mandate-list' slug %}"
+               hx-get="{% url 'governance:mandate-list' slug %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
                class="ctx-btn {% if record_type == slug %}active{% endif %}"
                style="height: 32px; font-size: 12px; padding-left: 16px;">
                 {{ label }}
@@ -58,7 +64,9 @@
 {% endblock %}
 
 {% block hub_stage %}
-    {% block governance_content %}{% endblock %}
+    <div id="governance-content" style="height:100%;overflow-y:auto;">
+        {% block governance_content %}{% endblock %}
+    </div>
 {% endblock %}
 
 {% block hub_options %}

@@ -2,42 +2,9 @@
 {% load static %}
 
 {% block governance_content %}
-    <div class="editorial-stage">
-        {# ── Published View Header ── #}
-        <div class="ws-page-header" style="padding: var(--space-xl) var(--space-4xl) var(--space-m); display: flex; justify-content: space-between; align-items: flex-end;">
-            <div class="ws-page-header__left">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <div class="ws-label-tag" style="color: var(--accent-red);">{{ record.get_record_type_display|upper }}</div>
-                    {% if record.status == 'locked' %}
-                    <span class="material-symbols-outlined" style="font-size: 16px; color: var(--muted);">lock</span>
-                    {% endif %}
-                </div>
-                <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; color: var(--text); margin: 0; line-height: 1.2;">{{ record.title }}</h1>
-            </div>
-            <div class="ws-page-header__actions" style="flex-shrink: 0;">
-                <a href="{% url 'handbook:home' %}"
-                   class="ws-topbar__cta" style="text-decoration: none; background: none; border: 1px solid var(--border-ink);">
-                    <span class="material-symbols-outlined">auto_stories</span>
-                    Open Handbook
-                </a>
-            </div>
-        </div>
-
-        {# ── The Reading Canvas ── #}
-        <div class="editorial-canvas" style="box-shadow: none; border: none; background: transparent;">
-            <div class="editorial-body">
-                {% if record.summary %}
-                <div style="font-family: var(--ff-display); font-size: 18px; line-height: 1.6; color: var(--muted); margin-bottom: var(--space-xl); padding-left: var(--space-m); border-left: 2px solid var(--border);">
-                    {{ record.summary }}
-                </div>
-                {% endif %}
-                
-                <div class="published-content">
-                    {{ record.content|linebreaks }}
-                </div>
-            </div>
-        </div>
-    </div>
+<div style="max-width: 860px; margin: 0 auto; padding: 20px 0 100px;">
+    {% include partial_tpl %}
+</div>
 {% endblock %}
 
 {% block content %}
