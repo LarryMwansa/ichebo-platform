@@ -9,13 +9,12 @@ from records.models import Record, Relationship
 #
 # Reference Library — Level 3+ read, Level 5 write, Handbook tenant only
 LIBRARY_TYPES = [
-    'class', 'principle', 'concept', 'divine_pattern',
+    'class', 'principle', 'concept', 'divine_pattern', 'narrative', 'subject', 'entity',
 ]
 
-# Mandate Branch — Level 4+ read, Level 5 write, Handbook tenant only
+# Mandate Branch — governance instruments
 MANDATE_TYPES = [
-    'mandate', 'statement', 'framework', 'narrative',
-    'subject', 'entity', 'protocol', 'procedure', 'programme',
+    'mandate', 'statement', 'framework', 'protocol', 'procedure', 'programme',
 ]
 
 LIBRARY_TYPE_LABELS = {
@@ -23,15 +22,15 @@ LIBRARY_TYPE_LABELS = {
     'principle':      'Principles',
     'concept':        'Concepts',
     'divine_pattern': 'Divine Patterns',
+    'narrative':      'Narratives',
+    'subject':        'Subjects',
+    'entity':         'Entities',
 }
 
 MANDATE_TYPE_LABELS = {
     'mandate':   'Mandates',
     'statement': 'Statements',
     'framework': 'Frameworks',
-    'narrative': 'Narratives',
-    'subject':   'Subjects',
-    'entity':    'Entities',
     'protocol':  'Protocols',
     'procedure': 'Procedures',
     'programme': 'Programmes',

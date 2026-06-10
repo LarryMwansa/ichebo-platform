@@ -18,6 +18,33 @@
     .hb-nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
     .hb-nav-btn .material-symbols-outlined { font-size: 16px; }
 
+    /* ── Collapsible library sections ── */
+    .hb-lib-section { margin-bottom: 4px; }
+    .hb-lib-toggle {
+        display: flex; align-items: center; justify-content: space-between;
+        width: 100%; padding: 7px 10px 7px 4px;
+        background: none; border: none; cursor: pointer;
+        color: var(--text-muted-ink); font-size: 10px; font-weight: 700;
+        letter-spacing: 0.08em; text-transform: uppercase;
+        border-radius: 5px; transition: background 0.1s, color 0.1s;
+    }
+    .hb-lib-toggle:hover { background: rgba(255,255,255,0.04); color: #fff; }
+    .hb-lib-toggle.open   { color: #fff; }
+    .hb-lib-toggle .hb-chevron {
+        font-size: 14px; transition: transform 0.2s;
+    }
+    .hb-lib-toggle.open .hb-chevron { transform: rotate(90deg); }
+
+    .hb-lib-body { display: none; padding-bottom: 4px; }
+    .hb-lib-body.open { display: block; }
+
+    /* 2-column grid for Mandate (many types) */
+    .hb-lib-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+    }
+    .hb-lib-grid .ctx-btn { font-size: 11px; padding: 6px 8px; }
+    .hb-lib-grid .ctx-btn .material-symbols-outlined { font-size: 14px; }
+
     .hb-status {
         font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
         text-transform: uppercase; padding: 2px 7px; border-radius: 4px;
@@ -52,48 +79,125 @@
 
     <div class="ctx-divider" style="margin: 10px 0;"></div>
 
-    {# ── Governance type dial — scoped to governance only ── #}
+    {# ── Type dial — three collapsible library sections ── #}
     {% if can_write and not record or can_write and record and record.status != 'locked' %}
-    <div class="ws-label-tag" style="margin-bottom: var(--space-xs);">Record Type</div>
-    <div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--space-s);" id="hb-type-nav">
-        {% for rt in record_types_reference %}
-        <button type="button"
-                class="ctx-btn {% if record and record.record_type == rt or not record and forloop.first and is_reference %}active{% endif %}"
-                data-type="{{ rt }}"
-                onclick="HBDial.setType(this, '{{ rt }}')">
-            <span class="material-symbols-outlined">
-                {% if rt == 'class' %}category
-                {% elif rt == 'principle' %}lightbulb
-                {% elif rt == 'concept' %}psychology
-                {% elif rt == 'divine_pattern' %}pattern
-                {% else %}article{% endif %}
-            </span>
-            {{ rt|title|cut:"_" }}
-        </button>
-        {% endfor %}
-        <div class="ctx-divider" style="margin: 4px 0;"></div>
-        {% for rt in record_types_mandate %}
-        <button type="button"
-                class="ctx-btn {% if record and record.record_type == rt %}active{% endif %}"
-                data-type="{{ rt }}"
-                onclick="HBDial.setType(this, '{{ rt }}')">
-            <span class="material-symbols-outlined">
-                {% if rt == 'mandate' %}gavel
-                {% elif rt == 'statement' %}format_quote
-                {% elif rt == 'framework' %}account_tree
-                {% elif rt == 'narrative' %}history_edu
-                {% elif rt == 'protocol' %}rule
-                {% elif rt == 'procedure' %}checklist
-                {% elif rt == 'programme' %}school
-                {% elif rt == 'subject' %}topic
-                {% elif rt == 'entity' %}badge
-                {% else %}description{% endif %}
-            </span>
-            {{ rt|title|cut:"_" }}
-        </button>
-        {% endfor %}
-    </div>
+    <div id="hb-type-nav" style="margin-bottom: 4px;">
 
+        {# ── Reference Library ── #}
+        <div class="hb-lib-section">
+            <button type="button"
+                    class="hb-lib-toggle {% if is_reference or not record %}open{% endif %}"
+                    onclick="HBDial.toggleSection(this, 'ref-body')">
+                <span style="display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:14px;">library_books</span>
+                    Reference Library
+                </span>
+                <span class="material-symbols-outlined hb-chevron">chevron_right</span>
+            </button>
+            <div class="hb-lib-body {% if is_reference or not record %}open{% endif %}" id="ref-body">
+                <div class="hb-lib-grid">
+                {% for rt in record_types_reference %}
+                <button type="button"
+                        class="ctx-btn {% if record and record.record_type == rt or not record and forloop.first %}active{% endif %}"
+                        data-type="{{ rt }}" data-family="governance"
+                        onclick="HBDial.setType(this, '{{ rt }}', 'governance')">
+                    <span class="material-symbols-outlined">
+                        {% if rt == 'class' %}category
+                        {% elif rt == 'principle' %}lightbulb
+                        {% elif rt == 'concept' %}psychology
+                        {% elif rt == 'divine_pattern' %}pattern
+                        {% elif rt == 'narrative' %}history_edu
+                        {% elif rt == 'subject' %}topic
+                        {% elif rt == 'entity' %}badge
+                        {% else %}article{% endif %}
+                    </span>
+                    {{ rt|title|cut:"_" }}
+                </button>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {# ── Mandate Library ── #}
+        <div class="hb-lib-section">
+            <button type="button"
+                    class="hb-lib-toggle {% if not is_reference and record and record.record_type not in record_types_reference and record.record_type != 'key' %}open{% endif %}"
+                    onclick="HBDial.toggleSection(this, 'mandate-body')">
+                <span style="display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:14px;">gavel</span>
+                    Mandate Library
+                </span>
+                <span class="material-symbols-outlined hb-chevron">chevron_right</span>
+            </button>
+            <div class="hb-lib-body {% if not is_reference and record and record.record_type not in record_types_reference and record.record_type != 'key' %}open{% endif %}" id="mandate-body">
+                <div class="hb-lib-grid">
+                {% for rt in record_types_mandate %}
+                <button type="button"
+                        class="ctx-btn {% if record and record.record_type == rt %}active{% endif %}"
+                        data-type="{{ rt }}" data-family="governance"
+                        onclick="HBDial.setType(this, '{{ rt }}', 'governance')">
+                    <span class="material-symbols-outlined">
+                        {% if rt == 'mandate' %}gavel
+                        {% elif rt == 'statement' %}format_quote
+                        {% elif rt == 'framework' %}account_tree
+                        {% elif rt == 'protocol' %}rule
+                        {% elif rt == 'procedure' %}checklist
+                        {% elif rt == 'programme' %}school
+                        {% else %}description{% endif %}
+                    </span>
+                    {{ rt|title|cut:"_" }}
+                </button>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {# ── Keys Library ── #}
+        <div class="hb-lib-section">
+            <button type="button"
+                    class="hb-lib-toggle {% if record and record.record_family == 'reference' %}open{% endif %}"
+                    onclick="HBDial.toggleSection(this, 'keys-body')">
+                <span style="display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:14px;">key</span>
+                    Keys Library
+                </span>
+                <span class="material-symbols-outlined hb-chevron">chevron_right</span>
+            </button>
+            <div class="hb-lib-body {% if record and record.record_type in 'key,subject,entity,narrative' %}open{% endif %}" id="keys-body">
+                <div class="hb-lib-grid">
+                <button type="button"
+                        class="ctx-btn {% if record and record.record_type == 'key' %}active{% endif %}"
+                        data-type="key" data-family="reference"
+                        onclick="HBDial.setType(this, 'key', 'reference')">
+                    <span class="material-symbols-outlined">key</span>
+                    Key
+                </button>
+                <button type="button"
+                        class="ctx-btn {% if record and record.record_type == 'subject' and record.record_family == 'reference' %}active{% endif %}"
+                        data-type="subject" data-family="reference"
+                        onclick="HBDial.setType(this, 'subject', 'reference')">
+                    <span class="material-symbols-outlined">topic</span>
+                    Subject
+                </button>
+                <button type="button"
+                        class="ctx-btn {% if record and record.record_type == 'entity' and record.record_family == 'reference' %}active{% endif %}"
+                        data-type="entity" data-family="reference"
+                        onclick="HBDial.setType(this, 'entity', 'reference')">
+                    <span class="material-symbols-outlined">badge</span>
+                    Entity
+                </button>
+                <button type="button"
+                        class="ctx-btn {% if record and record.record_type == 'narrative' and record.record_family == 'reference' %}active{% endif %}"
+                        data-type="narrative" data-family="reference"
+                        onclick="HBDial.setType(this, 'narrative', 'reference')">
+                    <span class="material-symbols-outlined">history_edu</span>
+                    Narrative
+                </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
     <div class="ctx-divider" style="margin: 10px 0;"></div>
     {% endif %}
 
@@ -110,22 +214,39 @@
 
 <script>
 const HBDial = {
-    setType(btn, type) {
+    setType(btn, type, family) {
         document.querySelectorAll('#hb-type-nav .ctx-btn').forEach(b => b.classList.remove('active'));
         if (btn) btn.classList.add('active');
         const fi = document.getElementById('hidden-record-family');
         const ti = document.getElementById('hidden-record-type');
         const st = document.getElementById('save-status');
-        if (fi) fi.value = 'governance';
+        if (fi) fi.value = family || btn?.dataset.family || 'governance';
         if (ti) ti.value = type;
         if (st) st.textContent = 'Handbook · ' + type.replace(/_/g, ' ');
+    },
+    toggleSection(toggleBtn, bodyId) {
+        const body = document.getElementById(bodyId);
+        if (!body) return;
+        const isOpen = body.classList.contains('open');
+        body.classList.toggle('open', !isOpen);
+        toggleBtn.classList.toggle('open', !isOpen);
     }
 };
 document.addEventListener('DOMContentLoaded', () => {
     const ti = document.getElementById('hidden-record-type');
     if (ti && ti.value) {
         const btn = document.querySelector(`[data-type="${ti.value}"]`);
-        if (btn) HBDial.setType(btn, ti.value);
+        if (btn) {
+            const family = btn.dataset.family || 'governance';
+            HBDial.setType(btn, ti.value, family);
+            // Ensure the parent section is open
+            const body = btn.closest('.hb-lib-body');
+            const toggle = body?.previousElementSibling;
+            if (body && !body.classList.contains('open')) {
+                body.classList.add('open');
+                if (toggle) toggle.classList.add('open');
+            }
+        }
     }
 });
 </script>

@@ -59,6 +59,14 @@
 
 {% block context_content %}
 <div style="padding: 0 4px;">
+    {% if can_write %}
+    <a href="{% url 'handbook:new' %}?branch={{ active_branch }}" class="hb-nav-btn"
+       style="background: rgba(175,50,54,0.12); color: var(--accent-red); margin-bottom: 10px;">
+        <span class="material-symbols-outlined">edit_note</span>
+        Open The Desk
+    </a>
+    {% endif %}
+
     <div class="ws-label-tag" style="margin-bottom: 8px;">Branches</div>
 
     <a href="?branch=reference" class="hb-nav-btn {% if active_branch == 'reference' %}active{% endif %}">

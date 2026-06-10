@@ -169,15 +169,20 @@
                    data-tooltip="Dashboard" hx-boost="false">
                     <span class="material-symbols-outlined">dashboard</span>
                 </a>
-                <a href="{% url 'handbook:home' %}"
-                   class="ics-sidebar__item {% if active_app == 'handbook' %}active{% endif %}"
-                   data-tooltip="Handbook" hx-boost="false">
-                    <span class="material-symbols-outlined">auto_stories</span>
+                <a href="{% url 'activity:activity-home' %}"
+                   class="ics-sidebar__item {% if active_app == 'activity' %}active{% endif %}"
+                   data-tooltip="Activity" hx-boost="false">
+                    <span class="material-symbols-outlined">task_alt</span>
                 </a>
-                <a href="{% url 'governance:home' %}"
-                   class="ics-sidebar__item {% if active_app == 'governance' %}active{% endif %}"
-                   data-tooltip="Governance" hx-boost="false">
-                    <span class="material-symbols-outlined">gavel</span>
+                <a href="{% url 'records:records-home' %}"
+                   class="ics-sidebar__item {% if active_app == 'records' %}active{% endif %}"
+                   data-tooltip="My Journal" hx-boost="false">
+                    <span class="material-symbols-outlined">history_edu</span>
+                </a>
+                <a href="{% url 'bible:reader' %}"
+                   class="ics-sidebar__item {% if active_app == 'bible' %}active{% endif %}"
+                   data-tooltip="Bible Reader" hx-boost="false">
+                    <span class="material-symbols-outlined">menu_book</span>
                 </a>
                 <a href="{% url 'community:community-home' %}"
                    class="ics-sidebar__item {% if active_app == 'community' %}active{% endif %}"
@@ -189,25 +194,20 @@
                    data-tooltip="Formation" hx-boost="false">
                     <span class="material-symbols-outlined">school</span>
                 </a>
-                <a href="{% url 'activity:activity-home' %}"
-                   class="ics-sidebar__item {% if active_app == 'activity' %}active{% endif %}"
-                   data-tooltip="Activity" hx-boost="false">
-                    <span class="material-symbols-outlined">task_alt</span>
-                </a>
-                <a href="{% url 'bible:reader' %}"
-                   class="ics-sidebar__item {% if active_app == 'bible' %}active{% endif %}"
-                   data-tooltip="Bible Reader" hx-boost="false">
-                    <span class="material-symbols-outlined">menu_book</span>
-                </a>
                 <a href="{% url 'video_live:home' %}"
                    class="ics-sidebar__item {% if active_app == 'video' %}active{% endif %}"
                    data-tooltip="Video & Broadcast" hx-boost="false">
                     <span class="material-symbols-outlined">live_tv</span>
                 </a>
-                <a href="{% url 'records:records-home' %}"
-                   class="ics-sidebar__item {% if active_app == 'records' %}active{% endif %}"
-                   data-tooltip="My Journal" hx-boost="false">
-                    <span class="material-symbols-outlined">history_edu</span>
+                <a href="{% url 'governance:home' %}"
+                   class="ics-sidebar__item {% if active_app == 'governance' %}active{% endif %}"
+                   data-tooltip="Governance" hx-boost="false">
+                    <span class="material-symbols-outlined">gavel</span>
+                </a>
+                <a href="{% url 'handbook:home' %}"
+                   class="ics-sidebar__item {% if active_app == 'handbook' %}active{% endif %}"
+                   data-tooltip="Handbook" hx-boost="false">
+                    <span class="material-symbols-outlined">auto_stories</span>
                 </a>
             </nav>
 

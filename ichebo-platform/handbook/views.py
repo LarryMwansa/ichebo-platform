@@ -10,26 +10,25 @@ from .models import HandbookAccess
 
 # ── Governance record type groupings (mirrors governance/services.py) ─────────
 
-LIBRARY_TYPES = ['class', 'principle', 'concept', 'divine_pattern']
+LIBRARY_TYPES = ['class', 'principle', 'concept', 'divine_pattern', 'narrative', 'subject', 'entity']
 MANDATE_TYPES = [
-    'mandate', 'statement', 'framework', 'narrative',
-    'subject', 'entity', 'protocol', 'procedure', 'programme',
+    'mandate', 'statement', 'framework', 'protocol', 'procedure', 'programme',
 ]
-KEY_TYPES = ['key']
+KEY_TYPES = ['key', 'subject', 'entity', 'narrative']
 
 LIBRARY_TYPE_LABELS = {
     'class':          'Classes',
     'principle':      'Principles',
     'concept':        'Concepts',
     'divine_pattern': 'Divine Patterns',
+    'narrative':      'Narratives',
+    'subject':        'Subjects',
+    'entity':         'Entities',
 }
 MANDATE_TYPE_LABELS = {
     'mandate':   'Mandates',
     'statement': 'Statements',
     'framework': 'Frameworks',
-    'narrative': 'Narratives',
-    'subject':   'Subjects',
-    'entity':    'Entities',
     'protocol':  'Protocols',
     'procedure': 'Procedures',
     'programme': 'Programmes',
@@ -85,8 +84,8 @@ def _governance_qs(user, access, include_drafts=False):
 
 def _keys_qs(user):
     return Record.objects.filter(
-        record_family='governance',
-        record_type='key',
+        record_family='reference',
+        record_type__in=KEY_TYPES,
         created_by=user,
         deleted_at__isnull=True,
     )
@@ -111,41 +110,44 @@ def handbook_home(request):
 
     records_by_type = {}
 
+    is_superuser = request.user.is_staff or request.user.is_superuser
+
     if active_branch == 'keys':
         qs = _keys_qs(request.user)
         if status_filter:
             qs = qs.filter(status=status_filter)
-        type_qs = qs.order_by('-updated_at')[:30]
-        if type_qs.exists():
-            records_by_type['key'] = list(type_qs)
+        for rtype in KEY_TYPES:
+            type_qs = qs.filter(record_type=rtype).order_by('-updated_at')[:30]
+            if type_qs.exists():
+                records_by_type[rtype] = list(type_qs)
         can_write_branch = True
     else:
-        if not access:
+        if not access and not is_superuser:
             can_write_branch = False
             qs = Record.objects.none()
         else:
-            qs = _governance_qs(request.user, access)
+            qs = _governance_qs(request.user, access, include_drafts=is_superuser or _can_write(access))
             if status_filter:
                 qs = qs.filter(status=status_filter)
             for rtype in RECORD_TYPES_BY_BRANCH.get(active_branch, []):
                 type_qs = qs.filter(record_type=rtype).order_by('-updated_at')[:20]
                 if type_qs.exists():
                     records_by_type[rtype] = list(type_qs)
-            can_write_branch = _can_write(access)
+            can_write_branch = is_superuser or _can_write(access)
 
     return render(request, 'workspace/handbook/home.html', {
         'active_app':            'handbook',
         'ws_page_title':         'Handbook',
         'access':                access,
         'can_write':             can_write_branch,
-        'is_editor':             _is_editor(access),
+        'is_editor':             is_superuser or _is_editor(access),
         'active_branch':         active_branch,
         'record_types_by_branch': RECORD_TYPES_BY_BRANCH,
         'library_type_labels':   LIBRARY_TYPE_LABELS,
         'mandate_type_labels':   MANDATE_TYPE_LABELS,
         'records_by_type':       records_by_type,
         'status_filter':         status_filter,
-        'has_access':            access is not None,
+        'has_access':            access is not None or is_superuser,
     })
 
 
@@ -158,22 +160,26 @@ def handbook_record(request, record_id):
 
     access = _get_access(request.user)
 
-    # Keys — any authenticated user, owner only
+    # Keys — personal records stored under record_family='reference'
     key_record = Record.objects.filter(
-        pk=record_id, record_family='governance',
-        record_type='key', created_by=request.user,
+        pk=record_id,
+        record_family='reference',
+        record_type__in=KEY_TYPES,
+        created_by=request.user,
         deleted_at__isnull=True,
     ).first()
+
+    is_superuser = request.user.is_staff or request.user.is_superuser
 
     if key_record:
         record = key_record
         can_write = True
     else:
-        if not access:
+        if not access and not is_superuser:
             return HttpResponseForbidden()
         qs = _governance_qs(request.user, access, include_drafts=True)
         record = get_object_or_404(qs, pk=record_id)
-        can_write = _can_write(access)
+        can_write = is_superuser or _can_write(access)
 
     # Version chain
     history = []
@@ -212,7 +218,8 @@ def handbook_record(request, record_id):
         'can_write':            can_write,
         'is_editor':            _is_editor(access),
         'is_reference':         record.record_type in LIBRARY_TYPES,
-        'is_key':               record.record_type == 'key',
+        'is_key':               record.record_type in KEY_TYPES and record.record_family == 'reference',
+        'show_hrs':             record.record_type in LIBRARY_TYPES or (record.record_type in KEY_TYPES and record.record_family == 'reference'),
         'hrs_attrs':            HRS_ATTRS,
         'record_types_reference': LIBRARY_TYPES,
         'record_types_mandate':   MANDATE_TYPES,
@@ -237,6 +244,7 @@ def handbook_new(request):
         return HttpResponseForbidden()
 
     access = _get_access(request.user)
+    is_superuser = request.user.is_staff or request.user.is_superuser
     active_branch = request.GET.get('branch', 'reference')
     if active_branch not in RECORD_TYPES_BY_BRANCH:
         active_branch = 'reference'
@@ -244,7 +252,7 @@ def handbook_new(request):
     if active_branch == 'keys':
         can_write = True
     else:
-        if not _can_write(access):
+        if not _can_write(access) and not is_superuser:
             return HttpResponseForbidden()
         can_write = True
 
@@ -274,6 +282,7 @@ def handbook_new(request):
         'is_editor':              _is_editor(access),
         'is_key':                 active_branch == 'keys',
         'is_reference':           active_branch == 'reference',
+        'show_hrs':               active_branch in ('reference', 'keys'),
         'active_branch':          active_branch,
         'hrs_attrs':              HRS_ATTRS,
         'record_types_reference': LIBRARY_TYPES,
@@ -296,7 +305,8 @@ def handbook_new(request):
 @login_required
 def handbook_access(request):
     access = _get_access(request.user)
-    if not _is_editor(access):
+    is_superuser = request.user.is_staff or request.user.is_superuser
+    if not _is_editor(access) and not is_superuser:
         return HttpResponseForbidden()
 
     if request.method == 'POST':
@@ -333,35 +343,42 @@ def handbook_save(request):
         return HttpResponse(status=405)
 
     access = _get_access(request.user)
+    is_superuser = request.user.is_staff or request.user.is_superuser
     record_id = request.POST.get('record_id', '').strip()
     title = request.POST.get('title', 'Untitled').strip()
     content = request.POST.get('content', '').strip()
     record_type = request.POST.get('record_type', 'principle').strip()
-    active_branch = request.POST.get('active_branch', 'reference').strip()
 
-    # Determine record_family (always governance for Handbook)
-    is_key = record_type == 'key'
+    # record_family posted by the editor dial; fall back to 'governance'
+    record_family = request.POST.get('record_family', 'governance').strip()
+    if record_family not in ('governance', 'reference'):
+        record_family = 'governance'
 
-    # Keys: any Level 3+ user can write their own
-    if not is_key and not _can_write(access):
+    is_key = record_type in KEY_TYPES and record_family == 'reference'
+
+    # Keys: any Level 3+ user can write their own; others need write access
+    if not is_key and not _can_write(access) and not is_superuser:
         return HttpResponseForbidden()
 
     custom_fields = {
         'complexity':            request.POST.get('complexity', ''),
+        'polarity':              request.POST.get('polarity', ''),
         'relationship_position': request.POST.get('relationship_position', ''),
         'position':              request.POST.get('position', ''),
         'direction':             request.POST.get('direction', ''),
         'speed':                 request.POST.get('speed', ''),
         'emotional_tone':        request.POST.get('emotional_tone', ''),
+        'symbol':                request.POST.get('symbol', ''),
     }
     # Strip empty
     custom_fields = {k: v for k, v in custom_fields.items() if v}
 
     if record_id:
         try:
+            lookup_family = 'reference' if is_key else 'governance'
             record = Record.objects.get(
                 pk=record_id,
-                record_family='governance',
+                record_family=lookup_family,
                 deleted_at__isnull=True,
             )
             if is_key and record.created_by != request.user:
@@ -378,12 +395,12 @@ def handbook_save(request):
         record = Record.objects.create(
             created_by=request.user,
             record_class='personal' if is_key else 'governance',
-            record_family='governance',
+            record_family='reference' if is_key else 'governance',
             record_type=record_type,
             title=title,
             content=content,
             status='draft',
-            custom_fields=custom_fields,
+            custom_fields=custom_fields or {},
         )
 
     from django.urls import reverse
@@ -454,6 +471,69 @@ def handbook_new_version(request, record_id):
     response = HttpResponse(status=204)
     response['HX-Redirect'] = reverse('handbook:record', kwargs={'record_id': new_record.pk})
     return response
+
+
+# ── HTMX: Set status ─────────────────────────────────────────────────────────
+
+VALID_STATUS_TRANSITIONS = {
+    'draft':      ['active', 'archived'],
+    'active':     ['locked', 'draft', 'archived'],
+    'locked':     ['archived'],
+    'archived':   ['draft'],
+    'superseded': [],
+    'submitted':  ['approved', 'draft'],
+    'approved':   ['active', 'draft'],
+}
+
+@login_required
+def handbook_set_status(request, record_id):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    access = _get_access(request.user)
+    is_superuser = request.user.is_staff or request.user.is_superuser
+
+    # Try personal (keys) record first, then governance
+    record = Record.objects.filter(
+        pk=record_id, record_family='reference',
+        record_type__in=KEY_TYPES, created_by=request.user,
+        deleted_at__isnull=True,
+    ).first()
+    if not record:
+        if not _can_write(access) and not is_superuser:
+            return HttpResponseForbidden()
+        record = get_object_or_404(Record, pk=record_id, record_family='governance', deleted_at__isnull=True)
+
+    new_status = request.POST.get('status', '').strip()
+    allowed = VALID_STATUS_TRANSITIONS.get(record.status, [])
+    if new_status not in allowed:
+        return HttpResponse(
+            f'<span style="color:#e17055;font-size:12px;">Cannot move {record.status} → {new_status}</span>',
+            status=422,
+        )
+
+    record.status = new_status
+    record.save(update_fields=['status', 'updated_at'])
+
+    # Build options for the refreshed dropdown
+    transitions = VALID_STATUS_TRANSITIONS.get(new_status, [])
+    options = f'<option value="{new_status}" selected>{new_status.title()}</option>'
+    for s in transitions:
+        options += f'<option value="{s}">{s.title()}</option>'
+
+    return HttpResponse(f'''
+        <div class="dopt-section" id="hb-status-panel">
+            <div class="ws-label-tag" style="margin-bottom:8px;">Status</div>
+            <select class="editorial-type-picker" style="width:100%;"
+                    hx-post="/handbook/htmx/{record.pk}/set-status/"
+                    hx-target="#hb-status-panel"
+                    hx-swap="outerHTML"
+                    hx-trigger="change"
+                    name="status">
+                {options}
+            </select>
+        </div>
+    ''')
 
 
 # ── HTMX: Linked records panel ────────────────────────────────────────────────

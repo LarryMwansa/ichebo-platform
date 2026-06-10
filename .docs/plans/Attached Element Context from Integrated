@@ -1,68 +1,39 @@
-<div id="dynamic-stewardship-panel"
-     style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+Attached Element Context from Integrated Browser
 
-    {# ── Tab bar ── #}
+Element: div
+
+URL: http://localhost:8001/handbook/records/new/
+
+HTML Path: div#ics-shell.ics-shell > aside#ics-options-bar.ics-options-bar > div.ics-options-bar__content > div#pane-relations.ws-options-pane.active > div
+
+Outer HTML:
+```html
+<div style="padding: var(--space-m);">
+                        
+    <div id="dynamic-stewardship-panel" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+
+    
     <div style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px; flex-shrink: 0;">
-        <button class="desk-tab desk-tab--active" data-tab="details"   onclick="DeskTabs.show('details', this)">Details</button>
-        {% if show_hrs %}
-        <button class="desk-tab"                  data-tab="hrs"       onclick="DeskTabs.show('hrs', this)">HRS</button>
-        {% endif %}
-        <button class="desk-tab"                  data-tab="relations" onclick="DeskTabs.show('relations', this)">Relations</button>
-        <button class="desk-tab"                  data-tab="recent"    onclick="DeskTabs.show('recent', this)">Recent</button>
+        <button class="desk-tab desk-tab--active" data-tab="details" onclick="DeskTabs.show('details', this)">Details</button>
+        <button class="desk-tab" data-tab="relations" onclick="DeskTabs.show('relations', this)">Relations</button>
+        <button class="desk-tab" data-tab="recent" onclick="DeskTabs.show('recent', this)">Recent</button>
     </div>
 
-    <div id="desk-tab-details" class="desk-tab-pane"
-         style="overflow-y: auto; flex: 1; padding-right: 2px;">
+    <div id="desk-tab-details" class="desk-tab-pane" style="overflow-y: auto; flex: 1; padding-right: 2px;">
 
-        {# Status #}
-        <div class="dopt-section" id="hb-status-panel">
+        
+        <div class="dopt-section">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Status</div>
-            {% if is_desk and record and can_write %}
-            {# Handbook — dropdown showing current status + valid transitions only #}
-            <select class="editorial-type-picker" style="width: 100%;"
-                    hx-post="{% url 'handbook:htmx-set-status' record.id %}"
-                    hx-target="#hb-status-panel"
-                    hx-swap="outerHTML"
-                    hx-trigger="change"
-                    name="status">
-                <option value="{{ record.status }}" selected>{{ record.get_status_display }}</option>
-                {% if record.status == 'draft' %}
-                <option value="active">Active</option>
-                <option value="archived">Archived</option>
-                {% elif record.status == 'active' %}
-                <option value="locked">Locked</option>
-                <option value="draft">Draft</option>
-                <option value="archived">Archived</option>
-                {% elif record.status == 'locked' %}
-                <option value="archived">Archived</option>
-                {% elif record.status == 'archived' %}
-                <option value="draft">Draft</option>
-                {% elif record.status == 'submitted' %}
-                <option value="approved">Approved</option>
-                <option value="draft">Draft</option>
-                {% elif record.status == 'approved' %}
-                <option value="active">Active</option>
-                <option value="draft">Draft</option>
-                {% endif %}
-            </select>
-            {% elif is_desk and record %}
-            {# Read-only status for non-writers #}
-            <select class="editorial-type-picker" style="width: 100%;" disabled>
-                <option selected>{{ record.get_status_display }}</option>
-            </select>
-            {% else %}
-            {# Desk and all other pages — original dropdown #}
             <select name="status" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
                 <option value="draft">Draft</option>
-                <option value="active" selected>Active</option>
+                <option value="active" selected="">Active</option>
                 <option value="archived">Archived</option>
             </select>
-            {% endif %}
         </div>
 
         <div class="dopt-divider"></div>
 
-        {# ── Journal fields ── #}
+        
         <div id="fields-journal" class="dynamic-field-group dopt-section">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Journal</div>
             <div class="dopt-field">
@@ -78,7 +49,7 @@
             </div>
         </div>
 
-        {# ── Governance fields + HRS Stewardship Attributes ── #}
+        
         <div id="fields-governance" class="dynamic-field-group dopt-section" style="display: none;">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Governance</div>
             <div class="dopt-field">
@@ -86,13 +57,12 @@
                 <select name="record_class" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
                     <option value="personal">Personal</option>
                     <option value="organizational">Organizational</option>
-                    <option value="governance" selected>Apostolic Decree</option>
+                    <option value="governance" selected="">Apostolic Decree</option>
                 </select>
             </div>
             <div class="dopt-field">
                 <label class="dopt-label">Version</label>
-                <input type="number" name="version" value="1" min="1"
-                       class="editorial-type-picker" style="width: 100%;" form="editorial-form">
+                <input type="number" name="version" value="1" min="1" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
             </div>
 
             <div class="dopt-divider"></div>
@@ -142,12 +112,11 @@
 
             <div class="dopt-field">
                 <label class="dopt-label">Symbol</label>
-                <input type="text" name="symbol" placeholder="Prophetic Symbol"
-                       class="editorial-type-picker" style="width: 100%;" form="editorial-form">
+                <input type="text" name="symbol" placeholder="Prophetic Symbol" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
             </div>
         </div>
 
-        {# ── Activity fields ── #}
+        
         <div id="fields-activity" class="dynamic-field-group dopt-section" style="display: none;">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Activity</div>
             <div class="dopt-field">
@@ -178,13 +147,12 @@
             </div>
         </div>
 
-        {# ── Community fields ── #}
+        
         <div id="fields-community" class="dynamic-field-group dopt-section" style="display: none;">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Gathering</div>
             <div class="dopt-field">
                 <label class="dopt-label">Scheduled At</label>
-                <input type="datetime-local" name="scheduled_at"
-                       class="editorial-type-picker" style="width: 100%;" form="editorial-form">
+                <input type="datetime-local" name="scheduled_at" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
             </div>
             <div class="dopt-field">
                 <label class="dopt-label">Format</label>
@@ -196,18 +164,16 @@
             </div>
             <div class="dopt-field">
                 <label class="dopt-label">Location</label>
-                <input type="text" name="location" placeholder="Venue or link"
-                       class="editorial-type-picker" style="width: 100%;" form="editorial-form">
+                <input type="text" name="location" placeholder="Venue or link" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
             </div>
         </div>
 
-        {# ── Bible fields ── #}
+        
         <div id="fields-bible" class="dynamic-field-group dopt-section" style="display: none;">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Scripture</div>
             <div class="dopt-field">
                 <label class="dopt-label">Passage</label>
-                <input type="text" name="passage" placeholder="e.g. John 3:16"
-                       class="editorial-type-picker" style="width: 100%;" form="editorial-form">
+                <input type="text" name="passage" placeholder="e.g. John 3:16" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
             </div>
             <div class="dopt-field">
                 <label class="dopt-label">Translation</label>
@@ -223,44 +189,35 @@
 
         <div class="dopt-divider"></div>
 
-        {# Tags — always visible #}
+        
         <div class="dopt-section">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Tags</div>
-            <input type="text" name="tags" id="desk-tags"
-                   placeholder="Comma separated…"
-                   class="editorial-type-picker" style="width: 100%;" form="editorial-form">
+            <input type="text" name="tags" id="desk-tags" placeholder="Comma separated…" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
         </div>
     </div>
 
-    <div id="desk-tab-relations" class="desk-tab-pane"
-         style="display: none; overflow-y: auto; flex: 1; padding-right: 2px;">
+    <div id="desk-tab-relations" class="desk-tab-pane" style="display: none; overflow-y: auto; flex: 1; padding-right: 2px;">
 
-        {# Add new relationship — only meaningful when editing an existing record #}
+        
         <div class="dopt-section" id="rel-add-panel">
             <div class="ws-label-tag" style="margin-bottom: 10px;">Link a Record</div>
 
-            {# Search #}
-            <input type="text" id="rel-search-input"
-                   placeholder="Search records…"
-                   class="editorial-type-picker" style="width: 100%; margin-bottom: 8px;"
-                   oninput="RelPanel.search(this.value)">
-            <div id="rel-search-results"
-                 style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; max-height: 160px; overflow-y: auto;">
+            
+            <input type="text" id="rel-search-input" placeholder="Search records…" class="editorial-type-picker" style="width: 100%; margin-bottom: 8px;" oninput="RelPanel.search(this.value)">
+            <div id="rel-search-results" style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; max-height: 160px; overflow-y: auto;">
             </div>
 
-            {# Selected target #}
-            <div id="rel-selected-record"
-                 style="display: none; padding: 8px 10px; background: var(--card-2);
+            
+            <div id="rel-selected-record" style="display: none; padding: 8px 10px; background: var(--card-2);
                         border: 1px solid var(--primary-alpha); border-radius: 8px;
                         margin-bottom: 8px;">
                 <div style="font-size: 10px; color: var(--primary); text-transform: uppercase;
                             letter-spacing: 0.07em; margin-bottom: 2px;">Selected</div>
-                <div id="rel-selected-title"
-                     style="font-size: 13px; font-weight: 600; color: var(--text);"></div>
+                <div id="rel-selected-title" style="font-size: 13px; font-weight: 600; color: var(--text);"></div>
                 <input type="hidden" id="rel-to-record-id">
             </div>
 
-            {# Relationship type picker #}
+            
             <div class="dopt-field">
                 <label class="dopt-label">Relationship Type</label>
                 <select id="rel-type-picker" class="editorial-type-picker" style="width: 100%;">
@@ -274,21 +231,17 @@
                 </select>
             </div>
 
-            {# Notes #}
+            
             <div class="dopt-field">
                 <label class="dopt-label">Notes (optional)</label>
-                <textarea id="rel-notes"
-                          placeholder="Context for this link…"
-                          style="width: 100%; height: 56px; resize: none;
+                <textarea id="rel-notes" placeholder="Context for this link…" style="width: 100%; height: 56px; resize: none;
                                  background: var(--card); border: 1px solid var(--border);
                                  border-radius: 6px; padding: 8px 10px;
                                  font-size: 12px; color: var(--text); outline: none;
                                  font-family: var(--ff-body); box-sizing: border-box;"></textarea>
             </div>
 
-            <button type="button" onclick="RelPanel.save()"
-                    class="ws-topbar__cta"
-                    style="width: 100%; justify-content: center; height: 36px; margin-top: 4px;">
+            <button type="button" onclick="RelPanel.save()" class="ws-topbar__cta" style="width: 100%; justify-content: center; height: 36px; margin-top: 4px;">
                 <span class="material-symbols-outlined" style="font-size: 16px;">add_link</span>
                 Establish Link
             </button>
@@ -296,208 +249,173 @@
 
         <div class="dopt-divider"></div>
 
-        {# Existing relationships #}
+        
         <div class="dopt-section">
             <div class="ws-label-tag" style="margin-bottom: 10px;">Established Links</div>
             <div id="rel-existing-list" style="display: flex; flex-direction: column; gap: 6px;">
-                {% for rel in current_relationships %}
-                <div class="dopt-rel-card">
-                    <div style="display: flex; align-items: flex-start; gap: 10px;">
-                        <span class="material-symbols-outlined"
-                              style="font-size: 16px; color: var(--accent-red); flex-shrink: 0; margin-top: 1px;">
-                            {% if rel.bible_verse %}menu_book{% else %}link{% endif %}
-                        </span>
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 9px; font-weight: 700; text-transform: uppercase;
-                                        letter-spacing: 0.08em; color: var(--accent-red); margin-bottom: 2px;">
-                                {{ rel.get_relationship_type_display }}
-                            </div>
-                            <div style="font-size: 12px; font-weight: 600; color: var(--text);
-                                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                {% if rel.to_record %}{{ rel.to_record.title }}
-                                {% elif rel.bible_verse %}{{ rel.bible_verse }}
-                                {% endif %}
-                            </div>
-                            {% if rel.notes %}
-                            <div style="font-size: 11px; color: var(--muted); margin-top: 2px;
-                                        font-style: italic; line-height: 1.4;">{{ rel.notes }}</div>
-                            {% endif %}
-                        </div>
-                        {% if rel.to_record %}
-                        <a href="{% url 'handbook:record' rel.to_record.id %}"
-                           style="color: var(--muted); flex-shrink: 0;"
-                           title="Open in Desk">
-                            <span class="material-symbols-outlined" style="font-size: 15px;">open_in_new</span>
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-                {% empty %}
+                
                 <div style="padding: 24px 0; text-align: center;">
-                    <span class="material-symbols-outlined"
-                          style="font-size: 36px; opacity: 0.12; display: block;">link_off</span>
+                    <span class="material-symbols-outlined" style="font-size: 36px; opacity: 0.12; display: block;">link_off</span>
                     <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">
                         No established links yet.
                     </p>
                 </div>
-                {% endfor %}
+                
             </div>
         </div>
     </div>
 
-    {% if show_hrs %}
-    <div id="desk-tab-hrs" class="desk-tab-pane" style="display: none; overflow-y: auto; flex: 1; padding-right: 2px;">
-
-        <div class="dopt-section">
-            <div class="ws-label-tag" style="margin-bottom: 4px; color: var(--accent-red);">HRS Stewardship</div>
-            <p style="font-size: 11px; color: var(--muted); margin: 0 0 14px; line-height: 1.5;">
-                Hierarchy Relationship System attributes for this record.
-            </p>
-
-            {% with cf=record.custom_fields %}
-            <div class="dopt-field">
-                <label class="dopt-label">Complexity</label>
-                <select name="complexity" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="Low"          {% if cf.complexity == 'Low'          %}selected{% endif %}>Low</option>
-                    <option value="Medium"       {% if cf.complexity == 'Medium'       %}selected{% endif %}>Medium</option>
-                    <option value="High"         {% if cf.complexity == 'High'         %}selected{% endif %}>High</option>
-                    <option value="Transcendent" {% if cf.complexity == 'Transcendent' %}selected{% endif %}>Transcendent</option>
-                </select>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Polarity</label>
-                <select name="polarity" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="subjective" {% if cf.polarity == 'subjective' %}selected{% endif %}>Subjective</option>
-                    <option value="objective"  {% if cf.polarity == 'objective'  %}selected{% endif %}>Objective</option>
-                </select>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Relationship Position</label>
-                <select name="relationship_position" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="up"    {% if cf.relationship_position == 'up'    %}selected{% endif %}>Up</option>
-                    <option value="down"  {% if cf.relationship_position == 'down'  %}selected{% endif %}>Down</option>
-                    <option value="left"  {% if cf.relationship_position == 'left'  %}selected{% endif %}>Left</option>
-                    <option value="right" {% if cf.relationship_position == 'right' %}selected{% endif %}>Right</option>
-                </select>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Position / Direction</label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                    <select name="position" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                        <option value="">Pos —</option>
-                        <option value="up"    {% if cf.position == 'up'    %}selected{% endif %}>Up</option>
-                        <option value="down"  {% if cf.position == 'down'  %}selected{% endif %}>Down</option>
-                        <option value="left"  {% if cf.position == 'left'  %}selected{% endif %}>Left</option>
-                        <option value="right" {% if cf.position == 'right' %}selected{% endif %}>Right</option>
-                    </select>
-                    <select name="direction" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                        <option value="">Dir —</option>
-                        <option value="forward"  {% if cf.direction == 'forward'  %}selected{% endif %}>Forward</option>
-                        <option value="backward" {% if cf.direction == 'backward' %}selected{% endif %}>Backward</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Speed</label>
-                <select name="speed" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="fast" {% if cf.speed == 'fast' %}selected{% endif %}>Fast</option>
-                    <option value="slow" {% if cf.speed == 'slow' %}selected{% endif %}>Slow</option>
-                </select>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Emotional Tone</label>
-                <select name="emotional_tone" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="reflective" {% if cf.emotional_tone == 'reflective' %}selected{% endif %}>Reflective</option>
-                    <option value="grateful"   {% if cf.emotional_tone == 'grateful'   %}selected{% endif %}>Grateful</option>
-                    <option value="burdened"   {% if cf.emotional_tone == 'burdened'   %}selected{% endif %}>Burdened</option>
-                    <option value="hopeful"    {% if cf.emotional_tone == 'hopeful'    %}selected{% endif %}>Hopeful</option>
-                    <option value="urgent"     {% if cf.emotional_tone == 'urgent'     %}selected{% endif %}>Urgent</option>
-                    <option value="joyful"     {% if cf.emotional_tone == 'joyful'     %}selected{% endif %}>Joyful</option>
-                    <option value="solemn"     {% if cf.emotional_tone == 'solemn'     %}selected{% endif %}>Solemn</option>
-                </select>
-            </div>
-            {% endwith %}
-
-            <div class="dopt-field">
-                <label class="dopt-label">Symbol</label>
-                <input type="text" name="symbol" placeholder="Prophetic symbol…"
-                       class="editorial-type-picker" style="width: 100%;" form="editorial-form"
-                       value="{{ record.custom_fields.symbol|default:'' }}">
-            </div>
-
-        </div>
-    </div>
-    {% endif %}
-
-    <div id="desk-tab-recent" class="desk-tab-pane"
-         style="display: none; overflow-y: auto; flex: 1; padding-right: 2px;">
+    <div id="desk-tab-recent" class="desk-tab-pane" style="display: none; overflow-y: auto; flex: 1; padding-right: 2px;">
 
         <div class="dopt-section" style="margin-bottom: 16px;">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Journals</div>
-            {% for draft in journal_drafts %}
-            <a href="{% url 'handbook:record' draft.id %}"
-               class="dopt-recent-item">
-                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">edit_square</span>
-                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
-                    {{ draft.title|default:'Untitled' }}
-                </span>
-                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
-                    {{ draft.updated_at|date:"d M" }}
-                </span>
-            </a>
-            {% empty %}
+            
             <p style="font-size: 12px; color: var(--muted); font-style: italic;">None yet</p>
-            {% endfor %}
+            
         </div>
 
         <div class="dopt-divider"></div>
 
         <div class="dopt-section" style="margin-bottom: 16px;">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Governance</div>
-            {% for draft in gov_drafts %}
-            <a href="{% url 'handbook:record' draft.id %}"
-               class="dopt-recent-item">
+            
+            <a href="/handbook/records/566decae-aae6-484a-a667-581102aab5e4/" class="dopt-recent-item">
                 <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">gavel</span>
                 <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
-                    {{ draft.title|default:'Untitled' }}
+                    Sweet roll halvah pastry candy canes
                 </span>
                 <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
-                    {{ draft.updated_at|date:"d M" }}
+                    09 Jun
                 </span>
             </a>
-            {% empty %}
-            <p style="font-size: 12px; color: var(--muted); font-style: italic;">None yet</p>
-            {% endfor %}
+            
+            <a href="/handbook/records/6d80cfb1-6f6c-4d2d-9db0-92f193ef2cc8/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">gavel</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    My test principle is here
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    09 Jun
+                </span>
+            </a>
+            
+            <a href="/handbook/records/9709cf64-7011-4670-9e53-61e289aa89d5/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">gavel</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    Commercialization of the Gentile Court
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    09 Jun
+                </span>
+            </a>
+            
+            <a href="/handbook/records/55950aa5-3b9d-4391-8051-ad9eb9b34eee/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">gavel</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    Candy canes soufflé pudding
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    06 Jun
+                </span>
+            </a>
+            
+            <a href="/handbook/records/ea08c86e-fb47-4e7e-9fe3-9d060d72a608/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">gavel</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    God, The First
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    03 Jun
+                </span>
+            </a>
+            
         </div>
 
         <div class="dopt-divider"></div>
 
         <div class="dopt-section">
             <div class="ws-label-tag" style="margin-bottom: 8px;">All Recent</div>
-            {% for rec in recent_records %}
-            <a href="{% url 'handbook:record' rec.id %}"
-               class="dopt-recent-item">
+            
+            <a href="/handbook/records/566decae-aae6-484a-a667-581102aab5e4/" class="dopt-recent-item">
                 <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">history_edu</span>
                 <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
-                    {{ rec.title|default:'Untitled' }}
+                    Sweet roll halvah pastry candy canes
                 </span>
                 <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
-                    {{ rec.updated_at|date:"d M" }}
+                    09 Jun
                 </span>
             </a>
-            {% empty %}
-            <p style="font-size: 12px; color: var(--muted); font-style: italic;">No records yet</p>
-            {% endfor %}
+            
+            <a href="/handbook/records/6d80cfb1-6f6c-4d2d-9db0-92f193ef2cc8/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">history_edu</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    My test principle is here
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    09 Jun
+                </span>
+            </a>
+            
+            <a href="/handbook/records/9709cf64-7011-4670-9e53-61e289aa89d5/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">history_edu</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    Commercialization of the Gentile Court
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    09 Jun
+                </span>
+            </a>
+            
+            <a href="/handbook/records/55950aa5-3b9d-4391-8051-ad9eb9b34eee/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">history_edu</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    Candy canes soufflé pudding
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    06 Jun
+                </span>
+            </a>
+            
+            <a href="/handbook/records/63f589e6-2f1f-4bf5-9b49-002693c92384/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">history_edu</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    marshmallow lollipop
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    06 Jun
+                </span>
+            </a>
+            
+            <a href="/handbook/records/2077cad8-332a-49a3-8b34-ce4197bf0bf2/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">history_edu</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    Sweet roll halvah pastry candy canes
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    06 Jun
+                </span>
+            </a>
+            
+            <a href="/handbook/records/6444c463-db75-44f5-af68-8ca03d7c1f88/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">history_edu</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    Sweet roll halvah pastry candy canes
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    06 Jun
+                </span>
+            </a>
+            
+            <a href="/handbook/records/11936be2-6a87-4b27-9a85-535ab6e66890/" class="dopt-recent-item">
+                <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); flex-shrink: 0;">history_edu</span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                    Tiramisu tiramisu
+                </span>
+                <span style="font-size: 10px; color: var(--muted); flex-shrink: 0;">
+                    06 Jun
+                </span>
+            </a>
+            
         </div>
     </div>
 </div>
@@ -738,3 +656,65 @@ const RelPanel = {
     }
 };
 </script>
+
+
+                    </div>
+```
+
+Dimensions:
+- top: 94px
+- left: 907px
+- width: 299px
+- height: 390px
+
+CSS:
+```css
+element { padding: var(--space-m); }
+*, *::before, *::after { padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  list-style: none;
+  list-style-type: none;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility; }
+
+/* Inherited */
+*, *::before, *::after { list-style: none; list-style-type: none }
+.ics-options-bar { color: var(--text-ink) }
+html, body { font-family: var(--font-family-base); line-height: var(--line-height-base); font-weight: var(--font-weight-regular) }
+body { font-family: var(--ff-body); font-size: 16px; line-height: 1.5; color: var(--text) }
+html { font-size: 100%; font-style: normal }
+:root { color: var(--text) }
+
+/* Resolved values */
+margin: 0px;
+padding: 24px;
+text-decoration: rgb(245, 243, 240);
+-webkit-font-smoothing: antialiased;
+box-sizing: border-box;
+color: rgb(245, 243, 240);
+display: block;
+font-family: Inter, system-ui, sans-serif;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+height: 389.7px;
+line-height: 24px;
+list-style-image: none;
+list-style-position: outside;
+list-style-type: none;
+text-rendering: optimizelegibility;
+unicode-bidi: isolate /*UA*/;
+width: 299.2px;
+
+/* CSS variables */
+--space-m: 1.5rem;
+--font-family-base: 'Inter', system-ui, sans-serif;
+--font-weight-regular: 400;
+--text: #f5f3f0;
+--line-height-base: 1.6;
+--text-ink: #F5F3F0;
+--ff-body: 'Inter', system-ui, sans-serif;
+```
