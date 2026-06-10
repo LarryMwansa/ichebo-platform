@@ -17,6 +17,14 @@ from .services import (
 )
 
 
+# ── Access level constants ─────────────────────────────────────────────────────
+# These will be moved to PlatformConfig (L10.6) so they can be changed from the
+# System Panel at /platform/ without a code deploy.
+MANDATE_ACCESS_LEVEL  = 4   # who can read Mandate Library in Governance
+KEYS_ACCESS_LEVEL     = 4   # who can access Keys Library (entity/narrative are L4-5 content)
+REFERENCE_ACCESS_LEVEL = 3  # kept for redirect guard; library now lives in Handbook
+
+
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 def _level(user):
@@ -66,90 +74,28 @@ def governance_health(request):
 
 @login_required
 def governance_home(request):
-    if _level(request.user) < 3:
+    if _level(request.user) < MANDATE_ACCESS_LEVEL:
         raise PermissionDenied
-    return _shell_or_partial(request, 'governance/_home.html', {
-        'library_types': LIBRARY_TYPE_LABELS,
-        'mandate_types': MANDATE_TYPE_LABELS,
-        'active_branch': 'library',
-    })
+    return redirect('governance:mandate-home')
 
 
-# ── Reference Library ──────────────────────────────────────────────────────────
+# ── Reference Library — moved to Handbook ─────────────────────────────────────
+# ADR-022: Reference Library is now authored and read in Handbook.
+# These views 301-redirect so existing bookmarks and HTMX links don't break.
 
 @login_required
 def library_home(request):
-    if _level(request.user) < 3:
-        raise PermissionDenied
-    search = request.GET.get('q', '').strip()
-    from records.models import Record as _R
-    records = _R.objects.filter(
-        record_family='governance',
-        record_type__in=LIBRARY_TYPES,
-        deleted_at__isnull=True,
-    ).order_by('-created_at')
-    if search:
-        records = records.filter(title__icontains=search)
-    records = records.filter(status__in=['active', 'locked'])
-    return _shell_or_partial(request, 'governance/_library_list.html', {
-        'records':       records,
-        'record_type':   None,
-        'type_label':    'All',
-        'search':        search,
-        'library_types': LIBRARY_TYPE_LABELS,
-        'mandate_types': MANDATE_TYPE_LABELS,
-        'active_branch': 'library',
-    }, shell_template='workspace/governance/home.html')
+    return redirect('/handbook/?branch=reference')
 
 
 @login_required
 def library_list(request, record_type):
-    if _level(request.user) < 3:
-        raise PermissionDenied
-    if record_type not in LIBRARY_TYPES:
-        raise PermissionDenied
-
-    search = request.GET.get('q', '').strip()
-    tag_filter = request.GET.get('tag', '').strip()
-
-    records = get_handbook_records(record_type, search=search)
-    if tag_filter:
-        records = [r for r in records if tag_filter in (r.tags or [])]
-
-    return _shell_or_partial(request, 'governance/_library_list.html', {
-        'records':       records,
-        'record_type':   record_type,
-        'type_label':    LIBRARY_TYPE_LABELS.get(record_type, record_type.title()),
-        'search':        search,
-        'tag_filter':    tag_filter,
-        'library_types': LIBRARY_TYPE_LABELS,
-        'mandate_types': MANDATE_TYPE_LABELS,
-        'active_branch': 'library',
-    }, shell_template='workspace/governance/home.html')
+    return redirect(f'/handbook/?branch=reference&type={record_type}')
 
 
 @login_required
 def library_detail(request, record_id):
-    if _level(request.user) < 3:
-        raise PermissionDenied
-
-    record = get_object_or_404(
-        Record, id=record_id, record_family='governance',
-        record_type__in=LIBRARY_TYPES, deleted_at__isnull=True
-    )
-
-    via_record = None
-    via_id = request.GET.get('via')
-    if via_id:
-        via_record = Record.objects.filter(id=via_id).first()
-
-    return _shell_or_partial(request, 'governance/_library_detail.html', {
-        'record':        record,
-        'via_record':    via_record,
-        'library_types': LIBRARY_TYPE_LABELS,
-        'active_branch': 'library',
-        'record_type':   record.record_type,
-    }, shell_template='workspace/governance/record_detail.html')
+    return redirect(f'/handbook/records/{record_id}/')
 
 
 # ── Mandate branch ─────────────────────────────────────────────────────────────
@@ -224,44 +170,18 @@ def mandate_detail(request, record_id):
     }, shell_template='workspace/governance/record_detail.html')
 
 
-# ── My Keys ────────────────────────────────────────────────────────────────────
+# ── My Keys — moved to Handbook ───────────────────────────────────────────────
+# ADR-022: Keys Library is personal and lives in Handbook (branch=keys).
+# Gate: KEYS_ACCESS_LEVEL (currently 4) — enforced in Handbook views.
 
 @login_required
 def keys_list(request):
-    if _level(request.user) < 3:
-        raise PermissionDenied
-
-    search = request.GET.get('q', '').strip()
-    keys = get_key_records(request.user, search=search)
-
-    return _shell_or_partial(request, 'governance/_keys_list.html', {
-        'keys':   keys,
-        'search': search,
-        'active_branch': 'keys',
-        'library_types': LIBRARY_TYPE_LABELS,
-        'mandate_types': MANDATE_TYPE_LABELS,
-    }, shell_template='workspace/governance/home.html')
+    return redirect('/handbook/?branch=keys')
 
 
 @login_required
 def keys_detail(request, record_id):
-    if _level(request.user) < 3:
-        raise PermissionDenied
-
-    record = get_object_or_404(
-        Record, id=record_id, record_family='reference',
-        record_type='key', created_by=request.user, deleted_at__isnull=True
-    )
-    linked = get_linked_records(record_id)
-    return _shell_or_partial(request, 'governance/_keys_detail.html', {
-        'record':        record,
-        'linked':        linked,
-        'active_branch': 'keys',
-        'library_types': LIBRARY_TYPE_LABELS,
-        'mandate_types': MANDATE_TYPE_LABELS,
-        'is_level5':     _level(request.user) >= 5,
-        'record_type':   record.record_type,
-    }, shell_template='workspace/governance/record_detail.html')
+    return redirect(f'/handbook/records/{record_id}/')
 
 
 # ── HTMX partials ──────────────────────────────────────────────────────────────

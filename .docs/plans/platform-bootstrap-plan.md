@@ -177,6 +177,55 @@ A new page at `/platform/` (Level 5 / superuser only) shows the live state of ev
 
 ---
 
+## Access Gating Configuration (L10.6 — System Panel)
+
+**Decision (2026-06-10):** Access level gates for Handbook and Governance libraries are
+currently hardcoded constants. They must become `PlatformConfig` fields so a Level 5
+steward can adjust them from the System Panel at `/platform/` without a code deploy.
+
+### Current hardcoded values (as of 2026-06-10)
+
+| Constant | App | Value | Meaning |
+| --- | --- | --- | --- |
+| `MANDATE_ACCESS_LEVEL` | `governance/views.py` | 4 | Minimum level to read Mandate Library in Governance |
+| `KEYS_ACCESS_LEVEL` | `handbook/views.py` | 4 | Minimum level to access Keys Library in Handbook (entity/narrative are L4-5 content) |
+| `REFERENCE_ACCESS_LEVEL` | `handbook/views.py` | 3 | Minimum level to read Reference Library in Handbook |
+
+### PlatformConfig model additions (L10.6)
+
+```python
+class PlatformConfig(models.Model):
+    # ... existing fields ...
+
+    # ── Library access gates ───────────────────────────────────────────────────
+    # Minimum competence_level required to access each library.
+    # Default values match the current hardcoded constants.
+    mandate_access_level   = models.IntegerField(default=4)
+    keys_access_level      = models.IntegerField(default=4)
+    reference_access_level = models.IntegerField(default=3)
+```
+
+### System Panel UI (L10.6)
+
+Add a **Library Access Gates** section to `/platform/` alongside the email verification toggle:
+
+| Setting | Input | Default | Description |
+| --- | --- | --- | --- |
+| Mandate Library gate | Number 1–5 | 4 | Who can read Mandate documents in Governance |
+| Keys Library gate | Number 1–5 | 4 | Who can access personal Keys Library in Handbook |
+| Reference Library gate | Number 1–5 | 3 | Who can read Reference Library in Handbook |
+
+### Migration path (L10.6)
+
+When L10.6 is implemented:
+
+1. Add `mandate_access_level`, `keys_access_level`, `reference_access_level` to `PlatformConfig`
+2. Replace the hardcoded constants in `governance/views.py` and `handbook/views.py` with reads from `PlatformConfig.get_solo()` (or equivalent singleton fetch, cached)
+3. Add the gate inputs to the System Panel template at `/platform/`
+4. The values default to the current constants so no behaviour changes on first deploy
+
+---
+
 ## Future Extensions (Not In Scope for L10.6)
 
 These are recorded here so they are not forgotten:

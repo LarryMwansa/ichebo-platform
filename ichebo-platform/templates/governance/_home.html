@@ -1,41 +1,17 @@
-<!-- Governance home — branch-selector landing -->
+<!-- governance/_home.html — Mandate-only landing (Reference + Keys now in Handbook) -->
 <div class="page-hero page-hero--watermark" data-watermark="GOVERNANCE">
   <div class="page-hero__eyebrow">
     <div class="page-hero__eyebrow-line"></div>
     <span class="page-hero__label">Apostolic Registry</span>
   </div>
-  <h1 class="page-hero__title">Prophet's <em>Handbook</em></h1>
-  <p class="page-hero__sub">Governance records, mandate library &amp; steward keys</p>
+  <h1 class="page-hero__title">Mandate <em>Library</em></h1>
+  <p class="page-hero__sub">Received directives, governance documents &amp; versioned protocols</p>
 </div>
 
 <div style="padding: 0 var(--space-s);">
 <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-s);">
 
-  <!-- Reference Library -->
-  <div class="card" style="border-radius: var(--radius-l); padding: var(--space-s);">
-    <div class="label-caps" style="color: var(--primary); margin-bottom: var(--space-3xs);">Reference Library</div>
-    <p style="font-size: 13px; color: var(--muted); margin-bottom: var(--space-s); line-height: 1.5;">
-      Apostolic Properties compiled from Scripture via HRS. Eight record types.
-    </p>
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3xs); margin-bottom: var(--space-s);">
-      {% for slug, label in library_types.items %}
-      <a href="{% url 'governance:library-list' slug %}"
-         style="display: flex; align-items: center; justify-content: center;
-                padding: 8px 4px; background: var(--card-2); border: 1px solid var(--border);
-                border-radius: var(--radius-m); font-size: 12px; font-weight: 600;
-                text-decoration: none; color: var(--muted); text-align: center;
-                transition: border-color 0.15s, color 0.15s;"
-         hx-get="{% url 'governance:library-list' slug %}"
-         hx-target="#governance-content"
-         hx-push-url="true">
-        {{ label }}
-      </a>
-      {% endfor %}
-    </div>
-  </div>
-
-  <!-- Mandate branch (Level 4+) -->
-  {% if request.user.competence_level >= 4 %}
+  <!-- Mandate branch -->
   <div class="card" style="border-radius: var(--radius-l); padding: var(--space-s);">
     <div class="label-caps" style="color: var(--primary); margin-bottom: var(--space-3xs);">Mandate</div>
     <p style="font-size: 13px; color: var(--muted); margin-bottom: var(--space-s); line-height: 1.5;">
@@ -57,23 +33,28 @@
       {% endfor %}
     </div>
   </div>
-  {% endif %}
 
-  <!-- My Keys -->
-  <div class="card" style="border-radius: var(--radius-l); padding: var(--space-s);">
-    <div class="label-caps" style="color: var(--primary); margin-bottom: var(--space-3xs);">My Keys</div>
+  <!-- Cross-links to Handbook -->
+  <div class="card" style="border-radius: var(--radius-l); padding: var(--space-s);
+                            border: 1px dashed var(--border);">
+    <div class="label-caps" style="color: var(--muted); margin-bottom: var(--space-3xs);">Handbook</div>
     <p style="font-size: 13px; color: var(--muted); margin-bottom: var(--space-s); line-height: 1.5;">
-      Personal symbol-to-meaning mappings drawn from your journal records.
+      Reference Library and Keys Library have moved to the Handbook workspace.
     </p>
-    <a href="{% url 'governance:keys-list' %}"
-       class="btn-touch btn-touch--primary"
-       style="width: 100%; justify-content: center; text-decoration: none;"
-       hx-get="{% url 'governance:keys-list' %}"
-       hx-target="#governance-content"
-       hx-push-url="true">
-      Open My Keys
-      <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
-    </a>
+    <div style="display: flex; gap: var(--space-xs);">
+      <a href="{% url 'handbook:home' %}?branch=reference"
+         class="btn-touch btn-touch--ghost"
+         style="flex: 1; justify-content: center; text-decoration: none; font-size: 12px;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">library_books</span>
+        Reference Library
+      </a>
+      <a href="{% url 'handbook:home' %}?branch=keys"
+         class="btn-touch btn-touch--ghost"
+         style="flex: 1; justify-content: center; text-decoration: none; font-size: 12px;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">vpn_key</span>
+        My Keys
+      </a>
+    </div>
   </div>
 
 </div>{# /grid #}

@@ -54,6 +54,13 @@ RECORD_TYPES_BY_BRANCH = {
 STATUS_CHOICES = ['draft', 'active', 'locked', 'superseded', 'submitted']
 
 
+# ── Access level constants ─────────────────────────────────────────────────────
+# Will be moved to PlatformConfig (L10.6) for System Panel configuration.
+KEYS_ACCESS_LEVEL      = 4   # Keys Library — entity/narrative are L4-5 content
+REFERENCE_ACCESS_LEVEL = 3   # Reference Library
+MANDATE_ACCESS_LEVEL   = 3   # Handbook authoring of Mandate records
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _get_access(user):
@@ -113,6 +120,8 @@ def handbook_home(request):
     is_superuser = request.user.is_staff or request.user.is_superuser
 
     if active_branch == 'keys':
+        if _level(request.user) < KEYS_ACCESS_LEVEL and not request.user.is_superuser:
+            return HttpResponseForbidden('Keys Library requires Level 4 or above.')
         qs = _keys_qs(request.user)
         if status_filter:
             qs = qs.filter(status=status_filter)
@@ -172,6 +181,8 @@ def handbook_record(request, record_id):
     is_superuser = request.user.is_staff or request.user.is_superuser
 
     if key_record:
+        if _level(request.user) < KEYS_ACCESS_LEVEL and not is_superuser:
+            return HttpResponseForbidden('Keys Library requires Level 4 or above.')
         record = key_record
         can_write = True
     else:
