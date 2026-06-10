@@ -80,25 +80,34 @@
                    class="editorial-title-input editorial-title"
                    required autofocus autocomplete="off">
 
-            <div id="editorial-split" style="display:flex;gap:0;width:100%;height:100%;">
-                <textarea name="content" id="editorial-editor"
-                          class="editorial-editor-textarea editorial-body"
-                          style="flex:1;min-width:0;"
-                          placeholder="Begin writing… the word is alive.">{{ record.content|default:'' }}</textarea>
+            {# Hidden textarea holds content for form submission #}
+            <textarea name="content" id="editorial-editor"
+                      style="display:none;">{{ record.content|default:'' }}</textarea>
 
-                <div id="editorial-preview"
-                     class="editorial-preview-pane editorial-body"
-                     style="display:none;flex:1;min-width:0;padding:24px 32px;
-                            border-left:1px solid var(--border-ink);overflow-y:auto;"></div>
-            </div>
+            {# CodeMirror 6 mounts here — Obsidian-style live markdown #}
+            <div id="cm-editor-mount"
+                 style="flex:1;height:100%;overflow:hidden;"></div>
+
+            {# Reading view — rendered markdown, shown via Preview toggle #}
+            <div id="editorial-preview"
+                 class="editorial-body"
+                 style="display:none;flex:1;height:100%;overflow-y:auto;
+                        padding:24px 32px;max-width:720px;margin:0 auto;"></div>
         </form>
     </div>
 </div>
 
+<script src="{% static 'js/codemirror-md.bundle.js' %}"></script>
 <script src="{% static 'js/editorial_v2.js' %}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => EditorialUI.init());
-    document.addEventListener('htmx:afterSwap', () => EditorialUI.init());
+    document.addEventListener('DOMContentLoaded', () => {
+        EditorialUI.init();
+        EditorialUI.initCM6();
+    });
+    document.addEventListener('htmx:afterSwap', () => {
+        EditorialUI.init();
+        EditorialUI.initCM6();
+    });
 
     // Sync command dial → hidden form fields + status label
     document.body.addEventListener('dialChanged', (e) => {

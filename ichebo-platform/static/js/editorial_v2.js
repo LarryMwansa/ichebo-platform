@@ -10,19 +10,46 @@ const EditorialUI = {
     autoSaveDelay:   2500,
     _saveTimer:      null,
     _focusActive:    false,
-    editor:          null,
+    _cmView:         null,   // CodeMirror 6 instance
+    editor:          null,   // hidden textarea (form submission only)
 
     // ── Boot ────────────────────────────────────────────────────────────────
 
     init() {
         this.editor = document.getElementById(this.editorId);
         if (!this.editor) return;
-
         this._setupAutoSave();
         this._setupShortcuts();
         this._setupWordCount();
         this.renderDraftsList();
-        this._syncPreview();
+    },
+
+    // ── CodeMirror 6 init ────────────────────────────────────────────────────
+
+    initCM6() {
+        const mount = document.getElementById('cm-editor-mount');
+        if (!mount || !this.editor || typeof createMarkdownEditor === 'undefined') return;
+
+        // Destroy previous instance if re-initialising (HTMX swap)
+        if (this._cmView) {
+            this._cmView.destroy();
+            this._cmView = null;
+        }
+
+        const darkMode = document.documentElement.classList.contains('dark') ||
+                         document.body.classList.contains('dark');
+
+        this._cmView = createMarkdownEditor({
+            targetId:     'cm-editor-mount',
+            initialValue: this.editor.value,
+            darkMode,
+            onChange: (val) => {
+                // Keep hidden textarea in sync so form submission works
+                this.editor.value = val;
+                this._updateWordCount();
+                this._triggerAutoSave();
+            },
+        });
     },
 
     // ── Formatting actions ───────────────────────────────────────────────────
@@ -43,38 +70,48 @@ const EditorialUI = {
     },
 
     _wrap(pre, suf, isBlock = false) {
+        // Route through CodeMirror 6 when available
+        if (this._cmView) {
+            const view  = this._cmView;
+            const state = view.state;
+            const { from, to } = state.selection.main;
+            const sel = state.sliceDoc(from, to);
+
+            let insert;
+            if (isBlock) {
+                const lineStart = state.doc.lineAt(from).from;
+                const prefix    = from > 0 && state.sliceDoc(lineStart, from) !== '' ? '\n' : '';
+                insert = sel.includes('\n')
+                    ? sel.split('\n').map(l => pre + l).join('\n')
+                    : prefix + pre + sel;
+            } else {
+                insert = pre + sel + suf;
+            }
+
+            view.dispatch({
+                changes: { from, to, insert },
+                selection: { anchor: from + (pre === '[' && !sel ? 1 : insert.length) },
+            });
+            view.focus();
+            return;
+        }
+
+        // Fallback: operate on hidden textarea directly
         const el    = this.editor;
+        if (!el) return;
         const start = el.selectionStart;
         const end   = el.selectionEnd;
         const val   = el.value;
         const sel   = val.substring(start, end);
-
         let insert;
         if (isBlock) {
-            // If there's a selection, prefix each line
-            if (sel.includes('\n')) {
-                insert = sel.split('\n').map(l => pre + l).join('\n');
-            } else {
-                insert = (start > 0 && val[start - 1] !== '\n' ? '\n' : '') + pre + sel;
-            }
+            insert = (start > 0 && val[start - 1] !== '\n' ? '\n' : '') + pre + sel;
         } else {
             insert = pre + sel + suf;
         }
-
         el.value = val.substring(0, start) + insert + val.substring(end);
         el.focus();
-
-        // Position cursor sensibly
-        if (pre === '[' && !sel) {
-            el.setSelectionRange(start + 1, start + 1); // inside link text
-        } else if (isBlock) {
-            const newPos = start + insert.length;
-            el.setSelectionRange(newPos, newPos);
-        } else {
-            el.setSelectionRange(start + pre.length + sel.length, start + pre.length + sel.length);
-        }
-
-        this._syncPreview();
+        el.setSelectionRange(start + pre.length + sel.length, start + pre.length + sel.length);
         this._triggerAutoSave();
     },
 
@@ -97,36 +134,37 @@ const EditorialUI = {
         });
     },
 
-    // ── Live preview ─────────────────────────────────────────────────────────
+    // ── Read / Write toggle ──────────────────────────────────────────────────
 
     togglePreview() {
+        const mount   = document.getElementById('cm-editor-mount');
         const preview = document.getElementById('editorial-preview');
-        const split   = document.getElementById('editorial-split');
         const btn     = document.getElementById('preview-toggle');
-        if (!preview || !this.editor) return;
+        if (!preview) return;
 
-        const showing = preview.style.display !== 'none';
-        if (showing) {
-            // Close preview — textarea takes full width
+        const reading = preview.style.display !== 'none';
+        if (reading) {
+            // Switch to Write mode — show CodeMirror, hide preview
             preview.style.display = 'none';
-            this.editor.style.flex = '1';
+            if (mount) mount.style.display = '';
             btn && btn.classList.remove('active');
+            btn && btn.setAttribute('title', 'Reading View');
+            if (this._cmView) this._cmView.focus();
         } else {
-            // Open preview side-by-side — both panes share 50/50
-            this._syncPreview();
+            // Switch to Read mode — render markdown, hide CodeMirror
+            if (typeof marked !== 'undefined') {
+                marked.setOptions({ breaks: true, gfm: true });
+                preview.innerHTML = marked.parse(this.editor ? this.editor.value : '');
+            }
+            if (mount) mount.style.display = 'none';
             preview.style.display = '';
-            this.editor.style.flex = '1';
             btn && btn.classList.add('active');
+            btn && btn.setAttribute('title', 'Write Mode');
         }
     },
 
     _syncPreview() {
-        const preview = document.getElementById('editorial-preview');
-        if (!preview || !this.editor) return;
-        if (preview.style.display === 'none') return;
-        if (typeof marked === 'undefined') return;
-        marked.setOptions({ breaks: true, gfm: true });
-        preview.innerHTML = marked.parse(this.editor.value || '');
+        // No-op — preview is now rendered on demand via togglePreview
     },
 
     // ── Focus mode ────────────────────────────────────────────────────────────
