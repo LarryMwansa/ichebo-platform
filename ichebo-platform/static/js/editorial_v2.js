@@ -101,18 +101,21 @@ const EditorialUI = {
 
     togglePreview() {
         const preview = document.getElementById('editorial-preview');
+        const split   = document.getElementById('editorial-split');
         const btn     = document.getElementById('preview-toggle');
         if (!preview || !this.editor) return;
 
         const showing = preview.style.display !== 'none';
         if (showing) {
+            // Close preview — textarea takes full width
             preview.style.display = 'none';
-            this.editor.style.display = '';
+            this.editor.style.flex = '1';
             btn && btn.classList.remove('active');
         } else {
+            // Open preview side-by-side — both panes share 50/50
             this._syncPreview();
             preview.style.display = '';
-            this.editor.style.display = 'none';
+            this.editor.style.flex = '1';
             btn && btn.classList.add('active');
         }
     },
@@ -146,7 +149,10 @@ const EditorialUI = {
     _setupWordCount() {
         if (!this.editor) return;
         this._updateWordCount();
-        this.editor.addEventListener('input', () => this._updateWordCount());
+        this.editor.addEventListener('input', () => {
+            this._updateWordCount();
+            this._syncPreview();
+        });
     },
 
     _updateWordCount() {
