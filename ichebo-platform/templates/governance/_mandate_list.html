@@ -2,13 +2,11 @@
 <div class="page-hero page-hero--watermark" data-watermark="{{ type_label|upper|default:'MANDATE' }}">
   {% if record_type %}
   <a href="{% url 'governance:mandate-home' %}"
-     hx-get="{% url 'governance:mandate-home' %}" hx-target="#governance-content" hx-push-url="true"
      style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
     <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>All Mandate
   </a>
   {% else %}
-  <a href="{% url 'governance:home' %}"
-     hx-get="{% url 'governance:home' %}" hx-target="#governance-content" hx-push-url="true"
+  <a href="{% url 'governance:mandate-home' %}"
      style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
     <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>Governance
   </a>
@@ -30,9 +28,7 @@
               font-size: 12px; font-weight: 700; text-decoration: none;
               border: 1px solid var(--border); white-space: nowrap;
               {% if not record_type %}background: var(--primary); color: #fff; border-color: var(--primary);
-              {% else %}background: var(--card-2); color: var(--muted);{% endif %}"
-       hx-get="{% url 'governance:mandate-home' %}"
-       hx-target="#governance-content" hx-push-url="true">
+              {% else %}background: var(--card-2); color: var(--muted);{% endif %}">
       All
     </a>
     {% for slug, label in mandate_types.items %}
@@ -41,9 +37,7 @@
               font-size: 12px; font-weight: 700; text-decoration: none;
               border: 1px solid var(--border); white-space: nowrap;
               {% if slug == record_type %}background: var(--primary); color: #fff; border-color: var(--primary);
-              {% else %}background: var(--card-2); color: var(--muted);{% endif %}"
-       hx-get="{% url 'governance:mandate-list' slug %}"
-       hx-target="#governance-content" hx-push-url="true">
+              {% else %}background: var(--card-2); color: var(--muted);{% endif %}">
       {{ label }}
     </a>
     {% endfor %}
@@ -71,9 +65,7 @@
   <div class="list-group" style="padding: var(--space-l) var(--space-s);">
     {% for record in records %}
     <a href="{% url 'governance:mandate-detail' record.id %}"
-       class="list-item" style="text-decoration: none; color: inherit;"
-       hx-get="{% url 'governance:mandate-detail' record.id %}"
-       hx-target="#governance-content" hx-push-url="true">
+       class="list-item" style="text-decoration: none; color: inherit;">
       <div class="list-item__content">
         <div class="list-item__title">{{ record.title }}</div>
         {% if record.summary %}
