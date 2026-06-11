@@ -1,17 +1,5 @@
 <!-- governance/_mandate_detail.html — mandate record detail (desktop + mobile) -->
 
-{# ── Back nav ── #}
-<div style="display: flex; align-items: center; gap: var(--space-xs);
-            padding: var(--space-xs) 0 0; margin-bottom: var(--space-xs);">
-  <a href="{% url 'governance:mandate-list' record.record_type %}"
-     style="display: flex; align-items: center; gap: 4px;
-            font-size: 12px; font-weight: 700; color: var(--muted);
-            text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em;">
-    <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
-    {{ record.get_record_type_display|default:record.record_type|title }}
-  </a>
-</div>
-
 {# ── Hero ── #}
 <div class="page-hero page-hero--watermark"
      data-watermark="{{ record.record_type|upper|cut:'_' }}"
