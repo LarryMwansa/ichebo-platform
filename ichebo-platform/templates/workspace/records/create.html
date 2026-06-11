@@ -49,6 +49,43 @@
     {% include "workspace/records/partials/editorial_form.html" %}
 {% endblock %}
 
+{% block content %}
+<div style="padding-bottom: 80px; display:flex; flex-direction:column; height:calc(100dvh - 56px); overflow:hidden;">
+
+    {# Sticky type picker bar #}
+    <div style="display:flex; align-items:center; gap:8px; padding:10px var(--space-s);
+                background:var(--bg); border-bottom:1px solid var(--border);
+                overflow-x:auto; flex-shrink:0; scrollbar-width:none;">
+        {% for value, label in record_types %}
+        <a href="?record_type={{ value }}"
+           style="display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+                  padding:6px 12px; border-radius:20px; font-size:12px; font-weight:700;
+                  text-decoration:none; flex-shrink:0;
+                  {% if value == active_type %}
+                  background:var(--primary); color:#fff;
+                  {% else %}
+                  background:var(--card-2); border:1px solid var(--border); color:var(--muted);
+                  {% endif %}">
+            <span class="material-symbols-outlined" style="font-size:14px;">
+                {% if value == 'prayer' %}self_improvement
+                {% elif value == 'spirit' %}auto_awesome
+                {% elif value == 'dream' %}bedtime
+                {% elif value == 'dar' %}assignment
+                {% else %}edit_note{% endif %}
+            </span>
+            {{ label }}
+        </a>
+        {% endfor %}
+    </div>
+
+    {# Editor fills remaining height #}
+    <div style="flex:1; overflow:hidden;">
+        {% include "workspace/records/partials/editorial_form.html" %}
+    </div>
+
+</div>
+{% endblock %}
+
 {% block ws_options %}
 <div style="padding: 0 4px;">
     <div class="ws-label-tag" style="margin-bottom: 12px;">About This Entry</div>

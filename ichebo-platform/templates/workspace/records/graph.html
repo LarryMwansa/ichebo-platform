@@ -97,17 +97,13 @@
     <div class="ctx-divider"></div>
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Governance</div>
-    <a href="{% url 'governance:library-home' %}" class="ctx-btn">
-        <span class="material-symbols-outlined">library_books</span>
-        Reference Library
-    </a>
     <a href="{% url 'governance:mandate-home' %}" class="ctx-btn">
         <span class="material-symbols-outlined">gavel</span>
         Mandate Branch
     </a>
-    <a href="{% url 'governance:keys-list' %}" class="ctx-btn">
-        <span class="material-symbols-outlined">vpn_key</span>
-        Steward Keys
+    <a href="{% url 'handbook:home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">menu_book</span>
+        Handbook
     </a>
 
 </div>
@@ -180,6 +176,29 @@
         <div><strong style="color: var(--text);">Click node</strong> — open record</div>
     </div>
 
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;
+            height:calc(100dvh - 120px); padding:32px; text-align:center;">
+    <span class="material-symbols-outlined"
+          style="font-size:48px; color:var(--muted); opacity:0.3; display:block; margin-bottom:16px;">
+        hub
+    </span>
+    <p style="font-size:14px; font-weight:700; color:var(--text); margin:0 0 8px;">
+        Apostolic Web
+    </p>
+    <p style="font-size:13px; color:var(--muted); line-height:1.6; max-width:260px; margin:0 0 24px;">
+        The knowledge graph requires a larger screen. Open on desktop or tablet to explore record connections.
+    </p>
+    <a href="{% url 'records:records-home' %}"
+       style="display:inline-flex; align-items:center; gap:6px; padding:10px 20px;
+              border-radius:8px; background:var(--card-2); border:1px solid var(--border);
+              font-size:13px; font-weight:600; color:var(--text); text-decoration:none;">
+        <span class="material-symbols-outlined" style="font-size:16px;">history_edu</span>
+        My Journal
+    </a>
 </div>
 {% endblock %}
 
