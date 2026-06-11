@@ -22,6 +22,15 @@
     <span class="nav-label">Explore</span>
   </a>
 
+  {% if user_level >= 4 or request.user.is_superuser %}
+  <a href="{% url 'handbook:home' %}"
+     class="nav-item {% if request.resolver_match.app_name == 'handbook' %}active{% endif %}"
+     aria-label="Handbook">
+    <span class="material-symbols-outlined nav-icon">menu_book</span>
+    <span class="nav-label">Handbook</span>
+  </a>
+  {% endif %}
+
   <a href="{% url 'dashboard:you' %}"
      class="nav-item {% if request.resolver_match.url_name == 'you' %}active{% endif %}"
      aria-label="You">

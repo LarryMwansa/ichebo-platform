@@ -218,3 +218,153 @@
     {% endif %}
 </div>
 {% endblock %}
+
+{# ── Mobile shell ── #}
+{% block content %}
+<div style="padding-bottom: 80px;">
+
+    {# ── Page header ── #}
+    <div class="page-hero page-hero--watermark" data-watermark="HANDBOOK">
+        <div class="page-hero__eyebrow">
+            <div class="page-hero__eyebrow-line"></div>
+            <span class="page-hero__label">
+                {% if active_branch == 'reference' %}Reference Library
+                {% elif active_branch == 'mandate' %}Mandate Branch
+                {% else %}Keys Library{% endif %}
+            </span>
+        </div>
+        <h1 class="page-hero__title">Handbook <em>Records</em></h1>
+    </div>
+
+    <div style="padding: 0 var(--space-s);">
+
+        {# ── Branch tabs ── #}
+        <div style="display: flex; gap: 6px; margin-bottom: var(--space-m);
+                    overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
+            <a href="?branch=reference"
+               style="flex-shrink:0; padding:6px 14px; border-radius:var(--radius-pill);
+                      font-size:12px; font-weight:700; text-decoration:none;
+                      border:1px solid var(--border); white-space:nowrap;
+                      {% if active_branch == 'reference' %}background:var(--primary);color:#fff;border-color:var(--primary);
+                      {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
+                Reference
+            </a>
+            <a href="?branch=mandate"
+               style="flex-shrink:0; padding:6px 14px; border-radius:var(--radius-pill);
+                      font-size:12px; font-weight:700; text-decoration:none;
+                      border:1px solid var(--border); white-space:nowrap;
+                      {% if active_branch == 'mandate' %}background:var(--primary);color:#fff;border-color:var(--primary);
+                      {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
+                Mandate
+            </a>
+            <a href="?branch=keys"
+               style="flex-shrink:0; padding:6px 14px; border-radius:var(--radius-pill);
+                      font-size:12px; font-weight:700; text-decoration:none;
+                      border:1px solid var(--border); white-space:nowrap;
+                      {% if active_branch == 'keys' %}background:var(--primary);color:#fff;border-color:var(--primary);
+                      {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
+                Keys
+            </a>
+        </div>
+
+        {# ── Status filter tabs ── #}
+        {% if can_write %}
+        <div style="display: flex; gap: 6px; margin-bottom: var(--space-m);
+                    overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
+            <a href="?branch={{ active_branch }}"
+               style="flex-shrink:0; padding:4px 10px; border-radius:var(--radius-pill);
+                      font-size:11px; font-weight:700; text-decoration:none;
+                      border:1px solid var(--border); white-space:nowrap;
+                      {% if not status_filter %}background:var(--primary);color:#fff;border-color:var(--primary);
+                      {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
+                All
+            </a>
+            <a href="?branch={{ active_branch }}&status=draft"
+               style="flex-shrink:0; padding:4px 10px; border-radius:var(--radius-pill);
+                      font-size:11px; font-weight:700; text-decoration:none;
+                      border:1px solid var(--border); white-space:nowrap;
+                      {% if status_filter == 'draft' %}background:var(--primary);color:#fff;border-color:var(--primary);
+                      {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
+                Drafts
+            </a>
+            <a href="?branch={{ active_branch }}&status=active"
+               style="flex-shrink:0; padding:4px 10px; border-radius:var(--radius-pill);
+                      font-size:11px; font-weight:700; text-decoration:none;
+                      border:1px solid var(--border); white-space:nowrap;
+                      {% if status_filter == 'active' %}background:var(--primary);color:#fff;border-color:var(--primary);
+                      {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
+                Active
+            </a>
+            <a href="?branch={{ active_branch }}&status=locked"
+               style="flex-shrink:0; padding:4px 10px; border-radius:var(--radius-pill);
+                      font-size:11px; font-weight:700; text-decoration:none;
+                      border:1px solid var(--border); white-space:nowrap;
+                      {% if status_filter == 'locked' %}background:var(--primary);color:#fff;border-color:var(--primary);
+                      {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
+                Locked
+            </a>
+        </div>
+        {% endif %}
+
+        {# ── Record list ── #}
+        {% if not has_access and active_branch != 'keys' %}
+        <div style="padding:60px 0;text-align:center;color:var(--muted);">
+            <span class="material-symbols-outlined" style="font-size:40px;opacity:0.15;display:block;margin-bottom:12px;">lock</span>
+            <p style="font-size:13px;">The Handbook is for invited architects.</p>
+        </div>
+        {% elif records_by_type %}
+            {% for rtype, records in records_by_type.items %}
+            <div style="margin-bottom: var(--space-l);">
+                <div class="ws-label-tag" style="margin-bottom: 8px;">
+                    {% if active_branch == 'reference' %}{{ library_type_labels|get_item:rtype|default:rtype }}
+                    {% elif active_branch == 'mandate' %}{{ mandate_type_labels|get_item:rtype|default:rtype }}
+                    {% else %}Keys{% endif %}
+                </div>
+                <div class="list-group">
+                    {% for record in records %}
+                    <a href="{% url 'handbook:record' record.id %}"
+                       class="list-item" style="text-decoration:none;color:inherit;">
+                        <div class="list-item__content">
+                            <div class="list-item__title">{{ record.title }}</div>
+                            <div class="list-item__meta">{{ record.updated_at|date:"d M Y" }}</div>
+                        </div>
+                        <span class="hb-status {{ record.status }}" style="font-size:10px;font-weight:700;
+                              letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;
+                              border-radius:4px;flex-shrink:0;">{{ record.get_status_display }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div style="padding:60px 0;text-align:center;color:var(--muted);">
+            <span class="material-symbols-outlined" style="font-size:40px;opacity:0.15;display:block;margin-bottom:12px;">auto_stories</span>
+            <p style="font-size:13px;">No records in this branch yet.</p>
+            {% if can_write %}
+            <a href="{% url 'handbook:new' %}?branch={{ active_branch }}"
+               style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+                      padding:8px 18px;border-radius:8px;background:var(--primary);
+                      color:#fff;font-size:13px;font-weight:600;text-decoration:none;">
+                <span class="material-symbols-outlined" style="font-size:15px;">add</span>
+                Create the first
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+
+    {# ── FAB: New record ── #}
+    {% if can_write %}
+    <a href="{% url 'handbook:new' %}?branch={{ active_branch }}"
+       style="position:fixed;bottom:80px;right:20px;z-index:200;
+              width:52px;height:52px;border-radius:50%;
+              background:var(--primary);color:#fff;
+              display:flex;align-items:center;justify-content:center;
+              box-shadow:0 4px 16px rgba(175,50,54,0.4);text-decoration:none;">
+        <span class="material-symbols-outlined" style="font-size:22px;">add</span>
+    </a>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -130,12 +130,35 @@
     </div>
     <span class="launcher-label">Governance</span>
   </a>
+
+  {% if user_level >= 4 %}
+  <a href="{% url 'handbook:home' %}" class="launcher-item">
+    <div class="launcher-icon icon-red">
+      <span class="material-symbols-outlined">menu_book</span>
+    </div>
+    <span class="launcher-label">Handbook</span>
+  </a>
+  {% else %}
+  <div class="launcher-item launcher-item--locked" title="Requires Level 4">
+    <div class="launcher-icon icon-red">
+      <span class="material-symbols-outlined">menu_book</span>
+    </div>
+    <span class="launcher-label">Handbook</span>
+  </div>
+  {% endif %}
+
   {% else %}
   <div class="launcher-item launcher-item--locked" title="Requires Level 3 — Steward">
     <div class="launcher-icon icon-purple">
       <span class="material-symbols-outlined">account_balance</span>
     </div>
     <span class="launcher-label">Governance</span>
+  </div>
+  <div class="launcher-item launcher-item--locked" title="Requires Level 4">
+    <div class="launcher-icon icon-red">
+      <span class="material-symbols-outlined">menu_book</span>
+    </div>
+    <span class="launcher-label">Handbook</span>
   </div>
   {% endif %}
 

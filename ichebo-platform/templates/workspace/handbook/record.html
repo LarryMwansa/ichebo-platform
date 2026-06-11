@@ -304,3 +304,74 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </div>
 {% endblock %}
+
+{# ── Mobile shell ── #}
+{% block content %}
+<div style="display:flex;flex-direction:column;height:100%;padding-bottom:80px;">
+
+    {# ── Mobile topbar ── #}
+    <div style="display:flex;align-items:center;justify-content:space-between;
+                padding:12px var(--space-s);border-bottom:1px solid var(--border);
+                position:sticky;top:0;background:var(--bg);z-index:10;">
+        <a href="{% url 'handbook:home' %}{% if record %}?branch={% if is_key %}keys{% elif is_reference %}reference{% else %}mandate{% endif %}{% endif %}"
+           style="display:flex;align-items:center;gap:4px;color:var(--muted);
+                  font-size:12px;font-weight:700;text-decoration:none;text-transform:uppercase;letter-spacing:0.05em;">
+            <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+            Handbook
+        </a>
+        {% if record %}
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;
+                     letter-spacing:0.05em;padding:2px 8px;border-radius:4px;
+                     {% if record.status == 'locked' %}background:rgba(175,50,54,0.1);color:#af3236;
+                     {% elif record.status == 'active' %}background:rgba(22,163,74,0.1);color:#16a34a;
+                     {% else %}background:var(--surface,var(--border));color:var(--muted);{% endif %}">
+            {{ record.status }}
+        </span>
+        {% endif %}
+    </div>
+
+    {# ── Editor canvas ── #}
+    <div style="flex:1;overflow:hidden;">
+        {% with save_url=handbook_save_url %}
+            {% include "workspace/editorial/partials/editor.html" %}
+        {% endwith %}
+    </div>
+
+    {# ── Lifecycle bar ── #}
+    {% if can_write and record %}
+    <div style="position:fixed;bottom:64px;left:0;right:0;z-index:50;
+                display:flex;align-items:center;gap:10px;padding:10px 16px;
+                background:var(--bg);border-top:1px solid var(--border);">
+        {% if record.status == 'draft' %}
+        <button hx-post="{% url 'handbook:htmx-publish' record.id %}"
+                hx-target="#hb-lifecycle-status" hx-swap="innerHTML"
+                class="ws-topbar__cta"
+                style="background:none;border:1px solid #00b894;color:#00b894;cursor:pointer;">
+            <span class="material-symbols-outlined">publish</span>
+            Publish
+        </button>
+        {% endif %}
+        {% if record.status == 'active' %}
+        <button hx-post="{% url 'handbook:htmx-lock' record.id %}"
+                hx-target="#hb-lifecycle-status" hx-swap="innerHTML"
+                class="ws-topbar__cta"
+                style="background:none;border:1px solid var(--border);cursor:pointer;">
+            <span class="material-symbols-outlined">lock</span>
+            Lock
+        </button>
+        {% endif %}
+        {% if record.status == 'locked' %}
+        <button hx-post="{% url 'handbook:htmx-new-version' record.id %}"
+                hx-confirm="Create a new version? The current record will be superseded."
+                class="ws-topbar__cta"
+                style="background:none;border:1px solid var(--border);cursor:pointer;">
+            <span class="material-symbols-outlined">fork_right</span>
+            New Version
+        </button>
+        {% endif %}
+        <span id="hb-lifecycle-status" style="font-size:12px;color:var(--muted);"></span>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -175,6 +175,101 @@
 </div>
 {% endblock %}
 
+{% block content %}
+<div style="padding-bottom: 80px;">
+
+    <div class="page-hero">
+        <a href="{% url 'handbook:home' %}"
+           style="display:inline-flex;align-items:center;gap:4px;color:var(--muted);
+                  font-size:12px;font-weight:700;text-decoration:none;
+                  text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-xs);">
+            <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+            Handbook
+        </a>
+        <div class="page-hero__eyebrow">
+            <div class="page-hero__eyebrow-line"></div>
+            <span class="page-hero__label">Editor View</span>
+        </div>
+        <h1 class="page-hero__title">Manage <em>Access</em></h1>
+    </div>
+
+    <div style="padding: 0 var(--space-s);">
+
+        {# ── Grant form ── #}
+        <div style="background:var(--card-2);border:1px solid var(--border);border-radius:12px;
+                    padding:20px;margin-bottom:var(--space-l);">
+            <div style="font-size:13px;font-weight:700;margin-bottom:16px;">Grant Access</div>
+            <form method="post" action="{% url 'handbook:access' %}"
+                  style="display:flex;flex-direction:column;gap:12px;">
+                {% csrf_token %}
+                <div>
+                    <label style="font-size:10px;font-weight:700;text-transform:uppercase;
+                                  letter-spacing:0.07em;color:var(--muted);display:block;margin-bottom:6px;">
+                        User Email
+                    </label>
+                    <input type="email" name="email" required autocomplete="off"
+                           placeholder="user@example.com"
+                           style="width:100%;padding:10px 12px;border:1px solid var(--border);
+                                  border-radius:8px;background:transparent;
+                                  color:var(--text);font-size:13px;outline:none;box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:10px;font-weight:700;text-transform:uppercase;
+                                  letter-spacing:0.07em;color:var(--muted);display:block;margin-bottom:6px;">
+                        Role
+                    </label>
+                    <select name="role"
+                            style="width:100%;padding:10px 12px;border:1px solid var(--border);
+                                   border-radius:8px;background:var(--bg);
+                                   color:var(--text);font-size:13px;">
+                        <option value="reader">Reader</option>
+                        <option value="author">Author</option>
+                        <option value="editor">Editor</option>
+                    </select>
+                </div>
+                <button type="submit" class="ws-topbar__cta"
+                        style="background:var(--primary);color:#fff;border:none;cursor:pointer;align-self:flex-start;">
+                    <span class="material-symbols-outlined">add</span>
+                    Grant
+                </button>
+            </form>
+        </div>
+
+        {# ── Access list ── #}
+        <div class="ws-label-tag" style="margin-bottom:12px;">
+            Current Access
+            <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:6px;">
+                {{ all_access|length }} member{{ all_access|length|pluralize }}
+            </span>
+        </div>
+
+        {% if all_access %}
+        <div class="list-group">
+            {% for entry in all_access %}
+            <div class="list-item" style="flex-direction:column;align-items:flex-start;gap:4px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                    <div style="font-size:13px;font-weight:600;">
+                        {{ entry.user.display_name|default:entry.user.email }}
+                    </div>
+                    <span class="hb-role-badge {{ entry.role }}">{{ entry.role }}</span>
+                </div>
+                <div style="font-size:11px;color:var(--muted);">
+                    {{ entry.user.email }} · granted {{ entry.granted_at|date:"d M Y" }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="padding:40px 0;text-align:center;color:var(--muted);">
+            <span class="material-symbols-outlined" style="font-size:36px;opacity:0.15;display:block;margin-bottom:12px;">manage_accounts</span>
+            <p style="font-size:13px;">No one has been granted access yet.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
 {% block ws_options %}
 <div style="padding: 16px;">
     <div class="ws-label-tag" style="margin-bottom: 12px;">Access Summary</div>
