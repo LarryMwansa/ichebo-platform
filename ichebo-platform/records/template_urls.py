@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 from . import template_views
 
 app_name = 'records'
@@ -15,7 +16,7 @@ urlpatterns = [
     path('htmx/search/', template_views.htmx_record_search, name='htmx-record-search'),
     path('htmx/recent-drafts/', template_views.htmx_recent_drafts, name='htmx-recent-drafts'),
     
-    # ── Knowledge Graph ──
-    path('graph/', template_views.graph_view, name='graph'),
-    path('htmx/graph/data/', template_views.htmx_graph_data, name='htmx-graph-data'),
+    # ── Knowledge Graph — redirects to Handbook ──
+    path('graph/', RedirectView.as_view(pattern_name='handbook:graph', permanent=True), name='graph'),
+    path('htmx/graph/data/', RedirectView.as_view(pattern_name='handbook:htmx-graph-data', permanent=False), name='htmx-graph-data'),
 ]

@@ -7,8 +7,8 @@
 <style>
     .graph-container {
         width: 100%;
-        height: calc(100vh - 64px); /* Subtract topbar height */
-        background: #050505; /* Deeper black for the web */
+        height: calc(100vh - 64px);
+        background: #050505;
         overflow: hidden;
         position: relative;
     }
@@ -55,7 +55,6 @@
         pointer-events: none;
     }
 
-    /* Tooltip */
     .graph-tooltip {
         position: absolute;
         padding: 10px 15px;
@@ -74,7 +73,7 @@
 {% endblock %}
 
 {% block breadcrumb %}
-    <span class="ws-topbar__breadcrumb-item">Governance</span>
+    <span class="ws-topbar__breadcrumb-item">Handbook</span>
     <span class="ws-topbar__breadcrumb-sep">›</span>
     <span class="ws-topbar__breadcrumb-item">Apostolic Web</span>
 {% endblock %}
@@ -89,21 +88,17 @@
         <span class="material-symbols-outlined">hub</span>
         Apostolic Web
     </a>
-    <a href="{% url 'records:records-home' %}" class="ctx-btn">
-        <span class="material-symbols-outlined">history_edu</span>
-        My Journal
-    </a>
 
     <div class="ctx-divider"></div>
 
-    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Governance</div>
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Handbook</div>
+    <a href="{% url 'handbook:home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">menu_book</span>
+        Records
+    </a>
     <a href="{% url 'governance:mandate-home' %}" class="ctx-btn">
         <span class="material-symbols-outlined">gavel</span>
         Mandate Branch
-    </a>
-    <a href="{% url 'handbook:home' %}" class="ctx-btn">
-        <span class="material-symbols-outlined">menu_book</span>
-        Handbook
     </a>
 
 </div>
@@ -192,12 +187,12 @@
     <p style="font-size:13px; color:var(--muted); line-height:1.6; max-width:260px; margin:0 0 24px;">
         The knowledge graph requires a larger screen. Open on desktop or tablet to explore record connections.
     </p>
-    <a href="{% url 'records:records-home' %}"
+    <a href="{% url 'handbook:home' %}"
        style="display:inline-flex; align-items:center; gap:6px; padding:10px 20px;
               border-radius:8px; background:var(--card-2); border:1px solid var(--border);
               font-size:13px; font-weight:600; color:var(--text); text-decoration:none;">
-        <span class="material-symbols-outlined" style="font-size:16px;">history_edu</span>
-        My Journal
+        <span class="material-symbols-outlined" style="font-size:16px;">menu_book</span>
+        Handbook
     </a>
 </div>
 {% endblock %}
@@ -226,7 +221,6 @@
         const height = container.clientHeight;
         const tooltip = document.getElementById('graph-tooltip');
 
-        // Apostolic Colors
         const colors = {
             governance: '#ff4757',
             journal: '#3498db',
@@ -235,7 +229,6 @@
             default: '#95a5a6'
         };
 
-        // Fetch Data
         const response = await fetch("{% url 'handbook:htmx-graph-data' %}");
         const data = await response.json();
 
@@ -246,13 +239,11 @@
             .force("x", d3.forceX(width / 2).strength(0.1))
             .force("y", d3.forceY(height / 2).strength(0.1));
 
-        // Add Zoom
         const g = svg.append("g");
         svg.call(d3.zoom().on("zoom", (event) => {
             g.attr("transform", event.transform);
         }));
 
-        // Render Links
         const link = g.append("g")
             .attr("class", "links")
             .selectAll("line")
@@ -261,7 +252,6 @@
             .attr("class", "graph-link")
             .attr("stroke", d => colors[d.type] || 'rgba(255,255,255,0.1)');
 
-        // Render Nodes
         const node = g.append("g")
             .attr("class", "nodes")
             .selectAll("circle")
@@ -281,15 +271,13 @@
                 tooltip.style.opacity = 0;
             })
             .on("click", (event, d) => {
-                // Open detail in context bar or push URL
-                window.location.href = `/records/${d.id}/`;
+                window.location.href = `/handbook/records/${d.id}/`;
             })
             .call(d3.drag()
                 .on("start", dragstarted)
                 .on("drag", dragged)
                 .on("end", dragended));
 
-        // Labels
         const label = g.append("g")
             .attr("class", "labels")
             .selectAll("text")

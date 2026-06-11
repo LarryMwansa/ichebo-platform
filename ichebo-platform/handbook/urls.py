@@ -10,6 +10,8 @@ template_urlpatterns = [
     path('records/new/', views.handbook_new, name='new'),
     path('records/<uuid:pk>/', views.handbook_record, name='record'),
     path('access/', views.handbook_access, name='access'),
+    path('graph/', views.handbook_graph, name='graph'),
+    path('htmx/graph/data/', views.handbook_graph_data, name='htmx-graph-data'),
 ]
 
 # ── DRF API URLs ──────────────────────────────────────────────────────────────

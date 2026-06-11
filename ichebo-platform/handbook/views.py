@@ -637,6 +637,47 @@ def handbook_relationship_list(request, record_id):
     return HttpResponse(rows)
 
 
+# ── Knowledge Graph ──────────────────────────────────────────────────────────
+
+@login_required
+def handbook_graph(request):
+    if _level(request.user) < 3:
+        return HttpResponseForbidden()
+    qs = Record.objects.filter(deleted_at__isnull=True)
+    return render(request, 'workspace/handbook/graph.html', {
+        'active_app':        'handbook',
+        'ws_page_title':     'Apostolic Web',
+        'total_nodes':       qs.count(),
+        'governance_count':  qs.filter(record_class='governance').count(),
+        'personal_count':    qs.filter(record_family='journal').count(),
+        'relationship_count': Relationship.objects.filter(deleted_at__isnull=True, to_record__isnull=False).count(),
+    })
+
+
+@login_required
+def handbook_graph_data(request):
+    from django.http import JsonResponse
+    nodes = [
+        {
+            'id':     str(r.id),
+            'title':  r.title,
+            'family': r.record_family,
+            'type':   r.record_type,
+            'level':  r.permissions_data.get('required_level', 1) if r.permissions_data else 1,
+        }
+        for r in Record.objects.filter(deleted_at__isnull=True)
+    ]
+    links = [
+        {
+            'source': str(rel.from_record_id),
+            'target': str(rel.to_record_id),
+            'type':   rel.relationship_type,
+        }
+        for rel in Relationship.objects.filter(deleted_at__isnull=True, to_record__isnull=False)
+    ]
+    return JsonResponse({'nodes': nodes, 'links': links})
+
+
 # ── HTMX: Recent governance records for context bar ──────────────────────────
 
 @login_required
