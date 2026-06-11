@@ -2,26 +2,292 @@
 {% load static %}
 
 {% block governance_content %}
-<div style="max-width: 860px; margin: 0 auto; padding: 20px 0 100px;">
+<div style="max-width: 860px; margin: 0 auto; padding: 24px 0 100px;">
 
-    <div class="ws-page-header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
-        <div>
-            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Apostolic Records</div>
-            <h1 class="ws-page-title">
-                {% if active_branch == 'library' %}Reference <em>Library</em>{% else %}Mandate <em>Branch</em>{% endif %}
-            </h1>
+    {# ── Hero ──────────────────────────────────────────────────────────────── #}
+    <div style="background: var(--ink, #1c1917);
+                border-radius: 16px;
+                padding: 40px 48px 44px;
+                margin-bottom: 32px;
+                position: relative;
+                overflow: hidden;">
+
+        {# red vertical rule #}
+        <div style="position: absolute; top: 0; bottom: 0; left: 0;
+                    width: 3px;
+                    background: linear-gradient(to bottom, transparent, #af3236 25%, #af3236 75%, transparent);
+                    border-radius: 16px 0 0 16px;"></div>
+
+        {# ghosted background word #}
+        <div style="position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
+                    font-family: var(--ff-display, 'Playfair Display', Georgia, serif);
+                    font-size: clamp(60px, 12vw, 120px);
+                    font-weight: 900;
+                    color: rgba(175, 50, 54, 0.05);
+                    white-space: nowrap;
+                    pointer-events: none;
+                    user-select: none;
+                    letter-spacing: -0.04em;">Mandate</div>
+
+        {# eyebrow #}
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+            <div style="width: 32px; height: 2px; background: #af3236; flex-shrink: 0;"></div>
+            <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+                         text-transform: uppercase; color: #af3236;">Apostolic Registry</span>
         </div>
-        <a href="{% url 'handbook:home' %}"
-           class="ws-topbar__cta" style="flex-shrink: 0; text-decoration: none; background: none; border: 1px solid var(--border-ink);">
-            <span class="material-symbols-outlined">auto_stories</span>
-            Open Handbook
-        </a>
+
+        {# heading #}
+        <h1 style="font-family: var(--ff-display, 'Playfair Display', Georgia, serif);
+                   font-size: clamp(36px, 5vw, 52px);
+                   font-weight: 900;
+                   color: #f5f3f0;
+                   letter-spacing: -0.02em;
+                   line-height: 1.1;
+                   margin: 0 0 16px;">
+            Mandate <em style="font-style: italic; color: #af3236;">Library</em>
+        </h1>
+
+        {# subtitle #}
+        <p style="font-size: 14px; color: rgba(245,243,240,0.55); line-height: 1.6;
+                  max-width: 480px; margin: 0 0 28px;">
+            The governance instruments that define apostolic authority, structure,
+            and operational frameworks for this movement.
+        </p>
+
+        {# CTAs #}
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="{% url 'governance:mandate-list' 'mandate' %}"
+               hx-get="{% url 'governance:mandate-list' 'mandate' %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
+               style="display: inline-flex; align-items: center; gap: 6px;
+                      padding: 8px 18px; border-radius: 8px;
+                      background: #af3236; color: #fff;
+                      font-size: 13px; font-weight: 600; text-decoration: none;
+                      transition: background 0.15s;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">gavel</span>
+                View Mandates
+            </a>
+            <a href="{% url 'handbook:home' %}"
+               style="display: inline-flex; align-items: center; gap: 6px;
+                      padding: 8px 18px; border-radius: 8px;
+                      background: transparent; color: rgba(245,243,240,0.7);
+                      border: 1px solid rgba(245,243,240,0.18);
+                      font-size: 13px; font-weight: 500; text-decoration: none;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">auto_stories</span>
+                Open Handbook
+            </a>
+        </div>
     </div>
 
-    <div style="height: 300px; border: 1px dashed var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--muted);">
-        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.2;">account_balance</span>
-        <p style="font-size: 14px; font-weight: 500;">Select a registry from the context bar to begin review.</p>
+    {# ── Type Cards ────────────────────────────────────────────────────────── #}
+    <div style="margin-bottom: 36px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px;">
+            <div class="ws-label-tag">Document Types</div>
+            <a href="{% url 'governance:mandate-home' %}"
+               hx-get="{% url 'governance:mandate-home' %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
+               style="font-size: 12px; color: var(--primary); text-decoration: none;">
+                View all types →
+            </a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px;">
+
+            {# Mandates #}
+            <a href="{% url 'governance:mandate-list' 'mandate' %}"
+               hx-get="{% url 'governance:mandate-list' 'mandate' %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
+               class="ws-stat-card"
+               style="text-decoration: none; cursor: pointer; border-left: 3px solid var(--primary); padding-left: 13px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--primary);">gavel</span>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--muted);
+                                 background: var(--surface, var(--border));
+                                 padding: 2px 8px; border-radius: 20px;">
+                        {{ type_counts.mandate|default:"0" }}
+                    </span>
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px;">Mandates</div>
+                <div style="font-size: 11px; color: var(--muted); line-height: 1.4;">
+                    Apostolic directives and authoritative declarations
+                </div>
+            </a>
+
+            {# Frameworks #}
+            <a href="{% url 'governance:mandate-list' 'framework' %}"
+               hx-get="{% url 'governance:mandate-list' 'framework' %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
+               class="ws-stat-card"
+               style="text-decoration: none; cursor: pointer; border-left: 3px solid var(--primary); padding-left: 13px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--primary);">account_tree</span>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--muted);
+                                 background: var(--surface, var(--border));
+                                 padding: 2px 8px; border-radius: 20px;">
+                        {{ type_counts.framework|default:"0" }}
+                    </span>
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px;">Frameworks</div>
+                <div style="font-size: 11px; color: var(--muted); line-height: 1.4;">
+                    Structural systems and governance architectures
+                </div>
+            </a>
+
+            {# Protocols #}
+            <a href="{% url 'governance:mandate-list' 'protocol' %}"
+               hx-get="{% url 'governance:mandate-list' 'protocol' %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
+               class="ws-stat-card"
+               style="text-decoration: none; cursor: pointer; border-left: 3px solid var(--primary); padding-left: 13px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--primary);">checklist_rtl</span>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--muted);
+                                 background: var(--surface, var(--border));
+                                 padding: 2px 8px; border-radius: 20px;">
+                        {{ type_counts.protocol|default:"0" }}
+                    </span>
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px;">Protocols</div>
+                <div style="font-size: 11px; color: var(--muted); line-height: 1.4;">
+                    Defined procedures for apostolic conduct and process
+                </div>
+            </a>
+
+            {# Statements #}
+            <a href="{% url 'governance:mandate-list' 'statement' %}"
+               hx-get="{% url 'governance:mandate-list' 'statement' %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
+               class="ws-stat-card"
+               style="text-decoration: none; cursor: pointer; border-left: 3px solid var(--primary); padding-left: 13px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--primary);">record_voice_over</span>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--muted);
+                                 background: var(--surface, var(--border));
+                                 padding: 2px 8px; border-radius: 20px;">
+                        {{ type_counts.statement|default:"0" }}
+                    </span>
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px;">Statements</div>
+                <div style="font-size: 11px; color: var(--muted); line-height: 1.4;">
+                    Official positions, declarations, and communiqués
+                </div>
+            </a>
+
+            {# Procedures #}
+            <a href="{% url 'governance:mandate-list' 'procedure' %}"
+               hx-get="{% url 'governance:mandate-list' 'procedure' %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
+               class="ws-stat-card"
+               style="text-decoration: none; cursor: pointer;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--muted);">list_alt</span>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--muted);
+                                 background: var(--surface, var(--border));
+                                 padding: 2px 8px; border-radius: 20px;">
+                        {{ type_counts.procedure|default:"0" }}
+                    </span>
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px;">Procedures</div>
+                <div style="font-size: 11px; color: var(--muted); line-height: 1.4;">
+                    Step-by-step operational instructions
+                </div>
+            </a>
+
+            {# Programmes #}
+            <a href="{% url 'governance:mandate-list' 'programme' %}"
+               hx-get="{% url 'governance:mandate-list' 'programme' %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
+               class="ws-stat-card"
+               style="text-decoration: none; cursor: pointer;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--muted);">calendar_month</span>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--muted);
+                                 background: var(--surface, var(--border));
+                                 padding: 2px 8px; border-radius: 20px;">
+                        {{ type_counts.programme|default:"0" }}
+                    </span>
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px;">Programmes</div>
+                <div style="font-size: 11px; color: var(--muted); line-height: 1.4;">
+                    Structured initiatives and ministry programmes
+                </div>
+            </a>
+        </div>
     </div>
+
+    {# ── Recent Records ────────────────────────────────────────────────────── #}
+    {% if recent_records %}
+    <div>
+        <div class="ws-label-tag" style="margin-bottom: 14px;">Recently Updated</div>
+
+        <div style="border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
+            {% for rec in recent_records %}
+            <a href="{% url 'governance:mandate-detail' rec.id %}"
+               hx-get="{% url 'governance:mandate-detail' rec.id %}"
+               hx-target="#governance-content"
+               hx-push-url="true"
+               style="display: flex; align-items: center; gap: 14px;
+                      padding: 14px 18px;
+                      border-bottom: {% if not forloop.last %}1px solid var(--border){% else %}none{% endif %};
+                      text-decoration: none;
+                      background: transparent;
+                      transition: background 0.12s;"
+               onmouseover="this.style.background='var(--surface,rgba(0,0,0,0.03))'"
+               onmouseout="this.style.background='transparent'">
+
+                <span class="material-symbols-outlined"
+                      style="font-size: 18px; color: var(--muted); flex-shrink: 0;">
+                    {% if rec.record_type == 'mandate' %}gavel
+                    {% elif rec.record_type == 'framework' %}account_tree
+                    {% elif rec.record_type == 'protocol' %}checklist_rtl
+                    {% elif rec.record_type == 'statement' %}record_voice_over
+                    {% elif rec.record_type == 'procedure' %}list_alt
+                    {% else %}calendar_month{% endif %}
+                </span>
+
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 13px; font-weight: 600; color: var(--text);
+                                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ rec.title }}
+                    </div>
+                    <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+                        {{ rec.get_record_type_display|default:rec.record_type|title }}
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                    <span style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                                 letter-spacing: 0.08em; padding: 2px 8px; border-radius: 4px;
+                                 {% if rec.status == 'locked' %}background: rgba(175,50,54,0.1); color: #af3236;
+                                 {% else %}background: rgba(22,163,74,0.1); color: #16a34a;{% endif %}">
+                        {{ rec.status }}
+                    </span>
+                    <span style="font-size: 11px; color: var(--muted);">
+                        {{ rec.updated_at|date:"d M Y" }}
+                    </span>
+                    <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted);">chevron_right</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div style="border: 1px dashed var(--border); border-radius: 12px;
+                padding: 40px; text-align: center; color: var(--muted);">
+        <span class="material-symbols-outlined" style="font-size: 36px; opacity: 0.2; display: block; margin-bottom: 12px;">inventory_2</span>
+        <p style="font-size: 13px; font-weight: 500; margin: 0;">
+            No active mandates yet. Author governance documents in the Handbook.
+        </p>
+    </div>
+    {% endif %}
 
 </div>
 {% endblock %}

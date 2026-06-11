@@ -1,0 +1,123 @@
+<!-- Mandate Library home — hero + type grid + recent records (mobile + HTMX) -->
+
+{# ── Hero ──────────────────────────────────────────────────────────────── #}
+<div class="page-hero page-hero--watermark" data-watermark="MANDATE">
+    <div class="page-hero__eyebrow">
+        <div class="page-hero__eyebrow-line"></div>
+        <span class="page-hero__label">Apostolic Registry</span>
+    </div>
+    <h1 class="page-hero__title">Mandate <em>Library</em></h1>
+    <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin: var(--space-xs) 0 0; max-width: 480px;">
+        The governance instruments that define apostolic authority, structure,
+        and operational frameworks for this movement.
+    </p>
+</div>
+
+<div style="padding: var(--space-m) var(--space-s) var(--space-xl);">
+
+    {# ── Type Grid ─────────────────────────────────────────────────────── #}
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Document Types</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: var(--space-l);">
+
+        <a href="{% url 'governance:mandate-list' 'mandate' %}"
+           hx-get="{% url 'governance:mandate-list' 'mandate' %}"
+           hx-target="#governance-content" hx-push-url="true"
+           class="ws-stat-card" style="text-decoration:none;border-left:3px solid var(--primary);padding-left:13px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);">gavel</span>
+                <span style="font-size:10px;font-weight:700;color:var(--muted);background:var(--surface,var(--border));padding:1px 7px;border-radius:20px;">{{ type_counts.mandate|default:"0" }}</span>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);">Mandates</div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.3;margin-top:2px;">Apostolic directives &amp; declarations</div>
+        </a>
+
+        <a href="{% url 'governance:mandate-list' 'framework' %}"
+           hx-get="{% url 'governance:mandate-list' 'framework' %}"
+           hx-target="#governance-content" hx-push-url="true"
+           class="ws-stat-card" style="text-decoration:none;border-left:3px solid var(--primary);padding-left:13px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);">account_tree</span>
+                <span style="font-size:10px;font-weight:700;color:var(--muted);background:var(--surface,var(--border));padding:1px 7px;border-radius:20px;">{{ type_counts.framework|default:"0" }}</span>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);">Frameworks</div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.3;margin-top:2px;">Governance structures &amp; architectures</div>
+        </a>
+
+        <a href="{% url 'governance:mandate-list' 'protocol' %}"
+           hx-get="{% url 'governance:mandate-list' 'protocol' %}"
+           hx-target="#governance-content" hx-push-url="true"
+           class="ws-stat-card" style="text-decoration:none;border-left:3px solid var(--primary);padding-left:13px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);">checklist_rtl</span>
+                <span style="font-size:10px;font-weight:700;color:var(--muted);background:var(--surface,var(--border));padding:1px 7px;border-radius:20px;">{{ type_counts.protocol|default:"0" }}</span>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);">Protocols</div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.3;margin-top:2px;">Apostolic conduct &amp; process rules</div>
+        </a>
+
+        <a href="{% url 'governance:mandate-list' 'statement' %}"
+           hx-get="{% url 'governance:mandate-list' 'statement' %}"
+           hx-target="#governance-content" hx-push-url="true"
+           class="ws-stat-card" style="text-decoration:none;border-left:3px solid var(--primary);padding-left:13px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);">record_voice_over</span>
+                <span style="font-size:10px;font-weight:700;color:var(--muted);background:var(--surface,var(--border));padding:1px 7px;border-radius:20px;">{{ type_counts.statement|default:"0" }}</span>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);">Statements</div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.3;margin-top:2px;">Official positions &amp; declarations</div>
+        </a>
+
+        <a href="{% url 'governance:mandate-list' 'procedure' %}"
+           hx-get="{% url 'governance:mandate-list' 'procedure' %}"
+           hx-target="#governance-content" hx-push-url="true"
+           class="ws-stat-card" style="text-decoration:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:var(--muted);">list_alt</span>
+                <span style="font-size:10px;font-weight:700;color:var(--muted);background:var(--surface,var(--border));padding:1px 7px;border-radius:20px;">{{ type_counts.procedure|default:"0" }}</span>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);">Procedures</div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.3;margin-top:2px;">Step-by-step operational instructions</div>
+        </a>
+
+        <a href="{% url 'governance:mandate-list' 'programme' %}"
+           hx-get="{% url 'governance:mandate-list' 'programme' %}"
+           hx-target="#governance-content" hx-push-url="true"
+           class="ws-stat-card" style="text-decoration:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:var(--muted);">calendar_month</span>
+                <span style="font-size:10px;font-weight:700;color:var(--muted);background:var(--surface,var(--border));padding:1px 7px;border-radius:20px;">{{ type_counts.programme|default:"0" }}</span>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);">Programmes</div>
+            <div style="font-size:10px;color:var(--muted);line-height:1.3;margin-top:2px;">Structured ministry initiatives</div>
+        </a>
+
+    </div>
+
+    {# ── Recent Records ────────────────────────────────────────────────── #}
+    {% if recent_records %}
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Recently Updated</div>
+    <div class="list-group">
+        {% for rec in recent_records %}
+        <a href="{% url 'governance:mandate-detail' rec.id %}"
+           class="list-item" style="text-decoration:none;color:inherit;"
+           hx-get="{% url 'governance:mandate-detail' rec.id %}"
+           hx-target="#governance-content" hx-push-url="true">
+            <span class="material-symbols-outlined" style="font-size:18px;color:var(--muted);flex-shrink:0;">
+                {% if rec.record_type == 'mandate' %}gavel
+                {% elif rec.record_type == 'framework' %}account_tree
+                {% elif rec.record_type == 'protocol' %}checklist_rtl
+                {% elif rec.record_type == 'statement' %}record_voice_over
+                {% elif rec.record_type == 'procedure' %}list_alt
+                {% else %}calendar_month{% endif %}
+            </span>
+            <div class="list-item__content">
+                <div class="list-item__title">{{ rec.title }}</div>
+                <div class="list-item__meta">{{ rec.record_type|title }} · {{ rec.updated_at|date:"d M Y" }}</div>
+            </div>
+            <span class="material-symbols-outlined" style="font-size:18px;color:var(--muted);flex-shrink:0;">chevron_right</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>

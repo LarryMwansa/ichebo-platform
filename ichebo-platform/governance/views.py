@@ -105,23 +105,32 @@ def mandate_home(request):
     if _level(request.user) < 4:
         raise PermissionDenied
     search = request.GET.get('q', '').strip()
-    from records.models import Record as _R
-    records = _R.objects.filter(
+    base_qs = Record.objects.filter(
         record_family='governance',
         record_type__in=MANDATE_TYPES,
         deleted_at__isnull=True,
-    ).order_by('-created_at')
+        status__in=['active', 'locked'],
+    )
+    type_counts = {
+        slug: base_qs.filter(record_type=slug).count()
+        for slug in MANDATE_TYPES
+    }
+    recent_records = base_qs.order_by('-updated_at')[:5]
+
+    records = base_qs.order_by('-created_at')
     if search:
         records = records.filter(title__icontains=search)
-    records = records.filter(status__in=['active', 'locked'])
-    return _shell_or_partial(request, 'governance/_mandate_list.html', {
-        'records':       records,
-        'record_type':   None,
-        'type_label':    'All',
-        'search':        search,
-        'library_types': LIBRARY_TYPE_LABELS,
-        'mandate_types': MANDATE_TYPE_LABELS,
-        'active_branch': 'mandate',
+
+    return _shell_or_partial(request, 'governance/_mandate_home.html', {
+        'records':        records,
+        'record_type':    None,
+        'type_label':     'All',
+        'search':         search,
+        'library_types':  LIBRARY_TYPE_LABELS,
+        'mandate_types':  MANDATE_TYPE_LABELS,
+        'type_counts':    type_counts,
+        'recent_records': recent_records,
+        'active_branch':  'mandate',
     }, shell_template='workspace/governance/home.html')
 
 
