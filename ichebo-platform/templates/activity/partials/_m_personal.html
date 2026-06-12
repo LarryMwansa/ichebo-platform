@@ -59,10 +59,13 @@
                 style="background: none; border: none; cursor: pointer; padding: 4px; display: flex;">
           <span class="material-symbols-outlined" style="font-size: 22px; color: var(--success);">check_circle</span>
         </button>
-        <a href="{% url 'activity:htmx-edit' item.id %}"
-           style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; color: var(--muted);">
-          <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
-        </a>
+        <button hx-get="{% url 'activity:htmx-edit' item.id %}"
+                hx-target="#drawerInner"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Activity')"
+                style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; color: var(--muted);">
+          <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
+        </button>
       </div>
     </div>
     {% endfor %}
@@ -101,10 +104,13 @@
                 style="background: none; border: none; cursor: pointer; padding: 4px; display: flex;">
           <span class="material-symbols-outlined" style="font-size: 22px; color: var(--success);">check_circle</span>
         </button>
-        <a href="{% url 'activity:htmx-edit' item.id %}"
-           style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; color: var(--muted);">
-          <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
-        </a>
+        <button hx-get="{% url 'activity:htmx-edit' item.id %}"
+                hx-target="#drawerInner"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Activity')"
+                style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; color: var(--muted);">
+          <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
+        </button>
       </div>
     </div>
     {% endfor %}
@@ -148,10 +154,13 @@
                 style="background: none; border: none; cursor: pointer; padding: 4px; display: flex;">
           <span class="material-symbols-outlined" style="font-size: 22px; color: var(--success);">check_circle</span>
         </button>
-        <a href="{% url 'activity:htmx-edit' item.id %}"
-           style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; color: var(--muted);">
-          <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
-        </a>
+        <button hx-get="{% url 'activity:htmx-edit' item.id %}"
+                hx-target="#drawerInner"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Activity')"
+                style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; color: var(--muted);">
+          <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
+        </button>
       </div>
     </div>
     {% endfor %}
