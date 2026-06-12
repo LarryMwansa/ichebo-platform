@@ -3,620 +3,457 @@
 
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Training &amp; Formation Programmes — Ichebo Christian Services</title>
+  <title>Formation — Ichebo Christian Services</title>
   <meta name="description"
-    content="Five qualification programmes — Certificate to Doctorate. Eight Kingdom Pathways. Formation that is structured, measurable, and aligned with the Kingdom Governance System.">
+    content="Everyone who joins a Sceptre Community deserves a clear path. Formation is structured, intentional, and built around the life of the community itself — not a classroom.">
+  <link rel="canonical" href="https://ichebo.org/training">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ichebo.org/training">
+  <meta property="og:title" content="Formation — Ichebo Christian Services">
+  <meta property="og:description" content="Everyone who joins a Sceptre Community deserves a clear path. Formation is structured, intentional, and built around the life of the community itself — not a classroom.">
+  <meta property="og:image" content="https://ichebo.org/logo.svg">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap"
     rel="stylesheet">
   <style>
-/* HERO */
+    /* ── Training-specific ── */
+
+    /* ══════════════════════
+       1. HERO (INK)
+    ══════════════════════ */
     .hero {
       background: var(--ink);
-      padding: 10rem 0 5rem;
+      padding: clamp(8rem, 14vw, 11rem) 0 clamp(4rem, 8vw, 7rem);
       position: relative;
       overflow: hidden
     }
 
     .hero::before {
-      content: 'FORMATION';
+      content: '';
       position: absolute;
-      bottom: -2rem;
-      right: -1rem;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, transparent 0%, var(--primary) 20%, var(--primary) 80%, transparent 100%)
+    }
+
+    .hero-watermark {
+      position: absolute;
+      bottom: -5%;
+      right: -2%;
       font-family: var(--ff-display);
-      font-size: clamp(6rem, 16vw, 14rem);
+      font-size: clamp(120px, 20vw, 240px);
       font-weight: 900;
-      color: rgba(255, 255, 255, 0.02);
+      color: rgba(175, 50, 54, .05);
+      line-height: 1;
       pointer-events: none;
-      letter-spacing: -0.04em
+      user-select: none;
+      white-space: nowrap;
+      letter-spacing: -.02em
     }
 
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: end
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 760px
     }
 
-    .hero h1 {
+    .hero-eyebrow {
+      margin-bottom: 1.75rem
+    }
+
+    .hero-headline {
       font-family: var(--ff-display);
-      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-size: clamp(2.4rem, 5.5vw, 4rem);
       font-weight: 800;
-      line-height: 1.08;
-      color: #fff;
-      letter-spacing: -0.02em;
-      margin: 1rem 0 1.5rem
+      line-height: 1.1;
+      letter-spacing: -.025em;
+      color: var(--white);
+      margin-bottom: 1.5rem
     }
 
-    .hero h1 em {
+    .hero-headline em {
       font-style: italic;
       color: var(--primary)
     }
 
     .hero-sub {
-      font-size: 1.05rem;
-      color: rgba(255, 255, 255, 0.55);
-      max-width: 50ch;
-      line-height: 1.8;
+      font-size: clamp(1rem, 1.8vw, 1.1rem);
+      line-height: 1.85;
+      color: rgba(255, 255, 255, .5);
+      max-width: 560px;
       margin-bottom: 2.5rem
+    }
+
+    .hero-sub strong {
+      color: rgba(255, 255, 255, .82);
+      font-weight: 500
     }
 
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 1rem
-    }
-
-    .levels-preview {
-      display: flex;
-      flex-direction: column;
-      gap: 3px
-    }
-
-    .lp-item {
-      display: flex;
-      align-items: center;
       gap: 1rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 4px;
-      transition: all var(--tr);
-      cursor: default
+      align-items: center
     }
 
-    .lp-item:hover {
-      background: rgba(175, 50, 54, 0.1);
-      border-color: rgba(175, 50, 54, 0.3)
+    /* ══════════════════════
+       2. THE JOURNEY (STONE)
+       Eight pathways, plain
+    ══════════════════════ */
+    .journey {
+      background: var(--stone);
+      padding: var(--sp) 0
     }
 
-    .lp-badge {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      background: rgba(175, 50, 54, 0.2);
-      color: var(--primary);
-      padding: 3px 8px;
-      border-radius: 2px;
-      white-space: nowrap;
-      min-width: 60px;
+    .journey-header {
+      max-width: 640px;
+      margin: 0 auto 3rem;
       text-align: center
     }
 
-    .lp-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.75)
+    .journey-label {
+      margin-bottom: 1.5rem;
+      justify-content: center
     }
 
-    .lp-dur {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.3);
-      margin-left: auto;
-      white-space: nowrap
+    .journey-heading {
+      font-family: var(--ff-display);
+      font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      color: var(--ink);
+      margin-bottom: 1rem
     }
 
-    /* PAGE NAV */
-    .page-nav {
-      background: var(--stone);
-      border-bottom: 1px solid var(--stone-2);
-      position: sticky;
-      top: 72px;
-      z-index: 50
+    .journey-heading em {
+      font-style: italic;
+      color: var(--primary)
     }
 
-    .page-nav-inner {
-      display: flex;
-      gap: 0;
-      overflow-x: auto;
-      scrollbar-width: none
-    }
-
-    .page-nav-inner::-webkit-scrollbar {
-      display: none
-    }
-
-    .pnl {
-      flex-shrink: 0;
-      padding: 1rem 1.5rem;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-      white-space: nowrap;
-      border-bottom: 2px solid transparent;
-      transition: all var(--tr)
-    }
-
-    .pnl:hover,
-    .pnl.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary)
-    }
-
-    /* INDUCTION */
-    .induction-section {
-      padding: var(--sp) 0;
-      background: var(--stone)
-    }
-
-    .induction-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(3rem, 6vw, 5rem);
-      align-items: center;
-      margin-top: clamp(2rem, 4vw, 3.5rem)
-    }
-
-    .induction-body {
+    .journey-sub {
       font-size: 1rem;
-      color: var(--muted);
       line-height: 1.8;
-      margin-bottom: 1.5rem
+      color: var(--muted)
     }
 
-    .pathway-cards {
+    .pathways-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
       background: var(--stone-2)
     }
 
-    .pc {
+    .pathway {
       background: var(--white);
-      padding: 1.25rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      transition: background var(--tr)
-    }
-
-    .pc:hover {
-      background: var(--stone)
-    }
-
-    .pc-icon {
-      font-size: 20px;
-      color: var(--primary);
-      flex-shrink: 0;
-      margin-top: 2px
-    }
-
-    .pc-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ink-2);
-      margin-bottom: 2px
-    }
-
-    .pc-desc {
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.5
-    }
-
-    /* PROGRAMMES */
-    .programmes-section {
-      padding: var(--sp) 0;
-      background: var(--white)
-    }
-
-    .programme-list {
+      padding: 1.75rem 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 3px;
-      background: var(--stone-2);
-      margin-top: clamp(2rem, 4vw, 3.5rem)
-    }
-
-    .prog-item {
-      background: var(--white);
-      display: grid;
-      grid-template-columns: 80px 1fr auto;
-      gap: 2rem;
-      align-items: center;
-      padding: 2.5rem 2rem;
+      gap: 6px;
       transition: background var(--tr);
       cursor: default
     }
 
-    .prog-item:hover {
+    .pathway:hover {
       background: var(--stone)
     }
 
-    .prog-level-badge {
-      width: 64px;
-      height: 64px;
+    .pathway-num {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--primary)
+    }
+
+    .pathway-name {
+      font-family: var(--ff-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.3
+    }
+
+    .pathway-desc {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    @media(max-width:720px) {
+      .pathways-grid {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:480px) {
+      .pathways-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* ══════════════════════
+       3. THE LEVELS (WHITE)
+       Five programmes plainly
+    ══════════════════════ */
+    .levels {
+      background: var(--white);
+      padding: var(--sp) 0;
+      border-top: 1px solid var(--stone-2)
+    }
+
+    .levels-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(2.5rem, 6vw, 6rem);
+      align-items: start;
+      margin-bottom: 3rem
+    }
+
+    .levels-label {
+      margin-bottom: 1.5rem
+    }
+
+    .levels-heading {
+      font-family: var(--ff-display);
+      font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      color: var(--ink);
+      margin-bottom: 1.25rem
+    }
+
+    .levels-heading em {
+      font-style: italic;
+      color: var(--primary)
+    }
+
+    .levels-body {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--muted)
+    }
+
+    .levels-note {
+      font-size: .9rem;
+      line-height: 1.75;
+      color: var(--muted-light);
+      margin-top: 1rem;
+      font-style: italic
+    }
+
+    .levels-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px
+    }
+
+    .level-item {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 1.5rem;
+      align-items: center;
+      padding: 1.75rem 1.5rem;
+      background: var(--stone);
+      border-left: 3px solid transparent;
+      transition: border-color .2s var(--tr), background .2s var(--tr)
+    }
+
+    .level-item:hover {
+      border-left-color: var(--primary);
+      background: var(--stone-2)
+    }
+
+    .level-badge {
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       border: 2px solid var(--primary-light);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 1px
+      gap: 1px;
+      flex-shrink: 0
     }
 
-    .prog-level-num {
+    .level-badge-num {
       font-family: var(--ff-display);
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: 800;
       color: var(--primary);
       line-height: 1
     }
 
-    .prog-level-label {
-      font-size: 9px;
+    .level-badge-label {
+      font-size: 8px;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: .06em;
       text-transform: uppercase;
-      color: var(--muted)
+      color: var(--muted-light)
     }
 
-    .prog-name {
+    .level-name {
       font-family: var(--ff-display);
-      font-size: 1.4rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: var(--ink-2);
-      margin-bottom: 6px
+      margin-bottom: 4px
     }
 
-    .prog-desc {
-      font-size: 0.875rem;
+    .level-desc {
+      font-size: 13.5px;
       color: var(--muted);
-      line-height: 1.6;
-      max-width: 60ch;
-      margin-bottom: 1rem
+      line-height: 1.55;
+      max-width: 50ch
     }
 
-    .prog-topics {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px
-    }
-
-    .prog-topic {
-      font-size: 11px;
-      font-weight: 500;
-      background: var(--stone);
-      color: var(--muted);
-      padding: 3px 10px;
-      border-radius: 2px
-    }
-
-    .prog-meta {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.5rem;
+    .level-duration {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted-light);
+      white-space: nowrap;
       text-align: right
     }
 
-    .prog-duration {
-      font-family: var(--ff-display);
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--ink-2)
+    .level-duration span {
+      display: block;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--muted-light);
+      margin-top: 2px
     }
 
-    .prog-dur-label {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em
+    @media(max-width:768px) {
+      .levels-header {
+        grid-template-columns: 1fr
+      }
+
+      .level-item {
+        grid-template-columns: 48px 1fr
+      }
+
+      .level-duration {
+        display: none
+      }
     }
 
-    .prog-action {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--primary);
-      margin-top: 0.5rem;
-      transition: gap var(--tr)
-    }
-
-    .prog-item:hover .prog-action {
-      gap: 10px
-    }
-
-    /* COMPETENCE */
-    .competence-section {
+    /* ══════════════════════
+       4. HOW IT WORKS (INK)
+       Four steps. Plain.
+    ══════════════════════ */
+    .process {
+      background: var(--ink-2);
       padding: var(--sp) 0;
-      background: var(--ink);
       position: relative;
       overflow: hidden
     }
 
-    .comp-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(3rem, 6vw, 5rem);
-      align-items: start;
-      margin-top: clamp(2rem, 4vw, 3.5rem)
+    .process-watermark {
+      position: absolute;
+      top: -5%;
+      left: -1%;
+      font-family: var(--ff-display);
+      font-size: clamp(100px, 16vw, 200px);
+      font-weight: 900;
+      color: rgba(255, 255, 255, .02);
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+      line-height: 1;
+      letter-spacing: -.02em
     }
 
-    .comp-levels {
-      display: flex;
-      flex-direction: column;
-      gap: 4px
+    .process-header {
+      max-width: 580px;
+      margin: 0 auto 3rem;
+      text-align: center;
+      position: relative;
+      z-index: 1
     }
 
-    .comp-level {
-      display: grid;
-      grid-template-columns: 48px 1fr auto;
-      gap: 1rem;
-      align-items: center;
-      padding: 1.25rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 4px;
-      transition: all var(--tr)
+    .process-label {
+      margin-bottom: 1.5rem;
+      justify-content: center
     }
 
-    .comp-level:hover {
-      background: rgba(175, 50, 54, 0.1)
+    .process-heading {
+      font-family: var(--ff-display);
+      font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      color: var(--white);
+      margin-bottom: 1rem
     }
 
-    .cl-num {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(175, 50, 54, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
+    .process-heading em {
+      font-style: italic;
       color: var(--primary)
     }
 
-    .cl-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.8)
-    }
-
-    .cl-role {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.35);
-      margin-top: 2px
-    }
-
-    .cl-prog {
-      font-size: 11px;
-      color: var(--primary);
-      font-weight: 600;
-      text-align: right;
-      white-space: nowrap
-    }
-
-    .comp-right-body {
+    .process-sub {
       font-size: 1rem;
-      color: rgba(255, 255, 255, 0.5);
       line-height: 1.8;
-      margin-bottom: 2rem
-    }
-
-    .orders-preview {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1px;
-      background: rgba(255, 255, 255, 0.05)
-    }
-
-    .order-item {
-      background: rgba(255, 255, 255, 0.02);
-      padding: 1rem;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.5);
-      transition: background var(--tr)
-    }
-
-    .order-item:hover {
-      background: rgba(175, 50, 54, 0.1);
-      color: rgba(255, 255, 255, 0.8)
-    }
-
-    /* PROCESS */
-    .process-section {
-      padding: var(--sp) 0;
-      background: var(--stone)
+      color: rgba(255, 255, 255, .4)
     }
 
     .process-steps {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1.5px;
-      background: var(--stone-2);
-      margin-top: clamp(2rem, 4vw, 3.5rem)
+      gap: 1px;
+      background: rgba(255, 255, 255, .05);
+      position: relative;
+      z-index: 1
     }
 
-    .ps {
-      background: var(--white);
+    .process-step {
+      background: var(--ink-2);
       padding: 2rem 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: .75rem;
       transition: background var(--tr)
     }
 
-    .ps:hover {
-      background: var(--stone)
+    .process-step:hover {
+      background: rgba(175, 50, 54, .06)
     }
 
     .ps-num {
-      font-family: var(--ff-display);
-      font-size: 3rem;
-      font-weight: 900;
-      color: var(--primary-light);
-      line-height: 1;
-      letter-spacing: -0.04em
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--primary)
     }
 
     .ps-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--ink-2)
+      font-family: var(--ff-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.3
     }
 
     .ps-desc {
-      font-size: 0.875rem;
-      color: var(--muted);
-      line-height: 1.65
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, .4)
     }
 
-    /* CTA */
-    .cta-section {
-      background: var(--primary);
-      padding: 5rem 0
-    }
-
-    .cta-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center
-    }
-
-    .cta-title {
-      font-family: var(--ff-display);
-      font-size: clamp(1.8rem, 4vw, 3rem);
-      font-weight: 800;
-      color: #fff;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
-      margin-bottom: 1rem
-    }
-
-    .cta-body {
-      font-size: 1rem;
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1.8
-    }
-
-    .cta-form {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem
-    }
-
-    .cta-input {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
-      padding: 12px 16px;
-      font-size: 14px;
-      color: #fff;
-      font-family: var(--ff-body);
-      width: 100%;
-      outline: none;
-      transition: border-color var(--tr)
-    }
-
-    .cta-input::placeholder {
-      color: rgba(255, 255, 255, 0.35)
-    }
-
-    .cta-input:focus {
-      border-color: rgba(255, 255, 255, 0.5)
-    }
-
-    .cta-submit {
-      width: 100%;
-      background: #fff;
-      color: var(--primary);
-      border: none;
-      border-radius: 4px;
-      padding: 14px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: var(--ff-body);
-      transition: all var(--tr)
-    }
-
-    .cta-submit:hover {
-      background: rgba(255, 255, 255, 0.9);
-      transform: translateY(-1px)
-    }
-
-    @media(max-width:1024px) {
-      .hero-grid {
-        grid-template-columns: 1fr
-      }
-
-      .levels-preview {
-        display: none
-      }
-
+    @media(max-width:720px) {
       .process-steps {
-        grid-template-columns: repeat(2, 1fr)
-      }
-
-      .footer-top {
         grid-template-columns: 1fr 1fr
-      }
-    }
-
-    @media(max-width:768px) {
-
-      .nav-links,
-      .nav-cta .btn-outline-w {
-        display: none
-      }
-
-      .nav-menu-btn {
-        display: flex
-      }
-
-      .induction-grid,
-      .comp-grid,
-      .cta-inner {
-        grid-template-columns: 1fr
-      }
-
-      .prog-item {
-        grid-template-columns: auto 1fr;
-        grid-template-rows: auto auto
-      }
-
-      .prog-meta {
-        grid-column: 2;
-        align-items: flex-start;
-        text-align: left
-      }
-
-      .footer-top {
-        grid-template-columns: 1fr;
-        gap: 2rem
       }
     }
 
@@ -624,530 +461,548 @@
       .process-steps {
         grid-template-columns: 1fr
       }
+    }
 
-      .pathway-cards {
-        grid-template-columns: 1fr
-      }
+    /* ══════════════════════
+       5. NEXT STEP (STONE)
+       Platform teaser
+    ══════════════════════ */
+    .next {
+      background: var(--stone);
+      padding: var(--sp) 0;
+      border-top: 1px solid var(--stone-2)
+    }
 
-      .orders-preview {
+    .next-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(2.5rem, 6vw, 6rem);
+      align-items: center
+    }
+
+    .next-label {
+      margin-bottom: 1.5rem
+    }
+
+    .next-heading {
+      font-family: var(--ff-display);
+      font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      color: var(--ink);
+      margin-bottom: 1.25rem
+    }
+
+    .next-heading em {
+      font-style: italic;
+      color: var(--primary)
+    }
+
+    .next-body {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--muted);
+      margin-bottom: 2rem
+    }
+
+    .next-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem
+    }
+
+    .next-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1px
+    }
+
+    .next-item {
+      background: var(--white);
+      border-left: 3px solid transparent;
+      padding: 1.2rem 1.5rem;
+      transition: border-color .2s var(--tr)
+    }
+
+    .next-item:hover {
+      border-left-color: var(--primary)
+    }
+
+    .next-item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 3px
+    }
+
+    .next-item-desc {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.5
+    }
+
+    @media(max-width:768px) {
+      .next-inner {
         grid-template-columns: 1fr
       }
     }
-    </style>
-  <script type="module" crossorigin src="/assets/main-Dx356a-_.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/main-g7rPdZEw.css">
+
+    /* FOOTER */
+    .site-footer {
+      background: var(--ink-2);
+      border-top: 1px solid rgba(255, 255, 255, .05);
+      padding: 3rem 0 2rem
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem
+    }
+
+    .footer-tagline {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .3);
+      line-height: 1.65;
+      max-width: 240px;
+      margin-top: 10px
+    }
+
+    .footer-col-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .3);
+      margin-bottom: 12px
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .45);
+      transition: color var(--tr)
+    }
+
+    .footer-links a:hover {
+      color: rgba(255, 255, 255, .85)
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, .05);
+      padding-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem
+    }
+
+    .footer-legal {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .2)
+    }
+
+    .footer-domain {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary)
+    }
+  </style>
 </head>
 
 <body>
-  <nav class="site-nav" id="siteNav" data-always-dark>
+
+  <!-- NAV -->
+  <nav class="site-nav" aria-label="Main navigation">
     <div class="container">
       <div class="nav-inner">
-        <a href="index.html" class="nav-logo"><svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg">
-            <polygon fill="#fff" fill-rule="evenodd"
-              points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42" />
-            <path fill="#fff" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z" />
-            <path fill="#fff"
-              d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z" />
-            <path fill="#fff"
-              d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z" />
-          </svg></a>
+        <a href="/" aria-label="Ichebo Christian Services">
+          <img src="/logo.svg" alt="Ichebo Christian Services" style="height:30px;width:auto">
+        </a>
         <ul class="nav-links">
-          <li><a href="programme.html">The Programme</a></li>
-          <li><a href="find-a-church.html">Find a Community</a></li>
-          <li><a href="training.html" class="active">Training</a></li>
-          <li><a href="watch.html">Watch</a></li>
-          <li><a href="platform.html">Platform</a></li>
+          <li><a href="/programme">Programme</a></li>
+          <li><a href="/platform">Platform</a></li>
+          <li><a href="/training" class="active">Formation</a></li>
+          <li><a href="/about">About</a></li>
         </ul>
-        <div class="nav-cta"><a href="contact.html" class="btn btn-outline-w"
-            style="padding:10px 20px;font-size:13px">Get in Touch</a><button
-            class="nav-menu-btn material-symbols-outlined" id="menuBtn">menu</button></div>
+        <a href="/#waitlist" class="nav-join">Join the Waiting List</a>
+        <button class="nav-menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
       </div>
     </div>
   </nav>
-  <button class="close-btn material-symbols-outlined" id="closeBtn">close</button>
+
+  <button class="nav-close-btn" id="closeBtn" aria-label="Close menu">✕</button>
   <nav class="mobile-nav" id="mobileNav" aria-hidden="true">
-    <a href="programme.html">The Programme <span class="material-symbols-outlined"
-        style="font-size:18px">chevron_right</span></a>
-    <a href="find-a-church.html">Find a Community <span class="material-symbols-outlined"
-        style="font-size:18px">chevron_right</span></a>
-    <a href="training.html">Get Training <span class="material-symbols-outlined"
-        style="font-size:18px">chevron_right</span></a>
-    <a href="watch.html">Watch <span class="material-symbols-outlined" style="font-size:18px">chevron_right</span></a>
-    <a href="platform.html">Platform <span class="material-symbols-outlined"
-        style="font-size:18px">chevron_right</span></a>
-    <div style="margin-top:2rem"><a href="contact.html" class="btn btn-primary"
-        style="width:100%;justify-content:center">Get in Touch</a></div>
+    <a href="/programme">Programme</a>
+    <a href="/platform">Platform</a>
+    <a href="/training">Formation</a>
+    <a href="/about">About</a>
+    <a href="/#waitlist" class="mobile-join">Join the Waiting List</a>
   </nav>
 
-  <section class="hero">
+  <!-- ══════════════════════
+       1. HERO
+  ══════════════════════ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-watermark" aria-hidden="true">FORMATION</div>
     <div class="container">
-      <div class="hero-grid">
+      <div class="hero-crumb">
+        <a href="/">Home</a>
+        <span class="hero-crumb-sep">→</span>
+        <a href="/programme">Programme</a>
+        <span class="hero-crumb-sep">→</span>
+        <span>Formation</span>
+      </div>
+      <div class="hero-inner">
+        <div class="hero-eyebrow fade-up">
+          <span class="label-tag label-tag--light">Formation</span>
+        </div>
+        <h1 class="hero-headline fade-up" id="hero-heading" style="transition-delay:.1s">
+          Everyone who joins<br>
+          deserves a <em>clear path.</em>
+        </h1>
+        <p class="hero-sub fade-up" style="transition-delay:.2s">
+          Formation is not a classroom programme. It is the journey every person walks inside a Sceptre Community — from
+          the moment they arrive to the moment they lead others.
+          <br><br>
+          <strong>Structured. Intentional. Built around the life of the community itself.</strong>
+        </p>
+        <div class="hero-actions fade-up" style="transition-delay:.3s">
+          <a href="#how" class="btn btn-primary">
+            How It Works
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+          <a href="/programme" class="btn btn-outline-w">Back to the Programme</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════
+       2. THE JOURNEY (STONE)
+  ══════════════════════ -->
+  <section class="journey" aria-labelledby="journey-heading">
+    <div class="container">
+      <div class="journey-header">
+        <div class="journey-label fade-up">
+          <span class="label-tag">The Eight Pathways</span>
+        </div>
+        <h2 class="journey-heading fade-up" id="journey-heading" style="transition-delay:.1s">
+          Growth is not just<br>one <em>dimension.</em>
+        </h2>
+        <p class="journey-sub fade-up" style="transition-delay:.15s">
+          Formation in a Sceptre Community develops a person in eight interconnected areas — so that growth is whole,
+          not just spiritual knowledge. Every person touches each pathway at every stage of their journey.
+        </p>
+      </div>
+      <div class="pathways-grid">
+        <div class="pathway fade-up" style="transition-delay:.03s">
+          <div class="pathway-num">01</div>
+          <div class="pathway-name">New Life</div>
+          <div class="pathway-desc">Arriving, belonging, and beginning. The first steps of a life lived as part of a
+            community with purpose.</div>
+        </div>
+        <div class="pathway fade-up" style="transition-delay:.06s">
+          <div class="pathway-num">02</div>
+          <div class="pathway-name">Spiritual Formation</div>
+          <div class="pathway-desc">Inner transformation. Prayer, Scripture, spiritual disciplines, and the development
+            of character over time.</div>
+        </div>
+        <div class="pathway fade-up" style="transition-delay:.09s">
+          <div class="pathway-num">03</div>
+          <div class="pathway-name">Community Life</div>
+          <div class="pathway-desc">Learning to live with others. Accountability, shared values, and what it means to
+            genuinely belong.</div>
+        </div>
+        <div class="pathway fade-up" style="transition-delay:.12s">
+          <div class="pathway-num">04</div>
+          <div class="pathway-name">Service</div>
+          <div class="pathway-desc">Discovering gifts and beginning to contribute. Finding where your particular shape
+            fits the work of the community.</div>
+        </div>
+        <div class="pathway fade-up" style="transition-delay:.15s">
+          <div class="pathway-num">05</div>
+          <div class="pathway-name">Leadership</div>
+          <div class="pathway-desc">Taking responsibility for others. Learning to carry people, make decisions, and hold
+            the community's direction.</div>
+        </div>
+        <div class="pathway fade-up" style="transition-delay:.18s">
+          <div class="pathway-num">06</div>
+          <div class="pathway-name">Learning</div>
+          <div class="pathway-desc">Structured development through the qualification programmes. Knowledge that is
+            applied, not just acquired.</div>
+        </div>
+        <div class="pathway fade-up" style="transition-delay:.21s">
+          <div class="pathway-num">07</div>
+          <div class="pathway-name">Mission</div>
+          <div class="pathway-desc">Carrying the community's calling outward. Engagement with the neighbourhood, the
+            workplace, the street outside the door.</div>
+        </div>
+        <div class="pathway fade-up" style="transition-delay:.24s">
+          <div class="pathway-num">08</div>
+          <div class="pathway-name">Stewardship</div>
+          <div class="pathway-desc">Oversight and governance. Caring for the structures and people that make the
+            community able to sustain and multiply.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════
+       3. THE LEVELS (WHITE)
+  ══════════════════════ -->
+  <section class="levels" aria-labelledby="levels-heading">
+    <div class="container">
+      <div class="levels-header">
         <div>
-          <div class="label-tag label-w" style="margin-bottom:1rem">Formation &amp; Training</div>
-          <h1>Formed before<br><em>deployed.</em></h1>
-          <p class="hero-sub">Five qualification programmes — Certificate to Doctorate. Eight Kingdom Pathways.
-            Twenty-four Orders of service. Formation that is structured, progressive, and aligned with the full scope of
-            the Kingdom Governance System.</p>
-          <div class="hero-actions">
-            <a href="#programmes" class="btn btn-primary">View All Programmes <span class="material-symbols-outlined"
-                style="font-size:18px">arrow_downward</span></a>
-            <a href="contact.html?ref=training" class="btn btn-outline-w">Enrol Now</a>
+          <div class="levels-label fade-up">
+            <span class="label-tag">The Qualification Programmes</span>
           </div>
-        </div>
-        <div class="levels-preview">
-          <div class="lp-item">
-            <div class="lp-badge">Level 1</div>
-            <div class="lp-name">Certificate of Kingdom Studies</div>
-            <div class="lp-dur">1 year</div>
-          </div>
-          <div class="lp-item">
-            <div class="lp-badge">Level 2</div>
-            <div class="lp-name">Diploma in Kingdom Service</div>
-            <div class="lp-dur">3 years</div>
-          </div>
-          <div class="lp-item">
-            <div class="lp-badge">Level 3</div>
-            <div class="lp-name">Degree in Kingdom Ministry</div>
-            <div class="lp-dur">4 years</div>
-          </div>
-          <div class="lp-item">
-            <div class="lp-badge">Level 4</div>
-            <div class="lp-name">Masters in Kingdom Leadership</div>
-            <div class="lp-dur">4–5 years</div>
-          </div>
-          <div class="lp-item">
-            <div class="lp-badge">Level 5</div>
-            <div class="lp-name">Doctorate in Apostolic Governance</div>
-            <div class="lp-dur">7 years</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="page-nav">
-    <div class="container">
-      <div class="page-nav-inner">
-        <a href="#induction" class="pnl">Induction</a>
-        <a href="#programmes" class="pnl">5 Programmes</a>
-        <a href="#competence" class="pnl">Competence Levels</a>
-        <a href="#orders" class="pnl">24 Service Orders</a>
-        <a href="#process" class="pnl">How to Enrol</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- INDUCTION -->
-  <section id="induction" class="induction-section">
-    <div class="container">
-      <div class="induction-grid">
-        <div class="fade-up">
-          <div class="label-tag" style="margin-bottom:1.25rem">Where It All Begins</div>
-          <h2
-            style="font-family:var(--ff-display);font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;line-height:1.12;letter-spacing:-0.02em;color:var(--ink);margin-bottom:1.25rem">
-            The Induction — your first 12 weeks.</h2>
-          <p class="induction-body">Before any qualification programme begins, every new member completes the Induction.
-            This is not an orientation paperwork exercise — it is a structured 12-week formation stage that discovers
-            your giftings, aligns you with the governance framework, and places you in the right community and pathway.
+          <h2 class="levels-heading fade-up" id="levels-heading" style="transition-delay:.1s">
+            Five levels.<br>
+            One <em>continuous</em> journey.
+          </h2>
+          <p class="levels-body fade-up" style="transition-delay:.15s">
+            Formation progresses through five levels — each building on the last. Movement from one level to the next is
+            confirmed by a steward, not just measured by time. Progression is tied to genuine growth, not attendance.
           </p>
-          <p class="induction-body">Two pathways into Induction: the <strong>Reconditioning Programme</strong> for
-            existing believers re-engaging with structured formation, and the <strong>Beginners Programme</strong> for
-            those new to the Kingdom life. Both lead to the <strong>Community Programme</strong> — the Inner Court of
-            the Induction — before placement into a permanent Sceptre Community.</p>
-          <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem">
-            <a href="find-a-church.html" class="btn btn-primary">Find a Community <span
-                class="material-symbols-outlined" style="font-size:18px">arrow_forward</span></a>
-            <a href="contact.html?ref=induction" class="btn btn-outline-d">Begin Induction</a>
-          </div>
+          <p class="levels-note fade-up" style="transition-delay:.2s">
+            All formation begins with a 12-week Induction — regardless of where a person comes from or what they already
+            know. This is not remedial. It is the foundation everything else rests on.
+          </p>
         </div>
-        <div class="fade-up" style="transition-delay:0.15s">
-          <div
-            style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">
-            The 8 Kingdom Pathways</div>
-          <div class="pathway-cards">
-            <div class="pc"><span class="pc-icon material-symbols-outlined">favorite</span>
-              <div>
-                <div class="pc-name">New Life</div>
-                <div class="pc-desc">Salvation, identity, foundational faith</div>
-              </div>
-            </div>
-            <div class="pc"><span class="pc-icon material-symbols-outlined">self_improvement</span>
-              <div>
-                <div class="pc-name">Spiritual Formation</div>
-                <div class="pc-desc">Inner transformation, spiritual maturity</div>
-              </div>
-            </div>
-            <div class="pc"><span class="pc-icon material-symbols-outlined">groups</span>
-              <div>
-                <div class="pc-name">Community Life</div>
-                <div class="pc-desc">Belonging, relational integration</div>
-              </div>
-            </div>
-            <div class="pc"><span class="pc-icon material-symbols-outlined">construction</span>
-              <div>
-                <div class="pc-name">Service</div>
-                <div class="pc-desc">Activation into Kingdom function</div>
-              </div>
-            </div>
-            <div class="pc"><span class="pc-icon material-symbols-outlined">workspace_premium</span>
-              <div>
-                <div class="pc-name">Leadership</div>
-                <div class="pc-desc">Readiness, responsibility, governance</div>
-              </div>
-            </div>
-            <div class="pc"><span class="pc-icon material-symbols-outlined">school</span>
-              <div>
-                <div class="pc-name">Learning &amp; Qualification</div>
-                <div class="pc-desc">Structured education, certification</div>
-              </div>
-            </div>
-            <div class="pc"><span class="pc-icon material-symbols-outlined">travel_explore</span>
-              <div>
-                <div class="pc-name">Mission</div>
-                <div class="pc-desc">Outward expression, expansion</div>
-              </div>
-            </div>
-            <div class="pc"><span class="pc-icon material-symbols-outlined">gavel</span>
-              <div>
-                <div class="pc-name">Apostolic Stewardship</div>
-                <div class="pc-desc">Oversight, governance, system leadership</div>
-              </div>
-            </div>
+        <div class="fade-up" style="transition-delay:.1s;align-self:center">
+          <p style="font-size:.95rem;line-height:1.85;color:var(--muted)">Each programme develops a person across all
+            eight pathways — so that qualification is not just a measure of knowledge, but of who the person is becoming
+            inside their community.</p>
+        </div>
+      </div>
+      <div class="levels-list">
+        <div class="level-item fade-up" style="transition-delay:.05s">
+          <div class="level-badge">
+            <div class="level-badge-num">1</div>
+            <div class="level-badge-label">Cert</div>
           </div>
+          <div>
+            <div class="level-name">Certificate</div>
+            <div class="level-desc">The first year of formation. Foundation in faith, community life, service, and
+              personal stewardship. Every member begins here.</div>
+          </div>
+          <div class="level-duration">Year 1<span>Foundation</span></div>
+        </div>
+        <div class="level-item fade-up" style="transition-delay:.1s">
+          <div class="level-badge">
+            <div class="level-badge-num">2</div>
+            <div class="level-badge-label">Dip</div>
+          </div>
+          <div>
+            <div class="level-name">Diploma</div>
+            <div class="level-desc">Deepening discipleship and beginning to carry responsibility for others. Leadership
+              principles and service domain placement.</div>
+          </div>
+          <div class="level-duration">Year 2<span>Development</span></div>
+        </div>
+        <div class="level-item fade-up" style="transition-delay:.15s">
+          <div class="level-badge">
+            <div class="level-badge-num">3</div>
+            <div class="level-badge-label">Deg</div>
+          </div>
+          <div>
+            <div class="level-name">Degree</div>
+            <div class="level-desc">Practitioner-level formation. Community governance, mission practice, and developing
+              others through their own formation journey.</div>
+          </div>
+          <div class="level-duration">Years 3–4<span>Practice</span></div>
+        </div>
+        <div class="level-item fade-up" style="transition-delay:.2s">
+          <div class="level-badge">
+            <div class="level-badge-num">4</div>
+            <div class="level-badge-label">Mas</div>
+          </div>
+          <div>
+            <div class="level-name">Masters</div>
+            <div class="level-desc">Strategic formation and oversight. Prepared to carry governance responsibility and
+              guide others at the level of the wider network.</div>
+          </div>
+          <div class="level-duration">Years 5–6<span>Oversight</span></div>
+        </div>
+        <div class="level-item fade-up" style="transition-delay:.25s">
+          <div class="level-badge">
+            <div class="level-badge-num">5</div>
+            <div class="level-badge-label">Doc</div>
+          </div>
+          <div>
+            <div class="level-name">Doctorate</div>
+            <div class="level-desc">Apostolic-level stewardship. Guiding the formation and governance of the movement at
+              institutional and generational scale.</div>
+          </div>
+          <div class="level-duration">Year 7<span>Stewardship</span></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PROGRAMMES -->
-  <section id="programmes" class="programmes-section">
+  <!-- ══════════════════════
+       4. HOW IT WORKS (INK)
+  ══════════════════════ -->
+  <section class="process" id="how" aria-labelledby="process-heading">
+    <div class="process-watermark" aria-hidden="true">BEGIN</div>
     <div class="container">
-      <div class="fade-up" style="max-width:52ch">
-        <div class="label-tag" style="margin-bottom:0.75rem">Five Qualification Programmes</div>
-        <h2
-          style="font-family:var(--ff-display);font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;line-height:1.12;letter-spacing:-0.02em;color:var(--ink)">
-          From Certificate to Doctorate.<br>A complete formation arc.</h2>
-        <p style="font-size:1rem;color:var(--muted);line-height:1.8;margin-top:1rem">Each programme is aligned with a
-          competence level, a Kingdom Pathway, and a set of Service Orders. Formation is progressive — not just
-          credential accumulation, but a deepening of identity, responsibility, and governance capacity.</p>
+      <div class="process-header fade-up">
+        <div class="process-label">
+          <span class="label-tag label-tag--light">How It Works</span>
+        </div>
+        <h2 class="process-heading" id="process-heading" style="margin-top:1rem">
+          From arrival to <em>advancement.</em>
+        </h2>
+        <p class="process-sub" style="margin-top:1rem">
+          Formation is not self-directed. Every step is accompanied — by your community, your steward, and the structure
+          of the programme itself.
+        </p>
       </div>
-      <div class="programme-list fade-up" style="transition-delay:0.1s">
-        <div class="prog-item" id="certificate">
-          <div class="prog-level-badge">
-            <div class="prog-level-num">1</div>
-            <div class="prog-level-label">Level</div>
-          </div>
-          <div>
-            <div class="prog-name">Certificate of Kingdom Studies</div>
-            <p class="prog-desc">Foundational formation. Establishes identity in Christ, introduces the governance
-              framework, and prepares the disciple for active community participation and initial service roles.</p>
-            <div class="prog-topics"><span class="prog-topic">Kingdom Mandate</span><span class="prog-topic">New Life
-                Pathway</span><span class="prog-topic">Community Foundations</span><span class="prog-topic">Introduction
-                to Service</span><span class="prog-topic">Governance Orientation</span></div>
-          </div>
-          <div class="prog-meta">
-            <div class="prog-duration">1 Year</div>
-            <div class="prog-dur-label">Duration</div><a href="contact.html?ref=certificate" class="prog-action">Enrol
-              <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></a>
-          </div>
+      <div class="process-steps">
+        <div class="process-step fade-up" style="transition-delay:.05s">
+          <div class="ps-num">Step 01</div>
+          <div class="ps-name">Begin with Induction</div>
+          <div class="ps-desc">Twelve weeks inside a Sceptre Community. Not a classroom — a lived experience of
+            community life, with structured reflection alongside it.</div>
         </div>
-        <div class="prog-item" id="diploma">
-          <div class="prog-level-badge">
-            <div class="prog-level-num">2</div>
-            <div class="prog-level-label">Level</div>
-          </div>
-          <div>
-            <div class="prog-name">Diploma in Kingdom Service</div>
-            <p class="prog-desc">Developing servant-leaders with practical ministry competence. Deepens theological
-              grounding, activates service within the 24 Orders, and introduces leadership responsibilities within the
-              Sceptre Community structure.</p>
-            <div class="prog-topics"><span class="prog-topic">Service Pathway</span><span class="prog-topic">Ministry
-                Competence</span><span class="prog-topic">Leadership Principles</span><span class="prog-topic">Community
-                Governance</span><span class="prog-topic">Formation Facilitation</span></div>
-          </div>
-          <div class="prog-meta">
-            <div class="prog-duration">3 Years</div>
-            <div class="prog-dur-label">Duration</div><a href="contact.html?ref=diploma" class="prog-action">Enrol <span
-                class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></a>
-          </div>
+        <div class="process-step fade-up" style="transition-delay:.1s">
+          <div class="ps-num">Step 02</div>
+          <div class="ps-name">Understand your shape</div>
+          <div class="ps-desc">During Induction, a gifting assessment maps your spiritual gifts, natural abilities, and
+            vocational skills — and places you on the right pathway.</div>
         </div>
-        <div class="prog-item" id="degree">
-          <div class="prog-level-badge">
-            <div class="prog-level-num">3</div>
-            <div class="prog-level-label">Level</div>
-          </div>
-          <div>
-            <div class="prog-name">Degree in Kingdom Ministry</div>
-            <p class="prog-desc">Functional ministry leadership and community coordination. Prepares leaders to govern
-              Sceptre Communities, coordinate Church Collectives, and steward formation pipelines within their sphere of
-              authority.</p>
-            <div class="prog-topics"><span class="prog-topic">Leadership Pathway</span><span
-                class="prog-topic">Community Coordination</span><span class="prog-topic">Governance
-                Architecture</span><span class="prog-topic">Mission Strategy</span><span class="prog-topic">Formation
-                Systems</span></div>
-          </div>
-          <div class="prog-meta">
-            <div class="prog-duration">4 Years</div>
-            <div class="prog-dur-label">Duration</div><a href="contact.html?ref=degree" class="prog-action">Enrol <span
-                class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></a>
-          </div>
+        <div class="process-step fade-up" style="transition-delay:.15s">
+          <div class="ps-num">Step 03</div>
+          <div class="ps-name">Enter the Certificate</div>
+          <div class="ps-desc">Your steward confirms placement and enrolment begins. The Ichebo Platform carries your
+            formation record and tracks your progress through the programme.</div>
         </div>
-        <div class="prog-item">
-          <div class="prog-level-badge">
-            <div class="prog-level-num">4</div>
-            <div class="prog-level-label">Level</div>
-          </div>
-          <div>
-            <div class="prog-name">Masters in Kingdom Leadership</div>
-            <p class="prog-desc">Strategic leadership formation and governance oversight. Equips leaders for district
-              and regional responsibility, multi-community oversight, and the stewardship of structures, resources, and
-              formation systems at scale.</p>
-            <div class="prog-topics"><span class="prog-topic">Strategic Leadership</span><span
-                class="prog-topic">Network Governance</span><span class="prog-topic">Apostolic Stewardship
-                Path</span><span class="prog-topic">Organisational Development</span><span class="prog-topic">7-Pillar
-                Architecture</span></div>
-          </div>
-          <div class="prog-meta">
-            <div class="prog-duration">4–5 Years</div>
-            <div class="prog-dur-label">Duration</div><a href="contact.html?ref=masters" class="prog-action">Enrol <span
-                class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></a>
-          </div>
-        </div>
-        <div class="prog-item">
-          <div class="prog-level-badge">
-            <div class="prog-level-num">5</div>
-            <div class="prog-level-label">Level</div>
-          </div>
-          <div>
-            <div class="prog-name">Doctorate in Apostolic Governance</div>
-            <p class="prog-desc">The highest formation tier. Prepares apostolic stewards for system-level oversight,
-              governance architecture, and the stewardship of the Kingdom Governance System across regions and
-              generations. Content authorship and framework development at this level.</p>
-            <div class="prog-topics"><span class="prog-topic">Apostolic Governance</span><span class="prog-topic">System
-                Architecture</span><span class="prog-topic">Generational Stewardship</span><span
-                class="prog-topic">Cross-regional Leadership</span><span class="prog-topic">KGS Framework
-                Development</span></div>
-          </div>
-          <div class="prog-meta">
-            <div class="prog-duration">7 Years</div>
-            <div class="prog-dur-label">Duration</div><a href="contact.html?ref=doctorate" class="prog-action">Enrol
-              <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></a>
-          </div>
+        <div class="process-step fade-up" style="transition-delay:.2s">
+          <div class="ps-num">Step 04</div>
+          <div class="ps-name">Advance when ready</div>
+          <div class="ps-desc">Progression to each new level is confirmed by a steward — not just by time. Growth is
+            measured, not assumed. Each level builds on what was genuinely formed in the last.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- COMPETENCE + ORDERS -->
-  <section id="competence" class="competence-section">
+  <!-- ══════════════════════
+       5. NEXT STEP (STONE)
+  ══════════════════════ -->
+  <section class="next" aria-labelledby="next-heading">
     <div class="container">
-      <div class="comp-grid">
-        <div class="fade-up">
-          <div class="label-tag label-w" style="margin-bottom:1.25rem">Competence &amp; Roles Framework</div>
-          <h2
-            style="font-family:var(--ff-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;letter-spacing:-0.02em;color:#fff;margin-bottom:1.25rem">
-            Leadership earned through competence and formation.</h2>
-          <div class="comp-levels">
-            <div class="comp-level">
-              <div class="cl-num">1</div>
-              <div>
-                <div class="cl-name">Foundational Disciple</div>
-                <div class="cl-role">Member / Disciple</div>
-              </div>
-              <div class="cl-prog">Certificate</div>
-            </div>
-            <div class="comp-level">
-              <div class="cl-num">2</div>
-              <div>
-                <div class="cl-name">Active Contributor</div>
-                <div class="cl-role">Servant / Minister-in-Training</div>
-              </div>
-              <div class="cl-prog">Diploma</div>
-            </div>
-            <div class="comp-level">
-              <div class="cl-num">3</div>
-              <div>
-                <div class="cl-name">Functional Minister</div>
-                <div class="cl-role">Community Coordinator</div>
-              </div>
-              <div class="cl-prog">Degree</div>
-            </div>
-            <div class="comp-level">
-              <div class="cl-num">4</div>
-              <div>
-                <div class="cl-name">Leader</div>
-                <div class="cl-role">Senior Steward / District Level</div>
-              </div>
-              <div class="cl-prog">Masters</div>
-            </div>
-            <div class="comp-level">
-              <div class="cl-num">5</div>
-              <div>
-                <div class="cl-name">Apostolic Steward</div>
-                <div class="cl-role">Architect / Global Leadership</div>
-              </div>
-              <div class="cl-prog">Doctorate</div>
-            </div>
+      <div class="next-inner">
+        <div>
+          <div class="next-label fade-up">
+            <span class="label-tag">The Tool Behind It</span>
+          </div>
+          <h2 class="next-heading fade-up" id="next-heading" style="transition-delay:.1s">
+            Formation needs<br>
+            <em>infrastructure</em> to sustain it.
+          </h2>
+          <p class="next-body fade-up" style="transition-delay:.15s">
+            The Ichebo Platform carries the formation record of every person inside every Sceptre Community — tracking
+            progress, supporting steward confirmation, and connecting each community to the wider network. It is what
+            makes formation manageable at any scale.
+          </p>
+          <div class="next-actions fade-up" style="transition-delay:.2s">
+            <a href="/platform" class="btn btn-primary">
+              See the Platform
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+            <a href="/#waitlist" class="btn btn-outline-d">Join the Waiting List</a>
           </div>
         </div>
-        <div class="fade-up" style="transition-delay:0.15s" id="orders">
-          <div class="label-tag label-w" style="margin-bottom:1.25rem">24 Orders of Kingdom Service</div>
-          <p class="comp-right-body">Every disciple finds their function within one of 24 Orders of Kingdom Service,
-            distributed across six Service Domains. Service Orders are not titles — they are assignments that align
-            calling with function within the movement.</p>
-          <div class="orders-preview">
-            <div class="order-item">Order of Apostolic Service</div>
-            <div class="order-item">Order of Prophetic Ministry</div>
-            <div class="order-item">Order of Teaching &amp; Doctrine</div>
-            <div class="order-item">Order of Prayer &amp; Intercession</div>
-            <div class="order-item">Order of Governance Support</div>
-            <div class="order-item">Order of Strategic Coordination</div>
-            <div class="order-item">Order of Leadership Assistance</div>
-            <div class="order-item">Order of Communication</div>
-            <div class="order-item">Order of Discipleship Facilitation</div>
-            <div class="order-item">Order of Training &amp; Instruction</div>
-            <div class="order-item">Order of Mentorship &amp; Coaching</div>
-            <div class="order-item">Order of Curriculum Development</div>
-            <div class="order-item">Order of Evangelism</div>
-            <div class="order-item">Order of Mission Teams</div>
-            <div class="order-item">Order of Community Outreach</div>
-            <div class="order-item">Order of Expansion &amp; Planting</div>
-            <div class="order-item">Order of Pastoral Care</div>
-            <div class="order-item">Order of Community Building</div>
-            <div class="order-item">Order of Hospitality &amp; Welcome</div>
-            <div class="order-item">Order of Welfare &amp; Support</div>
-            <div class="order-item">Order of Administration</div>
-            <div class="order-item">Order of Resource Management</div>
-            <div class="order-item">Order of Logistics &amp; Events</div>
-            <div class="order-item">Order of Media &amp; Communication</div>
+        <div class="next-right">
+          <div class="next-item fade-up" style="transition-delay:.05s">
+            <div class="next-item-name">Formation records for every person</div>
+            <div class="next-item-desc">Every member's journey tracked — pathway progress, steward notes, programme
+              stage</div>
+          </div>
+          <div class="next-item fade-up" style="transition-delay:.1s">
+            <div class="next-item-name">Steward confirmation built in</div>
+            <div class="next-item-desc">Advancement is confirmed through the platform — no external system needed</div>
+          </div>
+          <div class="next-item fade-up" style="transition-delay:.15s">
+            <div class="next-item-name">Connected to the network</div>
+            <div class="next-item-desc">Your community's formation data connects to the wider movement — not siloed
+              locally</div>
+          </div>
+          <div class="next-item fade-up" style="transition-delay:.2s">
+            <div class="next-item-name">Works offline</div>
+            <div class="next-item-desc">The Ichebo Desktop app operates without an internet connection — syncing when
+              available</div>
+          </div>
+          <div class="next-item fade-up" style="transition-delay:.25s">
+            <div class="next-item-name">Available on every device</div>
+            <div class="next-item-desc">Web, mobile, and desktop — the platform meets people where they are</div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PROCESS -->
-  <section id="process" class="process-section">
-    <div class="container">
-      <div class="fade-up" style="max-width:52ch;margin-bottom:0">
-        <div class="label-tag" style="margin-bottom:0.75rem">How to Enrol</div>
-        <h2
-          style="font-family:var(--ff-display);font-size:clamp(2rem,4.5vw,3.2rem);font-weight:800;line-height:1.12;letter-spacing:-0.02em;color:var(--ink)">
-          Four steps to begin your formation journey.</h2>
-      </div>
-      <div class="process-steps fade-up" style="transition-delay:0.1s">
-        <div class="ps">
-          <div class="ps-num">01</div>
-          <div class="ps-name">Complete Induction</div>
-          <div class="ps-desc">All formation begins with the 12-week Induction. Find or join a Sceptre Community and
-            begin the Reconditioning or Beginners programme.</div>
-        </div>
-        <div class="ps">
-          <div class="ps-num">02</div>
-          <div class="ps-name">Gifting Assessment</div>
-          <div class="ps-desc">During Induction weeks 5–8, complete the gifting assessment. This maps your spiritual
-            gifts, natural abilities, and vocational skills to a Kingdom Pathway and Service Order.</div>
-        </div>
-        <div class="ps">
-          <div class="ps-num">03</div>
-          <div class="ps-name">Placement &amp; Enrolment</div>
-          <div class="ps-desc">Your Induction Coordinator places you in a permanent Sceptre Community and recommends
-            your Certificate enrolment. Access the Ichebo Platform to begin.</div>
-        </div>
-        <div class="ps">
-          <div class="ps-num">04</div>
-          <div class="ps-name">Progress Through the Arc</div>
-          <div class="ps-desc">Each programme builds on the last. Advancement requires steward confirmation at each
-            level — ensuring progression is tied to genuine formation, not just time served.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <section class="cta-section">
-    <div class="container">
-      <div class="cta-inner">
-        <div class="fade-up">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem">
-            <div style="width:20px;height:2px;background:rgba(255,255,255,0.4)"></div><span
-              style="font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.5)">Begin
-              Your Formation</span>
-          </div>
-          <h2 class="cta-title">Ready to begin the Certificate programme?</h2>
-          <p class="cta-body">Enrolment begins with Induction. Tell us where you are and which programme interests you,
-            and we will connect you with the right community and coordinator to begin.</p>
-        </div>
-        <div class="cta-form fade-up" style="transition-delay:0.15s">
-          <input type="text" class="cta-input" placeholder="Your name">
-          <input type="email" class="cta-input" placeholder="Email address">
-          <select class="cta-input">
-            <option value="" disabled selected>Programme of interest</option>
-            <option>Certificate (Level 1)</option>
-            <option>Diploma (Level 2)</option>
-            <option>Degree (Level 3)</option>
-            <option>Masters (Level 4)</option>
-            <option>Doctorate (Level 5)</option>
-            <option>Not sure — help me decide</option>
-          </select>
-          <input type="text" class="cta-input" placeholder="Your city / country">
-          <button class="cta-submit">Request Enrolment Information</button>
-          <p style="font-size:11px;color:rgba(255,255,255,0.35);text-align:center">We'll respond within 48 hours with
-            next steps and your local community contact.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
+  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="container">
       <div class="footer-top">
-        <div class="footer-brand">
-          <div class="footer-logo"><svg viewBox="0 0 2559.19 1322.58" xmlns="http://www.w3.org/2000/svg">
-              <polygon fill="#fff" fill-rule="evenodd"
-                points="285.83 342.42 285.83 371.26 285.83 406.42 285.83 576.15 285.83 678.38 285.83 998.04 169.73 911.87 169.73 576.15 250.08 576.15 250.08 406.42 0 406.42 0 997.27 370.69 1272.4 741.38 997.27 741.38 406.42 491.31 406.42 491.31 576.15 571.65 576.15 571.65 911.87 455.56 998.04 455.56 678.38 455.56 576.15 455.56 406.42 455.56 371.26 455.56 342.42 649.2 342.42 649.2 172.69 455.56 172.69 455.56 50.17 285.83 50.17 285.83 172.69 92.18 172.69 92.18 342.42 285.83 342.42" />
-              <path fill="#fff" d="m956.1,240.42h256.61v815.17h-256.61V240.42Z" />
-              <path fill="#fff"
-                d="m1277.49,338.91c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v238.47h-256.61v-133.48c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v409.53c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-186.62h256.61v292.89c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58V338.91Z" />
-              <path fill="#fff"
-                d="m1934.54,810.66h256.61v42.77c0,6.06,3.02,9.08,9.06,9.08h60.91c6.05,0,9.08-3.02,9.08-9.08v-98.5c0-6.03-3.03-9.06-9.08-9.06h-198.28c-85.53,0-128.3-32.83-128.3-98.5v-308.45c0-65.66,42.77-98.48,128.3-98.48h335.67c85.53,0,128.3,32.83,128.3,98.48v146.45h-256.61v-41.47c0-6.05-3.03-9.08-9.08-9.08h-60.91c-6.05,0-9.06,3.03-9.06,9.08v98.48c0,6.06,3.02,9.08,9.06,9.08h198.3c43.19,0,75.38,7.78,96.55,23.33,21.16,15.56,31.75,39.75,31.75,72.58v312.33c0,32.84-10.59,57.03-31.75,72.58-21.17,15.56-53.36,23.33-96.55,23.33h-335.67c-43.2,0-75.39-7.77-96.55-23.33-21.17-15.55-31.75-39.73-31.75-72.58v-149.03Z" />
-            </svg></div>
-          <p>A Kingdom governance agency. Formation that is structured, progressive, and aligned with the full scope of
-            the Kingdom Governance System.</p>
-        </div>
         <div>
-          <div class="footer-col-title">Programmes</div>
-          <ul class="footer-links">
-            <li><a href="training.html#certificate">Certificate (Level 1)</a></li>
-            <li><a href="training.html#diploma">Diploma (Level 2)</a></li>
-            <li><a href="training.html#degree">Degree (Level 3)</a></li>
-            <li><a href="training.html#masters">Masters (Level 4)</a></li>
-            <li><a href="training.html#doctorate">Doctorate (Level 5)</a></li>
-          </ul>
+          <img src="/logo.svg" alt="Ichebo Christian Services" style="height:100px;width:auto;display:block">
+          <p class="footer-tagline">A Kingdom agency equipping gatherings with the structure, formation, and network to
+            bring meaningful impact to their communities.</p>
         </div>
         <div>
           <div class="footer-col-title">The Movement</div>
           <ul class="footer-links">
-            <li><a href="programme.html">Sceptre Community Programme</a></li>
-            <li><a href="find-a-church.html">Find a Community</a></li>
-            <li><a href="programme.html#start">Start a Community</a></li>
-            <li><a href="watch.html">Watch a Service</a></li>
+            <li><a href="/programme">Sceptre Community Programme</a></li>
+            <li><a href="/platform">Ichebo Platform</a></li>
+            <li><a href="/training">Formation Pathways</a></li>
+            <li><a href="/about">About</a></li>
           </ul>
         </div>
         <div>
-          <div class="footer-col-title">Organisation</div>
+          <div class="footer-col-title">Get Involved</div>
           <ul class="footer-links">
-            <li><a href="platform.html">Ichebo Platform</a></li>
-            <li><a href="about.html">About ICS</a></li>
-            <li><a href="contact.html">Get in Touch</a></li>
+            <li><a href="/#waitlist">Join the Waiting List</a></li>
+            <li><a href="mailto:info@ichebo.org">Contact Us</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
         <div class="footer-legal">© 2026 Ichebo Christian Services. All rights reserved.</div>
+        <div class="footer-domain">ichebo.org</div>
       </div>
     </div>
   </footer>
+
+  <script type="module" src="/src/main.js"></script>
 </body>
 
 </html>
