@@ -657,6 +657,8 @@ def handbook_graph(request):
 @login_required
 def handbook_graph_data(request):
     from django.http import JsonResponse
+    records_qs = Record.objects.filter(deleted_at__isnull=True)
+    node_ids = set(records_qs.values_list('id', flat=True))
     nodes = [
         {
             'id':     str(r.id),
@@ -665,8 +667,10 @@ def handbook_graph_data(request):
             'type':   r.record_type,
             'level':  r.permissions_data.get('required_level', 1) if r.permissions_data else 1,
         }
-        for r in Record.objects.filter(deleted_at__isnull=True)
+        for r in records_qs
     ]
+    # Only include links where both endpoints exist as active nodes.
+    # Orphaned relationships (records hard-deleted) crash D3 forceLink.
     links = [
         {
             'source': str(rel.from_record_id),
@@ -674,6 +678,7 @@ def handbook_graph_data(request):
             'type':   rel.relationship_type,
         }
         for rel in Relationship.objects.filter(deleted_at__isnull=True, to_record__isnull=False)
+        if rel.from_record_id in node_ids and rel.to_record_id in node_ids
     ]
     return JsonResponse({'nodes': nodes, 'links': links})
 

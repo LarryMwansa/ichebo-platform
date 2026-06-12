@@ -241,25 +241,33 @@
 {% block extra_js %}
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
         const svgEl = document.getElementById('apostolic-web-svg');
         const svg = d3.select(svgEl);
         const container = document.getElementById('graph-stage');
         const tooltip = document.getElementById('graph-tooltip');
 
-        // Fetch data early, render after first paint so CSS layout is settled
-        const response = await fetch("/handbook/htmx/graph/data/");
-        const data = await response.json();
-
-        requestAnimationFrame(() => {
+        // Wait for two animation frames so absolute layout is fully resolved,
+        // then fetch data and init. Two rAFs guarantee post-paint dimensions.
+        requestAnimationFrame(() => requestAnimationFrame(async () => {
+            const response = await fetch("{% url 'handbook:htmx-graph-data' %}");
+            const data = await response.json();
             initGraph(svg, svgEl, container, tooltip, data);
-        });
+        }));
     });
 
     function initGraph(svg, svgEl, container, tooltip, data) {
-        const rect = svgEl.getBoundingClientRect();
-        const width  = rect.width  || container.offsetWidth  || window.innerWidth;
-        const height = rect.height || container.offsetHeight || window.innerHeight;
+        // Use the stage element's actual rendered dimensions.
+        // ics-stage__content is flex:1 and fills the remaining viewport height,
+        // so its offsetWidth/offsetHeight are reliable after two rAF frames.
+        const stageContent = document.querySelector('.ics-stage__content');
+        const width  = (stageContent && stageContent.offsetWidth)  || window.innerWidth;
+        const height = (stageContent && stageContent.offsetHeight) || window.innerHeight;
+
+        // Set explicit SVG dimensions so D3 forces have real pixel bounds.
+        // CSS 100%/100% is not enough — SVG needs width/height attributes.
+        svgEl.setAttribute('width', width);
+        svgEl.setAttribute('height', height);
 
         const colors = {
             governance: '#ff4757',
