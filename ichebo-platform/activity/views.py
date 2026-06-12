@@ -374,7 +374,9 @@ def htmx_edit_activity(request, activity_id):
                 request=request,
             )
             detail_url = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
-            oob_html = f'<div id="ics-canvas" hx-swap-oob="innerHTML">{stage_html}</div>'
+            # Wrap in a throwaway div: HTMX's querySelectorAll('[hx-swap-oob]')
+            # does NOT match the root element of the parsed fragment, only descendants.
+            oob_html = f'<div><div id="ics-canvas" hx-swap-oob="innerHTML">{stage_html}</div></div>'
             response = HttpResponse(oob_html, content_type='text/html')
             response['HX-Trigger'] = json.dumps({'activityCreated': None})
             response['HX-Push-Url'] = detail_url
