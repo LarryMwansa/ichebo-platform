@@ -1,4 +1,6 @@
 # activity/views.py — Django template views + HTMX partial views
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -361,16 +363,21 @@ def htmx_edit_activity(request, activity_id):
             created_by=request.user,
             event_type='edited',
         )
-        # Drawer save → close drawer, push updated detail URL via HX-Location
-        # HX-Location triggers a boosted HTMX GET (sends HX-Request: true) so the
-        # detail view returns the stage partial, not the full shell.
+        # Drawer save → render updated stage partial with OOB swap into #ics-canvas,
+        # close drawer via HX-Trigger, and update the browser URL via HX-Push-Url.
         if request.headers.get('HX-Target') == 'drawerInner':
-            import json
             from django.urls import reverse
+            from django.template.loader import render_to_string
+            stage_html = render_to_string(
+                'activity/partials/activity_detail_stage.html',
+                {'activity': activity, 'user_level': _user_level(request.user), 'now': timezone.now()},
+                request=request,
+            )
             detail_url = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
-            response = HttpResponse(status=204)
-            response['HX-Location'] = json.dumps({'path': detail_url, 'target': '#main-stage'})
+            oob_html = f'<div id="ics-canvas" hx-swap-oob="innerHTML">{stage_html}</div>'
+            response = HttpResponse(oob_html, content_type='text/html')
             response['HX-Trigger'] = json.dumps({'activityCreated': None})
+            response['HX-Push-Url'] = detail_url
             return response
         return render(request, 'activity/partials/activity_card.html', {'activity': activity})
 
