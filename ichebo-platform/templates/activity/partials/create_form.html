@@ -1,60 +1,57 @@
-<div class="activity-drawer-form" style="padding: 1rem;">
-  <form class="activity-create-form"
-        hx-post="{% url 'activity:htmx-create' %}"
-        hx-swap="none">
-    {% csrf_token %}
+<form class="activity-create-form"
+      hx-post="{% url 'activity:htmx-create' %}"
+      hx-swap="none"
+      style="display: flex; flex-direction: column; gap: 12px;">
+  {% csrf_token %}
 
-    <div style="display: flex; flex-direction: column; gap: 1rem;">
-      
-      <div>
-        <label class="label-caps" style="margin-bottom: 8px; display: block;">Activity Details</label>
-        <div style="display: flex; gap: 8px;">
-          <select name="activity_type" class="form-input-touch" style="flex: 0 0 110px; border-radius: 12px;">
-            {% for slug, label in activity_types %}
-            <option value="{{ slug }}">{{ label }}</option>
-            {% endfor %}
-          </select>
-          <input type="text" name="title" placeholder="What needs to be done?"
-                 class="form-input-touch" style="flex: 1; border-radius: 12px;" required autofocus>
-        </div>
-      </div>
+  <div>
+    <label class="label-caps" style="margin-bottom: 6px; display: block; color: var(--muted);">Type</label>
+    <select name="activity_type" class="form-input-touch" style="width: 100%;">
+      {% for slug, label in activity_types %}
+      <option value="{{ slug }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        <div>
-          <label class="label-caps" style="margin-bottom: 8px; display: block;">Due Date</label>
-          <input type="date" name="due_at" class="form-input-touch" style="width: 100%; border-radius: 12px;">
-        </div>
-        <div>
-          <label class="label-caps" style="margin-bottom: 8px; display: block;">Recurrence</label>
-          <select name="recurrence" class="form-input-touch" style="width: 100%; border-radius: 12px;">
-            <option value="none">No recurrence</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-        </div>
-      </div>
+  <div>
+    <label class="label-caps" style="margin-bottom: 6px; display: block; color: var(--muted);">Title</label>
+    <input type="text" name="title" placeholder="What needs to be done?"
+           class="form-input-touch" style="width: 100%;" required autofocus autocomplete="off">
+  </div>
 
-      <div>
-        <label class="label-caps" style="margin-bottom: 8px; display: block;">KGS Pathway</label>
-        <select name="kgs_pathway" class="form-input-touch" style="width: 100%; border-radius: 12px;">
-          <option value="">None (General)</option>
-          <option value="new_life">New Life</option>
-          <option value="spiritual_formation">Spiritual Formation</option>
-          <option value="community_life">Community Life</option>
-          <option value="service">Service</option>
-          <option value="leadership">Leadership</option>
-          <option value="learning">Learning</option>
-          <option value="mission">Mission</option>
-          <option value="apostolic_stewardship">Apostolic Stewardship</option>
-        </select>
-      </div>
+  <div>
+    <label class="label-caps" style="margin-bottom: 6px; display: block; color: var(--muted);">Due Date</label>
+    <input type="date" name="due_at" class="form-input-touch" style="width: 100%;">
+  </div>
 
-      <div style="margin-top: 1rem;">
-        <button type="submit" class="btn-touch" style="background: var(--primary); color: #fff; width: 100%; border-radius: 12px; font-weight: 700;">
-          Create Activity
-        </button>
-      </div>
-    </div>
-  </form>
-</div>
+  <div>
+    <label class="label-caps" style="margin-bottom: 6px; display: block; color: var(--muted);">Recurrence</label>
+    <select name="recurrence" class="form-input-touch" style="width: 100%;">
+      <option value="none">No recurrence</option>
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+      <option value="monthly">Monthly</option>
+    </select>
+  </div>
+
+  <div>
+    <label class="label-caps" style="margin-bottom: 6px; display: block; color: var(--muted);">KGS Pathway</label>
+    <select name="kgs_pathway" class="form-input-touch" style="width: 100%;">
+      <option value="">None (General)</option>
+      <option value="new_life">New Life</option>
+      <option value="spiritual_formation">Spiritual Formation</option>
+      <option value="community_life">Community Life</option>
+      <option value="service">Service</option>
+      <option value="leadership">Leadership</option>
+      <option value="learning">Learning</option>
+      <option value="mission">Mission</option>
+      <option value="apostolic_stewardship">Apostolic Stewardship</option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn-touch"
+          style="background: var(--primary); color: #fff; width: 100%; font-weight: 700; margin-top: 4px;">
+    Create Activity
+  </button>
+
+</form>
