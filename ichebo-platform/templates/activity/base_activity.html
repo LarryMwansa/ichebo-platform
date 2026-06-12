@@ -12,8 +12,29 @@
     {% include "activity/partials/activity_sidebar.html" %}
 {% endblock %}
 
-{% block ws_options %}
-    {% include "activity/partials/activity_intel.html" %}
+{% block ws_options_tabs %}
+<div class="ics-options-tabs">
+  <button class="ics-options-tab active" id="tab-relations"
+          onclick="WorkspaceUI.switchOptionsTab('relations')">Intel</button>
+  <button class="ics-options-tab" id="tab-create"
+          onclick="WorkspaceUI.switchOptionsTab('create')">New Activity</button>
+</div>
+<div class="ics-options-bar__content">
+  <div class="ws-options-pane active" id="pane-relations">
+    <div style="padding: var(--space-m);">
+      {% include "activity/partials/activity_intel.html" %}
+    </div>
+  </div>
+  <div class="ws-options-pane" id="pane-create">
+    <div style="padding: var(--space-m);">
+      <div id="activity-create-pane">
+        <div style="text-align:center; padding: 2rem 1rem; color: var(--muted); font-size:13px;">
+          Click <strong>New Activity</strong> to start.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block ws_content %}

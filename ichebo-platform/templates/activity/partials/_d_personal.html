@@ -1,0 +1,148 @@
+{# Desktop: Personal activity tab body — standalone partial for OOB swap and full-page include #}
+{% load static %}
+<div class="sovereign-timeline">
+
+    {# Header #}
+    <div class="ws-page-header" style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Kingdom Momentum</div>
+            <h1 class="ws-page-title">Personal <em>Activity</em></h1>
+        </div>
+        <button class="ws-topbar__cta" style="text-decoration: none; flex-shrink: 0;"
+                hx-get="{% url 'activity:htmx-create' %}"
+                hx-target="#activity-create-pane"
+                hx-swap="innerHTML"
+                onclick="if(window.innerWidth>=1024){if(WorkspaceUI&&!WorkspaceUI.state.optionsOpen)WorkspaceUI.toggleOptions();WorkspaceUI.switchOptionsTab('create');}else{window.ICSDrawer&&window.ICSDrawer.open('New Activity');}">
+            <span class="material-symbols-outlined">add</span>
+            New Activity
+        </button>
+    </div>
+
+    {# Legend / Summary Strip #}
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px;">
+        <div class="activity-legend-pill {% if not active_type %}activity-legend-pill--active{% endif %}"
+             onclick="window.location='{% url 'activity:activity-home' %}'">
+            <span class="material-symbols-outlined">grid_view</span>
+            All <span class="activity-legend-count">{{ active_count|default:0 }}</span>
+        </div>
+        {% for slug, label in activity_types %}
+        <div class="activity-legend-pill {% if active_type == slug %}activity-legend-pill--active{% endif %}"
+             onclick="window.location='{% url 'activity:activity-home' %}?type={{ slug }}'">
+            <span class="material-symbols-outlined">
+                {% if slug == 'task' %}task_alt{% elif slug == 'habit' %}autorenew{% elif slug == 'goal' %}trophy{% elif slug == 'event' %}event{% elif slug == 'campaign' %}campaign{% elif slug == 'project' %}folder_open{% elif slug == 'reminder' %}alarm{% elif slug == 'skill' %}school{% else %}circle{% endif %}
+            </span>
+            {{ label }}
+        </div>
+        {% endfor %}
+    </div>
+
+    {# Timeline #}
+    <div style="position: relative; padding-left: 40px;">
+
+        {# Vertical axis line #}
+        <div style="position: absolute; left: 5px; top: 0; bottom: 0; width: 1px;
+                    background: linear-gradient(to bottom, var(--accent-red) 0%, var(--border) 100%);"></div>
+
+        {# Overdue Section #}
+        {% if overdue %}
+        <div style="margin-bottom: 48px; position: relative;">
+            <div style="position: absolute; left: -44px; top: 2px; width: 11px; height: 11px;
+                        background: var(--accent-red); border-radius: 50%;
+                        box-shadow: 0 0 8px var(--accent-red);"></div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <div class="ws-label-tag" style="color: var(--accent-red);">Overdue</div>
+                <span style="font-size: 11px; font-weight: 800; background: rgba(175,50,54,0.1);
+                             color: var(--accent-red); padding: 2px 8px; border-radius: 4px;">
+                    {{ overdue_count }} mandate{{ overdue_count|pluralize }}
+                </span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for activity in overdue %}
+                    {% include "activity/partials/activity_card.html" with activity=activity is_overdue=True %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# Today Section #}
+        {% if due_today %}
+        <div style="margin-bottom: 48px; position: relative;">
+            <div style="position: absolute; left: -44px; top: 2px; width: 11px; height: 11px;
+                        background: var(--primary); border-radius: 50%;
+                        box-shadow: 0 0 8px var(--primary-alpha);"></div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <div class="ws-label-tag" style="color: var(--primary);">Today</div>
+                <span style="font-size: 11px; font-weight: 600; color: var(--muted);">
+                    {{ due_today_count }} due
+                </span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for activity in due_today %}
+                    {% include "activity/partials/activity_card.html" with activity=activity %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# Upcoming Section #}
+        {% if upcoming %}
+        <div style="margin-bottom: 48px; position: relative;">
+            <div style="position: absolute; left: -44px; top: 2px; width: 11px; height: 11px;
+                        background: var(--border); border: 2px solid var(--muted); border-radius: 50%;"></div>
+            <div style="margin-bottom: 20px;">
+                <div class="ws-label-tag">Upcoming Horizon</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for activity in upcoming %}
+                    {% include "activity/partials/activity_card.html" with activity=activity %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# Empty State #}
+        {% if not overdue and not due_today and not upcoming %}
+        <div style="padding: 100px 0; text-align: center;">
+            <span class="material-symbols-outlined" style="font-size: 64px; opacity: 0.08; display: block;">verified</span>
+            <p style="font-size: 14px; color: var(--muted); margin-top: 20px; font-weight: 500;">All mandates secured. You are in perfect momentum.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<style>
+.sovereign-timeline {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px 0 100px;
+}
+.activity-legend-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--card-2);
+    font-size: 12px; font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+.activity-legend-pill .material-symbols-outlined { font-size: 16px; }
+.activity-legend-pill:hover { border-color: var(--primary); color: var(--primary); }
+.activity-legend-pill--active {
+    background: var(--primary-light);
+    border-color: var(--primary-alpha);
+    color: var(--primary);
+}
+.activity-legend-count {
+    font-weight: 800;
+    margin-left: 2px;
+}
+.activity-card:hover {
+    border-color: var(--primary-alpha) !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+}
+</style>

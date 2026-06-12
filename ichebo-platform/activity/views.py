@@ -282,9 +282,38 @@ def htmx_create_activity(request):
         )
 
         from django.urls import reverse
-        response = HttpResponse(status=204)
-        response['HX-Trigger'] = 'activityCreated'
-        response['HX-Redirect'] = reverse('activity:activity-home')
+        from django.template.loader import render_to_string
+
+        # Rebuild the personal activity lists for the updated canvas
+        qs = Activity.objects.filter(
+            assigned_to=request.user,
+            deleted_at__isnull=True,
+            status__in=['pending', 'in_progress'],
+        ).exclude(activity_type__in=['programme', 'lesson']).order_by('due_at', '-created_at')
+
+        overdue   = qs.filter(due_at__isnull=False, due_at__lt=timezone.now())
+        due_today = qs.filter(due_at__date=timezone.now().date()).exclude(due_at__lt=timezone.now())
+        upcoming  = qs.exclude(
+            id__in=list(overdue.values_list('id', flat=True)) +
+                   list(due_today.values_list('id', flat=True))
+        )
+
+        page_html = render_to_string('activity/partials/_d_personal.html', {
+            'overdue':        overdue,
+            'due_today':      due_today,
+            'upcoming':       upcoming,
+            'active_type':    '',
+            'activity_types': [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES],
+            'overdue_count':  overdue.count(),
+            'active_count':   qs.count(),
+            'due_today_count': due_today.count(),
+        }, request=request)
+
+        oob_html = f'<div><div id="ics-canvas" hx-swap-oob="innerHTML">{page_html}</div></div>'
+        home_url = reverse('activity:activity-home')
+        response = HttpResponse(oob_html, content_type='text/html')
+        response['HX-Trigger'] = json.dumps({'activityCreated': None, 'closeDrawer': None})
+        response['HX-Push-Url'] = home_url
         return response
 
     activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
