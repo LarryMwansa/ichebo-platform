@@ -6,26 +6,18 @@
 
   <div class="record-form-group">
     <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">
-      Edit Activity ({{ activity.activity_type|title }})
+      Edit Details ({{ activity.activity_type|title }})
     </label>
     <input type="text" name="title" value="{{ activity.title }}"
            class="form-input-touch" style="width:100%;" required autofocus autocomplete="off">
   </div>
 
-  <div class="record-form-group">
-    <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Description</label>
-    <textarea name="description" rows="3"
-              class="form-input-touch" style="width:100%;resize:vertical;">{{ activity.description|default:'' }}</textarea>
-  </div>
-
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:var(--space-m);">
     <div>
-      <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Status</label>
-      <select name="status" class="form-input-touch" style="width:100%;">
-        <option value="pending"     {% if activity.status == 'pending'     %}selected{% endif %}>Pending</option>
-        <option value="in_progress" {% if activity.status == 'in_progress' %}selected{% endif %}>In Progress</option>
-        <option value="completed"   {% if activity.status == 'completed'   %}selected{% endif %}>Completed</option>
-      </select>
+      <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Due Date</label>
+      <input type="date" name="due_at"
+             value="{% if activity.due_at %}{{ activity.due_at|date:'Y-m-d' }}{% endif %}"
+             class="form-input-touch" style="width:100%;">
     </div>
     <div>
       <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Recurrence</label>
@@ -36,13 +28,6 @@
         <option value="monthly" {% if activity.recurrence == 'monthly' %}selected{% endif %}>Monthly</option>
       </select>
     </div>
-  </div>
-
-  <div class="record-form-group">
-    <label class="label-caps" style="color:var(--muted);margin-bottom:8px;display:block;">Due Date</label>
-    <input type="date" name="due_at"
-           value="{% if activity.due_at %}{{ activity.due_at|date:'Y-m-d' }}{% endif %}"
-           class="form-input-touch" style="width:100%;">
   </div>
 
   <div style="display:flex;gap:8px;">

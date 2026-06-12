@@ -282,23 +282,6 @@ def htmx_create_activity(request):
         )
 
         from django.urls import reverse
-        from django.template.loader import render_to_string
-        # On desktop (HX-Target=drawerInner): OOB swap into #ics-canvas to show
-        # the new activity detail without a full page reload.
-        # On mobile: activityCreated trigger causes window.location.reload().
-        if request.headers.get('HX-Target') == 'drawerInner':
-            stage_html = render_to_string(
-                'activity/partials/activity_detail_stage.html',
-                {'activity': activity, 'user_level': _user_level(request.user), 'now': timezone.now()},
-                request=request,
-            )
-            detail_url = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
-            oob_html = f'<div><div id="ics-canvas" hx-swap-oob="innerHTML">{stage_html}</div></div>'
-            response = HttpResponse(oob_html, content_type='text/html')
-            response['HX-Trigger'] = json.dumps({'activityCreated': None})
-            response['HX-Push-Url'] = detail_url
-            return response
-        # Mobile / direct POST fallback — reload back to list
         response = HttpResponse(status=204)
         response['HX-Trigger'] = 'activityCreated'
         response['HX-Redirect'] = reverse('activity:activity-home')
@@ -371,16 +354,10 @@ def htmx_edit_activity(request, activity_id):
                 )
             except Exception:
                 pass
-        description = request.POST.get('description', '').strip()
-        activity.description = description
         recurrence = request.POST.get('recurrence')
         if recurrence:
             activity.recurrence = recurrence
-        status = request.POST.get('status', '').strip()
-        valid_statuses = ['pending', 'in_progress', 'completed']
-        if status in valid_statuses:
-            activity.status = status
-        activity.save(update_fields=['title', 'description', 'status', 'due_at', 'recurrence', 'updated_at'])
+        activity.save(update_fields=['title', 'due_at', 'recurrence', 'updated_at'])
         ActivityLog.objects.create(
             activity=activity,
             created_by=request.user,
