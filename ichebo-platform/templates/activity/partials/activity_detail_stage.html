@@ -2,19 +2,6 @@
 {# Rendered into #main-stage via HTMX — no extends #}
 <div style="max-width: 800px; margin: 0 auto; padding: 40px 0 100px;">
 
-    {# Breadcrumb back #}
-    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 24px;">
-        <a href="{% url 'activity:activity-home' %}"
-           class="ws-label-tag" style="color: var(--muted); text-decoration: none; cursor: pointer;"
-           hx-get="{% url 'activity:activity-home' %}"
-           hx-target="#main-stage"
-           hx-push-url="true">Activity</a>
-        <span class="material-symbols-outlined" style="font-size: 14px; color: var(--muted); opacity: 0.5;">chevron_right</span>
-        <span class="ws-label-tag" style="color: var(--accent-red);">
-            {{ activity.get_activity_type_display|default:activity.activity_type|title }}
-        </span>
-    </div>
-
     {# Header #}
     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 32px;">
         <div>
