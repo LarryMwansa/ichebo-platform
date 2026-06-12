@@ -273,6 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.addEventListener('activityCreated', () => {
     closeDrawer();
     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate([10, 30, 10]);
+    if (window.innerWidth < 1024) { window.location.reload(); }
   });
 
   document.body.addEventListener('govRecordCreated', () => {

@@ -361,12 +361,16 @@ def htmx_edit_activity(request, activity_id):
             created_by=request.user,
             event_type='edited',
         )
-        # Drawer save → close drawer, stay on page
+        # Drawer save → close drawer, push updated detail URL via HX-Location
+        # HX-Location triggers a boosted HTMX GET (sends HX-Request: true) so the
+        # detail view returns the stage partial, not the full shell.
         if request.headers.get('HX-Target') == 'drawerInner':
+            import json
             from django.urls import reverse
+            detail_url = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
             response = HttpResponse(status=204)
-            response['HX-Trigger'] = 'activityCreated'
-            response['HX-Redirect'] = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
+            response['HX-Location'] = json.dumps({'path': detail_url, 'target': '#main-stage'})
+            response['HX-Trigger'] = json.dumps({'activityCreated': None})
             return response
         return render(request, 'activity/partials/activity_card.html', {'activity': activity})
 
