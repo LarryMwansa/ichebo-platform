@@ -1,16 +1,10 @@
 {# templates/activity/my_activities.html #}
-{% extends "workspace_shell.html" %}
+{% extends "activity/base_activity.html" %}
 
 {% block title %}Activity Hub — Ichebo{% endblock %}
 
-{# Zone 2: Tactical Navigator #}
-{% block context_header %}Tactical Intel{% endblock %}
-{% block context_content %}
-    {% include "activity/partials/activity_sidebar.html" %}
-{% endblock %}
-
 {# Zone 3: The Sovereign Timeline #}
-{% block ws_content %}
+{% block activity_content %}
 <div class="sovereign-timeline">
 
     {# Header #}
@@ -157,11 +151,6 @@
     transform: translateY(-1px);
 }
 </style>
-{% endblock %}
-
-{# Zone 4: Tactical Intel #}
-{% block ws_options %}
-    {% include "activity/partials/activity_intel.html" %}
 {% endblock %}
 
 {# ── Mobile fallback (below 1024px) ── #}
