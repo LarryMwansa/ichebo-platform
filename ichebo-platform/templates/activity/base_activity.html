@@ -17,7 +17,9 @@
   <button class="ics-options-tab active" id="tab-relations"
           onclick="WorkspaceUI.switchOptionsTab('relations')">Intel</button>
   <button class="ics-options-tab" id="tab-create"
-          onclick="WorkspaceUI.switchOptionsTab('create')">New Activity</button>
+          onclick="WorkspaceUI.switchOptionsTab('create')">New</button>
+  <button class="ics-options-tab" id="tab-edit"
+          onclick="WorkspaceUI.switchOptionsTab('edit')">Edit</button>
 </div>
 <div class="ics-options-bar__content">
   <div class="ws-options-pane active" id="pane-relations">
@@ -30,6 +32,15 @@
       <div id="activity-create-pane">
         <div style="text-align:center; padding: 2rem 1rem; color: var(--muted); font-size:13px;">
           Click <strong>New Activity</strong> to start.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ws-options-pane" id="pane-edit">
+    <div style="padding: var(--space-m);">
+      <div id="activity-edit-pane">
+        <div style="text-align:center; padding: 2rem 1rem; color: var(--muted); font-size:13px;">
+          Click <strong>Edit</strong> on an activity to edit it.
         </div>
       </div>
     </div>

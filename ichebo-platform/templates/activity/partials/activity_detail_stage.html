@@ -40,9 +40,9 @@
             {% endif %}
             <button class="ws-topbar__cta"
                     hx-get="{% url 'activity:htmx-edit' activity.id %}"
-                    hx-target="#drawerInner"
+                    hx-target="#activity-edit-pane"
                     hx-swap="innerHTML"
-                    onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Activity')">
+                    onclick="if(window.innerWidth>=1024){if(WorkspaceUI&&!WorkspaceUI.state.optionsOpen)WorkspaceUI.toggleOptions();WorkspaceUI.switchOptionsTab('edit');}else{window.ICSDrawer&&window.ICSDrawer.open('Edit Activity');}">
                 <span class="material-symbols-outlined">edit</span>
                 Edit
             </button>
