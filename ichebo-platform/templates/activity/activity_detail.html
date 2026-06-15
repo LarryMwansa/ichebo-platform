@@ -5,7 +5,7 @@
     <a href="{% url 'activity:activity-home' %}"
        class="ws-topbar__breadcrumb-item"
        hx-get="{% url 'activity:activity-home' %}"
-       hx-target="#main-stage"
+       hx-target="#ics-canvas"
        hx-push-url="true"
        style="text-decoration: none;">Activity Timeline</a>
     <span class="ws-topbar__breadcrumb-sep">›</span>
@@ -45,7 +45,7 @@
             <button class="ws-topbar__cta"
                     style="background: #2ecc71; border-color: #2ecc71;"
                     hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=detail"
-                    hx-target="#main-stage"
+                    hx-target="#ics-canvas"
                     hx-push-url="true">
                 <span class="material-symbols-outlined">check_circle</span>
                 Complete
@@ -125,7 +125,7 @@
                     display: flex; align-items: center; justify-content: space-between;
                     transition: all 0.2s ease;"
              hx-get="{% url 'records:records-detail' activity.linked_record.id %}"
-             hx-target="#main-stage"
+             hx-target="#ics-canvas"
              hx-push-url="true">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <span class="material-symbols-outlined" style="font-size: 20px; color: var(--muted);">description</span>
