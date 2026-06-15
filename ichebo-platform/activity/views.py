@@ -394,7 +394,8 @@ def htmx_edit_activity(request, activity_id):
         )
         # Drawer save → render updated stage partial with OOB swap into #ics-canvas,
         # close drawer via HX-Trigger, and update the browser URL via HX-Push-Url.
-        if request.headers.get('HX-Target') == 'drawerInner':
+        hx_target = request.headers.get('HX-Target', '')
+        if hx_target in ('drawerInner', 'activity-edit-pane'):
             from django.urls import reverse
             from django.template.loader import render_to_string
             stage_html = render_to_string(
@@ -403,8 +404,6 @@ def htmx_edit_activity(request, activity_id):
                 request=request,
             )
             detail_url = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
-            # Wrap in a throwaway div: HTMX's querySelectorAll('[hx-swap-oob]')
-            # does NOT match the root element of the parsed fragment, only descendants.
             oob_html = f'<div><div id="ics-canvas" hx-swap-oob="innerHTML">{stage_html}</div></div>'
             response = HttpResponse(oob_html, content_type='text/html')
             response['HX-Trigger'] = json.dumps({'activityCreated': None})
@@ -413,13 +412,13 @@ def htmx_edit_activity(request, activity_id):
         return render(request, 'activity/partials/activity_card.html', {'activity': activity})
 
     activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
-    # Drawer GET → mobile form; direct URL → redirect to detail page
-    if request.headers.get('HX-Target') == 'drawerInner':
+    hx_target = request.headers.get('HX-Target', '')
+    if hx_target in ('drawerInner', 'activity-edit-pane'):
         return render(request, 'activity/partials/edit_form.html', {
             'activity': activity,
             'activity_types': activity_types,
         })
-    # Direct URL access — redirect to detail page with edit intent
+    # Direct URL access — redirect to detail page
     from django.shortcuts import redirect
     return redirect('activity:activity-detail', activity_id=activity.id)
 
