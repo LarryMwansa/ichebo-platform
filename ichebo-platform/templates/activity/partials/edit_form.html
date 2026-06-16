@@ -3,6 +3,8 @@
       hx-swap="none"
       style="display:flex;flex-direction:column;gap:12px;">
   {% csrf_token %}
+  {% if refresh_target %}<input type="hidden" name="refresh_target" value="{{ refresh_target }}">{% endif %}
+  {% if from_tab %}<input type="hidden" name="from_tab" value="{{ from_tab }}">{% endif %}
 
   <div>
     <label class="label-caps" style="color:var(--muted);margin-bottom:6px;display:block;">

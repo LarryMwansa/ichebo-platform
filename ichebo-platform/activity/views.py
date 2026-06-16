@@ -44,31 +44,20 @@ def activity_detail(request, activity_id):
         'active_app': 'activity',
         'ws_page_title': activity.title,
         'now': timezone.now(),
+        'from_tab': request.GET.get('from', ''),
     }
 
     if request.headers.get('HX-Request'):
+        if request.headers.get('HX-Target') == 'm-activity-body':
+            return render(request, 'activity/partials/_m_detail.html', context)
         return render(request, 'activity/partials/activity_detail_stage.html', context)
     return render(request, 'activity/activity_detail.html', context)
 
 
 # ── My Activities home ────────────────────────────────────────────────────────
 
-@login_required
-def my_activities(request):
+def _build_personal_ctx(request, active_type=''):
     user = request.user
-    tab = request.GET.get('tab', 'personal')
-    is_htmx = bool(request.headers.get('HX-Request'))
-
-    # ── HTMX tab dispatch: return only the body partial ──────────────────────
-    if is_htmx and tab == 'ministry':
-        return _ministry_partial(request)
-
-    if is_htmx and tab == 'calendar':
-        return _calendar_partial(request)
-
-    # ── Personal tab (default) ────────────────────────────────────────────────
-    active_type = request.GET.get('type', '')
-
     qs = Activity.objects.filter(
         assigned_to=user,
         deleted_at__isnull=True,
@@ -89,7 +78,7 @@ def my_activities(request):
 
     activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
 
-    personal_ctx = {
+    return {
         'overdue':        overdue,
         'due_today':      due_today,
         'upcoming':       upcoming,
@@ -100,23 +89,46 @@ def my_activities(request):
         'due_today_count': due_today.count(),
     }
 
+
+def _personal_mobile_partial(request):
+    """Return the personal tab body partial (used by HTMX tab dispatch and
+    post-action refreshes like complete/edit from the mobile detail view)."""
+    active_type = request.GET.get('type', '')
+    return render(request, 'activity/partials/_m_personal.html', _build_personal_ctx(request, active_type))
+
+
+@login_required
+def my_activities(request):
+    tab = request.GET.get('tab', 'personal')
+    is_htmx = bool(request.headers.get('HX-Request'))
+
+    # ── HTMX tab dispatch: return only the body partial ──────────────────────
+    if is_htmx and tab == 'ministry':
+        return _ministry_partial(request)
+
+    if is_htmx and tab == 'calendar':
+        return _calendar_partial(request)
+
+    # ── Personal tab (default) ────────────────────────────────────────────────
+    active_type = request.GET.get('type', '')
+    personal_ctx = _build_personal_ctx(request, active_type)
+
     if is_htmx:
         return render(request, 'activity/partials/_m_personal.html', personal_ctx)
 
     return render(request, 'activity/my_activities.html', {
         **personal_ctx,
-        'user_level':    _user_level(user),
+        'user_level':    _user_level(request.user),
         'active_app':    'activity',
         'ws_page_title': 'Activity',
         'active_tab':    tab,
     })
 
 
-def _ministry_partial(request):
-    """Return the ministry tab body partial (used by HTMX tab dispatch)."""
+def _build_ministry_ctx(request):
     user = request.user
-    active_type = request.GET.get('type', '')
-    assigned_tab = request.GET.get('assigned', 'all')
+    active_type = request.GET.get('type', '') or request.POST.get('type', '')
+    assigned_tab = request.GET.get('assigned', '') or request.POST.get('assigned', 'all')
 
     qs = Activity.objects.filter(
         deleted_at__isnull=True,
@@ -131,7 +143,7 @@ def _ministry_partial(request):
 
     overdue_qs = qs.filter(due_at__isnull=False, due_at__lt=timezone.now())
 
-    return render(request, 'activity/partials/_m_ministry.html', {
+    return {
         'activities':    qs,
         'active_type':   active_type,
         'assigned_tab':  assigned_tab,
@@ -139,7 +151,12 @@ def _ministry_partial(request):
         'now':           timezone.now(),
         'active_count':  qs.count(),
         'overdue_count': overdue_qs.count(),
-    })
+    }
+
+
+def _ministry_partial(request):
+    """Return the ministry tab body partial (used by HTMX tab dispatch)."""
+    return render(request, 'activity/partials/_m_ministry.html', _build_ministry_ctx(request))
 
 
 def _calendar_partial(request):
@@ -386,6 +403,13 @@ def htmx_complete_activity(request, activity_id):
         response['HX-Redirect'] = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
         return response
 
+    if request.GET.get('redirect') == 'list':
+        if request.GET.get('tab') == 'ministry':
+            return _ministry_partial(request)
+        if request.GET.get('tab') == 'calendar':
+            return _calendar_partial(request)
+        return _personal_mobile_partial(request)
+
     return render(request, 'activity/partials/_completed_item.html', {
         'activity': activity,
     })
@@ -426,9 +450,50 @@ def htmx_edit_activity(request, activity_id):
             created_by=request.user,
             event_type='edited',
         )
-        # Drawer save → render updated stage partial with OOB swap into #ics-canvas,
-        # close drawer via HX-Trigger, and update the browser URL via HX-Push-Url.
         hx_target = request.headers.get('HX-Target', '')
+        refresh_target = request.POST.get('refresh_target', '')
+        from_tab = request.POST.get('from_tab', '')
+
+        # Mobile drawer save → close drawer via HX-Trigger, OOB-refresh whichever
+        # mobile view (#m-activity-body list/detail) sent the edit.
+        if hx_target == 'drawerInner' and refresh_target == 'm-activity-body':
+            from django.template.loader import render_to_string
+            list_html = render_to_string(
+                'activity/partials/_m_personal.html',
+                _build_personal_ctx(request),
+                request=request,
+            )
+            oob_html = f'<div><div id="m-activity-body" hx-swap-oob="innerHTML">{list_html}</div></div>'
+            response = HttpResponse(oob_html, content_type='text/html')
+            response['HX-Trigger'] = json.dumps({'activityCreated': None})
+            return response
+
+        if hx_target == 'drawerInner' and refresh_target == 'm-ministry-body':
+            from django.template.loader import render_to_string
+            list_html = render_to_string(
+                'activity/partials/_m_ministry.html',
+                _build_ministry_ctx(request),
+                request=request,
+            )
+            oob_html = f'<div><div id="m-activity-body" hx-swap-oob="innerHTML">{list_html}</div></div>'
+            response = HttpResponse(oob_html, content_type='text/html')
+            response['HX-Trigger'] = json.dumps({'activityCreated': None})
+            return response
+
+        if hx_target == 'drawerInner' and refresh_target == 'm-detail-body':
+            from django.template.loader import render_to_string
+            detail_html = render_to_string(
+                'activity/partials/_m_detail.html',
+                {'activity': activity, 'user_level': _user_level(request.user), 'now': timezone.now(), 'from_tab': from_tab},
+                request=request,
+            )
+            oob_html = f'<div><div id="m-activity-body" hx-swap-oob="innerHTML">{detail_html}</div></div>'
+            response = HttpResponse(oob_html, content_type='text/html')
+            response['HX-Trigger'] = json.dumps({'activityCreated': None})
+            return response
+
+        # Desktop drawer/options-bar save → render updated stage partial with OOB
+        # swap into #ics-canvas, close drawer via HX-Trigger, push the detail URL.
         if hx_target in ('drawerInner', 'activity-edit-pane'):
             from django.urls import reverse
             from django.template.loader import render_to_string
@@ -451,6 +516,8 @@ def htmx_edit_activity(request, activity_id):
         return render(request, 'activity/partials/edit_form.html', {
             'activity': activity,
             'activity_types': activity_types,
+            'refresh_target': request.GET.get('refresh_target', ''),
+            'from_tab': request.GET.get('from_tab', ''),
         })
     # Direct URL access — redirect to detail page
     from django.shortcuts import redirect

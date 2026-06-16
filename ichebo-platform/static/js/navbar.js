@@ -170,7 +170,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let createUrl = '/records/htmx/create/?record_type=prayer';
     let title = 'New Entry';
 
-    if (path.startsWith('/activity')) {
+    if (path.startsWith('/activity/ministry')) {
+      createUrl = '/activity/htmx/create/?ministry=1';
+      title = 'New Ministry Activity';
+    } else if (path.startsWith('/calendar')) {
+      const params = new URLSearchParams(window.location.search);
+      const calParams = new URLSearchParams();
+      calParams.set('calendar', '1');
+      calParams.set('year', params.get('year') || new Date().getFullYear());
+      calParams.set('month', params.get('month') || (new Date().getMonth() + 1));
+      if (params.get('filter')) calParams.set('filter', params.get('filter'));
+      createUrl = '/activity/htmx/create/?' + calParams.toString();
+      title = 'New Activity';
+    } else if (path.startsWith('/activity')) {
       createUrl = '/activity/htmx/create/';
       title = 'New Activity';
     } else if (path.startsWith('/community')) {

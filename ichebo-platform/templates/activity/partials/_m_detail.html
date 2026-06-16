@@ -1,0 +1,77 @@
+{# Mobile: Activity detail — standalone partial, no tab nav. Loaded into #m-activity-body #}
+<div class="activity-detail" style="margin-top: var(--space-s); padding: 0 1rem 4rem;">
+
+  {% if from_tab == 'ministry' %}
+  <a href="{% url 'activity:ministry' %}"
+     hx-get="{% url 'activity:activity-home' %}?tab=ministry"
+     hx-target="#m-activity-body"
+     hx-push-url="{% url 'activity:ministry' %}"
+     style="font-size: 12px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; margin-bottom: var(--space-s);">
+    <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back_ios</span>
+    Back
+  </a>
+  {% elif from_tab == 'calendar' %}
+  <a href="{% url 'calendar:month' %}"
+     hx-get="{% url 'activity:activity-home' %}?tab=calendar"
+     hx-target="#m-activity-body"
+     hx-push-url="{% url 'calendar:month' %}"
+     style="font-size: 12px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; margin-bottom: var(--space-s);">
+    <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back_ios</span>
+    Back
+  </a>
+  {% else %}
+  <a href="{% url 'activity:activity-home' %}"
+     hx-get="{% url 'activity:activity-home' %}"
+     hx-target="#m-activity-body"
+     hx-push-url="{% url 'activity:activity-home' %}"
+     style="font-size: 12px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; margin-bottom: var(--space-s);">
+    <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back_ios</span>
+    Back
+  </a>
+  {% endif %}
+
+  {% if via_record %}
+  <div style="margin-bottom: 12px;">
+      <a href="{% url 'records:records-detail' via_record.id %}"
+         style="font-size: 11px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+          <span class="material-symbols-outlined" style="font-size: 14px;">arrow_back_ios</span>
+          Linked via: <span style="text-decoration: underline;">{{ via_record.title|truncatechars:30 }}</span>
+      </a>
+  </div>
+  {% endif %}
+
+  <div style="margin-bottom: 16px;">
+      <span class="status-badge status-badge--muted" style="margin-bottom: 8px; display: inline-block;">
+          {{ activity.activity_type|upper }}
+      </span>
+      <h2 style="margin: 0; font-size: 22px; font-weight: 700;">{{ activity.title }}</h2>
+  </div>
+
+  <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+      {% if activity.status != 'completed' %}
+      <button class="btn-touch" style="background: var(--primary); color: #fff; flex: 2;"
+              hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=list{% if from_tab == 'ministry' %}&tab=ministry{% elif from_tab == 'calendar' %}&tab=calendar{% endif %}"
+              hx-target="#m-activity-body"
+              hx-swap="innerHTML"
+              hx-push-url="{% if from_tab == 'ministry' %}{% url 'activity:ministry' %}{% elif from_tab == 'calendar' %}{% url 'calendar:month' %}{% else %}{% url 'activity:activity-home' %}{% endif %}">
+          Mark Completed
+      </button>
+      {% endif %}
+      <button class="btn-touch" style="background: var(--bg); border: 1px solid var(--border); flex: 1;"
+              hx-get="{% url 'activity:htmx-edit' activity.id %}"
+              hx-target="#drawerInner"
+              hx-swap="innerHTML"
+              hx-vals='{"refresh_target": "m-detail-body", "activity_id": "{{ activity.id }}", "from_tab": "{{ from_tab }}"}'
+              onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Activity')">
+          Edit
+      </button>
+  </div>
+
+  {% if activity.description %}
+  <div style="margin-bottom: 24px;">
+      <div class="label-caps" style="margin-bottom: 8px;">Description</div>
+      <div style="line-height: 1.6; color: var(--text);">{{ activity.description|linebreaks }}</div>
+  </div>
+  {% endif %}
+
+</div>

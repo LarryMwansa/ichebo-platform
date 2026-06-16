@@ -34,8 +34,10 @@
   {% if activities %}
   <div class="list-group">
     {% for activity in activities %}
-    <a href="{% url 'activity:activity-detail' activity.id %}"
-       class="list-item" style="text-decoration: none; color: inherit;">
+    <div class="list-item" style="text-decoration: none; color: inherit; cursor: pointer;"
+         hx-get="{% url 'activity:activity-detail' activity.id %}?from=ministry"
+         hx-target="#m-activity-body"
+         hx-push-url="{% url 'activity:activity-detail' activity.id %}">
       <div class="list-item__icon" style="color: var(--muted);">
         <span class="material-symbols-outlined">
           {% if activity.activity_type == 'task' %}task_alt
@@ -54,8 +56,15 @@
           {% if activity.due_at and activity.due_at < now %}<span style="color: var(--accent-red); font-weight: 700;"> · Overdue</span>{% endif %}
         </div>
       </div>
+      <button hx-get="{% url 'activity:htmx-edit' activity.id %}"
+              hx-target="#drawerInner" hx-swap="innerHTML"
+              hx-vals='{"refresh_target": "m-ministry-body"}'
+              onclick="event.stopPropagation(); window.ICSDrawer && window.ICSDrawer.open('Edit Activity')"
+              style="background: none; border: none; cursor: pointer; padding: 4px; display: flex; flex-shrink: 0; color: var(--muted);">
+        <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+      </button>
       <span class="material-symbols-outlined" style="color: var(--muted); font-size: 16px; flex-shrink: 0;">chevron_right</span>
-    </a>
+    </div>
     {% endfor %}
   </div>
   {% else %}

@@ -85,11 +85,13 @@
       </div>
       <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 36px;">
         {% for ev in wd.events %}
-        <a href="/activity/{{ ev.id }}/"
-           style="display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-                  background: var(--card); border: 1px solid var(--border);
-                  {% if wd.is_today %}border-left: 3px solid var(--primary);{% endif %}
-                  border-radius: 8px; text-decoration: none; color: inherit;">
+        <div hx-get="{% url 'activity:activity-detail' ev.id %}?from=calendar"
+             hx-target="#m-activity-body"
+             hx-push-url="{% url 'activity:activity-detail' ev.id %}"
+             style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer;
+                    background: var(--card); border: 1px solid var(--border);
+                    {% if wd.is_today %}border-left: 3px solid var(--primary);{% endif %}
+                    border-radius: 8px; text-decoration: none; color: inherit;">
           {% if ev.time %}
           <div style="font-size: 12px; font-weight: 700; color: var(--primary);
                       flex-shrink: 0; min-width: 36px; font-family: 'Playfair Display', serif;">{{ ev.time }}</div>
@@ -102,7 +104,7 @@
             {% endif %}
           </div>
           <span class="material-symbols-outlined" style="color: var(--muted); font-size: 14px; flex-shrink: 0;">chevron_right</span>
-        </a>
+        </div>
         {% endfor %}
       </div>
     </div>
@@ -162,11 +164,13 @@
           </div>
           <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 36px;">
             {% for ev in cell.events %}
-            <a href="/activity/{{ ev.id }}/"
-               style="display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-                      background: var(--card); border: 1px solid var(--border);
-                      {% if ev.is_overdue %}border-left: 3px solid var(--accent-red);{% elif cell.is_today %}border-left: 3px solid var(--primary);{% endif %}
-                      border-radius: 8px; text-decoration: none; color: inherit;">
+            <div hx-get="{% url 'activity:activity-detail' ev.id %}?from=calendar"
+                 hx-target="#m-activity-body"
+                 hx-push-url="{% url 'activity:activity-detail' ev.id %}"
+                 style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer;
+                        background: var(--card); border: 1px solid var(--border);
+                        {% if ev.is_overdue %}border-left: 3px solid var(--accent-red);{% elif cell.is_today %}border-left: 3px solid var(--primary);{% endif %}
+                        border-radius: 8px; text-decoration: none; color: inherit;">
               <div style="flex: 1; min-width: 0;">
                 <div style="font-size: 13px; font-weight: 700; color: var(--text);
                             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ ev.title }}</div>
@@ -179,7 +183,7 @@
                            color: var(--accent-red); flex-shrink: 0;">Overdue</span>
               {% endif %}
               <span class="material-symbols-outlined" style="color: var(--muted); font-size: 14px; flex-shrink: 0;">chevron_right</span>
-            </a>
+            </div>
             {% endfor %}
             {% if cell.overflow %}
             <div style="font-size: 11px; color: var(--muted); padding: 4px 12px;">+{{ cell.overflow }} more</div>
