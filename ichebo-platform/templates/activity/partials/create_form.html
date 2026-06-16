@@ -1,8 +1,15 @@
 <form class="activity-create-form"
-      hx-post="{% url 'activity:htmx-create' %}"
+      hx-post="{% url 'activity:htmx-create' %}{% if is_ministry %}?ministry=1{% elif is_calendar %}?calendar=1&year={{ cal_year }}&month={{ cal_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}{% endif %}"
       hx-swap="none"
       style="display: flex; flex-direction: column; gap: 12px;">
   {% csrf_token %}
+  {% if is_ministry %}<input type="hidden" name="ministry" value="1">{% endif %}
+  {% if is_calendar %}
+  <input type="hidden" name="calendar" value="1">
+  <input type="hidden" name="year" value="{{ cal_year }}">
+  <input type="hidden" name="month" value="{{ cal_month }}">
+  <input type="hidden" name="filter" value="{{ cal_filter }}">
+  {% endif %}
 
   <div>
     <label class="label-caps" style="margin-bottom: 6px; display: block; color: var(--muted);">Type</label>

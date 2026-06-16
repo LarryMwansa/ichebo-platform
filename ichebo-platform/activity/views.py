@@ -246,6 +246,9 @@ def _calendar_partial(request):
 
 @login_required
 def htmx_create_activity(request):
+    is_ministry = request.POST.get('ministry') == '1' or request.GET.get('ministry') == '1'
+    is_calendar = request.POST.get('calendar') == '1' or request.GET.get('calendar') == '1'
+
     if request.method == 'POST':
         activity_type = request.POST.get('activity_type', 'task')
         title = request.POST.get('title', '').strip()
@@ -284,42 +287,73 @@ def htmx_create_activity(request):
         from django.urls import reverse
         from django.template.loader import render_to_string
 
-        # Rebuild the personal activity lists for the updated canvas
-        qs = Activity.objects.filter(
-            assigned_to=request.user,
-            deleted_at__isnull=True,
-            status__in=['pending', 'in_progress'],
-        ).exclude(activity_type__in=['programme', 'lesson']).order_by('due_at', '-created_at')
+        if is_ministry:
+            qs = Activity.objects.filter(
+                deleted_at__isnull=True,
+                activity_type__in=MINISTRY_TYPES,
+                status__in=['pending', 'in_progress'],
+            ).order_by('due_at', '-created_at')
 
-        overdue   = qs.filter(due_at__isnull=False, due_at__lt=timezone.now())
-        due_today = qs.filter(due_at__date=timezone.now().date()).exclude(due_at__lt=timezone.now())
-        upcoming  = qs.exclude(
-            id__in=list(overdue.values_list('id', flat=True)) +
-                   list(due_today.values_list('id', flat=True))
-        )
+            page_html = render_to_string('activity/partials/_d_ministry.html', {
+                'activities':     qs,
+                'active_type':    '',
+                'assigned_tab':   'all',
+                'ministry_types': [(slug, TYPE_LABELS.get(slug, slug)) for slug in MINISTRY_TYPES],
+                'now':            timezone.now(),
+            }, request=request)
+            redirect_url = reverse('activity:ministry')
+        elif is_calendar:
+            from calendar_app.views import build_month_context
+            cal_year = int(request.POST.get('year') or timezone.now().year)
+            cal_month = int(request.POST.get('month') or timezone.now().month)
+            cal_filter = request.POST.get('filter', '')
 
-        page_html = render_to_string('activity/partials/_d_personal.html', {
-            'overdue':        overdue,
-            'due_today':      due_today,
-            'upcoming':       upcoming,
-            'active_type':    '',
-            'activity_types': [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES],
-            'overdue_count':  overdue.count(),
-            'active_count':   qs.count(),
-            'due_today_count': due_today.count(),
-        }, request=request)
+            ctx = build_month_context(request.user, cal_year, cal_month, cal_filter)
+            page_html = render_to_string('activity/partials/_d_calendar_month.html', ctx, request=request)
+
+            redirect_url = reverse('calendar:month')
+            if cal_filter:
+                redirect_url += f'?year={cal_year}&month={cal_month}&filter={cal_filter}'
+            else:
+                redirect_url += f'?year={cal_year}&month={cal_month}'
+        else:
+            qs = Activity.objects.filter(
+                assigned_to=request.user,
+                deleted_at__isnull=True,
+                status__in=['pending', 'in_progress'],
+            ).exclude(activity_type__in=['programme', 'lesson']).order_by('due_at', '-created_at')
+
+            overdue   = qs.filter(due_at__isnull=False, due_at__lt=timezone.now())
+            due_today = qs.filter(due_at__date=timezone.now().date()).exclude(due_at__lt=timezone.now())
+            upcoming  = qs.exclude(
+                id__in=list(overdue.values_list('id', flat=True)) +
+                       list(due_today.values_list('id', flat=True))
+            )
+
+            page_html = render_to_string('activity/partials/_d_personal.html', {
+                'overdue':        overdue,
+                'due_today':      due_today,
+                'upcoming':       upcoming,
+                'active_type':    '',
+                'activity_types': [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES],
+                'overdue_count':  overdue.count(),
+                'active_count':   qs.count(),
+                'due_today_count': due_today.count(),
+            }, request=request)
+            redirect_url = reverse('activity:activity-home')
 
         oob_html = f'<div><div id="ics-canvas" hx-swap-oob="innerHTML">{page_html}</div></div>'
-        home_url = reverse('activity:activity-home')
         response = HttpResponse(oob_html, content_type='text/html')
         response['HX-Trigger'] = json.dumps({'activityCreated': None, 'closeDrawer': None})
-        response['HX-Push-Url'] = home_url
+        response['HX-Push-Url'] = redirect_url
         return response
 
-    activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in ALL_TYPES]
     # GET — return the create form
+    type_slugs = MINISTRY_TYPES if is_ministry else ALL_TYPES
+    activity_types = [(slug, TYPE_LABELS.get(slug, slug)) for slug in type_slugs]
     return render(request, 'activity/partials/create_form.html', {
         'activity_types': activity_types,
+        'is_ministry':    is_ministry,
     })
 
 

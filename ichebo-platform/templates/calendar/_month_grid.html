@@ -31,7 +31,7 @@
                     {% elif cell.is_today %}cal-event--today
                     {% else %}cal-event--upcoming{% endif %}"
                      hx-get="/activity/{{ ev.id }}/"
-                     hx-target="#main-stage"
+                     hx-target="#ics-canvas"
                      hx-push-url="true"
                      title="{{ ev.title }}">
                     <span class="cal-event__dot"></span>

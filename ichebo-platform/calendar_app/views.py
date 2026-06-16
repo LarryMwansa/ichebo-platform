@@ -79,17 +79,13 @@ def _event_time(ev):
 # Month view
 # ---------------------------------------------------------------------------
 
-@login_required
-def month_view(request):
+def build_month_context(user, year=None, month=None, cal_filter=''):
+    """Build the context dict for the month grid. Shared by month_view and
+    any other view that needs to re-render the calendar grid (e.g. activity
+    create from the Calendar page's options-bar form)."""
     today = date.today()
-    try:
-        year = int(request.GET.get('year', today.year))
-        month = int(request.GET.get('month', today.month))
-    except ValueError:
-        year, month = today.year, today.month
-
-    # Clamp
-    month = max(1, min(12, month))
+    year = year if year is not None else today.year
+    month = max(1, min(12, month if month is not None else today.month))
 
     cal = calendar.Calendar(firstweekday=0)  # Monday-first
     weeks = cal.monthdatescalendar(year, month)  # list of 7-element date lists
@@ -97,10 +93,7 @@ def month_view(request):
     from_date = weeks[0][0]
     to_date = weeks[-1][6]
 
-    # Filter: 'personal' = only mine, 'institutional' = only tenant, '' = all
-    cal_filter = request.GET.get('filter', '')
-
-    raw_events = get_calendar_events(request.user, from_date, to_date)
+    raw_events = get_calendar_events(user, from_date, to_date)
 
     # Apply filter
     if cal_filter == 'personal':
@@ -139,7 +132,7 @@ def month_view(request):
 
     month_event_count = sum(len(cell['events']) for week in grid for cell in week if cell['in_month'])
 
-    ctx = {
+    return {
         'view': 'month',
         'year': year,
         'month': month,
@@ -154,6 +147,19 @@ def month_view(request):
         'next_month': next_first.month,
         'month_event_count': month_event_count,
     }
+
+
+@login_required
+def month_view(request):
+    today = date.today()
+    try:
+        year = int(request.GET.get('year', today.year))
+        month = int(request.GET.get('month', today.month))
+    except ValueError:
+        year, month = today.year, today.month
+
+    cal_filter = request.GET.get('filter', '')
+    ctx = build_month_context(request.user, year, month, cal_filter)
 
     if request.headers.get('HX-Request'):
         return render(request, 'calendar/_month_grid.html', ctx)

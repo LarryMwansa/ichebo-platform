@@ -1,0 +1,82 @@
+{# Desktop: Calendar month grid — standalone partial for OOB swap into #ics-canvas after create #}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <div class="ws-page-header" style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
+      <div>
+        <div class="ws-label-tag" style="margin-bottom: 12px; color: var(--accent-red);">Kingdom Momentum</div>
+        <h1 class="ws-page-title" id="cal-page-title">Activity <em>Calendar</em></h1>
+      </div>
+      <div class="cal-nav" style="flex-shrink: 0; display: flex; align-items: flex-end;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700;
+                       color: var(--text); min-width: 130px; text-align: right;">
+              {{ month_name }} {{ year }}
+          </span>
+          <a style="display: flex; align-items: center; justify-content: center;
+                    width: 36px; height: 36px; border-radius: 50%;
+                    border: 1px solid var(--border); background: var(--card);
+                    color: var(--muted); text-decoration: none; transition: all 0.15s;"
+             href="{% url 'calendar:month' %}?year={{ prev_year }}&month={{ prev_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+             aria-label="Previous month">
+             <span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
+          </a>
+          <a style="font-size: 12px; font-weight: 600; color: var(--primary); text-decoration: none;"
+             href="{% url 'calendar:month' %}{% if cal_filter %}?filter={{ cal_filter }}{% endif %}">Today</a>
+          <a style="display: flex; align-items: center; justify-content: center;
+                    width: 36px; height: 36px; border-radius: 50%;
+                    border: 1px solid var(--border); background: var(--card);
+                    color: var(--muted); text-decoration: none; transition: all 0.15s;"
+             href="{% url 'calendar:month' %}?year={{ next_year }}&month={{ next_month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+             aria-label="Next month">
+             <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+          </a>
+          <button class="ws-topbar__cta" style="margin-left: 8px;"
+                  hx-get="{% url 'activity:htmx-create' %}?calendar=1&year={{ year }}&month={{ month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+                  hx-target="#activity-create-pane"
+                  hx-swap="innerHTML"
+                  onclick="if(window.innerWidth>=1024){if(WorkspaceUI&&!WorkspaceUI.state.optionsOpen)WorkspaceUI.toggleOptions();WorkspaceUI.switchOptionsTab('create');}else{window.ICSDrawer&&window.ICSDrawer.open('New Activity');}">
+              <span class="material-symbols-outlined">add</span>
+              New Activity
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {# ── Filter strip ── #}
+    <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+        <a href="?year={{ year }}&month={{ month }}"
+           style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px;
+                  border: 1px solid {% if not cal_filter %}var(--accent-red){% else %}var(--border){% endif %};
+                  background: {% if not cal_filter %}rgba(175,50,54,0.08){% else %}var(--card-2){% endif %};
+                  font-size: 12px; font-weight: 600; text-decoration: none;
+                  color: {% if not cal_filter %}var(--accent-red){% else %}var(--muted){% endif %};">
+            <span class="material-symbols-outlined" style="font-size: 15px;">calendar_month</span>
+            All
+        </a>
+        <a href="?year={{ year }}&month={{ month }}&filter=personal"
+           style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px;
+                  border: 1px solid {% if cal_filter == 'personal' %}var(--accent-red){% else %}var(--border){% endif %};
+                  background: {% if cal_filter == 'personal' %}rgba(175,50,54,0.08){% else %}var(--card-2){% endif %};
+                  font-size: 12px; font-weight: 600; text-decoration: none;
+                  color: {% if cal_filter == 'personal' %}var(--accent-red){% else %}var(--muted){% endif %};">
+            <span class="material-symbols-outlined" style="font-size: 15px;">person</span>
+            Personal
+        </a>
+        <a href="?year={{ year }}&month={{ month }}&filter=institutional"
+           style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px;
+                  border: 1px solid {% if cal_filter == 'institutional' %}var(--accent-red){% else %}var(--border){% endif %};
+                  background: {% if cal_filter == 'institutional' %}rgba(175,50,54,0.08){% else %}var(--card-2){% endif %};
+                  font-size: 12px; font-weight: 600; text-decoration: none;
+                  color: {% if cal_filter == 'institutional' %}var(--accent-red){% else %}var(--muted){% endif %};">
+            <span class="material-symbols-outlined" style="font-size: 15px;">corporate_fare</span>
+            Institutional
+        </a>
+    </div>
+
+    <div id="cal-body">
+      {% include "calendar/_month_grid.html" %}
+    </div>
+
+  </div>
+</div>

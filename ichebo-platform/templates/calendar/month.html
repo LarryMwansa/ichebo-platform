@@ -28,10 +28,10 @@
      <span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
   </a>
   <button class="ws-topbar__cta" style="margin-left: 8px;"
-          hx-get="{% url 'activity:htmx-create' %}"
-          hx-target="#drawerInner"
+          hx-get="{% url 'activity:htmx-create' %}?calendar=1&year={{ year }}&month={{ month }}{% if cal_filter %}&filter={{ cal_filter }}{% endif %}"
+          hx-target="#activity-create-pane"
           hx-swap="innerHTML"
-          onclick="window.ICSDrawer && window.ICSDrawer.open('New Activity')">
+          onclick="if(window.innerWidth>=1024){if(WorkspaceUI&&!WorkspaceUI.state.optionsOpen)WorkspaceUI.toggleOptions();WorkspaceUI.switchOptionsTab('create');}else{window.ICSDrawer&&window.ICSDrawer.open('New Activity');}">
       <span class="material-symbols-outlined">add</span>
       New Activity
   </button>
