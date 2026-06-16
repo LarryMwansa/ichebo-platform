@@ -613,7 +613,7 @@ def calendar_view(request):
 def htmx_set_activity_link(request, activity_id):
     if request.method != 'POST':
         return HttpResponse(status=405)
-    
+
     activity = get_object_or_404(
         Activity, id=activity_id, created_by=request.user, deleted_at__isnull=True
     )
@@ -623,9 +623,18 @@ def htmx_set_activity_link(request, activity_id):
         record = get_object_or_404(Record, id=record_id)
         activity.linked_record = record
         activity.save(update_fields=['linked_record', 'updated_at'])
-    
-    # Return HX-Redirect to refresh the full detail page with the new link
-    from django.urls import reverse
-    response = HttpResponse(status=204)
-    response['HX-Redirect'] = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
+
+    from django.template.loader import render_to_string
+    stage_html = render_to_string(
+        'activity/partials/activity_detail_stage.html',
+        {'activity': activity, 'user_level': _user_level(request.user), 'now': timezone.now()},
+        request=request,
+    )
+    oob_html = f'<div><div id="ics-canvas" hx-swap-oob="innerHTML">{stage_html}</div></div>'
+    response = HttpResponse(oob_html, content_type='text/html')
+    if record_id:
+        response['X-WS-Toast'] = json.dumps([{
+            'level': 'success',
+            'message': f'Linked to "{activity.linked_record.title}"',
+        }])
     return response

@@ -153,7 +153,8 @@
     {% endif %}
 
     {# Hidden form for linking #}
-    <form id="set-link-form" hx-post="{% url 'activity:htmx-set-link' activity.id %}" hx-swap="none">
+    <form id="set-link-form" hx-post="{% url 'activity:htmx-set-link' activity.id %}"
+          hx-swap="none" hx-confirm="Link this activity to this record?">
         {% csrf_token %}
         <input type="hidden" name="record_id" id="target-record-id">
     </form>
@@ -162,10 +163,11 @@
 
     <script>
     window.selectRecord = function(recordId, recordTitle) {
-        if (confirm('Link this activity to "' + recordTitle + '"?')) {
-            document.getElementById('target-record-id').value = recordId;
-            htmx.trigger('#set-link-form', 'submit');
-        }
+        document.getElementById('set-link-form').setAttribute(
+            'hx-confirm', 'Link this activity to "' + recordTitle + '"?'
+        );
+        document.getElementById('target-record-id').value = recordId;
+        htmx.trigger('#set-link-form', 'submit');
         closeLinkModal();
     };
     </script>
