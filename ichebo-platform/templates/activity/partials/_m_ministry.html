@@ -36,7 +36,8 @@
     {% for activity in activities %}
     <div class="list-item" style="text-decoration: none; color: inherit; cursor: pointer;"
          hx-get="{% url 'activity:activity-detail' activity.id %}?from=ministry"
-         hx-target="#m-activity-body"
+         hx-target="#ws-mobile-shell"
+         hx-swap="innerHTML"
          hx-push-url="{% url 'activity:activity-detail' activity.id %}">
       <div class="list-item__icon" style="color: var(--muted);">
         <span class="material-symbols-outlined">

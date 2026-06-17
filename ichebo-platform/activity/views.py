@@ -48,7 +48,8 @@ def activity_detail(request, activity_id):
     }
 
     if request.headers.get('HX-Request'):
-        if request.headers.get('HX-Target') == 'm-activity-body':
+        hx_target = request.headers.get('HX-Target', '')
+        if hx_target in ('m-activity-body', 'ws-mobile-shell'):
             return render(request, 'activity/partials/_m_detail.html', context)
         return render(request, 'activity/partials/activity_detail_stage.html', context)
     return render(request, 'activity/activity_detail.html', context)

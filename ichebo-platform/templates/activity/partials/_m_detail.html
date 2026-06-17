@@ -1,77 +1,146 @@
-{# Mobile: Activity detail — standalone partial, no tab nav. Loaded into #m-activity-body #}
-<div class="activity-detail" style="margin-top: var(--space-s); padding: 0 1rem 4rem;">
+{# Mobile: Activity detail — standalone, no tab nav. Injected into #ws-mobile-shell #}
+<div style="padding: var(--space-m) var(--space-m) var(--space-s);">
 
+  {# Back link #}
   {% if from_tab == 'ministry' %}
   <a href="{% url 'activity:ministry' %}"
      hx-get="{% url 'activity:activity-home' %}?tab=ministry"
-     hx-target="#m-activity-body"
+     hx-target="#ws-mobile-shell"
+     hx-swap="innerHTML"
      hx-push-url="{% url 'activity:ministry' %}"
-     style="font-size: 12px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; margin-bottom: var(--space-s);">
-    <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back_ios</span>
-    Back
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
+            font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    Ministry
   </a>
   {% elif from_tab == 'calendar' %}
   <a href="{% url 'calendar:month' %}"
      hx-get="{% url 'activity:activity-home' %}?tab=calendar"
-     hx-target="#m-activity-body"
+     hx-target="#ws-mobile-shell"
+     hx-swap="innerHTML"
      hx-push-url="{% url 'calendar:month' %}"
-     style="font-size: 12px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; margin-bottom: var(--space-s);">
-    <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back_ios</span>
-    Back
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
+            font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    Calendar
   </a>
   {% else %}
   <a href="{% url 'activity:activity-home' %}"
      hx-get="{% url 'activity:activity-home' %}"
-     hx-target="#m-activity-body"
+     hx-target="#ws-mobile-shell"
+     hx-swap="innerHTML"
      hx-push-url="{% url 'activity:activity-home' %}"
-     style="font-size: 12px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; margin-bottom: var(--space-s);">
-    <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back_ios</span>
-    Back
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
+            font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    Activity
   </a>
   {% endif %}
 
   {% if via_record %}
-  <div style="margin-bottom: 12px;">
-      <a href="{% url 'records:records-detail' via_record.id %}"
-         style="font-size: 11px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px;">
-          <span class="material-symbols-outlined" style="font-size: 14px;">arrow_back_ios</span>
-          Linked via: <span style="text-decoration: underline;">{{ via_record.title|truncatechars:30 }}</span>
-      </a>
+  <div style="margin-bottom:10px;">
+    <a href="{% url 'records:records-detail' via_record.id %}"
+       style="font-size:11px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px;">
+      <span class="material-symbols-outlined" style="font-size:14px;">arrow_back_ios</span>
+      Linked via: <span style="text-decoration:underline;">{{ via_record.title|truncatechars:30 }}</span>
+    </a>
   </div>
   {% endif %}
 
-  <div style="margin-bottom: 16px;">
-      <span class="status-badge status-badge--muted" style="margin-bottom: 8px; display: inline-block;">
-          {{ activity.activity_type|upper }}
+  {# Title row + icon actions #}
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:var(--space-s);">
+    <div>
+      <span class="status-badge status-badge--muted" style="margin-bottom:8px;display:inline-block;">
+        {{ activity.activity_type|upper }}
       </span>
-      <h2 style="margin: 0; font-size: 22px; font-weight: 700;">{{ activity.title }}</h2>
-  </div>
-
-  <div style="display: flex; gap: 8px; margin-bottom: 24px;">
-      {% if activity.status != 'completed' %}
-      <button class="btn-touch" style="background: var(--primary); color: #fff; flex: 2;"
-              hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=list{% if from_tab == 'ministry' %}&tab=ministry{% elif from_tab == 'calendar' %}&tab=calendar{% endif %}"
-              hx-target="#m-activity-body"
+      <h1 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;
+                 color:var(--text);line-height:1.2;margin:0;">{{ activity.title }}</h1>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0;">
+      {% if activity.linked_record %}
+      <button class="btn-touch" style="background:var(--bg);border:1px solid var(--border);"
+              hx-get="{% url 'records:htmx-linked-records' activity.linked_record.id %}"
+              hx-target="#drawerInner"
               hx-swap="innerHTML"
-              hx-push-url="{% if from_tab == 'ministry' %}{% url 'activity:ministry' %}{% elif from_tab == 'calendar' %}{% url 'calendar:month' %}{% else %}{% url 'activity:activity-home' %}{% endif %}">
-          Mark Completed
+              onclick="window.ICSDrawer && window.ICSDrawer.open('Connections')">
+        <span class="material-symbols-outlined" style="font-size:18px;">hub</span>
       </button>
       {% endif %}
-      <button class="btn-touch" style="background: var(--bg); border: 1px solid var(--border); flex: 1;"
+      {% if activity.status != 'completed' %}
+      <button class="btn-touch" style="background:#2ecc71;border:none;color:#fff;"
+              hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=list{% if from_tab == 'ministry' %}&tab=ministry{% elif from_tab == 'calendar' %}&tab=calendar{% endif %}"
+              hx-target="#ws-mobile-shell"
+              hx-swap="innerHTML"
+              hx-push-url="{% if from_tab == 'ministry' %}{% url 'activity:ministry' %}{% elif from_tab == 'calendar' %}{% url 'calendar:month' %}{% else %}{% url 'activity:activity-home' %}{% endif %}">
+        <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
+      </button>
+      {% endif %}
+      <button class="btn-touch" style="background:var(--bg);border:1px solid var(--border);"
               hx-get="{% url 'activity:htmx-edit' activity.id %}"
               hx-target="#drawerInner"
               hx-swap="innerHTML"
-              hx-vals='{"refresh_target": "m-detail-body", "activity_id": "{{ activity.id }}", "from_tab": "{{ from_tab }}"}'
+              hx-vals='{"refresh_target": "m-detail-body", "from_tab": "{{ from_tab }}"}'
               onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Activity')">
-          Edit
+        <span class="material-symbols-outlined" style="font-size:18px;">edit</span>
       </button>
+    </div>
   </div>
 
-  {% if activity.description %}
-  <div style="margin-bottom: 24px;">
-      <div class="label-caps" style="margin-bottom: 8px;">Description</div>
-      <div style="line-height: 1.6; color: var(--text);">{{ activity.description|linebreaks }}</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:var(--space-m);">
+    {% if activity.due_at %}{{ activity.due_at|date:"d M Y" }} · {% endif %}{{ activity.status|title }}
   </div>
-  {% endif %}
 
 </div>
+
+{% if activity.description %}
+<div style="padding:0 var(--space-m) var(--space-m);font-size:15px;line-height:1.8;color:var(--text);">
+  <div class="label-caps" style="margin-bottom:8px;">Description</div>
+  {{ activity.description|linebreaks }}
+</div>
+{% endif %}
+
+{% if activity.linked_record %}
+<div style="margin:0 var(--space-m) var(--space-l);padding:14px;background:var(--card);
+            border:1px solid var(--border);border-radius:12px;
+            display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;"
+     hx-get="{% url 'records:records-detail' activity.linked_record.id %}"
+     hx-target="#ws-mobile-shell"
+     hx-swap="innerHTML"
+     hx-push-url="{% url 'records:records-detail' activity.linked_record.id %}">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="material-symbols-outlined" style="font-size:18px;color:var(--muted);">description</span>
+    <div>
+      <div style="font-size:13px;font-weight:700;">{{ activity.linked_record.title }}</div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">
+        {{ activity.linked_record.record_type }}
+      </div>
+    </div>
+  </div>
+  <span class="material-symbols-outlined" style="font-size:16px;color:var(--muted);">chevron_right</span>
+</div>
+{% else %}
+<div style="margin:0 var(--space-m) var(--space-2xl);padding:var(--space-m);
+            border:1px dashed var(--border);border-radius:12px;text-align:center;color:var(--muted);">
+  <span class="material-symbols-outlined" style="font-size:28px;opacity:0.2;display:block;margin-bottom:6px;">link</span>
+  <p style="font-size:13px;margin:0 0 10px;">No record linked.</p>
+  <button class="btn-touch" style="font-size:12px;background:var(--bg);border:1px solid var(--border);"
+          onclick="openLinkModal()">
+    <span class="material-symbols-outlined" style="font-size:16px;">add_link</span>
+    Attach Record
+  </button>
+</div>
+<form id="set-link-form" hx-post="{% url 'activity:htmx-set-link' activity.id %}"
+      hx-swap="none" hx-confirm="Link this activity to this record?">
+  {% csrf_token %}
+  <input type="hidden" name="record_id" id="target-record-id">
+</form>
+{% include "records/partials/_link_modal.html" %}
+<script>
+window.selectRecord = function(recordId, recordTitle) {
+  document.getElementById('set-link-form').setAttribute('hx-confirm', 'Link this activity to "' + recordTitle + '"?');
+  document.getElementById('target-record-id').value = recordId;
+  htmx.trigger('#set-link-form', 'submit');
+  closeLinkModal();
+};
+</script>
+{% endif %}
