@@ -1,25 +1,23 @@
 {# Mobile: Personal activity tab body — loaded into #m-activity-body via HTMX #}
 
 {# Filter pills #}
-<div style="display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
-            border-bottom: 1px solid var(--border); padding: var(--space-s) var(--space-s) 0;">
+<div style="display: flex; gap: 6px; overflow-x: auto; padding: var(--space-s);
+            scrollbar-width: none; -webkit-overflow-scrolling: touch;">
   <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=personal"
      hx-target="#m-activity-body" hx-push-url="{% url 'activity:activity-home' %}"
-     style="flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 700;
-            text-decoration: none; white-space: nowrap;
-            border-bottom: 2px solid {% if not active_type %}var(--primary){% else %}transparent{% endif %};
-            color: {% if not active_type %}var(--primary){% else %}var(--muted){% endif %};">
-    All
-  </a>
+     style="flex-shrink: 0; height: 30px; padding: 0 14px; display: inline-flex; align-items: center;
+            font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none; white-space: nowrap;
+            border: 1px solid {% if not active_type %}var(--primary){% else %}var(--border){% endif %};
+            background: {% if not active_type %}var(--primary){% else %}var(--card){% endif %};
+            color: {% if not active_type %}#fff{% else %}var(--text){% endif %};">All</a>
   {% for slug, label in activity_types %}
   <a href="#" hx-get="{% url 'activity:activity-home' %}?tab=personal&type={{ slug }}"
      hx-target="#m-activity-body" hx-push-url="{% url 'activity:activity-home' %}?type={{ slug }}"
-     style="flex-shrink: 0; padding: 10px 14px; font-size: 13px; font-weight: 700;
-            text-decoration: none; white-space: nowrap;
-            border-bottom: 2px solid {% if active_type == slug %}var(--primary){% else %}transparent{% endif %};
-            color: {% if active_type == slug %}var(--primary){% else %}var(--muted){% endif %};">
-    {{ label }}
-  </a>
+     style="flex-shrink: 0; height: 30px; padding: 0 14px; display: inline-flex; align-items: center;
+            font-size: 12px; font-weight: 700; border-radius: 20px; text-decoration: none; white-space: nowrap;
+            border: 1px solid {% if active_type == slug %}var(--primary){% else %}var(--border){% endif %};
+            background: {% if active_type == slug %}var(--primary){% else %}var(--card){% endif %};
+            color: {% if active_type == slug %}#fff{% else %}var(--text){% endif %};">{{ label }}</a>
   {% endfor %}
 </div>
 
