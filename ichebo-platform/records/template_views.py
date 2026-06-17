@@ -161,7 +161,8 @@ def htmx_create_record(request):
         'active_app': 'records',
     }
     if request.headers.get('HX-Request'):
-        if request.headers.get('HX-Target') == 'drawerInner':
+        hx_target = request.headers.get('HX-Target', '')
+        if hx_target in ('drawerInner', 'record-create-pane'):
             return render(request, 'records/partials/create_form.html', ctx)
         return render(request, 'workspace/records/partials/editorial_form.html', ctx)
     return render(request, 'workspace/records/create.html', ctx)
@@ -188,16 +189,34 @@ def htmx_edit_record(request, record_id):
             record.record_type = rtype
         record.save(update_fields=['title', 'content', 'record_type', 'updated_at'])
         from django.urls import reverse
+        from django.template.loader import render_to_string
+        import json
+        refresh_target = request.POST.get('refresh_target', '')
+        hx_target = request.headers.get('HX-Target', '')
+        # Desktop options bar save — OOB swap the detail into #ics-canvas
+        if hx_target == 'record-edit-pane' or refresh_target == 'record-edit-pane':
+            stage_html = render_to_string(
+                'workspace/records/partials/record_detail_stage.html',
+                {'record': record, 'record_types': JOURNAL_RECORD_TYPES},
+                request=request,
+            )
+            oob_html = f'<div><div id="ics-canvas" hx-swap-oob="innerHTML">{stage_html}</div></div>'
+            resp = HttpResponse(oob_html, content_type='text/html')
+            resp['X-WS-Toast'] = json.dumps([{'level': 'success', 'message': 'Entry saved.'}])
+            return resp
+        # Mobile drawer save — redirect to detail page
         response = HttpResponse(status=204)
         response['HX-Trigger'] = 'recordCreated'
         response['HX-Redirect'] = reverse('records:records-detail', kwargs={'record_id': record.id})
         return response
 
-    # GET — drawer gets mobile form, desktop gets editorial stage
-    if request.headers.get('HX-Target') == 'drawerInner':
+    # GET — drawer and options bar pane both get the compact form
+    hx_target = request.headers.get('HX-Target', '')
+    if hx_target in ('drawerInner', 'record-edit-pane'):
         return render(request, 'records/partials/edit_form.html', {
             'record': record,
             'record_types': JOURNAL_RECORD_TYPES,
+            'refresh_target': 'record-edit-pane' if hx_target == 'record-edit-pane' else '',
         })
     return render(request, 'workspace/records/partials/editorial_form.html', {
         'record': record,

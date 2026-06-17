@@ -57,22 +57,33 @@
 {% endblock %}
 
 {% block ws_content %}
-<div class="ics-stage__content" data-watermark="Journal"
-     style="height: 100%; overflow-y: auto;">
+<div style="height: 100%; overflow-y: auto;">
     <div class="rec-canvas">
 
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap;">
-            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
-                         padding: 2px 8px; border-radius: 20px;
-                         background: rgba(175,50,54,0.08); color: var(--accent-red);">
-                {{ record.record_type }}
-            </span>
-            <span style="font-size: 11px; color: var(--text-muted-ink);">
-                {{ record.updated_at|date:"d M Y · H:i" }}
-            </span>
-            <span style="font-size: 11px; color: var(--text-muted-ink); margin-left: auto;">
-                {{ record.status|title }}
-            </span>
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+                             padding: 2px 8px; border-radius: 20px;
+                             background: rgba(175,50,54,0.08); color: var(--accent-red);">
+                    {{ record.record_type }}
+                </span>
+                <span style="font-size: 11px; color: var(--text-muted-ink);">
+                    {{ record.updated_at|date:"d M Y · H:i" }}
+                </span>
+                <span style="font-size: 11px; color: var(--text-muted-ink);">
+                    {{ record.status|title }}
+                </span>
+            </div>
+            {% if record.created_by == request.user %}
+            <button class="ws-topbar__cta"
+                    hx-get="{% url 'records:htmx-edit' record.id %}"
+                    hx-target="#record-edit-pane"
+                    hx-swap="innerHTML"
+                    onclick="if(window.innerWidth>=1024){if(WorkspaceUI&&!WorkspaceUI.state.optionsOpen)WorkspaceUI.toggleOptions();WorkspaceUI.switchOptionsTab('edit');}else{window.ICSDrawer&&window.ICSDrawer.open('Edit Entry');}">
+                <span class="material-symbols-outlined">edit</span>
+                Edit
+            </button>
+            {% endif %}
         </div>
 
         <h1 class="rec-title">{{ record.title }}</h1>
@@ -85,59 +96,92 @@
 </div>
 {% endblock %}
 
-{% block ws_options %}
-<div style="padding: 14px;">
-    <div class="ws-label-tag" style="margin-bottom: 12px;">Record</div>
+{% block ws_options_tabs %}
+<div class="ics-options-tabs">
+  <button class="ics-options-tab active" id="tab-relations"
+          onclick="WorkspaceUI.switchOptionsTab('relations')">Intel</button>
+  {% if record.created_by == request.user %}
+  <button class="ics-options-tab" id="tab-edit"
+          onclick="WorkspaceUI.switchOptionsTab('edit')">Edit</button>
+  {% endif %}
+</div>
+<div class="ics-options-bar__content">
 
-    <div style="font-size: 12px; line-height: 1.8; color: var(--text-muted-ink); margin-bottom: 14px;">
+  {# Intel pane — record metadata + connections #}
+  <div class="ws-options-pane active" id="pane-relations">
+    <div style="padding: 14px;">
+      <div class="ws-label-tag" style="margin-bottom: 12px;">Record</div>
+      <div style="font-size: 12px; line-height: 1.8; color: var(--text-muted-ink); margin-bottom: 14px;">
         <div><strong style="color: var(--text-ink);">Type</strong></div>
         <div style="text-transform: capitalize; margin-bottom: 8px;">{{ record.record_type }}</div>
         <div><strong style="color: var(--text-ink);">Status</strong></div>
         <div style="margin-bottom: 8px; text-transform: capitalize;">{{ record.status }}</div>
         <div><strong style="color: var(--text-ink);">Created</strong></div>
         <div>{{ record.created_at|date:"d M Y" }}</div>
-    </div>
-
-    {% if record.created_by == request.user %}
-    <div style="height: 1px; background: var(--border-ink); margin: 14px 0;"></div>
-    <button class="rec-nav-btn"
-            style="color: var(--text-ink); padding: 9px 0;"
-            hx-get="{% url 'records:htmx-edit' record.id %}"
-            hx-target="#drawerContent"
-            onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Entry')">
-        <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
-        Edit Entry
-    </button>
-    {% endif %}
-
-    <div style="height: 1px; background: var(--border-ink); margin: 14px 0;"></div>
-    <div class="ws-label-tag" style="margin-bottom: 10px;">Connections</div>
-    <div id="ws-linked-records"
-         hx-get="{% url 'records:htmx-linked-records' record.id %}"
-         hx-trigger="load"
-         hx-swap="innerHTML"
-         style="font-size: 12px; color: var(--text-muted-ink);">
+      </div>
+      <div style="height: 1px; background: var(--border-ink); margin: 14px 0;"></div>
+      <div class="ws-label-tag" style="margin-bottom: 10px;">Connections</div>
+      <div id="ws-linked-records"
+           hx-get="{% url 'records:htmx-linked-records' record.id %}"
+           hx-trigger="load"
+           hx-swap="innerHTML"
+           style="font-size: 12px; color: var(--text-muted-ink);">
         Loading…
+      </div>
     </div>
+  </div>
+
+  {# Edit pane #}
+  {% if record.created_by == request.user %}
+  <div class="ws-options-pane" id="pane-edit">
+    <div style="padding: var(--space-m);">
+      <div id="record-edit-pane">
+        <div style="text-align:center; padding: 2rem 1rem; color: var(--muted); font-size:13px;">
+          Loading edit form…
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}
 
 {# ── Mobile shell ── #}
 {% block content %}
-<div class="page-hero" style="padding: var(--space-l) var(--space-m) var(--space-m);">
+<div style="padding: var(--space-m) var(--space-m) var(--space-s);">
     <a href="{% url 'records:records-home' %}"
        style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
-              font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);">
+              font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
         <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
         Journal
     </a>
-    <h1 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;
-               color:var(--text);line-height:1.2;margin:0 0 8px;">{{ record.title }}</h1>
-    <div style="font-size:12px;color:var(--muted);">
-        {{ record.record_type|title }} · {{ record.updated_at|date:"d M Y" }}
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:var(--space-s);">
+        <div>
+            <span class="status-badge status-badge--muted" style="margin-bottom:8px;display:inline-block;">
+                {{ record.record_type|upper }}
+            </span>
+            <h1 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;
+                       color:var(--text);line-height:1.2;margin:0;">{{ record.title }}</h1>
+        </div>
+        {% if record.created_by == request.user %}
+        <button class="btn-touch" style="flex-shrink:0;background:var(--bg);border:1px solid var(--border);"
+                hx-get="{% url 'records:htmx-edit' record.id %}"
+                hx-target="#drawerInner"
+                hx-swap="innerHTML"
+                onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Entry')">
+            <span class="material-symbols-outlined" style="font-size:18px;">edit</span>
+        </button>
+        {% endif %}
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);margin-bottom:var(--space-m);">
+        {{ record.updated_at|date:"d M Y" }} · {{ record.status|title }}
     </div>
 </div>
-<div style="padding:var(--space-m) var(--space-m) var(--space-2xl);
+
+<div style="padding: 0 var(--space-m) var(--space-2xl);
             font-size:15px;line-height:1.8;color:var(--text);">
     {{ record.content|linebreaks }}
 </div>

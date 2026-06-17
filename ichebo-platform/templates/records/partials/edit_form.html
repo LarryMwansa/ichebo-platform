@@ -3,6 +3,7 @@
       hx-target="#drawerInner"
       hx-swap="none">
   {% csrf_token %}
+  {% if refresh_target %}<input type="hidden" name="refresh_target" value="{{ refresh_target }}">{% endif %}
 
   <div class="record-form-group">
     <label class="label-caps" style="color: var(--muted); margin-bottom: 8px; display: block;">Entry Type</label>

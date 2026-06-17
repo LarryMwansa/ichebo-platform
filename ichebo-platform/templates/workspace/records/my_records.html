@@ -110,118 +110,172 @@
 {% endblock %}
 
 {% block ws_content %}
-<div class="ics-stage__content" data-watermark="Journal"
-     style="height: 100%; overflow-y: auto;">
+<div style="height: 100%; overflow-y: auto;">
 
-    <div style="padding: 28px 24px 12px; border-bottom: 1px solid var(--border-ink);
-                display: flex; align-items: flex-end; justify-content: space-between;">
-        <div>
-            <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: 8px;">Personal Record</div>
-            <h1 class="ws-page-title" style="font-size: 22px; margin: 0;">
-                {% if active_type %}
-                    {% for v, l in record_types %}{% if v == active_type %}{{ l }}{% endif %}{% endfor %}
-                {% else %}
-                    My Journal
-                {% endif %}
-            </h1>
-        </div>
-        <span style="font-size: 12px; color: var(--text-muted-ink);">
-            {{ records.count }} entr{% if records.count == 1 %}y{% else %}ies{% endif %}
+  {# ── Category cards grid ── #}
+  <div style="padding: 28px 28px 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+      <div>
+        <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: 6px;">Personal Record</div>
+        <h1 class="ws-page-title" style="font-size: 22px; margin: 0;">My Journal</h1>
+      </div>
+      <button class="ws-topbar__cta"
+              hx-get="{% url 'records:htmx-create' %}"
+              hx-target="#record-create-pane"
+              hx-swap="innerHTML"
+              onclick="if(window.innerWidth>=1024){if(WorkspaceUI&&!WorkspaceUI.state.optionsOpen)WorkspaceUI.toggleOptions();WorkspaceUI.switchOptionsTab('create');}else{window.ICSDrawer&&window.ICSDrawer.open('New Entry');}">
+        <span class="material-symbols-outlined">edit_note</span>
+        New Entry
+      </button>
+    </div>
+
+    {# Category cards #}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 32px;">
+      {% for value, label in record_types %}
+      {% with icon=value %}
+      <a href="{% url 'records:records-home' %}?type={{ value }}"
+         hx-get="{% url 'records:records-home' %}?type={{ value }}"
+         hx-target="#ics-canvas"
+         hx-push-url="true"
+         style="display:block; padding: 18px 16px; background: var(--card); border: 1px solid var(--border-ink);
+                border-radius: 12px; text-decoration: none; transition: all 0.15s;
+                {% if active_type == value %}border-color: var(--accent-red); background: rgba(175,50,54,0.04);{% endif %}">
+        <span class="material-symbols-outlined" style="font-size: 22px; color: var(--accent-red); display: block; margin-bottom: 10px;">
+          {% if value == 'prayer' %}church
+          {% elif value == 'spirit' %}self_improvement
+          {% elif value == 'dream' %}bedtime
+          {% elif value == 'dar' %}summarize
+          {% elif value == 'note' %}description
+          {% else %}history_edu{% endif %}
         </span>
+        <div style="font-size: 12px; font-weight: 700; color: var(--text-ink); margin-bottom: 4px;">{{ label }}</div>
+        <div style="font-size: 11px; color: var(--text-muted-ink);">
+          {{ records_by_type|default_if_none:"" }}
+        </div>
+      </a>
+      {% endwith %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {# ── Recent entries list ── #}
+  <div style="border-top: 1px solid var(--border-ink); padding: 0 0 100px;">
+    <div style="padding: 16px 28px 12px; display: flex; align-items: center; justify-content: space-between;">
+      <div class="ws-label-tag">
+        {% if active_type %}
+          {% for v, l in record_types %}{% if v == active_type %}{{ l }}{% endif %}{% endfor %}
+          — {{ records.count }} entr{% if records.count == 1 %}y{% else %}ies{% endif %}
+        {% else %}
+          Recent Entries — {{ records.count }} total
+        {% endif %}
+      </div>
+      {% if active_type %}
+      <a href="{% url 'records:records-home' %}"
+         hx-get="{% url 'records:records-home' %}"
+         hx-target="#ics-canvas" hx-push-url="true"
+         style="font-size: 11px; color: var(--accent-red); text-decoration: none; font-weight: 700;">
+        Show all
+      </a>
+      {% endif %}
     </div>
 
     <div id="record-list">
-        {% if records %}
-            {% for record in records %}
-            <a href="{% url 'records:records-detail' record.id %}" class="rec-row">
-                <div class="rec-row__icon">
-                    <span class="material-symbols-outlined">
-                        {% if record.record_type == 'prayer' %}church
-                        {% elif record.record_type == 'spirit' %}self_improvement
-                        {% elif record.record_type == 'dream' %}bedtime
-                        {% elif record.record_type == 'dar' %}summarize
-                        {% elif record.record_type == 'note' %}description
-                        {% else %}history_edu{% endif %}
-                    </span>
-                </div>
-                <div class="rec-row__body">
-                    <div class="rec-row__title">{{ record.title|truncatechars:72 }}</div>
-                    {% if record.content %}
-                    <div class="rec-row__excerpt">{{ record.content|striptags|truncatechars:140 }}</div>
-                    {% endif %}
-                    <div class="rec-row__meta">
-                        <span class="rec-type-pill">{{ record.record_type }}</span>
-                        <span>{{ record.updated_at|date:"d M Y" }}</span>
-                        {% if record.status == 'draft' %}
-                        <span style="color: #636e72; font-weight: 600;">Draft</span>
-                        {% endif %}
-                    </div>
-                </div>
-            </a>
-            {% endfor %}
-        {% else %}
-        <div style="padding: 80px 24px; text-align: center;">
-            <span class="material-symbols-outlined"
-                  style="font-size: 48px; opacity: 0.12; display: block; margin-bottom: 16px;">
-                history_edu
+      {% if records %}
+        {% for record in records %}
+        <a href="{% url 'records:records-detail' record.id %}"
+           hx-get="{% url 'records:records-detail' record.id %}"
+           hx-target="#ics-canvas" hx-push-url="true"
+           class="rec-row">
+          <div class="rec-row__icon">
+            <span class="material-symbols-outlined">
+              {% if record.record_type == 'prayer' %}church
+              {% elif record.record_type == 'spirit' %}self_improvement
+              {% elif record.record_type == 'dream' %}bedtime
+              {% elif record.record_type == 'dar' %}summarize
+              {% elif record.record_type == 'note' %}description
+              {% else %}history_edu{% endif %}
             </span>
-            <p style="font-size: 14px; color: var(--text-muted-ink); margin-bottom: 8px; font-weight: 500;">
-                No entries yet
-            </p>
-            <p style="font-size: 12px; color: var(--text-muted-ink);">
-                Use the compose panel on the right to write your first entry.
-            </p>
-        </div>
-        {% endif %}
+          </div>
+          <div class="rec-row__body">
+            <div class="rec-row__title">{{ record.title|truncatechars:72 }}</div>
+            {% if record.content %}
+            <div class="rec-row__excerpt">{{ record.content|striptags|truncatechars:140 }}</div>
+            {% endif %}
+            <div class="rec-row__meta">
+              <span class="rec-type-pill">{{ record.record_type }}</span>
+              <span>{{ record.updated_at|date:"d M Y" }}</span>
+              {% if record.status == 'draft' %}
+              <span style="color: #636e72; font-weight: 600;">Draft</span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      {% else %}
+      <div style="padding: 60px 24px; text-align: center;">
+        <span class="material-symbols-outlined"
+              style="font-size: 48px; opacity: 0.12; display: block; margin-bottom: 16px;">history_edu</span>
+        <p style="font-size: 14px; color: var(--text-muted-ink); margin-bottom: 8px; font-weight: 500;">No entries yet</p>
+        <button class="ws-topbar__cta"
+                hx-get="{% url 'records:htmx-create' %}"
+                hx-target="#record-create-pane"
+                hx-swap="innerHTML"
+                onclick="if(WorkspaceUI&&!WorkspaceUI.state.optionsOpen)WorkspaceUI.toggleOptions();WorkspaceUI.switchOptionsTab('create');">
+          <span class="material-symbols-outlined">edit_note</span>
+          Write your first entry
+        </button>
+      </div>
+      {% endif %}
     </div>
+  </div>
 
 </div>
 {% endblock %}
 
-{% block ws_options %}
-<div style="padding: 14px;">
-    <div class="ws-label-tag" style="margin-bottom: 14px; color: var(--accent-red);">Compose</div>
+{% block ws_options_tabs %}
+<div class="ics-options-tabs">
+  <button class="ics-options-tab active" id="tab-relations"
+          onclick="WorkspaceUI.switchOptionsTab('relations')">Journal</button>
+  <button class="ics-options-tab" id="tab-create"
+          onclick="WorkspaceUI.switchOptionsTab('create')">New</button>
+</div>
+<div class="ics-options-bar__content">
 
-    <form class="rec-compose-form"
-          hx-post="{% url 'records:htmx-create' %}">
-        {% csrf_token %}
-        <input type="hidden" name="record_family" value="journal">
-        <input type="text" name="title" placeholder="Entry title…" required>
-
-        <select name="record_type">
-            {% for value, label in record_types %}
-            <option value="{{ value }}"
-                    {% if active_type == value %}selected{% endif %}>
-                {{ label }}
-            </option>
-            {% endfor %}
-        </select>
-
-        <textarea name="content" placeholder="Write…"></textarea>
-
-        <button type="submit" class="ws-topbar__cta"
-                style="width: 100%; justify-content: center; margin-top: 4px;
-                       background: var(--accent-red); color: #fff; border: none; cursor: pointer;">
-            <span class="material-symbols-outlined">save</span>
-            Save Entry
-        </button>
-    </form>
-
-    <div style="height: 1px; background: var(--border-ink); margin: 18px 0;"></div>
-
-    <div class="ws-label-tag" style="margin-bottom: 10px;">Stats</div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+  {# Journal stats pane #}
+  <div class="ws-options-pane active" id="pane-relations">
+    <div style="padding: 14px;">
+      <div class="ws-label-tag" style="margin-bottom: 10px;">Stats</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
         <div style="padding: 12px; background: var(--card-2, rgba(0,0,0,0.03)); border: 1px solid var(--border-ink); border-radius: 8px;">
-            <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-ink); margin-bottom: 4px;">Entries</div>
-            <div style="font-size: 22px; font-weight: 800; color: var(--text-ink);">{{ records.count|default:0 }}</div>
+          <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-ink); margin-bottom: 4px;">Entries</div>
+          <div style="font-size: 22px; font-weight: 800; color: var(--text-ink);">{{ records.count|default:0 }}</div>
         </div>
         <div style="padding: 12px; background: var(--card-2, rgba(0,0,0,0.03)); border: 1px solid var(--border-ink); border-radius: 8px;">
-            <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-ink); margin-bottom: 4px;">Type</div>
-            <div style="font-size: 13px; font-weight: 700; color: var(--text-ink); text-transform: capitalize;">
-                {{ active_type|default:"All" }}
-            </div>
+          <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted-ink); margin-bottom: 4px;">Filter</div>
+          <div style="font-size: 13px; font-weight: 700; color: var(--text-ink); text-transform: capitalize;">{{ active_type|default:"All" }}</div>
         </div>
+      </div>
+      <div class="ws-label-tag" style="margin-bottom: 8px;">Recent</div>
+      <div id="rec-recent-pane"
+           hx-get="{% url 'records:htmx-recent-drafts' %}"
+           hx-trigger="load"
+           style="display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--text-muted-ink);">
+        Loading…
+      </div>
     </div>
+  </div>
+
+  {# New record pane #}
+  <div class="ws-options-pane" id="pane-create">
+    <div style="padding: var(--space-m);">
+      <div id="record-create-pane">
+        <div style="text-align:center; padding: 2rem 1rem; color: var(--muted); font-size:13px;">
+          Click <strong>New Entry</strong> to start.
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 {% endblock %}
 
