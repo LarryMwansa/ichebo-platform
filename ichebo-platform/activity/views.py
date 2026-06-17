@@ -405,11 +405,16 @@ def htmx_complete_activity(request, activity_id):
         return response
 
     if request.GET.get('redirect') == 'list':
+        from django.urls import reverse
         if request.GET.get('tab') == 'ministry':
-            return _ministry_partial(request)
-        if request.GET.get('tab') == 'calendar':
-            return _calendar_partial(request)
-        return _personal_mobile_partial(request)
+            redirect_url = reverse('activity:ministry')
+        elif request.GET.get('tab') == 'calendar':
+            redirect_url = reverse('calendar:month')
+        else:
+            redirect_url = reverse('activity:activity-home')
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = redirect_url
+        return response
 
     return render(request, 'activity/partials/_completed_item.html', {
         'activity': activity,

@@ -1,13 +1,9 @@
 {# Mobile: Activity detail — standalone, no tab nav. Injected into #ws-mobile-shell #}
 <div style="padding: var(--space-m) var(--space-m) var(--space-s);">
 
-  {# Back link #}
+  {# Back link — full navigation so the hero + tab nav re-render correctly #}
   {% if from_tab == 'ministry' %}
   <a href="{% url 'activity:ministry' %}"
-     hx-get="{% url 'activity:activity-home' %}?tab=ministry"
-     hx-target="#ws-mobile-shell"
-     hx-swap="innerHTML"
-     hx-push-url="{% url 'activity:ministry' %}"
      style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
             font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
     <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
@@ -15,10 +11,6 @@
   </a>
   {% elif from_tab == 'calendar' %}
   <a href="{% url 'calendar:month' %}"
-     hx-get="{% url 'activity:activity-home' %}?tab=calendar"
-     hx-target="#ws-mobile-shell"
-     hx-swap="innerHTML"
-     hx-push-url="{% url 'calendar:month' %}"
      style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
             font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
     <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
@@ -26,10 +18,6 @@
   </a>
   {% else %}
   <a href="{% url 'activity:activity-home' %}"
-     hx-get="{% url 'activity:activity-home' %}"
-     hx-target="#ws-mobile-shell"
-     hx-swap="innerHTML"
-     hx-push-url="{% url 'activity:activity-home' %}"
      style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
             font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
     <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
@@ -69,9 +57,7 @@
       {% if activity.status != 'completed' %}
       <button class="btn-touch" style="background:#2ecc71;border:none;color:#fff;"
               hx-post="{% url 'activity:htmx-complete' activity.id %}?redirect=list{% if from_tab == 'ministry' %}&tab=ministry{% elif from_tab == 'calendar' %}&tab=calendar{% endif %}"
-              hx-target="#ws-mobile-shell"
-              hx-swap="innerHTML"
-              hx-push-url="{% if from_tab == 'ministry' %}{% url 'activity:ministry' %}{% elif from_tab == 'calendar' %}{% url 'calendar:month' %}{% else %}{% url 'activity:activity-home' %}{% endif %}">
+              hx-swap="none">
         <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
       </button>
       {% endif %}
