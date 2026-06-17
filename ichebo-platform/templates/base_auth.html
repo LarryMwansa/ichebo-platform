@@ -14,8 +14,32 @@
   <script src="/static/js/storage.js"></script>
 </head>
 <body class="auth-shell">
+
+  <button id="themeToggle"
+          aria-label="Toggle theme"
+          style="position:fixed;top:16px;right:16px;z-index:100;
+                 width:40px;height:40px;border-radius:50%;
+                 background:var(--card);border:1px solid var(--border);
+                 display:flex;align-items:center;justify-content:center;
+                 cursor:pointer;color:var(--text);transition:background 0.15s;">
+    <span class="material-symbols-outlined theme-icon-sun" aria-hidden="true" style="font-size:20px;">light_mode</span>
+    <span class="material-symbols-outlined theme-icon-moon" aria-hidden="true" style="font-size:20px;">dark_mode</span>
+  </button>
+
   <main class="auth-main">
     {% block content %}{% endblock %}
   </main>
+
+  <script>
+    document.getElementById('themeToggle').addEventListener('click', function() {
+      var current = window.ICSStorage ? window.ICSStorage.getTheme() : (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      var next = current === 'dark' ? 'light' : 'dark';
+      if (window.ICSStorage) {
+        window.ICSStorage.setTheme(next);
+      } else {
+        document.documentElement.classList.toggle('dark', next === 'dark');
+      }
+    });
+  </script>
 </body>
 </html>
