@@ -10,7 +10,7 @@ from accounts.models import User
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _make_user(email='user@example.com', password='testpass123', level=0):
+def _make_user(email='user@example.com', password='Tr0ub4dor&3xample!', level=0):
     return User.objects.create_user(
         username=email, email=email, password=password,
         competence_level=level,
@@ -51,14 +51,14 @@ class RegisterAPITests(APITestCase):
     url = '/api/auth/register/'
 
     def test_register_success_returns_token_and_user(self):
-        response = self.client.post(self.url, {'email': 'new@example.com', 'password': 'securepass'})
+        response = self.client.post(self.url, {'email': 'new@example.com', 'password': 'Tr0ub4dor&3xample!'})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn('token', response.data)
         self.assertEqual(response.data['user']['email'], 'new@example.com')
         self.assertEqual(response.data['user']['competence_level'], 0)
 
     def test_register_sets_seeker_status(self):
-        self.client.post(self.url, {'email': 'seeker@example.com', 'password': 'securepass'})
+        self.client.post(self.url, {'email': 'seeker@example.com', 'password': 'Tr0ub4dor&3xample!'})
         user = User.objects.get(email='seeker@example.com')
         self.assertEqual(user.status, 'seeker')
         self.assertEqual(user.competence_level, 0)
@@ -67,13 +67,21 @@ class RegisterAPITests(APITestCase):
         response = self.client.post(self.url, {'email': 'x@example.com', 'password': 'short'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_register_numeric_password_fails(self):
+        response = self.client.post(self.url, {'email': 'x2@example.com', 'password': '1234567890'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_register_common_password_fails(self):
+        response = self.client.post(self.url, {'email': 'x3@example.com', 'password': 'password123'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_register_duplicate_email_fails(self):
         _make_user(email='dup@example.com')
-        response = self.client.post(self.url, {'email': 'dup@example.com', 'password': 'securepass'})
+        response = self.client.post(self.url, {'email': 'dup@example.com', 'password': 'Tr0ub4dor&3xample!'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_register_missing_email_fails(self):
-        response = self.client.post(self.url, {'password': 'securepass'})
+        response = self.client.post(self.url, {'password': 'Tr0ub4dor&3xample!'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -85,10 +93,10 @@ class LoginAPITests(APITestCase):
     url = '/api/auth/login/'
 
     def setUp(self):
-        self.user = _make_user(email='login@example.com', password='correctpass')
+        self.user = _make_user(email='login@example.com', password='Tr0ub4dor&3xample!')
 
     def test_login_success_returns_token(self):
-        response = self.client.post(self.url, {'email': 'login@example.com', 'password': 'correctpass'})
+        response = self.client.post(self.url, {'email': 'login@example.com', 'password': 'Tr0ub4dor&3xample!'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('token', response.data)
         self.assertEqual(response.data['user']['email'], 'login@example.com')

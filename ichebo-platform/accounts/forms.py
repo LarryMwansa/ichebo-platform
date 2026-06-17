@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from .models import UserProfile
 
 User = get_user_model()
@@ -30,7 +32,7 @@ class RegisterForm(forms.ModelForm):
 
 class SignUpForm(forms.Form):
     email = forms.EmailField(label='Email address')
-    password = forms.CharField(label='Password', min_length=8, widget=forms.PasswordInput)
+    password = forms.CharField(label='Password', min_length=10, widget=forms.PasswordInput)
     password_confirm = forms.CharField(label='Confirm password', widget=forms.PasswordInput)
 
     def clean_email(self):
@@ -38,6 +40,15 @@ class SignUpForm(forms.Form):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('An account with this email already exists.')
         return email
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if password:
+            try:
+                validate_password(password)
+            except ValidationError as e:
+                raise forms.ValidationError(e.messages)
+        return password
 
     def clean(self):
         cleaned = super().clean()
