@@ -55,6 +55,16 @@
         Tenancy Hub
     </a>
 
+    <div class="ctx-divider"></div>
+
+    <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
+        {% csrf_token %}
+        <button type="submit" class="ctx-btn" style="width:100%;background:none;border:none;cursor:pointer;color:var(--danger,#e53e3e);text-align:left;">
+            <span class="material-symbols-outlined">logout</span>
+            Sign out
+        </button>
+    </form>
+
 </div>
 {% endblock %}
 
