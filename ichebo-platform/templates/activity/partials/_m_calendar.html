@@ -86,7 +86,7 @@
       <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 36px;">
         {% for ev in wd.events %}
         <div hx-get="{% url 'activity:activity-detail' ev.id %}?from=calendar"
-             hx-target="#ws-mobile-shell"
+             hx-target="#ws-mobile-main"
              hx-swap="innerHTML"
              hx-push-url="{% url 'activity:activity-detail' ev.id %}"
              style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer;
@@ -166,7 +166,7 @@
           <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 36px;">
             {% for ev in cell.events %}
             <div hx-get="{% url 'activity:activity-detail' ev.id %}?from=calendar"
-                 hx-target="#ws-mobile-shell"
+                 hx-target="#ws-mobile-main"
                  hx-swap="innerHTML"
                  hx-push-url="{% url 'activity:activity-detail' ev.id %}"
                  style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer;

@@ -73,7 +73,7 @@ def record_detail(request, record_id):
     if request.headers.get('HX-Request'):
         hx_target = request.headers.get('HX-Target', '')
         # Mobile shell injection — return standalone mobile partial only
-        if hx_target == 'ws-mobile-shell':
+        if hx_target in ('ws-mobile-shell', 'ws-mobile-main'):
             return render(request, 'workspace/records/partials/_m_record_detail.html', {
                 'record': record,
                 'via_record': via_record,

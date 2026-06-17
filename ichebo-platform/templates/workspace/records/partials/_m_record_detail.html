@@ -5,7 +5,7 @@
   {% if via_activity %}
   <a href="{% url 'activity:activity-detail' via_activity.id %}"
      hx-get="{% url 'activity:activity-detail' via_activity.id %}"
-     hx-target="#ws-mobile-shell"
+     hx-target="#ws-mobile-main"
      hx-swap="innerHTML"
      hx-push-url="{% url 'activity:activity-detail' via_activity.id %}"
      style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
@@ -16,7 +16,7 @@
   {% elif via_record %}
   <a href="{% url 'records:records-detail' via_record.id %}"
      hx-get="{% url 'records:records-detail' via_record.id %}"
-     hx-target="#ws-mobile-shell"
+     hx-target="#ws-mobile-main"
      hx-swap="innerHTML"
      hx-push-url="{% url 'records:records-detail' via_record.id %}"
      style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
@@ -27,7 +27,7 @@
   {% else %}
   <a href="{% url 'records:records-home' %}"
      hx-get="{% url 'records:records-home' %}"
-     hx-target="#ws-mobile-shell"
+     hx-target="#ws-mobile-main"
      hx-swap="innerHTML"
      hx-push-url="{% url 'records:records-home' %}"
      style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);

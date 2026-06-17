@@ -90,7 +90,7 @@
             border:1px solid var(--border);border-radius:12px;
             display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;"
      hx-get="{% url 'records:records-detail' activity.linked_record.id %}?via_activity={{ activity.id }}"
-     hx-target="#ws-mobile-shell"
+     hx-target="#ws-mobile-main"
      hx-swap="innerHTML"
      hx-push-url="{% url 'records:records-detail' activity.linked_record.id %}?via_activity={{ activity.id }}">
   <div style="display:flex;align-items:center;gap:10px;">
