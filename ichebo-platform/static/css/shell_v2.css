@@ -76,9 +76,13 @@ html:not(.dark) .ics-sidebar {
 }
 
 .ics-logo {
-  /* Sidebar is always --ink dark, so white SVG needs no filter adjustment */
   filter: none;
   transition: filter var(--transition-fast);
+}
+
+html:not(.dark) .ics-logo {
+  /* Light mode sidebar is --card-2 (stone), so invert white SVG to black */
+  filter: brightness(0);
 }
 
 .ics-sidebar__nav {
