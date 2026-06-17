@@ -1,0 +1,56 @@
+{# OOB swap target: #ics-options-bar — record detail options tabs #}
+<div id="ics-options-bar" hx-swap-oob="innerHTML">
+  <header class="ics-options-bar__header">
+    <span class="label-caps">Details & Relations</span>
+    <button class="ws-icon-btn" onclick="WorkspaceUI.toggleOptions()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </header>
+
+  <div class="ics-options-tabs">
+    <button class="ics-options-tab active" id="tab-relations"
+            onclick="WorkspaceUI.switchOptionsTab('relations')">Intel</button>
+    {% if record.created_by == request.user %}
+    <button class="ics-options-tab" id="tab-edit"
+            onclick="WorkspaceUI.switchOptionsTab('edit')">Edit</button>
+    {% endif %}
+  </div>
+  <div class="ics-options-bar__content">
+
+    <div class="ws-options-pane active" id="pane-relations">
+      <div style="padding: 14px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Record</div>
+        <div style="font-size: 12px; line-height: 1.8; color: var(--text-muted-ink); margin-bottom: 14px;">
+          <div><strong style="color: var(--text-ink);">Type</strong></div>
+          <div style="text-transform: capitalize; margin-bottom: 8px;">{{ record.record_type }}</div>
+          <div><strong style="color: var(--text-ink);">Status</strong></div>
+          <div style="margin-bottom: 8px; text-transform: capitalize;">{{ record.status }}</div>
+          <div><strong style="color: var(--text-ink);">Created</strong></div>
+          <div>{{ record.created_at|date:"d M Y" }}</div>
+        </div>
+        <div style="height: 1px; background: var(--border-ink); margin: 14px 0;"></div>
+        <div class="ws-label-tag" style="margin-bottom: 10px;">Connections</div>
+        <div id="ws-linked-records"
+             hx-get="{% url 'records:htmx-linked-records' record.id %}"
+             hx-trigger="load"
+             hx-swap="innerHTML"
+             style="font-size: 12px; color: var(--text-muted-ink);">
+          Loading…
+        </div>
+      </div>
+    </div>
+
+    {% if record.created_by == request.user %}
+    <div class="ws-options-pane" id="pane-edit">
+      <div style="padding: var(--space-m);">
+        <div id="record-edit-pane">
+          <div style="text-align:center; padding: 2rem 1rem; color: var(--muted); font-size:13px;">
+            Click <strong>Edit</strong> to load the form.
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>

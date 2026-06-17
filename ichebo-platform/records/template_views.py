@@ -64,10 +64,15 @@ def record_detail(request, record_id):
         via_record = Record.objects.filter(id=via_id).first()
 
     if request.headers.get('HX-Request'):
-        return render(request, 'workspace/records/partials/record_detail_stage.html', {
-            'record': record,
-            'via_record': via_record,
-        })
+        from django.template.loader import render_to_string
+        ctx = {'record': record, 'via_record': via_record}
+        stage_html = render_to_string(
+            'workspace/records/partials/record_detail_stage.html', ctx, request=request
+        )
+        options_html = render_to_string(
+            'workspace/records/partials/_options_detail.html', ctx, request=request
+        )
+        return HttpResponse(f'<div>{stage_html}{options_html}</div>', content_type='text/html')
 
     return render(request, 'workspace/records/record_detail.html', {
         'record': record,
