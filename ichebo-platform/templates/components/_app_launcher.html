@@ -35,42 +35,7 @@
 
 <div class="app-launcher-grid">
 
-  {# Always visible #}
-  <a href="{% url 'dashboard:index' %}" class="launcher-item">
-    <div class="launcher-icon icon-blue">
-      <span class="material-symbols-outlined">dashboard</span>
-    </div>
-    <span class="launcher-label">Home</span>
-  </a>
-
-  <a href="{% url 'bible:reader' %}" class="launcher-item">
-    <div class="launcher-icon icon-orange">
-      <span class="material-symbols-outlined">auto_stories</span>
-    </div>
-    <span class="launcher-label">Bible</span>
-  </a>
-
-  <a href="{% url 'learn:learn-home' %}" class="launcher-item">
-    <div class="launcher-icon icon-pink">
-      <span class="material-symbols-outlined">school</span>
-    </div>
-    <span class="launcher-label">Learn</span>
-  </a>
-
-  <a href="{% url 'community:community-home' %}" class="launcher-item">
-    <div class="launcher-icon icon-green">
-      <span class="material-symbols-outlined">group</span>
-    </div>
-    <span class="launcher-label">Community</span>
-  </a>
-
-  <a href="{% url 'records:records-home' %}" class="launcher-item">
-    <div class="launcher-icon icon-cyan">
-      <span class="material-symbols-outlined">description</span>
-    </div>
-    <span class="launcher-label">Records</span>
-  </a>
-
+  {# Activity — always visible #}
   <a href="{% url 'activity:activity-home' %}" class="launcher-item">
     <div class="launcher-icon icon-teal">
       <span class="material-symbols-outlined">task_alt</span>
@@ -78,35 +43,25 @@
     <span class="launcher-label">Activity</span>
   </a>
 
-  {# Level 1+ #}
+  {# Alerts — Level 1+ #}
   {% if user_level >= 1 %}
-  <a href="{% url 'activity:ministry' %}" class="launcher-item">
-    <div class="launcher-icon icon-teal">
-      <span class="material-symbols-outlined">campaign</span>
-    </div>
-    <span class="launcher-label">Ministry</span>
-  </a>
-
-  <a href="{% url 'activity:calendar' %}" class="launcher-item">
-    <div class="launcher-icon icon-blue">
-      <span class="material-symbols-outlined">calendar_month</span>
-    </div>
-    <span class="launcher-label">Calendar</span>
-  </a>
-
   <a href="{% url 'notifications:list' %}" class="launcher-item">
     <div class="launcher-icon icon-slate">
       <span class="material-symbols-outlined">notifications</span>
     </div>
     <span class="launcher-label">Alerts</span>
   </a>
-  {% else %}
-  <div class="launcher-item launcher-item--locked" title="Requires Level 1 — complete Induction">
-    <div class="launcher-icon icon-teal">
-      <span class="material-symbols-outlined">campaign</span>
+  {% endif %}
+
+  {# Calendar — Level 1+ #}
+  {% if user_level >= 1 %}
+  <a href="{% url 'activity:calendar' %}" class="launcher-item">
+    <div class="launcher-icon icon-blue">
+      <span class="material-symbols-outlined">calendar_month</span>
     </div>
-    <span class="launcher-label">Ministry</span>
-  </div>
+    <span class="launcher-label">Calendar</span>
+  </a>
+  {% else %}
   <div class="launcher-item launcher-item--locked" title="Requires Level 1 — complete Induction">
     <div class="launcher-icon icon-blue">
       <span class="material-symbols-outlined">calendar_month</span>
@@ -115,22 +70,32 @@
   </div>
   {% endif %}
 
-  {# Level 3+ Steward Dashboard + Governance #}
-  {% if user_level >= 3 %}
-  <a href="{% url 'tenants:steward-dashboard' %}" class="launcher-item">
-    <div class="launcher-icon icon-orange">
-      <span class="material-symbols-outlined">admin_panel_settings</span>
+  {# Community — always visible #}
+  <a href="{% url 'community:community-home' %}" class="launcher-item">
+    <div class="launcher-icon icon-green">
+      <span class="material-symbols-outlined">group</span>
     </div>
-    <span class="launcher-label">Steward</span>
+    <span class="launcher-label">Community</span>
   </a>
 
+  {# Governance — Level 3+ #}
+  {% if user_level >= 3 %}
   <a href="{% url 'governance:home' %}" class="launcher-item">
     <div class="launcher-icon icon-purple">
       <span class="material-symbols-outlined">account_balance</span>
     </div>
     <span class="launcher-label">Governance</span>
   </a>
+  {% else %}
+  <div class="launcher-item launcher-item--locked" title="Requires Level 3 — Steward">
+    <div class="launcher-icon icon-purple">
+      <span class="material-symbols-outlined">account_balance</span>
+    </div>
+    <span class="launcher-label">Governance</span>
+  </div>
+  {% endif %}
 
+  {# Handbook — Level 4+ #}
   {% if user_level >= 4 %}
   <a href="{% url 'handbook:home' %}" class="launcher-item">
     <div class="launcher-icon icon-red">
@@ -147,34 +112,63 @@
   </div>
   {% endif %}
 
+  {# Learn — always visible #}
+  <a href="{% url 'learn:learn-home' %}" class="launcher-item">
+    <div class="launcher-icon icon-pink">
+      <span class="material-symbols-outlined">school</span>
+    </div>
+    <span class="launcher-label">Learn</span>
+  </a>
+
+  {# Ministry — Level 1+ #}
+  {% if user_level >= 1 %}
+  <a href="{% url 'activity:ministry' %}" class="launcher-item">
+    <div class="launcher-icon icon-teal">
+      <span class="material-symbols-outlined">campaign</span>
+    </div>
+    <span class="launcher-label">Ministry</span>
+  </a>
   {% else %}
-  <div class="launcher-item launcher-item--locked" title="Requires Level 3 — Steward">
-    <div class="launcher-icon icon-purple">
-      <span class="material-symbols-outlined">account_balance</span>
+  <div class="launcher-item launcher-item--locked" title="Requires Level 1 — complete Induction">
+    <div class="launcher-icon icon-teal">
+      <span class="material-symbols-outlined">campaign</span>
     </div>
-    <span class="launcher-label">Governance</span>
-  </div>
-  <div class="launcher-item launcher-item--locked" title="Requires Level 4">
-    <div class="launcher-icon icon-red">
-      <span class="material-symbols-outlined">menu_book</span>
-    </div>
-    <span class="launcher-label">Handbook</span>
+    <span class="launcher-label">Ministry</span>
   </div>
   {% endif %}
 
-  <a href="{% url 'video_live:home' %}" class="launcher-item">
-    <div class="launcher-icon icon-red">
-      <span class="material-symbols-outlined">live_tv</span>
+  {# Records — always visible #}
+  <a href="{% url 'records:records-home' %}" class="launcher-item">
+    <div class="launcher-icon icon-cyan">
+      <span class="material-symbols-outlined">description</span>
     </div>
-    <span class="launcher-label">Video</span>
+    <span class="launcher-label">Records</span>
   </a>
 
-  {# Always visible #}
+  {# Settings — always visible #}
   <a href="{% url 'accounts:settings' %}" class="launcher-item">
     <div class="launcher-icon icon-slate">
       <span class="material-symbols-outlined">settings</span>
     </div>
     <span class="launcher-label">Settings</span>
+  </a>
+
+  {# Steward — Level 3+ #}
+  {% if user_level >= 3 %}
+  <a href="{% url 'tenants:steward-dashboard' %}" class="launcher-item">
+    <div class="launcher-icon icon-orange">
+      <span class="material-symbols-outlined">admin_panel_settings</span>
+    </div>
+    <span class="launcher-label">Steward</span>
+  </a>
+  {% endif %}
+
+  {# Video — always visible #}
+  <a href="{% url 'video_live:home' %}" class="launcher-item">
+    <div class="launcher-icon icon-red">
+      <span class="material-symbols-outlined">live_tv</span>
+    </div>
+    <span class="launcher-label">Video</span>
   </a>
 
 </div>
