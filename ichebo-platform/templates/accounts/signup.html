@@ -36,7 +36,7 @@
       {% if form.password.errors %}
         <span class="auth-field__error">{{ form.password.errors|join:", " }}</span>
       {% endif %}
-      <span class="auth-field__hint">Minimum 10 characters — must not be entirely numeric or a common password.</span>
+      <span class="auth-field__hint">Minimum 10 characters · at least one uppercase, one lowercase, one number, and one special character.</span>
     </div>
 
     <div class="auth-field">
