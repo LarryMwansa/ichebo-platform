@@ -32,6 +32,16 @@
   }
 }
 
+/* Logo colour responds to theme — white SVG inverted to black on light navbar */
+.nav-logo {
+  filter: brightness(0) invert(1);
+  transition: filter var(--transition-fast, 0.15s);
+}
+
+html:not(.dark) .nav-logo {
+  filter: brightness(0);
+}
+
 /* ─── LOGO ────────────────────────────────────────────────── */
 
 .nav-left {
