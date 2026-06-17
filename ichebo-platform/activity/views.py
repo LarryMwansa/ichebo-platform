@@ -630,6 +630,14 @@ def htmx_set_activity_link(request, activity_id):
         activity.linked_record = record
         activity.save(update_fields=['linked_record', 'updated_at'])
 
+    from django.urls import reverse
+
+    # Mobile: redirect to reload the detail page so the linked record renders
+    if request.POST.get('source') == 'mobile':
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = reverse('activity:activity-detail', kwargs={'activity_id': activity.id})
+        return response
+
     from django.template.loader import render_to_string
     stage_html = render_to_string(
         'activity/partials/activity_detail_stage.html',

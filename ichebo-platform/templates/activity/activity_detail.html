@@ -274,6 +274,7 @@
       hx-swap="none" hx-confirm="Link this activity to this record?">
   {% csrf_token %}
   <input type="hidden" name="record_id" id="target-record-id">
+  <input type="hidden" name="source" value="mobile">
 </form>
 {% include "records/partials/_link_modal.html" %}
 <script>
