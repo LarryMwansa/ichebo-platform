@@ -35,9 +35,8 @@
     var items = document.querySelectorAll('.bottom-bar .nav-item[data-nav-match]');
     items.forEach(function (item) {
       var match = item.getAttribute('data-nav-match');
-      // Home matches exactly /dashboard/ only
-      if (match === '/dashboard/') {
-        item.classList.toggle('active', path === match || path === '/');
+      if (match === '/') {
+        item.classList.toggle('active', path === '/');
       } else {
         item.classList.toggle('active', path.startsWith(match));
       }
