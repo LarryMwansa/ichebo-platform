@@ -76,14 +76,9 @@ html:not(.dark) .ics-sidebar {
 }
 
 .ics-logo {
-  filter: invert(1);
-  /* Default for dark mode if logo is black */
-  transition: filter var(--transition-fast);
-}
-
-html:not(.dark) .ics-logo {
+  /* Sidebar is always --ink dark, so white SVG needs no filter adjustment */
   filter: none;
-  /* Light mode uses original black/dark logo */
+  transition: filter var(--transition-fast);
 }
 
 .ics-sidebar__nav {
