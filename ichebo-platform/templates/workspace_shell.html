@@ -407,18 +407,36 @@
             const existing = document.getElementById('ws-confirm-bar');
             if (existing) existing.remove();
 
+            const isMobile = window.innerWidth < 1024;
             const bar = document.createElement('div');
             bar.id = 'ws-confirm-bar';
-            bar.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;align-items:center;gap:12px;padding:14px 20px;border-radius:12px;background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.22);font-size:13px;color:var(--text);pointer-events:all;animation:ws-toast-in 0.18s ease;white-space:nowrap;';
-            bar.innerHTML = `
-                <span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;color:#d97706;">warning</span>
-                <span style="flex:1;line-height:1.4;">${e.detail.question}</span>
-                <button id="ws-confirm-ok" style="display:flex;align-items:center;gap:5px;padding:7px 14px;background:#991b1b;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
-                    <span class="material-symbols-outlined" style="font-size:15px;">check</span>Confirm
-                </button>
-                <button id="ws-confirm-cancel" style="display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--card-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
-                    Cancel
-                </button>`;
+            if (isMobile) {
+                bar.style.cssText = 'position:fixed;bottom:80px;left:12px;right:12px;z-index:10000;padding:16px;border-radius:16px;background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.22);font-size:13px;color:var(--text);pointer-events:all;animation:ws-toast-in 0.18s ease;';
+                bar.innerHTML = `
+                    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">
+                        <span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;color:#d97706;margin-top:1px;">warning</span>
+                        <span style="line-height:1.5;">${e.detail.question}</span>
+                    </div>
+                    <div style="display:flex;gap:10px;">
+                        <button id="ws-confirm-ok" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 0;background:#991b1b;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+                            <span class="material-symbols-outlined" style="font-size:16px;">check</span>Confirm
+                        </button>
+                        <button id="ws-confirm-cancel" style="flex:1;display:flex;align-items:center;justify-content:center;padding:11px 0;background:var(--card-2);color:var(--text);border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+                            Cancel
+                        </button>
+                    </div>`;
+            } else {
+                bar.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;align-items:center;gap:12px;padding:14px 20px;border-radius:12px;background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.22);font-size:13px;color:var(--text);pointer-events:all;animation:ws-toast-in 0.18s ease;white-space:nowrap;';
+                bar.innerHTML = `
+                    <span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;color:#d97706;">warning</span>
+                    <span style="flex:1;line-height:1.4;">${e.detail.question}</span>
+                    <button id="ws-confirm-ok" style="display:flex;align-items:center;gap:5px;padding:7px 14px;background:#991b1b;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
+                        <span class="material-symbols-outlined" style="font-size:15px;">check</span>Confirm
+                    </button>
+                    <button id="ws-confirm-cancel" style="display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--card-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
+                        Cancel
+                    </button>`;
+            }
             document.body.appendChild(bar);
 
             const cleanup = () => bar.remove();
