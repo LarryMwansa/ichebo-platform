@@ -32,6 +32,17 @@
 </style>
 {% endblock %}
 
+{% block breadcrumb %}
+    <a href="{% url 'records:records-home' %}"
+       class="ws-topbar__breadcrumb-item"
+       hx-get="{% url 'records:records-home' %}"
+       hx-target="#ics-canvas"
+       hx-push-url="true"
+       style="text-decoration: none;">My Journal</a>
+    <span class="ws-topbar__breadcrumb-sep">›</span>
+    <span class="ws-topbar__breadcrumb-item">{{ record.record_type|title }}</span>
+{% endblock %}
+
 {% block context_header %}My Journal{% endblock %}
 
 {% block context_content %}
