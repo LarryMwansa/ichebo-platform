@@ -35,18 +35,12 @@
     var items = document.querySelectorAll('.bottom-bar .nav-item[data-nav-match]');
     items.forEach(function (item) {
       var match = item.getAttribute('data-nav-match');
-      if (match === '/') {
-        item.classList.toggle('active', path === '/');
-      } else {
-        item.classList.toggle('active', path.startsWith(match));
-      }
+      var isActive = (match === '/') ? (path === '/') : path.startsWith(match);
+      item.classList.toggle('active', isActive);
     });
   }
 
-  setBottomNavActive();
-
-  // Re-run after HTMX navigation updates the URL
-  document.addEventListener('htmx:pushedIntoHistory', setBottomNavActive);
-  document.addEventListener('htmx:replacedInHistory', setBottomNavActive);
+  document.addEventListener('DOMContentLoaded', setBottomNavActive);
+  document.addEventListener('htmx:afterSettle', setBottomNavActive);
 })();
 </script>
