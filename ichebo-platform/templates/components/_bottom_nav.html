@@ -1,31 +1,22 @@
 <!-- components/_bottom_nav.html -->
 <div class="bottom-bar" role="navigation" aria-label="Main navigation">
 
-  <a href="{% url 'dashboard:index' %}"
-     class="nav-item {% if request.resolver_match.url_name == 'index' and request.resolver_match.app_name == 'dashboard' %}active{% endif %}"
-     aria-label="Home">
+  <a href="{% url 'dashboard:index' %}" class="nav-item" aria-label="Home" data-nav-match="/dashboard/">
     <span class="material-symbols-outlined nav-icon">home</span>
     <span class="nav-label">Home</span>
   </a>
 
-  <a href="{% url 'bible:reader' %}"
-     class="nav-item {% if request.resolver_match.app_name == 'bible' %}active{% endif %}"
-     aria-label="Bible">
+  <a href="{% url 'bible:reader' %}" class="nav-item" aria-label="Bible" data-nav-match="/bible/">
     <span class="material-symbols-outlined nav-icon">auto_stories</span>
     <span class="nav-label">Bible</span>
   </a>
 
-  <a href="{% url 'dashboard:explore' %}"
-     class="nav-item {% if request.resolver_match.url_name == 'explore' %}active{% endif %}"
-     aria-label="Explore">
+  <a href="{% url 'dashboard:explore' %}" class="nav-item" aria-label="Explore" data-nav-match="/dashboard/explore/">
     <span class="material-symbols-outlined nav-icon">explore</span>
     <span class="nav-label">Explore</span>
   </a>
 
-
-  <a href="{% url 'dashboard:you' %}"
-     class="nav-item {% if request.resolver_match.url_name == 'you' %}active{% endif %}"
-     aria-label="You">
+  <a href="{% url 'dashboard:you' %}" class="nav-item" aria-label="You" data-nav-match="/dashboard/you/">
     <span class="material-symbols-outlined nav-icon">person</span>
     <span class="nav-label">You</span>
   </a>
@@ -36,3 +27,27 @@
   </button>
 
 </div>
+
+<script>
+(function () {
+  function setBottomNavActive() {
+    var path = window.location.pathname;
+    var items = document.querySelectorAll('.bottom-bar .nav-item[data-nav-match]');
+    items.forEach(function (item) {
+      var match = item.getAttribute('data-nav-match');
+      // Home matches exactly /dashboard/ only
+      if (match === '/dashboard/') {
+        item.classList.toggle('active', path === match || path === '/');
+      } else {
+        item.classList.toggle('active', path.startsWith(match));
+      }
+    });
+  }
+
+  setBottomNavActive();
+
+  // Re-run after HTMX navigation updates the URL
+  document.addEventListener('htmx:pushedIntoHistory', setBottomNavActive);
+  document.addEventListener('htmx:replacedInHistory', setBottomNavActive);
+})();
+</script>
