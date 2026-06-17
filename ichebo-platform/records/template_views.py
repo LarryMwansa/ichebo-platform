@@ -258,26 +258,31 @@ RELATIONSHIP_CONTEXTS = {
 def htmx_linked_records(request, record_id):
     record = get_object_or_404(Record, id=record_id, deleted_at__isnull=True)
     grouped = get_linked_records(record_id)
-    
-    # Filter relationship types based on family or explicit context param
+
     context_slug = request.GET.get('context', record.record_family)
     allowed_types = RELATIONSHIP_CONTEXTS.get(context_slug, [])
-    
+
     if allowed_types:
         relationship_types = [
-            (val, label) for val, label in Relationship.RELATIONSHIP_TYPE_CHOICES 
+            (val, label) for val, label in Relationship.RELATIONSHIP_TYPE_CHOICES
             if val in allowed_types
         ]
     else:
         relationship_types = Relationship.RELATIONSHIP_TYPE_CHOICES
 
-    return render(request, '_linked_records_section.html', {
+    ctx = {
         'record': record,
         'grouped': grouped,
         'relationship_types': relationship_types,
         'can_add_link': True,
         'context': context_slug,
-    })
+    }
+
+    # Mobile drawer: wrap in the relations drawer shell
+    if request.headers.get('HX-Target') == 'drawerInner':
+        return render(request, 'workspace/records/partials/_m_relations.html', ctx)
+
+    return render(request, '_linked_records_section.html', ctx)
 
 
 # ── HTMX: create relationship ─────────────────────────────────────────────────

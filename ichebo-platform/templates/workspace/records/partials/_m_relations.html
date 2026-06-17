@@ -1,0 +1,13 @@
+{# Mobile drawer content: record connections + link form #}
+<div style="padding: var(--space-m) var(--space-m) var(--space-2xl);">
+
+  <div class="ws-label-tag" style="margin-bottom: 4px;">{{ record.title|truncatechars:40 }}</div>
+  <div style="font-size: 11px; color: var(--muted); margin-bottom: var(--space-m);">
+    {{ record.record_type|title }} · {{ record.record_family|title }}
+  </div>
+
+  <div id="ws-linked-records">
+    {% include "_linked_records_section.html" with record=record grouped=grouped relationship_types=relationship_types can_add_link=can_add_link %}
+  </div>
+
+</div>
