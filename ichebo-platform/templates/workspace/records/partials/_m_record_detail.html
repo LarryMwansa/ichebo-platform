@@ -1,0 +1,77 @@
+{# Mobile: Record detail — standalone, injected into #ws-mobile-shell #}
+<div style="padding: var(--space-m) var(--space-m) var(--space-s);">
+
+  {# Back link — context-aware #}
+  {% if via_activity %}
+  <a href="{% url 'activity:activity-detail' via_activity.id %}"
+     hx-get="{% url 'activity:activity-detail' via_activity.id %}"
+     hx-target="#ws-mobile-shell"
+     hx-swap="innerHTML"
+     hx-push-url="{% url 'activity:activity-detail' via_activity.id %}"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
+            font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    {{ via_activity.title|truncatechars:28 }}
+  </a>
+  {% elif via_record %}
+  <a href="{% url 'records:records-detail' via_record.id %}"
+     hx-get="{% url 'records:records-detail' via_record.id %}"
+     hx-target="#ws-mobile-shell"
+     hx-swap="innerHTML"
+     hx-push-url="{% url 'records:records-detail' via_record.id %}"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
+            font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    {{ via_record.title|truncatechars:28 }}
+  </a>
+  {% else %}
+  <a href="{% url 'records:records-home' %}"
+     hx-get="{% url 'records:records-home' %}"
+     hx-target="#ws-mobile-shell"
+     hx-swap="innerHTML"
+     hx-push-url="{% url 'records:records-home' %}"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
+            font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    Journal
+  </a>
+  {% endif %}
+
+  {# Title row + icon actions #}
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:var(--space-s);">
+    <div>
+      <span class="status-badge status-badge--muted" style="margin-bottom:8px;display:inline-block;">
+        {{ record.record_type|upper }}
+      </span>
+      <h1 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;
+                 color:var(--text);line-height:1.2;margin:0;">{{ record.title }}</h1>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0;">
+      <button class="btn-touch" style="background:var(--bg);border:1px solid var(--border);"
+              hx-get="{% url 'records:htmx-linked-records' record.id %}"
+              hx-target="#drawerInner"
+              hx-swap="innerHTML"
+              onclick="window.ICSDrawer && window.ICSDrawer.open('Connections')">
+        <span class="material-symbols-outlined" style="font-size:18px;">hub</span>
+      </button>
+      {% if record.created_by == request.user %}
+      <button class="btn-touch" style="background:var(--bg);border:1px solid var(--border);"
+              hx-get="{% url 'records:htmx-edit' record.id %}"
+              hx-target="#drawerInner"
+              hx-swap="innerHTML"
+              onclick="window.ICSDrawer && window.ICSDrawer.open('Edit Entry')">
+        <span class="material-symbols-outlined" style="font-size:18px;">edit</span>
+      </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <div style="font-size:12px;color:var(--muted);margin-bottom:var(--space-m);">
+    {{ record.updated_at|date:"d M Y" }} · {{ record.status|title }}
+  </div>
+
+</div>
+
+<div style="padding:0 var(--space-m) var(--space-2xl);font-size:15px;line-height:1.8;color:var(--text);">
+  {{ record.content|linebreaks }}
+</div>

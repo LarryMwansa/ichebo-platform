@@ -63,7 +63,22 @@ def record_detail(request, record_id):
     if via_id:
         via_record = Record.objects.filter(id=via_id).first()
 
+    # Mobile back-to-activity breadcrumb
+    via_activity = None
+    via_activity_id = request.GET.get('via_activity')
+    if via_activity_id:
+        from activity.models import Activity
+        via_activity = Activity.objects.filter(id=via_activity_id, deleted_at__isnull=True).first()
+
     if request.headers.get('HX-Request'):
+        hx_target = request.headers.get('HX-Target', '')
+        # Mobile shell injection — return standalone mobile partial only
+        if hx_target == 'ws-mobile-shell':
+            return render(request, 'workspace/records/partials/_m_record_detail.html', {
+                'record': record,
+                'via_record': via_record,
+                'via_activity': via_activity,
+            })
         from django.template.loader import render_to_string
         ctx = {'record': record, 'via_record': via_record}
         stage_html = render_to_string(
@@ -77,6 +92,7 @@ def record_detail(request, record_id):
     return render(request, 'workspace/records/record_detail.html', {
         'record': record,
         'via_record': via_record,
+        'via_activity': via_activity,
         'active_app': 'records',
         'ws_page_title': record.title,
         'record_types': JOURNAL_RECORD_TYPES,

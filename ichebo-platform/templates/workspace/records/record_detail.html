@@ -161,12 +161,21 @@
 {# ── Mobile shell ── #}
 {% block content %}
 <div style="padding: var(--space-m) var(--space-m) var(--space-s);">
+    {% if via_activity %}
+    <a href="{% url 'activity:activity-detail' via_activity.id %}"
+       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
+              font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+        {{ via_activity.title|truncatechars:28 }}
+    </a>
+    {% else %}
     <a href="{% url 'records:records-home' %}"
        style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);
               font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);">
         <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
         Journal
     </a>
+    {% endif %}
 
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:var(--space-s);">
         <div>
