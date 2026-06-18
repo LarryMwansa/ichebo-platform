@@ -81,10 +81,11 @@ python manage.py bootstrap_platform
 | 6 | Seed 24 Service Orders | `Record.objects.filter(record_type='service_order').count() >= 24` |
 | 7 | Grant Handbook access to Level 5 users | Check `UserPermission` records for handbook tenant |
 | 8 | Backfill Level 0 users into induction tenant | `backfill_induction_placement` logic |
-| 9 | Report: induction programmes present? | Count active `record_type='induction'` records |
-| 10 | Report: any active programmes in catalogue? | Count active `record_type='programme'` records |
+| 9 | Seed the 6 nested Qualification Programmes (Induction → New Life → Foundation → Leaders → Builders → Architect's) | `seed_induction_programme` + `seed_programmes` — `Record.objects.filter(record_family='learning', record_type__in=['induction','programme']).count() >= 6` |
+| 10 | Create Genesis Sceptre Community (default Sceptre One tenant) | `Tenant.objects.filter(tier='church_node', slug='genesis-sceptre').exists()` |
+| 11 | Report: any active programmes in catalogue beyond the 6 seeded? | Count active `record_type='programme'` records `> 6` |
 
-Steps 9 and 10 are **report-only** — they cannot be automated because content must be authored by a human. They print a reminder with the URL to go create them.
+Step 11 is **report-only**. Steps 9–10 are now fully automatable — see "Doctrinal Grounding" below for why the 6 programmes are seed data, not author-created content like step 11's free catalogue additions.
 
 ### Output example
 
@@ -99,12 +100,12 @@ Ichebo Platform Bootstrap
 ✅  Service Orders — 24 seeded
 ✅  Handbook access — granted to 2 Level 5 users
 ✅  Induction backfill — 3 Level 0 users placed
-⚠️  Induction programmes — none found
-     → Log in as Level 5 and go to /learn/author/ to create one
-⚠️  Programme catalogue — empty
-     → Log in as Level 5 and go to /learn/author/ to create programmes
+✅  Qualification Programmes — 6 seeded (Induction → Architect's)
+✅  Genesis Sceptre Community — created at /global/genesis-sceptre/
+⚠️  Programme catalogue — only the 6 seeded programmes exist
+     → Log in as Level 5 and go to /learn/author/ to add more
 
-Bootstrap complete. 2 warnings require manual action.
+Bootstrap complete. 1 warning requires manual action.
 ```
 
 ### Flags
@@ -160,8 +161,9 @@ A new page at `/platform/` (Level 5 / superuser only) shows the live state of ev
 | Induction tenant | ✅ / ❌ |
 | Prime tenancy | ✅ / ❌ |
 | Service Orders (24) | ✅ / count |
-| Active induction programmes | count |
-| Active catalogue programmes | count |
+| Qualification Programmes (6 nested, Induction–Architect's) | ✅ / count |
+| Genesis Sceptre Community | ✅ / ❌ |
+| Additional catalogue programmes (beyond the 6 seeded) | count |
 | Level 0 users without induction placement | count |
 | Email verification required | ON / OFF toggle |
 
@@ -231,6 +233,68 @@ When L10.6 is implemented:
 
 ---
 
+## Doctrinal Grounding (2026-06-18)
+
+Reference documents: `.docs/kingdom-governance-system_v1.md` (KGS), `.docs/sceptre-community-programme-concept-note_v2.md` (Sceptre Community Programme), `Things-for-systems-setup.md` (Chizola).
+
+### Agency Tenants — already built, no change needed
+
+KGS §4.2 / Sceptre Community Programme's six Service Domains describe Prime
+Tenancy plus six agency offices (Apostolic & Spiritual Ministry, Leadership &
+Governance Support, Formation & Teaching, Mission & Outreach, Community Life
+& Care, Operations & Stewardship). Confirmed at the 2026-06-18 readiness
+check: `seed_prime_tenancy.py` already creates Prime Tenancy and all six
+agencies as children of Prime, by these exact names. Step 5 in the bootstrap
+scope table covers this — no new step required.
+
+### Genesis Sceptre Community — genuine gap, now added as step 10
+
+`seed_induction_tenant.py` creates the Induction Tenant singleton but no
+default Sceptre Community (Church Node) tenant exists anywhere in the
+codebase. Per KGS §4.2.5.1 and the concept note's Part B, the Sceptre
+Community is the foundational unit of the whole movement — a fresh platform
+with zero communities is a materially incomplete first-run state, not just a
+content gap. Added as bootstrap step 10: creates one default `church_node`
+tier tenant ("Genesis Sceptre Community" / slug `genesis-sceptre`) so a fresh
+deployment has at least one working Church Node to demonstrate and test
+against.
+
+### The 6 Qualification Programmes are seed data, not authored content
+
+Earlier drafts of this plan treated programme creation as something "content
+must be authored by a human" and left it report-only. That was incorrect for
+the 6 core programmes specifically. Per Chizola (2026-06-18): `competence_level`
+(0–5) is not merely an access gate — it is a credential corresponding to real
+formation, and the 6 programmes (Induction → New Life → Foundation → Leaders
+→ Builders → Architect's) are not generic e-learning content sitting beside
+the movement; they **are** the Qualification Programmes Framework (KGS §25)
+that operationalises the Sceptre Community Programme's 7-year formation
+pathway (concept note §15). Each programme nests the one below it
+(`prerequisites` field in `seed_programmes.py`), and `required_level` gates
+access — confirmed in `learn/services.py:check_prerequisites()`, already
+enforcing this correctly.
+
+Because these 6 programmes are fixed, doctrinally-defined seed data — not
+open-ended catalogue content — they belong in `bootstrap_platform` as step 9,
+reusing the existing `seed_induction_programme` and `seed_programmes`
+commands. Only programmes *beyond* these 6 remain human-authored
+(report-only, step 11).
+
+### Correction — level-up automation is not a gap
+
+An earlier readiness assessment flagged "no automatic level-up on programme
+completion" as a missing feature. This was incorrect and is retracted.
+`learn/services.py:confirm_certification_record()` is the designed, sole
+write path for `competence_level` (per the file's own header comment and
+ADR-006), and it deliberately requires a confirming steward (Level 3+) to
+call it — it is not, and should not be, triggered automatically by programme
+completion alone. This matches KGS §24.3: "Leadership is service-based...
+formed, tested, and affirmed" — affirmation is a human governance act, not a
+system event. No change needed to `bootstrap_platform` or `PlatformConfig`
+for this; recorded here only to correct the prior assessment.
+
+---
+
 ## Future Extensions (Not In Scope for L10.6)
 
 These are recorded here so they are not forgotten:
@@ -275,6 +339,11 @@ Missing pieces confirmed at the same readiness check:
 2. `/platform/` app, URLs, views, templates — no scaffolding at all
 3. `bootstrap_platform` management command itself — does not exist
 4. Access-level constants are still hardcoded in two files (see resolved conflict above)
+5. A `genesis-sceptre` seed step/command — does not exist yet (see Doctrinal Grounding above)
+
+Scope finalised 2026-06-18 — `Things-for-systems-setup.md` and the doctrinal
+review against KGS / the Sceptre Community Programme concept note are folded
+in above. No further items pending; the command now wraps 11 steps (was 10).
 
 Suggested build order:
 
@@ -283,17 +352,17 @@ Suggested build order:
    `mandate_access_level`, `keys_access_level`, `reference_access_level`,
    `require_email_verification`, `bootstrapped_at`, `bootstrapped_by`,
    `bootstrap_version` fields from this document.
-2. **`bootstrap_platform` management command** — steps 1–10 as specified above,
+2. **`seed_genesis_sceptre_community` management command** — new, creates the
+   default `church_node` tier tenant. Needed before step 3 since
+   `bootstrap_platform` step 10 wraps it.
+3. **`bootstrap_platform` management command** — steps 1–11 as specified above,
    idempotent, with `--dry-run`, `--quiet`, `--force` flags.
-3. **`/platform/` app — Setup Checklist page only** — read-only status display,
+4. **`/platform/` app — Setup Checklist page only** — read-only status display,
    lowest risk, no write actions yet. Level 5 / superuser gated.
-4. **System Tenants management UI** (`/platform/tenants/`) — induction, handbook,
-   prime tenant detail with steward assignment.
-5. **Bootstrap Actions** — buttons that trigger seed logic from the browser
+5. **System Tenants management UI** (`/platform/tenants/`) — induction, handbook,
+   prime, and Genesis Sceptre Community tenant detail with steward assignment.
+6. **Bootstrap Actions** — buttons that trigger seed logic from the browser
    (idempotent, same logic as the CLI command).
-
-Pending: a list of additional items to fold into bootstrap scope, to be supplied
-by Chizola before implementation of step 2 begins.
 
 ## Entry Requirement
 
@@ -303,9 +372,11 @@ Track 1 (induction tenant auto-placement signal) must be complete before L10.6 b
 
 - [ ] `python manage.py bootstrap_platform` runs end-to-end on a fresh database with 0 errors
 - [ ] `python manage.py bootstrap_platform` is idempotent — running it twice produces the same output with no duplicate records
+- [ ] All 6 Qualification Programmes (Induction → Architect's) exist after bootstrap, correctly nested via `prerequisites` and gated by `required_level`
+- [ ] Genesis Sceptre Community tenant exists after bootstrap (`tier='church_node'`, slug `genesis-sceptre`)
 - [ ] `--dry-run` flag prints the plan without writing anything
 - [ ] Platform Admin Shell renders at `/platform/` for Level 5 / superuser
-- [ ] System Tenants list renders at `/platform/tenants/` with induction + handbook
+- [ ] System Tenants list renders at `/platform/tenants/` with induction + handbook + Genesis Sceptre Community
 - [ ] Red banner appears in workspace shell when `PlatformConfig.bootstrapped_at` is null
 - [ ] All existing seed commands still work independently (backwards compatible)
 - [ ] `python manage.py check` — 0 issues
