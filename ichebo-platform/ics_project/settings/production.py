@@ -43,8 +43,14 @@ DATABASES['default']['CONN_MAX_AGE'] = 60  # noqa: F405
 # ── Static files — ManifestStaticFilesStorage adds content hashes ─────────────
 # Fingerprinted filenames (e.g. main.abc123.css) allow infinite cache TTL in Nginx.
 # Requires `python manage.py collectstatic` to have been run before deployment.
+# STORAGES (not STATICFILES_STORAGE) is the Django 4.2+ setting — base.py already
+# defines STORAGES for the S3/MinIO default backend, so override only the
+# "staticfiles" key here rather than setting the legacy STATICFILES_STORAGE,
+# which conflicts with STORAGES and raises ImproperlyConfigured on startup.
 
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+STORAGES['staticfiles'] = {  # noqa: F405
+    'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
+}
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 # Run once: mkdir -p /var/log/ics && chown www-data:www-data /var/log/ics
