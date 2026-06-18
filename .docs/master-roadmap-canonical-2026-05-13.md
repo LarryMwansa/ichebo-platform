@@ -60,7 +60,7 @@ These decisions are final. They cannot be changed without producing a new ADR. D
 | ADR-011 | KGS programme and curriculum structure | Five qualification programmes (Certificate → Doctorate), four induction lessons, eight pathways. See VERSION_2_PLANNING for full specification. |
 | ADR-012 | Apostolic Command Shell | Four-column desktop governance interface. Level 3+ only. The canonical desktop web surface. |
 | ADR-013 | DESIGN.md + design-preview.html as locked design authority | All visual decisions governed by DESIGN.md. design-preview.html is the canonical visual reference. Neither may be contradicted without amendment. |
-| ADR-014 | The Desk as governance authorship surface | Canonical authorship environment within the Apostolic Command Shell. All governance record creation routes through The Desk. |
+| ADR-014 (amended by ADR-022) | The Desk as governance authorship surface | Canonical authorship environment. **Amended 2026-06-09 (ADR-022):** The Desk is relocated into the Handbook surface. Canonical statement is now "The Handbook is the canonical governance authorship surface; The Desk editor is embedded within it." All governance record creation still routes through this editor — only its navigational home changed. |
 | ADR-015 | Dual-shell rendering architecture | Stage Mode (Level 3+, desktop) and Mobile Mode (all users, mobile) are two first-class rendering paths. Neither is a degradation of the other. |
 | ADR-016 | Local-first as Ichebo architectural philosophy | Device is primary computer. Cloud is coordination. Applies to Ichebo Desktop and native Flutter Mobile. Does not change the Django cloud platform. |
 | ADR-017 | Ichebo Desktop as primary product | Desktop is the primary product. Cloud exists to coordinate and give visibility to local installations. MVP: People + Activity + Sync. |
@@ -68,6 +68,7 @@ These decisions are final. They cannot be changed without producing a new ADR. D
 | ADR-019 | Go as language for foundation engines | Records Engine, Activity Engine, Relationships Engine, Bible Engine, Calendar Engine, Sync Engine — all Go modules. Django is the web layer and API adapter. |
 | ADR-020 | Ichebo Handbook as standalone product | Supersedes Handbook-as-tenant decision. Handbook is institutional memory that precedes all tenants. Handbook-as-tenant remains in production pending migration. |
 | ADR-021 | Ichebo Media as standalone product | Full video engine — upload, transcode, store, serve, live stream. Go + FFmpeg + Hetzner Object Storage + HLS. Version 3+. |
+| ADR-022 | Handbook and Governance separation of concerns | Governance App becomes read-only public library (no write UI). Handbook becomes the invited Level 4-5 authorship workspace; The Desk relocates here. `HandbookRecord`/`HandbookRelationship` retired — Handbook is now a UI layer over `records.Record`, same as Governance. Records App gets a dedicated full-width desktop layout. Amends ADR-012 (sidebar order) and ADR-014 (Desk's canonical location). Does not amend ADR-020. |
 | Email | Email via Brevo | Free tier (300 emails/day). SMTP integration via Django email backend. |
 
 ---
@@ -340,6 +341,8 @@ LAYER 10 — SCALE                            (Docker, Redis, Celery, AI)
 
 **What was built:** Scripture reader (KJV, ASV, WEB), flat JSON scripture data loaded by management command, personal and tenant-scoped annotations using Records Engine (record_family: "bible", record_type: "bible_note"), Handbook linkages (Level 5), three-panel mobile-first HTMX UI, translation switcher.
 
+**Amendment 2026-06-09 (mobile reader) — approved, not yet built:** A dedicated mobile Bible reader was specified for `/bible/m/<book_code>/<chapter>/` — a standalone full-screen page (no workspace shell) with sticky topbar, chapter content, bottom nav strip, navigator/annotation/display-settings sheets, verse toolbar, and localStorage highlight persistence. **Status as of 2026-06-18 audit: not present in code** — `bible/urls.py` has no `/m/` route, and no `reader_mobile.html` template exists. Desktop reader at `/bible/<book_code>/<chapter>/` is unaffected either way. This is open implementation work, not yet a completed phase.
+
 **Commit:** `feat: bible app`
 
 ## Phase 5.2 — Learn App ✅
@@ -417,6 +420,8 @@ LAYER 10 — SCALE                            (Docker, Redis, Celery, AI)
 **What was built:** Four-column grid workspace (Primary Sidebar 72px, Context Bar 240px, Stage flexible, Options Bar 300px), workspace_shell.html as root desktop template, dual-shell switching (Stage Mode / Mobile Mode), DESIGN.md design system applied throughout, Playfair Display + Inter typography, Ink + Stone + Red colour system, all app templates updated with both {% block ws_content %} and {% block content %} blocks.
 
 **Reference:** ADR-012, ADR-013, ADR-014, ADR-015, DESIGN.md, design-preview.html
+
+**Amendment 2026-06-09 (ADR-015) — approved, partially built:** Two Mobile Mode rendering patterns are now recognised: Standard Mobile Mode (`{% block content %}`, unchanged) and Standalone Mobile Mode (dedicated `/m/` URL with a minimal base template, for full-screen experiences like the Bible reader). A `{% block mobile_fullscreen %}` slot was specified for `workspace_shell.html` to support this. **Status as of 2026-06-18 audit: the `mobile_fullscreen` block is not present in the current `workspace_shell.html`.** The Activity Hub HTMX tab-dispatch pattern (Decision 1 of the same amendment, consolidating Personal/Ministry/Calendar into one mobile shell URL) is similarly specified but not confirmed built as of this audit. See the web-ui-mobile-amendment doc for full pattern reference. Also amends ADR-012's sidebar order — see ADR-022 in the ADR table, which supersedes the navigation structure further.
 
 ---
 
@@ -669,11 +674,15 @@ Shared engine interface in `engines/engine/engine.go`.
 
 **What was built:** Standalone `handbook` Django app. `HandbookRecord` (UUID PK, three branches, four status lifecycle, version chain), `HandbookRelationship` (HRS + scripture links in one model), `HandbookAccess` (reader/author/editor roles, global scope). Full DRF API: list/create, detail/patch, publish, lock, new-version, history. Migration `0001_initial` applied.
 
+**Superseded by ADR-022 (2026-06-09):** `HandbookRecord` and `HandbookRelationship` are retired. Handbook is now a UI-only app over `records.Record` (`record_family='governance'`) — no owned content models, same pattern as Governance and Community. `HandbookAccess` is retained as the permission-gate model for the authorship workspace. The Desk editor (formerly its own sidebar icon) is relocated into Handbook. Migration `0002_retire_content_models.py` applied. See ADR-022 for full rationale and the Governance/Handbook/Records separation of concerns it establishes.
+
 **Commit:** `feat(handbook): K.1 — Handbook product foundation`
 
 ## Phase K.2 — Workspace UI + The Desk ✅
 
 **What was built:** Four-column Apostolic Command Shell for the Handbook — `home.html` (branch navigator, record list grouped by type), `record.html` (four-tab Properties Sidecar: Props/HRS/Scripture/History, `HBDesk` JS object, auto-save on keystroke), `access.html` (editor-only access management). Sidebar nav entry added to `workspace_shell.html`. Template URLs registered at `/handbook/`.
+
+**Superseded by ADR-022 (2026-06-09):** The Desk (`governance/desk_views.py`) is relocated from its own sidebar icon into the Handbook surface. Handbook views now query `records.Record` directly rather than `HandbookRecord`. The `edit_note` Desk sidebar icon is removed; Handbook (`auto_stories`) becomes the single entry point for governance authorship, moving to sidebar position 2.
 
 **Commit:** `feat(handbook): K.2 — Workspace UI and The Desk`
 

@@ -113,7 +113,13 @@ Three products. One design system. Different canvases, same visual language.
 Every template in the Django web app implements two rendering paths simultaneously from the same template inheritance tree:
 
 - Stage Mode ({% block ws_content %}): Level 3+ users on viewport ≥1024px. The Apostolic Command Shell four-column grid.
-- Mobile Mode ({% block content %}): All users on mobile viewport. Level 0-2 on any viewport. Mobile-first shell with bottom navigation.
+- Mobile Mode: All users on mobile viewport. Standard pages use `{% block content %}`. Pages with full-screen mobile experiences (e.g. Bible reader) use the dedicated `/m/` URL pattern with a standalone minimal template. Both are Mobile Mode — the latter is purpose-built, not a workaround.
+
+**Implementation status (2026-06-18 audit):** approved, not yet built. See roadmap Phase 5.1 amendment note.
+
+**Activity Hub pattern:** On mobile, multi-tab app sections (Activity, Calendar) consolidate into a single shell URL with HTMX tab dispatch. Separate desktop URLs for sub-sections remain unchanged. This avoids re-rendering the hero and navigation on each tab.
+
+**Implementation status (2026-06-18 audit):** approved, not yet confirmed built in current code.
 
 Neither is a fallback or degradation of the other. Both are designed for their canvas. CSS switching via .ws-active class on the body element, toggled by inline JavaScript on base.html.
 
@@ -126,6 +132,8 @@ The Desk occupies The Stage when the user is in authorship mode. It is the edito
 - Writing canvas max-width: 680px centred in The Stage
 - Options Bar serves The Desk: record properties, HRS relationships, Bible tool
 - All governance record creation and editing routes through The Desk - no full-page forms
+
+**Amended by ADR-022 (2026-06-09):** The Desk is relocated into the Handbook surface. "The Desk is the canonical governance authorship surface" is superseded by "The Handbook is the canonical governance authorship surface; The Desk editor is embedded within it." Implemented in code as of the 2026-06-18 audit.
 
 ## **2.2 Ichebo Desktop**
 
