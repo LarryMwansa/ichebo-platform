@@ -58,7 +58,7 @@ STATUS_CHOICES = ['draft', 'active', 'locked', 'superseded', 'submitted']
 # Will be moved to PlatformConfig (L10.6) for System Panel configuration.
 KEYS_ACCESS_LEVEL      = 4   # Keys Library — entity/narrative are L4-5 content
 REFERENCE_ACCESS_LEVEL = 3   # Reference Library
-MANDATE_ACCESS_LEVEL   = 3   # Handbook authoring of Mandate records
+MANDATE_ACCESS_LEVEL   = 4   # Handbook authoring of Mandate records — canonical value, matches governance/views.py
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

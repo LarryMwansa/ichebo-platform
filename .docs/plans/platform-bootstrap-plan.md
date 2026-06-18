@@ -191,6 +191,11 @@ steward can adjust them from the System Panel at `/platform/` without a code dep
 | `KEYS_ACCESS_LEVEL` | `handbook/views.py` | 4 | Minimum level to access Keys Library in Handbook (entity/narrative are L4-5 content) |
 | `REFERENCE_ACCESS_LEVEL` | `handbook/views.py` | 3 | Minimum level to read Reference Library in Handbook |
 
+**Resolved (2026-06-18):** `handbook/views.py` also defined its own `MANDATE_ACCESS_LEVEL = 3`
+(unused dead reference, but inconsistent with `governance/views.py`'s value of 4). Canonical
+value confirmed as **4** — `handbook/views.py` corrected to match. This removes the conflict
+before it gets baked into `PlatformConfig.mandate_access_level`'s default.
+
 ### PlatformConfig model additions (L10.6)
 
 ```python
@@ -252,6 +257,43 @@ These are recorded here so they are not forgotten:
 No new ADR is required for L10.6. This is an operational tooling phase, not an architectural decision.
 
 ---
+
+## Implementation Order (2026-06-18)
+
+**Readiness check performed 2026-06-18:** all 6 seed commands the plan wraps
+(`create_handbook`, `seed_induction_tenant`, `seed_prime_tenancy`,
+`seed_service_orders`, `grant_handbook_access`, `backfill_induction_placement`)
+already exist and work independently. `Tenant` model already has all three
+tiers (`handbook`, `induction`, `global`) this plan depends on.
+`EmailVerificationToken` model and `pending_verification` user status already
+exist. `bootstrap_platform` is genuinely orchestration over existing logic,
+not new business logic — the project is ready to implement this phase now.
+
+Missing pieces confirmed at the same readiness check:
+
+1. `PlatformConfig` singleton model — does not exist yet
+2. `/platform/` app, URLs, views, templates — no scaffolding at all
+3. `bootstrap_platform` management command itself — does not exist
+4. Access-level constants are still hardcoded in two files (see resolved conflict above)
+
+Suggested build order:
+
+1. **`PlatformConfig` model + migration** — collapses the `MANDATE_ACCESS_LEVEL`
+   conflict into the model's default in the same change. Include
+   `mandate_access_level`, `keys_access_level`, `reference_access_level`,
+   `require_email_verification`, `bootstrapped_at`, `bootstrapped_by`,
+   `bootstrap_version` fields from this document.
+2. **`bootstrap_platform` management command** — steps 1–10 as specified above,
+   idempotent, with `--dry-run`, `--quiet`, `--force` flags.
+3. **`/platform/` app — Setup Checklist page only** — read-only status display,
+   lowest risk, no write actions yet. Level 5 / superuser gated.
+4. **System Tenants management UI** (`/platform/tenants/`) — induction, handbook,
+   prime tenant detail with steward assignment.
+5. **Bootstrap Actions** — buttons that trigger seed logic from the browser
+   (idempotent, same logic as the CLI command).
+
+Pending: a list of additional items to fold into bootstrap scope, to be supplied
+by Chizola before implementation of step 2 begins.
 
 ## Entry Requirement
 
