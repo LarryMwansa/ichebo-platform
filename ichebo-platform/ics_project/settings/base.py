@@ -256,7 +256,9 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 # Ichebo Media — Video Engine
 MEDIA_ENGINE_URL = config('MEDIA_ENGINE_URL', default='http://localhost:8090')
-MEDIA_ENGINE_API_KEY = config('MEDIA_ENGINE_API_KEY', default='dev-key')
+# No insecure default — must be set explicitly in every environment (including
+# local dev) and must match MEDIA_DJANGO_API_KEY in the Go engine's environment.
+MEDIA_ENGINE_API_KEY = config('MEDIA_ENGINE_API_KEY')
 
 # Security Settings
 X_FRAME_OPTIONS = 'SAMEORIGIN'
