@@ -341,3 +341,39 @@ database (without months of accumulated local dev workarounds papering over
 it) will surface. Worth checking, for any other UUID-PK migration from the
 same E.1 phase, whether the same `AlterField`-on-an-FK no-op pattern exists
 elsewhere — this fix only covered `bible`.
+
+---
+
+## Post-Deploy Fix #4 (2026-06-22, same day) — load remaining Bible translations from bibles_dbs/*.xml
+
+User asked to check whether `bible/data`'s XML files were already
+represented in the platform, and if not, load them.
+
+**Audit of `bible/data/`:**
+
+- `bible.db` — empty SQLite scaffold (0 rows); `import__json_bible.py` /
+  `import_xml_bible.py` — both dead leftovers from an unrelated prototype
+  (import from `sqlmodel`/`app.models`, neither exists in this Django app).
+  None of these three were ever part of the real pipeline.
+- `json_bibles/*.json` — source for the 3 translations already loaded
+  (KJV, ASV, WEB) via `load_bible` in Post-Deploy Fix #3.
+- `bibles_dbs/*.xml` — 10 full Zefania-format translations, only 2
+  (`asv.xml`, `kjv.xml`) overlapping what was already loaded (from the JSON
+  source instead, kept as-is per user decision). 8 genuinely new: AMP, ESV,
+  MSG, NASB, NIV, NKJV, NLT, TNIV. `nrsv.ewb` is a different, unsupported
+  format — left alone.
+
+**Bug found and fixed in the same pass:** `load_bible_xml.py` preferred the
+XML file's own `biblename` attribute over its curated `TRANSLATION_NAMES`
+dict, so translation display names shipped the source data's quality
+issues verbatim — bare codes (`AMP`, `MSG`, `NKJV`, `NLT`), a typo
+(`NASB`'s source XML literally says `biblename="NSAB"`), and mangled text
+(`TNIV`'s says `biblename="ENGLISHTNV"`). Fixed `load_bible_xml.py` to
+prefer the curated dict first; added missing `NIV`/`ASV`/`KJV` entries.
+
+**Deployed:** pulled, ran `load_bible_xml` for all 8 new translations on
+production. All loaded cleanly, zero warnings (every book name in the
+source XML mapped correctly to the platform's book codes). Verified final
+state — 11 total translations, ~31,100 verses each, correct full names
+(`Amplified Bible`, `The Message`, `New International Version`, etc.) —
+and confirmed `/bible/versions/` renders all of them live.
