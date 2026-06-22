@@ -240,3 +240,104 @@ than silently fixed, per this project's working convention:
 
 - `ichebo-media` (Go video engine) — no Go toolchain on this server, no
   second server provisioned yet. Confirmed out of scope for this cutover.
+
+---
+
+## Post-Deploy Fix #1 (2026-06-22, same day) — nginx static path stale
+
+User reported the dashboard rendering with no CSS after logging in
+(screenshot showed the Apostolic Command Shell completely unstyled).
+
+**Root cause:** `/etc/nginx/sites-available/ics`'s `location /static/` block
+still aliased `/home/scepter/ics/staticfiles/` — the **old** app's path.
+Phase 3 of this plan updated the systemd unit's `WorkingDirectory` but
+missed that nginx has its own independent, hardcoded static file path.
+`variables.css`/`main.css` returned 200 (stale duplicate filenames existed
+in the old app's `staticfiles/` too), but `workspace.css`/`shell_v2.css`/
+`workspace_v2.css` — files specific to the Apostolic Command Shell, added
+later in this project's history — only exist in the new app's directory, so
+they 404'd.
+
+**Fix:** updated the `alias` to
+`/home/scepter/ichebo-platform-repo/ichebo-platform/staticfiles/`,
+`nginx -t` validated, `systemctl reload nginx`. Re-verified every CSS/JS/
+image asset spot-checked returns 200 with real content. `location /media/`
+needed no change — it proxies to MinIO, not a filesystem path.
+
+---
+
+## Post-Deploy Fix #2 (2026-06-22, same day) — marketing site missing build entries
+
+User reported `https://ichebo.org/programme` and `/platform` 404ing.
+
+**Root cause:** `programme.html` and `platform.html` existed in the
+`ichebo-website` repo (committed earlier the same day) and were already
+linked from the site's own nav/footer, but `vite.config.js`'s
+`rollupOptions.input` only listed `main`, `about`, `training` — Vite never
+built them, so they never existed in any `dist/` output despite the source
+files being present.
+
+**Fix:** added `platform` and `programme` entries to `vite.config.js`,
+committed (`220a9b9`), pushed, pulled on the VPS, `npm run build` (now
+produces all 5 pages), backed up the live `ichebo-site` directory (second
+timestamped backup of the day), copied the new `dist/` over it. Verified all
+5 routes return 200 with correct page titles
+(`The Sceptre Community Programme — Ichebo Christian Services`,
+`Ichebo Platform — Ichebo Christian Services`).
+
+**Process note for future deploys:** this is the second time in one day a
+cutover step quietly missed a path that exists outside the obvious
+systemd-unit/`.env` surface (nginx's hardcoded alias, Vite's hardcoded entry
+list). Worth a standing checklist item: after any redeploy that changes the
+served directory, explicitly diff `grep -rn "ics/" /etc/nginx/` and the
+build tool's entry/manifest config against the actual file tree, rather than
+assuming "it built/the service restarted" means every route is reachable.
+
+---
+
+## Post-Deploy Fix #3 (2026-06-22, same day) — Bible data never loaded + a real migration bug found underneath
+
+User reported `https://app.ichebo.org/bible/` 404ing with "Bible data is not
+loaded."
+
+**Layer 1 (expected gap):** `bootstrap_platform` never seeds Bible
+data — it's loaded separately via `load_bible`, which was simply never run
+on this fresh production database. This part was always going to need a
+manual step; not a bug, just an omission to fix now.
+
+**Layer 2 (a real, pre-existing migration bug, found while fixing Layer 1):**
+running `load_bible KJV` failed with
+`column "book_id" is of type bigint but expression is of type uuid`.
+Migration `0003_biblebook_uuid_pk` (part of this session's earlier Phase E.1
+work, well before today) correctly converted `BibleBook.id` from
+`BigAutoField` to `UUIDField`, but its final operation — an `AlterField` on
+`BibleVerse.book` meant to update the FK column to match — was a silent
+no-op. Confirmed via `sqlmigrate bible 0003`: Django's autodetector only
+emits real `ALTER COLUMN` SQL when a field's *state* differs between
+migrations, and that `AlterField` used an identical `ForeignKey` definition
+to what already existed, so nothing was generated. This means **the bug
+existed in the repo before today's deploy** — it surfaced today only
+because this was the first time `load_bible` was ever run against the new
+schema.
+
+**Fix:** new migration `bible/0004_fix_bibleverse_book_fk_type.py` using a
+genuine `RemoveField`/`AddField` pair (not `AlterField`) — confirmed via
+`sqlmigrate` this produces real DDL on both SQLite and PostgreSQL. Had to
+explicitly drop and recreate `BibleVerse`'s `unique_together` and both
+indexes around the field removal, since SQLite's table-rebuild migration
+path raises `FieldDoesNotExist` if an index/constraint still references the
+field mid-rebuild. Verified locally first (wiped 93k leftover local dev
+verse rows to get a clean test, then reloaded all three translations
+successfully) before applying to production.
+
+**Deployed:** pulled, `migrate bible` (confirmed `book_id` is now `uuid` via
+direct `\d bible_bibleverse`), then `load_bible` for all three
+roadmap-specified translations — KJV (31,102 verses, set as default), ASV
+(31,101), WEB (31,098). `https://app.ichebo.org/bible/` now correctly
+redirects to login (`302`, not `404`) for an unauthenticated request.
+
+**Process note:** this is the kind of bug that only a real production
+database (without months of accumulated local dev workarounds papering over
+it) will surface. Worth checking, for any other UUID-PK migration from the
+same E.1 phase, whether the same `AlterField`-on-an-FK no-op pattern exists
+elsewhere — this fix only covered `bible`.
