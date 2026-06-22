@@ -24,6 +24,18 @@ def _event_qs(tenant=None):
     return qs
 
 
+def _steward_tenant(user):
+    """Resolve the scheduling steward's primary tenant, so events they create
+    are tenant-scoped and surface in the Community live room. Mirrors the
+    _get_user_permissions(user)[0].tenant pattern used in community/views.py."""
+    from tenants.models import UserPermission
+    perm = (
+        UserPermission.objects.filter(user=user, is_active=True)
+        .select_related('tenant').order_by('-level').first()
+    )
+    return perm.tenant if perm else None
+
+
 def _annotate_event(event):
     """Return a plain dict safe for Django templates (no underscore attributes)."""
     meta = event.metadata or {}
@@ -240,6 +252,7 @@ def video_manage(request):
                     scheduled_at=scheduled_at,
                     status='pending',
                     created_by=request.user,
+                    tenant=_steward_tenant(request.user),
                     metadata={
                         'stream_url': stream_url,
                         'duration_minutes': int(duration) if duration.isdigit() else 60,
@@ -395,6 +408,7 @@ def htmx_studio_quick_schedule(request):
                     scheduled_at=scheduled_at,
                     status='pending',
                     created_by=request.user,
+                    tenant=_steward_tenant(request.user),
                     metadata={
                         'stream_url': stream_url,
                         'duration_minutes': int(duration) if duration.isdigit() else 60,
