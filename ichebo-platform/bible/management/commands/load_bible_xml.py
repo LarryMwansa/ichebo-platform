@@ -42,9 +42,12 @@ TRANSLATION_NAMES = {
     'ESV': 'English Standard Version',
     'MSG': 'The Message',
     'NASB': 'New American Standard Bible',
+    'NIV': 'New International Version',
     'NKJV': 'New King James Version',
     'NLT': 'New Living Translation',
-    'TNIV': 'Today\'s New International Version'
+    'TNIV': 'Today\'s New International Version',
+    'ASV': 'American Standard Version',
+    'KJV': 'Authorized King James Version',
 }
 
 class Command(BaseCommand):
@@ -66,13 +69,15 @@ class Command(BaseCommand):
         tree = ET.parse(data_path)
         root = tree.getroot()
 
-        # Handle potential name from XML root attribute
+        # Prefer the curated full name over the XML's own biblename attribute —
+        # source files are inconsistent (bare codes, typos like NASB's "NSAB",
+        # or mangled values like TNIV's "ENGLISHTNV").
         xml_biblename = root.get('biblename')
-        
+
         translation, created = BibleTranslation.objects.update_or_create(
             code=code,
             defaults={
-                'name': xml_biblename or TRANSLATION_NAMES.get(code, code),
+                'name': TRANSLATION_NAMES.get(code) or xml_biblename or code,
                 'language': 'en',
                 'language_full': 'English',
                 'is_public': True,
