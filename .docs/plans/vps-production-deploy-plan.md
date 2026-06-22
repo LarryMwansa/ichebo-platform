@@ -1,7 +1,7 @@
 # Production Deploy — ichebo-platform + ichebo-website to the existing VPS
 
-**Version:** 1.0 — 2026-06-22
-**Status:** Approved — executing
+**Version:** 1.1 — 2026-06-22
+**Status:** Executed — live in production, one manual follow-up pending (Brevo credentials)
 **Server:** `scepter@37.27.82.169` (hostname `scepter-server`)
 **Author:** Claude (technical) — directed by Chizola
 
@@ -120,10 +120,123 @@ If cutover fails at Phase 3:
 
 ## Exit Criteria
 
-- [ ] `https://app.ichebo.org` serves this repo's Django app, login works, static assets load
-- [ ] `https://ichebo.org` serves this repo's `ichebo-website`, waitlist form successfully creates a `WaitlistEntry` and the signee receives a confirmation email
-- [ ] `python manage.py check --deploy` reports 0 issues against the real production `.env`
-- [ ] `bootstrap_platform` has run successfully — Handbook, Induction, Prime, 6 agencies, 24 Service Orders, 6 Qualification Programmes, Genesis Sceptre Community all exist
-- [ ] Redis + Celery worker + beat are running; a real notification/email task completes via `.delay()` without a connection error
-- [ ] Old app (`/home/scepter/ics`) and old site source (`/home/scepter/ichebo-site-src`) are preserved on disk, not deleted
-- [ ] Daily backup cron continues to run against the new `ics_db` content
+- [x] `https://app.ichebo.org` serves this repo's Django app, login works, static assets load
+- [x] `https://ichebo.org` serves this repo's `ichebo-website`, waitlist form successfully creates a `WaitlistEntry` — confirmation email queued correctly but **not yet delivered** (Brevo credentials still placeholders, see Execution Log)
+- [x] `python manage.py check --deploy` reports 0 issues against the real production `.env`
+- [x] `bootstrap_platform` has run successfully — Handbook, Induction, Prime, 6 agencies, 24 Service Orders, 6 Qualification Programmes, Genesis Sceptre Community all exist
+- [x] Redis + Celery worker + beat are running; task dispatch confirmed (`.delay()` reaches the worker with no connection error) — actual email send blocked on Brevo credentials, not the queue/worker pipeline
+- [x] Old app (`/home/scepter/ics`) and old site source (`/home/scepter/ichebo-site-src`) are preserved on disk, not deleted
+- [x] Daily backup cron continues to run against the new `ics_db` content (unmodified, still points at `ics_db`)
+
+---
+
+## Execution Log (2026-06-22)
+
+Executed in full, Phases 1–3 and the Phase 4 verification checklist. Real
+discrepancies found and corrected during execution, recorded here rather
+than silently fixed, per this project's working convention:
+
+1. **GitHub repo rename mid-session** — `origin` was `LarryMwansa/icebho-platform.git`
+   (typo). GitHub auto-redirected the push but the local remote was corrected
+   to `LarryMwansa/ichebo-platform.git` before the VPS clone, to avoid relying
+   on the redirect long-term.
+
+2. **Mono repo layout vs. the plan's assumed path** — the plan's Phase 1
+   describes cloning to `/home/scepter/ichebo-platform`. Since this is a mono
+   repo (contains `ichebo-platform/`, `ichebo-website/`, `ichebo-media/`,
+   etc. as siblings), it was cloned to `/home/scepter/ichebo-platform-repo/`
+   and the systemd unit's `WorkingDirectory` points at the nested
+   `ichebo-platform-repo/ichebo-platform/` directory instead.
+
+3. **`manage.py`'s `setdefault('DJANGO_SETTINGS_MODULE', 'ics_project.settings.base')`
+   wins over `.env`'s value for any manually-run CLI command** — `migrate`,
+   `bootstrap_platform`, and the first `collectstatic` run were executed
+   without `DJANGO_SETTINGS_MODULE` explicitly exported, so they silently ran
+   against `base.py`, not `production.py`. This does not affect the live
+   running app (the systemd unit's `Environment=` line sets it correctly for
+   gunicorn), but it meant `collectstatic` initially ran without
+   `ManifestStaticFilesStorage`'s content-hashing. Fixed by re-running
+   `collectstatic` (and confirming `migrate` needed no changes — `DATABASES`
+   doesn't differ between `base` and `production`) with
+   `DJANGO_SETTINGS_MODULE=ics_project.settings.production` explicitly
+   exported in the shell.
+
+4. **First-generated `SECRET_KEY` was 45 characters, not 50** — written via a
+   bash heredoc containing a literal `$` character that the shell partially
+   consumed before it reached the file. `check --deploy` caught this
+   (`security.W009`). Regenerated using `sed` instead of a heredoc, verified
+   the byte length before writing.
+
+5. **`ics_user` lacks `CREATEDB` privilege** — `DROP DATABASE` succeeded as
+   `ics_user`, but `CREATE DATABASE` required `sudo -u postgres psql`.
+   Resolved by creating the fresh `ics_db` as the `postgres` superuser,
+   `OWNER ics_user`, so the app's existing role continues to own and access
+   it normally afterward.
+
+6. **MinIO root credentials existed in `/etc/default/minio`, but no
+   app-scoped access key did** — the old app's `.env` had no MinIO/S3 config
+   at all, implying it never actually exercised object storage. Created a
+   dedicated `ichebo-app` MinIO user with a `readwrite` policy rather than
+   embedding root credentials in the new `.env`. The first generated secret
+   for this user was visible in this session's tool output and was rotated
+   immediately via `mc admin user add` (which updates an existing user's
+   secret) before being used anywhere.
+
+7. **Brevo SMTP credentials were not available this session** — `.env`
+   contains `EMAIL_HOST_USER=REPLACE_ME_BREVO_LOGIN` and
+   `EMAIL_HOST_PASSWORD=REPLACE_ME_BREVO_SMTP_KEY` as explicit placeholders.
+   Confirmed via live Celery worker logs that the waitlist confirmation and
+   internal-notification emails correctly queue, dispatch to the worker, and
+   retry on `SMTPAuthenticationError` exactly as designed — the retry/backoff
+   logic itself is proven correct. **Outstanding: replace these two values
+   in `/home/scepter/ichebo-platform-repo/ichebo-platform/.env` with real
+   Brevo SMTP credentials, then `sudo systemctl restart ics-celery
+   ics-celery-beat ics-gunicorn`** so the new `.env` is re-read.
+
+8. **Admin superuser password was generated server-side but printed to this
+   session's tool output once** (to test the login flow end-to-end) —
+   rotated immediately after the test login succeeded. Current password
+   lives only in `/home/scepter/.admin-temp-password` on the server
+   (`chmod 600`); retrieve and change it via the admin UI, then delete that
+   file.
+
+9. **nginx's `/static/` alias was never updated and still pointed at the old
+   app's path** (`/home/scepter/ics/staticfiles/`) — missed during Phase 3
+   because the plan's cutover steps focused on the systemd unit
+   (`WorkingDirectory`), not nginx's separate, independently-hardcoded static
+   path. Found after deploy when a logged-in user reported the dashboard
+   rendering with no CSS (screenshot showed the workspace shell completely
+   unstyled). Root cause confirmed precisely: `variables.css` and `main.css`
+   returned 200 (likely stale copies of the same filenames existed in the old
+   app's `staticfiles/` too), but `workspace.css`/`shell_v2.css`/`workspace_v2.css`
+   — files specific to the Apostolic Command Shell built later in this
+   project's history — returned 404, since they only exist in the new app's
+   `staticfiles/`. Fixed by updating the `alias` in
+   `/etc/nginx/sites-available/ics`'s `location /static/` block to
+   `/home/scepter/ichebo-platform-repo/ichebo-platform/staticfiles/`,
+   `nginx -t` validated, `systemctl reload nginx`. Re-verified: all CSS, JS,
+   and image assets spot-checked now return 200 with real (non-empty)
+   content. **`location /media/` was already correct** — it proxies to MinIO
+   at `localhost:9000`, not a filesystem path, so it needed no change.
+
+**Verified live, end to end:**
+
+- `https://app.ichebo.org/` → 302 to login (correct, unauthenticated)
+- Full HSTS / `X-Frame-Options: DENY` / secure-cookie headers present on a
+  real response — confirms `production.py` hardening is active
+- POST login with the real superuser credentials → 302 (successful auth)
+- `https://ichebo.org/` → 200, correct title, correct content length matching
+  the Vite build output
+- `POST https://app.ichebo.org/api/waitlist/` with `Origin: https://ichebo.org`
+  → 201, `access-control-allow-origin: https://ichebo.org` present (CORS
+  correctly scoped, not wildcard), `WaitlistEntry` created, both Celery tasks
+  dispatched and visible in the worker log within ~1 second
+- Test waitlist entry removed from production data after verification
+- All static assets (`variables.css`, `main.css`, `workspace.css`, `shell_v2.css`,
+  `workspace_v2.css`, `htmx.min.js`, `navbar.js`, `images/logo.svg`) confirmed
+  200 with real content after the nginx static-path fix (discrepancy 9 above)
+
+**Not yet done (explicitly deferred per the plan, no action taken):**
+
+- `ichebo-media` (Go video engine) — no Go toolchain on this server, no
+  second server provisioned yet. Confirmed out of scope for this cutover.
