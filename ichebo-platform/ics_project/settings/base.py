@@ -264,5 +264,11 @@ MEDIA_ENGINE_URL = config('MEDIA_ENGINE_URL', default='http://localhost:8090')
 # local dev) and must match MEDIA_DJANGO_API_KEY in the Go engine's environment.
 MEDIA_ENGINE_API_KEY = config('MEDIA_ENGINE_API_KEY')
 
+# MediaMTX — native RTMP ingest / HLS delivery for BroadcastSchedule live streams.
+# Placeholder defaults only apply if unset — set both explicitly before using
+# the native broadcast path in any real environment.
+MEDIAMTX_RTMP_URL = config('MEDIAMTX_RTMP_URL', default='rtmp://media.ichebo.org/live')
+MEDIAMTX_HLS_BASE_URL = config('MEDIAMTX_HLS_BASE_URL', default='https://cdn.ichebo.org/live')
+
 # Security Settings
 X_FRAME_OPTIONS = 'SAMEORIGIN'
