@@ -45,13 +45,14 @@
 
     <div class="manage-form" style="max-width: 600px;">
       <div class="label-caps" style="margin-bottom: var(--space-s);">Schedule a Broadcast</div>
-      <form method="post">
+      <form method="post" onsubmit="this.tz_offset_minutes.value = new Date().getTimezoneOffset();">
         {% csrf_token %}
+        <input type="hidden" name="tz_offset_minutes" value="">
         <label for="ws_id_title">Title *</label>
         <input type="text" id="ws_id_title" name="title" required placeholder="e.g. Sunday Service — 4 May">
         <label for="ws_id_stream_url">Stream URL * <span style="font-weight: 400; color: var(--muted);">(YouTube, Vimeo, or .mp4)</span></label>
         <input type="url" id="ws_id_stream_url" name="stream_url" required placeholder="https://youtube.com/watch?v=...">
-        <label for="ws_id_scheduled_at">Date &amp; Time *</label>
+        <label for="ws_id_scheduled_at">Date &amp; Time * <span style="font-weight: 400; color: var(--muted);">(your local time)</span></label>
         <input type="datetime-local" id="ws_id_scheduled_at" name="scheduled_at" required>
         <label for="ws_id_duration">Duration (minutes)</label>
         <input type="number" id="ws_id_duration" name="duration_minutes" value="60" min="5" max="480">
@@ -109,8 +110,10 @@
 
   <div style="background: var(--card); border: 1px solid var(--border);
               border-radius: var(--radius-l); padding: var(--space-m); margin-bottom: var(--space-m);">
-    <form method="post" style="display: flex; flex-direction: column; gap: 14px;">
+    <form method="post" style="display: flex; flex-direction: column; gap: 14px;"
+          onsubmit="this.tz_offset_minutes.value = new Date().getTimezoneOffset();">
       {% csrf_token %}
+      <input type="hidden" name="tz_offset_minutes" value="">
       <div>
         <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
                       letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px;">Title *</label>
@@ -125,7 +128,7 @@
       </div>
       <div>
         <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
-                      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px;">Date &amp; Time *</label>
+                      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px;">Date &amp; Time * <span style="font-weight:400;text-transform:none;">(your local time)</span></label>
         <input type="datetime-local" name="scheduled_at" required class="form-input-touch">
       </div>
       <div>

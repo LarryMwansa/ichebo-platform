@@ -25,6 +25,7 @@
     <form hx-post="{% url 'video_live:studio-quick-schedule' %}"
           hx-target="#studio-form-panel"
           hx-swap="innerHTML"
+          hx-vals='js:{"tz_offset_minutes": new Date().getTimezoneOffset()}'
           style="display: flex; flex-direction: column; gap: 12px;">
         {% csrf_token %}
 
@@ -62,7 +63,7 @@
             <div>
                 <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
                                letter-spacing: 0.07em; color: var(--muted); margin-bottom: 5px;">
-                    Date &amp; Time *
+                    Date &amp; Time * <span style="text-transform:none;font-weight:400;">(local)</span>
                 </label>
                 <input type="datetime-local" name="scheduled_at" required
                        style="display: block; width: 100%; height: 38px; padding: 0 10px;

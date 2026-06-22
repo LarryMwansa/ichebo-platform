@@ -24,6 +24,35 @@ def _event_qs(tenant=None):
     return qs
 
 
+def _parse_local_datetime(raw_str, tz_offset_minutes_str):
+    """Parse a <input type="datetime-local"> value into an aware UTC datetime.
+
+    datetime-local carries no timezone information — it's the browser's
+    local wall-clock time with no offset attached. TIME_ZONE='UTC' means
+    make_aware() on its own would silently treat that local time AS UTC,
+    shifting the actual broadcast time by the user's UTC offset (e.g. a
+    steward in UTC+2 typing "12:14" meaning their own noon would have it
+    stored as 12:14 UTC — 2 hours later than intended).
+
+    tz_offset_minutes is JS's Date.getTimezoneOffset() — minutes to ADD to
+    local time to reach UTC (positive west of UTC, negative east — e.g.
+    UTC+2 reports -120). Returns None if raw_str doesn't parse.
+    """
+    from django.utils.dateparse import parse_datetime
+
+    naive = parse_datetime(raw_str)
+    if not naive:
+        return None
+
+    try:
+        offset_minutes = int(tz_offset_minutes_str)
+    except (TypeError, ValueError):
+        offset_minutes = 0
+
+    utc_naive = naive + timezone.timedelta(minutes=offset_minutes)
+    return timezone.make_aware(utc_naive, timezone.utc)
+
+
 def _steward_tenant(user):
     """Resolve the scheduling steward's primary tenant, so events they create
     are tenant-scoped and surface in the Community live room. Mirrors the
@@ -227,6 +256,7 @@ def video_manage(request):
         title = request.POST.get('title', '').strip()
         stream_url = request.POST.get('stream_url', '').strip()
         scheduled_at_str = request.POST.get('scheduled_at', '').strip()
+        tz_offset_minutes = request.POST.get('tz_offset_minutes', '0').strip()
         duration = request.POST.get('duration_minutes', '60').strip()
         description = request.POST.get('description', '').strip()
 
@@ -237,13 +267,10 @@ def video_manage(request):
         elif not scheduled_at_str:
             error = 'Broadcast date/time is required.'
         else:
-            from django.utils.dateparse import parse_datetime
-            scheduled_at = parse_datetime(scheduled_at_str)
+            scheduled_at = _parse_local_datetime(scheduled_at_str, tz_offset_minutes)
             if not scheduled_at:
                 error = 'Invalid date/time format. Use YYYY-MM-DDTHH:MM.'
             else:
-                if timezone.is_naive(scheduled_at):
-                    scheduled_at = timezone.make_aware(scheduled_at)
                 from django.contrib import messages as _messages
                 Activity.objects.create(
                     activity_type='event',
@@ -383,10 +410,10 @@ def htmx_studio_quick_schedule(request):
     if request.method == 'POST':
         import json
         from django.contrib import messages
-        from django.utils.dateparse import parse_datetime
         title       = request.POST.get('title', '').strip()
         stream_url  = request.POST.get('stream_url', '').strip()
         scheduled_at_str = request.POST.get('scheduled_at', '').strip()
+        tz_offset_minutes = request.POST.get('tz_offset_minutes', '0').strip()
         duration    = request.POST.get('duration_minutes', '60').strip()
         error = None
         if not title:
@@ -396,12 +423,10 @@ def htmx_studio_quick_schedule(request):
         elif not scheduled_at_str:
             error = 'Date/time is required.'
         else:
-            scheduled_at = parse_datetime(scheduled_at_str)
+            scheduled_at = _parse_local_datetime(scheduled_at_str, tz_offset_minutes)
             if not scheduled_at:
                 error = 'Invalid date/time.'
             else:
-                if timezone.is_naive(scheduled_at):
-                    scheduled_at = timezone.make_aware(scheduled_at)
                 Activity.objects.create(
                     activity_type='event',
                     title=title,
