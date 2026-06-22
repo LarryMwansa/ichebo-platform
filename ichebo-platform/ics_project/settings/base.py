@@ -225,6 +225,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'paraclete.tasks.refresh_all_active_digests',
         'schedule': crontab(minute='*/10'),
     },
+    'reconcile-stuck-transcode-jobs': {
+        'task': 'media.tasks.reconcile_stuck_transcode_jobs',
+        'schedule': crontab(minute='*/5'),
+    },
 }
 
 

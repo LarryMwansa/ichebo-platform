@@ -1,5 +1,4 @@
 import uuid
-import requests
 from django.conf import settings
 from django.utils import timezone
 from rest_framework import status
@@ -9,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from records.models import Record
+from .engine_client import post_with_retry
 from .models import TranscodeJob, VideoRecord
 from .serializers import VideoRecordSerializer
 
@@ -44,7 +44,7 @@ class UploadInitView(APIView):
         # Forward init request to Go Video Engine.
         engine_url = getattr(settings, 'MEDIA_ENGINE_URL', 'http://localhost:8090')
         try:
-            resp = requests.post(
+            resp = post_with_retry(
                 f'{engine_url}/engine/upload/init',
                 json={
                     'filename': filename,
@@ -55,7 +55,6 @@ class UploadInitView(APIView):
                 },
                 timeout=15,
             )
-            resp.raise_for_status()
             engine_data = resp.json()
         except Exception as exc:
             record.delete()
@@ -92,12 +91,11 @@ class UploadCompleteView(APIView):
 
         # Complete assembly in the engine.
         try:
-            resp = requests.post(
+            resp = post_with_retry(
                 f'{engine_url}/engine/upload/{upload_id}/complete',
                 json={'chunk_checksums': chunk_checksums},
                 timeout=60,
             )
-            resp.raise_for_status()
             engine_data = resp.json()
         except Exception as exc:
             return Response({'error': f'Upload complete failed: {exc}'}, status=503)
@@ -106,7 +104,7 @@ class UploadCompleteView(APIView):
 
         # Submit transcode job to the engine.
         try:
-            transcode_resp = requests.post(
+            transcode_resp = post_with_retry(
                 f'{engine_url}/engine/transcode',
                 json={
                     'upload_id': upload_id,
@@ -117,7 +115,6 @@ class UploadCompleteView(APIView):
                 },
                 timeout=15,
             )
-            transcode_resp.raise_for_status()
             transcode_data = transcode_resp.json()
         except Exception as exc:
             return Response({'error': f'Transcode submit failed: {exc}'}, status=503)
