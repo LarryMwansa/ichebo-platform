@@ -1,0 +1,39 @@
+<!-- community/partials/live_request_form.html -->
+<!-- Member-facing prayer/question form alongside the live player -->
+<div id="live-request-form-{{ session.broadcast_id }}">
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button type="button" class="btn-touch" style="flex:1;padding:8px;font-size:0.8125rem"
+            onclick="document.getElementById('live-request-box-prayer').style.display='block';document.getElementById('live-request-box-question').style.display='none';">
+      🙏 Prayer Request
+    </button>
+    <button type="button" class="btn-touch" style="flex:1;padding:8px;font-size:0.8125rem"
+            onclick="document.getElementById('live-request-box-question').style.display='block';document.getElementById('live-request-box-prayer').style.display='none';">
+      ❓ Question
+    </button>
+  </div>
+
+  <div id="live-request-box-prayer" style="display:none">
+    <form hx-post="{% url 'community:htmx-raise-live-request' %}"
+          hx-target="#live-request-form-{{ session.broadcast_id }}" hx-swap="outerHTML"
+          style="display:flex;flex-direction:column;gap:8px">
+      {% csrf_token %}
+      <input type="hidden" name="broadcast_id" value="{{ session.broadcast_id }}">
+      <input type="hidden" name="kind" value="prayer">
+      <textarea name="content" rows="2" placeholder="What would you like prayer for?" required
+                style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:0.875rem;font-family:inherit;resize:vertical"></textarea>
+      <button type="submit" class="btn-touch btn-touch--primary" style="font-size:0.8125rem">Send</button>
+    </form>
+  </div>
+  <div id="live-request-box-question" style="display:none">
+    <form hx-post="{% url 'community:htmx-raise-live-request' %}"
+          hx-target="#live-request-form-{{ session.broadcast_id }}" hx-swap="outerHTML"
+          style="display:flex;flex-direction:column;gap:8px">
+      {% csrf_token %}
+      <input type="hidden" name="broadcast_id" value="{{ session.broadcast_id }}">
+      <input type="hidden" name="kind" value="question">
+      <textarea name="content" rows="2" placeholder="What's your question?" required
+                style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:0.875rem;font-family:inherit;resize:vertical"></textarea>
+      <button type="submit" class="btn-touch btn-touch--primary" style="font-size:0.8125rem">Send</button>
+    </form>
+  </div>
+</div>

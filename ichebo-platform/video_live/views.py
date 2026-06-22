@@ -8,14 +8,20 @@ from activity.models import Activity
 from .utils import get_embed_type, get_embed_url
 
 
-def _event_qs():
-    return (
+def _event_qs(tenant=None):
+    """Optional tenant filter — existing global callers (steward-facing
+    schedule/VOD/manage views) pass nothing and keep current behaviour.
+    The Community-scoped live room passes the member's tenant explicitly."""
+    qs = (
         Activity.objects
         .filter(activity_type='event', deleted_at__isnull=True)
         .exclude(metadata__stream_url=None)
         .exclude(metadata__stream_url='')
         .order_by('scheduled_at')
     )
+    if tenant is not None:
+        qs = qs.filter(tenant=tenant)
+    return qs
 
 
 def _annotate_event(event):

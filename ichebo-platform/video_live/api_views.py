@@ -10,14 +10,17 @@ from .models import BroadcastSchedule
 from .utils import get_embed_type, get_embed_url
 
 
-def _event_qs():
-    return (
+def _event_qs(tenant_id=None):
+    qs = (
         Activity.objects
         .filter(activity_type='event', deleted_at__isnull=True)
         .exclude(metadata__stream_url=None)
         .exclude(metadata__stream_url='')
         .order_by('scheduled_at')
     )
+    if tenant_id:
+        qs = qs.filter(tenant_id=tenant_id)
+    return qs
 
 
 def _serialize_event(event):
@@ -58,8 +61,9 @@ class VideoFeedView(APIView):
     def get(self, request):
         now = timezone.now()
         cutoff = now + timezone.timedelta(days=7)
+        tenant_id = request.query_params.get('tenant_id')
 
-        events = [_serialize_event(e) for e in _event_qs()]
+        events = [_serialize_event(e) for e in _event_qs(tenant_id=tenant_id)]
 
         live = [e for e in events if e['is_live']]
         upcoming = [
@@ -72,7 +76,10 @@ class VideoFeedView(APIView):
         # Merge in native broadcasts
         native_broadcasts = BroadcastSchedule.objects.filter(
             status__in=['scheduled', 'live']
-        ).order_by('scheduled_at')[:20]
+        )
+        if tenant_id:
+            native_broadcasts = native_broadcasts.filter(tenant_id=tenant_id)
+        native_broadcasts = native_broadcasts.order_by('scheduled_at')[:20]
 
         for b in native_broadcasts:
             entry = {

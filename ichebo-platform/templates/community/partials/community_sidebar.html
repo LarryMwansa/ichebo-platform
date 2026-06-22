@@ -26,6 +26,11 @@
         <span class="material-symbols-outlined">event_available</span>
         Upcoming Events
     </a>
+    <a href="{% url 'community:community-live' %}"
+       class="ctx-btn {% if active_community_tab == 'live' %}active{% endif %}">
+        <span class="material-symbols-outlined">live_tv</span>
+        Watch Live
+    </a>
     <a href="{% url 'community:community-management' %}"
        class="ctx-btn {% if active_community_tab == 'management' %}active{% endif %}">
         <span class="material-symbols-outlined">settings_account_box</span>

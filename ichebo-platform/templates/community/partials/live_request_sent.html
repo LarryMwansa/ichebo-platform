@@ -1,0 +1,13 @@
+<!-- community/partials/live_request_sent.html -->
+<div id="live-request-form-{{ record.custom_fields.broadcast_id }}">
+  <div class="info-card" style="border-color:var(--success)">
+    <div class="info-card-icon">✓</div>
+    <div>
+      <div class="info-card-label">Sent</div>
+      <div class="info-card-value">
+        {% if record.title == 'prayer' %}Your prayer request{% else %}Your question{% endif %}
+        has been sent to the steward.
+      </div>
+    </div>
+  </div>
+</div>

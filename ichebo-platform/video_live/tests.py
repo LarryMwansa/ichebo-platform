@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from accounts.models import User
 from activity.models import Activity
+from tenants.models import Tenant
 from video_live.utils import get_embed_type, get_embed_url, get_youtube_id, get_vimeo_id
 from video_live.views import _annotate_event, _event_qs
 
@@ -218,6 +219,46 @@ class EventQuerysetTests(TestCase):
         _event(self.creator, title='Event 1')
         _event(self.creator, title='Event 2', offset_minutes=120)
         self.assertEqual(_event_qs().count(), 2)
+
+    def test_no_tenant_arg_returns_all_tenants_unscoped(self):
+        """Default (no tenant passed) preserves existing global behaviour for
+        the steward-facing schedule/VOD/manage views."""
+        tenant_a = Tenant.objects.create(
+            name='T1', slug='video-t1', tier='church_node', path='/global/video-t1/',
+            status='active', created_by=self.creator,
+        )
+        tenant_b = Tenant.objects.create(
+            name='T2', slug='video-t2', tier='church_node', path='/global/video-t2/',
+            status='active', created_by=self.creator,
+        )
+        ev_a = _event(self.creator, title='A')
+        ev_a.tenant = tenant_a
+        ev_a.save(update_fields=['tenant'])
+        ev_b = _event(self.creator, title='B')
+        ev_b.tenant = tenant_b
+        ev_b.save(update_fields=['tenant'])
+
+        self.assertEqual(_event_qs().count(), 2)
+
+    def test_tenant_arg_scopes_to_that_tenant_only(self):
+        tenant_a = Tenant.objects.create(
+            name='T3', slug='video-t3', tier='church_node', path='/global/video-t3/',
+            status='active', created_by=self.creator,
+        )
+        tenant_b = Tenant.objects.create(
+            name='T4', slug='video-t4', tier='church_node', path='/global/video-t4/',
+            status='active', created_by=self.creator,
+        )
+        ev_a = _event(self.creator, title='A')
+        ev_a.tenant = tenant_a
+        ev_a.save(update_fields=['tenant'])
+        ev_b = _event(self.creator, title='B')
+        ev_b.tenant = tenant_b
+        ev_b.save(update_fields=['tenant'])
+
+        scoped = _event_qs(tenant=tenant_a)
+        self.assertEqual(scoped.count(), 1)
+        self.assertEqual(scoped.first().title, 'A')
 
 
 # ---------------------------------------------------------------------------

@@ -7,6 +7,7 @@ urlpatterns = [
     # ── My Community surface ─────────────────────────────────────────────────
     path('community/', views.my_community, name='community-home'),
     path('community/gatherings/', views.gatherings_list, name='community-gatherings'),
+    path('community/live/', views.live_service_room, name='community-live'),
 
     # ── Steward management surface (Level 3+) — flat URLs ────────────────────
     path('community/management/', views.management_home, name='community-management'),
@@ -63,4 +64,14 @@ urlpatterns = [
          views.htmx_my_support_requests, name='htmx-my-support-requests'),
     path('community/htmx/support/<uuid:record_id>/acknowledge/',
          views.htmx_acknowledge_support_request, name='htmx-acknowledge-support-request'),
+
+    # ── Live service room — in-service ministry panel ─────────────────────────
+    path('community/htmx/live/request/',
+         views.htmx_raise_live_request, name='htmx-raise-live-request'),
+    path('community/htmx/live/mine/',
+         views.htmx_my_live_requests, name='htmx-my-live-requests'),
+    path('community/htmx/live/queue/',
+         views.htmx_live_requests_queue, name='htmx-live-requests-queue'),
+    path('community/htmx/live/<uuid:record_id>/respond/',
+         views.htmx_respond_live_request, name='htmx-respond-live-request'),
 ]

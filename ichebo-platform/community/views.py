@@ -1068,6 +1068,240 @@ def htmx_review_request(request, request_id):
     })
 
 
+# ── Live service room — tenant-scoped, with in-service ministry panel ───────
+# See .docs/plans/community-live-service-room-plan.md
+#
+# Checks both video_live data sources, per DOC G §7.2's documented coexistence
+# policy: the legacy Activity URL-embed system and the native BroadcastSchedule
+# (Go Media Engine) model. Neither is being unified — both are queried here.
+
+LIVE_REQUEST_POLL_SECONDS = 15
+
+
+def _find_live_session(tenant):
+    """Return a dict describing the tenant's current/next live session,
+    checking both video_live data sources, or None if neither has anything
+    scheduled. Player type follows DOC G §7.3's existing discriminator."""
+    from video_live.views import _event_qs, _annotate_event
+    from video_live.models import BroadcastSchedule
+
+    if tenant is None:
+        return None
+
+    now = timezone.now()
+
+    # Native BroadcastSchedule (Go Media Engine / RTMP+HLS) — checked first
+    # since a 'live' status is an unambiguous, authoritative signal.
+    broadcast = BroadcastSchedule.objects.filter(
+        tenant=tenant, status='live',
+    ).order_by('-scheduled_at').first()
+    if broadcast:
+        return {
+            'source': 'broadcast',
+            'broadcast_id': str(broadcast.id),
+            'title': broadcast.title,
+            'description': broadcast.description,
+            'scheduled_at': broadcast.scheduled_at,
+            'is_live': True,
+            'player_type': 'hls',
+            'embed_url': broadcast.viewer_hls_url,
+            'gathering_record_id': str(broadcast.gathering_record_id) if broadcast.gathering_record_id else None,
+        }
+
+    # Legacy Activity URL-embed system
+    events = [_annotate_event(e) for e in _event_qs(tenant=tenant)]
+    live_events = [e for e in events if e['is_live']]
+    if live_events:
+        event = live_events[0]
+        return {
+            'source': 'activity',
+            'broadcast_id': str(event['id']),
+            'title': event['title'],
+            'description': event['description'],
+            'scheduled_at': event['scheduled_at'],
+            'is_live': True,
+            'player_type': event['embed_type'],
+            'embed_url': event['embed_url'],
+            'gathering_record_id': None,
+        }
+
+    # Nothing live — surface the next scheduled session from either source.
+    next_broadcast = BroadcastSchedule.objects.filter(
+        tenant=tenant, status='scheduled', scheduled_at__gte=now,
+    ).order_by('scheduled_at').first()
+    next_event = next(
+        (e for e in events if not e['is_live'] and not e['is_past']), None,
+    )
+
+    candidates = []
+    if next_broadcast:
+        candidates.append((next_broadcast.scheduled_at, {
+            'source': 'broadcast', 'title': next_broadcast.title,
+            'scheduled_at': next_broadcast.scheduled_at, 'is_live': False,
+        }))
+    if next_event:
+        candidates.append((next_event['scheduled_at'], {
+            'source': 'activity', 'title': next_event['title'],
+            'scheduled_at': next_event['scheduled_at'], 'is_live': False,
+        }))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda c: c[0])
+    return candidates[0][1]
+
+
+def _gathering_for_session(session):
+    """Resolve the linked Gathering Record for a live session, if any —
+    reads existing wiring (BroadcastSchedule.gathering_record FK, or the
+    aligns_with Relationship pattern used elsewhere in this file). No new
+    write path; this only reads what scheduling already created."""
+    if not session:
+        return None
+    if session.get('gathering_record_id'):
+        try:
+            return Record.objects.get(id=session['gathering_record_id'])
+        except Record.DoesNotExist:
+            return None
+    return None
+
+
+@login_required
+def live_service_room(request):
+    """/community/live/ — tenant-scoped live service room. Level 1+."""
+    user = request.user
+    if _user_level(user) < 1:
+        return render(request, 'community/seeker_gate.html', {
+            'active_app': 'community', 'ws_page_title': 'Community',
+        })
+
+    perms = _get_user_permissions(user)
+    primary_perm = perms[0] if perms else None
+    tenant = primary_perm.tenant if primary_perm else None
+
+    session = _find_live_session(tenant)
+    gathering = _gathering_for_session(session)
+    is_steward = _user_level(user) >= 3
+
+    return render(request, 'community/live_service_room.html', {
+        'session': session,
+        'gathering': gathering,
+        'is_steward': is_steward,
+        'poll_seconds': LIVE_REQUEST_POLL_SECONDS,
+        'active_app': 'community',
+        'ws_page_title': 'Live Service',
+        'active_community_tab': 'live',
+    })
+
+
+@login_required
+def htmx_raise_live_request(request):
+    """POST → create a live_request Record scoped to one broadcast_id."""
+    user = request.user
+    broadcast_id = request.POST.get('broadcast_id', '').strip()
+    kind = request.POST.get('kind', '').strip()
+    content = request.POST.get('content', '').strip()
+
+    if not broadcast_id or kind not in ('prayer', 'question') or not content:
+        return HttpResponse('<p class="form-error">Please enter your request.</p>')
+
+    perms = _get_user_permissions(user)
+    primary_perm = perms[0] if perms else None
+    tenant = primary_perm.tenant if primary_perm else None
+
+    record = Record.objects.create(
+        tenant=tenant,
+        created_by=user,
+        record_class='personal',
+        record_family='community',
+        record_type='live_request',
+        title=kind,
+        content=content,
+        status='submitted',
+        custom_fields={
+            'broadcast_id': broadcast_id,
+            'session_date': timezone.now().date().isoformat(),
+        },
+    )
+
+    from notifications.service import notify_live_request_raised
+    notify_live_request_raised(record)
+
+    return render(request, 'community/partials/live_request_sent.html', {
+        'record': record,
+    })
+
+
+@login_required
+def htmx_my_live_requests(request):
+    """GET → the member's own requests for one broadcast_id, polled."""
+    broadcast_id = request.GET.get('broadcast_id', '').strip()
+    if not broadcast_id:
+        return HttpResponse('')
+
+    qs = Record.objects.filter(
+        record_family='community',
+        record_type='live_request',
+        created_by=request.user,
+        custom_fields__broadcast_id=broadcast_id,
+        deleted_at__isnull=True,
+    ).order_by('-created_at')
+
+    return render(request, 'community/partials/my_live_requests.html', {
+        'requests': qs,
+        'broadcast_id': broadcast_id,
+        'poll_seconds': LIVE_REQUEST_POLL_SECONDS,
+    })
+
+
+@login_required
+def htmx_live_requests_queue(request):
+    """GET → steward-only live queue for one broadcast_id, polled."""
+    if not _require_level(request, 3):
+        return HttpResponse('', status=403)
+
+    broadcast_id = request.GET.get('broadcast_id', '').strip()
+    if not broadcast_id:
+        return HttpResponse('')
+
+    qs = Record.objects.filter(
+        record_family='community',
+        record_type='live_request',
+        custom_fields__broadcast_id=broadcast_id,
+        deleted_at__isnull=True,
+    ).select_related('created_by').order_by('created_at')
+
+    return render(request, 'community/partials/live_requests_queue.html', {
+        'requests': qs,
+        'broadcast_id': broadcast_id,
+        'poll_seconds': LIVE_REQUEST_POLL_SECONDS,
+    })
+
+
+@login_required
+def htmx_respond_live_request(request, record_id):
+    """POST → steward marks a live_request 'active' (responding) or 'completed'."""
+    if not _require_level(request, 3) or request.method != 'POST':
+        return HttpResponse('', status=403)
+
+    record = get_object_or_404(
+        Record, id=record_id, record_family='community', record_type='live_request',
+    )
+    action = request.POST.get('action', '')
+
+    if action == 'respond' and record.status == 'submitted':
+        record.status = 'active'
+        record.save(update_fields=['status'])
+    elif action == 'complete':
+        record.status = 'completed'
+        record.save(update_fields=['status'])
+    else:
+        return HttpResponse('<p class="form-error">Invalid action.</p>', status=400)
+
+    return render(request, 'community/partials/live_request_row.html', {
+        'record': record,
+    })
+
+
 # ── Support requests — member-to-steward, SLA-tracked ────────────────────────
 # See .docs/plans/community-support-requests-plan.md
 

@@ -1,0 +1,22 @@
+<!-- community/partials/my_live_requests.html -->
+<!-- Member view: own requests for this session, polled while the room is open -->
+<div id="my-live-requests-{{ broadcast_id }}"
+     hx-get="{% url 'community:htmx-my-live-requests' %}?broadcast_id={{ broadcast_id }}"
+     hx-trigger="every {{ poll_seconds }}s" hx-swap="outerHTML">
+  {% if requests %}
+  <div class="label-caps" style="margin-top:var(--space-s);margin-bottom:6px">My requests this session</div>
+  {% for record in requests %}
+  <div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:0.8125rem">
+    <span style="font-weight:600">{% if record.title == 'prayer' %}🙏 Prayer{% else %}❓ Question{% endif %}</span>
+    {% if record.status == 'submitted' %}
+      <span class="status-badge status-badge--warning" style="margin-left:6px">Sent</span>
+    {% elif record.status == 'active' %}
+      <span class="status-badge status-badge--seeker" style="margin-left:6px">Steward responding</span>
+    {% elif record.status == 'completed' %}
+      <span class="status-badge status-badge--active" style="margin-left:6px">Acknowledged</span>
+    {% endif %}
+    <div style="color:var(--muted);margin-top:2px">{{ record.content }}</div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>

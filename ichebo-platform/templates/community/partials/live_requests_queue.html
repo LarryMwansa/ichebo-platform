@@ -1,0 +1,16 @@
+<!-- community/partials/live_requests_queue.html -->
+<!-- Steward-only live queue for one broadcast_id, polled while the room is open -->
+<div id="live-requests-queue-{{ broadcast_id }}"
+     hx-get="{% url 'community:htmx-live-requests-queue' %}?broadcast_id={{ broadcast_id }}"
+     hx-trigger="every {{ poll_seconds }}s" hx-swap="outerHTML">
+  <div class="label-caps" style="margin-top:var(--space-s);margin-bottom:6px">Ministry Queue</div>
+  {% if requests %}
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-l);overflow:hidden">
+    {% for record in requests %}
+    {% include "community/partials/live_request_row.html" with record=record %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state" style="padding:24px 0;font-size:0.875rem">No requests yet this session.</div>
+  {% endif %}
+</div>

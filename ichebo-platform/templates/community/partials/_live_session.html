@@ -1,0 +1,58 @@
+{# community/partials/_live_session.html — shared between Stage Mode and Mobile Mode #}
+{% if session and session.is_live %}
+
+  {% if gathering %}
+  <div style="font-size:0.8125rem;color:var(--muted);margin-bottom:8px">
+    Part of <strong>{{ gathering.title }}</strong>
+  </div>
+  {% endif %}
+
+  <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem">
+    <span class="live-indicator" style="display:inline-flex;align-items:center;gap:6px;background:color-mix(in srgb, var(--error) 12%, transparent);color:var(--error);padding:4px 10px;border-radius:999px;font-size:0.75rem;font-weight:700;">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--error);display:inline-block;"></span>
+      LIVE NOW
+    </span>
+    <span style="font-size:0.8125rem;color:var(--muted)">{{ session.title }}</span>
+  </div>
+
+  <div style="background:#000;border-radius:var(--radius-l);overflow:hidden;aspect-ratio:16/9;margin-bottom:16px">
+    {% if session.player_type == 'hls' %}
+    <video controls autoplay playsinline style="width:100%;height:100%" src="{{ session.embed_url }}"></video>
+    {% elif session.player_type == 'mp4' %}
+    <video controls autoplay style="width:100%;height:100%"><source src="{{ session.embed_url }}" type="video/mp4"></video>
+    {% else %}
+    <iframe src="{{ session.embed_url }}" style="width:100%;height:100%;border:0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    {% endif %}
+  </div>
+
+  {% if session.description %}
+  <p style="font-size:0.875rem;color:var(--muted);margin-bottom:16px">{{ session.description }}</p>
+  {% endif %}
+
+  {% include "community/partials/live_request_form.html" %}
+
+  <div hx-get="{% url 'community:htmx-my-live-requests' %}?broadcast_id={{ session.broadcast_id }}"
+       hx-trigger="load" hx-swap="outerHTML">
+  </div>
+
+  {% if is_steward %}
+  <div hx-get="{% url 'community:htmx-live-requests-queue' %}?broadcast_id={{ session.broadcast_id }}"
+       hx-trigger="load" hx-swap="outerHTML">
+  </div>
+  {% endif %}
+
+{% elif session %}
+  <div class="empty-state" style="padding:48px 0;">
+    <span class="material-symbols-outlined" style="font-size:2.5rem;display:block;margin-bottom:0.5rem;opacity:0.4">live_tv</span>
+    <p style="font-weight:600;color:var(--text);margin-bottom:0.25rem">Not live yet</p>
+    <p style="font-size:0.85rem">
+      {{ session.title }} — {{ session.scheduled_at|date:"D, j M H:i" }}
+    </p>
+  </div>
+{% else %}
+  <div class="empty-state" style="padding:48px 0;">
+    <span class="material-symbols-outlined" style="font-size:2.5rem;display:block;margin-bottom:0.5rem;opacity:0.4">live_tv</span>
+    <p style="font-weight:600;color:var(--text);margin-bottom:0.25rem">No service scheduled</p>
+    <p style="font-size:0.85rem">Check back closer to your community's next gathering.</p>
+  </div>
+{% endif %}

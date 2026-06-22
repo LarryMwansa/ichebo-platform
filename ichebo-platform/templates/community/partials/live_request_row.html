@@ -1,0 +1,30 @@
+<!-- community/partials/live_request_row.html -->
+<!-- Single steward-queue row for a live_request. Re-rendered after respond/complete. -->
+<div class="list-item" id="live-request-{{ record.id }}" style="border-bottom:1px solid var(--border)">
+  <div class="list-item__content">
+    <div class="list-item__title">
+      {% if record.title == 'prayer' %}🙏 Prayer{% else %}❓ Question{% endif %}
+      &middot; {{ record.created_by.display_name|default:record.created_by.email }}
+    </div>
+    <div class="list-item__meta">{{ record.content }}</div>
+  </div>
+  <div style="display:flex;gap:6px;flex-shrink:0">
+    {% if record.status == 'submitted' %}
+    <button class="btn-touch" style="padding:4px 10px;font-size:0.75rem"
+            hx-post="{% url 'community:htmx-respond-live-request' record.id %}"
+            hx-vals='{"action": "respond"}'
+            hx-target="#live-request-{{ record.id }}" hx-swap="outerHTML">
+      Responding
+    </button>
+    {% elif record.status == 'active' %}
+    <button class="btn-touch btn-touch--primary" style="padding:4px 10px;font-size:0.75rem"
+            hx-post="{% url 'community:htmx-respond-live-request' record.id %}"
+            hx-vals='{"action": "complete"}'
+            hx-target="#live-request-{{ record.id }}" hx-swap="outerHTML">
+      Done
+    </button>
+    {% else %}
+    <span class="status-badge status-badge--active">Done</span>
+    {% endif %}
+  </div>
+</div>

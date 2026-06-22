@@ -1,0 +1,42 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block title %}Live Service — Ichebo{% endblock %}
+
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Community</span>{% endblock %}
+{% block context_header %}Community Ops{% endblock %}
+{% block context_content %}
+    {% include "community/partials/community_sidebar.html" %}
+{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 760px;">
+
+    <div style="margin-bottom: 24px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Live Service</div>
+        <h1 class="ws-page-title">Watch <em>Live</em></h1>
+    </div>
+
+    {% include "community/partials/_live_session.html" %}
+
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero page-hero--watermark" data-watermark="LIVE">
+  <a href="{% url 'community:community-home' %}"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    Community
+  </a>
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Live Service</span>
+  </div>
+  <h1 class="page-hero__title">Watch <em>Live</em></h1>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+    {% include "community/partials/_live_session.html" %}
+</div>
+{% endblock %}

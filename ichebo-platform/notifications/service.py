@@ -250,6 +250,35 @@ def notify_support_request_acknowledged(record):
 
 
 # ---------------------------------------------------------------------------
+# Community — live service in-session prayer/question requests
+# ---------------------------------------------------------------------------
+
+def notify_live_request_raised(record):
+    """Fan-out to stewards (not all members) for the broadcast's tenant —
+    follows the same shape as video_live.api_views._notify_broadcast_start()
+    but scoped to the steward role, not every member."""
+    if record.tenant_id is None:
+        return
+    from tenants.models import UserPermission
+    stewards = UserPermission.objects.filter(
+        tenant_id=record.tenant_id, is_active=True, role__endswith='-steward',
+    ).select_related('user')
+
+    kind = record.title or 'request'
+    for perm in stewards:
+        create_notification(
+            user=perm.user,
+            notification_type='live_request_raised',
+            title=f'New {kind} during the live service',
+            body=(record.content or '')[:200],
+            data={
+                'record_id': str(record.id),
+                'broadcast_id': (record.custom_fields or {}).get('broadcast_id'),
+            },
+        )
+
+
+# ---------------------------------------------------------------------------
 # V2.6 — Content approval
 # ---------------------------------------------------------------------------
 
