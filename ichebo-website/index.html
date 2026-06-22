@@ -1176,24 +1176,19 @@
       btn.textContent = 'Sending…';
 
       try {
-        /* BREVO_API_KEY is injected at build time via Vite's define or at runtime via a meta tag.
-           Set window.BREVO_API_KEY from a <meta name="brevo-key" content="..."> in your deploy. */
-        const apiKey = document.querySelector('meta[name="brevo-key"]')?.content || '';
-        const res = await fetch('https://api.brevo.com/v3/contacts', {
+        /* Set <meta name="api-base-url" content="..."> to override per deploy
+           (e.g. a staging backend). Defaults to the production app domain. */
+        const apiBase = document.querySelector('meta[name="api-base-url"]')?.content
+          || 'https://app.ichebo.org';
+        const res = await fetch(`${apiBase}/api/waitlist/`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'api-key': apiKey },
-          body: JSON.stringify({
-            email,
-            attributes: {
-              FIRSTNAME: name.split(' ')[0],
-              LASTNAME: name.split(' ').slice(1).join(' '),
-              PATH: pathEl.value,
-            },
-            listIds: [2],
-            updateEnabled: true,
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, path: pathEl.value, consent }),
         });
-        if (res.ok || res.status === 204) {
+
+        if (res.status === 201 || res.status === 200) {
+          // 201 = newly registered, 200 = already_registered — both are a
+          // success from the user's point of view, so show the same screen.
           document.getElementById('waitlistForm').style.display = 'none';
           document.getElementById('formSuccess').classList.add('visible');
         } else {
