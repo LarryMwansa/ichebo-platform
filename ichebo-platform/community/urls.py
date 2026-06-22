@@ -54,4 +54,13 @@ urlpatterns = [
          views.htmx_pending_requests, name='htmx-pending-requests'),
     path('community/htmx/membership/<uuid:request_id>/review/',
          views.htmx_review_request, name='htmx-review-request'),
+
+    # ── Support requests — member-to-steward, SLA-tracked ────────────────────
+    path('community/support/', views.support_requests_queue, name='support-requests-queue'),
+    path('community/htmx/support/create/',
+         views.htmx_create_support_request, name='htmx-create-support-request'),
+    path('community/htmx/support/mine/',
+         views.htmx_my_support_requests, name='htmx-my-support-requests'),
+    path('community/htmx/support/<uuid:record_id>/acknowledge/',
+         views.htmx_acknowledge_support_request, name='htmx-acknowledge-support-request'),
 ]

@@ -32,4 +32,13 @@
         Management
     </a>
 
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Care</div>
+    <a href="{% url 'community:support-requests-queue' %}"
+       class="ctx-btn {% if active_community_tab == 'support' %}active{% endif %}">
+        <span class="material-symbols-outlined">support_agent</span>
+        Support Requests
+    </a>
+
 </div>

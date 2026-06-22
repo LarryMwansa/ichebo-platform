@@ -30,10 +30,27 @@
       </div>
       <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
     </button>
-    {% else %}
+    {% endif %}
+
+    {% if request.user.competence_level >= 1 %}
+    <button class="list-item" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;{% if request.user.competence_level >= 3 %}border-top:1px solid var(--border);{% endif %}"
+            hx-get="{% url 'community:htmx-create-support-request' %}"
+            hx-target="#drawerInner" hx-swap="innerHTML">
+      <div class="list-item__icon" style="background:rgba(175,50,54,0.1);color:var(--primary);">
+        <span class="material-symbols-outlined">support_agent</span>
+      </div>
+      <div class="list-item__content">
+        <div class="list-item__title">Raise a Request</div>
+        <div class="list-item__meta">Reach your steward with a concern or need</div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted);font-size:16px;">chevron_right</span>
+    </button>
+    {% endif %}
+
+    {% if request.user.competence_level < 1 %}
     <div style="padding: var(--space-m); text-align: center; color: var(--muted); font-size: 13px;">
       <span class="material-symbols-outlined" style="display:block;font-size:2rem;opacity:0.3;margin-bottom:8px;">lock</span>
-      Steward actions require Level 3+
+      Community actions unlock after induction
     </div>
     {% endif %}
 

@@ -27,6 +27,8 @@ class Notification(SoftDeleteMixin, models.Model):
         ('tenant_invitation',    'Community Invitation'),
         ('member_added',         'Added to Community'),
         ('member_removed',       'Removed from Community'),
+        ('support_request_created',      'Support Request Created'),
+        ('support_request_acknowledged', 'Support Request Acknowledged'),
         ('system',               'System'),
     ]
 

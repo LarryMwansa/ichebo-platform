@@ -1,0 +1,74 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block title %}Support Requests — Ichebo{% endblock %}
+
+{% block breadcrumb %}<span class="ws-topbar__breadcrumb-item">Community</span>{% endblock %}
+{% block context_header %}Community Ops{% endblock %}
+{% block context_content %}
+    {% include "community/partials/community_sidebar.html" %}
+{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 40px 48px; max-width: 900px;">
+
+    <div style="margin-bottom: 32px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Steward Queue</div>
+        <h1 class="ws-page-title">Support <em>Requests</em></h1>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;">
+        <a href="?" class="status-badge {% if not status_filter %}status-badge--active{% else %}status-badge--muted{% endif %}" style="text-decoration:none;">All</a>
+        <a href="?status=open" class="status-badge {% if status_filter == 'open' %}status-badge--active{% else %}status-badge--muted{% endif %}" style="text-decoration:none;">Open</a>
+        <a href="?status=acknowledged" class="status-badge {% if status_filter == 'acknowledged' %}status-badge--active{% else %}status-badge--muted{% endif %}" style="text-decoration:none;">Acknowledged</a>
+        <a href="?status=resolved" class="status-badge {% if status_filter == 'resolved' %}status-badge--active{% else %}status-badge--muted{% endif %}" style="text-decoration:none;">Resolved</a>
+        <a href="?status=needs_routing" class="status-badge {% if status_filter == 'needs_routing' %}status-badge--active{% else %}status-badge--muted{% endif %}" style="text-decoration:none;">Needs Routing</a>
+    </div>
+
+    {% if rows %}
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l); overflow: hidden;">
+        {% for row in rows %}
+        {% include "community/partials/support_request_row.html" with record=row.record due_at=row.due_at overdue=row.overdue needs_routing=row.needs_routing %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding:48px 0;">No support requests in this view.</div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero page-hero--watermark" data-watermark="SUPPORT">
+  <a href="{% url 'community:community-home' %}"
+     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-xs);letter-spacing:0.02em;">
+    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
+    Community
+  </a>
+  <div class="page-hero__eyebrow">
+    <div class="page-hero__eyebrow-line"></div>
+    <span class="page-hero__label">Steward Queue</span>
+  </div>
+  <h1 class="page-hero__title">Support <em>Requests</em></h1>
+</div>
+
+<div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
+    <div style="display:flex;gap:8px;margin-bottom:var(--space-m);flex-wrap:wrap;overflow-x:auto;">
+        <a href="?" class="status-badge {% if not status_filter %}status-badge--active{% else %}status-badge--muted{% endif %}" style="text-decoration:none;white-space:nowrap;">All</a>
+        <a href="?status=open" class="status-badge {% if status_filter == 'open' %}status-badge--active{% else %}status-badge--muted{% endif %}" style="text-decoration:none;white-space:nowrap;">Open</a>
+        <a href="?status=acknowledged" class="status-badge {% if status_filter == 'acknowledged' %}status-badge--active{% else %}status-badge--muted{% endif %}" style="text-decoration:none;white-space:nowrap;">Acknowledged</a>
+        <a href="?status=resolved" class="status-badge {% if status_filter == 'resolved' %}status-badge--active{% else %}status-badge--muted{% endif %}" style="text-decoration:none;white-space:nowrap;">Resolved</a>
+        <a href="?status=needs_routing" class="status-badge {% if status_filter == 'needs_routing' %}status-badge--active{% else %}status-badge--muted{% endif %}" style="text-decoration:none;white-space:nowrap;">Needs Routing</a>
+    </div>
+
+    {% if rows %}
+    <div class="list-group">
+        {% for row in rows %}
+        {% include "community/partials/support_request_row.html" with record=row.record due_at=row.due_at overdue=row.overdue needs_routing=row.needs_routing %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding:48px 0;">No support requests in this view.</div>
+    {% endif %}
+</div>
+{% endblock %}

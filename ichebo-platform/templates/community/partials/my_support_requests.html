@@ -1,0 +1,25 @@
+<!-- community/partials/my_support_requests.html -->
+<!-- Member view: read-only list of the user's own submitted support requests -->
+{% if requests %}
+{% for record in requests %}
+<div class="list-item" style="border-bottom:1px solid var(--border)">
+  <div class="list-item__content">
+    <div class="list-item__title">{{ record.title }}</div>
+    <div class="list-item__meta">
+      {% if record.status == 'submitted' %}
+        <span class="status-badge status-badge--warning">Awaiting steward</span>
+      {% elif record.status == 'active' %}
+        <span class="status-badge status-badge--seeker">Steward is on it</span>
+      {% elif record.status == 'completed' %}
+        <span class="status-badge status-badge--active">Resolved</span>
+      {% endif %}
+      &middot; {{ record.created_at|timesince }} ago
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="empty-state" style="padding:16px 0;font-size:0.9rem;color:var(--text-secondary)">
+  You haven't raised any requests yet.
+</div>
+{% endif %}

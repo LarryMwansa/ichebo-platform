@@ -1,0 +1,26 @@
+<!-- community/partials/support_request_sent.html -->
+<div class="support-request-sent" id="support-request-form">
+  {% if needs_routing %}
+  <div class="info-card" style="border-color:var(--warning)">
+    <div class="info-card-icon">⏳</div>
+    <div>
+      <div class="info-card-label">Request sent — finding a steward</div>
+      <div class="info-card-value">
+        Your request <strong>{{ record.title }}</strong> has been recorded.
+        No steward is currently assigned to your community — this will be picked up shortly.
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="info-card" style="border-color:var(--success)">
+    <div class="info-card-icon">✓</div>
+    <div>
+      <div class="info-card-label">Request sent</div>
+      <div class="info-card-value">
+        Your request <strong>{{ record.title }}</strong> has been sent to your steward.
+        You'll be notified once they've seen it.
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>

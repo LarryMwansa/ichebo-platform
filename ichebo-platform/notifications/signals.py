@@ -136,6 +136,27 @@ def on_member_removed(sender, user, tenant, **kwargs):
 
 
 # ---------------------------------------------------------------------------
+# Community — member-to-steward support requests
+# ---------------------------------------------------------------------------
+
+@receiver(post_save, sender='records.Record')
+def on_support_request_saved(sender, instance, created, **kwargs):
+    if instance.record_type != 'support_request':
+        return
+
+    from notifications.service import notify_support_request_created, notify_support_request_acknowledged
+
+    if created:
+        notify_support_request_created(instance)
+        return
+
+    if instance.status == 'active' and not (instance.custom_fields or {}).get('_ack_notified'):
+        notify_support_request_acknowledged(instance)
+        instance.custom_fields['_ack_notified'] = True
+        instance.save(update_fields=['custom_fields'])
+
+
+# ---------------------------------------------------------------------------
 # Learn — content approved by reviewer
 # ---------------------------------------------------------------------------
 

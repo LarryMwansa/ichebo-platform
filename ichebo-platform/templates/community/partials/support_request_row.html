@@ -1,0 +1,38 @@
+<!-- community/partials/support_request_row.html -->
+<!-- Single steward queue row. Re-rendered standalone after an acknowledge/resolve action. -->
+<div class="list-item" id="support-request-{{ record.id }}"
+     style="border-bottom:1px solid var(--border);{% if overdue %}background:color-mix(in srgb, var(--error) 6%, transparent);{% endif %}">
+  <div class="list-item__content">
+    <div class="list-item__title">
+      {{ record.title }}
+      {% if overdue %}<span class="status-badge status-badge--danger" style="margin-left:6px">Overdue</span>{% endif %}
+      {% if needs_routing %}<span class="status-badge status-badge--muted" style="margin-left:6px">Needs routing</span>{% endif %}
+    </div>
+    <div class="list-item__meta">
+      {{ record.created_by.display_name|default:record.created_by.email }}
+      &middot; {{ record.created_at|timesince }} ago
+      {% if due_at %}&middot; due {{ due_at|timesince }} {% if overdue %}overdue{% else %}from now{% endif %}{% endif %}
+    </div>
+    <div style="margin-top:6px;font-size:0.875rem;color:var(--text)">{{ record.content }}</div>
+  </div>
+
+  <div style="display:flex;gap:8px;flex-shrink:0;margin-top:8px">
+    {% if record.status == 'submitted' %}
+    <button class="btn-touch" style="padding:6px 14px;font-size:0.8125rem"
+            hx-post="{% url 'community:htmx-acknowledge-support-request' record.id %}"
+            hx-vals='{"action": "acknowledge"}'
+            hx-target="#support-request-{{ record.id }}" hx-swap="outerHTML">
+      Acknowledge
+    </button>
+    {% elif record.status == 'active' %}
+    <button class="btn-touch btn-touch--primary" style="padding:6px 14px;font-size:0.8125rem"
+            hx-post="{% url 'community:htmx-acknowledge-support-request' record.id %}"
+            hx-vals='{"action": "resolve"}'
+            hx-target="#support-request-{{ record.id }}" hx-swap="outerHTML">
+      Mark Resolved
+    </button>
+    {% else %}
+    <span class="status-badge status-badge--active">Resolved</span>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,31 @@
+<!-- community/partials/support_request_form.html -->
+<div class="support-request-form" id="support-request-form" style="text-align:left">
+  <div class="section-heading" style="text-align:left">Raise a Request</div>
+  <p style="font-size:0.8125rem;color:var(--muted);margin:0.4rem 0 0.75rem">
+    Reach your steward with a concern or need. They'll be notified and you'll see when it's been seen.
+  </p>
+
+  <form hx-post="{% url 'community:htmx-create-support-request' %}"
+        hx-target="#support-request-form" hx-swap="outerHTML"
+        style="display:flex;flex-direction:column;gap:0.75rem">
+    {% csrf_token %}
+
+    <div style="display:flex;flex-direction:column;gap:0.4rem">
+      <label for="support-request-title"
+             style="font-size:0.8125rem;font-weight:600;color:var(--muted)">Subject</label>
+      <input type="text" id="support-request-title" name="title" maxlength="200" required
+             style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:0.9375rem;font-family:inherit">
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:0.4rem">
+      <label for="support-request-content"
+             style="font-size:0.8125rem;font-weight:600;color:var(--muted)">What's going on?</label>
+      <textarea id="support-request-content" name="content" rows="4" required
+                style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:0.9375rem;font-family:inherit;resize:vertical"></textarea>
+    </div>
+
+    <button type="submit" class="btn-touch btn-touch--primary" style="margin-top:0.25rem">
+      Send to my steward
+    </button>
+  </form>
+</div>

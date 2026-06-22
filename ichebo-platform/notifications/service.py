@@ -212,6 +212,44 @@ def notify_member_removed(user, tenant):
 
 
 # ---------------------------------------------------------------------------
+# Community — member-to-steward support requests
+# ---------------------------------------------------------------------------
+
+def notify_support_request_created(record):
+    steward_id = (record.custom_fields or {}).get('assigned_steward_id')
+    if not steward_id:
+        return  # needs-routing case — no recipient yet
+    from accounts.models import User
+    try:
+        steward = User.objects.get(id=steward_id)
+    except User.DoesNotExist:
+        return
+    create_notification(
+        user=steward,
+        notification_type='support_request_created',
+        title=f'New support request: {record.title}',
+        body=(record.content or '')[:200],
+        data={
+            'record_id': str(record.id),
+            'url': f'/community/support/{record.id}/',
+        },
+    )
+
+
+def notify_support_request_acknowledged(record):
+    create_notification(
+        user=record.created_by,
+        notification_type='support_request_acknowledged',
+        title='Your support request has been seen',
+        body='A steward has acknowledged your request and is working on it.',
+        data={
+            'record_id': str(record.id),
+            'url': f'/community/support/{record.id}/',
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
 # V2.6 — Content approval
 # ---------------------------------------------------------------------------
 

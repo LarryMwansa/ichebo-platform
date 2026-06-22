@@ -12,10 +12,13 @@ from activity.models import Activity
 from accounts.models import User
 from tenants.models import Tenant, UserPermission
 from .models import MembershipRequest
+from .services import resolve_steward_for_tenant
 from .constants import (
     KGS_SERVICE_ORDERS, KGS_SERVICE_ORDER_CHOICES,
     KGS_PARTICIPATION_STAGES, KGS_COMPETENCE_LABELS,
 )
+
+SUPPORT_REQUEST_RESPONSE_WINDOW_HOURS = 72
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -1062,6 +1065,166 @@ def htmx_review_request(request, request_id):
     return render(request, 'community/partials/membership_request_card.html', {
         'req': membership_req,
         'reviewed': True,
+    })
+
+
+# ── Support requests — member-to-steward, SLA-tracked ────────────────────────
+# See .docs/plans/community-support-requests-plan.md
+
+@login_required
+def htmx_create_support_request(request):
+    """
+    GET  → request form
+    POST → create a support_request Record, routed to a steward.
+    """
+    user = request.user
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        content = request.POST.get('content', '').strip()
+
+        if not title or not content:
+            return HttpResponse(
+                '<p class="form-error">Please enter a subject and a description.</p>'
+            )
+
+        perms = _get_user_permissions(user)
+        primary_perm = perms[0] if perms else None
+        tenant = primary_perm.tenant if primary_perm else None
+
+        steward = resolve_steward_for_tenant(tenant)
+        response_due_at = timezone.now() + timedelta(hours=SUPPORT_REQUEST_RESPONSE_WINDOW_HOURS)
+
+        record = Record.objects.create(
+            tenant=tenant,
+            created_by=user,
+            record_class='organizational',
+            record_family='community',
+            record_type='support_request',
+            title=title,
+            content=content,
+            status='submitted',
+            custom_fields={
+                'response_due_at': response_due_at.isoformat(),
+                'acknowledged_at': None,
+                'resolved_at': None,
+                'assigned_steward_id': str(steward.id) if steward else None,
+            },
+            permissions_data={'visibility': 'member_and_assigned_steward'},
+        )
+
+        return render(request, 'community/partials/support_request_sent.html', {
+            'record': record,
+            'needs_routing': steward is None,
+        })
+
+    return render(request, 'community/partials/support_request_form.html')
+
+
+@login_required
+def htmx_my_support_requests(request):
+    """GET → the current member's own submitted support requests, read-only."""
+    qs = Record.objects.filter(
+        record_family='community',
+        record_type='support_request',
+        created_by=request.user,
+        deleted_at__isnull=True,
+    ).order_by('-created_at')[:30]
+
+    return render(request, 'community/partials/my_support_requests.html', {
+        'requests': qs,
+    })
+
+
+@login_required
+def support_requests_queue(request):
+    """
+    /community/support/ — steward queue view. Level 3+ / steward role only.
+    Lists support requests for tenants within the viewer's scope, soonest
+    response-due-date first, with overdue items flagged.
+    """
+    if not _require_level(request, 3):
+        return render(request, 'community/locked.html', {
+            'min_level': 3, 'active_app': 'community', 'ws_page_title': 'Community',
+        }, status=403)
+
+    perms = _get_user_permissions(request.user)
+    primary_perm = perms[0] if perms else None
+    scope_tenant = primary_perm.tenant if primary_perm else None
+
+    qs = Record.objects.filter(
+        record_family='community',
+        record_type='support_request',
+        deleted_at__isnull=True,
+    ).select_related('created_by', 'tenant')
+
+    if scope_tenant:
+        qs = qs.filter(tenant__path__startswith=scope_tenant.path)
+
+    status_filter = request.GET.get('status', '')
+    if status_filter == 'open':
+        qs = qs.filter(status='submitted')
+    elif status_filter == 'acknowledged':
+        qs = qs.filter(status='active')
+    elif status_filter == 'resolved':
+        qs = qs.filter(status='completed')
+    elif status_filter == 'needs_routing':
+        qs = qs.filter(custom_fields__assigned_steward_id__isnull=True)
+
+    requests_list = list(qs.exclude(status='completed').order_by('created_at')) + \
+        list(qs.filter(status='completed').order_by('-created_at')[:20])
+
+    now = timezone.now()
+    rows = []
+    for r in requests_list:
+        due_at_raw = (r.custom_fields or {}).get('response_due_at')
+        due_at = None
+        overdue = False
+        if due_at_raw:
+            from django.utils.dateparse import parse_datetime
+            due_at = parse_datetime(due_at_raw)
+            if due_at and r.status != 'completed' and now > due_at:
+                overdue = True
+        rows.append({
+            'record': r,
+            'due_at': due_at,
+            'overdue': overdue,
+            'needs_routing': not (r.custom_fields or {}).get('assigned_steward_id'),
+        })
+
+    return render(request, 'community/support_requests_queue.html', {
+        'rows': rows,
+        'status_filter': status_filter,
+        'active_app': 'community',
+        'ws_page_title': 'Support Requests',
+        'active_community_tab': 'support',
+    })
+
+
+@login_required
+def htmx_acknowledge_support_request(request, record_id):
+    """POST → steward marks a request acknowledged ('active') or resolved ('completed')."""
+    if not _require_level(request, 3) or request.method != 'POST':
+        return HttpResponse('', status=403)
+
+    record = get_object_or_404(
+        Record, id=record_id, record_family='community', record_type='support_request',
+    )
+    action = request.POST.get('action', '')
+
+    if action == 'acknowledge' and record.status == 'submitted':
+        record.status = 'active'
+        record.custom_fields['acknowledged_at'] = timezone.now().isoformat()
+        record.save(update_fields=['status', 'custom_fields'])
+    elif action == 'resolve':
+        record.status = 'completed'
+        record.custom_fields['resolved_at'] = timezone.now().isoformat()
+        record.save(update_fields=['status', 'custom_fields'])
+    else:
+        return HttpResponse('<p class="form-error">Invalid action.</p>', status=400)
+
+    return render(request, 'community/partials/support_request_row.html', {
+        'record': record,
     })
 
 
