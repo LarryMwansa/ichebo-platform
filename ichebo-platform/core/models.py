@@ -74,3 +74,59 @@ class SyncChangelog(models.Model):
     def compute_hash(payload: dict) -> str:
         canonical = json.dumps(payload, sort_keys=True, default=str)
         return hashlib.sha256(canonical.encode()).hexdigest()
+
+
+class PlatformConfig(models.Model):
+    """
+    Singleton row tracking platform bootstrap state and a handful of
+    settings a Level 5 steward should be able to change without a code
+    deploy. See .docs/plans/platform-bootstrap-plan.md.
+
+    Uses a fixed, well-known UUID as its primary key (not an auto-incrementing
+    integer) per the platform-wide UUID PK rule (core/apps.py:check_uuid_primary_keys)
+    — every model must carry a permanent identity for Sync Engine compatibility,
+    even a singleton with no sync requirement of its own.
+
+    Always fetch via PlatformConfig.get_solo() — never .objects.create()
+    or .objects.get(pk=...) directly.
+    """
+    SINGLETON_ID = uuid.UUID('00000000-0000-0000-0000-000000000001')
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    bootstrapped_at = models.DateTimeField(null=True, blank=True)
+    bootstrapped_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+    )
+    bootstrap_version = models.CharField(max_length=20, default='', blank=True)
+
+    # ── Email verification toggle ───────────────────────────────────────────
+    # When True: new users start status='pending_verification' and must verify
+    # before login. When False: new users start status='seeker' immediately.
+    require_email_verification = models.BooleanField(default=True)
+
+    # ── Library access gates ────────────────────────────────────────────────
+    # Minimum competence_level required to access each library. Defaults
+    # match the constants these replace in governance/views.py and
+    # handbook/views.py (not yet wired to read from here — see plan §
+    # "Access Gating Configuration", deferred to the /platform/ UI phase).
+    mandate_access_level = models.IntegerField(default=4)
+    keys_access_level = models.IntegerField(default=4)
+    reference_access_level = models.IntegerField(default=3)
+
+    class Meta:
+        db_table = 'core_platform_config'
+
+    def save(self, *args, **kwargs):
+        self.pk = self.SINGLETON_ID
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass  # singleton — never actually deleted
+
+    @classmethod
+    def get_solo(cls):
+        obj, _ = cls.objects.get_or_create(pk=cls.SINGLETON_ID)
+        return obj
+
+    def __str__(self):
+        return f'PlatformConfig(bootstrapped={bool(self.bootstrapped_at)})'
