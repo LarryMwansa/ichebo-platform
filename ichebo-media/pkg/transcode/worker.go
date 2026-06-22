@@ -83,6 +83,7 @@ func (wp *WorkerPool) process(job *Job) error {
 		job.SetProgress(100)
 		job.SetStatus(StatusComplete)
 		stubURL := "file:///tmp/ichebo-media/stub-video.m3u8"
+		job.SetOutput(stubURL, "", 0)
 		wp.notifyDjango(job, stubURL, "", 0)
 		return nil
 	}
@@ -169,7 +170,8 @@ func (wp *WorkerPool) process(job *Job) error {
 
 	videoURL := wp.deliveryStore.GetPublicURL(masterKey)
 	thumbURL := wp.deliveryStore.GetPublicURL(thumbKey)
-	wp.notifyDjango(job, videoURL, thumbURL, 0) // duration from FFprobe can be added later
+	job.SetOutput(videoURL, thumbURL, durationSeconds)
+	wp.notifyDjango(job, videoURL, thumbURL, durationSeconds)
 
 	return nil
 }

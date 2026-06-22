@@ -27,6 +27,13 @@ type Job struct {
 	CreatedAt    time.Time
 	CompletedAt  *time.Time
 
+	// Output — set once the job completes. Mirrors what the webhook payload
+	// carries, so a status poll can fully reconcile a record even if the
+	// webhook delivery itself was lost (e.g. Django was briefly unreachable).
+	VideoURL        string
+	ThumbnailURL    string
+	DurationSeconds int
+
 	mu sync.Mutex
 }
 
@@ -52,22 +59,38 @@ func (j *Job) SetError(err string) {
 	j.Error = err
 }
 
+// SetOutput records the transcode result so a later status poll can recover
+// it even if the push webhook to Django never arrived.
+func (j *Job) SetOutput(videoURL, thumbnailURL string, durationSeconds int) {
+	j.mu.Lock()
+	defer j.mu.Unlock()
+	j.VideoURL = videoURL
+	j.ThumbnailURL = thumbnailURL
+	j.DurationSeconds = durationSeconds
+}
+
 func (j *Job) Snapshot() JobSnapshot {
 	j.mu.Lock()
 	defer j.mu.Unlock()
 	return JobSnapshot{
-		ID:          j.ID,
-		Status:      j.Status,
-		ProgressPct: j.ProgressPct,
-		Error:       j.Error,
+		ID:              j.ID,
+		Status:          j.Status,
+		ProgressPct:     j.ProgressPct,
+		Error:           j.Error,
+		VideoURL:        j.VideoURL,
+		ThumbnailURL:    j.ThumbnailURL,
+		DurationSeconds: j.DurationSeconds,
 	}
 }
 
 type JobSnapshot struct {
-	ID          string `json:"job_id"`
-	Status      string `json:"status"`
-	ProgressPct int    `json:"progress_pct"`
-	Error       string `json:"error,omitempty"`
+	ID              string `json:"job_id"`
+	Status          string `json:"status"`
+	ProgressPct     int    `json:"progress_pct"`
+	Error           string `json:"error,omitempty"`
+	VideoURL        string `json:"video_url,omitempty"`
+	ThumbnailURL    string `json:"thumbnail_url,omitempty"`
+	DurationSeconds int    `json:"duration_seconds,omitempty"`
 }
 
 // Queue manages the in-memory job list and dispatch channel.
