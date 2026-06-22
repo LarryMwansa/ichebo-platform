@@ -129,7 +129,7 @@ class UserProfile(models.Model):
         if not self.date_of_birth:
             return None
         from django.utils import timezone
-        today = timezone.now().date()
+        today = timezone.localtime(timezone.now()).date()
         dob = self.date_of_birth
         return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 

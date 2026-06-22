@@ -119,7 +119,7 @@ def build_digest(user) -> ParacleteDigest:
     # competence_level is on User directly (not on a userprofile sub-object)
     level = getattr(user, 'competence_level', 0)
     now = timezone.now()
-    today = now.date()
+    today = timezone.localtime(now).date()
 
     digest = ParacleteDigest(
         generated_at=now.isoformat(),
@@ -230,9 +230,11 @@ def _calculate_streak(activity) -> HabitStreak:
         new_value='completed',
     ).order_by('-created_at').values_list('created_at', flat=True)
 
-    completed_dates = {l.date() for l in logs}
+    # Both sides of this comparison must use the same (local) calendar date —
+    # l is a UTC-stored created_at; .date() alone would give the UTC date.
+    completed_dates = {timezone.localtime(l).date() for l in logs}
     streak = 0
-    check_date = timezone.now().date()
+    check_date = timezone.localtime(timezone.now()).date()
     while check_date in completed_dates:
         streak += 1
         check_date -= datetime.timedelta(days=1)

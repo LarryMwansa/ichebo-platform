@@ -69,7 +69,7 @@ def _build_personal_ctx(request, active_type=''):
         qs = qs.filter(activity_type=active_type)
 
     overdue = qs.filter(due_at__isnull=False, due_at__lt=timezone.now())
-    due_today = qs.filter(due_at__date=timezone.now().date()).exclude(
+    due_today = qs.filter(due_at__date=timezone.localtime(timezone.now()).date()).exclude(
         due_at__lt=timezone.now()
     )
     upcoming = qs.exclude(
@@ -342,7 +342,7 @@ def htmx_create_activity(request):
             ).exclude(activity_type__in=['programme', 'lesson']).order_by('due_at', '-created_at')
 
             overdue   = qs.filter(due_at__isnull=False, due_at__lt=timezone.now())
-            due_today = qs.filter(due_at__date=timezone.now().date()).exclude(due_at__lt=timezone.now())
+            due_today = qs.filter(due_at__date=timezone.localtime(timezone.now()).date()).exclude(due_at__lt=timezone.now())
             upcoming  = qs.exclude(
                 id__in=list(overdue.values_list('id', flat=True)) +
                        list(due_today.values_list('id', flat=True))

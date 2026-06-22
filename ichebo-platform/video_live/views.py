@@ -167,8 +167,9 @@ def video_schedule(request):
         if e['scheduled_at'] and now <= e['scheduled_at'] <= cutoff
     ]
 
-    # Build a list of day buckets for the window
-    today = now.date()
+    # Build a list of day buckets for the window — local calendar date, not
+    # the UTC date now() would give once TIME_ZONE != UTC.
+    today = timezone.localtime(now).date()
     days = []
     for i in range(weeks * 7):
         day = today + dt.timedelta(days=i)
@@ -342,8 +343,11 @@ def _studio_context(request):
     fallback_obj = _get_fallback()
     fallback = _annotate_event(fallback_obj) if fallback_obj else None
 
-    # Build today's timeline: 48 half-hour slots
-    today = now.date()
+    # Build today's timeline: 48 half-hour slots, in the active TIME_ZONE.
+    # now.date() would be the UTC calendar date — wrong day near midnight
+    # once TIME_ZONE != UTC, since make_aware() below attaches the local
+    # zone to each slot but the date itself stayed UTC-derived.
+    today = timezone.localtime(now).date()
     slots = []
     for h in range(24):
         for m in (0, 30):

@@ -1219,7 +1219,7 @@ def htmx_raise_live_request(request):
         status='submitted',
         custom_fields={
             'broadcast_id': broadcast_id,
-            'session_date': timezone.now().date().isoformat(),
+            'session_date': timezone.localtime(timezone.now()).date().isoformat(),
         },
     )
 

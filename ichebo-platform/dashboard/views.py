@@ -83,7 +83,7 @@ def htmx_today_schedule(request):
     from activity.models import Activity
     from django.utils import timezone
 
-    today = timezone.now().date()
+    today = timezone.localtime(timezone.now()).date()
     user  = request.user
 
     tenant_ids = list(

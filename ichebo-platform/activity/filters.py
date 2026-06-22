@@ -19,7 +19,7 @@ class ActivityFilter(django_filters.FilterSet):
 
     def filter_due_today(self, queryset, name, value):
         if value:
-            today = timezone.now().date()
+            today = timezone.localtime(timezone.now()).date()
             return queryset.filter(
                 due_at__date=today,
                 status__in=['pending', 'in_progress']
