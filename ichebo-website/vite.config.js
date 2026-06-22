@@ -8,6 +8,8 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         about: resolve(__dirname, 'about.html'),
         training: resolve(__dirname, 'training.html'),
+        platform: resolve(__dirname, 'platform.html'),
+        programme: resolve(__dirname, 'programme.html'),
       },
     },
   },
