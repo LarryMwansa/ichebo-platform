@@ -20,6 +20,9 @@ import (
 
 func main() {
 	cfg := config.Load()
+	if err := cfg.Validate(); err != nil {
+		log.Fatalf("[mediad] config error: %v", err)
+	}
 
 	// ── Storage ──────────────────────────────────────────────────────────────
 	var uploadStore storage.UploadStore
