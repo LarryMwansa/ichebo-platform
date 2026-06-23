@@ -92,6 +92,7 @@ const EditorialUI = {
             category.classList.add('open');
             headBtn.classList.add('open');
             this._installCategoryCloseListeners();
+            this._positionDropdown(category);
         }
     },
 
@@ -99,7 +100,33 @@ const EditorialUI = {
         document.querySelectorAll('.editorial-toolbar__category.open').forEach((cat) => {
             cat.classList.remove('open');
             cat.querySelector('.editorial-toolbar__cat-head')?.classList.remove('open');
+            const dd = cat.querySelector('.editorial-toolbar__dropdown');
+            if (dd) dd.style.transform = '';
         });
+    },
+
+    // The dropdown's CSS centers it under the head button via
+    // left:50%;transform:translateX(-50%). That's fine when the category
+    // is roughly in the middle of the toolbar, but wider dropdowns (e.g.
+    // Headings' 7 buttons) anchored under a head near either edge can
+    // extend past the viewport — confirmed visually at 375px width, where
+    // the Headings dropdown's first two buttons were cut off entirely.
+    // Nudge it back into view with an extra translateX offset on top of
+    // the CSS default, only when it would actually overflow.
+    _positionDropdown(category) {
+        const dd = category.querySelector('.editorial-toolbar__dropdown');
+        if (!dd) return;
+        const rect = dd.getBoundingClientRect();
+        const margin = 8;
+        let shift = 0;
+        if (rect.left < margin) {
+            shift = margin - rect.left;
+        } else if (rect.right > window.innerWidth - margin) {
+            shift = (window.innerWidth - margin) - rect.right;
+        }
+        if (shift !== 0) {
+            dd.style.transform = `translateX(calc(-50% + ${shift}px))`;
+        }
     },
 
     _installCategoryCloseListeners() {
@@ -125,22 +152,105 @@ const EditorialUI = {
     },
 
     // ── Formatting actions ───────────────────────────────────────────────────
+    //
+    // Verified against the actual renderer (marked.js, gfm:true) before
+    // wiring up — confirmed real markdown each of these maps to, rather
+    // than assumed: strikethrough/code/task-list/table are standard GFM;
+    // numbered list relies on marked's CommonMark-correct auto-renumbering
+    // (every line can say "1." — only the first item's number is used to
+    // pick the <ol> start value, so a flat per-line prefix is sufficient,
+    // no incrementing logic needed). "Highlight" (==text==) and "Comment"
+    // were requested but have no markdown equivalent the renderer
+    // understands — confirmed by direct render test, not assumption — so
+    // they're intentionally not implemented (Chizola, 2026-06-23).
 
     handleAction(sfx, action) {
         sfx = sfx || '';
         const st = this._state(sfx);
         if (!st.editor) return;
+
+        if (action === 'body') return this._clearHeading(sfx);
+        if (action === 'hr')    return this._insertBlock(sfx, '\n---\n\n');
+        // Trailing blank line matters here, confirmed by direct render
+        // test: without it, GFM table parsing absorbs the very next line
+        // of content into the table as a malformed extra row instead of
+        // treating it as a separate paragraph.
+        if (action === 'table') return this._insertBlock(sfx,
+            '\n| Column 1 | Column 2 |\n| --- | --- |\n| Cell | Cell |\n\n');
+
         const map = {
-            'bold':      { pre: '**',  suf: '**'    },
-            'italic':    { pre: '_',   suf: '_'     },
-            'heading 1': { pre: '# ',  suf: '',  block: true },
-            'heading 2': { pre: '## ', suf: '',  block: true },
-            'quote':     { pre: '> ',  suf: '',  block: true },
-            'bullet':    { pre: '- ',  suf: '',  block: true },
-            'link':      { pre: '[',   suf: '](url)' },
+            'bold':          { pre: '**',  suf: '**'    },
+            'italic':        { pre: '_',   suf: '_'     },
+            'strikethrough': { pre: '~~',  suf: '~~'    },
+            'code':          { pre: '`',   suf: '`'     },
+            'heading 1':     { pre: '# ',  suf: '',  block: true },
+            'heading 2':     { pre: '## ', suf: '',  block: true },
+            'heading 3':     { pre: '### ',    suf: '',  block: true },
+            'heading 4':     { pre: '#### ',   suf: '',  block: true },
+            'heading 5':     { pre: '##### ',  suf: '',  block: true },
+            'heading 6':     { pre: '###### ', suf: '',  block: true },
+            'quote':         { pre: '> ',  suf: '',  block: true },
+            'bullet':        { pre: '- ',  suf: '',  block: true },
+            'numbered':      { pre: '1. ', suf: '',  block: true },
+            'task':          { pre: '- [ ] ', suf: '', block: true },
+            'link':          { pre: '[',   suf: '](url)' },
         };
         const cfg = map[action];
         if (cfg) this._wrap(sfx, cfg.pre, cfg.suf, cfg.block);
+    },
+
+    // "Body" strips a leading markdown heading marker (#, ##, ... ######)
+    // from every selected line, rather than adding one — the inverse of
+    // the heading actions above.
+    _clearHeading(sfx) {
+        sfx = sfx || '';
+        const st = this._state(sfx);
+        if (st.cmView) {
+            const view  = st.cmView;
+            const state = view.state;
+            const { from, to } = state.selection.main;
+            const sel = state.sliceDoc(from, to);
+            const strip = (line) => line.replace(/^#{1,6}\s+/, '');
+            const insert = sel.includes('\n')
+                ? sel.split('\n').map(strip).join('\n')
+                : strip(sel);
+            view.dispatch({ changes: { from, to, insert } });
+            view.focus();
+            return;
+        }
+        const el = st.editor;
+        if (!el) return;
+        const start = el.selectionStart;
+        const end   = el.selectionEnd;
+        const val   = el.value;
+        const sel   = val.substring(start, end).replace(/^#{1,6}\s+/, '');
+        el.value = val.substring(0, start) + sel + val.substring(end);
+        this._triggerAutoSave(sfx);
+    },
+
+    // Inserts a fixed block of text at the cursor (not a selection wrap) —
+    // used for Horizontal Rule and the Table starter skeleton, neither of
+    // which has a "wrap the selection" shape like Bold/Italic do.
+    _insertBlock(sfx, text) {
+        sfx = sfx || '';
+        const st = this._state(sfx);
+        if (st.cmView) {
+            const view = st.cmView;
+            const pos  = view.state.selection.main.to;
+            view.dispatch({
+                changes: { from: pos, to: pos, insert: text },
+                selection: { anchor: pos + text.length },
+            });
+            view.focus();
+            return;
+        }
+        const el = st.editor;
+        if (!el) return;
+        const pos = el.selectionEnd;
+        el.value = el.value.substring(0, pos) + text + el.value.substring(pos);
+        el.focus();
+        el.setSelectionRange(pos + text.length, pos + text.length);
+        this._triggerAutoSave(sfx);
     },
 
     _wrap(sfx, pre, suf, isBlock = false) {

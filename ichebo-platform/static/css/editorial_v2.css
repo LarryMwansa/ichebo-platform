@@ -297,6 +297,54 @@
   color: var(--text);
 }
 
+.editorial-preview-pane h4,
+.editorial-preview-pane h5,
+.editorial-preview-pane h6 {
+  font-family: var(--ff-display);
+  font-size: 15px;
+  font-weight: 700;
+  margin: 1.3em 0 0.3em;
+  color: var(--text);
+}
+
+.editorial-preview-pane h5 {
+  font-size: 14px;
+}
+
+.editorial-preview-pane h6 {
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.editorial-preview-pane del {
+  color: var(--muted);
+}
+
+.editorial-preview-pane table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.2em;
+  font-size: 0.92em;
+}
+
+.editorial-preview-pane th,
+.editorial-preview-pane td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.editorial-preview-pane th {
+  background: var(--card-2);
+  font-weight: 700;
+}
+
+.editorial-preview-pane li input[type="checkbox"] {
+  margin-right: 6px;
+}
+
 .editorial-preview-pane p {
   margin-bottom: 1.2em;
 }
@@ -353,27 +401,26 @@
   margin: 2em 0;
 }
 
-/* ── Focus Mode ── */
-.editorial-focus-mode .editorial-toolbar {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
+/* ── Focus Mode ──
+   Hides the surrounding shell chrome (context bar, options bar, top bar,
+   primary sidebar) so the canvas gets full width. Deliberately does NOT
+   touch .editorial-toolbar's size/position/visibility — an earlier version
+   of this rule resized the toolbar to a fixed 700px and hid it behind
+   opacity:0 until hovered, which read as "Focus Mode changes the
+   toolbar's behavior" rather than "Focus Mode hides the chrome around the
+   toolbar" (Chizola, 2026-06-23). The toolbar should look identical
+   in and out of Focus Mode.
 
-.editorial-focus-mode .editorial-toolbar:hover {
-  opacity: 1;
-}
-
-.editorial-focus-mode .editorial-canvas {
-  max-width: 680px;
-  margin: 0 auto;
-  padding-top: 80px;
-}
-
-/* Hide the 4-zone shell chrome in focus mode */
-body.focus-mode #ws-context-bar,
-body.focus-mode #ws-options-bar,
-body.focus-mode .ws-topbar,
-body.focus-mode .ws-primary-sidebar {
+   The 4 selectors below were also wrong before this fix — #ws-context-bar,
+   #ws-options-bar, .ws-topbar, .ws-primary-sidebar don't exist anywhere in
+   workspace_shell.html (confirmed by grep — real ids/classes are
+   #ics-context-bar, #ics-options-bar, .ics-stage__topbar, .ics-sidebar).
+   None of the four ever matched, so Focus Mode never actually hid any
+   chrome at all, on top of the toolbar bug — fixed both in the same pass. ── */
+body.focus-mode #ics-context-bar,
+body.focus-mode #ics-options-bar,
+body.focus-mode .ics-stage__topbar,
+body.focus-mode .ics-sidebar {
   display: none !important;
 }
 
@@ -386,21 +433,6 @@ body.focus-mode .editorial-canvas {
   max-width: 700px;
   margin: 0 auto;
   padding-top: 80px;
-}
-
-body.focus-mode .editorial-toolbar {
-  max-width: 700px;
-  margin: 0 auto;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 700px;
-  border-radius: 0 0 8px 8px;
-  opacity: 0;
-  transition: opacity 0.25s;
-}
-
-body.focus-mode .editorial-toolbar:hover {
-  opacity: 1;
 }
 
 /* ── Mobile (<1024px) — the Desk editor on phone/narrow viewports ── */

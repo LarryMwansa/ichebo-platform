@@ -21,9 +21,9 @@ stale desktop copy, and Save submitted that stale copy instead.
         </div>
 
         <div class="editorial-toolbar__group--center">
-            {# ── Inline: Bold, Italic ── #}
+            {# ── Fonts: Bold, Italic, Strikethrough, Code ── #}
             <div class="editorial-toolbar__category">
-                <button type="button" class="editorial-toolbar__btn editorial-toolbar__cat-head" title="Text formatting"
+                <button type="button" class="editorial-toolbar__btn editorial-toolbar__cat-head" title="Fonts"
                         onclick="EditorialUI.toggleCategory('{{ sfx }}', this)">
                     <span class="material-symbols-outlined">format_bold</span>
                 </button>
@@ -36,10 +36,18 @@ stale desktop copy, and Save submitted that stale copy instead.
                             onclick="EditorialUI.handleAction('{{ sfx }}', 'italic')">
                         <span class="material-symbols-outlined">format_italic</span>
                     </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Strikethrough"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'strikethrough')">
+                        <span class="material-symbols-outlined">format_strikethrough</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Code"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'code')">
+                        <span class="material-symbols-outlined">code</span>
+                    </button>
                 </div>
             </div>
 
-            {# ── Headings: H1, H2 ── #}
+            {# ── Headings: H1–H6, Body ── #}
             <div class="editorial-toolbar__category">
                 <button type="button" class="editorial-toolbar__btn editorial-toolbar__cat-head" title="Headings"
                         onclick="EditorialUI.toggleCategory('{{ sfx }}', this)">
@@ -54,27 +62,74 @@ stale desktop copy, and Save submitted that stale copy instead.
                             onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 2')">
                         <span class="material-symbols-outlined">format_h2</span>
                     </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Heading 3"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 3')">
+                        <span class="material-symbols-outlined">format_h3</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Heading 4"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 4')">
+                        <span class="material-symbols-outlined">format_h4</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Heading 5"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 5')">
+                        <span class="material-symbols-outlined">format_h5</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Heading 6"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 6')">
+                        <span class="material-symbols-outlined">format_h6</span>
+                    </button>
+                    <div class="editorial-toolbar__divider"></div>
+                    <button type="button" class="editorial-toolbar__btn" title="Body (clear heading)"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'body')">
+                        <span class="material-symbols-outlined">notes</span>
+                    </button>
                 </div>
             </div>
 
-            {# ── Block / Insert: Quote, Link, Bullet List ── #}
+            {# ── Paragraph: Bullet List, Numbered List, Task List, Blockquote ── #}
             <div class="editorial-toolbar__category">
-                <button type="button" class="editorial-toolbar__btn editorial-toolbar__cat-head" title="Insert"
+                <button type="button" class="editorial-toolbar__btn editorial-toolbar__cat-head" title="Paragraph"
                         onclick="EditorialUI.toggleCategory('{{ sfx }}', this)">
-                    <span class="material-symbols-outlined">format_quote</span>
+                    <span class="material-symbols-outlined">format_list_bulleted</span>
                 </button>
                 <div class="editorial-toolbar__dropdown">
+                    <button type="button" class="editorial-toolbar__btn" title="Bullet List"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'bullet')">
+                        <span class="material-symbols-outlined">format_list_bulleted</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Numbered List"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'numbered')">
+                        <span class="material-symbols-outlined">format_list_numbered</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Task List"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'task')">
+                        <span class="material-symbols-outlined">checklist</span>
+                    </button>
                     <button type="button" class="editorial-toolbar__btn" title="Quote"
                             onclick="EditorialUI.handleAction('{{ sfx }}', 'quote')">
                         <span class="material-symbols-outlined">format_quote</span>
                     </button>
+                </div>
+            </div>
+
+            {# ── Insert: Link, Horizontal Rule, Table ── #}
+            <div class="editorial-toolbar__category">
+                <button type="button" class="editorial-toolbar__btn editorial-toolbar__cat-head" title="Insert"
+                        onclick="EditorialUI.toggleCategory('{{ sfx }}', this)">
+                    <span class="material-symbols-outlined">link</span>
+                </button>
+                <div class="editorial-toolbar__dropdown">
                     <button type="button" class="editorial-toolbar__btn" title="Link"
                             onclick="EditorialUI.handleAction('{{ sfx }}', 'link')">
                         <span class="material-symbols-outlined">link</span>
                     </button>
-                    <button type="button" class="editorial-toolbar__btn" title="Bullet List"
-                            onclick="EditorialUI.handleAction('{{ sfx }}', 'bullet')">
-                        <span class="material-symbols-outlined">format_list_bulleted</span>
+                    <button type="button" class="editorial-toolbar__btn" title="Horizontal Rule"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'hr')">
+                        <span class="material-symbols-outlined">horizontal_rule</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Table"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'table')">
+                        <span class="material-symbols-outlined">table</span>
                     </button>
                 </div>
             </div>
