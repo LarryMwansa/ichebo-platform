@@ -43,12 +43,42 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-}
-
-.editorial-toolbar__scroll {
   display: flex;
   align-items: center;
+  gap: 4px;
+}
+
+/* ── Category head + dropdown — replaces the old flat 8-button row.
+   Same structure on desktop and mobile: a single icon button per category
+   (Inline, Headings, Insert, View) opens a dropdown with that category's
+   original buttons. Keeps the toolbar's footprint constant regardless of
+   how many formatting options exist within a category. ── */
+.editorial-toolbar__category {
+  position: relative;
+}
+
+.editorial-toolbar__dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: 4px;
   gap: 2px;
+  z-index: 200;
+}
+
+.editorial-toolbar__category.open .editorial-toolbar__dropdown {
+  display: flex;
+}
+
+.editorial-toolbar__cat-head.open {
+  background: var(--hover);
+  color: var(--text);
 }
 
 .editorial-toolbar__btn {
@@ -136,6 +166,14 @@
   height: 34px;
   border-radius: 6px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editorial-save-btn__icon {
+  display: none; /* desktop: label only, shown on mobile below */
+  font-size: 18px;
 }
 
 /* ── Writing Canvas ── */
@@ -368,8 +406,8 @@ body.focus-mode .editorial-toolbar:hover {
 /* ── Mobile (<1024px) — the Desk editor on phone/narrow viewports ── */
 @media (max-width: 1023px) {
   /* Toolbar: drop absolute centering (nowhere to center into on a phone
-     width) and make the button group horizontally scrollable instead of
-     letting it overlap/compress against the left/right groups. */
+     width) — 4 category-head buttons fit a fixed row without needing the
+     scroll mechanism the flat 8-button row used to require. */
   .editorial-toolbar {
     padding: 0 var(--space-s);
     gap: var(--space-s);
@@ -380,58 +418,30 @@ body.focus-mode .editorial-toolbar:hover {
   }
 
   .editorial-toolbar__group--center {
-    position: relative; /* anchor for the scroll-fade hint below */
-    left: auto;          /* reset the desktop rule's left: 50% */
-    transform: none;     /* reset the desktop rule's translateX(-50%) */
+    position: static;
+    transform: none;
     flex: 1 1 auto;
     min-width: 0;
-  }
-
-  /* The actual scroll container is a separate inner element so the fade
-     overlay (a sibling, not a child) never scrolls along with the buttons
-     it's hinting at. */
-  .editorial-toolbar__group--center .editorial-toolbar__scroll {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .editorial-toolbar__group--center .editorial-toolbar__scroll::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Right-edge "more" hint — a fade-to-background gradient is invisible
-     here (the toolbar's own background is the same flat color, so there's
-     nothing for the fade to contrast against). A small chevron is an
-     unambiguous, theme-independent signal instead. Fixed in place (a
-     sibling of the scroll container, not inside it), so it doesn't move
-     when the row scrolls. */
-  .editorial-toolbar__group--center::after {
-    content: 'chevron_right';
-    font-family: 'Material Symbols Outlined';
-    font-size: 16px;
-    color: var(--muted);
-    position: absolute;
-    top: 50%;
-    right: -2px;
-    transform: translateY(-50%);
-    pointer-events: none;
-  }
-
-  .editorial-toolbar__btn {
-    flex-shrink: 0;
+    justify-content: center;
   }
 
   .editorial-toolbar__right {
     flex-shrink: 0;
   }
 
+  /* Save button: icon only on mobile, full label stays desktop-only —
+     the label was the single biggest space consumer in the toolbar's
+     right-hand group. */
   .editorial-save-btn {
-    padding: 0 var(--space-s);
-    font-size: 12px;
+    padding: 0 10px;
+  }
+
+  .editorial-save-btn__icon {
+    display: block;
+  }
+
+  .editorial-save-btn__label {
+    display: none;
   }
 
   /* Canvas: desktop's generous 56px top / 120px bottom padding is dead

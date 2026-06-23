@@ -21,54 +21,89 @@ stale desktop copy, and Save submitted that stale copy instead.
         </div>
 
         <div class="editorial-toolbar__group--center">
-          <div class="editorial-toolbar__scroll">
-            <button type="button" class="editorial-toolbar__btn" title="Bold"
-                    onclick="EditorialUI.handleAction('{{ sfx }}', 'bold')">
-                <span class="material-symbols-outlined">format_bold</span>
-            </button>
-            <button type="button" class="editorial-toolbar__btn" title="Italic"
-                    onclick="EditorialUI.handleAction('{{ sfx }}', 'italic')">
-                <span class="material-symbols-outlined">format_italic</span>
-            </button>
-            <div class="editorial-toolbar__divider"></div>
-            <button type="button" class="editorial-toolbar__btn" title="Heading 1"
-                    onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 1')">
-                <span class="material-symbols-outlined">format_h1</span>
-            </button>
-            <button type="button" class="editorial-toolbar__btn" title="Heading 2"
-                    onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 2')">
-                <span class="material-symbols-outlined">format_h2</span>
-            </button>
-            <div class="editorial-toolbar__divider"></div>
-            <button type="button" class="editorial-toolbar__btn" title="Quote"
-                    onclick="EditorialUI.handleAction('{{ sfx }}', 'quote')">
-                <span class="material-symbols-outlined">format_quote</span>
-            </button>
-            <button type="button" class="editorial-toolbar__btn" title="Link"
-                    onclick="EditorialUI.handleAction('{{ sfx }}', 'link')">
-                <span class="material-symbols-outlined">link</span>
-            </button>
-            <button type="button" class="editorial-toolbar__btn" title="Bullet List"
-                    onclick="EditorialUI.handleAction('{{ sfx }}', 'bullet')">
-                <span class="material-symbols-outlined">format_list_bulleted</span>
-            </button>
-            <div class="editorial-toolbar__divider"></div>
-            <button type="button" class="editorial-toolbar__btn" title="Preview (⌘P)"
-                    id="preview-toggle{{ sfx }}" onclick="EditorialUI.togglePreview('{{ sfx }}')">
-                <span class="material-symbols-outlined">visibility</span>
-            </button>
-            <button type="button" class="editorial-toolbar__btn" title="Focus Mode (⌘⇧F)"
-                    id="focus-toggle{{ sfx }}" onclick="EditorialUI.toggleFocus('{{ sfx }}')">
-                <span class="material-symbols-outlined">fullscreen</span>
-            </button>
-          </div>
+            {# ── Inline: Bold, Italic ── #}
+            <div class="editorial-toolbar__category">
+                <button type="button" class="editorial-toolbar__btn editorial-toolbar__cat-head" title="Text formatting"
+                        onclick="EditorialUI.toggleCategory('{{ sfx }}', this)">
+                    <span class="material-symbols-outlined">format_bold</span>
+                </button>
+                <div class="editorial-toolbar__dropdown">
+                    <button type="button" class="editorial-toolbar__btn" title="Bold"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'bold')">
+                        <span class="material-symbols-outlined">format_bold</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Italic"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'italic')">
+                        <span class="material-symbols-outlined">format_italic</span>
+                    </button>
+                </div>
+            </div>
+
+            {# ── Headings: H1, H2 ── #}
+            <div class="editorial-toolbar__category">
+                <button type="button" class="editorial-toolbar__btn editorial-toolbar__cat-head" title="Headings"
+                        onclick="EditorialUI.toggleCategory('{{ sfx }}', this)">
+                    <span class="material-symbols-outlined">format_h1</span>
+                </button>
+                <div class="editorial-toolbar__dropdown">
+                    <button type="button" class="editorial-toolbar__btn" title="Heading 1"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 1')">
+                        <span class="material-symbols-outlined">format_h1</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Heading 2"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 2')">
+                        <span class="material-symbols-outlined">format_h2</span>
+                    </button>
+                </div>
+            </div>
+
+            {# ── Block / Insert: Quote, Link, Bullet List ── #}
+            <div class="editorial-toolbar__category">
+                <button type="button" class="editorial-toolbar__btn editorial-toolbar__cat-head" title="Insert"
+                        onclick="EditorialUI.toggleCategory('{{ sfx }}', this)">
+                    <span class="material-symbols-outlined">format_quote</span>
+                </button>
+                <div class="editorial-toolbar__dropdown">
+                    <button type="button" class="editorial-toolbar__btn" title="Quote"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'quote')">
+                        <span class="material-symbols-outlined">format_quote</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Link"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'link')">
+                        <span class="material-symbols-outlined">link</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Bullet List"
+                            onclick="EditorialUI.handleAction('{{ sfx }}', 'bullet')">
+                        <span class="material-symbols-outlined">format_list_bulleted</span>
+                    </button>
+                </div>
+            </div>
+
+            {# ── View: Preview, Focus Mode ── #}
+            <div class="editorial-toolbar__category">
+                <button type="button" class="editorial-toolbar__btn editorial-toolbar__cat-head" title="View"
+                        onclick="EditorialUI.toggleCategory('{{ sfx }}', this)">
+                    <span class="material-symbols-outlined">visibility</span>
+                </button>
+                <div class="editorial-toolbar__dropdown">
+                    <button type="button" class="editorial-toolbar__btn" title="Preview (⌘P)"
+                            id="preview-toggle{{ sfx }}" onclick="EditorialUI.togglePreview('{{ sfx }}')">
+                        <span class="material-symbols-outlined">visibility</span>
+                    </button>
+                    <button type="button" class="editorial-toolbar__btn" title="Focus Mode (⌘⇧F)"
+                            id="focus-toggle{{ sfx }}" onclick="EditorialUI.toggleFocus('{{ sfx }}')">
+                        <span class="material-symbols-outlined">fullscreen</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="editorial-toolbar__right">
             <span class="editorial-status" id="word-count{{ sfx }}" style="min-width: 60px; text-align: right;"></span>
             <button type="submit" form="editorial-form{{ sfx }}"
-                    class="ws-topbar__cta editorial-save-btn">
-                Save to Registry
+                    class="ws-topbar__cta editorial-save-btn" title="Save to Registry">
+                <span class="material-symbols-outlined editorial-save-btn__icon">cloud_upload</span>
+                <span class="editorial-save-btn__label">Save to Registry</span>
             </button>
         </div>
     </div>

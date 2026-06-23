@@ -75,6 +75,55 @@ const EditorialUI = {
         });
     },
 
+    // ── Toolbar category dropdowns ───────────────────────────────────────────
+    //
+    // Each category (Inline, Headings, Insert, View) collapses to one head
+    // button; clicking it opens a dropdown with that category's buttons.
+    // Only one dropdown open at a time, closes on outside click, Escape, or
+    // after any button inside it is used (including Preview/Focus Mode —
+    // uniform behavior is simpler than treating those two as special-cased
+    // persistent toggles that leave the dropdown open).
+
+    toggleCategory(sfx, headBtn) {
+        const category = headBtn.closest('.editorial-toolbar__category');
+        const wasOpen  = category.classList.contains('open');
+        this._closeAllCategories();
+        if (!wasOpen) {
+            category.classList.add('open');
+            headBtn.classList.add('open');
+            this._installCategoryCloseListeners();
+        }
+    },
+
+    _closeAllCategories() {
+        document.querySelectorAll('.editorial-toolbar__category.open').forEach((cat) => {
+            cat.classList.remove('open');
+            cat.querySelector('.editorial-toolbar__cat-head')?.classList.remove('open');
+        });
+    },
+
+    _installCategoryCloseListeners() {
+        if (this._categoryListenersInstalled) return;
+        this._categoryListenersInstalled = true;
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.editorial-toolbar__category')) {
+                // Click was on a button inside an open dropdown (not the
+                // head, which toggleCategory already handles) — close after
+                // the action runs.
+                if (!e.target.closest('.editorial-toolbar__cat-head')) {
+                    this._closeAllCategories();
+                }
+                return;
+            }
+            this._closeAllCategories();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this._closeAllCategories();
+        });
+    },
+
     // ── Formatting actions ───────────────────────────────────────────────────
 
     handleAction(sfx, action) {
