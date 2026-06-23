@@ -54,3 +54,55 @@ The originally proposed two-part fix was carried out:
 
 **Why:** Keeps one template hierarchy, no per-page duplication, the CSS is already done.
 
+## A real bug class found and fixed (2026-06-23): duplicate-partial-id data loss
+
+Chizola reported the Handbook editor's toolbar looking squashed on mobile.
+Investigating with the `browse` skill at an actual 375px viewport (not just
+reading CSS) found something much worse: `handbook/record.html` includes
+the shared `workspace/editorial/partials/editor.html` **twice** — once
+inside `{% block ws_content %}` (desktop, `#ics-shell`) and once inside
+`{% block content %}` (mobile, `#ws-mobile-shell`). That partial hardcodes
+ids (`id="cm-editor-mount"`, `id="record-title"`, `id="editorial-form"`,
+etc.). Because `#ics-shell` and `#ws-mobile-shell` are sibling DOM subtrees
+— CSS only shows/hides which one is visible, neither is removed from the
+DOM — every `getElementById`/`form[id]` lookup in `editorial_v2.js` always
+bound to the first (desktop) copy, regardless of which one was actually on
+screen.
+
+**Confirmed via live testing, not assumption:** typing into the visible
+mobile title field or canvas edited a hidden, stale desktop copy. The
+visible "Save to Registry" button submitted that stale copy's form. A
+mobile user's edits were silently discarded on save. Real data loss, not
+cosmetic.
+
+**Fixed** by giving `editor.html` a `mount_suffix` template parameter so
+every id is unique per inclusion (mobile passes `mount_suffix="-mobile"`),
+and rewriting `EditorialUI` in `editorial_v2.js` from a singleton object to
+one keyed by suffix so each instance's state (CodeMirror view, focus mode,
+autosave timer) is independent. The `<script src="editorial_v2.js">` tag
+and its boot listeners now load only once per page (guarded by
+`{% if not sfx %}`), since they're global, not per-instance.
+
+**The general lesson — check before assuming any "duplicate content for
+mobile" pattern is safe:** any shared partial that's included into both
+`#ics-shell` and `#ws-mobile-shell` on the same page, and that contains
+hardcoded ids referenced by JS or `hx-target`, has this exact bug latent
+until proven otherwise. `record.html`'s lifecycle action bar
+(`id="hb-lifecycle-status"`, used as an `hx-target`) had the identical
+issue — fixed the same way, with a `-mobile` suffixed id on the mobile
+copy. Before duplicating any further per-page content into both shells,
+grep that partial for hardcoded `id="..."` and trace every JS/`hx-target`
+reference to it.
+
+## A Django gotcha hit while writing the fix above
+
+`{# ... #}` Django template comments do **not** support multi-line
+content — confirmed by direct reproduction in a Django shell, both via
+raw `Template()` construction and the real view-rendering pipeline matters
+(a raw multi-line `{# #}` was found to literally render as visible page
+text). Multi-line documentation inside a template must use
+`{% comment %}...{% endcomment %}` instead. Caught this only because the
+fix above was screenshot-verified rather than assumed correct from reading
+the diff — the first draft's explanatory comments rendered as a wall of
+visible text above the editor on the actual page.
+
