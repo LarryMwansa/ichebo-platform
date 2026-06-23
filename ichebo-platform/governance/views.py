@@ -74,7 +74,8 @@ def governance_health(request):
 
 @login_required
 def governance_home(request):
-    if _level(request.user) < MANDATE_ACCESS_LEVEL:
+    is_operator = request.user.is_staff or request.user.is_superuser
+    if _level(request.user) < MANDATE_ACCESS_LEVEL and not is_operator:
         raise PermissionDenied
     return redirect('governance:mandate-home')
 

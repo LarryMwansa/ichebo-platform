@@ -231,6 +231,31 @@ When L10.6 is implemented:
 3. Add the gate inputs to the System Panel template at `/platform/`
 4. The values default to the current constants so no behaviour changes on first deploy
 
+### Standing rule — the operator bypass (2026-06-23)
+
+**Every access gate the System Panel can set must have a guaranteed
+operator bypass that cannot itself be configured away.** A Level 5 steward
+(or whoever holds the System Panel) can set `mandate_access_level` to a
+value no real account meets — accidentally or otherwise — and without a
+hardcoded escape hatch, that locks out the very person who would need to
+fix it. There is no recovery path from inside the app at that point; it
+becomes a `manage.py shell` operation on the server.
+
+This is not hypothetical. Auditing the *current* hardcoded gates
+(2026-06-23) found `handbook/views.py` already guards every
+`KEYS_ACCESS_LEVEL` check with `not (request.user.is_staff or
+request.user.is_superuser)`, but `governance/views.py`'s
+`MANDATE_ACCESS_LEVEL` check had no such guard at all — a superuser could
+already be locked out of the Mandate Library today, before the System
+Panel even exists. Fixed to match `handbook/views.py`'s pattern.
+
+**Rule for L10.6 and anything added to the System Panel after it:** the
+bypass condition (`is_staff or is_superuser` — the platform's existing
+"operator" concept, not a new role) is checked in code at the enforcement
+point, never read from `PlatformConfig` or any other database value the
+panel itself controls. The panel may change *who else* gets access; it must
+never be able to remove the operator's own access as a side effect.
+
 ---
 
 ## Doctrinal Grounding (2026-06-18)
