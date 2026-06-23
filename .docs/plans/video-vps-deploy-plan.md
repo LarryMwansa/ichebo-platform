@@ -186,6 +186,12 @@ all four, verified each leg of the chain with the Django test client
 for a bad key with valid auth, not a blanket 401). Committed separately
 (`371f739`) since it's a real application bug fix, not infra config.
 
+**See also:** `.docs/plans/doc-g-video-pipeline-amendment.md` — DOC G's
+own API contract and pipeline description (§4.1, §4.2, §4.3, §5.2)
+predates and doesn't match this real implementation. That amendment
+documents the exact gaps and proposes the canonical-doc edits; not merged
+into DOC G's text yet.
+
 **Phase 4 — MediaMTX.** Binary downloaded and checksum-verified against the
 GitHub release's `checksums.sha256` (exact match) before running. v1.19.1 —
 confirmed this version renamed the hooks documented in older MediaMTX
