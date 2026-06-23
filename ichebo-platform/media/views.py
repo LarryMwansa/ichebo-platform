@@ -166,7 +166,32 @@ class TranscodeCompleteWebhookView(APIView):
     """POST /api/media/transcode-complete/ — called by Go Video Engine on job completion.
 
     Authenticated by shared API key in Authorization header, not user token.
+
+    Handles two distinct cases sharing the same payload shape, disambiguated
+    by job_id prefix (set by the Go engine — pkg/transcode/worker.go for
+    regular uploads, pkg/stream/archiver.go's "archive-" + record_id for
+    live broadcast DVR archiving):
+    - Regular upload transcode -> updates a media Record's custom_fields.
+    - Live broadcast archive complete -> updates a video_live.BroadcastSchedule's
+      vod_url. Added 2026-06-23 (Chizola) — record_id in this case is a
+      BroadcastSchedule.id, not a Record.id, since the archiver's session
+      registry doesn't know about Record at all (see stream/session.go);
+      the original version of this view only ever checked Record and would
+      have silently 200'd without saving anything for every broadcast
+      archive completion.
+
+    authentication_classes/permission_classes explicitly emptied — DRF's
+    global DEFAULT_PERMISSION_CLASSES is IsAuthenticated, which rejected
+    every call to this view with 401 before the manual bearer-key check
+    below ever ran, even with a correct key. Confirmed by direct test: this
+    webhook has likely never actually worked since it was written, despite
+    its own docstring claiming otherwise. Fixed 2026-06-23 (Chizola) while
+    chasing why the live-broadcast archive handshake (a separate, related
+    bug — see video_live.api_views.StreamStartWebhookView) wasn't wiring
+    up either.
     """
+    authentication_classes = []
+    permission_classes = []
 
     def post(self, request):
         api_key = getattr(settings, 'MEDIA_ENGINE_API_KEY', 'dev-key')
@@ -182,12 +207,16 @@ class TranscodeCompleteWebhookView(APIView):
         duration_seconds = request.data.get('duration_seconds', 0)
         quality_variants = request.data.get('quality_variants', [])
 
-        # Update TranscodeJob.
+        # Update TranscodeJob — only relevant for the regular-upload case,
+        # but harmless no-op (filter matches nothing) for archive jobs.
         TranscodeJob.objects.filter(job_id=job_id).update(
             status=job_status,
             progress_pct=100 if job_status == 'complete' else 0,
             completed_at=timezone.now() if job_status in ('complete', 'failed') else None,
         )
+
+        if job_id.startswith('archive-'):
+            return self._handle_broadcast_archive(record_id, job_status, video_url)
 
         # Update Record.custom_fields atomically.
         try:
@@ -205,6 +234,20 @@ class TranscodeCompleteWebhookView(APIView):
         if job_status == 'complete':
             record.status = 'active'
         record.save(update_fields=['custom_fields', 'status'])
+
+        return Response(status=status.HTTP_200_OK)
+
+    def _handle_broadcast_archive(self, broadcast_id, job_status, video_url):
+        from video_live.models import BroadcastSchedule
+
+        try:
+            broadcast = BroadcastSchedule.objects.get(id=broadcast_id)
+        except (BroadcastSchedule.DoesNotExist, ValueError, TypeError):
+            return Response(status=status.HTTP_200_OK)
+
+        if job_status == 'complete' and video_url:
+            broadcast.vod_url = video_url
+            broadcast.save(update_fields=['vod_url', 'updated_at'])
 
         return Response(status=status.HTTP_200_OK)
 
