@@ -168,18 +168,30 @@ following the existing `editorial_v2.js` pattern of one shared controller
 keyed by element id (not a new framework or player library beyond
 `hls.js` itself).
 
-### 2. Community — service scheduling, built into Community's own UI
+### 2. Community — service scheduling, extending the existing Gathering form
 
-Community already has the correct viewing half
+**Correction (2026-06-24):** an earlier version of this section proposed a
+new "Schedule a Service" action and claimed no Gathering record existed to
+attach it to. Both were wrong — found by reading
+`community/views.py:htmx_create_gathering` directly, not assumed.
+A Gathering record is real (`Record(record_family='community',
+record_type='gathering')`, dual-written to `Activity`, exactly as DOC G
+describes), already has a working form
+(`management.html`'s "Schedule" button → `htmx-create-gathering`), and
+already has a `format` field with a `digital` option. The actual gap is
+one field: for `format == 'digital'`, that form writes a plain typed-in
+`custom_fields.stream_url` string, never a real `BroadcastSchedule`.
+
+The fix is to extend this existing form, not add a parallel one: when a
+steward picks `format = digital`, create a `BroadcastSchedule` (not a
+typed URL field) linked via its existing `gathering_record` FK, and show
+the generated `rtmp_ingest_url` for the steward to paste into their
+streaming software. Community already has the correct *viewing* half
 (`community/live_service_room.html`, `_find_live_session`, checks
 `BroadcastSchedule.status='live'` first, falls back to legacy `Activity`
-for old data only per the policy above). What's missing is the
-*scheduling* half: a steward currently has nowhere inside Community to
-create a `BroadcastSchedule` and get a stream key to give to OBS. Add a
-"Schedule a Service" action directly in Community's existing
-steward-facing surface — creates a real `BroadcastSchedule`, shows the
-generated `rtmp_ingest_url` for the steward to paste into their streaming
-software, links it to a Gathering record if one exists.
+for old data only per the policy above) — this closes the loop so a
+digital Gathering scheduled today actually produces something the viewing
+page can find.
 
 ### 3. Learn — real lesson video, not pasted links
 

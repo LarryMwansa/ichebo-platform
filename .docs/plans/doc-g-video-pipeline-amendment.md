@@ -35,7 +35,7 @@ rather than leaving the gap implicit.
 |---|---|---|
 | `POST /engine/stream/start` is called with `record_id` already in the body | §5.2 | **Inaccurate as written.** Nothing can call this with a valid `record_id` except Django — MediaMTX has no knowledge of Django's data model. The real chain is MediaMTX → Django (`/video/api/stream/start/`, resolves `record_id` from `BroadcastSchedule.stream_key`) → Go engine. Confirmed by reading `pkg/stream/handler.go`'s actual validation (`record_id` is a required field, rejected with 400 if empty) and by the fact no code anywhere could supply it before today. |
 | Live pipeline (§4.1) shows MediaMTX → FFmpeg → Object Storage with no Django step | §4.1 | **Incomplete.** Django mediates both stream start and stream end — see above. Diagram should show a Django step between MediaMTX and the Go engine. |
-| Scheduling a broadcast creates a **Gathering record** (Community App) with `format: "digital"` and `stream_url` | §4.3 | **Not what was built.** No `Gathering` model exists in `community/models.py`. The real model is `video_live.BroadcastSchedule` — a dedicated model with its own `status`, `stream_key`, `hls_url`, `vod_url` fields, not a generic Gathering/Activity dual-write. |
+| Scheduling a broadcast creates a **Gathering record** (Community App) with `format: "digital"` and `stream_url` | §4.3 | **Correction (2026-06-24):** an earlier version of this amendment claimed no Gathering model exists — wrong, found by reading `community/views.py:htmx_create_gathering` directly. A Gathering record genuinely exists (`Record(record_family='community', record_type='gathering')`, dual-written to an `Activity` row, exactly as DOC G describes), with `custom_fields.format`/`stream_url` for the "digital" case. What's actually missing is narrower: that flow writes a plain `stream_url` string, never a `video_live.BroadcastSchedule` row — so a "digital" Gathering has no real stream key, RTMP URL, or HLS output. See `video-direction-v2-plan.md` for the fix (the Gathering form gains a path to create a real `BroadcastSchedule`, linked via its existing `gathering_record` FK, instead of a typed URL). |
 | CDN domain is `cdn.ichebo.org`; viewer URL is `https://cdn.ichebo.org/live/{stream-key}/index.m3u8` | §4.1, §4.2, §6.1 (throughout) | **Different domain actually deployed.** Live HLS is served from `https://media.ichebo.org/...`; delivered/archived video from `https://video.ichebo.org/media/...`. `cdn.ichebo.org` does not exist in DNS or in any deployed config. |
 | Video Engine server: "CX32 minimum for live transcoding" | §4.2 | **Contradicts §5.1's own table**, which says "CX42 minimum (8 vCPU, 16GB RAM)" for the same server. Pre-existing internal inconsistency, not caused by today's deploy. Neither was actually provisioned — the real server is far smaller (2 vCPU / 3.7GB); see Resolution below. |
 | `/engine/stream/end` returns `{ archive_record_id }` — "the auto-created VOD record" | §5.2 | **Not what was built.** The Go engine's `End` handler returns `{"status": ..., "broadcast_id": ...}` (no `archive_record_id`). Archive completion is a separate, later, async webhook (`/api/media/transcode-complete/`) carrying a `video_url`, not a record ID handed back synchronously from `stream/end`. |
@@ -97,18 +97,25 @@ domain actually provisioned and live (no `cdn.ichebo.org` exists).
 
 ### Edit 3 — §4.3 Broadcast Scheduling
 
-**Replace** "A Gathering record (Community App) with format: 'digital'
-and stream_url set to the HLS viewer URL" with:
+**Correction to this amendment itself (2026-06-24):** the original Edit 3
+below was written from an incomplete read — it claimed no Gathering model
+exists. It does: `community/views.py:htmx_create_gathering` creates a real
+`Record(record_family='community', record_type='gathering')`, dual-written
+to an `Activity` row, exactly matching DOC G's original §4.3 description.
+The actual gap is narrower than originally stated:
 
-> A `video_live.BroadcastSchedule` row — not a Gathering record as
-> originally specified. No `Gathering` model exists in `community/models.py`
-> as of this audit; the live-broadcast scheduling flow was built as its
-> own dedicated model instead, with `status`, `stream_key`, `hls_url`, and
-> `vod_url` fields. **Open question, not resolved by this amendment:**
-> whether `BroadcastSchedule` should additionally dual-write into Activity
-> as the original spec intended for community-feed visibility — confirmed
-> absent today, not in scope of today's deploy work, flagged for a
-> separate decision.
+**Add**, after the existing §4.3 text:
+
+> **Implementation note (2026-06-24):** the Gathering record this section
+> describes is real and dual-writes to Activity exactly as specified. What
+> it does not yet do: for a "digital" format Gathering, `custom_fields.stream_url`
+> is a plain typed-in URL, never a `video_live.BroadcastSchedule` row — so
+> a digitally-scheduled Gathering has no real stream key, RTMP ingest URL,
+> or native HLS output, only whatever external link a steward pastes in.
+> See `video-direction-v2-plan.md` for the fix: the Gathering form gains a
+> path to create a real `BroadcastSchedule` linked via its existing
+> `gathering_record` FK, replacing the typed-URL field for new digital
+> Gatherings.
 
 ### Edit 4 — §5.2 Video Engine Service - Go, API contract
 
