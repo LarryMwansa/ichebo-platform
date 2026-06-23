@@ -332,19 +332,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     {# ── Editor canvas ── #}
     <div style="flex:1;overflow:hidden;">
-        {% with save_url=handbook_save_url %}
+        {% with save_url=handbook_save_url mount_suffix="-mobile" %}
             {% include "workspace/editorial/partials/editor.html" %}
         {% endwith %}
     </div>
 
-    {# ── Lifecycle bar ── #}
+    {% comment %}
+    Lifecycle bar (mobile) — hx-target uses the -mobile suffixed status
+    span; the desktop block above targets the unsuffixed one. Two
+    separate ids, not one shared node — see editor.html's mount_suffix
+    comment for why.
+    {% endcomment %}
     {% if can_write and record %}
     <div style="position:fixed;bottom:64px;left:0;right:0;z-index:50;
                 display:flex;align-items:center;gap:10px;padding:10px 16px;
                 background:var(--bg);border-top:1px solid var(--border);">
         {% if record.status == 'draft' %}
         <button hx-post="{% url 'handbook:htmx-publish' record.id %}"
-                hx-target="#hb-lifecycle-status" hx-swap="innerHTML"
+                hx-target="#hb-lifecycle-status-mobile" hx-swap="innerHTML"
                 class="ws-topbar__cta"
                 style="background:none;border:1px solid #00b894;color:#00b894;cursor:pointer;">
             <span class="material-symbols-outlined">publish</span>
@@ -353,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
         {% endif %}
         {% if record.status == 'active' %}
         <button hx-post="{% url 'handbook:htmx-lock' record.id %}"
-                hx-target="#hb-lifecycle-status" hx-swap="innerHTML"
+                hx-target="#hb-lifecycle-status-mobile" hx-swap="innerHTML"
                 class="ws-topbar__cta"
                 style="background:none;border:1px solid var(--border);cursor:pointer;">
             <span class="material-symbols-outlined">lock</span>
@@ -369,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
             New Version
         </button>
         {% endif %}
-        <span id="hb-lifecycle-status" style="font-size:12px;color:var(--muted);"></span>
+        <span id="hb-lifecycle-status-mobile" style="font-size:12px;color:var(--muted);"></span>
     </div>
     {% endif %}
 

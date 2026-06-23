@@ -1,59 +1,72 @@
 {% load static %}
-
-<div class="editorial-stage" id="editorial-stage">
+{% comment %}
+mount_suffix: this partial is included twice per page (once inside
+#ics-shell for desktop, once inside #ws-mobile-shell for mobile — they
+are sibling DOM subtrees, not the same node, so the CSS breakpoint can
+only show/hide each copy, not share one). Every id in this partial must
+therefore be unique per inclusion, or every JS getElementById/form[id]
+lookup binds to whichever copy is first in document order regardless of
+which one is actually visible — confirmed as a real bug (2026-06-23):
+editing the visible mobile title/canvas silently edited a hidden,
+stale desktop copy, and Save submitted that stale copy instead.
+{% endcomment %}
+{% with sfx=mount_suffix|default:"" %}
+<div class="editorial-stage" id="editorial-stage{{ sfx }}">
 
     {# ── 1. Sticky Toolbar ── #}
     <div class="editorial-toolbar">
 
         <div class="editorial-toolbar__left">
-            <span class="editorial-status" id="save-status">Steward drafting…</span>
+            <span class="editorial-status" id="save-status{{ sfx }}">Steward drafting…</span>
         </div>
 
         <div class="editorial-toolbar__group--center">
+          <div class="editorial-toolbar__scroll">
             <button type="button" class="editorial-toolbar__btn" title="Bold"
-                    onclick="EditorialUI.handleAction('bold')">
+                    onclick="EditorialUI.handleAction('{{ sfx }}', 'bold')">
                 <span class="material-symbols-outlined">format_bold</span>
             </button>
             <button type="button" class="editorial-toolbar__btn" title="Italic"
-                    onclick="EditorialUI.handleAction('italic')">
+                    onclick="EditorialUI.handleAction('{{ sfx }}', 'italic')">
                 <span class="material-symbols-outlined">format_italic</span>
             </button>
             <div class="editorial-toolbar__divider"></div>
             <button type="button" class="editorial-toolbar__btn" title="Heading 1"
-                    onclick="EditorialUI.handleAction('heading 1')">
+                    onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 1')">
                 <span class="material-symbols-outlined">format_h1</span>
             </button>
             <button type="button" class="editorial-toolbar__btn" title="Heading 2"
-                    onclick="EditorialUI.handleAction('heading 2')">
+                    onclick="EditorialUI.handleAction('{{ sfx }}', 'heading 2')">
                 <span class="material-symbols-outlined">format_h2</span>
             </button>
             <div class="editorial-toolbar__divider"></div>
             <button type="button" class="editorial-toolbar__btn" title="Quote"
-                    onclick="EditorialUI.handleAction('quote')">
+                    onclick="EditorialUI.handleAction('{{ sfx }}', 'quote')">
                 <span class="material-symbols-outlined">format_quote</span>
             </button>
             <button type="button" class="editorial-toolbar__btn" title="Link"
-                    onclick="EditorialUI.handleAction('link')">
+                    onclick="EditorialUI.handleAction('{{ sfx }}', 'link')">
                 <span class="material-symbols-outlined">link</span>
             </button>
             <button type="button" class="editorial-toolbar__btn" title="Bullet List"
-                    onclick="EditorialUI.handleAction('bullet')">
+                    onclick="EditorialUI.handleAction('{{ sfx }}', 'bullet')">
                 <span class="material-symbols-outlined">format_list_bulleted</span>
             </button>
             <div class="editorial-toolbar__divider"></div>
             <button type="button" class="editorial-toolbar__btn" title="Preview (⌘P)"
-                    id="preview-toggle" onclick="EditorialUI.togglePreview()">
+                    id="preview-toggle{{ sfx }}" onclick="EditorialUI.togglePreview('{{ sfx }}')">
                 <span class="material-symbols-outlined">visibility</span>
             </button>
             <button type="button" class="editorial-toolbar__btn" title="Focus Mode (⌘⇧F)"
-                    id="focus-toggle" onclick="EditorialUI.toggleFocus()">
+                    id="focus-toggle{{ sfx }}" onclick="EditorialUI.toggleFocus('{{ sfx }}')">
                 <span class="material-symbols-outlined">fullscreen</span>
             </button>
+          </div>
         </div>
 
         <div class="editorial-toolbar__right">
-            <span class="editorial-status" id="word-count" style="min-width: 60px; text-align: right;"></span>
-            <button type="submit" form="editorial-form"
+            <span class="editorial-status" id="word-count{{ sfx }}" style="min-width: 60px; text-align: right;"></span>
+            <button type="submit" form="editorial-form{{ sfx }}"
                     class="ws-topbar__cta editorial-save-btn">
                 Save to Registry
             </button>
@@ -61,35 +74,36 @@
     </div>
 
     {# ── 2. Writing Canvas ── #}
-    <div class="editorial-canvas" id="editorial-canvas">
-        <form id="editorial-form"
+    <div class="editorial-canvas" id="editorial-canvas{{ sfx }}">
+        <form id="editorial-form{{ sfx }}"
               hx-post="{{ save_url }}"
               hx-target="this"
-              hx-swap="none">
+              hx-swap="none"
+              data-editorial-suffix="{{ sfx }}">
             {% csrf_token %}
 
-            <input type="hidden" name="record_family" id="hidden-record-family"
+            <input type="hidden" name="record_family" id="hidden-record-family{{ sfx }}"
                    value="{{ active_family|default:'journal' }}">
-            <input type="hidden" name="record_type" id="hidden-record-type"
+            <input type="hidden" name="record_type" id="hidden-record-type{{ sfx }}"
                    value="{{ active_type|default:'note' }}">
-            <input type="hidden" name="record_id" id="record-id-meta" value="{{ record.id|default:'' }}">
+            <input type="hidden" name="record_id" id="record-id-meta{{ sfx }}" value="{{ record.id|default:'' }}">
 
-            <input type="text" name="title" id="record-title"
+            <input type="text" name="title" id="record-title{{ sfx }}"
                    value="{{ record.title|default:'' }}"
                    placeholder="Title…"
                    class="editorial-title-input editorial-title"
-                   required autofocus autocomplete="off">
+                   required {% if not sfx %}autofocus{% endif %} autocomplete="off">
 
             {# Hidden textarea holds content for form submission #}
-            <textarea name="content" id="editorial-editor"
+            <textarea name="content" id="editorial-editor{{ sfx }}"
                       style="display:none;">{{ record.content|default:'' }}</textarea>
 
             {# CodeMirror 6 mounts here — Obsidian-style live markdown #}
-            <div id="cm-editor-mount"
+            <div id="cm-editor-mount{{ sfx }}"
                  style="flex:1;height:100%;overflow:hidden;"></div>
 
             {# Reading view — rendered markdown, shown via Preview toggle #}
-            <div id="editorial-preview"
+            <div id="editorial-preview{{ sfx }}"
                  class="editorial-body editorial-preview-pane"
                  style="display:none;flex:1;height:100%;overflow-y:auto;
                         padding:24px 32px;max-width:720px;margin:0 auto;"></div>
@@ -98,26 +112,38 @@
 </div>
 
 <script src="{% static 'js/codemirror-md.bundle.js' %}"></script>
+{% if not sfx %}
+{% comment %}
+editorial_v2.js and the boot listeners are global — load once regardless
+of how many times this partial is included, or DOMContentLoaded/htmx
+listeners stack up and every EditorialUI.init() call re-runs per copy.
+{% endcomment %}
 <script src="{% static 'js/editorial_v2.js' %}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        EditorialUI.init();
-        EditorialUI.initCM6();
-    });
-    document.addEventListener('htmx:afterSwap', () => {
-        EditorialUI.init();
-        EditorialUI.initCM6();
-    });
+    function _editorialBootAll() {
+        document.querySelectorAll('[data-editorial-suffix]').forEach((form) => {
+            EditorialUI.init(form.dataset.editorialSuffix);
+            EditorialUI.initCM6(form.dataset.editorialSuffix);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', _editorialBootAll);
+    document.addEventListener('htmx:afterSwap', _editorialBootAll);
 
-    // Sync command dial → hidden form fields + status label
+    // Sync command dial → hidden form fields + status label, for whichever
+    // instance is currently visible (desktop vs mobile).
     document.body.addEventListener('dialChanged', (e) => {
-        const fi = document.getElementById('hidden-record-family');
-        const ti = document.getElementById('hidden-record-type');
-        const st = document.getElementById('save-status');
-        if (fi) fi.value = e.detail.family;
-        if (ti) ti.value = e.detail.type;
-        if (st) st.textContent = e.detail.family.charAt(0).toUpperCase() +
-                                  e.detail.family.slice(1) + ' · ' +
-                                  e.detail.type.replace(/_/g, ' ');
+        document.querySelectorAll('[data-editorial-suffix]').forEach((form) => {
+            const sfx = form.dataset.editorialSuffix;
+            const fi = document.getElementById('hidden-record-family' + sfx);
+            const ti = document.getElementById('hidden-record-type' + sfx);
+            const st = document.getElementById('save-status' + sfx);
+            if (fi) fi.value = e.detail.family;
+            if (ti) ti.value = e.detail.type;
+            if (st) st.textContent = e.detail.family.charAt(0).toUpperCase() +
+                                      e.detail.family.slice(1) + ' · ' +
+                                      e.detail.type.replace(/_/g, ' ');
+        });
     });
 </script>
+{% endif %}
+{% endwith %}

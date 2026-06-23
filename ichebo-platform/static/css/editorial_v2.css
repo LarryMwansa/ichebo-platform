@@ -43,6 +43,9 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+}
+
+.editorial-toolbar__scroll {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -360,6 +363,109 @@ body.focus-mode .editorial-toolbar {
 
 body.focus-mode .editorial-toolbar:hover {
   opacity: 1;
+}
+
+/* ── Mobile (<1024px) — the Desk editor on phone/narrow viewports ── */
+@media (max-width: 1023px) {
+  /* Toolbar: drop absolute centering (nowhere to center into on a phone
+     width) and make the button group horizontally scrollable instead of
+     letting it overlap/compress against the left/right groups. */
+  .editorial-toolbar {
+    padding: 0 var(--space-s);
+    gap: var(--space-s);
+  }
+
+  .editorial-toolbar__left {
+    display: none; /* "Steward drafting…" status — desktop-only, no room on phone */
+  }
+
+  .editorial-toolbar__group--center {
+    position: relative; /* anchor for the scroll-fade hint below */
+    left: auto;          /* reset the desktop rule's left: 50% */
+    transform: none;     /* reset the desktop rule's translateX(-50%) */
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* The actual scroll container is a separate inner element so the fade
+     overlay (a sibling, not a child) never scrolls along with the buttons
+     it's hinting at. */
+  .editorial-toolbar__group--center .editorial-toolbar__scroll {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .editorial-toolbar__group--center .editorial-toolbar__scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Right-edge "more" hint — a fade-to-background gradient is invisible
+     here (the toolbar's own background is the same flat color, so there's
+     nothing for the fade to contrast against). A small chevron is an
+     unambiguous, theme-independent signal instead. Fixed in place (a
+     sibling of the scroll container, not inside it), so it doesn't move
+     when the row scrolls. */
+  .editorial-toolbar__group--center::after {
+    content: 'chevron_right';
+    font-family: 'Material Symbols Outlined';
+    font-size: 16px;
+    color: var(--muted);
+    position: absolute;
+    top: 50%;
+    right: -2px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .editorial-toolbar__btn {
+    flex-shrink: 0;
+  }
+
+  .editorial-toolbar__right {
+    flex-shrink: 0;
+  }
+
+  .editorial-save-btn {
+    padding: 0 var(--space-s);
+    font-size: 12px;
+  }
+
+  /* Canvas: desktop's generous 56px top / 120px bottom padding is dead
+     space on a phone. The mobile lifecycle bar in record.html's mobile
+     block is `position: fixed; bottom: 64px` (above the bottom nav) and
+     sits outside document flow, so no canvas padding can make room for
+     it — it can overlap canvas content regardless. Padding here only
+     reduces how much gets hidden, it can't fully solve the overlap; see
+     editorial_v2.css's comment trail / web-ui-mobile-strategy.md for the
+     real fix (give the lifecycle bar a non-fixed home in the flow). */
+  .editorial-canvas {
+    padding: 20px var(--space-s) 140px;
+    max-width: 100%;
+  }
+
+  .editorial-title-input {
+    font-size: 26px;
+    margin-bottom: 14px;
+  }
+
+  .editorial-summary-input {
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  .editorial-editor-textarea,
+  .editorial-preview-pane {
+    font-size: 16px; /* keep >=16px so iOS Safari doesn't auto-zoom on focus */
+    min-height: 60vh;
+  }
+
+  .editorial-preview-pane {
+    padding: 0;
+  }
 }
 
 /* ── Context navigation (Desk context bar) ── */
