@@ -331,6 +331,10 @@ calendar_app/ ← Calendar aggregation service (no models)
 paraclete/ ← Orchestration service (ParacletePrompt model only)
 
 video_live/ ← Video / Live App (no models - uses Activity + records)
+  [SUPERSEDED 2026-06-23, see video-direction-v2-plan.md — already stale before that
+   document: BroadcastSchedule is a real model. video_live is now models/webhooks
+   infrastructure only; its app templates/views/URLs and sidebar icon are retired.
+   Consumed directly by community/ and learn/.]
 
 notifications/ ← Notification model
 

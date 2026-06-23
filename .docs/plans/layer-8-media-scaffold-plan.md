@@ -764,7 +764,7 @@ Django media app:
 - TranscodeJob model + migration
 - DRF API: upload init/complete, video list/detail, transcode-complete webhook
 - VideoRecord helper with typed custom_fields accessors
-- Video library management page in video_live app
+- Video library management page in video_live app — built (`templates/video_live/library.html`, confirmed 179 lines), then retired by `video-direction-v2-plan.md` (2026-06-23) along with the rest of `video_live`'s app surface
 - "media" added to record_family choices
 
 Flutter HLS player:

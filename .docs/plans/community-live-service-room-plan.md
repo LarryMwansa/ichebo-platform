@@ -44,6 +44,8 @@ Video stays infrastructure — it already serves Learn (lesson video embeds), wi
 | New "Live Service" feature with its own URLs, separate from both apps | Duplicates `video_live`'s player/embed logic and `community`'s tenant/steward context for no benefit. |
 | **New Community-scoped view that queries the existing `Activity`/`BroadcastSchedule` data, filtered to the member's tenant, with a new request panel alongside it** | **Chosen.** Reuses 100% of the existing video infrastructure. Adds exactly the two missing things: tenant filtering and an interaction surface. |
 
+**Note added 2026-06-23 (`video-direction-v2-plan.md`):** the rejected option above ("move `video_live` app under `community/`") and that later document's decision are not in conflict, despite both involving `video_live`. This plan rejected moving the *infrastructure* (`BroadcastSchedule`, the Go engine's API contract) under `community/` — correctly, since Learn also needs it, tenant-agnostic. The later document retires `video_live`'s separate *app surface* (Studio, Schedule, VOD, Watch, its sidebar icon) while leaving the infrastructure exactly where this plan left it. Community's own scheduling UI (built per the v2 plan) calls `BroadcastSchedule` directly, the same tenant-agnostic model this plan already relied on — nothing about the infrastructure moved.
+
 ---
 
 ## Part 1 — Tenant-scoped Live Service Room

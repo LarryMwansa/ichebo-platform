@@ -485,6 +485,8 @@ feat: multi-tenant content scoping
 
 **Commit:** `feat: video live app — broadcast scheduler + live stream + VOD`
 
+**Superseded by `video-direction-v2-plan.md` (2026-06-23):** this app surface (Studio, Schedule, VOD Library, Watch, Programme Grid, sidebar icon) is retired. `BroadcastSchedule` and `media`'s upload/transcode pipeline are consumed directly by the Community and Learn apps instead. See the v2 plan for what replaces each piece.
+
 ---
 
 ## Flutter Mobile App — Phase V2.M

@@ -184,6 +184,13 @@ sections listed above mention the old domain).
 - Does not re-audit §6 (Flutter player) or §7 (transition strategy)
   exhaustively for further `cdn.ichebo.org` references or other drift —
   only the sections touched by today's actual deploy work were checked
+- Does not address the app/UI layer — see `video-direction-v2-plan.md`
+  (2026-06-23) for the decision to retire `video_live`'s standalone app
+  surface and fold scheduling/viewing into Community and Learn directly.
+  That document's §4.3-equivalent edit (Gathering record vs.
+  `BroadcastSchedule`) touches the same model this amendment's Edit 3
+  does, from the UI-ownership angle rather than the API-contract angle —
+  read both before changing either.
 
 ---
 
