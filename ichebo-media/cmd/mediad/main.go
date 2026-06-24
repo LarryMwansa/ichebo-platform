@@ -18,6 +18,26 @@ import (
 	"github.com/ichebo/media/pkg/webhook"
 )
 
+// withCORS wraps a handler with CORS headers scoped to a single allowed
+// origin, plus OPTIONS preflight handling. Only applied to the upload
+// routes (PUT/POST /engine/upload/...) — those are the only ones called
+// directly from a browser (Learn's lesson-authoring page, on
+// app.ichebo.org); every other /engine/ route is called server-to-server
+// (Django's webhook handlers, MediaMTX's hooks), which never needs CORS
+// because the browser is never the caller.
+func withCORS(allowedOrigin string, next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Chunk-Checksum")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		next(w, r)
+	}
+}
+
 func main() {
 	cfg := config.Load()
 	if err := cfg.Validate(); err != nil {
@@ -105,15 +125,17 @@ func main() {
 	mux.HandleFunc("/health", health.Handler)
 	mux.HandleFunc("/engine/status", transcode.EngineStatusHandler(queue, cfg.WorkerCount))
 
-	// Upload routes
-	mux.HandleFunc("/engine/upload/init", func(w http.ResponseWriter, r *http.Request) {
+	// Upload routes — wrapped in withCORS since these are called directly
+	// from the browser (see withCORS's doc comment for why the other
+	// /engine/ routes below are not).
+	mux.HandleFunc("/engine/upload/init", withCORS(cfg.CORSAllowedOrigin, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		uploadHandler.InitUpload(w, r)
-	})
-	mux.HandleFunc("/engine/upload/", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	mux.HandleFunc("/engine/upload/", withCORS(cfg.CORSAllowedOrigin, func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPut:
 			uploadHandler.ReceiveChunk(w, r)
@@ -122,7 +144,7 @@ func main() {
 		default:
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		}
-	})
+	}))
 
 	// Stream routes
 	mux.HandleFunc("/engine/stream/start", func(w http.ResponseWriter, r *http.Request) {

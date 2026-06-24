@@ -9,22 +9,28 @@ import (
 )
 
 type Config struct {
-	Port              string
-	UploadBucket      string
-	DeliveryBucket    string
-	S3Endpoint        string
-	S3Region          string
-	S3AccessKey       string
-	S3SecretKey       string
-	CDNBaseURL        string
-	FFmpegPath        string
-	WorkerCount       int
-	DjangoWebhookURL  string
-	DjangoAPIKey      string
-	TempDir           string
-	LocalMode         bool // true when S3Endpoint is empty
+	Port             string
+	UploadBucket     string
+	DeliveryBucket   string
+	S3Endpoint       string
+	S3Region         string
+	S3AccessKey      string
+	S3SecretKey      string
+	CDNBaseURL       string
+	FFmpegPath       string
+	WorkerCount      int
+	DjangoWebhookURL string
+	DjangoAPIKey     string
+	TempDir          string
+	LocalMode        bool // true when S3Endpoint is empty
 	// Live streaming
-	MediaMTXHLSBase   string // CDN root where MediaMTX writes live HLS segments
+	MediaMTXHLSBase string // CDN root where MediaMTX writes live HLS segments
+	// CORS — chunk uploads (PUT /engine/upload/{id}/chunk/{n}) are called
+	// directly from the browser on app.ichebo.org, cross-origin from this
+	// server (video.ichebo.org). Added 2026-06-24 when wiring Learn's
+	// lesson video upload into the web UI — confirmed by direct browser
+	// test that uploads were blocked with zero CORS headers present.
+	CORSAllowedOrigin string
 }
 
 func Load() *Config {
@@ -58,22 +64,28 @@ func Load() *Config {
 
 	s3Endpoint := os.Getenv("MEDIA_S3_ENDPOINT")
 
+	corsAllowedOrigin := os.Getenv("MEDIA_CORS_ALLOWED_ORIGIN")
+	if corsAllowedOrigin == "" {
+		corsAllowedOrigin = "https://app.ichebo.org"
+	}
+
 	return &Config{
-		Port:             port,
-		UploadBucket:     os.Getenv("MEDIA_UPLOAD_BUCKET"),
-		DeliveryBucket:   os.Getenv("MEDIA_DELIVERY_BUCKET"),
-		S3Endpoint:       s3Endpoint,
-		S3Region:         os.Getenv("MEDIA_S3_REGION"),
-		S3AccessKey:      os.Getenv("MEDIA_S3_ACCESS_KEY"),
-		S3SecretKey:      os.Getenv("MEDIA_S3_SECRET_KEY"),
-		CDNBaseURL:       os.Getenv("MEDIA_CDN_BASE_URL"),
-		FFmpegPath:       ffmpegPath,
-		WorkerCount:      workerCount,
-		DjangoWebhookURL: os.Getenv("MEDIA_DJANGO_WEBHOOK_URL"),
-		DjangoAPIKey:     os.Getenv("MEDIA_DJANGO_API_KEY"),
-		TempDir:          tempDir,
-		LocalMode:        s3Endpoint == "",
-		MediaMTXHLSBase:  os.Getenv("MEDIA_MEDIAMTX_HLS_BASE"),
+		Port:              port,
+		UploadBucket:      os.Getenv("MEDIA_UPLOAD_BUCKET"),
+		DeliveryBucket:    os.Getenv("MEDIA_DELIVERY_BUCKET"),
+		S3Endpoint:        s3Endpoint,
+		S3Region:          os.Getenv("MEDIA_S3_REGION"),
+		S3AccessKey:       os.Getenv("MEDIA_S3_ACCESS_KEY"),
+		S3SecretKey:       os.Getenv("MEDIA_S3_SECRET_KEY"),
+		CDNBaseURL:        os.Getenv("MEDIA_CDN_BASE_URL"),
+		FFmpegPath:        ffmpegPath,
+		WorkerCount:       workerCount,
+		DjangoWebhookURL:  os.Getenv("MEDIA_DJANGO_WEBHOOK_URL"),
+		DjangoAPIKey:      os.Getenv("MEDIA_DJANGO_API_KEY"),
+		TempDir:           tempDir,
+		LocalMode:         s3Endpoint == "",
+		MediaMTXHLSBase:   os.Getenv("MEDIA_MEDIAMTX_HLS_BASE"),
+		CORSAllowedOrigin: corsAllowedOrigin,
 	}
 }
 
