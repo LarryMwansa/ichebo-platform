@@ -377,3 +377,67 @@ source XML mapped correctly to the platform's book codes). Verified final
 state — 11 total translations, ~31,100 verses each, correct full names
 (`Amplified Bible`, `The Message`, `New International Version`, etc.) —
 and confirmed `/bible/versions/` renders all of them live.
+
+---
+
+## Post-Deploy Fix #5 (2026-06-24) — Video Direction v2: real video consumption + video_live retirement
+
+Followed `.docs/plans/video-direction-v2-plan.md` end to end, across both
+production servers (`scepter` = Django app, `ics` = video VPS).
+
+**What shipped:**
+
+- A real shared HLS player (`templates/video/_player.html`, hls.js with a
+  native-`<video>` fallback) wired into both Learn's lesson viewer and
+  Community's live service room — the web UI previously had no working
+  path to actually play video from the new infrastructure at all.
+- Community's Gathering form now creates a real `BroadcastSchedule` (RTMP
+  ingest URL handed to the steward) when format is digital/hybrid, instead
+  of a typed stream-URL field; fixed a pre-existing timezone bug in the
+  same form while wiring this up (tz-naive `scheduled_at` was stored as if
+  it were already UTC).
+- Learn's lesson-authoring video field is now a real chunked upload
+  (`learn/partials/_video_upload.html` + `static/js/learn_video_upload.js`)
+  straight to the Go engine, replacing the old pasted-URL input — required
+  adding CORS support to mediad (browser-direct chunk PUTs are
+  cross-origin from app.ichebo.org) and a new `MEDIA_ENGINE_PUBLIC_URL`
+  Django setting (the existing `MEDIA_ENGINE_URL` is the server-to-server
+  address, not the public one a browser can reach).
+- Deleted `video_live`'s entire standalone app surface (views, templates,
+  the mobile feed/CRUD API that had zero Flutter client code consuming
+  it) — kept only `BroadcastSchedule` and the Go-engine/MediaMTX webhooks
+  as real infrastructure. Removed the "Video" nav entry from the sidebar,
+  app launcher, and icon rail; fixed the dashboard's "Today's Schedule"
+  widget, which had been querying the legacy `Activity.metadata.stream_url`
+  pattern this whole effort retired (confirmed zero live production rows
+  before removing it) and linking to a URL that was never real
+  (`/studio/watch/{id}/`) — rewired to query `BroadcastSchedule` and link
+  to Community's live room.
+
+**Bugs found and fixed via direct testing, not assumed:**
+
+- `video.canPlayType('application/vnd.apple.mpegurl')` is not a reliable
+  HLS-support signal — real Chromium returns `"maybe"` for every MIME
+  type. Player now prefers `Hls.isSupported()` first.
+- A second instance of the Django `{# multi-line #}` comment-leak bug
+  (first found and fixed earlier on `editor.html`) — `_video_upload.html`'s
+  first draft rendered its explanatory comment as literal page text; fixed
+  and re-swept every template touched this session to confirm no other
+  instance existed.
+- The dashboard schedule widget's LIVE badge was keyed off `is_broadcast`
+  (true for any scheduled item) rather than an actual `is_live` check — a
+  merely-scheduled service showed LIVE before this was caught.
+- Two stale comments in `community/views.py` and `community/tests.py`
+  still described checking "both video_live data sources" after an
+  earlier fix in this same session had already removed the legacy
+  fallback from `_find_live_session` — found and corrected, plus one dead
+  test (`test_finds_legacy_activity_stream_when_no_native_broadcast`) that
+  exercised the removed code path.
+
+**Deployed:** rebuilt and redeployed mediad on the video VPS with the CORS
+fix (live, confirmed via a real OPTIONS preflight against
+`video.ichebo.org`); pulled, added `MEDIA_ENGINE_PUBLIC_URL` to `.env`,
+collected static, and restarted gunicorn on the app server. Verified live:
+`/video/*` template routes 404 correctly, the stream-start webhook still
+resolves to its original path and enforces its auth key, and the
+homepage/static asset all serve correctly post-restart.
