@@ -4,7 +4,10 @@ from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
 from .models import ServiceOrder, Tenant, TenantInvitation, UserPermission
-from .service import InvitationError, accept_invitation, remove_member, send_invitation
+from .service import (
+    InvitationError, accept_invitation, get_oversight_tenant_ids,
+    remove_member, send_invitation,
+)
 
 TIER_STEWARD_ROLE = {
     'handbook':           'branch-steward',
@@ -41,14 +44,20 @@ def _make_unique_slug(base_slug):
 
 
 def _is_steward_of(user, tenant):
-    steward_roles = {
-        'branch-steward', 'district-steward', 'provincial-steward',
-        'national-steward', 'regional-steward', 'continental-steward',
-        'global-steward', 'admin',
-    }
-    return UserPermission.objects.filter(
-        tenant=tenant, user=user, is_active=True, role__in=steward_roles
-    ).exists()
+    """True if the user is a direct steward of this exact tenant, OR holds
+    a steward role on an ancestor tenant (hierarchical oversight — e.g. a
+    global-steward on Prime is a steward of every descendant, not just
+    Prime itself). See get_oversight_tenant_ids's docstring for the
+    template-views-never-walked-the-hierarchy bug this closes."""
+    if UserPermission.objects.filter(
+        tenant=tenant, user=user, is_active=True, role__in=UserPermission.STEWARD_ROLES
+    ).exists():
+        return True
+
+    oversight_perms = UserPermission.objects.filter(
+        user=user, is_active=True, role__in=UserPermission.STEWARD_ROLES,
+    ).select_related('tenant')
+    return any(tenant.path.startswith(p.tenant.path) for p in oversight_perms)
 
 
 # ---------------------------------------------------------------------------
@@ -60,19 +69,14 @@ def steward_dashboard(request):
     user = request.user
     level = _user_level(user)
 
-    # Tenants this user stewards (non-agency)
-    steward_roles = {
-        'branch-steward', 'district-steward', 'provincial-steward',
-        'national-steward', 'regional-steward', 'continental-steward',
-        'global-steward', 'admin',
-    }
-    my_steward_perms = (
-        UserPermission.objects
-        .filter(user=user, is_active=True, role__in=steward_roles)
-        .select_related('tenant')
-        .order_by('tenant__name')
+    # Tenants this user stewards directly, plus every descendant of a
+    # tenant they hold hierarchical oversight of (e.g. global-steward on
+    # Prime sees every tenant under it) — see get_oversight_tenant_ids.
+    oversight_ids = get_oversight_tenant_ids(user)
+    my_tenants = list(
+        Tenant.objects.filter(id__in=oversight_ids, is_agency=False)
+        .order_by('name')
     )
-    my_tenants = [p.tenant for p in my_steward_perms if not p.tenant.is_agency]
 
     # Agency tenants (Prime Tenancy oversight — Level 5 only)
     agency_tenants = []
@@ -118,16 +122,52 @@ def steward_dashboard(request):
 # My Communities (member view — kept for non-stewards)
 # ---------------------------------------------------------------------------
 
+class _OversightRow:
+    """Lightweight stand-in for a UserPermission row, used in my_tenants
+    for a tenant the user can see through hierarchical oversight (e.g. a
+    global-steward on Prime) but has no direct UserPermission on. Exposes
+    the same .tenant / .get_role_display() shape the template already
+    expects, so my_tenants.html needs no changes — labeled with the role
+    that grants the oversight, not a role on the tenant itself."""
+
+    def __init__(self, tenant, oversight_role):
+        self.tenant = tenant
+        self._oversight_role = oversight_role
+
+    def get_role_display(self):
+        return f'{dict(UserPermission.ROLE_CHOICES).get(self._oversight_role, self._oversight_role)} (oversight)'
+
+
 @login_required
 def my_tenants(request):
     user = request.user
     level = _user_level(user)
-    perms = (
+    direct_perms = (
         UserPermission.objects
         .filter(user=user, is_active=True)
         .select_related('tenant')
         .order_by('tenant__name')
     )
+    direct_tenant_ids = {p.tenant_id for p in direct_perms}
+
+    # Oversight-only tenants: visible via hierarchy (e.g. global-steward on
+    # Prime) but with no direct UserPermission row — see
+    # get_oversight_tenant_ids's docstring for why this exists.
+    oversight_perm = (
+        UserPermission.objects
+        .filter(user=user, is_active=True, role__in=UserPermission.STEWARD_ROLES)
+        .order_by('-level')
+        .first()
+    )
+    oversight_rows = []
+    if oversight_perm:
+        oversight_ids = get_oversight_tenant_ids(user) - direct_tenant_ids
+        oversight_rows = [
+            _OversightRow(t, oversight_perm.role)
+            for t in Tenant.objects.filter(id__in=oversight_ids).order_by('name')
+        ]
+
+    perms = list(direct_perms) + oversight_rows
     can_create = level >= 3
     my_tenants = [p.tenant for p in perms]
     return render(request, 'tenants/my_tenants.html', {
@@ -169,12 +209,10 @@ def tenant_detail(request, tenant_id):
     )
     service_orders = ServiceOrder.objects.filter(is_active=True)
 
-    my_tenants = [p.tenant for p in UserPermission.objects.filter(
-        user=user, is_active=True,
-        role__in={'branch-steward', 'district-steward', 'provincial-steward',
-                  'national-steward', 'regional-steward', 'continental-steward',
-                  'global-steward', 'admin'},
-    ).select_related('tenant').order_by('tenant__name')]
+    my_tenants = list(
+        Tenant.objects.filter(id__in=get_oversight_tenant_ids(user), is_agency=False)
+        .order_by('name')
+    )
     return render(request, 'tenants/tenant_detail.html', {
         'tenant': tenant,
         'members': members,
@@ -415,14 +453,10 @@ def create_tenant(request):
             )
             return redirect('tenants:tenant-created', tenant_id=tenant.id)
 
-    my_tenants = [
-        p.tenant for p in UserPermission.objects.filter(
-            user=request.user, is_active=True,
-            role__in={'branch-steward', 'district-steward', 'provincial-steward',
-                      'national-steward', 'regional-steward', 'continental-steward',
-                      'global-steward', 'admin'},
-        ).select_related('tenant').order_by('tenant__name')
-    ]
+    my_tenants = list(
+        Tenant.objects.filter(id__in=get_oversight_tenant_ids(request.user), is_agency=False)
+        .order_by('name')
+    )
     return render(request, 'tenants/create_tenant.html', {
         'form_data': form_data,
         'errors': errors,

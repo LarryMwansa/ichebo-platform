@@ -28,6 +28,7 @@ from activity.models import Activity
 from activity.serializers import ActivitySerializer
 from notifications.models import Notification
 from notifications.serializers import NotificationSerializer
+from tenants.models import UserPermission as _UserPermission
 
 from core.models import SyncChangelog, OP_CREATE, OP_UPDATE, OP_DELETE
 
@@ -36,12 +37,11 @@ PULL_PAGE_SIZE = 500
 
 
 # ── Steward role set (used by both views) ─────────────────────────────────────
-
-_STEWARD_ROLES = {
-    'branch-steward', 'district-steward', 'provincial-steward',
-    'national-steward', 'regional-steward', 'continental-steward',
-    'global-steward', 'admin',
-}
+# Shared with tenants.UserPermission.STEWARD_ROLES rather than a separate
+# literal copy — this file's own copy used to drift independently (one of
+# four near-identical copies found 2026-06-24 across the codebase; see
+# tenants/service.py's get_oversight_tenant_ids docstring).
+_STEWARD_ROLES = _UserPermission.STEWARD_ROLES
 
 
 # ── Licence validation ────────────────────────────────────────────────────────

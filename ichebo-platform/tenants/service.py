@@ -1,9 +1,50 @@
+from django.db.models import Q
 from django.utils import timezone
 from .models import Tenant, TenantInvitation, UserPermission
 
 
 class InvitationError(Exception):
     pass
+
+
+def get_oversight_tenant_ids(user):
+    """Every tenant id a user can see: tenants they have a direct
+    UserPermission on, plus every descendant of a tenant where they hold a
+    steward role (UserPermission.STEWARD_ROLES) — e.g. a global-steward on
+    Prime Tenancy (path '/global/') oversees every tenant whose path starts
+    with that prefix, not just Prime itself. Superusers see every tenant,
+    matching TenantViewSet's existing superuser behavior.
+
+    This logic previously existed only in tenants/views.py's TenantViewSet
+    (the DRF API) — every template-rendered page (steward_dashboard,
+    my_tenants, tenant_detail's is_steward check, community's
+    _get_user_permissions) checked direct UserPermission rows only, so a
+    global-steward's own descendant tenants were invisible to them outside
+    the API. Found 2026-06-24 when a freshly-seeded community
+    (seed_genesis_sceptre_community, which creates the Tenant row but never
+    grants anyone a UserPermission on it) was invisible to a global-steward
+    who should have had oversight of it automatically.
+    """
+    if user.is_superuser:
+        return set(Tenant.objects.values_list('id', flat=True))
+
+    direct_tenant_ids = set(
+        UserPermission.objects.filter(user=user, is_active=True)
+        .values_list('tenant_id', flat=True)
+    )
+
+    oversight_perms = (
+        UserPermission.objects
+        .filter(user=user, is_active=True, role__in=UserPermission.STEWARD_ROLES)
+        .select_related('tenant')
+    )
+    if not oversight_perms:
+        return direct_tenant_ids
+
+    q = Q(id__in=direct_tenant_ids)
+    for perm in oversight_perms:
+        q |= Q(path__startswith=perm.tenant.path)
+    return set(Tenant.objects.filter(q).values_list('id', flat=True))
 
 
 def send_invitation(tenant, email, invited_by):

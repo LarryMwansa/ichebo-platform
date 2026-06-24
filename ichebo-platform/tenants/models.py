@@ -112,6 +112,22 @@ class UserPermission(SoftDeleteMixin, models.Model):
         ('admin', 'Admin'),
     ]
 
+    # Roles that imply hierarchical oversight of descendant tenants, not
+    # just the one tenant the role is granted on — e.g. a global-steward on
+    # Prime Tenancy oversees every tenant under it, not only Prime itself.
+    # Derived from ROLE_CHOICES (minus the three non-steward member roles)
+    # so the two can't drift apart; was previously copy-pasted as a literal
+    # set in four separate places (tenants/views.py's DRF API and three
+    # spots in template_views.py) with no shared source of truth — see
+    # get_oversight_tenant_ids in tenants/service.py, added 2026-06-24 after
+    # a global-steward's own community went invisible to them: the API view
+    # already walked this hierarchy correctly, the template-rendered pages
+    # never did.
+    STEWARD_ROLES = frozenset(
+        role for role, _ in ROLE_CHOICES
+        if role not in ('seeker', 'beginner', 'disciple')
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='permissions')
     user = models.ForeignKey(
