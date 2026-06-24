@@ -263,6 +263,13 @@ MEDIA_ENGINE_URL = config('MEDIA_ENGINE_URL', default='http://localhost:8090')
 # No insecure default — must be set explicitly in every environment (including
 # local dev) and must match MEDIA_DJANGO_API_KEY in the Go engine's environment.
 MEDIA_ENGINE_API_KEY = config('MEDIA_ENGINE_API_KEY')
+# Public, browser-reachable URL for the same engine — distinct from
+# MEDIA_ENGINE_URL above, which is the server-to-server address Django uses
+# (often an internal/localhost address, not reachable from a user's
+# browser). Chunk uploads (PUT /engine/upload/{id}/chunk/{n}) are called
+# directly from Learn's lesson-authoring page in the browser, not proxied
+# through Django — see mediad's withCORS for the matching server-side fix.
+MEDIA_ENGINE_PUBLIC_URL = config('MEDIA_ENGINE_PUBLIC_URL', default='https://video.ichebo.org')
 
 # MediaMTX — native RTMP ingest / HLS delivery for BroadcastSchedule live streams.
 # Placeholder defaults only apply if unset — set both explicitly before using

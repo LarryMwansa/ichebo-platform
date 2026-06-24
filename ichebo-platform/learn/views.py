@@ -1,6 +1,7 @@
 # learn/views.py — Django template views + HTMX partial views
 import json
 
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -648,6 +649,7 @@ def author_lesson_form(request, record_id=None):
     return render(request, 'learn/author_lesson_form.html', {
         'courses': courses,
         'record': record,
+        'media_engine_public_url': settings.MEDIA_ENGINE_PUBLIC_URL,
     })
 
 

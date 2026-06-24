@@ -93,7 +93,7 @@
 
     {# ── Video player ── #}
     {% if video_url %}
-    {% include "video/_player.html" with title=lesson.title embed_url=embed_url video_type=video_type %}
+    {% include "video/_player.html" with title=lesson.title video_url=video_url embed_url=embed_url video_type=video_type %}
     {% endif %}
 
     {# ── Lesson content ── #}
@@ -248,7 +248,7 @@
   <div style="padding: var(--space-s) var(--space-s) var(--space-2xl);">
 
     {% if video_url %}
-    {% include "video/_player.html" with title=lesson.title embed_url=embed_url video_type=video_type %}
+    {% include "video/_player.html" with title=lesson.title video_url=video_url embed_url=embed_url video_type=video_type %}
     {% endif %}
 
     {% if lesson.content %}
