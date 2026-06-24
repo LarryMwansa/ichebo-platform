@@ -113,13 +113,6 @@
         Bible
       </a>
 
-      <a href="{% url 'video_live:home' %}"
-         class="ws-sidebar__nav-item {% if active_app == 'video' %}active{% endif %}"
-         aria-current="{% if active_app == 'video' %}page{% endif %}">
-        <span class="material-symbols-outlined" aria-hidden="true">live_tv</span>
-        Video &amp; Live
-      </a>
-
       {# Paraclete — Level 5 only #}
       {% if user.competence_level >= 5 %}
       <a href="{% url 'dashboard:index' %}#divine-intel"

@@ -79,9 +79,18 @@ def htmx_learn_tab(request):
 
 @login_required
 def htmx_today_schedule(request):
-    """Today's broadcasts + community events."""
+    """Today's broadcasts + community events.
+
+    Broadcasts come from BroadcastSchedule (video_live.models) — Community's
+    digital-Gathering flow creates these directly now. The old branch here
+    queried Activity.metadata.stream_url, the legacy embed-link pattern that
+    video-direction-v2-plan.md retired 2026-06-24 (confirmed zero live rows
+    in production before removing it); fixed in the same pass since it was
+    dead code pointing at a data shape nothing writes anymore.
+    """
     from activity.models import Activity
     from django.utils import timezone
+    from video_live.models import BroadcastSchedule
 
     today = timezone.localtime(timezone.now()).date()
     user  = request.user
@@ -97,10 +106,17 @@ def htmx_today_schedule(request):
             activity_type='event',
             scheduled_at__date=today,
             status__in=['pending', 'in_progress'],
+            tenant_id__in=tenant_ids,
         )
+        .order_by('scheduled_at')[:10]
+    )
+
+    broadcasts = (
+        BroadcastSchedule.objects
         .filter(
-            Q(tenant_id__in=tenant_ids) |
-            Q(metadata__stream_url__isnull=False)
+            tenant_id__in=tenant_ids,
+            scheduled_at__date=today,
+            status__in=['scheduled', 'live'],
         )
         .order_by('scheduled_at')[:10]
     )
@@ -109,16 +125,28 @@ def htmx_today_schedule(request):
     for ev in events:
         meta = ev.metadata or {}
         items.append({
-            'title':      ev.title,
-            'time':       ev.scheduled_at.strftime('%H:%M') if ev.scheduled_at else '',
-            'duration':   meta.get('duration_minutes', ''),
-            'is_broadcast': bool(meta.get('stream_url')),
-            'source':     meta.get('source_app', 'activity'),
-            'id':         str(ev.id),
+            'title':        ev.title,
+            'time':         ev.scheduled_at.strftime('%H:%M') if ev.scheduled_at else '',
+            'duration':     meta.get('duration_minutes', ''),
+            'is_broadcast': False,
+            'is_live':      False,
+            'source':       meta.get('source_app', 'activity'),
+            'id':           str(ev.id),
         })
+    for b in broadcasts:
+        items.append({
+            'title':        b.title,
+            'time':         b.scheduled_at.strftime('%H:%M'),
+            'duration':     b.duration_minutes,
+            'is_broadcast': True,
+            'source':       'community',
+            'id':           str(b.id),
+            'is_live':      b.status == 'live',
+        })
+    items.sort(key=lambda i: i['time'])
 
     return render(request, 'dashboard/partials/_today_schedule.html', {
-        'items': items,
+        'items': items[:10],
         'today': today,
     })
 

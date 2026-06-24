@@ -3,7 +3,7 @@
 {% if items %}
 <div style="display: flex; flex-direction: column; gap: 8px;">
     {% for item in items %}
-    <a href="{% if item.is_broadcast %}/studio/watch/{{ item.id }}/{% else %}/activity/{{ item.id }}/{% endif %}"
+    <a href="{% if item.is_broadcast %}{% url 'community:community-live' %}{% else %}/activity/{{ item.id }}/{% endif %}"
        style="display: flex; align-items: center; gap: 12px; padding: 10px 12px;
               background: var(--card-2); border: 1px solid var(--border);
               border-radius: 10px; text-decoration: none; transition: border-color 0.2s;">
@@ -22,7 +22,7 @@
             </div>
             <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
                 {{ item.time }}{% if item.duration %} · {{ item.duration }}m{% endif %}
-                {% if item.is_broadcast %}
+                {% if item.is_live %}
                 <span style="margin-left: 6px; padding: 1px 6px; border-radius: 4px;
                              background: var(--accent-red); color: #fff; font-size: 9px;
                              font-weight: 800; letter-spacing: 0.04em;">LIVE</span>
@@ -37,7 +37,7 @@
 <div style="padding: 24px 16px; text-align: center; border: 1px dashed var(--border); border-radius: 12px;">
     <span class="material-symbols-outlined" style="font-size: 28px; opacity: 0.15; display: block; margin-bottom: 8px;">today</span>
     <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">No broadcasts or events today.</p>
-    <a href="{% url 'video_live:schedule' %}" style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none;">
+    <a href="{% url 'community:community-gatherings' %}" style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none;">
         View Schedule →
     </a>
 </div>

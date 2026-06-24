@@ -1137,9 +1137,10 @@ def htmx_review_request(request, request_id):
 # ── Live service room — tenant-scoped, with in-service ministry panel ───────
 # See .docs/plans/community-live-service-room-plan.md
 #
-# Checks both video_live data sources, per DOC G §7.2's documented coexistence
-# policy: the legacy Activity URL-embed system and the native BroadcastSchedule
-# (Go Media Engine) model. Neither is being unified — both are queried here.
+# Backed by BroadcastSchedule (the native Go Media Engine model) only — the
+# legacy Activity URL-embed system this used to also check was retired
+# 2026-06-24 (video-direction-v2-plan.md). See _find_live_session's
+# docstring below for why.
 
 LIVE_REQUEST_POLL_SECONDS = 15
 

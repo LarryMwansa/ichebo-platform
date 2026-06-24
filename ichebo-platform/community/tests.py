@@ -222,9 +222,11 @@ class SupportRequestFlowTests(TestCase):
 # ---------------------------------------------------------------------------
 
 class FindLiveSessionTests(TestCase):
-    """_find_live_session checks both video_live data sources (native
-    BroadcastSchedule and the legacy Activity URL-embed system) per DOC G
-    §7.2's documented coexistence policy."""
+    """_find_live_session is backed by BroadcastSchedule only — the legacy
+    Activity URL-embed fallback it used to also check was retired
+    2026-06-24 (video-direction-v2-plan.md): production had zero rows using
+    that pattern, and video_live's app surface (the only place that could
+    create new ones) was deleted in the same pass."""
 
     def setUp(self):
         self.steward = _make_user('live-find-steward@example.com', level=3)
@@ -260,22 +262,6 @@ class FindLiveSessionTests(TestCase):
             scheduled_at=timezone.now(), status='live',
         )
         self.assertIsNone(_find_live_session(self.tenant_b))
-
-    def test_finds_legacy_activity_stream_when_no_native_broadcast(self):
-        from datetime import timedelta
-        from django.utils import timezone
-        from activity.models import Activity
-
-        Activity.objects.create(
-            activity_type='event', title='Legacy Stream', tenant=self.tenant_a,
-            scheduled_at=timezone.now() - timedelta(minutes=5), status='in_progress',
-            created_by=self.steward,
-            metadata={'stream_url': 'https://youtube.com/watch?v=abc', 'duration_minutes': 60},
-        )
-        session = _find_live_session(self.tenant_a)
-        self.assertIsNotNone(session)
-        self.assertEqual(session['source'], 'activity')
-        self.assertTrue(session['is_live'])
 
 
 class LiveServiceRoomFlowTests(TestCase):
