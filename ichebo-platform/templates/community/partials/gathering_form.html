@@ -79,19 +79,16 @@
                    onblur="this.style.borderColor='var(--border)'">
         </div>
 
-        {# Stream Link #}
-        <div id="stream-field" style="display: none;">
-            <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
-                           letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
-                Stream Link
-            </label>
-            <input type="url" name="stream_url" placeholder="https://youtube.com/live/…"
-                   style="display: block; width: 100%; height: 40px; padding: 0 12px;
-                          background: var(--card-2); border: 1px solid var(--border);
-                          border-radius: 8px; font-size: 13px; color: var(--text);
-                          outline: none; box-sizing: border-box; transition: border-color 0.15s;"
-                   onfocus="this.style.borderColor='var(--primary)'"
-                   onblur="this.style.borderColor='var(--border)'">
+        {# Stream — a real RTMP stream key is generated on save, not typed in #}
+        <div id="stream-field" class="card-accent" style="display: none;">
+            <p style="font-size: 12px; color: var(--text); margin: 0 0 4px; font-weight: 700;">
+                Live stream key generated on save
+            </p>
+            <p style="font-size: 12px; color: var(--muted); margin: 0; line-height: 1.5;">
+                After publishing, you'll get an RTMP URL to paste into your streaming
+                software (OBS, Streamlabs, or a mobile RTMP app). Viewers watch from
+                this Gathering's own page — no separate link to share.
+            </p>
         </div>
 
         {# Additional Notes #}
@@ -118,6 +115,7 @@
                     hx-target="#gathering-form-slot"
                     hx-swap="innerHTML"
                     hx-include="#gathering-form"
+                    hx-vals='js:{"tz_offset_minutes": new Date().getTimezoneOffset()}'
                     style="background: var(--primary); color: #fff; border: none; cursor: pointer;">
                 <span class="material-symbols-outlined">event_available</span>
                 Publish Gathering

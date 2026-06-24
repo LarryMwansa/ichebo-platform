@@ -2,7 +2,7 @@ import uuid
 from django.conf import settings
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,8 +14,20 @@ from .serializers import VideoRecordSerializer
 
 
 class UploadInitView(APIView):
-    """POST /api/media/upload/init/ — initialise a chunked upload session."""
-    authentication_classes = [TokenAuthentication]
+    """POST /api/media/upload/init/ — initialise a chunked upload session.
+
+    SessionAuthentication added 2026-06-24 (video-direction-v2-plan.md) so
+    the Learn lesson-authoring page's browser session can call this
+    directly — the original TokenAuthentication-only setup required a DRF
+    auth token, a Flutter-app credential a normal Django session doesn't
+    carry, and rendering one into page HTML for this purpose would have
+    been a real credential-exposure surface. Session auth already carries
+    CSRF protection via Django's standard session-cookie + CSRF-token
+    pair; DRF's SessionAuthentication enforces that automatically. Token
+    auth stays for the Flutter app's existing calls — both are checked,
+    either is accepted.
+    """
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -69,8 +81,12 @@ class UploadInitView(APIView):
 
 
 class UploadCompleteView(APIView):
-    """POST /api/media/upload/complete/ — assemble chunks and start transcoding."""
-    authentication_classes = [TokenAuthentication]
+    """POST /api/media/upload/complete/ — assemble chunks and start transcoding.
+
+    SessionAuthentication added alongside TokenAuthentication — see
+    UploadInitView's docstring for why.
+    """
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -136,8 +152,12 @@ class UploadCompleteView(APIView):
 
 
 class VideoListView(APIView):
-    """GET /api/media/videos/ — list all media Records for the current user's tenant."""
-    authentication_classes = [TokenAuthentication]
+    """GET /api/media/videos/ — list all media Records for the current user's tenant.
+
+    SessionAuthentication added alongside TokenAuthentication — see
+    UploadInitView's docstring for why.
+    """
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -150,8 +170,14 @@ class VideoListView(APIView):
 
 
 class VideoDetailView(APIView):
-    """GET /api/media/videos/{id}/ — single video Record with all fields."""
-    authentication_classes = [TokenAuthentication]
+    """GET /api/media/videos/{id}/ — single video Record with all fields.
+
+    SessionAuthentication added alongside TokenAuthentication — see
+    UploadInitView's docstring for why. Learn's lesson-authoring page polls
+    this endpoint to detect when a just-uploaded video's transcoding job
+    completes.
+    """
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, record_id):

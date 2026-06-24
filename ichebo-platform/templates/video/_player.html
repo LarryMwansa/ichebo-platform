@@ -1,16 +1,39 @@
+{% comment %}
+video/_player.html — shared video player, used by Learn (lesson video) and
+Community (live service / Gathering playback). Branches on video_type:
+'hls' (live broadcast or transcoded VOD manifest, needs hls.js in every
+browser except Safari — a bare <video src="...m3u8"> silently shows
+nothing in Chrome/Firefox/Edge), 'direct' (mp4/webm, native <video>),
+'youtube'/'vimeo' (legacy iframe embed), or unknown (open-in-new-tab
+fallback).
+
+Required context: video_url, embed_url, video_type. title is optional.
+
+This partial may be included more than once on the same page (desktop +
+mobile shell blocks both render it — see workspace_shell.html's
+{% block ws_content %} / {% block content %} pattern). No element below
+uses a hardcoded id for this reason — id collisions across two inclusions
+caused a real, separate data-loss bug elsewhere in this codebase (the
+Handbook editor partial, see web-ui-mobile-strategy.md) when JS bound to
+the first match regardless of which copy was visible. Every script here
+scopes its DOM lookup to its own immediately-preceding markup via
+document.currentScript, so each inclusion only ever touches its own
+elements. hls.js itself is loaded once globally (window.__hlsJsLoading
+guard) even if this partial renders twice.
+{% endcomment %}
 {% if video_url %}
 <div class="video-player-wrap" style="margin: var(--space-l) 0; border-radius: 12px; overflow: hidden;
                                        background: #000; aspect-ratio: 16/9; position: relative;">
     {% if video_type == 'youtube' or video_type == 'vimeo' %}
-    <iframe id="video-iframe-{{ lesson.id|default:'player' }}"
+    <iframe class="video-player__iframe"
             src="{{ embed_url }}"
             style="position: absolute; inset: 0; width: 100%; height: 100%; border: none;"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
             loading="lazy"
-            title="{{ title|default:'Lesson video' }}">
+            title="{{ title|default:'Video' }}">
     </iframe>
-    <div id="video-fallback-{{ lesson.id|default:'player' }}"
+    <div class="video-player__fallback"
          style="display: none; position: absolute; inset: 0; align-items: center;
                 justify-content: center; flex-direction: column; gap: 16px; background: #111;">
         <span class="material-symbols-outlined" style="font-size: 56px; color: #fff; opacity: 0.4;">play_circle</span>
@@ -25,8 +48,9 @@
     </div>
     <script>
     (function() {
-        var iframe = document.getElementById('video-iframe-{{ lesson.id|default:"player" }}');
-        var fallback = document.getElementById('video-fallback-{{ lesson.id|default:"player" }}');
+        var wrap = document.currentScript.closest('.video-player-wrap');
+        var iframe = wrap.querySelector('.video-player__iframe');
+        var fallback = wrap.querySelector('.video-player__fallback');
         if (!iframe || !fallback) return;
         iframe.addEventListener('error', function() {
             iframe.style.display = 'none';
@@ -41,6 +65,54 @@
                     fallback.style.display = 'flex';
                 }
             } catch(err) {}
+        });
+    })();
+    </script>
+    {% elif video_type == 'hls' %}
+    <video class="video-player__video" data-hls-src="{{ embed_url }}"
+           controls playsinline
+           style="position: absolute; inset: 0; width: 100%; height: 100%;">
+        Your browser does not support the video tag.
+    </video>
+    <script>
+    (function() {
+        var wrap = document.currentScript.closest('.video-player-wrap');
+        var video = wrap.querySelector('.video-player__video');
+        if (!video) return;
+        var src = video.dataset.hlsSrc;
+
+        function attach() {
+            // Prefer hls.js whenever the browser supports the MediaSource
+            // APIs it needs — checking video.canPlayType('...mpegurl') first
+            // is the common-looking shortcut, but it's an unreliable signal:
+            // confirmed by direct test that a real (headless) Chromium build
+            // reports "maybe" for HLS, mp4, and everything else alike, which
+            // is truthy and would wrongly skip hls.js. Hls.isSupported() is
+            // the actual capability check. Only fall back to native <video>
+            // playback (Safari, or any browser hls.js explicitly can't run
+            // on) when that's false.
+            if (window.Hls && window.Hls.isSupported()) {
+                var hls = new window.Hls();
+                hls.loadSource(src);
+                hls.attachMedia(video);
+                return;
+            }
+            video.src = src;
+        }
+
+        if (window.Hls) {
+            attach();
+            return;
+        }
+        if (window.__hlsJsLoading) {
+            window.__hlsJsLoading.then(attach);
+            return;
+        }
+        window.__hlsJsLoading = new Promise(function(resolve) {
+            var script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js';
+            script.onload = function() { resolve(); attach(); };
+            document.head.appendChild(script);
         });
     })();
     </script>

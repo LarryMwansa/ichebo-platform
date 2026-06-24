@@ -41,6 +41,41 @@ def _get_user_permissions(user):
     )
 
 
+def _parse_local_datetime(raw_str, tz_offset_minutes_str):
+    """Parse a <input type="datetime-local"> value into an aware UTC datetime.
+
+    datetime-local carries no timezone information — it's the browser's
+    local wall-clock time with no offset attached. TIME_ZONE='UTC' means
+    make_aware() on its own would silently treat that local time AS UTC,
+    shifting the actual scheduled time by the user's UTC offset (e.g. a
+    steward in UTC+2 typing "12:14" meaning their own noon would have it
+    stored as 12:14 UTC — 2 hours later than intended). Found as a real,
+    pre-existing bug in htmx_create_gathering while wiring up digital
+    Gatherings (2026-06-24) — the form sent no offset at all, so every
+    Gathering's scheduled_at (in-person and hybrid included, not just
+    digital) had this exact shift. Ported from video_live/views.py
+    (retired alongside this fix) rather than imported, since that module
+    no longer exists.
+
+    tz_offset_minutes is JS's Date.getTimezoneOffset() — minutes to ADD to
+    local time to reach UTC (positive west of UTC, negative east — e.g.
+    UTC+2 reports -120). Returns None if raw_str doesn't parse.
+    """
+    from django.utils.dateparse import parse_datetime
+
+    naive = parse_datetime(raw_str)
+    if not naive:
+        return None
+
+    try:
+        offset_minutes = int(tz_offset_minutes_str)
+    except (TypeError, ValueError):
+        offset_minutes = 0
+
+    utc_naive = naive + timezone.timedelta(minutes=offset_minutes)
+    return timezone.make_aware(utc_naive, timezone.utc)
+
+
 def _get_scope_permissions(scope_tenant, filters=None):
     """All active UserPermissions within a steward's scope tenant."""
     # UserPermission imported at module level
@@ -609,18 +644,21 @@ def htmx_create_gathering(request):
 
     if request.method == 'POST':
         from django.db import transaction
+        from video_live.models import BroadcastSchedule
 
         perms = _get_user_permissions(request.user)
         primary_perm = perms[0] if perms else None
         tenant = primary_perm.tenant if primary_perm else None
 
-        title        = request.POST.get('title', '').strip()
-        description  = request.POST.get('description', '').strip() or None
-        fmt          = request.POST.get('format', 'in_person')
-        location     = request.POST.get('location', '').strip() or None
-        stream_url   = request.POST.get('stream_url', '').strip() or None
-        capacity     = request.POST.get('capacity', '').strip() or None
-        scheduled_at = request.POST.get('scheduled_at', '').strip() or None
+        title             = request.POST.get('title', '').strip()
+        description       = request.POST.get('description', '').strip() or None
+        fmt               = request.POST.get('format', 'in_person')
+        location          = request.POST.get('location', '').strip() or None
+        capacity          = request.POST.get('capacity', '').strip() or None
+        scheduled_at_raw  = request.POST.get('scheduled_at', '').strip()
+        tz_offset_minutes = request.POST.get('tz_offset_minutes', '0').strip()
+
+        scheduled_at = _parse_local_datetime(scheduled_at_raw, tz_offset_minutes) if scheduled_at_raw else None
 
         try:
             with transaction.atomic():
@@ -640,9 +678,8 @@ def htmx_create_gathering(request):
                     custom_fields={
                         'format':       fmt,
                         'location':     location,
-                        'stream_url':   stream_url,
                         'capacity':     int(capacity) if capacity else None,
-                        'scheduled_at': scheduled_at,
+                        'scheduled_at': scheduled_at.isoformat() if scheduled_at else None,
                     },
                 )
 
@@ -651,7 +688,7 @@ def htmx_create_gathering(request):
                     activity_type='event',
                     title=title,
                     description=description,
-                    scheduled_at=scheduled_at or None,
+                    scheduled_at=scheduled_at,
                     status='pending',
                     kgs_pathway='community_life',
                     tenant=tenant,
@@ -667,11 +704,40 @@ def htmx_create_gathering(request):
                     metadata={'linked_activity_id': str(event_activity.id)},
                 )
 
+                # Digital/hybrid: create a real BroadcastSchedule (stream
+                # key + RTMP/HLS lifecycle), not a typed-in URL. Replaces
+                # the old custom_fields.stream_url field entirely — see
+                # video-direction-v2-plan.md. tenant is required and
+                # protected on BroadcastSchedule; skip native streaming
+                # silently (Gathering still saves) if it's missing rather
+                # than failing the whole save over a secondary feature.
+                broadcast = None
+                if fmt in ('digital', 'hybrid') and tenant is not None:
+                    broadcast = BroadcastSchedule.objects.create(
+                        tenant=tenant,
+                        created_by=request.user,
+                        title=title,
+                        description=description or '',
+                        scheduled_at=scheduled_at or timezone.now(),
+                        gathering_record=gathering_record,
+                    )
+
         except Exception as exc:
             return HttpResponse(
                 f'<p style="color:var(--error)">Failed to schedule gathering: {exc}</p>'
             )
 
+        if broadcast:
+            return HttpResponse(
+                f'<div class="announcement-card" style="border-color:var(--success)">'
+                f'<div class="announcement-title">✓ Gathering scheduled: {title}</div>'
+                f'<div class="card-accent" style="margin-top:12px;">'
+                f'<p style="font-size:12px;font-weight:700;color:var(--text);margin:0 0 4px;">'
+                f'RTMP URL — paste into your streaming software</p>'
+                f'<code style="font-size:12px;word-break:break-all;">{broadcast.rtmp_ingest_url}</code>'
+                f'</div>'
+                f'</div>'
+            )
         return HttpResponse(
             f'<div class="announcement-card" style="border-color:var(--success)">'
             f'<div class="announcement-title">✓ Gathering scheduled: {title}</div>'
@@ -1079,10 +1145,15 @@ LIVE_REQUEST_POLL_SECONDS = 15
 
 
 def _find_live_session(tenant):
-    """Return a dict describing the tenant's current/next live session,
-    checking both video_live data sources, or None if neither has anything
-    scheduled. Player type follows DOC G §7.3's existing discriminator."""
-    from video_live.views import _event_qs, _annotate_event
+    """Return a dict describing the tenant's current/next live session, or
+    None if nothing is scheduled.
+
+    Checked only against BroadcastSchedule — the legacy Activity
+    URL-embed fallback this function used to also check was removed
+    2026-06-24 (video-direction-v2-plan.md): production has zero rows
+    using that pattern, and video_live's app surface (the only place that
+    could create new ones) is retired, so the branch was confirmed dead
+    code, not a real data path."""
     from video_live.models import BroadcastSchedule
 
     if tenant is None:
@@ -1090,8 +1161,9 @@ def _find_live_session(tenant):
 
     now = timezone.now()
 
-    # Native BroadcastSchedule (Go Media Engine / RTMP+HLS) — checked first
-    # since a 'live' status is an unambiguous, authoritative signal.
+    # 'live' status is an unambiguous, authoritative signal — set only by
+    # the real MediaMTX -> Django webhook handshake, not inferred from a
+    # scheduled-time window.
     broadcast = BroadcastSchedule.objects.filter(
         tenant=tenant, status='live',
     ).order_by('-scheduled_at').first()
@@ -1108,46 +1180,15 @@ def _find_live_session(tenant):
             'gathering_record_id': str(broadcast.gathering_record_id) if broadcast.gathering_record_id else None,
         }
 
-    # Legacy Activity URL-embed system
-    events = [_annotate_event(e) for e in _event_qs(tenant=tenant)]
-    live_events = [e for e in events if e['is_live']]
-    if live_events:
-        event = live_events[0]
-        return {
-            'source': 'activity',
-            'broadcast_id': str(event['id']),
-            'title': event['title'],
-            'description': event['description'],
-            'scheduled_at': event['scheduled_at'],
-            'is_live': True,
-            'player_type': event['embed_type'],
-            'embed_url': event['embed_url'],
-            'gathering_record_id': None,
-        }
-
-    # Nothing live — surface the next scheduled session from either source.
     next_broadcast = BroadcastSchedule.objects.filter(
         tenant=tenant, status='scheduled', scheduled_at__gte=now,
     ).order_by('scheduled_at').first()
-    next_event = next(
-        (e for e in events if not e['is_live'] and not e['is_past']), None,
-    )
-
-    candidates = []
-    if next_broadcast:
-        candidates.append((next_broadcast.scheduled_at, {
-            'source': 'broadcast', 'title': next_broadcast.title,
-            'scheduled_at': next_broadcast.scheduled_at, 'is_live': False,
-        }))
-    if next_event:
-        candidates.append((next_event['scheduled_at'], {
-            'source': 'activity', 'title': next_event['title'],
-            'scheduled_at': next_event['scheduled_at'], 'is_live': False,
-        }))
-    if not candidates:
+    if not next_broadcast:
         return None
-    candidates.sort(key=lambda c: c[0])
-    return candidates[0][1]
+    return {
+        'source': 'broadcast', 'title': next_broadcast.title,
+        'scheduled_at': next_broadcast.scheduled_at, 'is_live': False,
+    }
 
 
 def _gathering_for_session(session):
