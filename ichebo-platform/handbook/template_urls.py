@@ -16,6 +16,7 @@ urlpatterns = [
     path('htmx/<uuid:record_id>/lock/', views.handbook_lock, name='htmx-lock'),
     path('htmx/<uuid:record_id>/publish/', views.handbook_publish, name='htmx-publish'),
     path('htmx/<uuid:record_id>/new-version/', views.handbook_new_version, name='htmx-new-version'),
+    path('htmx/<uuid:record_id>/delete/', views.handbook_delete, name='htmx-delete'),
     path('htmx/<uuid:record_id>/set-status/', views.handbook_set_status, name='htmx-set-status'),
     path('htmx/<uuid:record_id>/links/', views.handbook_linked_records, name='htmx-links'),
     path('htmx/<uuid:record_id>/relationships/', views.handbook_relationship_list, name='htmx-relationship-list'),

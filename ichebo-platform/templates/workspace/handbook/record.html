@@ -289,6 +289,15 @@ document.addEventListener('DOMContentLoaded', () => {
             New Version
         </button>
         {% endif %}
+        {% if record.status != 'locked' %}
+        <button hx-post="{% url 'handbook:htmx-delete' record.id %}"
+                hx-confirm="Delete {{ record.title }}? This cannot be undone from here."
+                class="ws-topbar__cta"
+                style="background: none; border: 1px solid var(--error); color: var(--error); cursor: pointer;">
+            <span class="material-symbols-outlined">delete</span>
+            Delete
+        </button>
+        {% endif %}
         <span class="hb-status {{ record.status }}" style="margin-left: 4px;">{{ record.get_status_display }}</span>
         <span id="hb-lifecycle-status" style="font-size: 12px; color: var(--text-muted-ink);"></span>
     </div>
@@ -372,6 +381,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 style="background:none;border:1px solid var(--border);cursor:pointer;">
             <span class="material-symbols-outlined">fork_right</span>
             New Version
+        </button>
+        {% endif %}
+        {% if record.status != 'locked' %}
+        <button hx-post="{% url 'handbook:htmx-delete' record.id %}"
+                hx-confirm="Delete {{ record.title }}? This cannot be undone from here."
+                class="ws-topbar__cta"
+                style="background:none;border:1px solid var(--error);color:var(--error);cursor:pointer;">
+            <span class="material-symbols-outlined">delete</span>
+            Delete
         </button>
         {% endif %}
         <span id="hb-lifecycle-status-mobile" style="font-size:12px;color:var(--muted);"></span>

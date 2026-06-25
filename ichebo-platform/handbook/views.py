@@ -280,7 +280,25 @@ def handbook_new(request):
         deleted_at__isnull=True,
     ).order_by('-updated_at')[:5]
 
-    default_type = LIBRARY_TYPES[0] if active_branch == 'reference' else MANDATE_TYPES[0]
+    # Bug found 2026-06-24, real privacy impact: this used to be a two-way
+    # ternary (LIBRARY_TYPES[0] if reference else MANDATE_TYPES[0]) with no
+    # 'keys' case at all — creating a record from the Keys branch silently
+    # defaulted active_type to 'mandate' and active_family (below) to
+    # 'governance', so the record the editor actually saved
+    # (handbook_save reads record_type/record_family straight from these
+    # dial values) was a real governance/Handbook record, not a personal
+    # Key — visible to every Handbook author/editor instead of just the
+    # creator. See video-direction-v2-plan.md-adjacent fix notes; two real
+    # affected records found and corrected on production in the same pass.
+    if active_branch == 'keys':
+        default_type = KEY_TYPES[0]
+        default_family = 'reference'
+    elif active_branch == 'reference':
+        default_type = LIBRARY_TYPES[0]
+        default_family = 'governance'
+    else:
+        default_type = MANDATE_TYPES[0]
+        default_family = 'governance'
 
     return render(request, 'workspace/handbook/record.html', {
         'active_app':             'handbook',
@@ -301,7 +319,7 @@ def handbook_new(request):
         # Editor canvas context
         'save_url':               reverse('handbook:save'),
         'handbook_save_url':      reverse('handbook:save'),
-        'active_family':          'governance',
+        'active_family':          default_family,
         'active_type':            default_type,
         'is_desk':                True,
         'recent_records':         recent_records,
@@ -481,6 +499,63 @@ def handbook_new_version(request, record_id):
     from django.urls import reverse
     response = HttpResponse(status=204)
     response['HX-Redirect'] = reverse('handbook:record', kwargs={'record_id': new_record.pk})
+    return response
+
+
+# ── HTMX: Delete ──────────────────────────────────────────────────────────────
+# Added 2026-06-24 — Handbook had no delete action at all (Lock/Publish/New
+# Version existed, Delete never did). Reported as a real privacy concern
+# alongside the handbook_new miscategorization bug above: Keys are
+# personal records (created_by-scoped, see handbook_record's key_record
+# branch above), and with no delete action there was no way to remove a
+# Key that had been miscategorized or was otherwise wrong. Soft-delete via
+# deleted_at, mirroring the established pattern in
+# records/template_views.py:htmx_delete_record.
+#
+# Permission mirrors handbook_record's own branch exactly: a Key can only
+# be deleted by the user who created it (personal data — _can_write's
+# HandbookAccess role is for institutional Handbook content, not personal
+# Keys, and was never the right check here); a governance record follows
+# the same _can_write(access) rule as Lock/Publish/New Version above.
+@login_required
+def handbook_delete(request, record_id):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    key_record = Record.objects.filter(
+        pk=record_id, record_family='reference', record_type__in=KEY_TYPES,
+        created_by=request.user, deleted_at__isnull=True,
+    ).first()
+
+    if key_record:
+        record = key_record
+    else:
+        access = _get_access(request.user)
+        is_superuser = request.user.is_staff or request.user.is_superuser
+        if not (is_superuser or _can_write(access)):
+            return HttpResponseForbidden()
+        record = get_object_or_404(
+            Record, pk=record_id, record_family='governance', deleted_at__isnull=True
+        )
+        if record.status == 'locked':
+            return HttpResponse(
+                '<p class="gov-error">This record is locked and cannot be deleted.</p>',
+                status=403,
+            )
+
+    if key_record:
+        branch = 'keys'
+    elif record.record_type in LIBRARY_TYPES:
+        branch = 'reference'
+    else:
+        branch = 'mandate'
+
+    record.deleted_at = timezone.now()
+    record.save(update_fields=['deleted_at'])
+
+    from django.urls import reverse
+    response = HttpResponse(status=204)
+    response['HX-Redirect'] = f"{reverse('handbook:home')}?branch={branch}"
     return response
 
 
