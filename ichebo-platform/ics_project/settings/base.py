@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'waitlist',
     'broadcast',
+    'sceptre',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
