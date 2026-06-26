@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Document | DOC J — Sceptre Community Surface, Ichebo Channel, Access Model |
-| Version | 1.2 — 2026-06-26 (corrected against the live repo; v1.2 adds cross-references to the four built UI mockups in `sceptre_comm_web-ui_mockup/` and fixes three real prose/mockup mismatches found while reading them — see Correction Log items 12 and the notes in Parts 3.3, 3.4, 6, and 7) |
+| Version | 1.3 — 2026-06-26 (corrected against the live repo; v1.2 added cross-references to the four built UI mockups and fixed three prose/mockup mismatches — Correction Log item 12, Parts 3.3/3.4/6/7. v1.3 resolves Part 5.1's 0a/0b "open question" — it was never a gap: 0a/visitor and 0b/seeker are a real, already-implemented distinction via `UserPermission` on an `induction`-tier tenant, confirmed against `community/views.py:my_community`, not a missing `competence_level` value. Locked the participant gate accordingly and corrected `sceptre/auth.py` in §5.2.) |
 | Status | Approved — Canonical Reference |
 | ADR reference | ADR-023 (subdomain separation), ADR-024 (Ichebo Channel architecture) |
 | Data contract | data-contract-v11-canonical-2026-05-13.md — v12 amendments noted |
@@ -25,13 +25,13 @@ v1.0 was produced in a session without access to the live codebase. The followin
 | 2 | H.3 (Community Support) and H.4 (Live Service Room) listed as new phases to build | **Both already shipped.** H.3: `commit 16bfbab`, 2026-06-22 — `community/services.py:resolve_steward_for_tenant`, `Record(record_type='support_request')`, queue at `/community/support/`. H.4: `commit d6a7854`, 2026-06-22, superseded/corrected by `commit 67878ba` (2026-06-24/25) — tenant-scoped live room at `/community/live/`, `community/views.py:_find_live_session`, in-service ministry panel. The H.3 and H.4 phase plan documents in this folder describe this work as not-yet-built against files (`video_live/views.py:_event_qs`) that no longer exist — see those documents' own correction notes. |
 | 3 | Django app server: `/home/ics/ichebo-platform`, Gunicorn on `127.0.0.1:8000` | Real path: **`/home/scepter/ichebo-platform-repo/ichebo-platform`**. Real Gunicorn bind: **`127.0.0.1:8001`** (confirmed in `gunicorn.conf.py` on the server). User is `scepter`, not `ics`. |
 | 4 | `ROOT_URLCONF` implied as `ichebo_platform.urls`, settings module as `settings.py` | Real values: `ROOT_URLCONF = 'ics_project.urls'`; settings live in `ics_project/settings/base.py` + `production.py`, not a single `settings.py`. |
-| 5 | `competence_level` treated as a string with values like `'0a'`, `'0b'`, `'3'` | Real field: `accounts/models.py` — `competence_level = models.IntegerField(default=0)`. Plain integers `0`–`5`. **There is no `'0a'`/`'0b'` distinction in the model.** Every gating snippet in this document and the phase plans that does `competence_level not in ['0b','1','2',...]` compares an int to a list of strings — always `True`/`False` the wrong way in real Python, which would lock every participant out. All gating code in this document corrected to use integer comparisons. The 0a/0b distinction may exist as a UI/UX concept (e.g. "has the user completed induction yet") but must be implemented as a real boolean/derived check, not a level value — flagged as an open question in Part 5. |
+| 5 | `competence_level` treated as a string with values like `'0a'`, `'0b'`, `'3'` | Real field: `accounts/models.py` — `competence_level = models.IntegerField(default=0)`. Plain integers `0`–`5`. **There is no `'0a'`/`'0b'` distinction on this field.** Every gating snippet in this document and the phase plans that does `competence_level not in ['0b','1','2',...]` compares an int to a list of strings — always `True`/`False` the wrong way in real Python, which would lock every participant out. All gating code in this document corrected to use integer comparisons. **Resolved 2026-06-26 (see Part 5.1):** the 0a/0b distinction is real, but lives on a second axis — an active `UserPermission` on an `induction`-tier tenant — not on `competence_level`. No longer an open question. |
 | 6 | `Tenant` model fields implied as `tenant_path` (on Tenant itself) | Real field is **`Tenant.path`** (materialized path). `tenant_path` is a real field, but it lives on **`UserPermission`**, not `Tenant`. `Tenant.objects.create(...)` also requires `slug` (unique, required), `tier` (required, no default), and `created_by` (required, `PROTECT`) — none of which appeared in this document's or the phase plans' test helpers. Corrected in Part 5 and noted for the phase-plan test suites. |
 | 7 | `role__endswith='-steward'` proposed as the steward-role check | Works for every steward role (`branch-steward` … `global-steward`) but **silently excludes `'admin'`**, which does not end in `-steward` and is a real, in-use role (confirmed in `tenants/models.py:UserPermission.STEWARD_ROLES`, built 2026-06-24 for an unrelated tenancy-visibility fix). Corrected to check membership in the real `STEWARD_ROLES` set instead of a suffix match. |
 | 8 | `create_notification()` called with `source_app`, `source_record_id`, `message` kwargs (H.5 plan) | Real signature (`notifications/service.py`): `create_notification(user, notification_type, title, body='', data=None)`. No `source_app`/`source_record_id`/`message` parameters exist — corrected in the H.5 plan. |
 | 9 | DNS for `sceptre.ichebo.org` and the other new subdomains listed as "not yet configured" / a precondition to check | **Confirmed live** as of 2026-06-26 — `sceptre.ichebo.org`, `join`, `identity`, `learn`, `handbook`, `give` all resolve to the Django VPS (`37.27.82.169`); `media.ichebo.org` resolves to the video VPS (`46.62.211.72`). DNS is no longer a blocker for H.6's Nginx/SSL step. |
 | 10 | Nginx config shown as a separate file per subdomain (`/etc/nginx/sites-available/sceptre.ichebo.org`) | The real server keeps **one file**, `/etc/nginx/sites-available/ics`, with every subdomain as its own `server {}` block inside it (confirmed by reading the live file). The corrected H.6 plan adds a new block to that same file rather than creating a separate one, matching the existing convention. |
-| 11 | `ALLOWED_HOSTS` / `SESSION_COOKIE_DOMAIN` shown as already containing other entries | Production's actual `.env` currently has `ALLOWED_HOSTS=app.ichebo.org,ichebo.org,www.ichebo.org` — `sceptre.ichebo.org` is genuinely not yet present and must be added. `SESSION_COOKIE_DOMAIN`/`CSRF_COOKIE_DOMAIN` are **not set at all** currently (no cross-subdomain cookie sharing exists yet) — the decision in §11.3 (share a login across subdomains vs. require separate logins) is still open and needs Chizola's call before H.6 ships. |
+| 11 | `ALLOWED_HOSTS` / `SESSION_COOKIE_DOMAIN` shown as already containing other entries | Production's actual `.env` currently has `ALLOWED_HOSTS=app.ichebo.org,ichebo.org,www.ichebo.org` — `sceptre.ichebo.org` is genuinely not yet present and must be added. `SESSION_COOKIE_DOMAIN`/`CSRF_COOKIE_DOMAIN` are **not set at all** currently (no cross-subdomain cookie sharing exists yet) — the decision in §11.3 (share a login across subdomains vs. require separate logins) is **locked, 2026-06-26: shared login**, `SESSION_COOKIE_DOMAIN`/`CSRF_COOKIE_DOMAIN` = `.ichebo.org`. |
 | 12 | This document had no visual reference for H.4's already-shipped Live Service Room + Ministry Panel | `sceptre_comm_web-ui_mockup/04-sceptre-live-service.html` — built mockup covering all four states (member view with prayer/question form, post-submit confirmation, steward queue, no-live-service empty state). One real inconsistency found and fixed directly in the mockup file: it said the steward queue "refreshes every 20 seconds" in three places — the actual shipped polling interval is 15 seconds (`LIVE_REQUEST_POLL_SECONDS = 15`, `community/views.py`); corrected to 15s in the mockup. |
 
 ---
@@ -501,15 +501,23 @@ The scheduler uses the existing Apostolic Command Shell layout — no new shell 
 
 | Tier | Level | Primary surface | What they see |
 |---|---|---|---|
-| Participant | 0–2 (integer `competence_level`) | `sceptre.ichebo.org` consumer side + Flutter mobile | Channel, Community (read), Learn (Level 1+), Bible, Support |
+| Participant | 0b–2 (see below — "0b" is a real, already-implemented state, not a `competence_level` value) | `sceptre.ichebo.org` consumer side + Flutter mobile | Channel, Community (read), Learn (Level 1+), Bible, Support |
 | Community Steward | 3+ | `sceptre.ichebo.org` steward side (role-adaptive) | All participant access + member management, gathering scheduling, formation pipeline, certification queue, announcement authorship, support queue |
 | Architect | 5 (Prime) | `app.ichebo.org` (primary) + `sceptre.ichebo.org` (steward-equivalent) | All steward access + channel scheduler, constitutional data, Handbook authorship, licence issuance, network-wide oversight |
 
-**Open question (not resolved in v1.0, flagged here rather than assumed):** Doc J's original framing of "Participant Level 0b–2" implies a distinction between a brand-new seeker (0a) and someone partway through induction (0b) that does not exist as a `competence_level` value in the real model — both are simply `competence_level = 0`. If that distinction matters for gating (e.g. "has completed induction" should unlock something a brand-new seeker can't see), it needs to be modeled as a real, separate boolean or derived check (e.g. an `Induction`-tenant `UserPermission`, which already exists and is checked elsewhere in `community/views.py:my_community`) — not invented as a fake level value. Confirm with Chizola whether this distinction is actually needed for H.6's scope, or whether `competence_level >= 0` (i.e. "any authenticated user") is sufficient for the participant gate.
+**The 0a/0b distinction — resolved 2026-06-26, locked, not an open question.** v1.1 of this document mis-read this as a gap because `competence_level` is a single integer with no `'0a'`/`'0b'` value — true, but the distinction was never meant to live on `competence_level` at all. It is a second, already-implemented axis, confirmed directly in `community/views.py:my_community` (the existing `app.ichebo.org` Community home, which this surface's participant home replaces for Level 1+ users):
+
+- **0a — Visitor.** `competence_level == 0`, **no** `UserPermission` on an `induction`-tier tenant at all. Has never entered the induction flow. Per the documented user journey (subdomain map: "Seeker arrives → `join.ichebo.org`"), a visitor's front door is `join.ichebo.org`, not `sceptre.ichebo.org` — they should not reach the channel-first participant home. `my_community`'s real behaviour for this state: `community/seeker_gate.html`.
+- **0b — Seeker.** `competence_level == 0`, **has** an active `UserPermission` on an `induction`-tier tenant (placed in induction, not yet graduated to a real Sceptre Community). `my_community`'s real behaviour: `_render_induction_hub`. This is the lowest level that should reach `sceptre.ichebo.org`.
+- **1+ — Member.** Has landed in a real, non-induction tenant — a Sceptre Community proper. This is the normal participant case.
+
+**Locked gating rule for `sceptre.ichebo.org`'s participant gate:** `competence_level >= 1` **OR** an active `UserPermission` on an `induction`-tier tenant. A bare `competence_level == 0` with no induction placement (0a) is correctly excluded. See the corrected `sceptre/auth.py` in §5.2 below, which implements exactly this — it does not invent a fake level value, it checks the same two real conditions `my_community` already checks.
+
+**How often 0a is actually reachable, found while verifying this fix against real data:** `accounts/signals.py:auto_place_new_user_in_induction_tenant` (a `post_save` signal on `User`) auto-places every newly-created account into the induction tenant the instant the row is created — so in normal operation, there is no authenticated user who is genuinely 0a; by the time a `User` exists at all, they're already 0b. The 0a branch (`seeker_gate.html` in `my_community`, and the `PermissionDenied` path in the gate above) is real defensive code for a genuine edge case — the signal's own `if not induction_tenant: ... return` fallback (induction tenant missing or misconfigured) or a legacy account created before this signal existed — not a state most users pass through. Confirmed with Chizola (2026-06-26): keep the gate exactly as specified above: it is correct either way, and the edge case is real even though it's rare.
 
 ### 5.2 Gating Rules
 
-**sceptre.ichebo.org — view-level gating**, corrected to real field types and the real `STEWARD_ROLES` set (`tenants/models.py`, added 2026-06-24):
+**sceptre.ichebo.org — view-level gating**, corrected to real field types, the real `STEWARD_ROLES` set (`tenants/models.py`, added 2026-06-24), and the real 0a/0b distinction (resolved above, not modeled as a fake level value):
 
 ```python
 # sceptre/auth.py
@@ -519,25 +527,42 @@ from django.core.exceptions import PermissionDenied
 
 from tenants.models import UserPermission
 
-PARTICIPANT_LEVELS = (0, 1, 2, 3, 4, 5)   # real IntegerField values — no '0a'/'0b' split
 STEWARD_LEVELS = (3, 4, 5)
+
+
+def _is_seeker_or_above(user):
+    """0b+ — the real participant gate. Level 1+ always passes. A
+    competence_level == 0 user only passes if they have an active
+    UserPermission on an induction-tier tenant (placed in induction —
+    'seeker', 0b) rather than no placement at all ('visitor', 0a, whose
+    front door is join.ichebo.org, not this surface). Mirrors
+    community/views.py:my_community's existing Level-0 branch exactly —
+    not a new rule, the same one already enforced at app.ichebo.org."""
+    if user.competence_level >= 1:
+        return True
+    return UserPermission.objects.filter(
+        user=user, tenant__tier='induction', is_active=True,
+    ).exists()
+
 
 def require_sceptre_participant(view_func):
     @wraps(view_func)
     @login_required
     def wrapper(request, *args, **kwargs):
-        if request.user.competence_level not in PARTICIPANT_LEVELS:
+        if not _is_seeker_or_above(request.user):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return wrapper
+
 
 def require_sceptre_steward(view_func):
     @wraps(view_func)
     @login_required
     def wrapper(request, *args, **kwargs):
-        level_ok = request.user.competence_level in STEWARD_LEVELS
+        user = request.user
+        level_ok = user.competence_level in STEWARD_LEVELS
         role_ok = UserPermission.objects.filter(
-            user=request.user,
+            user=user,
             role__in=UserPermission.STEWARD_ROLES,   # includes 'admin' — role__endswith='-steward' silently excludes it
             is_active=True,
         ).exists()
@@ -548,6 +573,8 @@ def require_sceptre_steward(view_func):
 ```
 
 `login_required` (Django's own decorator) replaces the manual `if not request.user.is_authenticated: return redirect('/login/')` check — same effect, standard idiom, one fewer thing to get wrong (e.g. the real login URL is `/accounts/login/`, not `/login/` — confirmed via `accounts/urls.py` — so the hand-written redirect in v1.0 would have 404'd).
+
+**What a 0a visitor sees if they reach `sceptre.ichebo.org` anyway** (e.g. a stale bookmark, or arriving before completing `join.ichebo.org`'s flow): `PermissionDenied` — Django's default 403 page, or a custom one if `sceptre`'s own `urls.py` wires a handler. Not redirected to `join.ichebo.org` automatically in this pass; that redirect is a reasonable follow-up but is new scope beyond what was asked, not assumed here.
 
 **app.ichebo.org — what moves, what stays, what is new:**
 
@@ -747,14 +774,15 @@ ALLOWED_HOSTS = ['app.ichebo.org', 'sceptre.ichebo.org', '127.0.0.1']
 
 ### 11.3 Session Cookie
 
-`SESSION_COOKIE_DOMAIN` must be set to `.ichebo.org` (with leading dot) to allow a session cookie shared across both subdomains. This allows a steward to be logged in once and access both surfaces.
+**Locked, 2026-06-26 (Chizola): shared login across both subdomains.** `SESSION_COOKIE_DOMAIN` is set to `.ichebo.org` (with leading dot), allowing a session cookie shared across both subdomains — a steward logs in once, on either subdomain, and is authenticated on both.
 
 ```python
-SESSION_COOKIE_DOMAIN = '.ichebo.org'
-CSRF_COOKIE_DOMAIN = '.ichebo.org'
+if not DEBUG:
+    SESSION_COOKIE_DOMAIN = '.ichebo.org'
+    CSRF_COOKIE_DOMAIN = '.ichebo.org'
 ```
 
-If subdomain isolation is preferred for security, omit these settings — users will need to log in separately on each subdomain, which is acceptable for the pilot.
+Guarded by `not DEBUG` — Django's test client doesn't set domain cookies, which would otherwise break the H.6 test suite (Task 6).
 
 ### 11.4 Static Files
 
