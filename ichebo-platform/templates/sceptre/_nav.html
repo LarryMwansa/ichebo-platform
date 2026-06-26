@@ -1,0 +1,90 @@
+<!-- templates/sceptre/_nav.html -->
+{% load static %}
+<nav class="top-nav">
+  <div class="top-nav__brand">
+    <a href="{% url 'home' %}" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+      <div class="top-nav__mark">
+        <svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg>
+      </div>
+      <span class="top-nav__wordmark">Ichebo</span>
+    </a>
+  </div>
+
+  <div class="top-nav__links">
+    <a href="{% url 'home' %}"
+       class="nav-link {% if request.resolver_match.url_name == 'home' %}nav-link--active{% endif %}">
+      Channel
+    </a>
+    <a href="{% url 'community' %}"
+       class="nav-link {% if request.resolver_match.url_name == 'community' %}nav-link--active{% endif %}">
+      Community
+    </a>
+    <a href="{% url 'learn' %}"
+       class="nav-link {% if request.resolver_match.url_name == 'learn' %}nav-link--active{% endif %}">
+      Learn
+    </a>
+    <a href="{% url 'bible' %}" class="nav-link">Bible</a>
+    <a href="{% url 'support' %}" class="nav-link">Support</a>
+  </div>
+
+  <div class="top-nav__right">
+    {% if user.is_authenticated %}
+      {% if is_steward %}
+        <button type="button" class="steward-trigger" id="steward-trigger" aria-expanded="false" aria-controls="steward-sidebar">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Manage
+        </button>
+      {% endif %}
+      <a href="{% url 'profile' %}" class="avatar">
+        {{ user.get_full_name|default:user.username|slice:":1"|upper }}
+      </a>
+    {% endif %}
+  </div>
+</nav>
+
+{% if is_steward %}
+<!-- Steward sidebar — hidden by default, toggled by #steward-trigger -->
+<div class="steward-sidebar" id="steward-sidebar" hidden>
+  <div class="steward-sidebar__header">
+    <div class="steward-sidebar__close">
+      <div class="steward-sidebar__label">Community Management</div>
+      <button type="button" class="steward-sidebar__close-btn" id="steward-sidebar-close" aria-label="Close">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    {% if tenant %}<div class="steward-sidebar__title">{{ tenant.name }}</div>{% endif %}
+  </div>
+
+  <nav class="steward-nav">
+    <a href="{% url 'steward_members' %}" class="steward-nav__item">Members</a>
+    <a href="{% url 'steward_gatherings' %}" class="steward-nav__item">Gatherings</a>
+    <a href="{% url 'steward_formation' %}" class="steward-nav__item">Formation</a>
+    <a href="{% url 'steward_announcements' %}" class="steward-nav__item">Announcements</a>
+    <a href="{% url 'steward_support' %}" class="steward-nav__item">Support Queue</a>
+    <a href="{% url 'steward_settings' %}" class="steward-nav__item">Settings</a>
+  </nav>
+</div>
+
+<script>
+  (function () {
+    var trigger = document.getElementById('steward-trigger');
+    var sidebar = document.getElementById('steward-sidebar');
+    var closeBtn = document.getElementById('steward-sidebar-close');
+    if (!trigger || !sidebar) return;
+
+    function open() {
+      sidebar.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+    }
+    function close() {
+      sidebar.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    trigger.addEventListener('click', function () {
+      sidebar.hidden ? open() : close();
+    });
+    closeBtn.addEventListener('click', close);
+  })();
+</script>
+{% endif %}

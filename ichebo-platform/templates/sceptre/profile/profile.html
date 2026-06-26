@@ -1,0 +1,13 @@
+<!-- templates/sceptre/profile/profile.html -->
+{% extends "sceptre/base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div style="padding: 24px 28px;">
+  <div style="margin-bottom: 20px;">
+    <div class="ws-label-tag">Identity</div>
+    <h1 class="ws-page-title" style="font-size: 1.25rem; margin-top: 8px;">{{ user.get_full_name|default:user.username }}</h1>
+  </div>
+  <p style="color: var(--text); font-size: 13px;">Level: {{ user.competence_level }}</p>
+  <p style="font-size: 13px;"><a href="/profile/" style="color: var(--primary);">Full profile settings</a></p>
+</div>
+{% endblock %}

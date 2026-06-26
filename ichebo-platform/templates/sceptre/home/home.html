@@ -1,0 +1,34 @@
+<!-- templates/sceptre/home/home.html -->
+{% extends "sceptre/base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div id="channel-area"
+     hx-get="{% url 'now_playing_partial' %}"
+     hx-trigger="load, every 60s"
+     hx-swap="innerHTML">
+  {% include "sceptre/home/_now_playing.html" with now_playing=None tenant_id=tenant_id %}
+</div>
+
+<!-- Quick-access tiles -->
+<div class="tiles-section">
+  <div class="tiles-row">
+    <a href="{% url 'community' %}" class="tile">
+      <span class="tile__icon">&#128101;</span>
+      <span class="tile__label">Community</span>
+    </a>
+    <a href="{% url 'learn' %}" class="tile">
+      <span class="tile__icon">&#128214;</span>
+      <span class="tile__label">Learn</span>
+    </a>
+    <a href="{% url 'bible' %}" class="tile">
+      <span class="tile__icon">&#128220;</span>
+      <span class="tile__label">Bible</span>
+    </a>
+    <a href="{% url 'support' %}" class="tile">
+      <span class="tile__icon">&#128172;</span>
+      <span class="tile__label">Support</span>
+    </a>
+  </div>
+</div>
+{% endblock %}
