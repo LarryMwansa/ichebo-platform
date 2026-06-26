@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sceptre — Home Screen Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #AF3236;
+  --primary-dark: #8C2A2D;
+  --primary-light: rgba(175,50,54,0.12);
+  --secondary: #185ABC;
+  --ink: #0E0E0E;
+  --ink-2: #1A1A1A;
+  --ink-light: #2D2D2D;
+  --bg: #FFFFFF;
+  --card: #F5F3F0;
+  --card-2: #ECE9E4;
+  --hover: #ECE9E4;
+  --text: #1A1A1A;
+  --muted: #6B6B6B;
+  --muted-light: #9A9A9A;
+  --success: #16A34A;
+  --warning: #CA8A04;
+  --error: #DC2626;
+  --border: rgba(0,0,0,0.08);
+  --radius-xs: 3px;
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-l: 12px;
+  --radius-pill: 999px;
+  --space-3xs: 4px;
+  --space-2xs: 8px;
+  --space-xs: 12px;
+  --space-s: 16px;
+  --space-m: 24px;
+  --space-l: 32px;
+  --space-xl: 48px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ── MOCKUP FRAME ───────────────────────────────── */
+.mockup-label {
+  background: var(--ink);
+  color: rgba(255,255,255,0.5);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  font-family: 'Inter', sans-serif;
+}
+.mockup-label strong { color: #fff; }
+.mockup-section {
+  border-top: 3px solid var(--primary);
+  margin-top: 48px;
+}
+.mockup-section:first-of-type { margin-top: 0; }
+
+/* ── TOP NAV ────────────────────────────────────── */
+.top-nav {
+  height: 56px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-m);
+  gap: var(--space-l);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.top-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  flex-shrink: 0;
+}
+
+.top-nav__wordmark {
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: #fff;
+  letter-spacing: -0.03em;
+}
+
+.top-nav__mark {
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
+  border-radius: var(--radius-s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.top-nav__mark svg { width: 16px; height: 16px; fill: #fff; }
+
+.top-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.nav-link {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-s);
+  transition: color 100ms, background 100ms;
+  white-space: nowrap;
+}
+.nav-link:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.nav-link--active {
+  color: #fff;
+  background: rgba(175,50,54,0.18);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-s) var(--radius-s) 0;
+  padding-left: 9px;
+}
+
+.top-nav__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  flex-shrink: 0;
+}
+
+.notif-btn {
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-m);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+}
+.notif-btn svg { width: 18px; height: 18px; stroke: rgba(255,255,255,0.7); fill: none; stroke-width: 1.5; }
+.notif-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  background: var(--primary);
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── CHANNEL PLAYER AREA ────────────────────────── */
+.channel-hero {
+  width: 100vw;
+  position: relative;
+  background: var(--ink);
+  aspect-ratio: 16 / 9;
+  max-height: 75vh;
+  overflow: hidden;
+}
+
+.channel-hero__bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #0E0E0E 0%, #1A1A1A 40%, #0f0a0a 100%);
+}
+
+/* Ghost watermark */
+.channel-hero__watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(80px, 18vw, 240px);
+  color: rgba(175,50,54,0.055);
+  letter-spacing: -0.04em;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+
+/* Scan-line texture for TV feel */
+.channel-hero__scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+}
+
+/* State: LIVE */
+.channel-hero__live-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-s);
+}
+
+.channel-hero__play-icon {
+  width: 64px;
+  height: 64px;
+  background: rgba(175,50,54,0.15);
+  border: 1.5px solid rgba(175,50,54,0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.channel-hero__play-icon svg { width: 24px; height: 24px; fill: #fff; margin-left: 3px; }
+
+.channel-hero__now-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(16px, 3vw, 28px);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.03em;
+  text-align: center;
+  padding: 0 var(--space-l);
+}
+
+/* Now-playing strip */
+.now-playing-strip {
+  background: var(--ink-2);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 10px var(--space-m);
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-family: 'Inter', sans-serif;
+  flex-shrink: 0;
+}
+.live-dot {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.vod-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-family: 'Inter', sans-serif;
+  flex-shrink: 0;
+}
+
+.now-playing-strip__title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.9);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.now-playing-strip__ends {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  font-family: 'Inter', sans-serif;
+  flex-shrink: 0;
+}
+
+.up-next {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  flex-shrink: 0;
+}
+.up-next span { color: rgba(255,255,255,0.65); }
+
+/* Unmute prompt */
+.unmute-prompt {
+  position: absolute;
+  bottom: var(--space-m);
+  right: var(--space-m);
+  background: rgba(14,14,14,0.75);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+.unmute-prompt svg { width: 14px; height: 14px; stroke: rgba(255,255,255,0.7); fill: none; stroke-width: 2; }
+
+/* ── QUICK TILES (1×4 horizontal scroll) ────────── */
+.tiles-section {
+  background: var(--card);
+  border-bottom: 1px solid var(--card-2);
+  padding: var(--space-s) var(--space-m);
+}
+
+.tiles-row {
+  display: flex;
+  gap: var(--space-xs);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.tiles-row::-webkit-scrollbar { display: none; }
+
+.tile {
+  flex: 0 0 160px;
+  background: #fff;
+  border: 1px solid var(--card-2);
+  border-radius: var(--radius-l);
+  padding: var(--space-m) var(--space-s);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  cursor: pointer;
+  transition: border-color 150ms, box-shadow 150ms;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+.tile::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary);
+  transform: scaleY(0);
+  transition: transform 150ms;
+  transform-origin: bottom;
+}
+.tile:hover { border-color: rgba(175,50,54,0.3); box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.tile:hover::before { transform: scaleY(1); }
+
+.tile__icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.tile__label {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.tile__status {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* ── OFFLINE STATE ──────────────────────────────── */
+.channel-offline {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-s);
+}
+
+.channel-offline__frame {
+  text-align: center;
+}
+
+.channel-offline__brand {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 32px;
+  color: rgba(255,255,255,0.08);
+  letter-spacing: -0.04em;
+  margin-bottom: var(--space-xs);
+}
+
+.channel-offline__msg {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.25);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.channel-offline__next {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  margin-top: var(--space-xs);
+}
+.channel-offline__next strong { color: rgba(255,255,255,0.55); }
+
+/* ── SECTION DIVIDER ─────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--card-2);
+  margin: 0 var(--space-m);
+}
+
+.label-tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.label-tag::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+
+/* ── SCENARIO LABELS ─────────────────────────────── */
+.scenario {
+  padding: var(--space-m);
+  background: var(--ink);
+  color: rgba(255,255,255,0.5);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+}
+.scenario strong { color: rgba(255,255,255,0.9); }
+.scenario-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.scenario-dot--live { background: var(--primary); }
+.scenario-dot--vod { background: var(--secondary); }
+.scenario-dot--offline { background: rgba(255,255,255,0.2); }
+
+.screen-frame {
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  margin: var(--space-m);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.1);
+}
+
+.page-header {
+  background: var(--ink);
+  color: #fff;
+  padding: 32px var(--space-m) var(--space-m);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border-bottom: 3px solid var(--primary);
+}
+.page-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-top: var(--space-2xs);
+  color: #fff;
+}
+</style>
+</head>
+<body>
+
+<div class="mockup-label">
+  <strong>MOCKUP 01 — Sceptre Home Screen</strong> &nbsp;·&nbsp; sceptre.ichebo.org &nbsp;·&nbsp; Participant View &nbsp;·&nbsp; Three channel states
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SCENARIO A — LIVE BROADCAST
+══════════════════════════════════════════════════ -->
+<div class="scenario">
+  <div class="scenario-dot scenario-dot--live"></div>
+  <strong>State A</strong> — Channel is LIVE (active BroadcastSchedule)
+</div>
+
+<div class="screen-frame">
+  <!-- Top Nav -->
+  <nav class="top-nav">
+    <div class="top-nav__brand">
+      <div class="top-nav__mark">
+        <svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg>
+      </div>
+      <span class="top-nav__wordmark">Ichebo</span>
+    </div>
+    <div class="top-nav__links">
+      <a href="#" class="nav-link nav-link--active">Channel</a>
+      <a href="#" class="nav-link">Community</a>
+      <a href="#" class="nav-link">Learn</a>
+      <a href="#" class="nav-link">Bible</a>
+      <a href="#" class="nav-link">Support</a>
+    </div>
+    <div class="top-nav__right">
+      <div class="notif-btn">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="avatar">CM</div>
+    </div>
+  </nav>
+
+  <!-- Channel Player — LIVE state -->
+  <div class="channel-hero">
+    <div class="channel-hero__bg"></div>
+    <div class="channel-hero__watermark">LIVE</div>
+    <div class="channel-hero__scanlines"></div>
+    <div class="channel-hero__live-content">
+      <div class="channel-hero__play-icon">
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      </div>
+      <div class="channel-hero__now-title">Sunday Morning Service — Apostolic Faith Centre</div>
+    </div>
+    <div class="unmute-prompt">
+      <svg viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      Tap to unmute
+    </div>
+  </div>
+
+  <!-- Now-playing strip -->
+  <div class="now-playing-strip">
+    <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+    <span class="now-playing-strip__title">Sunday Morning Service — Apostolic Faith Centre</span>
+    <span class="up-next">Up next: <span>Evening Devotion 6:00 PM</span></span>
+  </div>
+
+  <!-- Quick-access tiles -->
+  <div class="tiles-section">
+    <div class="tiles-row">
+      <a href="#" class="tile">
+        <span class="tile__icon">👥</span>
+        <span class="tile__label">Community</span>
+        <span class="tile__status">3 new announcements</span>
+      </a>
+      <a href="#" class="tile">
+        <span class="tile__icon">📖</span>
+        <span class="tile__label">Learn</span>
+        <span class="tile__status">Lesson 4 of 8 — continue</span>
+      </a>
+      <a href="#" class="tile">
+        <span class="tile__icon">📜</span>
+        <span class="tile__label">Bible</span>
+        <span class="tile__status">John 15 — last read</span>
+      </a>
+      <a href="#" class="tile">
+        <span class="tile__icon">💬</span>
+        <span class="tile__label">Support</span>
+        <span class="tile__status">No open requests</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SCENARIO B — VOD / SCHEDULED CONTENT
+══════════════════════════════════════════════════ -->
+<div class="scenario" style="margin-top: 40px;">
+  <div class="scenario-dot scenario-dot--vod"></div>
+  <strong>State B</strong> — Scheduled VOD content (ChannelSlot active)
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand">
+      <div class="top-nav__mark">
+        <svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg>
+      </div>
+      <span class="top-nav__wordmark">Ichebo</span>
+    </div>
+    <div class="top-nav__links">
+      <a href="#" class="nav-link nav-link--active">Channel</a>
+      <a href="#" class="nav-link">Community</a>
+      <a href="#" class="nav-link">Learn</a>
+      <a href="#" class="nav-link">Bible</a>
+      <a href="#" class="nav-link">Support</a>
+    </div>
+    <div class="top-nav__right">
+      <div class="notif-btn">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <div class="avatar">CM</div>
+    </div>
+  </nav>
+
+  <div class="channel-hero">
+    <div class="channel-hero__bg" style="background: linear-gradient(135deg, #0a0a14 0%, #0f0f1a 50%, #0E0E0E 100%);"></div>
+    <div class="channel-hero__watermark">CHANNEL</div>
+    <div class="channel-hero__scanlines"></div>
+    <div class="channel-hero__live-content">
+      <div class="channel-hero__play-icon" style="background: rgba(24,90,188,0.15); border-color: rgba(24,90,188,0.4);">
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="#fff"/></svg>
+      </div>
+      <div class="channel-hero__now-title">Kingdom Foundations — Episode 12: The Apostolic Order</div>
+    </div>
+    <div class="unmute-prompt">
+      <svg viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      Tap to unmute
+    </div>
+  </div>
+
+  <div class="now-playing-strip">
+    <span class="vod-badge">▶ PLAYING</span>
+    <span class="now-playing-strip__title">Kingdom Foundations — Ep. 12: The Apostolic Order</span>
+    <span class="now-playing-strip__ends">Until 2:30 PM</span>
+    <span class="up-next">Up next: <span>Sunday Service 6:00 PM</span></span>
+  </div>
+
+  <div class="tiles-section">
+    <div class="tiles-row">
+      <a href="#" class="tile">
+        <span class="tile__icon">👥</span>
+        <span class="tile__label">Community</span>
+        <span class="tile__status">3 new announcements</span>
+      </a>
+      <a href="#" class="tile">
+        <span class="tile__icon">📖</span>
+        <span class="tile__label">Learn</span>
+        <span class="tile__status">Lesson 4 of 8 — continue</span>
+      </a>
+      <a href="#" class="tile">
+        <span class="tile__icon">📜</span>
+        <span class="tile__label">Bible</span>
+        <span class="tile__status">John 15 — last read</span>
+      </a>
+      <a href="#" class="tile">
+        <span class="tile__icon">💬</span>
+        <span class="tile__label">Support</span>
+        <span class="tile__status">1 open request</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SCENARIO C — CHANNEL OFFLINE
+══════════════════════════════════════════════════ -->
+<div class="scenario" style="margin-top: 40px;">
+  <div class="scenario-dot scenario-dot--offline"></div>
+  <strong>State C</strong> — Channel offline (no content configured)
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand">
+      <div class="top-nav__mark">
+        <svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg>
+      </div>
+      <span class="top-nav__wordmark">Ichebo</span>
+    </div>
+    <div class="top-nav__links">
+      <a href="#" class="nav-link nav-link--active">Channel</a>
+      <a href="#" class="nav-link">Community</a>
+      <a href="#" class="nav-link">Learn</a>
+      <a href="#" class="nav-link">Bible</a>
+      <a href="#" class="nav-link">Support</a>
+    </div>
+    <div class="top-nav__right">
+      <div class="notif-btn">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <div class="avatar">CM</div>
+    </div>
+  </nav>
+
+  <div class="channel-hero">
+    <div class="channel-hero__bg"></div>
+    <div class="channel-hero__scanlines"></div>
+    <div class="channel-offline">
+      <div class="channel-offline__frame">
+        <div class="channel-offline__brand">Ichebo</div>
+        <div class="channel-offline__msg">Channel offline</div>
+        <div class="channel-offline__next">Next service: <strong>Sunday 10:00 AM</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="now-playing-strip" style="background: #111;">
+    <span class="vod-badge" style="background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.25);">OFFLINE</span>
+    <span class="now-playing-strip__title" style="color: rgba(255,255,255,0.25);">No content scheduled right now</span>
+    <span class="now-playing-strip__ends">Next: Sunday 10:00 AM</span>
+  </div>
+
+  <div class="tiles-section">
+    <div class="tiles-row">
+      <a href="#" class="tile">
+        <span class="tile__icon">👥</span>
+        <span class="tile__label">Community</span>
+        <span class="tile__status">3 new announcements</span>
+      </a>
+      <a href="#" class="tile">
+        <span class="tile__icon">📖</span>
+        <span class="tile__label">Learn</span>
+        <span class="tile__status">Lesson 4 of 8 — continue</span>
+      </a>
+      <a href="#" class="tile">
+        <span class="tile__icon">📜</span>
+        <span class="tile__label">Bible</span>
+        <span class="tile__status">John 15 — last read</span>
+      </a>
+      <a href="#" class="tile">
+        <span class="tile__icon">💬</span>
+        <span class="tile__label">Support</span>
+        <span class="tile__status">No open requests</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div style="height: 48px;"></div>
+</body>
+</html>

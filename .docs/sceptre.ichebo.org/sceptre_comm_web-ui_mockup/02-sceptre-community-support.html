@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sceptre — Community + Support Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #AF3236; --primary-dark: #8C2A2D; --primary-light: rgba(175,50,54,0.12);
+  --secondary: #185ABC; --ink: #0E0E0E; --ink-2: #1A1A1A; --ink-light: #2D2D2D;
+  --bg: #FFFFFF; --card: #F5F3F0; --card-2: #ECE9E4; --hover: #ECE9E4;
+  --text: #1A1A1A; --muted: #6B6B6B; --muted-light: #9A9A9A;
+  --success: #16A34A; --warning: #CA8A04; --error: #DC2626;
+  --border: rgba(0,0,0,0.08);
+  --radius-xs: 3px; --radius-s: 4px; --radius-m: 8px; --radius-l: 12px; --radius-pill: 999px;
+  --space-3xs: 4px; --space-2xs: 8px; --space-xs: 12px; --space-s: 16px;
+  --space-m: 24px; --space-l: 32px; --space-xl: 48px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #E8E6E1; color: var(--text); font-size: 16px; line-height: 1.5; padding: var(--space-m); }
+
+.mockup-label {
+  background: var(--ink); color: rgba(255,255,255,0.5);
+  font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 12px 20px; font-family: 'Inter', sans-serif; margin-bottom: var(--space-m);
+}
+.mockup-label strong { color: #fff; }
+
+.screen-frame {
+  border: 1px solid rgba(0,0,0,0.1); border-radius: var(--radius-m);
+  overflow: hidden; box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+  background: var(--bg); margin-bottom: var(--space-xl);
+}
+
+.scenario {
+  padding: 10px var(--space-m); background: var(--ink-2);
+  color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; font-family: 'Inter', sans-serif;
+  display: flex; align-items: center; gap: var(--space-s);
+  margin-bottom: var(--space-m); border-radius: var(--radius-s);
+}
+.scenario strong { color: rgba(255,255,255,0.9); }
+
+/* Top Nav */
+.top-nav {
+  height: 56px; background: var(--ink);
+  display: flex; align-items: center; padding: 0 var(--space-m); gap: var(--space-l);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.top-nav__brand { display: flex; align-items: center; gap: var(--space-2xs); flex-shrink: 0; }
+.top-nav__wordmark { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 18px; color: #fff; letter-spacing: -0.03em; }
+.top-nav__mark { width: 28px; height: 28px; background: var(--primary); border-radius: var(--radius-s); display: flex; align-items: center; justify-content: center; }
+.top-nav__mark svg { width: 16px; height: 16px; fill: #fff; }
+.top-nav__links { display: flex; align-items: center; gap: 4px; flex: 1; }
+.nav-link { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.55); text-decoration: none; padding: 6px 12px; border-radius: var(--radius-s); }
+.nav-link--active { color: #fff; background: rgba(175,50,54,0.18); border-left: 3px solid var(--primary); border-radius: 0 var(--radius-s) var(--radius-s) 0; padding-left: 9px; }
+.top-nav__right { display: flex; align-items: center; gap: var(--space-s); }
+.avatar { width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+
+/* Page layout */
+.page-body { padding: var(--space-l) var(--space-m); background: var(--card); min-height: 500px; }
+
+/* Label tag */
+.label-tag {
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary);
+  display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-s);
+}
+.label-tag::before { content: ''; display: block; width: 20px; height: 2px; background: var(--primary); }
+
+.page-title {
+  font-family: 'Playfair Display', serif; font-weight: 800; font-size: 32px;
+  color: var(--ink); letter-spacing: -0.03em; margin-bottom: var(--space-m);
+}
+
+/* Feed items */
+.feed { display: flex; flex-direction: column; gap: var(--space-xs); }
+
+.feed-item {
+  background: #fff; border: 1px solid var(--card-2); border-radius: var(--radius-l);
+  display: flex; overflow: hidden; transition: box-shadow 150ms, border-color 150ms;
+}
+.feed-item:hover { border-color: rgba(175,50,54,0.2); box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+
+.feed-item__rule { width: 3px; background: var(--primary); flex-shrink: 0; }
+.feed-item__rule--muted { background: var(--card-2); }
+
+.feed-item__body { padding: var(--space-s) var(--space-m); flex: 1; }
+
+.feed-item__title {
+  font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;
+  color: var(--text); margin-bottom: var(--space-3xs); line-height: 1.35;
+}
+
+.feed-item__excerpt { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: var(--space-xs); }
+
+.feed-item__meta {
+  display: flex; align-items: center; gap: var(--space-s);
+  font-size: 12px; color: var(--muted-light);
+}
+
+.feed-item__comment-count {
+  display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted);
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: var(--radius-pill); font-family: 'Inter', sans-serif;
+}
+.status-badge--submitted { background: rgba(202,138,4,0.12); color: var(--warning); }
+.status-badge--active { background: rgba(22,163,74,0.1); color: var(--success); }
+.status-badge--completed { background: rgba(0,0,0,0.05); color: var(--muted); }
+.status-badge--overdue { background: rgba(220,38,38,0.1); color: var(--error); }
+
+/* Page action bar */
+.page-actions { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-m); }
+
+/* Btn */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+  padding: 8px 16px; border-radius: var(--radius-xs); cursor: pointer;
+  text-decoration: none; border: none;
+  transition: background 100ms, box-shadow 100ms;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--card-2); }
+
+/* Comment section */
+.comments-section { margin-top: var(--space-l); }
+.comments-title { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: var(--space-m); }
+
+.comment-item {
+  border-left: 2px solid var(--card-2); padding-left: var(--space-m);
+  margin-bottom: var(--space-m);
+}
+.comment-author { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: var(--space-3xs); }
+.comment-date { font-size: 11px; color: var(--muted-light); font-weight: 400; margin-left: 6px; }
+.comment-content { font-size: 14px; color: var(--text); line-height: 1.55; }
+
+.comment-form { margin-top: var(--space-m); }
+.form-input {
+  width: 100%; border: 1px solid var(--card-2); border-radius: var(--radius-m);
+  padding: var(--space-xs) var(--space-s); font-family: 'Inter', sans-serif;
+  font-size: 14px; color: var(--text); background: #fff; resize: vertical;
+  transition: border-color 100ms;
+}
+.form-input:focus { outline: none; border-color: var(--primary); }
+.field-label { font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+/* Support request list items */
+.request-item {
+  background: #fff; border: 1px solid var(--card-2); border-radius: var(--radius-l);
+  display: flex; overflow: hidden; margin-bottom: var(--space-xs);
+}
+.request-item--overdue { border-color: rgba(220,38,38,0.3); }
+.request-item__rule { width: 3px; background: var(--card-2); flex-shrink: 0; }
+.request-item__rule--overdue { background: var(--error); }
+.request-item__rule--active { background: var(--success); }
+.request-item__body { padding: var(--space-s) var(--space-m); flex: 1; }
+.request-item__title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.request-item__meta { display: flex; align-items: center; gap: var(--space-s); flex-wrap: wrap; }
+.overdue-badge { font-size: 11px; font-weight: 700; color: var(--error); letter-spacing: 0.06em; text-transform: uppercase; }
+.due-time { font-size: 12px; color: var(--muted-light); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: var(--space-xl) var(--space-m); color: var(--muted); }
+.empty-state p { font-size: 14px; margin-bottom: var(--space-s); }
+
+/* Two col layout for post detail */
+.post-detail { background: #fff; border: 1px solid var(--card-2); border-radius: var(--radius-l); padding: var(--space-l); margin-bottom: var(--space-m); }
+.post-detail__title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: var(--space-xs); color: var(--ink); }
+.post-detail__meta { font-size: 12px; color: var(--muted-light); margin-bottom: var(--space-m); }
+.post-detail__content { font-size: 15px; line-height: 1.7; color: var(--text); }
+
+/* Filter tabs */
+.filter-tabs { display: flex; gap: 4px; margin-bottom: var(--space-m); flex-wrap: wrap; }
+.filter-tab { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: var(--radius-pill); border: 1px solid var(--card-2); color: var(--muted); cursor: pointer; background: #fff; text-decoration: none; }
+.filter-tab--active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.back-link { font-size: 13px; color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-bottom: var(--space-m); }
+.back-link:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="mockup-label">
+  <strong>MOCKUP 02 — Community + Support</strong> &nbsp;·&nbsp; sceptre.ichebo.org &nbsp;·&nbsp; Feed, Post Detail, Support List
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     COMMUNITY FEED
+══════════════════════════════════════════════════ -->
+<div class="scenario">
+  <strong>Screen A</strong> — Community noticeboard feed (participant view)
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand"><div class="top-nav__mark"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg></div><span class="top-nav__wordmark">Ichebo</span></div>
+    <div class="top-nav__links">
+      <a href="#" class="nav-link">Channel</a>
+      <a href="#" class="nav-link nav-link--active">Community</a>
+      <a href="#" class="nav-link">Learn</a>
+      <a href="#" class="nav-link">Bible</a>
+      <a href="#" class="nav-link">Support</a>
+    </div>
+    <div class="top-nav__right"><div class="avatar">CM</div></div>
+  </nav>
+
+  <div class="page-body">
+    <div class="label-tag">Community</div>
+    <div class="page-actions">
+      <h1 class="page-title" style="margin-bottom:0;">Noticeboard</h1>
+    </div>
+
+    <div class="feed">
+      <div class="feed-item">
+        <div class="feed-item__rule"></div>
+        <div class="feed-item__body">
+          <div class="feed-item__title">Sunday Service Update — 10:00 AM This Week</div>
+          <div class="feed-item__excerpt">We will be gathering this Sunday for our regular service. Please note the updated time. Childcare will be available from 9:45 AM.</div>
+          <div class="feed-item__meta">
+            <span>Elder Thomas</span>
+            <span>·</span>
+            <span>24 Jun 2026</span>
+            <span class="feed-item__comment-count">💬 4</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-item__rule"></div>
+        <div class="feed-item__body">
+          <div class="feed-item__title">Formation Programme — Cohort 3 Now Enrolling</div>
+          <div class="feed-item__excerpt">The Kingdom Governance Certificate Programme is now open for Cohort 3. Applications close 30 June. Speak to your steward to apply.</div>
+          <div class="feed-item__meta">
+            <span>Community Steward</span>
+            <span>·</span>
+            <span>22 Jun 2026</span>
+            <span class="feed-item__comment-count">💬 12</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-item__rule feed-item__rule--muted"></div>
+        <div class="feed-item__body">
+          <div class="feed-item__title">Community Gathering — Quarterly Review</div>
+          <div class="feed-item__excerpt">We will be holding our quarterly community gathering on the 5th of July. All members are encouraged to attend. Venue details to follow.</div>
+          <div class="feed-item__meta">
+            <span>Elder Thomas</span>
+            <span>·</span>
+            <span>18 Jun 2026</span>
+            <span class="feed-item__comment-count">💬 7</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-item__rule feed-item__rule--muted"></div>
+        <div class="feed-item__body">
+          <div class="feed-item__title">Prayer Focus — Week of 23 June</div>
+          <div class="feed-item__excerpt">This week's community prayer focus is on the families of our members going through transition. Please hold them in prayer as you seek the Lord.</div>
+          <div class="feed-item__meta">
+            <span>Community Steward</span>
+            <span>·</span>
+            <span>16 Jun 2026</span>
+            <span class="feed-item__comment-count">💬 3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     POST DETAIL WITH COMMENTS
+══════════════════════════════════════════════════ -->
+<div class="scenario">
+  <strong>Screen B</strong> — Post detail with flat comments and response form
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand"><div class="top-nav__mark"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg></div><span class="top-nav__wordmark">Ichebo</span></div>
+    <div class="top-nav__links">
+      <a href="#" class="nav-link">Channel</a>
+      <a href="#" class="nav-link nav-link--active">Community</a>
+      <a href="#" class="nav-link">Learn</a>
+      <a href="#" class="nav-link">Bible</a>
+      <a href="#" class="nav-link">Support</a>
+    </div>
+    <div class="top-nav__right"><div class="avatar">CM</div></div>
+  </nav>
+
+  <div class="page-body">
+    <a href="#" class="back-link">← Community</a>
+
+    <div class="post-detail">
+      <div class="label-tag">Community Post</div>
+      <div class="post-detail__title">Formation Programme — Cohort 3 Now Enrolling</div>
+      <div class="post-detail__meta">Community Steward &nbsp;·&nbsp; 22 Jun 2026</div>
+      <div class="post-detail__content">
+        <p>The Kingdom Governance Certificate Programme is now open for Cohort 3 enrolment. This programme is designed for members who have completed their induction and are ready to move into deeper formation within the KGS framework.</p>
+        <br>
+        <p>Applications close 30 June. Speak to your community steward to apply or raise a support request if you have questions about eligibility.</p>
+        <br>
+        <p>The programme runs over 12 weeks and covers: Kingdom foundations, apostolic governance, relational ministry, and practical service. Certification is awarded on completion.</p>
+      </div>
+    </div>
+
+    <div class="comments-section">
+      <div class="comments-title">Responses (3)</div>
+
+      <div class="comment-item">
+        <div class="comment-author">Chidi Okafor <span class="comment-date">23 Jun 2026</span></div>
+        <div class="comment-content">Thank you for sharing this. I have been waiting for Cohort 3. Will we be notified of acceptance before the close date?</div>
+      </div>
+
+      <div class="comment-item">
+        <div class="comment-author">Community Steward <span class="comment-date">23 Jun 2026</span></div>
+        <div class="comment-content">Yes — once you submit your interest we will confirm eligibility within 48 hours. Please raise a support request if you need any help with the process.</div>
+      </div>
+
+      <div class="comment-item">
+        <div class="comment-author">Amara Mensah <span class="comment-date">24 Jun 2026</span></div>
+        <div class="comment-content">Submitted my interest this morning. Looking forward to the programme. What materials do we need before starting?</div>
+      </div>
+
+      <div class="comment-form" style="margin-top: var(--space-l);">
+        <div class="label-tag">Add a Response</div>
+        <div style="margin-top: var(--space-s);">
+          <textarea class="form-input" rows="3" placeholder="Share your response…"></textarea>
+        </div>
+        <div style="margin-top: var(--space-xs);">
+          <a href="#" class="btn btn-primary">Post Response</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SUPPORT REQUEST LIST (MEMBER VIEW)
+══════════════════════════════════════════════════ -->
+<div class="scenario">
+  <strong>Screen C</strong> — Member support request list (own requests)
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand"><div class="top-nav__mark"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg></div><span class="top-nav__wordmark">Ichebo</span></div>
+    <div class="top-nav__links">
+      <a href="#" class="nav-link">Channel</a>
+      <a href="#" class="nav-link">Community</a>
+      <a href="#" class="nav-link">Learn</a>
+      <a href="#" class="nav-link">Bible</a>
+      <a href="#" class="nav-link nav-link--active">Support</a>
+    </div>
+    <div class="top-nav__right"><div class="avatar">CM</div></div>
+  </nav>
+
+  <div class="page-body">
+    <div class="label-tag">Community Support</div>
+    <div class="page-actions">
+      <h1 class="page-title" style="margin-bottom:0;">My Requests</h1>
+      <a href="#" class="btn btn-primary">+ Raise a Request</a>
+    </div>
+
+    <div class="request-item">
+      <div class="request-item__rule request-item__rule--active"></div>
+      <div class="request-item__body">
+        <div class="request-item__title">Help with induction lesson 3 — cannot proceed</div>
+        <div class="request-item__meta">
+          <span class="status-badge status-badge--active">Acknowledged</span>
+          <span class="due-time">Submitted 24 Jun 2026</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="request-item request-item--overdue">
+      <div class="request-item__rule request-item__rule--overdue"></div>
+      <div class="request-item__body">
+        <div class="request-item__title">Question about the Formation Programme eligibility</div>
+        <div class="request-item__meta">
+          <span class="status-badge status-badge--submitted">Open</span>
+          <span class="due-time">Submitted 20 Jun 2026</span>
+          <span class="overdue-badge">⚠ Overdue</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="request-item">
+      <div class="request-item__rule"></div>
+      <div class="request-item__body">
+        <div class="request-item__title">Request for family support during bereavement</div>
+        <div class="request-item__meta">
+          <span class="status-badge status-badge--completed">Resolved</span>
+          <span class="due-time">Submitted 10 Jun 2026</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height: 48px;"></div>
+</body>
+</html>

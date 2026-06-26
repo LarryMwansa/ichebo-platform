@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sceptre — Live Service Room Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #AF3236; --primary-dark: #8C2A2D; --primary-light: rgba(175,50,54,0.12);
+  --secondary: #185ABC; --ink: #0E0E0E; --ink-2: #1A1A1A; --ink-light: #2D2D2D;
+  --bg: #FFFFFF; --card: #F5F3F0; --card-2: #ECE9E4;
+  --text: #1A1A1A; --muted: #6B6B6B; --muted-light: #9A9A9A;
+  --success: #16A34A; --warning: #CA8A04; --error: #DC2626;
+  --radius-xs: 3px; --radius-s: 4px; --radius-m: 8px; --radius-l: 12px; --radius-pill: 999px;
+  --space-3xs: 4px; --space-2xs: 8px; --space-xs: 12px; --space-s: 16px;
+  --space-m: 24px; --space-l: 32px; --space-xl: 48px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #E8E6E1; color: var(--text); font-size: 16px; padding: var(--space-m); }
+
+.mockup-label { background: var(--ink); color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 12px 20px; margin-bottom: var(--space-m); }
+.mockup-label strong { color: #fff; }
+.screen-frame { border: 1px solid rgba(0,0,0,0.1); border-radius: var(--radius-m); overflow: hidden; box-shadow: 0 4px 32px rgba(0,0,0,0.12); background: var(--bg); margin-bottom: var(--space-xl); }
+.scenario { padding: 10px var(--space-m); background: var(--ink-2); color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: var(--space-s); margin-bottom: var(--space-m); border-radius: var(--radius-s); }
+.scenario strong { color: rgba(255,255,255,0.9); }
+.annotation { font-size: 11px; color: var(--muted); font-style: italic; padding: var(--space-xs) var(--space-m); background: rgba(175,50,54,0.04); border-left: 2px solid var(--primary); margin: var(--space-m); }
+
+/* Top Nav */
+.top-nav { height: 56px; background: var(--ink); display: flex; align-items: center; padding: 0 var(--space-m); gap: var(--space-l); }
+.top-nav__brand { display: flex; align-items: center; gap: var(--space-2xs); flex-shrink: 0; }
+.top-nav__wordmark { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 18px; color: #fff; letter-spacing: -0.03em; }
+.top-nav__mark { width: 28px; height: 28px; background: var(--primary); border-radius: var(--radius-s); display: flex; align-items: center; justify-content: center; }
+.top-nav__mark svg { width: 16px; height: 16px; fill: #fff; }
+.top-nav__links { display: flex; align-items: center; gap: 4px; flex: 1; }
+.nav-link { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.55); text-decoration: none; padding: 6px 12px; border-radius: var(--radius-s); }
+.nav-link--active { color: #fff; background: rgba(175,50,54,0.18); border-left: 3px solid var(--primary); border-radius: 0 var(--radius-s) var(--radius-s) 0; padding-left: 9px; }
+.top-nav__right { display: flex; align-items: center; gap: var(--space-s); }
+.avatar { width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+.live-badge { display: flex; align-items: center; gap: 5px; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; border-radius: var(--radius-pill); }
+.live-dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Page header strip */
+.page-strip {
+  background: var(--ink-2); padding: var(--space-s) var(--space-m);
+  display: flex; align-items: center; gap: var(--space-m);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.page-strip__label { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary); }
+.page-strip__title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.02em; flex: 1; }
+
+/* Live service layout — side by side */
+.live-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  min-height: 520px;
+  background: var(--ink);
+}
+
+/* Video column */
+.live-video-col { position: relative; background: var(--ink); }
+
+.video-area {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.video-area__bg { position: absolute; inset: 0; background: linear-gradient(135deg, #050508, #0c0c14); }
+.video-area__watermark {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-weight: 900; font-size: 100px;
+  color: rgba(175,50,54,0.055); letter-spacing: -0.04em; pointer-events: none;
+}
+.video-area__icon {
+  width: 56px; height: 56px; background: rgba(175,50,54,0.15);
+  border: 1.5px solid rgba(175,50,54,0.4); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; z-index: 1;
+  position: relative;
+}
+.video-area__icon svg { width: 22px; height: 22px; fill: #fff; margin-left: 3px; }
+
+.video-info { padding: var(--space-s) var(--space-m); background: var(--ink-2); border-top: 1px solid rgba(255,255,255,0.06); }
+.video-info__title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 3px; }
+.video-info__sub { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+.gathering-link {
+  padding: var(--space-xs) var(--space-m); background: rgba(24,90,188,0.08);
+  border-top: 1px solid rgba(24,90,188,0.12);
+  display: flex; align-items: center; gap: var(--space-s);
+}
+.gathering-link__label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(24,90,188,0.8); }
+.gathering-link__name { font-size: 13px; color: rgba(255,255,255,0.7); }
+
+/* Ministry panel */
+.ministry-panel {
+  background: var(--ink-2);
+  border-left: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column;
+}
+
+.ministry-panel__header {
+  padding: var(--space-m);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.ministry-panel__label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--primary); display: flex; align-items: center; gap: 6px; margin-bottom: var(--space-xs);
+}
+.ministry-panel__label::before { content: ''; display: block; width: 16px; height: 2px; background: var(--primary); }
+.ministry-panel__title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.ministry-panel__sub { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 3px; }
+
+/* Request form */
+.ministry-form { padding: var(--space-m); }
+.field-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+
+.radio-row { display: flex; gap: var(--space-xs); margin-bottom: var(--space-m); }
+.radio-chip {
+  padding: 6px 14px; border-radius: var(--radius-pill); cursor: pointer;
+  font-size: 12px; font-weight: 600; transition: all 100ms;
+  border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.5);
+  background: transparent;
+}
+.radio-chip--active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+.ministry-textarea {
+  width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-m); padding: var(--space-xs) var(--space-s);
+  font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.85);
+  resize: none; margin-bottom: var(--space-m);
+}
+.ministry-textarea::placeholder { color: rgba(255,255,255,0.25); }
+.ministry-textarea:focus { outline: none; border-color: rgba(175,50,54,0.5); }
+
+.btn-submit {
+  width: 100%; background: var(--primary); color: #fff; border: none;
+  border-radius: var(--radius-xs); padding: 10px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+}
+
+/* Steward queue in ministry panel */
+.ministry-queue { padding: var(--space-m); flex: 1; overflow-y: auto; }
+.queue-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-m); }
+.queue-count { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+.live-request {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-m); padding: var(--space-s); margin-bottom: var(--space-xs);
+}
+.live-request--prayer { border-left: 3px solid var(--primary); }
+.live-request--question { border-left: 3px solid var(--secondary); }
+
+.live-request__type {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.live-request__type--prayer { color: var(--primary); }
+.live-request__type--question { color: #5b9bd5; }
+
+.live-request__content { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; margin-bottom: var(--space-xs); }
+.live-request__meta { font-size: 11px; color: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: space-between; }
+.live-request__respond {
+  font-size: 11px; font-weight: 600; color: var(--primary);
+  background: transparent; border: 1px solid rgba(175,50,54,0.3);
+  border-radius: var(--radius-xs); padding: 3px 10px; cursor: pointer;
+}
+
+.poll-indicator {
+  display: flex; align-items: center; gap: 5px; padding: var(--space-xs) var(--space-m);
+  font-size: 11px; color: rgba(255,255,255,0.25); border-top: 1px solid rgba(255,255,255,0.06);
+}
+.poll-dot { width: 5px; height: 5px; background: var(--success); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+
+/* Empty service state */
+.service-offline {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: var(--space-xl) var(--space-l); background: var(--card);
+  min-height: 400px;
+}
+.service-offline__icon { font-size: 48px; margin-bottom: var(--space-m); opacity: 0.4; }
+.service-offline__title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; margin-bottom: var(--space-s); }
+.service-offline__sub { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 360px; margin: 0 auto; }
+.service-offline__next { margin-top: var(--space-l); background: #fff; border: 1px solid var(--card-2); border-radius: var(--radius-l); padding: var(--space-m) var(--space-l); display: inline-block; }
+.service-offline__next-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); margin-bottom: var(--space-2xs); }
+.service-offline__next-time { font-size: 18px; font-weight: 700; color: var(--ink); }
+
+/* Confirmation state */
+.confirmation {
+  background: rgba(22,163,74,0.08); border: 1px solid rgba(22,163,74,0.2);
+  border-radius: var(--radius-m); padding: var(--space-m); text-align: center;
+  margin-top: var(--space-m);
+}
+.confirmation__icon { font-size: 24px; margin-bottom: var(--space-xs); }
+.confirmation__text { font-size: 14px; color: var(--success); font-weight: 600; }
+.confirmation__sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="mockup-label">
+  <strong>MOCKUP 04 — Live Service Room + Ministry Panel</strong> &nbsp;·&nbsp; sceptre.ichebo.org/community/live/ &nbsp;·&nbsp; Member view + Steward queue view
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SCREEN A — MEMBER VIEW (LIVE + MINISTRY FORM)
+══════════════════════════════════════════════════ -->
+<div class="scenario">
+  <strong>Screen A</strong> — Member attending live service — prayer/question form in ministry panel
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand"><div class="top-nav__mark"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg></div><span class="top-nav__wordmark">Ichebo</span></div>
+    <div class="top-nav__links">
+      <a href="#" class="nav-link">Channel</a>
+      <a href="#" class="nav-link nav-link--active">Community</a>
+      <a href="#" class="nav-link">Learn</a>
+      <a href="#" class="nav-link">Bible</a>
+      <a href="#" class="nav-link">Support</a>
+    </div>
+    <div class="top-nav__right">
+      <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+      <div class="avatar">CM</div>
+    </div>
+  </nav>
+
+  <div class="page-strip">
+    <span class="page-strip__label">—— Community</span>
+    <span class="page-strip__title">Live Service</span>
+    <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+  </div>
+
+  <div class="live-layout">
+    <!-- Video column -->
+    <div class="live-video-col">
+      <div class="video-area">
+        <div class="video-area__bg"></div>
+        <div class="video-area__watermark">LIVE</div>
+        <div class="video-area__icon">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+      </div>
+      <div class="video-info">
+        <div class="video-info__title">Sunday Morning Service — Apostolic Faith Centre</div>
+        <div class="video-info__sub">Pastor Emmanuel Osei &nbsp;·&nbsp; Series: Kingdom Governance Week 4</div>
+      </div>
+      <div class="gathering-link">
+        <span class="gathering-link__label">Today's Gathering</span>
+        <span class="gathering-link__name">Sunday Morning Service — 10:00 AM</span>
+      </div>
+    </div>
+
+    <!-- Ministry panel — member form -->
+    <div class="ministry-panel">
+      <div class="ministry-panel__header">
+        <div class="ministry-panel__label">Ministry</div>
+        <div class="ministry-panel__title">Raise a Request</div>
+        <div class="ministry-panel__sub">A steward will respond during the service</div>
+      </div>
+
+      <div class="ministry-form">
+        <div class="field-label">Type</div>
+        <div class="radio-row">
+          <div class="radio-chip radio-chip--active">🙏 Prayer</div>
+          <div class="radio-chip">❓ Question</div>
+        </div>
+
+        <div class="field-label">Your request</div>
+        <textarea class="ministry-textarea" rows="5" placeholder="Share your prayer request or question with the ministry team…">Please pray for my mother who has been ill for the past two weeks. We are believing for complete healing.</textarea>
+
+        <button class="btn-submit">Submit Request</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SCREEN B — CONFIRMATION AFTER SUBMIT
+══════════════════════════════════════════════════ -->
+<div class="scenario">
+  <strong>Screen B</strong> — After member submits — confirmation replaces the form
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand"><div class="top-nav__mark"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg></div><span class="top-nav__wordmark">Ichebo</span></div>
+    <div class="top-nav__links"><a href="#" class="nav-link">Channel</a><a href="#" class="nav-link nav-link--active">Community</a><a href="#" class="nav-link">Learn</a></div>
+    <div class="top-nav__right"><span class="live-badge"><span class="live-dot"></span> LIVE</span><div class="avatar">CM</div></div>
+  </nav>
+
+  <div class="live-layout">
+    <div class="live-video-col">
+      <div class="video-area" style="height: 260px;">
+        <div class="video-area__bg"></div>
+        <div class="video-area__watermark">LIVE</div>
+        <div class="video-area__icon"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+      </div>
+      <div class="video-info">
+        <div class="video-info__title">Sunday Morning Service</div>
+        <div class="video-info__sub">Pastor Emmanuel Osei</div>
+      </div>
+    </div>
+
+    <div class="ministry-panel">
+      <div class="ministry-panel__header">
+        <div class="ministry-panel__label">Ministry</div>
+        <div class="ministry-panel__title">Request Received</div>
+      </div>
+      <div style="padding: var(--space-m);">
+        <div class="confirmation">
+          <div class="confirmation__icon">🙏</div>
+          <div class="confirmation__text">Your prayer request has been received</div>
+          <div class="confirmation__sub" style="color: rgba(22,163,74,0.7);">A steward will pray with you shortly</div>
+        </div>
+        <div style="margin-top: var(--space-m);">
+          <button class="btn-submit" style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.6);">Submit another request</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SCREEN C — STEWARD VIEW (LIVE QUEUE)
+══════════════════════════════════════════════════ -->
+<div class="scenario">
+  <strong>Screen C</strong> — Steward view — ministry queue with live requests (polling every 20s)
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand"><div class="top-nav__mark"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg></div><span class="top-nav__wordmark">Ichebo</span></div>
+    <div class="top-nav__links"><a href="#" class="nav-link">Channel</a><a href="#" class="nav-link nav-link--active">Community</a><a href="#" class="nav-link">Learn</a></div>
+    <div class="top-nav__right"><span class="live-badge"><span class="live-dot"></span> LIVE</span><div class="avatar">ES</div></div>
+  </nav>
+
+  <div class="live-layout">
+    <div class="live-video-col">
+      <div class="video-area" style="height: 260px;">
+        <div class="video-area__bg"></div>
+        <div class="video-area__watermark">LIVE</div>
+        <div class="video-area__icon"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+      </div>
+      <div class="video-info">
+        <div class="video-info__title">Sunday Morning Service</div>
+        <div class="video-info__sub">Pastor Emmanuel Osei &nbsp;·&nbsp; 47 watching</div>
+      </div>
+    </div>
+
+    <!-- Steward ministry queue -->
+    <div class="ministry-panel">
+      <div class="ministry-panel__header">
+        <div class="ministry-panel__label">Ministry Queue</div>
+        <div class="ministry-panel__title">This Session</div>
+        <div class="ministry-panel__sub">Refreshes every 20 seconds</div>
+      </div>
+
+      <div class="ministry-queue">
+        <div class="queue-header">
+          <span class="ministry-panel__label" style="font-size:10px;">3 pending</span>
+          <span class="queue-count">Tap to respond</span>
+        </div>
+
+        <div class="live-request live-request--prayer">
+          <div class="live-request__type live-request__type--prayer">Prayer Request</div>
+          <div class="live-request__content">Please pray for my mother who has been ill for the past two weeks. Believing for complete healing.</div>
+          <div class="live-request__meta">
+            <span>Chidi Okafor &nbsp;·&nbsp; 10:23 AM</span>
+            <button class="live-request__respond">Respond</button>
+          </div>
+        </div>
+
+        <div class="live-request live-request--question">
+          <div class="live-request__type live-request__type--question">Question</div>
+          <div class="live-request__content">Can you explain the difference between the apostolic and prophetic governance functions mentioned in the sermon?</div>
+          <div class="live-request__meta">
+            <span>Amara Mensah &nbsp;·&nbsp; 10:31 AM</span>
+            <button class="live-request__respond">Respond</button>
+          </div>
+        </div>
+
+        <div class="live-request live-request--prayer">
+          <div class="live-request__type live-request__type--prayer">Prayer Request</div>
+          <div class="live-request__content">Praying for breakthrough in my job situation. Three months without work.</div>
+          <div class="live-request__meta">
+            <span>Blessing Adeyemi &nbsp;·&nbsp; 10:38 AM</span>
+            <button class="live-request__respond">Respond</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="poll-indicator">
+        <div class="poll-dot"></div>
+        Live — refreshing every 20 seconds
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SCREEN D — NO LIVE SERVICE (EMPTY STATE)
+══════════════════════════════════════════════════ -->
+<div class="scenario">
+  <strong>Screen D</strong> — No live service right now (empty state with next scheduled)
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand"><div class="top-nav__mark"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg></div><span class="top-nav__wordmark">Ichebo</span></div>
+    <div class="top-nav__links"><a href="#" class="nav-link">Channel</a><a href="#" class="nav-link nav-link--active">Community</a><a href="#" class="nav-link">Learn</a></div>
+    <div class="top-nav__right"><div class="avatar">CM</div></div>
+  </nav>
+
+  <div class="service-offline">
+    <div class="service-offline__icon">📡</div>
+    <div class="service-offline__title">No live service right now</div>
+    <div class="service-offline__sub">Your community's next live service will appear here automatically when it begins. Join your community in worship — the stream will be available right on this page.</div>
+    <div class="service-offline__next">
+      <div class="service-offline__next-label">Next Service</div>
+      <div class="service-offline__next-time">Sunday 10:00 AM &nbsp;·&nbsp; 29 June 2026</div>
+    </div>
+  </div>
+</div>
+
+<div style="height: 48px;"></div>
+</body>
+</html>

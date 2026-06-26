@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sceptre — Steward Panel Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #AF3236; --primary-dark: #8C2A2D; --primary-light: rgba(175,50,54,0.12);
+  --secondary: #185ABC; --ink: #0E0E0E; --ink-2: #1A1A1A; --ink-light: #2D2D2D;
+  --bg: #FFFFFF; --card: #F5F3F0; --card-2: #ECE9E4;
+  --text: #1A1A1A; --muted: #6B6B6B; --muted-light: #9A9A9A;
+  --success: #16A34A; --warning: #CA8A04; --error: #DC2626;
+  --radius-xs: 3px; --radius-s: 4px; --radius-m: 8px; --radius-l: 12px; --radius-pill: 999px;
+  --space-3xs: 4px; --space-2xs: 8px; --space-xs: 12px; --space-s: 16px;
+  --space-m: 24px; --space-l: 32px; --space-xl: 48px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #E8E6E1; color: var(--text); font-size: 16px; padding: var(--space-m); }
+
+.mockup-label { background: var(--ink); color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 12px 20px; margin-bottom: var(--space-m); }
+.mockup-label strong { color: #fff; }
+.screen-frame { border: 1px solid rgba(0,0,0,0.1); border-radius: var(--radius-m); overflow: hidden; box-shadow: 0 4px 32px rgba(0,0,0,0.12); background: var(--bg); margin-bottom: var(--space-xl); }
+.scenario { padding: 10px var(--space-m); background: var(--ink-2); color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: var(--space-s); margin-bottom: var(--space-m); border-radius: var(--radius-s); }
+.scenario strong { color: rgba(255,255,255,0.9); }
+
+/* Top Nav */
+.top-nav { height: 56px; background: var(--ink); display: flex; align-items: center; padding: 0 var(--space-m); gap: var(--space-l); }
+.top-nav__brand { display: flex; align-items: center; gap: var(--space-2xs); flex-shrink: 0; }
+.top-nav__wordmark { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 18px; color: #fff; letter-spacing: -0.03em; }
+.top-nav__mark { width: 28px; height: 28px; background: var(--primary); border-radius: var(--radius-s); display: flex; align-items: center; justify-content: center; }
+.top-nav__mark svg { width: 16px; height: 16px; fill: #fff; }
+.top-nav__links { display: flex; align-items: center; gap: 4px; flex: 1; }
+.nav-link { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.55); text-decoration: none; padding: 6px 12px; border-radius: var(--radius-s); }
+.nav-link--active { color: #fff; background: rgba(175,50,54,0.18); border-left: 3px solid var(--primary); border-radius: 0 var(--radius-s) var(--radius-s) 0; padding-left: 9px; }
+.top-nav__right { display: flex; align-items: center; gap: var(--space-s); }
+.avatar { width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+
+/* Steward trigger button */
+.steward-trigger {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(175,50,54,0.12); border: 1px solid rgba(175,50,54,0.25);
+  border-radius: var(--radius-s); padding: 5px 10px; cursor: pointer;
+  font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8);
+  transition: background 100ms;
+}
+.steward-trigger:hover { background: rgba(175,50,54,0.2); }
+.steward-trigger svg { width: 14px; height: 14px; stroke: var(--primary); fill: none; stroke-width: 2; }
+
+/* Shell with steward sidebar */
+.shell-with-steward { display: flex; min-height: 600px; }
+
+/* Main content area */
+.shell-main { flex: 1; background: var(--card); padding: var(--space-l) var(--space-m); }
+
+/* Steward sidebar */
+.steward-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(255,255,255,0.06);
+}
+
+.steward-sidebar__header {
+  padding: var(--space-m);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.steward-sidebar__close {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-s);
+}
+.steward-sidebar__close-btn {
+  width: 28px; height: 28px; background: rgba(255,255,255,0.06);
+  border-radius: var(--radius-s); display: flex; align-items: center;
+  justify-content: center; cursor: pointer;
+}
+.steward-sidebar__close-btn svg { width: 14px; height: 14px; stroke: rgba(255,255,255,0.5); fill: none; stroke-width: 2; }
+
+.steward-sidebar__label {
+  font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary);
+  display: flex; align-items: center; gap: 6px;
+}
+.steward-sidebar__label::before { content: ''; display: block; width: 16px; height: 2px; background: var(--primary); }
+
+.steward-sidebar__title {
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 800;
+  color: rgba(255,255,255,0.9); letter-spacing: -0.02em; margin-top: var(--space-2xs);
+}
+
+/* Steward nav */
+.steward-nav { flex: 1; padding: var(--space-s) 0; overflow-y: auto; }
+
+.steward-nav__item {
+  display: flex; align-items: center; gap: var(--space-s);
+  padding: 10px var(--space-m); cursor: pointer;
+  font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.55);
+  text-decoration: none; transition: background 100ms, color 100ms;
+  border-left: 3px solid transparent;
+}
+.steward-nav__item:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.85); }
+.steward-nav__item--active { color: #fff; background: rgba(175,50,54,0.12); border-left-color: var(--primary); }
+.steward-nav__item svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.5; flex-shrink: 0; }
+
+.steward-nav__badge {
+  margin-left: auto; background: var(--primary); color: #fff;
+  font-size: 10px; font-weight: 700; padding: 2px 7px;
+  border-radius: var(--radius-pill); flex-shrink: 0;
+}
+.steward-nav__badge--warn { background: var(--warning); }
+
+/* Content */
+.label-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary); display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-s); }
+.label-tag::before { content: ''; display: block; width: 20px; height: 2px; background: var(--primary); }
+.page-title { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 32px; color: var(--ink); letter-spacing: -0.03em; margin-bottom: var(--space-m); }
+
+/* Queue items */
+.filter-tabs { display: flex; gap: 4px; margin-bottom: var(--space-m); flex-wrap: wrap; }
+.filter-tab { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: var(--radius-pill); border: 1px solid var(--card-2); color: var(--muted); cursor: pointer; background: #fff; text-decoration: none; }
+.filter-tab--active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.queue-item {
+  background: #fff; border: 1px solid var(--card-2); border-radius: var(--radius-l);
+  display: flex; overflow: hidden; margin-bottom: var(--space-xs);
+}
+.queue-item--overdue { border-color: rgba(220,38,38,0.35); background: rgba(220,38,38,0.02); }
+.queue-item__rule { width: 4px; flex-shrink: 0; }
+.queue-item__rule--submitted { background: var(--warning); }
+.queue-item__rule--active { background: var(--success); }
+.queue-item__rule--overdue { background: var(--error); }
+
+.queue-item__body { padding: var(--space-s) var(--space-m); flex: 1; }
+.queue-item__top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-s); margin-bottom: 6px; }
+.queue-item__title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.35; flex: 1; }
+.queue-item__meta { display: flex; align-items: center; gap: var(--space-s); flex-wrap: wrap; }
+.queue-item__member { font-size: 12px; color: var(--muted); }
+.queue-item__date { font-size: 12px; color: var(--muted-light); }
+.due-badge { font-size: 11px; font-weight: 700; color: var(--error); letter-spacing: 0.04em; }
+.due-badge--warn { color: var(--warning); }
+
+.status-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: var(--radius-pill); }
+.status-badge--submitted { background: rgba(202,138,4,0.12); color: var(--warning); }
+.status-badge--active { background: rgba(22,163,74,0.1); color: var(--success); }
+
+.queue-item__actions { margin-top: var(--space-xs); display: flex; gap: var(--space-xs); }
+.btn-sm { font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: var(--radius-xs); cursor: pointer; border: none; font-family: 'Inter', sans-serif; text-decoration: none; display: inline-flex; align-items: center; }
+.btn-sm-secondary { background: transparent; border: 1px solid var(--card-2); color: var(--text); }
+.btn-sm-secondary:hover { background: var(--card); }
+.btn-sm-primary { background: var(--primary); color: #fff; }
+
+/* Overdue summary */
+.overdue-banner {
+  background: rgba(220,38,38,0.06); border: 1px solid rgba(220,38,38,0.18);
+  border-radius: var(--radius-m); padding: var(--space-s) var(--space-m);
+  display: flex; align-items: center; gap: var(--space-m); margin-bottom: var(--space-m);
+}
+.overdue-banner__icon { font-size: 20px; }
+.overdue-banner__text { font-size: 13px; color: var(--error); font-weight: 600; }
+.overdue-banner__sub { font-size: 12px; color: var(--muted); font-weight: 400; }
+
+/* Page annotations */
+.annotation {
+  font-size: 11px; color: var(--muted); font-style: italic;
+  padding: var(--space-xs) var(--space-m); background: rgba(175,50,54,0.04);
+  border-left: 2px solid var(--primary); margin: var(--space-m);
+}
+</style>
+</head>
+<body>
+
+<div class="mockup-label">
+  <strong>MOCKUP 03 — Steward Management Panel</strong> &nbsp;·&nbsp; sceptre.ichebo.org &nbsp;·&nbsp; Collapsible steward sidebar + support queue
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     STEWARD VIEW — SIDEBAR OPEN
+══════════════════════════════════════════════════ -->
+<div class="scenario">
+  <strong>Screen A</strong> — Participant home with steward sidebar OPEN (slides in from right)
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand"><div class="top-nav__mark"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg></div><span class="top-nav__wordmark">Ichebo</span></div>
+    <div class="top-nav__links">
+      <a href="#" class="nav-link nav-link--active">Channel</a>
+      <a href="#" class="nav-link">Community</a>
+      <a href="#" class="nav-link">Learn</a>
+      <a href="#" class="nav-link">Bible</a>
+      <a href="#" class="nav-link">Support</a>
+    </div>
+    <div class="top-nav__right">
+      <!-- Steward trigger — visible only to Level 3+ -->
+      <div class="steward-trigger">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Manage
+      </div>
+      <div class="avatar">ES</div>
+    </div>
+  </nav>
+
+  <div class="shell-with-steward">
+    <!-- Main content — participant home (condensed) -->
+    <div class="shell-main">
+      <div style="background: #0E0E0E; height: 200px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-m); margin-bottom: var(--space-m);">
+        <div style="text-align:center;">
+          <div style="font-family:'Playfair Display',serif; font-size:60px; color:rgba(175,50,54,0.055); font-weight:900; line-height:1;">CHANNEL</div>
+          <div style="font-size:12px; color:rgba(255,255,255,0.25); text-transform:uppercase; letter-spacing:0.1em; margin-top:8px;">Offline — Next: Sunday 10:00 AM</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:12px; overflow-x:auto;">
+        <div style="flex:0 0 130px; background:#fff; border:1px solid var(--card-2); border-radius:12px; padding:16px 12px; font-size:13px; font-weight:600;">👥 Community</div>
+        <div style="flex:0 0 130px; background:#fff; border:1px solid var(--card-2); border-radius:12px; padding:16px 12px; font-size:13px; font-weight:600;">📖 Learn</div>
+        <div style="flex:0 0 130px; background:#fff; border:1px solid var(--card-2); border-radius:12px; padding:16px 12px; font-size:13px; font-weight:600;">📜 Bible</div>
+        <div style="flex:0 0 130px; background:#fff; border:1px solid var(--card-2); border-radius:12px; padding:16px 12px; font-size:13px; font-weight:600;">💬 Support</div>
+      </div>
+    </div>
+
+    <!-- Steward sidebar — OPEN -->
+    <div class="steward-sidebar">
+      <div class="steward-sidebar__header">
+        <div class="steward-sidebar__close">
+          <div class="steward-sidebar__label">Community Management</div>
+          <div class="steward-sidebar__close-btn">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+        </div>
+        <div class="steward-sidebar__title">Apostolic Faith Centre</div>
+      </div>
+
+      <nav class="steward-nav">
+        <a href="#" class="steward-nav__item">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Members
+        </a>
+        <a href="#" class="steward-nav__item">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Gatherings
+        </a>
+        <a href="#" class="steward-nav__item">
+          <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          Formation
+        </a>
+        <a href="#" class="steward-nav__item">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Announcements
+        </a>
+        <a href="#" class="steward-nav__item steward-nav__item--active">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+          Support Queue
+          <span class="steward-nav__badge steward-nav__badge--warn">3</span>
+        </a>
+        <a href="#" class="steward-nav__item">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+          Settings
+        </a>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<div class="annotation">
+  ↑ The steward sidebar slides in from the right when "Manage" is tapped. The main content dims slightly (overlay). Closing the sidebar (×) returns to the full participant view. Stewards see the "Manage" button in the top nav — participants do not.
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     STEWARD SUPPORT QUEUE
+══════════════════════════════════════════════════ -->
+<div class="scenario" style="margin-top: 40px;">
+  <strong>Screen B</strong> — Steward support queue with SLA flagging
+</div>
+
+<div class="screen-frame">
+  <nav class="top-nav">
+    <div class="top-nav__brand"><div class="top-nav__mark"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg></div><span class="top-nav__wordmark">Ichebo</span></div>
+    <div class="top-nav__links">
+      <a href="#" class="nav-link">Channel</a>
+      <a href="#" class="nav-link">Community</a>
+      <a href="#" class="nav-link">Learn</a>
+      <a href="#" class="nav-link">Bible</a>
+      <a href="#" class="nav-link">Support</a>
+    </div>
+    <div class="top-nav__right">
+      <div class="steward-trigger"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> Manage</div>
+      <div class="avatar">ES</div>
+    </div>
+  </nav>
+
+  <div style="background: var(--card); padding: var(--space-l) var(--space-m);">
+    <div class="label-tag">Community Management</div>
+    <h1 class="page-title">Support Queue</h1>
+
+    <!-- Overdue banner -->
+    <div class="overdue-banner">
+      <div class="overdue-banner__icon">⚠</div>
+      <div>
+        <div class="overdue-banner__text">2 requests are overdue</div>
+        <div class="overdue-banner__sub">Response target: 72 hours — these requests have passed that window</div>
+      </div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="filter-tabs">
+      <a href="#" class="filter-tab filter-tab--active">Open (3)</a>
+      <a href="#" class="filter-tab">Acknowledged (1)</a>
+      <a href="#" class="filter-tab">Resolved (5)</a>
+      <a href="#" class="filter-tab">Needs Routing (0)</a>
+      <a href="#" class="filter-tab">All</a>
+    </div>
+
+    <!-- Overdue item 1 -->
+    <div class="queue-item queue-item--overdue">
+      <div class="queue-item__rule queue-item__rule--overdue"></div>
+      <div class="queue-item__body">
+        <div class="queue-item__top">
+          <div class="queue-item__title">Question about the Formation Programme eligibility</div>
+          <span class="status-badge status-badge--submitted">Open</span>
+        </div>
+        <div class="queue-item__meta">
+          <span class="queue-item__member">Chidi Okafor</span>
+          <span class="queue-item__date">Submitted 20 Jun 2026</span>
+          <span class="due-badge">⚠ Overdue by 4 days</span>
+        </div>
+        <div class="queue-item__actions">
+          <a href="#" class="btn-sm btn-sm-primary">Acknowledge</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overdue item 2 -->
+    <div class="queue-item queue-item--overdue">
+      <div class="queue-item__rule queue-item__rule--overdue"></div>
+      <div class="queue-item__body">
+        <div class="queue-item__top">
+          <div class="queue-item__title">Request for pastoral support — family situation</div>
+          <span class="status-badge status-badge--submitted">Open</span>
+        </div>
+        <div class="queue-item__meta">
+          <span class="queue-item__member">Amara Mensah</span>
+          <span class="queue-item__date">Submitted 18 Jun 2026</span>
+          <span class="due-badge">⚠ Overdue by 6 days</span>
+        </div>
+        <div class="queue-item__actions">
+          <a href="#" class="btn-sm btn-sm-primary">Acknowledge</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Normal open item -->
+    <div class="queue-item">
+      <div class="queue-item__rule queue-item__rule--submitted"></div>
+      <div class="queue-item__body">
+        <div class="queue-item__top">
+          <div class="queue-item__title">Help with induction lesson 3 — cannot proceed past the assessment</div>
+          <span class="status-badge status-badge--submitted">Open</span>
+        </div>
+        <div class="queue-item__meta">
+          <span class="queue-item__member">Emmanuel Osei</span>
+          <span class="queue-item__date">Submitted 24 Jun 2026</span>
+          <span class="due-badge due-badge--warn">Due in 10 hours</span>
+        </div>
+        <div class="queue-item__actions">
+          <a href="#" class="btn-sm btn-sm-primary">Acknowledge</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acknowledged item -->
+    <div class="queue-item" style="opacity:0.65;">
+      <div class="queue-item__rule queue-item__rule--active"></div>
+      <div class="queue-item__body">
+        <div class="queue-item__top">
+          <div class="queue-item__title">Request for help with community onboarding documents</div>
+          <span class="status-badge status-badge--active">Acknowledged</span>
+        </div>
+        <div class="queue-item__meta">
+          <span class="queue-item__member">Blessing Adeyemi</span>
+          <span class="queue-item__date">Submitted 23 Jun 2026</span>
+        </div>
+        <div class="queue-item__actions">
+          <a href="#" class="btn-sm btn-sm-secondary">Mark Resolved</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height: 48px;"></div>
+</body>
+</html>
