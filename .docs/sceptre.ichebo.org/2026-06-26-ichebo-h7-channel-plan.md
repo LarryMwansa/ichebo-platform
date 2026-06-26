@@ -1,5 +1,20 @@
 # Phase H.7 — Ichebo Channel (broadcast app + now-playing endpoint + channel scheduler UI)
 
+> ## ⚠️ Correction, 2026-06-26 — not yet built; real fixes needed before execution
+>
+> H.7 has not been started — no `broadcast` app, no `ChannelConfig`/`ChannelSlot`, no now-playing endpoint exist anywhere in the codebase as of 2026-06-26. Fixes needed, found by checking every claim against the live repository:
+>
+> 1. **`ics_project/settings.py` doesn't exist.** `INSTALLED_APPS` lives in `ics_project/settings/base.py`. Task 1, Step 3's instruction is otherwise correct, just needs the right file.
+> 2. **`competence_level` is a real `IntegerField` (`0`–`5`), not a string.** Task 4's `_require_architect` does `if getattr(user, 'competence_level', '0') != '5':` — comparing an int to the string `'5'` is always `True` in real Python, meaning **every user, including a real Level 5 Architect, would be denied** by this check as written. Fix: `if getattr(user, 'competence_level', 0) != 5:`.
+> 3. **`Tenant.objects.filter(deleted_at__isnull=True)` is correct** (confirmed — `Tenant` uses `SoftDeleteMixin`, which provides `deleted_at`) — no fix needed there, called out only because it's one of the few claims in this plan that checked out on first read.
+> 4. **`agency_urls.py` doesn't exist** — Task 4, Step 4 already hedges with "or the main `urls.py` for `app.ichebo.org`," which is the correct fallback: the real file is `ics_project/urls.py` (`ROOT_URLCONF = 'ics_project.urls'`). Add `path('channel/', include('broadcast.channel_urls'))` there.
+> 5. **CSS classes throughout the scheduler templates (Task 4, Step 5) don't match this codebase's convention.** `class="btn btn-primary"`, `class="page-container"`, `class="label-tag"`, `class="field-group"`/`field-label`/`field-input`, `class="slot-item"` etc. are a generic system that doesn't exist here. Since this scheduler lives at `app.ichebo.org` (the existing Apostolic Command Shell), it should use the real, established `ws-`-prefixed classes and inline-style convention — see any real governance/community template (e.g. `templates/governance/governance.html`, `templates/community/partials/gathering_form.html`) for the actual pattern. Every template in Task 4 would render unstyled as written.
+> 6. **The `video_record_id`/`loop_default_video_id` comments are slightly wrong about where the referenced data lives.** "FK to video_live VideoRecord or media VideoRecord — resolved at read time" (Task 1, Step 2) — `video_live` has no `VideoRecord` model at all; its only surviving model after Video Direction v2 (2026-06-23/24) is `BroadcastSchedule`. `media.VideoRecord` is real, but it's explicitly documented in its own docstring as "not a database model" — a typed Python wrapper around a `records.Record` with `record_family='media'`, with no primary key of its own. These fields should be understood as storing a `Record.id`, not a separate "VideoRecord" identifier. Functionally the field type (`UUIDField`) is still correct; only the comment is misleading.
+> 7. **The test suite's `make_tenant` helper has the same `Tenant` field gaps as H.5 and H.6's test suites** — `Tenant.objects.create(name=..., tenant_path=...)` is missing `slug` (required, unique), uses the wrong field name (`path`, not `tenant_path`, which lives on `UserPermission`), and is missing required `tier` and `created_by`. See H.5's correction note, point 7, for a working helper shape.
+> 8. **Server paths**: real repo path is `/home/scepter/ichebo-platform-repo/ichebo-platform` (user `scepter`), not implied elsewhere in this folder's docs as `/home/ics/...`. Not directly referenced in this particular plan's commands, but relevant if running any of Task 1–6's verification steps on the real server rather than locally.
+>
+> Fix all eight before running any task below — #2 is the most serious, since it would lock the real Architect out of the one tool this whole phase exists to build.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Build the `broadcast` Django app with `ChannelConfig` and `ChannelSlot` configuration models, the `GET /api/broadcast/now/` now-playing endpoint with four-level fallback resolution, and the channel scheduler UI at `app.ichebo.org` (Architect only, Level 5).
@@ -33,7 +48,7 @@ python manage.py check
 **Files:**
 - Run: `python manage.py startapp broadcast`
 - Modify: `broadcast/models.py`
-- Modify: `ics_project/settings.py` — add `'broadcast'` to `INSTALLED_APPS`
+- Modify: `ics_project/settings/base.py` — add `'broadcast'` to `INSTALLED_APPS`
 - Create migration
 
 **Step 1: Create the app**
@@ -138,7 +153,7 @@ class ChannelSlot(models.Model):
 
 **Step 3: Register app in settings**
 
-In `ics_project/settings.py`, find `INSTALLED_APPS` and add:
+In `ics_project/settings/base.py`, find `INSTALLED_APPS` and add:
 
 ```python
 'broadcast',
@@ -178,7 +193,7 @@ print('OK')
 **Step 7: Commit**
 
 ```bash
-git add broadcast/ ics_project/settings.py
+git add broadcast/ ics_project/settings/base.py
 git commit -m "feat(broadcast): create broadcast app with ChannelConfig and ChannelSlot models"
 ```
 
@@ -508,7 +523,7 @@ from tenants.models import Tenant
 
 def _require_architect(user):
     """Gate: only Level 5 (Architect/Prime) may access channel scheduler."""
-    if getattr(user, 'competence_level', '0') != '5':
+    if getattr(user, 'competence_level', 0) != 5:   # real IntegerField — compare to an int
         raise PermissionDenied
 
 
@@ -882,16 +897,24 @@ from tenants.models import Tenant
 User = get_user_model()
 
 
-def make_tenant(name='Channel Tenant', path='/global/channel/'):
-    return Tenant.objects.create(name=name, tenant_path=path)
+def make_tenant(name='Channel Tenant', slug='channel-test'):
+    # Tenant requires slug (unique), path (the real field — tenant_path
+    # lives on UserPermission, not Tenant), tier, and created_by.
+    admin = User.objects.create_user(
+        username='_test_admin_h7', email='_test_admin_h7@test.com',
+    )
+    return Tenant.objects.create(
+        name=name, slug=slug, path=f'/global/{slug}/',
+        tier='church_node', created_by=admin,
+    )
 
 
-def make_user(username, level='1'):
+def make_user(username, level=1):
     user = User.objects.create_user(
         username=username, password='testpass123',
         email=f'{username}@test.com',
     )
-    user.competence_level = level
+    user.competence_level = level   # real IntegerField — pass an int
     user.save()
     return user
 
@@ -990,7 +1013,7 @@ class TestNowPlayingAPIEndpoint(TestCase):
     """GET /api/broadcast/now/ — authentication, response shape, tenant scoping."""
 
     def setUp(self):
-        self.tenant = make_tenant(name='API Channel', path='/global/apichannel/')
+        self.tenant = make_tenant(name='API Channel', slug='apichannel')
         self.user = make_user('api_user')
         self.client = Client()
 
@@ -1027,9 +1050,9 @@ class TestChannelSchedulerAccessControl(TestCase):
     """Channel scheduler UI — only accessible to Level 5."""
 
     def setUp(self):
-        self.tenant = make_tenant(name='Sched Tenant', path='/global/sched/')
-        self.architect = make_user('architect_h7', level='5')
-        self.member = make_user('member_h7', level='1')
+        self.tenant = make_tenant(name='Sched Tenant', slug='sched')
+        self.architect = make_user('architect_h7', level=5)
+        self.member = make_user('member_h7', level=1)
         self.client = Client()
 
     def test_architect_can_access_overview(self):

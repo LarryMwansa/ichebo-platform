@@ -1,5 +1,18 @@
 # Phase H.3 — Community Support Requests Implementation Plan
 
+> ## ⚠️ Correction, 2026-06-26 — ALREADY SHIPPED, do not execute
+>
+> This plan was written without access to the live repository. By the time it was written, **this work was already built and live in production** — `commit 16bfbab feat: add member-to-steward support request flow with SLA tracking`, 2026-06-22. Do not run the tasks below; they would attempt to recreate code that already exists.
+>
+> **Where the real, shipped code actually lives:**
+> - `community/views.py` — search for `# ── Support requests — member-to-steward, SLA-tracked ──`. `SUPPORT_REQUEST_RESPONSE_WINDOW_HOURS = 72` is the real SLA constant (matches Task 4 below exactly).
+> - `community/services.py:resolve_steward_for_tenant(tenant)` — exists, and matches Task 2's design exactly, including its `role__endswith='-steward'` filter. **This is a real, still-live gap, not yet fixed**: it silently excludes `'admin'`-role holders, since that role string doesn't end in `-steward`. `tenants.models.UserPermission.STEWARD_ROLES` (a set added 2026-06-24 for an unrelated tenancy-visibility fix, which correctly includes `'admin'`) would be the right fix if this routing gap ever needs closing — flagging it here since it was found by direct comparison, not fixing it as part of this correction pass (out of scope for "fix the docs").
+> - `notifications/models.py` — `support_request_created` and `support_request_acknowledged` are both already present in `NOTIFICATION_TYPES`, exactly as Task 1 below specifies.
+> - **Real bug in this plan's Task 3, found by checking the actual `create_notification` signature:** the plan's `notify_support_request_created`/`notify_support_request_acknowledged` call `create_notification(user=..., notification_type=..., source_app=..., source_record_id=..., message=...)`. The real signature (`notifications/service.py`) is `create_notification(user, notification_type, title, body='', data=None)` — there is no `source_app`, `source_record_id`, or `message` parameter. Calling it as written below would raise `TypeError`. The actual shipped code does not have this bug — check the real `notifications/service.py` for the correct call shape rather than copying Task 3's code.
+> - Real URLs (`community/urls.py`): `/community/support/`, `/community/htmx/support/create/`, `/community/htmx/support/mine/`, `/community/htmx/support/{id}/acknowledge/`.
+>
+> The task-by-task plan below is preserved as a historical record of the original design intent — useful for understanding *why* the shipped code looks the way it does, not as a build checklist. If extending Community Support later, start from the real files above.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Build a member-initiated support request flow routed to the community steward, with SLA tracking visible in a steward queue view — entirely within the existing `community` Django app, using the existing `Record` model with no new models.

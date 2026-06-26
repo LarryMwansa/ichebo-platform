@@ -5,13 +5,34 @@
 | Field | Value |
 |---|---|
 | Document | DOC J — Sceptre Community Surface, Ichebo Channel, Access Model |
-| Version | 1.0 — 2026-06-25 |
+| Version | 1.2 — 2026-06-26 (corrected against the live repo; v1.2 adds cross-references to the four built UI mockups in `sceptre_comm_web-ui_mockup/` and fixes three real prose/mockup mismatches found while reading them — see Correction Log items 12 and the notes in Parts 3.3, 3.4, 6, and 7) |
 | Status | Approved — Canonical Reference |
-| ADR reference | ADR-022 (subdomain separation), ADR-023 (Ichebo Channel architecture) |
+| ADR reference | ADR-023 (subdomain separation), ADR-024 (Ichebo Channel architecture) |
 | Data contract | data-contract-v11-canonical-2026-05-13.md — v12 amendments noted |
-| Roadmap | Master Roadmap v7 — Phases H.3, H.4, H.5 (new) |
-| Depends on | DOC G (Ichebo Media), ADR-001–021, Community Support Plan (H.3), Community Live Service Room Plan (H.4), Video Direction v2 Plan |
+| Roadmap | Master Roadmap v7 — Phases H.5, H.6, H.7 (new). H.3 and H.4 are already shipped — see Correction Log. |
+| Depends on | DOC G (Ichebo Media), ADR-001–022, Community Support Plan (H.3 — shipped), Community Live Service Room Plan (H.4 — shipped), Video Direction v2 Plan |
 | Authors | Chizola (domain); Claude (technical) |
+
+---
+
+## Correction Log — v1.0 → v1.1 (2026-06-26)
+
+v1.0 was produced in a session without access to the live codebase. The following corrections were found by checking every claim directly against the repository and the production servers — not by re-deriving the design. The architecture and decisions below are unchanged; only facts that were wrong or had since moved are corrected.
+
+| # | v1.0 said | Actual / corrected |
+|---|---|---|
+| 1 | ADR-022 (subdomain separation), ADR-023 (channel) | **ADR-022 already exists** — approved 2026-06-09, Handbook/Governance separation (`2026-06-09-adr-022-handbook-governance-separation.md`). Renumbered to **ADR-023** (subdomain separation) and **ADR-024** (channel) throughout this document. |
+| 2 | H.3 (Community Support) and H.4 (Live Service Room) listed as new phases to build | **Both already shipped.** H.3: `commit 16bfbab`, 2026-06-22 — `community/services.py:resolve_steward_for_tenant`, `Record(record_type='support_request')`, queue at `/community/support/`. H.4: `commit d6a7854`, 2026-06-22, superseded/corrected by `commit 67878ba` (2026-06-24/25) — tenant-scoped live room at `/community/live/`, `community/views.py:_find_live_session`, in-service ministry panel. The H.3 and H.4 phase plan documents in this folder describe this work as not-yet-built against files (`video_live/views.py:_event_qs`) that no longer exist — see those documents' own correction notes. |
+| 3 | Django app server: `/home/ics/ichebo-platform`, Gunicorn on `127.0.0.1:8000` | Real path: **`/home/scepter/ichebo-platform-repo/ichebo-platform`**. Real Gunicorn bind: **`127.0.0.1:8001`** (confirmed in `gunicorn.conf.py` on the server). User is `scepter`, not `ics`. |
+| 4 | `ROOT_URLCONF` implied as `ichebo_platform.urls`, settings module as `settings.py` | Real values: `ROOT_URLCONF = 'ics_project.urls'`; settings live in `ics_project/settings/base.py` + `production.py`, not a single `settings.py`. |
+| 5 | `competence_level` treated as a string with values like `'0a'`, `'0b'`, `'3'` | Real field: `accounts/models.py` — `competence_level = models.IntegerField(default=0)`. Plain integers `0`–`5`. **There is no `'0a'`/`'0b'` distinction in the model.** Every gating snippet in this document and the phase plans that does `competence_level not in ['0b','1','2',...]` compares an int to a list of strings — always `True`/`False` the wrong way in real Python, which would lock every participant out. All gating code in this document corrected to use integer comparisons. The 0a/0b distinction may exist as a UI/UX concept (e.g. "has the user completed induction yet") but must be implemented as a real boolean/derived check, not a level value — flagged as an open question in Part 5. |
+| 6 | `Tenant` model fields implied as `tenant_path` (on Tenant itself) | Real field is **`Tenant.path`** (materialized path). `tenant_path` is a real field, but it lives on **`UserPermission`**, not `Tenant`. `Tenant.objects.create(...)` also requires `slug` (unique, required), `tier` (required, no default), and `created_by` (required, `PROTECT`) — none of which appeared in this document's or the phase plans' test helpers. Corrected in Part 5 and noted for the phase-plan test suites. |
+| 7 | `role__endswith='-steward'` proposed as the steward-role check | Works for every steward role (`branch-steward` … `global-steward`) but **silently excludes `'admin'`**, which does not end in `-steward` and is a real, in-use role (confirmed in `tenants/models.py:UserPermission.STEWARD_ROLES`, built 2026-06-24 for an unrelated tenancy-visibility fix). Corrected to check membership in the real `STEWARD_ROLES` set instead of a suffix match. |
+| 8 | `create_notification()` called with `source_app`, `source_record_id`, `message` kwargs (H.5 plan) | Real signature (`notifications/service.py`): `create_notification(user, notification_type, title, body='', data=None)`. No `source_app`/`source_record_id`/`message` parameters exist — corrected in the H.5 plan. |
+| 9 | DNS for `sceptre.ichebo.org` and the other new subdomains listed as "not yet configured" / a precondition to check | **Confirmed live** as of 2026-06-26 — `sceptre.ichebo.org`, `join`, `identity`, `learn`, `handbook`, `give` all resolve to the Django VPS (`37.27.82.169`); `media.ichebo.org` resolves to the video VPS (`46.62.211.72`). DNS is no longer a blocker for H.6's Nginx/SSL step. |
+| 10 | Nginx config shown as a separate file per subdomain (`/etc/nginx/sites-available/sceptre.ichebo.org`) | The real server keeps **one file**, `/etc/nginx/sites-available/ics`, with every subdomain as its own `server {}` block inside it (confirmed by reading the live file). The corrected H.6 plan adds a new block to that same file rather than creating a separate one, matching the existing convention. |
+| 11 | `ALLOWED_HOSTS` / `SESSION_COOKIE_DOMAIN` shown as already containing other entries | Production's actual `.env` currently has `ALLOWED_HOSTS=app.ichebo.org,ichebo.org,www.ichebo.org` — `sceptre.ichebo.org` is genuinely not yet present and must be added. `SESSION_COOKIE_DOMAIN`/`CSRF_COOKIE_DOMAIN` are **not set at all** currently (no cross-subdomain cookie sharing exists yet) — the decision in §11.3 (share a login across subdomains vs. require separate logins) is still open and needs Chizola's call before H.6 ships. |
+| 12 | This document had no visual reference for H.4's already-shipped Live Service Room + Ministry Panel | `sceptre_comm_web-ui_mockup/04-sceptre-live-service.html` — built mockup covering all four states (member view with prayer/question form, post-submit confirmation, steward queue, no-live-service empty state). One real inconsistency found and fixed directly in the mockup file: it said the steward queue "refreshes every 20 seconds" in three places — the actual shipped polling interval is 15 seconds (`LIVE_REQUEST_POLL_SECONDS = 15`, `community/views.py`); corrected to 15s in the mockup. |
 
 ---
 
@@ -39,18 +60,18 @@ Same Django backend. Same database. Same API. Same data contract. Django serves 
 
 ---
 
-## Part 2 — Subdomain Architecture (ADR-022)
+## Part 2 — Subdomain Architecture (ADR-023)
 
 ### 2.0 Full Subdomain Topology
 
 The Ichebo ecosystem spans two physical servers. All subdomains are documented here to prevent ambiguity when configuring Nginx, DNS, or SSL certificates.
 
-**Django VPS — `37.27.82.169` (platform VPS, existing)**
+**Django VPS — `37.27.82.169` (platform VPS, existing). User: `scepter`. Repo: `/home/scepter/ichebo-platform-repo/ichebo-platform`.**
 
 | Subdomain | Purpose | Routes to |
 |---|---|---|
-| `app.ichebo.org` | Agency / Architect surface — Apostolic Command Shell | Gunicorn `127.0.0.1:8000` |
-| `sceptre.ichebo.org` | Sceptre Community surface — participant + steward (new) | Gunicorn `127.0.0.1:8000` (same process) |
+| `app.ichebo.org` | Agency / Architect surface — Apostolic Command Shell | Gunicorn `127.0.0.1:8001` |
+| `sceptre.ichebo.org` | Sceptre Community surface — participant + steward (new). DNS confirmed live 2026-06-26, points at this server. | Gunicorn `127.0.0.1:8001` (same process) |
 
 **Video VPS — `46.62.211.72` (Helsinki, deployed 2026-06-23)**
 
@@ -82,76 +103,87 @@ Django's `sites` framework (multi-site) is not used. It was built for entirely s
 - Nginx receives requests on both `app.ichebo.org` and `sceptre.ichebo.org`
 - Both proxy to the same Gunicorn/Django process (same port, same workers)
 - Django's `ALLOWED_HOSTS` includes both subdomains
-- A custom middleware reads `request.get_host()` and sets `request.site = 'agency' | 'community'`
-- Django's `ROOT_URLCONF` routes to a dispatcher that delegates per host
-- `agency_urls.py` handles `app.ichebo.org` — existing URL patterns, unchanged
-- `sceptre_urls.py` handles `sceptre.ichebo.org` — new URL patterns
-- Templates live in `templates/agency/` and `templates/sceptre/` — separate shells, shared HTMX patterns
+- A custom middleware reads `request.get_host()` and sets `request.site = 'agency' | 'community'`, and sets `request.urlconf` directly when the host is `sceptre.ichebo.org` — this is the real Django mechanism for per-request URL conf override; it does not require a separate dispatcher function in `ics_project/urls.py`
+- `ics_project/urls.py` (the real `ROOT_URLCONF`) handles `app.ichebo.org` — existing URL patterns, completely unchanged
+- `sceptre/urls.py` (new) handles `sceptre.ichebo.org` — new URL patterns, used only when `request.urlconf` is set
+- Templates: the existing tree under `templates/` is flat (e.g. `templates/community/`, `templates/governance/`) — **no `templates/agency/` namespace exists and none is needed.** Only `templates/sceptre/` is new and additive; nothing existing moves or is relocated.
 - Same `User`, `UserPermission`, `Record`, `Activity` models underpin both
 
-**Nginx configuration:**
+**Nginx configuration** — corrected to match the real server, which keeps every subdomain as one `server {}` block inside a single file (`/etc/nginx/sites-available/ics`), not a separate file per subdomain:
 
 ```nginx
-# /etc/nginx/sites-available/app.ichebo.org (existing — unchanged)
-server {
-    server_name app.ichebo.org;
-    location / { proxy_pass http://127.0.0.1:8000; }
-}
-
-# /etc/nginx/sites-available/sceptre.ichebo.org (new)
+# /etc/nginx/sites-available/ics — add this block alongside the existing
+# app.ichebo.org blocks already in the file. Do not create a separate file.
 server {
     listen 80;
     server_name sceptre.ichebo.org;
+    return 301 https://sceptre.ichebo.org$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name sceptre.ichebo.org;
+
+    ssl_certificate /etc/letsencrypt/live/sceptre.ichebo.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/sceptre.ichebo.org/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location /static/ {
+        alias /home/scepter/ichebo-platform-repo/ichebo-platform/staticfiles/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /media/ {
+        proxy_pass http://localhost:9000/ics-media/;
+    }
+
     location / {
-        proxy_pass http://127.0.0.1:8000;
+        proxy_pass http://127.0.0.1:8001;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120;
     }
 }
 ```
 
-SSL via certbot (same as existing subdomains). DNS: A record for `sceptre.ichebo.org` pointing to the same Django VPS IP as `app.ichebo.org`.
+SSL via certbot (same as existing subdomains). DNS: confirmed live 2026-06-26 — `sceptre.ichebo.org` already resolves to the Django VPS IP, no DNS work remains.
 
-**Django settings and middleware:**
+**Django settings and middleware** — corrected to the real settings module path and `request.urlconf` mechanism:
 
 ```python
-# settings.py
-ALLOWED_HOSTS = [
-    'app.ichebo.org',
-    'sceptre.ichebo.org',
-    '127.0.0.1',
-    'localhost',
-]
+# ics_project/settings/base.py — ALLOWED_HOSTS is read from .env via config();
+# production's .env currently has ALLOWED_HOSTS=app.ichebo.org,ichebo.org,www.ichebo.org
+# — sceptre.ichebo.org must be added to that value.
 
-# middleware/site_router.py
+# middleware/site_router.py (new file, new top-level package)
 class SiteRouterMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        host = request.get_host().split(':')[0]
+        host = request.get_host().split(':')[0].lower()
         if host == 'sceptre.ichebo.org':
             request.site = 'community'
+            request.urlconf = 'sceptre.urls'   # overrides ROOT_URLCONF for this request only
         else:
             request.site = 'agency'
+            # request.urlconf intentionally not set — Django falls back to
+            # ROOT_URLCONF ('ics_project.urls'), completely unchanged.
         return self.get_response(request)
-
-# ichebo_platform/urls.py
-def get_urlconf(request):
-    if getattr(request, 'site', 'agency') == 'community':
-        return 'sceptre.urls'
-    return 'agency.urls'
 ```
+
+No dispatcher function in `ics_project/urls.py` is needed — setting `request.urlconf` directly in the middleware is the complete mechanism; Django's URL resolver checks it automatically on every request.
 
 **Template directory structure:**
 
 ```
 templates/
-├── agency/           # app.ichebo.org templates (existing, relocated)
-│   ├── base.html     # Apostolic Command Shell base
-│   ├── _sidebar.html
-│   └── [app templates]
-└── sceptre/          # sceptre.ichebo.org templates (new)
+├── base.html, workspace_shell.html, community/, governance/, learn/, ...   # existing — unchanged, untouched, not relocated
+└── sceptre/          # sceptre.ichebo.org templates (new — the only addition)
     ├── base.html     # Sceptre shell base
     ├── _nav.html     # Navigation component
     ├── home/         # Participant home
@@ -175,9 +207,9 @@ The consumer side and steward side are not separate URLs — they are one role-a
 
 | User type | Gating rule | What they see |
 |---|---|---|
-| Participant | competence_level 0b–2 | Consumer side: Channel, Community (read), Learn, Bible, Support |
-| Community Steward | competence_level >= 3 OR `UserPermission.role` endswith `'-steward'` | All participant access + steward management panel |
-| Architect | competence_level == 5 AND is_prime_tenant | Does not use `sceptre.ichebo.org` as primary — works from `app.ichebo.org`; can access `sceptre.ichebo.org` as a steward-equivalent if needed |
+| Participant | `competence_level` 0–2 (real `IntegerField`, no `'0a'`/`'0b'` split in the model) | Consumer side: Channel, Community (read), Learn, Bible, Support |
+| Community Steward | `competence_level >= 3` OR `UserPermission.role in tenants.models.UserPermission.STEWARD_ROLES` | All participant access + steward management panel |
+| Architect | `competence_level == 5` AND a direct `UserPermission` on the Prime tenant | Does not use `sceptre.ichebo.org` as primary — works from `app.ichebo.org`; can access `sceptre.ichebo.org` as a steward-equivalent if needed |
 
 The steward layer does not exist in a participant's DOM — it is not hidden via CSS, it is not rendered. Template context is gated at the view level using the same `_require_level` helper pattern already used across the Community and Governance apps.
 
@@ -215,17 +247,22 @@ The fifth tab (Support) replaces the previous Profile tab in the bottom nav for 
 ### 3.3 Participant Home Screen
 
 > **—— Channel-first design**
+>
+> **Visual reference:** `sceptre_comm_web-ui_mockup/01-sceptre-home.html` — built, real HTML/CSS mockup covering all three channel states (live, scheduled VOD, offline). Treat it as the authoritative visual spec where it disagrees with the prose below; two real differences found by reading the mockup directly:
+> - The mockup uses a **dark ink top nav bar** (`#0E0E0E`, Playfair wordmark, nav links, notification bell, avatar) spanning full width — not described in the prose layout below at all. Add it as item 0 in the Web Home Layout list.
+> - The four tiles render as a **horizontal-scrolling 1×4 row** (`flex: 0 0 160px` each, `overflow-x: auto`), not a "2×2 grid" — and the hero video is full-bleed (`width: 100vw`), not "max content width 800px, centred." The mockup's layout is the one to build from.
 
 The channel video window is the first and dominant element on the participant Home screen. It is not a card, not a thumbnail, not a poster image — it is an actively playing video. The participant opens the app or visits `sceptre.ichebo.org/home/` and the channel is already playing.
 
 **Web Home Layout (`sceptre.ichebo.org/home/`):**
 
-Layout uses a single column, max content width 800px, centred. From top to bottom:
+Layout is full-bleed, not centred to a fixed width (corrected per the mockup — see note above). From top to bottom:
 
+0. Top nav bar — dark ink, brand mark + wordmark (left), nav links Channel/Community/Learn/Bible/Support (centre), notification bell + avatar (right). The active nav link gets a left red rule accent, matching the Apostolic Command Shell's existing active-state pattern.
 1. Channel video player — full width, 16:9 aspect ratio, autoplay muted (browser policy). Now-playing title and live badge (if live) displayed below the player frame. 'Tap to unmute' prompt on first load.
 2. Now-playing strip — slim row beneath the video: channel name/label, current content title, ends-at time (or 'LIVE' badge if live). Left red rule accent on the live badge.
 3. Next up — single-line teaser: next scheduled item title and start time. Only shown if `ChannelSlot` exists.
-4. Four compact tiles in a 2×2 grid — Community, Learn, Bible, Support. Each tile: icon (48px), label (Inter 600 14px), brief status line (latest announcement / next lesson / current passage / open requests). Stone surface, left red rule on hover.
+4. Four compact tiles in a **horizontal-scrolling row** (not a 2×2 grid — corrected per the mockup) — Community, Learn, Bible, Support. Each tile: icon, label (Inter 600 13px), brief status line (latest announcement / next lesson / current passage / open requests). White card on stone background, left red rule on hover.
 
 **Flutter Home Screen (Channel tab):**
 
@@ -256,8 +293,10 @@ Web: HTMX polls the now-playing endpoint every 60 seconds (`hx-trigger='every 60
 ### 3.4 Steward Side — Information Architecture
 
 > **—— Role-adaptive panel**
+>
+> **Visual reference:** `sceptre_comm_web-ui_mockup/03-sceptre-steward-panel.html` — built mockup, and it shows a structurally different mechanism than the prose immediately below: not a permanently-visible nav section, but a **"Manage" trigger button in the top nav** (visible only to Level 3+/steward-role users) that **slides in a steward sidebar from the right** over a dimmed main view, with its own close button. The mockup's mechanism is the one to build from — corrected below.
 
-When a Level 3+ user or `-steward` role holder logs in to `sceptre.ichebo.org`, the shell gains a steward panel. On web, this appears as an additional navigation section below the participant nav items, labelled 'Community Management'. On mobile (Flutter), a sixth nav tab appears — 'Manage' — gated by the same competence level check.
+When a Level 3+ user or a role in `UserPermission.STEWARD_ROLES` logs in to `sceptre.ichebo.org`, a "Manage" button appears in the top nav (participants never see it). Tapping it slides in a steward sidebar from the right — main content dims slightly behind it — labelled 'Community Management' with its own close (×) control; it is not a section appended below the participant nav. On mobile (Flutter), a sixth nav tab appears — 'Manage' — gated by the same competence level check, opening the same six options as a bottom sheet (per the existing FAB sheet pattern, unchanged from the original design intent here).
 
 **Steward navigation additions (web):**
 
@@ -270,11 +309,11 @@ When a Level 3+ user or `-steward` role holder logs in to `sceptre.ichebo.org`, 
 | Support Queue | `/steward/support/` | All open support requests, SLA status, assignment |
 | Community Settings | `/steward/settings/` | Community profile, ChannelConfig (if tenant has channel) |
 
-The steward navigation section is separated from the participant navigation by a visual divider and a label tag ('—— COMMUNITY MANAGEMENT'). On mobile, the Manage tab opens a bottom sheet with these six options, following the existing FAB sheet pattern.
+The steward sidebar is fully separate from the participant nav by construction (it's an overlay, not an inline section) — the label tag ('—— COMMUNITY MANAGEMENT') sits at the top of the slide-in panel itself, per the mockup. On mobile, the Manage tab opens a bottom sheet with these six options, following the existing FAB sheet pattern.
 
 ---
 
-## Part 4 — Ichebo Channel Architecture (ADR-023)
+## Part 4 — Ichebo Channel Architecture (ADR-024)
 
 ### 4.1 What the Channel Is
 
@@ -305,9 +344,13 @@ class ChannelConfig(models.Model):
     tenant                = models.OneToOneField('tenants.Tenant', on_delete=models.CASCADE,
                                related_name='channel_config')
     loop_default_video_id = models.UUIDField(null=True, blank=True)
-    # FK to video_live VideoRecord or media VideoRecord — resolved at read time
+    # The id of a records.Record with record_family='media' — resolved at
+    # read time via media.models.VideoRecord(record), a typed wrapper
+    # class around Record, not a separate model with its own primary key
+    # (confirmed in media/models.py). video_live has no VideoRecord at all
+    # — its only surviving model after Video Direction v2 is BroadcastSchedule.
     fallback_playlist     = models.JSONField(default=list)
-    # Ordered list of VideoRecord UUIDs (strings)
+    # Ordered list of media-family Record UUIDs (strings)
     fallback_position     = models.IntegerField(default=0)
     # Current position in fallback_playlist — advances on each rotation
     is_active             = models.BooleanField(default=True)
@@ -337,7 +380,8 @@ class ChannelSlot(models.Model):
     scheduled_end         = models.DateTimeField()
     content_type          = models.CharField(max_length=10, choices=CONTENT_TYPE_CHOICES)
     video_record_id       = models.UUIDField(null=True, blank=True)
-    # UUID of the VideoRecord for vod content_type
+    # id of a records.Record with record_family='media' for vod content_type
+    # — see ChannelConfig.loop_default_video_id's comment above
     broadcast_schedule_id = models.UUIDField(null=True, blank=True)
     # UUID of BroadcastSchedule for live content_type
     title                 = models.CharField(max_length=255)
@@ -457,45 +501,53 @@ The scheduler uses the existing Apostolic Command Shell layout — no new shell 
 
 | Tier | Level | Primary surface | What they see |
 |---|---|---|---|
-| Participant | 0b–2 | `sceptre.ichebo.org` consumer side + Flutter mobile | Channel, Community (read), Learn (Level 1+), Bible, Support |
+| Participant | 0–2 (integer `competence_level`) | `sceptre.ichebo.org` consumer side + Flutter mobile | Channel, Community (read), Learn (Level 1+), Bible, Support |
 | Community Steward | 3+ | `sceptre.ichebo.org` steward side (role-adaptive) | All participant access + member management, gathering scheduling, formation pipeline, certification queue, announcement authorship, support queue |
 | Architect | 5 (Prime) | `app.ichebo.org` (primary) + `sceptre.ichebo.org` (steward-equivalent) | All steward access + channel scheduler, constitutional data, Handbook authorship, licence issuance, network-wide oversight |
 
+**Open question (not resolved in v1.0, flagged here rather than assumed):** Doc J's original framing of "Participant Level 0b–2" implies a distinction between a brand-new seeker (0a) and someone partway through induction (0b) that does not exist as a `competence_level` value in the real model — both are simply `competence_level = 0`. If that distinction matters for gating (e.g. "has completed induction" should unlock something a brand-new seeker can't see), it needs to be modeled as a real, separate boolean or derived check (e.g. an `Induction`-tenant `UserPermission`, which already exists and is checked elsewhere in `community/views.py:my_community`) — not invented as a fake level value. Confirm with Chizola whether this distinction is actually needed for H.6's scope, or whether `competence_level >= 0` (i.e. "any authenticated user") is sufficient for the participant gate.
+
 ### 5.2 Gating Rules
 
-**sceptre.ichebo.org — view-level gating:**
+**sceptre.ichebo.org — view-level gating**, corrected to real field types and the real `STEWARD_ROLES` set (`tenants/models.py`, added 2026-06-24):
 
 ```python
 # sceptre/auth.py
 from functools import wraps
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+
+from tenants.models import UserPermission
+
+PARTICIPANT_LEVELS = (0, 1, 2, 3, 4, 5)   # real IntegerField values — no '0a'/'0b' split
+STEWARD_LEVELS = (3, 4, 5)
 
 def require_sceptre_participant(view_func):
     @wraps(view_func)
+    @login_required
     def wrapper(request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect('/login/')
-        if request.user.competence_level not in ['0b','1','2','3','4','5']:
+        if request.user.competence_level not in PARTICIPANT_LEVELS:
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return wrapper
 
 def require_sceptre_steward(view_func):
     @wraps(view_func)
+    @login_required
     def wrapper(request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect('/login/')
-        level_ok = request.user.competence_level in ['3','4','5']
+        level_ok = request.user.competence_level in STEWARD_LEVELS
         role_ok = UserPermission.objects.filter(
             user=request.user,
-            role__endswith='-steward',
-            is_active=True
+            role__in=UserPermission.STEWARD_ROLES,   # includes 'admin' — role__endswith='-steward' silently excludes it
+            is_active=True,
         ).exists()
         if not (level_ok or role_ok):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return wrapper
 ```
+
+`login_required` (Django's own decorator) replaces the manual `if not request.user.is_authenticated: return redirect('/login/')` check — same effect, standard idiom, one fewer thing to get wrong (e.g. the real login URL is `/accounts/login/`, not `/login/` — confirmed via `accounts/urls.py` — so the hand-written redirect in v1.0 would have 404'd).
 
 **app.ichebo.org — what moves, what stays, what is new:**
 
@@ -522,9 +574,11 @@ def require_sceptre_steward(view_func):
 
 ## Part 6 — Community Support Feature
 
-> **—— Already approved — H.3 plan**
+> **—— Already shipped (backend) — H.3, `commit 16bfbab`, 2026-06-22**
+>
+> **Visual reference for the still-to-build `sceptre.ichebo.org` front end:** `sceptre_comm_web-ui_mockup/02-sceptre-community-support.html`, **Screen C only** ("Member support request list"). Screens A and B in that same file are the Community Chat feature (Part 7 below, H.5), not Community Support — the mockup file bundles both features under one filename; cite it by screen letter, not just filename, to avoid confusion. Screen C shows the real shape: a "My Requests" list with status badges (Acknowledged/Open/Resolved), an overdue flag, and a "+ Raise a Request" button — matches this part's URL table below. The steward-facing queue (with the overdue banner and SLA countdown) is in Mockup 03, Screen B — see Part 3.4's note.
 
-Community Support is fully specified in the Community App — Member-to-Steward Support Requests — Roadmap Amendment (`community-support-requests-plan.md`, approved 2026-06-18). This part summarises the spec for completeness and notes its placement within the `sceptre.ichebo.org` surface. The H.3 plan document is authoritative for implementation detail.
+Community Support is fully specified in the Community App — Member-to-Steward Support Requests — Roadmap Amendment (`community-support-requests-plan.md`, approved 2026-06-18) **and the backend is already built and live in production.** This part summarises the spec for completeness and notes its placement within the `sceptre.ichebo.org` surface — the front-end URLs in §6.3 below do not exist yet, since `sceptre.ichebo.org` itself hasn't been built (H.6). The real backend implementation — `community/services.py:resolve_steward_for_tenant`, `community/views.py`'s support-request views, `/community/support/` (the existing, working URL at `app.ichebo.org` today) — is authoritative; the H.3 phase-plan document in this folder describes the work as not-yet-started and should be read as historical/superseded, not as a build checklist.
 
 ### 6.1 What It Is
 
@@ -562,6 +616,8 @@ Community Support (Part 6 / H.3) covers the structured member-to-leadership chan
 
 ### 7.2 What Community Chat Is (Locked Spec)
 
+> **Visual reference:** `sceptre_comm_web-ui_mockup/02-sceptre-community-support.html`, **Screens A and B** ("Community noticeboard feed" and "Post detail with flat comments and response form") — despite the filename, these two screens are Community Chat, not Community Support (Screen C in the same file is Support — see Part 6's note). Matches the locked spec below: steward-authored posts in a flat feed, post detail with a flat (non-nested) comment list and a single response textarea.
+
 A tenant-scoped community noticeboard with member responses. Not a real-time chat system. Not threaded conversation. Closer to a community feed — stewards post, members respond, the community stays connected between gatherings.
 
 **Scope boundary (what it is not):**
@@ -591,25 +647,25 @@ Both use the existing `Record.status` lifecycle. A `community_post` in `'draft'`
 
 ## Part 8 — Architecture Decision Records
 
-### ADR-022 — Subdomain Separation: sceptre.ichebo.org
+### ADR-023 — Subdomain Separation: sceptre.ichebo.org
 
 | Field | Value |
 |---|---|
-| Number | ADR-022 |
+| Number | ADR-023 (renumbered from the v1.0 draft's ADR-022, which collides with the already-approved 2026-06-09 ADR-022 — Handbook/Governance separation) |
 | Title | Subdomain separation — sceptre.ichebo.org as community surface |
-| Status | Approved — 2026-06-25 |
+| Status | Approved — 2026-06-25, renumbered 2026-06-26 |
 | Context | The Ichebo platform now serves two distinct user populations with different design needs: participants in the Sceptre Community Programme (consumer experience) and the Architect/stewards managing governance operations. `app.ichebo.org` is the Apostolic Command Shell — governance-dense, Level 3+. A separate, consumer-oriented surface is needed for participants. |
-| Decision | `sceptre.ichebo.org` is served from the same Django codebase via subdomain-aware URL routing and a custom `SiteRouterMiddleware`. No Django multi-site framework. Separate URL confs (`sceptre/urls.py`) and template directories (`templates/sceptre/`). The same models, database, and authentication underpin both subdomains. ADR-005 (Django templates + HTMX) is extended to cover `sceptre.ichebo.org` — no new frontend technology is introduced. |
-| Consequences | One Nginx server block added for `sceptre.ichebo.org`. `SiteRouterMiddleware` sets `request.site` on every request. URL dispatcher routes per host. Template isolation prevents accidental cross-surface template reuse. SSL certificate via certbot. DNS A record for `sceptre.ichebo.org` points to same Django VPS. |
+| Decision | `sceptre.ichebo.org` is served from the same Django codebase via subdomain-aware URL routing and a custom `SiteRouterMiddleware`. No Django multi-site framework. A new URL conf (`sceptre/urls.py`) and a new, additive template directory (`templates/sceptre/`) — the existing flat `templates/` tree is untouched, not relocated. The same models, database, and authentication underpin both subdomains. ADR-005 (Django templates + HTMX) is extended to cover `sceptre.ichebo.org` — no new frontend technology is introduced. |
+| Consequences | One new `server {}` block pair (HTTP redirect + HTTPS) added to the existing single Nginx config file (`/etc/nginx/sites-available/ics`) — not a separate file. `SiteRouterMiddleware` sets `request.site` and `request.urlconf` on every request; Django's resolver picks up `request.urlconf` automatically, no dispatcher function needed. Template isolation prevents accidental cross-surface template reuse. SSL certificate via certbot. DNS A record for `sceptre.ichebo.org` already live, points to the same Django VPS. `sceptre.ichebo.org` must be added to `ALLOWED_HOSTS` in production's `.env` (currently only lists `app.ichebo.org,ichebo.org,www.ichebo.org`). |
 | Alternatives rejected | Django multi-site framework: built for separate projects sharing a DB — adds unnecessary complexity. Separate Django process: doubles infrastructure, complicates deployment, shared session/auth becomes harder to manage. |
 
-### ADR-023 — Ichebo Channel Architecture
+### ADR-024 — Ichebo Channel Architecture
 
 | Field | Value |
 |---|---|
-| Number | ADR-023 |
+| Number | ADR-024 (renumbered from the v1.0 draft's ADR-023, shifted by the ADR-022 renumbering above) |
 | Title | Ichebo Channel — continuous broadcast channel architecture |
-| Status | Approved — 2026-06-25 |
+| Status | Approved — 2026-06-25, renumbered 2026-06-26 |
 | Context | The participant experience requires a channel-first design — video playing immediately when the app opens or the home page loads, without navigation required. A scheduled playlist with live override and fallback hierarchy is the correct model. The existing `BroadcastSchedule` handles individual live events but not continuous channel programming. |
 | Decision | A new `broadcast` Django app provides `ChannelConfig` (per-tenant channel configuration: loop default, fallback playlist) and `ChannelSlot` (programme grid slots with scheduled start/end, content type, content reference). A now-playing endpoint (`GET /api/broadcast/now/?tenant_id=`) resolves the current content using a four-level fallback hierarchy: (1) scheduled `ChannelSlot`, (2) live `BroadcastSchedule` override, (3) `ChannelConfig.fallback_playlist` rotation, (4) `ChannelConfig.loop_default`. The channel scheduler UI lives exclusively at `app.ichebo.org` as an Architect tool (Level 5). |
 | Consequences | `ChannelConfig` and `ChannelSlot` are configuration models — ADR-003 does not apply. Two new migrations. `GET /api/broadcast/now/` added to the DRF API. Mobile polls every 60s. Web HTMX polls every 60s. Content sources are VOD records from Ichebo Media (already built) and `BroadcastSchedule` live events (already built). No new video infrastructure required. |
@@ -622,7 +678,7 @@ Both use the existing `Record.status` lifecycle. A `community_post` in `'draft'`
 The following amendments are required to `data-contract-v11-canonical-2026-05-13.md` to produce v12. v12 inherits all v11 content unchanged except where explicitly noted.
 
 **Part 1 — Core Principles (amendment):**
-Add to the Architecture statement: *"`sceptre.ichebo.org` is the Sceptre Community surface — a role-adaptive Django surface serving participants (Level 0b–2) and stewards (Level 3+). Served from the same Django codebase as `app.ichebo.org` via subdomain-aware URL routing (ADR-022)."*
+Add to the Architecture statement: *"`sceptre.ichebo.org` is the Sceptre Community surface — a role-adaptive Django surface serving participants (Level 0–2) and stewards (Level 3+). Served from the same Django codebase as `app.ichebo.org` via subdomain-aware URL routing (ADR-023)."*
 
 **Part 20 — Complete Endpoint Reference (additions):**
 
@@ -641,29 +697,29 @@ Add Part 24 with the `ChannelConfig` and `ChannelSlot` model schemas, the now-pl
 
 - `community_post`: `record_class='organizational'`, `record_family='community'`, `record_type='community_post'`. Create = Level 1+. Read = Level 1+ within tenant. Steward-moderated (status transitions by Level 3+).
 - `community_comment`: `record_class='organizational'`, `record_family='community'`, `record_type='community_comment'`. `custom_fields: { parent_post_id: uuid }`. Create = Level 1+. Read = Level 1+ within tenant.
-- `support_request` is specified in the H.3 plan (`community-support-requests-plan.md`) — include as a formal data contract entry in v12.
+- `support_request` is already shipped (H.3, `commit 16bfbab`, 2026-06-22) per `community-support-requests-plan.md` — include as a formal data contract entry in v12, documenting existing behaviour rather than planned behaviour.
 
 **ADR cross-reference table additions:**
-- ADR-022: Architecture statement — `sceptre.ichebo.org` subdomain separation
-- ADR-023: Part 24 — Broadcast channel data contracts
+- ADR-023: Architecture statement — `sceptre.ichebo.org` subdomain separation
+- ADR-024: Part 24 — Broadcast channel data contracts
 
 ---
 
 ## Part 10 — Master Roadmap Amendment
 
-### 10.1 New Phases
+### 10.1 Phases — Status Corrected 2026-06-26
 
-| Phase | Name | Dependency | Commit |
-|---|---|---|---|
-| H.3 | Community Support Requests | Community App complete — no new infra. Plan approved 2026-06-18. | `feat(community): support request flow — member-to-steward with SLA tracking` |
-| H.4 | Community Live Service Room + In-Service Ministry Panel | Ichebo Media deployed (Layer 8 complete). Plan approved 2026-06-18. | `feat(community): tenant-scoped live service room and ministry panel` |
-| H.5 | Community Chat / Intranet | H.3 complete. No new infra — Record table, no WebSockets. | `feat(community): tenant-scoped community noticeboard with member responses` |
-| H.6 | sceptre.ichebo.org surface + Participant Home | Ichebo Channel (H.7) must be in progress or complete. | `feat(sceptre): sceptre.ichebo.org shell, participant home, steward side` |
-| H.7 | Ichebo Channel — broadcast Django app + now-playing endpoint | Ichebo Media complete (Layer 8). No new infra. | `feat(broadcast): ChannelConfig, ChannelSlot, now-playing endpoint, channel scheduler UI` |
+| Phase | Name | Status | Dependency | Commit |
+|---|---|---|---|---|
+| H.3 | Community Support Requests | **Already shipped** — `commit 16bfbab`, 2026-06-22 | Community App complete — no new infra. | `feat: add member-to-steward support request flow with SLA tracking` |
+| H.4 | Community Live Service Room + In-Service Ministry Panel | **Already shipped** — `commit d6a7854`, 2026-06-22; tenant-scoping and timezone bugs corrected in `commit 67878ba`-adjacent work, 2026-06-24/25 | Ichebo Media deployed (Layer 8 complete). | `feat: add tenant-scoped live service room + in-service ministry panel` |
+| H.5 | Community Chat / Intranet | Not started | H.3 complete (it is). No new infra — Record table, no WebSockets. | `feat(community): tenant-scoped community noticeboard with member responses` |
+| H.6 | sceptre.ichebo.org surface + Participant Home | Not started. DNS for `sceptre.ichebo.org` confirmed live 2026-06-26 — no longer a precondition. | Ichebo Channel (H.7) must be in progress or complete. | `feat(sceptre): sceptre.ichebo.org shell, participant home, steward side` |
+| H.7 | Ichebo Channel — broadcast Django app + now-playing endpoint | Not started | Ichebo Media complete (Layer 8). No new infra. | `feat(broadcast): ChannelConfig, ChannelSlot, now-playing endpoint, channel scheduler UI` |
 
-### 10.2 Sequencing Rationale
+### 10.2 Sequencing Rationale (corrected)
 
-H.3 first — Community Support is simpler, already fully specced, and delivers immediate pilot value (members can reach leadership). H.4 second — Live Service Room completes the live service experience for existing communities. H.5 third — Community Chat adds the social layer after the structured channels are proven. H.7 in parallel with or just before H.6 — the channel backend must exist before the `sceptre.ichebo.org` shell can display it. H.6 last in this sequence — it is the surface that ties everything together.
+H.3 and H.4 are already built and in production — they are not part of the remaining sequence. The remaining work is H.7 then H.6 then H.5, in that order: H.7 first because the channel backend must exist before the `sceptre.ichebo.org` shell can display it (the participant home screen's video player calls `GET /api/broadcast/now/`, which doesn't exist until H.7 ships). H.6 second — it is the surface that ties everything together, and is the highest-value remaining piece since it's the actual pilot-facing deliverable. H.5 (Community Chat) last — it's additive, lower urgency, and explicitly deferred in the original session ("spec now, defer build," Part 7.1) until the structured channels (Support, Live Service — both already shipped) are proven.
 
 ### 10.3 Pilot Readiness Plan Amendment
 
@@ -720,9 +776,9 @@ The existing `deploy-site.sh` script deploys to both subdomains — no separate 
 - [ ] Participant home (`/`) renders with channel video player, now-playing strip, four quick-access tiles
 - [ ] Steward navigation section visible only to Level 3+ users
 - [ ] All participant views return 403 / login redirect for unauthenticated requests
-- [ ] All steward views return 403 for Level 0b–2 users
+- [ ] All steward views return 403 for Level 0–2 users
 - [ ] `python manage.py check` — 0 issues
-- [ ] Templates isolated: `templates/sceptre/` renders correctly, no bleed from `templates/agency/`
+- [ ] Templates isolated: `templates/sceptre/` renders correctly, no bleed from the existing flat `templates/` tree
 
 ### H.7 — Ichebo Channel
 
@@ -735,15 +791,15 @@ The existing `deploy-site.sh` script deploys to both subdomains — no separate 
 - [ ] Level 4: Loop default returns loop default video URL
 - [ ] Level 5 (offline): Returns `content_type='offline'` with null `video_url`
 - [ ] Channel scheduler UI at `app.ichebo.org` — add/edit/delete `ChannelSlot`, edit `ChannelConfig`
-- [ ] Channel scheduler is not accessible to Level 0b–4 users
+- [ ] Channel scheduler is not accessible to Level 0–4 users
 - [ ] `python manage.py check` — 0 issues
 - [ ] 10 passing tests covering the resolution logic and all fallback levels
 
 ### Overall
 
 - [ ] Data contract v12 produced with all amendments noted in Part 9
-- [ ] ADR-022 and ADR-023 written and added to the ADR document
-- [ ] Master roadmap updated with H.3–H.7 phase entries
+- [ ] ADR-023 and ADR-024 written and added to the ADR document
+- [ ] Master roadmap updated with H.5, H.6, H.7 phase entries — H.3 and H.4 are already complete and need only a status-correction note, not a new entry
 
 ---
 

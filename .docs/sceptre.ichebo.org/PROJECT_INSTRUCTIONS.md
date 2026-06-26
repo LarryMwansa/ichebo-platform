@@ -202,7 +202,7 @@ These documents cover the full ecosystem — Go engines, Sync Engine, Desktop, M
 | `2026-05-13-ichebo-sync-engine-spec_doc-c_v1_0.docx` | Doc C | Sync Engine — ChangeLog, Push/Pull/Resolve, ConflictQueue, FFI bridge spec |
 | `2026-05-13-ichebo-technical-architecture_doc-d_v1_0.docx` | Doc D | Technical architecture — full stack diagram, Go engines, data flow, deployment |
 | `2026-05-13-ichebo-engine-specs_doc-e_v1_0.docx` | Doc E | Go engine specifications — Records, Activity, Relationships, Bible, Calendar |
-| `2026-05-13-ichebo-handbook-spec_doc-f_v1_0.docx` | Doc F | Ichebo Handbook standalone product — HandbookRecord, HRS, Scripture Linking, Keys privacy |
+| `2026-05-13-ichebo-handbook-spec_doc-f_v1_0.docx` | Doc F | Ichebo Handbook standalone product — HandbookRecord, HRS, Scripture Linking, Keys privacy. **Architecture superseded by ADR-022 (2026-06-09)** — HandbookRecord/HandbookRelationship no longer exist; see this file's note under "The Ecosystem Architecture — Full Picture" below for the current model. |
 | `2026-05-13-ichebo-media-spec_doc-g_v1_0.docx` | Doc G | Ichebo Media — Video Engine, transcoding pipeline, live streaming, HLS delivery |
 | `2026-05-13-ichebo-formation-spec_doc-h_v1_0.docx` | Doc H | Formation system — induction, programmes, pathways, competence levels |
 | `2026-05-13-ichebo-onboarding-spec_doc-i_v1_0.docx` | Doc I | Onboarding — licence activation wizard, initial sync, community setup |
@@ -272,7 +272,7 @@ These are non-negotiable. If a request would require changing one of these, flag
 | Apostolic Command Shell | Four-column grid (Sidebar 72px, Context Bar 240px, Stage flexible, Options Bar 300px). Level 3+ only. |
 | Dual-shell (Stage Mode / Mobile Mode) | Two first-class rendering paths. Neither is a degradation. Both blocks in every template. |
 | Local-first philosophy | Device is primary computer. Cloud is coordination. Applies to Desktop and native Mobile. |
-| Handbook as standalone product | ADR-020. HandbookRecord model with three branches, four status lifecycle. No new features into old Handbook tenant. |
+| Handbook as standalone product | ADR-020 locked Handbook's separation from the old Handbook tenant — that part stands. ADR-022 (2026-06-09) corrected the implementation: confirmed via `handbook/models.py` that `HandbookRecord` and `HandbookRelationship` no longer exist as standalone models — Handbook content lives in `records.Record` (`record_family='governance'`), following the same single-records-table pattern as every other app. The three branches (Reference/Mandate/Keys) and four-status lifecycle are `record_type`/`status` values, not separate model fields. Still true: no new features into the old Handbook tenant. |
 | Sync Engine as standalone Go binary | ChangeLog, Push/Pull/Resolve, ConflictQueue, FFI bridge. Strategic secret sauce — not a third-party service. |
 | Go for foundation engines | Records, Activity, Relationships, Bible, Calendar engines — all Go modules in ichebo-sync/engines/. |
 | Redis + Celery active (L10.1) | ADR-008 lifted. Redis DB 0 is broker, DB 1 is cache. Celery handles async email, FCM, and Paraclete scheduling. |
@@ -371,7 +371,7 @@ Nothing currently in active build. H.2 is the immediate priority.
 2. **Communications rewrite** — reframe all four external documents to reflect three-layer positioning and full ecosystem scope.
 3. **L10.2** — Docker Compose: containerise the full stack.
 4. **L10.3** — Django Channels + WebSockets: real-time notifications.
-5. **L10.4** — Paraclete AI (LLM): requires ADR-022.
+5. **L10.4** — Paraclete AI (LLM): requires its own ADR. Originally numbered ADR-022 in this document; that number is now taken (ADR-022, approved 2026-06-09, is Handbook/Governance separation — see `2026-06-09-adr-022-handbook-governance-separation.md`). The Sceptre subdomain work has since claimed ADR-023 and ADR-024 (DOC J, `sceptre.ichebo.org`'s system design). Use **ADR-025** for Paraclete AI when it's actually written.
 6. **L10.5** — iOS (Flutter): after Android stable in real-world use.
 
 ### What is deferred (not forgotten)
@@ -382,7 +382,7 @@ Nothing currently in active build. H.2 is the immediate priority.
 - Reading plans, verse highlights, scripture full-text search
 - Rich text editor for lesson authorship (TipTap or similar)
 - Licensed Bible translations (NIV/ESV/NLT — require publisher agreements)
-- Paraclete AI / LLM (Layer 10, requires ADR-022)
+- Paraclete AI / LLM (Layer 10, requires ADR-025 — see the "What is next" note above on the renumbering)
 - iOS app (Layer 10, after Android stable)
 - Ichebo Desktop pricing model (open decision)
 
@@ -411,7 +411,7 @@ Nothing currently in active build. H.2 is the immediate priority.
 - **Never write to competence_level** except through the locked endpoint.
 - **Never produce stubs or partial documents** — complete and canonical only.
 - **Never use pink as an accent colour** — it is a bug, not a design choice.
-- **Never put HRS logic in the Bible Engine** — Bible Engine returns text only. HRS lives in the Handbook (HandbookRelationship model with seven relationship types).
+- **Never put HRS logic in the Bible Engine** — Bible Engine returns text only. HRS relationships are corrected by ADR-022: `HandbookRelationship` no longer exists as a standalone model — HRS-relevant relationship types (`has_symbol`, `matches_pattern`, `has_subject`, `has_entity`, `derived_from`, `aligns_with`, `authorised_by`, and others) now live as values on `records.Relationship.relationship_type`, a single shared model used across every app, not an HRS-specific "seven types" model.
 - **Never add new domain logic to Django** — domain logic goes into Go engines. Django is the web layer and API adapter.
 - **Never re-open a locked architecture decision** without proposing a new ADR.
 - **Never call the Mobile Mode "graceful degradation"** — it is a first-class designed experience.
@@ -472,12 +472,13 @@ Ichebo Mobile (daily companion — Flutter + Go FFI)
 
 **Ichebo Media** (`ichebo-media/`): Go service (`cmd/mediad/`). Packages: transcode (FFmpeg pipeline), upload (chunked), storage (Hetzner S3), hls (manifest generation), stream (RTMP + MediaMTX), webhook (stream lifecycle). Django `media/` app wired via `MEDIA_ENGINE_URL`.
 
-**Ichebo Handbook** (standalone Django app): `HandbookRecord` (UUID PK, three branches: Reference/Mandate/Keys, four status: draft/active/locked/superseded), `HandbookRelationship` (seven HRS types + scripture links), `HandbookAccess` (reader/author/editor). Full Apostolic Command Shell UI. Keys Library privacy invariant enforced with 13 tests.
+**Ichebo Handbook** — **architecture corrected by ADR-022 (2026-06-09), superseding the description below.** `HandbookRecord` as a standalone model no longer exists (confirmed: `handbook/models.py` now contains only `HandbookAccess` — explicitly documented in its own docstring as "Not a content model," compliant with data contract Part 1.6). Handbook content now lives in `records.Record` with `record_family='governance'`, following the single-records-table pattern (ADR-003) — the three branches (Reference/Mandate/Keys) and the status lifecycle are `record_type`/`status` values on `Record`, not fields on a separate model. `HandbookAccess` (reader/author/editor) still gates who may write. Full Apostolic Command Shell UI retained. Keys Library privacy invariant retained, enforced via `created_by`-scoping in `handbook/views.py` rather than a dedicated privacy-helper module. See `2026-06-09-adr-022-handbook-governance-separation.md` for the full rationale — it resolved a real data-contract violation (the old `HandbookRecord` was a parallel content store outside the single-records-table pattern).
 
-**Layer 10 remaining:** Docker Compose (L10.2), Django Channels (L10.3), Paraclete AI (L10.4, ADR-022 required), iOS (L10.5).
+**Layer 10 remaining:** Docker Compose (L10.2), Django Channels (L10.3), Paraclete AI (L10.4, requires ADR-025 — see "What is next" above), iOS (L10.5).
 
 ---
 
 *Project instructions — Ichebo Platform — May 2026 — Ichebo Christian Services*
 *Maintained by: Chizola (domain) + Claude (technical)*
 *Last updated: 2026-05-24 — aligned with master-roadmap-canonical-2026-05-13 (repo version), Layers 5–9 marked complete, L10.1 complete, ecosystem doc inventory added*
+*Correction pass 2026-06-26: ADR-022 references corrected throughout (a real ADR-022, Handbook/Governance separation, was approved 2026-06-09 — this document still referenced the number as a Paraclete-AI placeholder from before that approval; reassigned to ADR-025). Handbook architecture description updated to match ADR-022's actual outcome — `HandbookRecord`/`HandbookRelationship` no longer exist as standalone models; Handbook content lives in `records.Record`. This document's "Current Platform State" and "What is next" sections otherwise still reflect May 2026 and have not been reconciled with the Sceptre subdomain work (H.3–H.7, DOC J) built since — see `.docs/sceptre.ichebo.org/` for that body of work's own corrected plan documents.*

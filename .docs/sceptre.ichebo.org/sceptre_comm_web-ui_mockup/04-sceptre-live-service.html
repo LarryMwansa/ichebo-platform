@@ -329,7 +329,7 @@ body { font-family: 'Inter', sans-serif; background: #E8E6E1; color: var(--text)
      SCREEN C — STEWARD VIEW (LIVE QUEUE)
 ══════════════════════════════════════════════════ -->
 <div class="scenario">
-  <strong>Screen C</strong> — Steward view — ministry queue with live requests (polling every 20s)
+  <strong>Screen C</strong> — Steward view — ministry queue with live requests (polling every 15s — matches LIVE_REQUEST_POLL_SECONDS in community/views.py)
 </div>
 
 <div class="screen-frame">
@@ -357,7 +357,7 @@ body { font-family: 'Inter', sans-serif; background: #E8E6E1; color: var(--text)
       <div class="ministry-panel__header">
         <div class="ministry-panel__label">Ministry Queue</div>
         <div class="ministry-panel__title">This Session</div>
-        <div class="ministry-panel__sub">Refreshes every 20 seconds</div>
+        <div class="ministry-panel__sub">Refreshes every 15 seconds</div>
       </div>
 
       <div class="ministry-queue">
@@ -396,7 +396,7 @@ body { font-family: 'Inter', sans-serif; background: #E8E6E1; color: var(--text)
 
       <div class="poll-indicator">
         <div class="poll-dot"></div>
-        Live — refreshing every 20 seconds
+        Live — refreshing every 15 seconds
       </div>
     </div>
   </div>

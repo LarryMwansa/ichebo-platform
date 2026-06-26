@@ -1,5 +1,29 @@
 # Phase H.5 — Community Chat / Intranet
 
+> ## ⚠️ Correction, 2026-06-26 — not yet built; real bugs found in this plan before any code was written
+>
+> Unlike H.3/H.4 (already shipped), **H.5 has not been started** — `community_post`/`community_comment` do not exist anywhere in the codebase as of 2026-06-26. This plan can still be executed, but only after the following are fixed — found by checking every claim in this plan against the live repository, not by re-deriving the design:
+>
+> 1. **`competence_level` is a real `IntegerField` (plain `0`–`5`), not a string.** Every check in this plan of the form `getattr(user, 'competence_level', '0') in ['3', '4', '5']` compares an int to a list of strings — in real Python this is always `False`, meaning **every steward check in this plan would silently deny every steward**, including a real Level 5 user. Fix: compare against integers, e.g. `getattr(user, 'competence_level', 0) >= 3`.
+> 2. **`role__endswith='-steward'` excludes `'admin'`**, a real, in-use role that does not end in `-steward`. Use `tenants.models.UserPermission.STEWARD_ROLES` (a set covering all steward roles including `admin`, added 2026-06-24) instead — `role__in=UserPermission.STEWARD_ROLES`.
+> 3. **`_get_active_community_tenant(user)` does not exist.** This plan calls it four times (Tasks 3, 4, 5) as if it were an existing helper. The real, established pattern in `community/views.py` (used by every other view in this file) is: `perms = _get_user_permissions(user); primary_perm = perms[0] if perms else None; tenant = primary_perm.tenant if primary_perm else None`. Either inline that pattern at each call site or add a small wrapper function with that body — but it must be written, not assumed to already exist.
+> 4. **Missing imports.** `community/views.py` currently imports `get_object_or_404` and `render` from `django.shortcuts`, and does not import `Http404`, `HttpResponseForbidden`, or `redirect` at all (confirmed by reading the file's import block directly). This plan's new views use all three without adding them. Add `from django.http import Http404, HttpResponseForbidden` and `from django.shortcuts import redirect` (alongside the existing imports) before any of these views are added — or use the codebase's existing HTMX-redirect convention instead (see point 5).
+> 5. **Plain `redirect()` doesn't match this codebase's established HTMX pattern.** Every other HTMX-driven view in `community/views.py` (e.g. the support-request and live-request handlers) returns `HttpResponse(status=204)` with an `HX-Redirect` header for post-submit navigation, not Django's `redirect()` shortcut — a plain `redirect()` works for a normal form POST but will not behave correctly if the calling template later wires these buttons up via `hx-post` (which the rest of this codebase does everywhere). Worth deciding up front whether `community_post_new`/`community_post_activate`/the comment-submit branch in `community_post_detail` should follow the HTMX-redirect convention now, rather than retrofitting it later — the comment template (Task 4) already uses `hx-post`/`hx-target` for the comment form, so at least that one path should use the `HX-Redirect` pattern, not `redirect()`.
+> 6. **`create_notification()` is called with the wrong keyword arguments.** Task 1's `notify_community_post_created` calls `create_notification(user=..., notification_type=..., source_app=..., source_record_id=..., message=...)`. The real signature (`notifications/service.py`) is `create_notification(user, notification_type, title, body='', data=None)` — there is no `source_app`, `source_record_id`, or `message` parameter; calling it as written raises `TypeError`. Compare against the already-shipped `notify_support_request_created`/`notify_support_request_acknowledged` in the same file for the correct call shape (`title=`, `body=`, `data={'record_id': ..., 'url': ...}`).
+> 7. **The test suite's `make_tenant`/`make_user` helpers would crash with `TypeError`/`IntegrityError`.** `Tenant.objects.create(name=..., tenant_path=...)` is missing required fields: the real `Tenant` model's path field is `path` (not `tenant_path` — `tenant_path` is a real field, but it lives on `UserPermission`, not `Tenant`), and `Tenant` also requires `slug` (unique, no default), `tier` (required, no default), and `created_by` (required, `on_delete=PROTECT`) — none of which this plan's test helper supplies. A working helper needs all four, e.g.:
+>    ```python
+>    def make_tenant(name='Chat Tenant', slug='chat-tenant'):
+>        admin = User.objects.create_user(username='_test_admin', email='_test_admin@test.com')
+>        return Tenant.objects.create(
+>            name=name, slug=slug, path=f'/global/{slug}/',
+>            tier='church_node', created_by=admin,
+>        )
+>    ```
+>    `UserPermission.objects.create(..., tenant_path=tenant.tenant_path)` (Task 6) is also wrong for the same reason — it should read `tenant_path=tenant.path`.
+> 8. **CSS classes in the templates don't match this codebase's real convention.** `class="btn btn-primary"`, `class="page-container"`, `class="label-tag"`, `class="field-group"`/`field-label`/`field-input` are a generic Bootstrap-style system that doesn't exist here. The real convention (confirmed across `templates/governance/`, `templates/community/`) is `ws-`-prefixed utility classes (`ws-label-tag`, `ws-page-title`, `ws-topbar__cta` for buttons) plus inline styles using this project's CSS custom properties (`var(--space-l)`, `var(--text)`, `var(--border)`, etc.) — see any real form, e.g. `templates/community/partials/gathering_form.html`, for the actual pattern to copy. Every template in this plan would render completely unstyled as written.
+>
+> None of the above are stylistic except #8 — each of 1–7 would either crash on first run or silently produce the wrong access-control result (steward checks always failing being the most serious, since it would make every gated view in this feature unusable for real stewards while appearing to work in any test that happens to use a Level 5 superuser bypass elsewhere). Fix all eight before running any task below.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Build a tenant-scoped community noticeboard with member responses — posts visible to all tenant members, flat comments, steward-moderated. No real-time, no WebSockets, no threading.
@@ -162,15 +186,17 @@ def community_feed(request):
     from records.models import Record
     from tenants.models import UserPermission
 
-    tenant = _get_active_community_tenant(request.user)
+    perms = _get_user_permissions(request.user)
+    primary_perm = perms[0] if perms else None
+    tenant = primary_perm.tenant if primary_perm else None
     if not tenant:
         return HttpResponseForbidden('No active community found.')
 
     user = request.user
     is_steward = (
-        getattr(user, 'competence_level', '0') in ['3', '4', '5'] or
+        user.competence_level in (3, 4, 5) or
         UserPermission.objects.filter(
-            user=user, role__endswith='-steward', is_active=True
+            user=user, role__in=UserPermission.STEWARD_ROLES, is_active=True
         ).exists()
     )
 
@@ -289,7 +315,9 @@ def community_post_detail(request, post_id):
     from records.models import Record
     import uuid
 
-    tenant = _get_active_community_tenant(request.user)
+    perms = _get_user_permissions(request.user)
+    primary_perm = perms[0] if perms else None
+    tenant = primary_perm.tenant if primary_perm else None
     if not tenant:
         return HttpResponseForbidden()
 
@@ -305,9 +333,9 @@ def community_post_detail(request, post_id):
     # Members can only see active posts
     from tenants.models import UserPermission
     is_steward = (
-        getattr(request.user, 'competence_level', '0') in ['3', '4', '5'] or
+        request.user.competence_level in (3, 4, 5) or
         UserPermission.objects.filter(
-            user=request.user, role__endswith='-steward', is_active=True
+            user=request.user, role__in=UserPermission.STEWARD_ROLES, is_active=True
         ).exists()
     )
     if post.status != 'active' and not is_steward:
@@ -453,15 +481,17 @@ def community_post_new(request):
     from tenants.models import UserPermission
 
     user = request.user
-    level_ok = getattr(user, 'competence_level', '0') in ['3', '4', '5']
+    level_ok = user.competence_level in (3, 4, 5)
     role_ok = UserPermission.objects.filter(
-        user=user, role__endswith='-steward', is_active=True
+        user=user, role__in=UserPermission.STEWARD_ROLES, is_active=True
     ).exists()
     if not (level_ok or role_ok):
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied
 
-    tenant = _get_active_community_tenant(user)
+    perms = _get_user_permissions(user)
+    primary_perm = perms[0] if perms else None
+    tenant = primary_perm.tenant if primary_perm else None
     if not tenant:
         return HttpResponseForbidden()
 
@@ -508,9 +538,9 @@ def community_post_activate(request, post_id):
     from records.models import Record
 
     user = request.user
-    level_ok = getattr(user, 'competence_level', '0') in ['3', '4', '5']
+    level_ok = user.competence_level in (3, 4, 5)
     role_ok = UserPermission.objects.filter(
-        user=user, role__endswith='-steward', is_active=True
+        user=user, role__in=UserPermission.STEWARD_ROLES, is_active=True
     ).exists()
     if not (level_ok or role_ok):
         from django.core.exceptions import PermissionDenied
@@ -613,21 +643,29 @@ from tenants.models import Tenant, UserPermission
 User = get_user_model()
 
 
-def make_tenant(name='Chat Tenant', path='/global/chat/'):
-    return Tenant.objects.create(name=name, tenant_path=path)
+def make_tenant(name='Chat Tenant', slug='chat-tenant'):
+    # Tenant requires slug (unique), path (the real field — tenant_path
+    # lives on UserPermission, not Tenant), tier, and created_by.
+    admin = User.objects.create_user(
+        username='_test_admin_h5', email='_test_admin_h5@test.com',
+    )
+    return Tenant.objects.create(
+        name=name, slug=slug, path=f'/global/{slug}/',
+        tier='church_node', created_by=admin,
+    )
 
 
-def make_user(username, level='1', tenant=None, role=None):
+def make_user(username, level=1, tenant=None, role=None):
     user = User.objects.create_user(
         username=username, password='testpass123',
         email=f'{username}@test.com',
     )
-    user.competence_level = level
+    user.competence_level = level   # real IntegerField — pass an int
     user.save()
     if tenant and role:
         UserPermission.objects.create(
             user=user, tenant=tenant, role=role,
-            is_active=True, tenant_path=tenant.tenant_path,
+            is_active=True, tenant_path=tenant.path,
         )
     return user
 
@@ -652,8 +690,8 @@ class TestCommunityFeed(TestCase):
 
     def setUp(self):
         self.tenant = make_tenant()
-        self.member = make_user('chat_member', level='1', tenant=self.tenant, role='member')
-        self.steward = make_user('chat_steward', level='3', tenant=self.tenant, role='branch-steward')
+        self.member = make_user('chat_member', level=1, tenant=self.tenant, role='member')
+        self.steward = make_user('chat_steward', level=3, tenant=self.tenant, role='branch-steward')
         self.client = Client()
 
     def test_member_sees_active_posts(self):
@@ -683,9 +721,9 @@ class TestCommunityFeed(TestCase):
 class TestPostCreation(TestCase):
 
     def setUp(self):
-        self.tenant = make_tenant(name='Chat T2', path='/global/chat2/')
-        self.steward = make_user('chat_stew2', level='3', tenant=self.tenant, role='branch-steward')
-        self.member = make_user('chat_mem2', level='1', tenant=self.tenant, role='member')
+        self.tenant = make_tenant(name='Chat T2', slug='chat2')
+        self.steward = make_user('chat_stew2', level=3, tenant=self.tenant, role='branch-steward')
+        self.member = make_user('chat_mem2', level=1, tenant=self.tenant, role='member')
         self.client = Client()
 
     def test_steward_can_create_draft_post(self):
@@ -724,9 +762,9 @@ class TestPostCreation(TestCase):
 class TestComments(TestCase):
 
     def setUp(self):
-        self.tenant = make_tenant(name='Chat T3', path='/global/chat3/')
-        self.member = make_user('chat_mem3', level='1', tenant=self.tenant, role='member')
-        self.steward = make_user('chat_stew3', level='3', tenant=self.tenant, role='branch-steward')
+        self.tenant = make_tenant(name='Chat T3', slug='chat3')
+        self.member = make_user('chat_mem3', level=1, tenant=self.tenant, role='member')
+        self.steward = make_user('chat_stew3', level=3, tenant=self.tenant, role='branch-steward')
         self.post = make_post(self.tenant, self.steward, status='active')
         self.client = Client()
 

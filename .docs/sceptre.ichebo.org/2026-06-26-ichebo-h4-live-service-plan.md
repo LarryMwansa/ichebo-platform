@@ -1,5 +1,20 @@
 # Phase H.4 — Community Live Service Room + In-Service Ministry Panel
 
+> ## ⚠️ Correction, 2026-06-26 — ALREADY SHIPPED, and the target files no longer exist
+>
+> This plan targets `video_live/views.py:_event_qs()` and `video_live/api_views.py:VideoFeedView`. **Neither exists anymore.** Both were deleted on 2026-06-23/24 as part of Video Direction v2, which retired `video_live`'s entire standalone app surface (its template views, all of `templates/video_live/`, and the mobile feed/CRUD API including `VideoFeedView` — confirmed it had zero Flutter client code ever consuming it). This is a stronger correction than H.3's: it's not just that the work shipped differently — the plan's actual target files are gone. Do not attempt to execute this plan.
+>
+> **What actually exists and ships the same outcome this plan wanted** (tenant-scoped live viewing, no cross-tenant leak):
+>
+> - `community/views.py`, search for `# ── Live service room — tenant-scoped, with in-service ministry panel ──` (around line 1137). `_find_live_session(tenant)` is the real, current function — checks `BroadcastSchedule` only (the legacy `Activity` URL-embed fallback this plan's Task 1 describes was found to have zero live production rows and was removed in the same Video Direction v2 pass — DOC G §7.2's "coexistence policy" this plan references is itself superseded).
+> - `live_service_room(request)` — the real view, served at `/community/live/`.
+> - The in-service ministry panel (`htmx_raise_live_request`, `htmx_my_live_requests`, `htmx_live_requests_queue`, `htmx_respond_live_request`) — all present, matching this plan's intent for prayer-request/question handling during a live session.
+> - `BroadcastSchedule` itself (`video_live/models.py`) is the one part of `video_live` that survived the app's retirement — it's now created directly by Community's Gathering form (digital/hybrid format) rather than through any standalone video app.
+>
+> **Real bugs that existed in the originally-shipped version of this work, found and fixed later in the same overall effort** (useful context, not part of this plan's own scope): a timezone bug where `<input type="datetime-local">` values were stored as if already UTC, shifting broadcast times by the scheduling user's UTC offset; and the live-room view not setting `tenant` on the records it created, which broke the same tenant-scoping this plan was trying to add in the first place. Both are fixed in the current code.
+>
+> The task-by-task plan below is preserved as a historical record of the original design intent. If extending the live service room later, start from `community/views.py`'s real functions above — the file paths and function names in the tasks below will not resolve.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Build a tenant-scoped live service viewing room in the Community app, fixing the existing global-unfiltered video scoping gap, and adding an in-service ministry panel (prayer requests / questions) with a steward-visible queue scoped to the current session.

@@ -1,10 +1,31 @@
 # Phase H.6 — sceptre.ichebo.org Surface + Participant Home
 
+> ## ⚠️ Correction, 2026-06-26 — not yet built; real fixes needed before execution
+>
+> H.6 has not been started — no `sceptre` app, no `SiteRouterMiddleware`, no DNS gap anymore (see point 8). Fixes needed, found by checking every claim against the live repository and production server:
+>
+> 1. **Server identity is wrong throughout.** Real path: `/home/scepter/ichebo-platform-repo/ichebo-platform` (user `scepter`, not `ics`). Real Gunicorn bind: `127.0.0.1:8001`, not `8000`. Real settings module: `ics_project.settings.production` / `ics_project.settings.base` — there is no single `ics_project/settings.py`. Every `cd`/`source venv/bin/activate`/`python manage.py ...` command in the Pre-Flight Checks and Task 5 needs these paths, and the venv is at `.venv/bin/` inside the repo, activated via `source .venv/bin/activate` (confirmed: production runs Django through `.venv/bin/gunicorn` directly, set by `Environment="PATH=..."` in the systemd unit, not a `source venv/bin/activate` shell step at all — there is no interactive shell session on production; deploys run `DJANGO_SETTINGS_MODULE=ics_project.settings.production .venv/bin/python3 manage.py ...` directly).
+> 2. **`ics_project/settings.py` doesn't exist** — settings live in `ics_project/settings/base.py` (shared) and `production.py` (production overrides). `MIDDLEWARE` and `ALLOWED_HOSTS` both live in `base.py`. Task 1's instruction to "find `MIDDLEWARE` list... and add at the top" is otherwise correct — just in the right file.
+> 3. **No URL-conf dispatcher function is needed in `ics_project/urls.py` at all.** Task 2 proposes a `get_urlconf(request)` function and an unclear wiring step ("Add to urlpatterns — this is the fallback for agency / sceptre URLs are served by the middleware-set urlconf"). The middleware setting `request.urlconf = 'sceptre.urls'` directly (which Task 2's own Step 3 correctly arrives at) is the *complete* mechanism — Django's resolver checks `request.urlconf` automatically on every request. Delete the `get_urlconf` function and the "Add to urlpatterns" step entirely; `ics_project/urls.py` needs zero changes for this phase.
+> 4. **`competence_level` is a real `IntegerField` (`0`–`5`), not a string.** `sceptre/auth.py`'s `PARTICIPANT_LEVELS = ['0b', '1', '2', '3', '4', '5']` and `STEWARD_LEVELS = ['3', '4', '5']` are lists of strings being compared against an int — always `False`, which would lock out every real user. There is also no `'0b'` value in the model at all (see Doc J's Correction Log, item 5, for the open question about whether a 0a/0b distinction is needed and how to model it for real if so). Fix: `PARTICIPANT_LEVELS = (0, 1, 2, 3, 4, 5)`, `STEWARD_LEVELS = (3, 4, 5)`.
+> 5. **`role__endswith='-steward'` (Task 3's `require_sceptre_steward`/`is_steward`) excludes `'admin'`.** Use `tenants.models.UserPermission.STEWARD_ROLES` instead — `role__in=UserPermission.STEWARD_ROLES`.
+> 6. **`_get_tenant_for_user` (Task 4) is missing `.order_by('-level')`.** The established pattern this codebase actually uses everywhere else (`community/views.py:_get_user_permissions`) orders by `-level` before taking `.first()`, so a user with multiple `UserPermission` rows resolves to their *highest*-level tenant, not an arbitrary one. Add `.order_by('-level')` before `.first()`.
+> 7. **`now_playing_partial` (Task 4) makes an unnecessary internal HTTP call to its own API**, including a `GUNICORN_PORT` setting that doesn't exist anywhere in this codebase (confirmed) and the wrong port (`8000`) even if it did. There is no reason for a Django view to make an HTTP round-trip to its own server's API to get data — call the resolution function directly instead: `from broadcast.services import resolve_now_playing` (built in H.7) and `result = resolve_now_playing(tenant)`, no `requests`, no token, no port. Delete `_get_api_token` entirely — it exists solely to support this unnecessary HTTP call.
+> 8. **DNS is no longer a precondition — `sceptre.ichebo.org` already resolves** to the Django VPS (confirmed live 2026-06-26). Skip the "Confirm DNS A record" line in Pre-Flight Checks; go straight to the Nginx step.
+> 9. **Nginx: one file, not a new one.** The real server keeps every subdomain as a `server {}` block pair inside a single file, `/etc/nginx/sites-available/ics` (confirmed by reading the live file) — there is no `sites-available/sceptre.ichebo.org` to create or symlink. Add the new blocks to the existing `ics` file instead, matching its established style (HTTP block that redirects to HTTPS, then the real HTTPS block with `ssl_certificate`/`ssl_certificate_key` paths under `/etc/letsencrypt/live/sceptre.ichebo.org/`, a `location /static/` alias to `/home/scepter/ichebo-platform-repo/ichebo-platform/staticfiles/`, and `proxy_pass http://127.0.0.1:8001;` — see Doc J Part 2.1 for the corrected, complete block). Task 5's Steps 1–2 (create file, symlink into `sites-enabled`) should be replaced with "edit the existing `ics` file directly," since it's already enabled.
+> 10. **`SESSION_COOKIE_DOMAIN`/`CSRF_COOKIE_DOMAIN` are not set at all currently** (confirmed — absent from both `base.py` and `production.py`). Whether to add them (one login works across both subdomains) or leave them unset (separate logins per subdomain, acceptable for a pilot) is a real, open decision for Chizola — Doc J §11.3 already notes this; don't silently pick one without confirming.
+> 11. **The real login URL is `/accounts/login/`** (`LOGIN_URL` in `base.py`, mounted via `accounts/urls.py`), not `/login/`. `sceptre/auth.py`'s manual `return redirect('/login/')` would 404. Using `@login_required` (Django's own decorator, which reads `LOGIN_URL` automatically) avoids this entirely — see the corrected `sceptre/auth.py` in Doc J Part 5.2, which this phase plan's Task 3 should match.
+> 12. **The test suite's `make_tenant`/`make_user` helpers have the same `Tenant` field gaps as H.5 and H.7's test suites** — missing `slug`, using the wrong field name `tenant_path` instead of `path`, missing required `tier` and `created_by`. See H.5's correction note, point 7, for a working helper shape.
+> 13. **Two separate CSS problems, not one.** The placeholder pages in Task 4, Step 7 (`templates/sceptre/community/community.html`, `learn/learn.html`, `profile/profile.html`, `steward/settings.html`) use `class="page-container"`/`"label-tag"`/`"page-title"` — a generic Bootstrap-style system that doesn't exist in this codebase (confirmed: the real convention is `ws-`-prefixed classes, e.g. `ws-label-tag`/`ws-page-title`, plus inline styles — see any real form like `templates/community/partials/gathering_form.html`). Separately, `base.html`, `_nav.html`, `home.html`, and `_now_playing.html` use new, purpose-built classes (`sceptre-shell`, `channel-player-container`, `quick-tile`, `now-playing`, etc.) — a legitimate design choice for a visually distinct consumer surface, *not* a mismatch with this codebase's convention — but **no stylesheet defining any of them exists yet, and this plan never adds one.** A new CSS file (e.g. `static/css/sceptre.css`, loaded from `sceptre/base.html`) needs to be designed and written as part of this phase; it isn't optional polish, the participant home screen renders as unstyled HTML without it.
+> 14. **`_nav.html`'s steward section (Task 4, Step 2) doesn't match the real visual mockup.** The built mockup (`sceptre_comm_web-ui_mockup/03-sceptre-steward-panel.html`) shows a structurally different mechanism: a **"Manage" trigger button in the top nav** that **slides in a steward sidebar from the right** over a dimmed main view, with its own close (×) control — not a `<div class="steward-nav">` block sitting inline inside the always-visible profile area, as currently written. Restructure `_nav.html` to render a "Manage" trigger (visible only when `is_steward`) plus a separate, initially-hidden `steward-sidebar` element toggled by it — see Doc J Part 3.4's corrected description and the mockup file directly for the exact visual structure to copy.
+>
+> Fix all fourteen before running any task below — several (4, 5, 11) would otherwise make every gated view in this phase unusable for real users while appearing syntactically fine.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Build `sceptre.ichebo.org` as a role-adaptive Django surface — subdomain routing middleware, separate URL conf and template directories, participant home screen with channel video player and four quick-access tiles, steward management navigation, and Nginx + SSL configuration.
 
-**Architecture:** Subdomain-aware URL routing in one Django project — no multi-site framework (ADR-022). `SiteRouterMiddleware` detects the host and sets `request.site`. `sceptre/urls.py` is a new URL conf. Templates live in `templates/sceptre/`. Same `User`, `Tenant`, `Record` models underpin both subdomains. Role-adaptive shell: steward navigation rendered only for Level 3+ or `-steward` role holders. Channel video calls `GET /api/broadcast/now/` (built in H.7).
+**Architecture:** Subdomain-aware URL routing in one Django project — no multi-site framework (ADR-023, renumbered from the original draft's ADR-022 — see correction note above). `SiteRouterMiddleware` detects the host and sets `request.site` and `request.urlconf`. `sceptre/urls.py` is a new URL conf. Templates: only `templates/sceptre/` is new — the existing flat `templates/` tree is untouched. Same `User`, `Tenant`, `Record` models underpin both subdomains. Role-adaptive shell: steward navigation rendered only for Level 3+ or a role in `UserPermission.STEWARD_ROLES`. Channel video calls `GET /api/broadcast/now/` (built in H.7) — or, better, calls `broadcast.services.resolve_now_playing(tenant)` directly (see correction note point 7).
 
 **Tech Stack:** Django 4.2, HTMX, Nginx, certbot SSL, existing all apps.
 
@@ -39,7 +60,7 @@ python manage.py check
 
 **Files:**
 - Create: `middleware/site_router.py`
-- Modify: `ics_project/settings.py` — add middleware and `sceptre.ichebo.org` to `ALLOWED_HOSTS`
+- Modify: `ics_project/settings/base.py` — add middleware. `ALLOWED_HOSTS` is read from `.env` via `config()` — add `sceptre.ichebo.org` to production's `.env` `ALLOWED_HOSTS` value instead of hardcoding it in `base.py`.
 
 **Step 1: Create the middleware**
 
@@ -48,7 +69,7 @@ python manage.py check
 """
 SiteRouterMiddleware — sets request.site based on incoming Host header.
 Used to serve sceptre.ichebo.org from the same Django process as app.ichebo.org.
-ADR-022.
+ADR-023.
 """
 
 
@@ -67,34 +88,25 @@ class SiteRouterMiddleware:
 
 **Step 2: Add to settings**
 
-In `ics_project/settings.py`:
+In `ics_project/settings/base.py`:
 
-Find `MIDDLEWARE` list and add at the top (before `SecurityMiddleware` if present, or first):
+Find `MIDDLEWARE` list and add at the top (before `SecurityMiddleware`):
 
 ```python
 'middleware.site_router.SiteRouterMiddleware',
 ```
 
-Find `ALLOWED_HOSTS` and add:
+`ALLOWED_HOSTS` is not a literal list in `base.py` — it's `config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])`, read from the `.env` file. On the server, edit `/home/scepter/ichebo-platform-repo/ichebo-platform/.env` and add `sceptre.ichebo.org` to the existing `ALLOWED_HOSTS` value (currently `app.ichebo.org,ichebo.org,www.ichebo.org`).
 
-```python
-'sceptre.ichebo.org',
-```
-
-Find `SESSION_COOKIE_DOMAIN` (or add it):
-
-```python
-SESSION_COOKIE_DOMAIN = '.ichebo.org'
-CSRF_COOKIE_DOMAIN = '.ichebo.org'
-```
-
-**Note on SESSION_COOKIE_DOMAIN:** If this causes test failures (Django test client does not set domain cookies), wrap it in an environment check:
+`SESSION_COOKIE_DOMAIN`/`CSRF_COOKIE_DOMAIN` are not set anywhere currently (confirmed — absent from both `base.py` and `production.py`). **Before adding them, confirm with Chizola** whether a steward should get one shared login across both subdomains (needs these two settings) or a separate login per subdomain (leave them unset — simpler, acceptable for a pilot). If sharing is wanted, add to `base.py`:
 
 ```python
 if not DEBUG:
     SESSION_COOKIE_DOMAIN = '.ichebo.org'
     CSRF_COOKIE_DOMAIN = '.ichebo.org'
 ```
+
+(guarded by `not DEBUG` because Django's test client doesn't set domain cookies, which would otherwise break the test suite in Task 6).
 
 **Step 3: Verify middleware loads**
 
@@ -109,8 +121,8 @@ print('OK — middleware importable')
 **Step 4: Commit**
 
 ```bash
-git add middleware/site_router.py ics_project/settings.py
-git commit -m "feat(sceptre): add SiteRouterMiddleware for subdomain detection (ADR-022)"
+git add middleware/site_router.py ics_project/settings/base.py
+git commit -m "feat(sceptre): add SiteRouterMiddleware for subdomain detection (ADR-023)"
 ```
 
 ---
@@ -124,7 +136,7 @@ git commit -m "feat(sceptre): add SiteRouterMiddleware for subdomain detection (
 **Step 1: Read the current ROOT_URLCONF and urls.py**
 
 ```bash
-grep -n "ROOT_URLCONF\|urlpatterns\|include" ics_project/settings.py ics_project/urls.py | head -20
+grep -n "ROOT_URLCONF\|urlpatterns\|include" ics_project/settings/base.py ics_project/urls.py | head -20
 ```
 
 Note how the current `urls.py` is structured. The dispatcher must preserve all existing URL patterns for `app.ichebo.org` while routing `sceptre.ichebo.org` to its own conf.
@@ -232,7 +244,7 @@ git commit -m "feat(sceptre): sceptre/urls.py and urlconf dispatcher via SiteRou
 python manage.py startapp sceptre
 ```
 
-Add to `INSTALLED_APPS` in `settings.py`:
+Add to `INSTALLED_APPS` in `ics_project/settings/base.py`:
 
 ```python
 'sceptre',
@@ -240,64 +252,66 @@ Add to `INSTALLED_APPS` in `settings.py`:
 
 **Step 2: Create sceptre/auth.py**
 
+Corrected against the real `competence_level` `IntegerField` and the real `UserPermission.STEWARD_ROLES` set (which includes `'admin'`, unlike a `-steward` suffix match) — see Doc J Part 5.2 for the same code with full reasoning:
+
 ```python
 # sceptre/auth.py
 """
 View decorators for sceptre.ichebo.org access control.
-Participant gate: Level 0b+.
-Steward gate: Level 3+ OR -steward role.
+Participant gate: competence_level 0+ (any authenticated user — see Doc J
+Part 5.1's open question on whether a finer-grained "has completed
+induction" check is needed here; not modeled as a fake level value).
+Steward gate: Level 3+ OR a role in UserPermission.STEWARD_ROLES.
 """
 from functools import wraps
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import redirect
 
+from tenants.models import UserPermission
 
-PARTICIPANT_LEVELS = ['0b', '1', '2', '3', '4', '5']
-STEWARD_LEVELS = ['3', '4', '5']
+PARTICIPANT_LEVELS = (0, 1, 2, 3, 4, 5)   # real IntegerField values
+STEWARD_LEVELS = (3, 4, 5)
 
 
 def require_sceptre_participant(view_func):
-    """Gate: authenticated user with competence_level 0b+."""
+    """Gate: authenticated user with competence_level 0+."""
     @wraps(view_func)
     @login_required
     def wrapper(request, *args, **kwargs):
-        level = getattr(request.user, 'competence_level', '0a')
-        if level not in PARTICIPANT_LEVELS:
+        if request.user.competence_level not in PARTICIPANT_LEVELS:
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return wrapper
 
 
 def require_sceptre_steward(view_func):
-    """Gate: Level 3+ OR active -steward UserPermission role."""
+    """Gate: Level 3+ OR an active steward-role UserPermission."""
     @wraps(view_func)
     @login_required
     def wrapper(request, *args, **kwargs):
         user = request.user
-        level_ok = getattr(user, 'competence_level', '0') in STEWARD_LEVELS
-        if not level_ok:
-            from tenants.models import UserPermission
-            role_ok = UserPermission.objects.filter(
-                user=user,
-                role__endswith='-steward',
-                is_active=True,
-            ).exists()
-            if not role_ok:
-                raise PermissionDenied
+        level_ok = user.competence_level in STEWARD_LEVELS
+        role_ok = UserPermission.objects.filter(
+            user=user,
+            role__in=UserPermission.STEWARD_ROLES,
+            is_active=True,
+        ).exists()
+        if not (level_ok or role_ok):
+            raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return wrapper
 
 
 def is_steward(user):
     """Helper — returns True if user has steward access."""
-    if getattr(user, 'competence_level', '0') in STEWARD_LEVELS:
+    if user.competence_level in STEWARD_LEVELS:
         return True
-    from tenants.models import UserPermission
     return UserPermission.objects.filter(
-        user=user, role__endswith='-steward', is_active=True
+        user=user, role__in=UserPermission.STEWARD_ROLES, is_active=True
     ).exists()
 ```
+
+`@login_required` (Django's own decorator) handles the unauthenticated case and redirects to the real `LOGIN_URL` (`/accounts/login/`) automatically — no manual `redirect('/login/')` needed, and no `from django.shortcuts import redirect` import either, since nothing in this file calls it directly anymore.
 
 **Step 3: Verify**
 
@@ -311,7 +325,7 @@ print('OK — sceptre auth helpers importable')
 **Step 4: Commit**
 
 ```bash
-git add sceptre/ ics_project/settings.py
+git add sceptre/ ics_project/settings/base.py
 git commit -m "feat(sceptre): create sceptre app with participant and steward auth decorators"
 ```
 
@@ -884,21 +898,30 @@ from tenants.models import Tenant, UserPermission
 User = get_user_model()
 
 
-def make_tenant(name='Sceptre Tenant', path='/global/sceptre_test/'):
-    return Tenant.objects.create(name=name, tenant_path=path)
+def make_tenant(name='Sceptre Tenant', slug='sceptre-test'):
+    # Tenant requires slug (unique), path (the real field — not
+    # tenant_path, which lives on UserPermission), tier, and created_by —
+    # none of which the original draft of this helper supplied.
+    admin = User.objects.create_user(
+        username='_test_admin_h6', email='_test_admin_h6@test.com',
+    )
+    return Tenant.objects.create(
+        name=name, slug=slug, path=f'/global/{slug}/',
+        tier='church_node', created_by=admin,
+    )
 
 
-def make_user(username, level='1', tenant=None, role=None):
+def make_user(username, level=1, tenant=None, role=None):
     user = User.objects.create_user(
         username=username, password='testpass123',
         email=f'{username}@test.com',
     )
-    user.competence_level = level
+    user.competence_level = level   # real IntegerField — pass an int, not a string
     user.save()
     if tenant and role:
         UserPermission.objects.create(
             user=user, tenant=tenant, role=role,
-            is_active=True, tenant_path=tenant.tenant_path,
+            is_active=True, tenant_path=tenant.path,
         )
     return user
 
@@ -933,8 +956,8 @@ class TestSceptreAccessControl(TestCase):
 
     def setUp(self):
         self.tenant = make_tenant()
-        self.participant = make_user('part_h6', level='1', tenant=self.tenant, role='member')
-        self.steward = make_user('stew_h6', level='3', tenant=self.tenant, role='branch-steward')
+        self.participant = make_user('part_h6', level=1, tenant=self.tenant, role='member')
+        self.steward = make_user('stew_h6', level=3, tenant=self.tenant, role='branch-steward')
         self.guest = make_user('guest_h6', level='0a')
         self.client = Client()
 
@@ -973,18 +996,18 @@ class TestIsStew(TestCase):
     """is_steward helper function."""
 
     def setUp(self):
-        self.tenant = make_tenant(name='Stew T', path='/global/stewt/')
+        self.tenant = make_tenant(name='Stew T', slug='stewt')
 
     def test_level_3_is_steward(self):
-        user = make_user('s_l3', level='3')
+        user = make_user('s_l3', level=3)
         self.assertTrue(is_steward(user))
 
     def test_level_1_not_steward(self):
-        user = make_user('s_l1', level='1')
+        user = make_user('s_l1', level=1)
         self.assertFalse(is_steward(user))
 
     def test_level_1_with_steward_role_is_steward(self):
-        user = make_user('s_role', level='1', tenant=self.tenant, role='branch-steward')
+        user = make_user('s_role', level=1, tenant=self.tenant, role='branch-steward')
         self.assertTrue(is_steward(user))
 
 
@@ -992,8 +1015,8 @@ class TestParticipantHomeTemplate(TestCase):
     """Participant home renders without error."""
 
     def setUp(self):
-        self.tenant = make_tenant(name='Home T', path='/global/homet/')
-        self.user = make_user('home_user', level='1', tenant=self.tenant, role='member')
+        self.tenant = make_tenant(name='Home T', slug='homet')
+        self.user = make_user('home_user', level=1, tenant=self.tenant, role='member')
         self.client = Client()
 
     def test_home_renders_200(self):
@@ -1015,7 +1038,7 @@ class TestParticipantHomeTemplate(TestCase):
         self.assertNotContains(response, 'COMMUNITY MANAGEMENT')
 
     def test_steward_nav_visible_to_steward(self):
-        steward = make_user('home_stew', level='3', tenant=self.tenant, role='branch-steward')
+        steward = make_user('home_stew', level=3, tenant=self.tenant, role='branch-steward')
         self.client.login(username='home_stew', password='testpass123')
         response = self.client.get('/', HTTP_HOST='sceptre.ichebo.org')
         self.assertContains(response, 'COMMUNITY MANAGEMENT')
@@ -1066,9 +1089,10 @@ git push origin main
 - [ ] Participant home (`/`) renders with channel video player, now-playing strip, four quick-access tiles
 - [ ] Channel offline state renders correctly when no content is configured
 - [ ] Steward navigation section (`COMMUNITY MANAGEMENT`) visible only to Level 3+ users
-- [ ] Level 0a users get 403 on all participant routes
-- [ ] Unauthenticated users get redirected to login
-- [ ] All steward views return 403 for Level 0b–2 users
-- [ ] Templates isolated: `templates/sceptre/` renders without bleed from `templates/` (agency templates)
+- [ ] Unauthenticated users get redirected to `/accounts/login/`
+- [ ] All steward views return 403 for Level 0–2 users
+- [ ] Templates isolated: `templates/sceptre/` renders without bleed from the existing flat `templates/` tree
+
+The original draft of this checklist had two contradictory lines here — "Level 0a users get 403 on all participant routes" alongside "steward views return 403 for Level 0b–2 users" — which only make sense if 0a and 0b are different gating outcomes, but no such distinction exists in the real `competence_level` model (a single integer `0`). Removed the contradictory line; if a real 0a/0b-equivalent distinction is wanted (e.g. "hasn't started induction" vs. "mid-induction"), it needs its own exit criterion once that's actually decided and modeled — see Doc J Part 5.1's open question.
 - [ ] `python manage.py check` — 0 issues
 - [ ] All tests in `sceptre/tests/test_sceptre_surface.py` pass
