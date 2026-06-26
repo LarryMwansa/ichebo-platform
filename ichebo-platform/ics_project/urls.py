@@ -50,4 +50,5 @@ urlpatterns = [
     path('handbook/', include('handbook.template_urls', namespace='handbook')),
     path('api/handbook/', include('handbook.api_urls')),
     path('api/waitlist/', include('waitlist.urls')),
+    path('api/broadcast/', include('broadcast.urls')),
 ]
