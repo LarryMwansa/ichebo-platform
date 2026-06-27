@@ -44,15 +44,16 @@ body.sceptre-shell {
   z-index: 100;
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-.top-nav__brand { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.top-nav__mark {
-  width: 28px; height: 28px; background: var(--sc-primary);
-  border-radius: var(--sc-radius-s); display: flex; align-items: center; justify-content: center;
-}
-.top-nav__mark svg { width: 16px; height: 16px; fill: #fff; }
-.top-nav__wordmark {
-  font-family: 'Playfair Display', serif; font-weight: 800; font-size: 18px;
-  color: #fff; letter-spacing: -0.03em;
+.top-nav__brand { display: flex; align-items: center; flex-shrink: 0; }
+/* logo.svg is a white-stroked mark — brightness(0) invert(1) forces it to
+   render white regardless of source colors, matching navbar.css's
+   established pattern. The sceptre top-nav is permanently dark
+   (var(--sc-ink)), unlike that nav's theme-dependent background, so no
+   light-mode override is needed here. */
+.top-nav__logo {
+  height: 30px;
+  width: auto;
+  filter: brightness(0) invert(1);
 }
 .top-nav__links { display: flex; align-items: center; gap: 4px; flex: 1; }
 .nav-link {

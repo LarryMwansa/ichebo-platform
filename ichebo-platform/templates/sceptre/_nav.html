@@ -2,11 +2,8 @@
 {% load static %}
 <nav class="top-nav">
   <div class="top-nav__brand">
-    <a href="{% url 'home' %}" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
-      <div class="top-nav__mark">
-        <svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="12" rx="1"/><rect x="9" y="2" width="5" height="7" rx="1"/></svg>
-      </div>
-      <span class="top-nav__wordmark">Ichebo</span>
+    <a href="{% url 'home' %}" style="display: flex; align-items: center; text-decoration: none;">
+      <img src="{% static 'images/logo.svg' %}" alt="Ichebo" class="top-nav__logo">
     </a>
   </div>
 
