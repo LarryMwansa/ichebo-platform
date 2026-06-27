@@ -32,6 +32,20 @@ REQUIRE_REFEREE_UPLOADS = config('REQUIRE_REFEREE_UPLOADS', default=False, cast=
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
+# Derived from ALLOWED_HOSTS so the two can't drift apart. Needed because
+# Django's CSRF middleware falls back to strict Referer checking whenever
+# a request has no Origin header — and some mobile browsers/privacy modes
+# omit Referer even on a same-origin form POST. Without this, that
+# fallback has no Origin-based escape hatch and the request 403s with
+# "CSRF verification failed... no Referer was sent", confirmed by
+# reproducing it directly against production (a request with neither
+# header set is rejected; CSRF_TRUSTED_ORIGINS only patches the
+# Origin-present path, which is why it doesn't need to also fix the
+# Referer fallback — most real browsers that drop Referer still send
+# Origin, which this list now covers explicitly instead of relying on
+# Django's narrower same-host-exact-match default).
+CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS]
+
 # Shared login across app.ichebo.org and sceptre.ichebo.org (ADR-023).
 # Guarded by `not DEBUG` — Django's test client doesn't set domain
 # cookies, which would otherwise break the test suite.
