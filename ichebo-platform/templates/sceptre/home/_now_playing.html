@@ -1,0 +1,64 @@
+<!-- templates/sceptre/home/_now_playing.html -->
+{% if now_playing and now_playing.content_type != 'offline' %}
+
+  <div class="channel-hero">
+    <div class="channel-hero__bg"></div>
+    {% if now_playing.is_live %}<div class="channel-hero__watermark">LIVE</div>{% endif %}
+    <div class="channel-hero__scanlines"></div>
+
+    <video id="channel-video"
+           style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
+           controls
+           autoplay
+           muted
+           {% if now_playing.is_live %}playsinline{% endif %}>
+      {% if now_playing.is_live %}
+        <source src="{{ now_playing.hls_url }}" type="application/x-mpegURL">
+      {% else %}
+        <source src="{{ now_playing.video_url }}" type="video/mp4">
+      {% endif %}
+    </video>
+
+    <div class="unmute-prompt" onclick="document.getElementById('channel-video').muted = false; this.style.display = 'none';">
+      <svg viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      Tap to unmute
+    </div>
+  </div>
+
+  <div class="now-playing-strip">
+    {% if now_playing.is_live %}
+      <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+    {% else %}
+      <span class="vod-badge">&#9654; PLAYING</span>
+    {% endif %}
+    <span class="now-playing-strip__title">{{ now_playing.title|default:"" }}</span>
+    {% if now_playing.ends_at %}
+      <span class="now-playing-strip__ends">Until {{ now_playing.ends_at }}</span>
+    {% endif %}
+    {% if now_playing.next_scheduled %}
+      <span class="up-next">Up next: <span>{{ now_playing.next_scheduled.title }} {{ now_playing.next_scheduled.starts_at }}</span></span>
+    {% endif %}
+  </div>
+
+{% else %}
+
+  <div class="channel-hero">
+    <div class="channel-hero__bg"></div>
+    <div class="channel-hero__scanlines"></div>
+    <div class="channel-offline">
+      <div class="channel-offline__frame">
+        <div class="channel-offline__brand">Ichebo</div>
+        <div class="channel-offline__msg">Channel offline</div>
+        {% if now_playing.next_scheduled %}
+          <div class="channel-offline__next">Next: <strong>{{ now_playing.next_scheduled.title }} {{ now_playing.next_scheduled.starts_at }}</strong></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="now-playing-strip" style="background: #111;">
+    <span class="vod-badge" style="background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.25);">OFFLINE</span>
+    <span class="now-playing-strip__title" style="color: rgba(255,255,255,0.25);">No content scheduled right now</span>
+  </div>
+
+{% endif %}

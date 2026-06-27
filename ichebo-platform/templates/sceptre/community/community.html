@@ -1,0 +1,20 @@
+<!-- templates/sceptre/community/community.html -->
+{% extends "sceptre/base.html" %}
+{% block title %}Community{% endblock %}
+{% block content %}
+<div style="padding: 24px 28px;">
+  <div style="margin-bottom: 20px;">
+    <div class="ws-label-tag">Community</div>
+    <h1 class="ws-page-title" style="font-size: 1.25rem; margin-top: 8px;">{{ tenant.name|default:"Community" }}</h1>
+  </div>
+  {% for post in announcements %}
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+                padding: 16px 20px; margin-bottom: 12px;">
+      <div style="font-size: 14px; font-weight: 600; color: var(--text);">{{ post.title }}</div>
+      <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">{{ post.created_at|date:"d M Y" }}</div>
+    </div>
+  {% empty %}
+    <p style="color: var(--muted); font-size: 13px;">No announcements yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

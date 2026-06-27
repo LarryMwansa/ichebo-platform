@@ -1216,7 +1216,7 @@ git push origin main
 - [ ] `app.ichebo.org` behaviour is completely unchanged
 - [ ] Participant home (`/`) renders with channel video player, now-playing strip, four quick-access tiles
 - [ ] Channel offline state renders correctly when no content is configured
-- [ ] Steward navigation section (`COMMUNITY MANAGEMENT`) visible only to Level 3+ users
+- [ ] Steward navigation section (`Community Management` — real template text is title case; CSS `text-transform: uppercase` only changes the display, not what `assertContains` sees) visible only to Level 3+ users
 - [ ] Unauthenticated users get redirected to `/accounts/login/`
 - [ ] All steward views return 403 for Level 1–2 users (and for 0b/seeker — stewardship starts at Level 3, not at any participant level)
 - [ ] A 0a/visitor (no induction-tenant `UserPermission` at all) gets 403 on every participant route — the rare, real edge case covered by `_is_seeker_or_above`'s `False` branch (see Doc J §5.1, resolved 2026-06-26 — not the prior "open question")

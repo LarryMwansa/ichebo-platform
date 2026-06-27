@@ -32,6 +32,13 @@ REQUIRE_REFEREE_UPLOADS = config('REQUIRE_REFEREE_UPLOADS', default=False, cast=
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
+# Shared login across app.ichebo.org and sceptre.ichebo.org (ADR-023).
+# Guarded by `not DEBUG` — Django's test client doesn't set domain
+# cookies, which would otherwise break the test suite.
+if not DEBUG:
+    SESSION_COOKIE_DOMAIN = '.ichebo.org'
+    CSRF_COOKIE_DOMAIN = '.ichebo.org'
+
 
 # Application definition
 
@@ -67,11 +74,13 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'waitlist',
     'broadcast',
+    'sceptre',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
+    'middleware.site_router.SiteRouterMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
