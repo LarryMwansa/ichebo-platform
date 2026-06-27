@@ -51,7 +51,7 @@ body.sceptre-shell {
    (var(--sc-ink)), unlike that nav's theme-dependent background, so no
    light-mode override is needed here. */
 .top-nav__logo {
-  height: 30px;
+  height: 80px;
   width: auto;
   filter: brightness(0) invert(1);
 }
