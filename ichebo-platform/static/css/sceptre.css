@@ -31,31 +31,44 @@ body.sceptre-shell {
   margin: 0;
 }
 
-/* ── TOP NAV ─────────────────────────────────────────────────── */
+/* ── TOP NAV ─────────────────────────────────────────────────────
+   Mobile-first: .top-nav__links and the steward sidebar are designed
+   for desktop width and don't fit five nav links + logo + steward
+   controls + avatar in one row below 800px (the platform's own
+   breakpoint — see navbar.css/main.css) — confirmed directly: with no
+   media queries at all, .top-nav forced the whole page to overflow
+   horizontally on a real phone viewport. Links collapse into
+   .nav-links-mobile (hamburger-toggled dropdown) below 800px instead. */
 .top-nav {
   height: 56px;
   background: var(--sc-ink);
   display: flex;
   align-items: center;
-  padding: 0 var(--sc-space-m);
-  gap: var(--sc-space-l);
+  padding: 0 var(--sc-space-s);
+  gap: var(--sc-space-s);
   position: sticky;
   top: 0;
   z-index: 100;
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-.top-nav__brand { display: flex; align-items: center; flex-shrink: 0; }
+.top-nav__brand { display: flex; align-items: center; gap: 8px; flex-shrink: 0; min-width: 0; }
 /* logo.svg is a white-stroked mark — brightness(0) invert(1) forces it to
    render white regardless of source colors, matching navbar.css's
    established pattern. The sceptre top-nav is permanently dark
    (var(--sc-ink)), unlike that nav's theme-dependent background, so no
    light-mode override is needed here. */
 .top-nav__logo {
-  height: 80px;
+  height: 36px;
   width: auto;
   filter: brightness(0) invert(1);
 }
-.top-nav__links { display: flex; align-items: center; gap: 4px; flex: 1; }
+.nav-hamburger {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex-shrink: 0;
+  background: transparent; border: none; padding: 0; cursor: pointer;
+}
+.nav-hamburger svg { width: 22px; height: 22px; stroke: rgba(255,255,255,0.8); fill: none; stroke-width: 2; }
+.top-nav__links { display: none; align-items: center; gap: 4px; flex: 1; }
 .nav-link {
   font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
   color: rgba(255,255,255,0.55); text-decoration: none; padding: 6px 12px;
@@ -69,12 +82,33 @@ body.sceptre-shell {
   border-radius: 0 var(--sc-radius-s) var(--sc-radius-s) 0;
   padding-left: 9px;
 }
-.top-nav__right { display: flex; align-items: center; gap: var(--sc-space-s); flex-shrink: 0; }
+.top-nav__right { display: flex; align-items: center; gap: var(--sc-space-2xs); flex-shrink: 0; }
 .avatar {
   width: 32px; height: 32px; background: var(--sc-primary); border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 700; color: #fff; text-decoration: none;
-  cursor: pointer;
+  cursor: pointer; flex-shrink: 0;
+}
+
+/* Mobile dropdown — same links as .top-nav__links, shown below the bar.
+   Hidden by default via the [hidden] attribute; toggled by #nav-hamburger. */
+.nav-links-mobile {
+  display: flex; flex-direction: column;
+  background: var(--sc-ink-2);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky; top: 56px; z-index: 99;
+}
+.nav-links-mobile[hidden] { display: none; }
+.nav-links-mobile .nav-link { padding: 12px var(--sc-space-m); border-radius: 0; }
+.nav-links-mobile .nav-link--active { border-left-width: 4px; }
+
+@media (min-width: 800px) {
+  .top-nav { padding: 0 var(--sc-space-m); gap: var(--sc-space-l); }
+  .top-nav__logo { height: 56px; }
+  .nav-hamburger { display: none; }
+  .top-nav__links { display: flex; }
+  .top-nav__right { gap: var(--sc-space-s); }
+  .nav-links-mobile { display: none !important; }
 }
 
 /* ── STEWARD TRIGGER + SIDEBAR ──────────────────────────────────
@@ -87,16 +121,23 @@ body.sceptre-shell {
   font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8);
   transition: background 100ms;
   font-family: 'Inter', sans-serif;
+  flex-shrink: 0;
 }
 .steward-trigger:hover { background: rgba(175,50,54,0.2); }
-.steward-trigger svg { width: 14px; height: 14px; stroke: var(--sc-primary); fill: none; stroke-width: 2; }
+.steward-trigger svg { width: 14px; height: 14px; stroke: var(--sc-primary); fill: none; stroke-width: 2; flex-shrink: 0; }
+/* Icon-only on narrow screens — "Manage" text + hamburger + avatar all
+   competing for space in one 56px row. */
+.steward-trigger__label { display: none; }
+@media (min-width: 800px) {
+  .steward-trigger__label { display: inline; }
+}
 
 .steward-sidebar {
   position: fixed;
   top: 56px;
   right: 0;
   bottom: 0;
-  width: 260px;
+  width: 100%;
   background: var(--sc-ink);
   display: flex;
   flex-direction: column;
@@ -105,6 +146,10 @@ body.sceptre-shell {
   box-shadow: -8px 0 32px rgba(0,0,0,0.25);
 }
 .steward-sidebar[hidden] { display: none; }
+
+@media (min-width: 800px) {
+  .steward-sidebar { width: 260px; }
+}
 
 .steward-sidebar-backdrop {
   position: fixed;
