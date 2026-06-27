@@ -43,6 +43,12 @@
 </nav>
 
 {% if is_steward %}
+<!-- Dimmed backdrop over the main view — the mockup's own caption
+     describes this ("the main content dims slightly") but its CSS
+     never actually implemented it; added here to match the documented
+     intent rather than re-deriving a different effect. -->
+<div class="steward-sidebar-backdrop" id="steward-sidebar-backdrop" hidden></div>
+
 <!-- Steward sidebar — hidden by default, toggled by #steward-trigger -->
 <div class="steward-sidebar" id="steward-sidebar" hidden>
   <div class="steward-sidebar__header">
@@ -69,15 +75,18 @@
   (function () {
     var trigger = document.getElementById('steward-trigger');
     var sidebar = document.getElementById('steward-sidebar');
+    var backdrop = document.getElementById('steward-sidebar-backdrop');
     var closeBtn = document.getElementById('steward-sidebar-close');
     if (!trigger || !sidebar) return;
 
     function open() {
       sidebar.hidden = false;
+      if (backdrop) backdrop.hidden = false;
       trigger.setAttribute('aria-expanded', 'true');
     }
     function close() {
       sidebar.hidden = true;
+      if (backdrop) backdrop.hidden = true;
       trigger.setAttribute('aria-expanded', 'false');
     }
 
@@ -85,6 +94,7 @@
       sidebar.hidden ? open() : close();
     });
     closeBtn.addEventListener('click', close);
+    if (backdrop) backdrop.addEventListener('click', close);
   })();
 </script>
 {% endif %}

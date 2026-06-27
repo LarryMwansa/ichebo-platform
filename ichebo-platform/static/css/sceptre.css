@@ -105,6 +105,18 @@ body.sceptre-shell {
 }
 .steward-sidebar[hidden] { display: none; }
 
+.steward-sidebar-backdrop {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 150;
+  cursor: pointer;
+}
+.steward-sidebar-backdrop[hidden] { display: none; }
+
 .steward-sidebar__header { padding: var(--sc-space-m); border-bottom: 1px solid rgba(255,255,255,0.06); }
 .steward-sidebar__close { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sc-space-s); }
 .steward-sidebar__close-btn {

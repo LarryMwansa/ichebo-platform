@@ -14,10 +14,29 @@ NoReverseMatch: 'sceptre' is not a registered namespace, raised from a
 real render() of participant_home). Templates use bare {% url 'home' %}
 etc., not {% url 'sceptre:home' %}.
 """
-from django.urls import path
+from django.urls import include, path
+from accounts import views as accounts_views
+from accounts.urls import template_urlpatterns as accounts_template_urlpatterns
 from sceptre import views
 
 urlpatterns = [
+    # Auth routes — request.urlconf makes this module the *root* resolver
+    # for sceptre.ichebo.org, so @login_required's redirect to LOGIN_URL
+    # (/accounts/login/) must resolve here too, not just under
+    # ics_project.urls. Confirmed via a real browser session (not just
+    # the test client, which bypasses this via force_login/c.login):
+    # an unauthenticated visit to sceptre.ichebo.org redirected to
+    # /accounts/login/ and got a 404, since this urlconf didn't include
+    # django.contrib.auth.urls at all.
+    #
+    # The shared registration/login.html template also calls
+    # {% url 'accounts:signup' %} unconditionally — mirrors
+    # ics_project/urls.py's accounts: namespace registration exactly, or
+    # that link 500s with NoReverseMatch on this surface specifically.
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/register/', accounts_views.RegisterView.as_view(), name='register_ui'),
+    path('accounts/', include((accounts_template_urlpatterns, 'accounts'))),
+
     # Participant routes
     path('', views.participant_home, name='home'),
     path('now-playing/', views.now_playing_partial, name='now_playing_partial'),
