@@ -18,6 +18,12 @@ class SiteRouterMiddleware:
         if host == 'sceptre.ichebo.org':
             request.site = 'community'
             request.urlconf = 'sceptre.urls'
+        elif host == 'learn.ichebo.org':
+            request.site = 'learn'
+            request.urlconf = 'learn.subdomain_urls'
+        elif host == 'bible.ichebo.org':
+            request.site = 'bible'
+            request.urlconf = 'bible.subdomain_urls'
         else:
             request.site = 'agency'
             # request.urlconf left unset — Django falls back to ROOT_URLCONF

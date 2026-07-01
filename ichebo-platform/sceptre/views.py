@@ -87,18 +87,14 @@ def community_area(request):
 
 @require_sceptre_participant
 def learn_summary(request):
-    """Learn summary — interim until learn.ichebo.org ships."""
-    user_is_steward = is_steward(request.user)
-    return render(request, 'sceptre/learn/learn.html', {
-        'is_steward': user_is_steward,
-    })
+    """Learn — redirect to learn.ichebo.org."""
+    return redirect('https://learn.ichebo.org/')
 
 
 @require_sceptre_participant
 def bible_redirect(request):
-    """Bible — redirect to bible.ichebo.org once that surface is built;
-    interim: redirect to the existing Bible app."""
-    return redirect('/bible/')
+    """Bible — redirect to bible.ichebo.org."""
+    return redirect('https://bible.ichebo.org/')
 
 
 @require_sceptre_participant
