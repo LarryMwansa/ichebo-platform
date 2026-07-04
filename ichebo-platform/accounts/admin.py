@@ -14,6 +14,9 @@ class UserAdmin(BaseUserAdmin):
         ('Preferences', {'fields': ('display_name', 'avatar', 'preferences', 'fcm_token', 'preferred_bible_translation')}),
     )
 
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
