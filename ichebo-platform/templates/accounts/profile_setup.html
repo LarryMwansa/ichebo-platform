@@ -127,7 +127,7 @@
 
       <div class="auth-field">
         <label>{{ form.accepted_christ.label }}</label>
-        <div class="auth-radio-group setup-inline-radios">
+        <div class="auth-radio-group auth-inline-radios">
           {% for choice in form.accepted_christ %}
             <label>{{ choice.tag }} {{ choice.choice_label }}</label>
           {% endfor %}
@@ -137,7 +137,7 @@
 
       <div class="auth-field">
         <label>{{ form.church_member.label }}</label>
-        <div class="auth-radio-group setup-inline-radios">
+        <div class="auth-radio-group auth-inline-radios">
           {% for choice in form.church_member %}
             <label>{{ choice.tag }} {{ choice.choice_label }}</label>
           {% endfor %}

@@ -938,13 +938,13 @@
 .auth-radio-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
+  gap: 10px;
+  margin-top: 8px;
 }
 .auth-radio-group.auth-inline-radios {
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 20px;
 }
 .auth-radio-group label {
   display: flex;
@@ -954,6 +954,15 @@
   font-weight: 400;
   color: var(--text);
   cursor: pointer;
+  line-height: 1.4;
+}
+.auth-radio-group input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin: 0;
 }
 .auth-terms {
   display: flex;
