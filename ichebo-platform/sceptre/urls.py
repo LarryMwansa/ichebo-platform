@@ -18,7 +18,6 @@ from django.urls import include, path
 from accounts import views as accounts_views
 from accounts.urls import template_urlpatterns as accounts_template_urlpatterns
 from sceptre import views
-from community import views as community_views
 
 urlpatterns = [
     # Auth routes — request.urlconf makes this module the *root* resolver
@@ -46,12 +45,6 @@ urlpatterns = [
     path('bible/', views.bible_redirect, name='bible'),
     path('support/', views.support_redirect, name='support'),
     path('profile/', views.profile_summary, name='profile'),
-
-    # Community support routes — referenced by support_redirect and steward_support_redirect
-    path('community/support/', community_views.support_requests_queue, name='support-requests-queue'),
-    path('community/htmx/support/create/', community_views.htmx_create_support_request, name='htmx-create-support-request'),
-    path('community/htmx/support/mine/', community_views.htmx_my_support_requests, name='htmx-my-support-requests'),
-    path('community/htmx/support/<uuid:record_id>/acknowledge/', community_views.htmx_acknowledge_support_request, name='htmx-acknowledge-support-request'),
 
     # Steward routes (gated at view level)
     path('steward/members/', views.steward_members, name='steward_members'),

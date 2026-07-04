@@ -99,8 +99,8 @@ def bible_redirect(request):
 
 @require_sceptre_participant
 def support_redirect(request):
-    """Support — redirect to the community support request list."""
-    return redirect('/community/support/')
+    """Support — redirect to the community support request list on app.ichebo.org."""
+    return redirect('https://app.ichebo.org/community/support/')
 
 
 @require_sceptre_participant
@@ -140,7 +140,7 @@ def steward_announcements(request):
 
 @require_sceptre_steward
 def steward_support_redirect(request):
-    return redirect('/community/support/')
+    return redirect('https://app.ichebo.org/community/support/')
 
 
 @require_sceptre_steward
