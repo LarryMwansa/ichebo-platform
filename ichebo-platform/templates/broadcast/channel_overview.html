@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Channel Scheduler{% endblock %}
+
+{% block ws_content %}
+<div style="padding: 0 32px 48px;">
+
+    <div style="margin-bottom: 28px;">
+        <div class="ws-label-tag" style="margin-bottom: 8px;">—— ARCHITECT</div>
+        <h1 style="font-size: 1.5rem; font-weight: 700; margin: 0 0 4px; color: var(--text);">Channel Scheduler</h1>
+        <p style="font-size: 13px; color: var(--muted); margin: 0;">Programme the Ichebo Channel — schedule slots and configure fallback content.</p>
+    </div>
+
+    {# Community picker #}
+    <div style="margin-bottom: 28px;">
+        <form method="get">
+            <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                           letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                Select Community
+            </label>
+            <select name="tenant_id" onchange="this.form.submit()"
+                    style="display: block; width: 280px; height: 40px; padding: 0 12px;
+                           background: var(--card-2); border: 1px solid var(--border);
+                           border-radius: 8px; font-size: 13px; color: var(--text);
+                           outline: none; cursor: pointer;">
+                <option value="">— Select a community —</option>
+                {% for t in tenants %}
+                    <option value="{{ t.id }}" {% if t == selected_tenant %}selected{% endif %}>
+                        {{ t.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% if selected_tenant %}
+
+        {# Actions row #}
+        <div style="display: flex; gap: 10px; margin-bottom: 28px;">
+            <a href="{% url 'channel_slot_add' %}?tenant_id={{ selected_tenant.id }}"
+               style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px;
+                      background: var(--primary); color: #fff; border-radius: 8px;
+                      font-size: 13px; font-weight: 600; text-decoration: none;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+                Add Slot
+            </a>
+            <a href="{% url 'channel_config_edit' selected_tenant.id %}"
+               style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px;
+                      background: var(--card-2); border: 1px solid var(--border); color: var(--text);
+                      border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">settings</span>
+                Edit Fallback Config
+            </a>
+        </div>
+
+        {# Fallback config summary #}
+        {% if config %}
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+                    padding: 16px 20px; margin-bottom: 24px;">
+            <div class="ws-label-tag" style="margin-bottom: 10px; opacity: 0.7;">—— FALLBACK CONFIG</div>
+            <div style="display: flex; gap: 32px; font-size: 13px; color: var(--text);">
+                <div>
+                    <span style="color: var(--muted); font-size: 11px; text-transform: uppercase;
+                                  font-weight: 700; letter-spacing: 0.06em;">Loop Default</span><br>
+                    <span style="font-family: monospace; font-size: 12px;">
+                        {{ config.loop_default_video_id|default:"Not set" }}
+                    </span>
+                </div>
+                <div>
+                    <span style="color: var(--muted); font-size: 11px; text-transform: uppercase;
+                                  font-weight: 700; letter-spacing: 0.06em;">Fallback Playlist</span><br>
+                    {{ config.fallback_playlist|length }} item{{ config.fallback_playlist|length|pluralize }}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="background: var(--card); border: 1px dashed var(--border); border-radius: 10px;
+                    padding: 16px 20px; margin-bottom: 24px;">
+            <p style="font-size: 13px; color: var(--muted); margin: 0;">
+                No fallback config yet for this community.
+                <a href="{% url 'channel_config_edit' selected_tenant.id %}"
+                   style="color: var(--primary);">Configure one</a>
+                to prevent the channel going offline between scheduled slots.
+            </p>
+        </div>
+        {% endif %}
+
+        {# Programme grid #}
+        <div>
+            <div class="ws-label-tag" style="margin-bottom: 14px;">—— PROGRAMME GRID</div>
+
+            {% if not slots %}
+                <div style="background: var(--card); border: 1px dashed var(--border); border-radius: 10px;
+                            padding: 24px; text-align: center; color: var(--muted); font-size: 13px;">
+                    No slots scheduled for this community.
+                </div>
+            {% else %}
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    {% for slot in slots %}
+                    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+                                padding: 14px 18px; display: flex; align-items: center; gap: 16px;
+                                {% if slot.scheduled_end < now %}opacity: 0.5;{% endif %}">
+
+                        {# Content type badge #}
+                        <div style="width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0;
+                                    background: {% if slot.content_type == 'live' %}var(--error){% else %}var(--primary){% endif %};
+                                    display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: #fff;">
+                                {% if slot.content_type == 'live' %}live_tv{% else %}play_circle{% endif %}
+                            </span>
+                        </div>
+
+                        {# Slot info #}
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px;
+                                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ slot.title }}
+                            </div>
+                            <div style="font-size: 12px; color: var(--muted);">
+                                {{ slot.scheduled_start|date:"d M Y, H:i" }} &rarr; {{ slot.scheduled_end|date:"H:i" }}
+                                &nbsp;·&nbsp; {{ slot.get_content_type_display }}
+                                {% if slot.scheduled_end < now %}
+                                    &nbsp;·&nbsp; <span style="color: var(--muted);">past</span>
+                                {% elif slot.scheduled_start <= now and slot.scheduled_end >= now %}
+                                    &nbsp;·&nbsp; <span style="color: var(--success); font-weight: 600;">on air</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {# Delete #}
+                        <form method="post" action="{% url 'channel_slot_delete' slot.id %}"
+                              onsubmit="return confirm('Delete this slot?')">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    style="display: flex; align-items: center; justify-content: center;
+                                           width: 32px; height: 32px; border-radius: 6px;
+                                           background: transparent; border: 1px solid var(--border);
+                                           cursor: pointer; color: var(--muted);"
+                                    title="Delete slot">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}

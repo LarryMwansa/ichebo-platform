@@ -190,3 +190,55 @@ class TestNowPlayingAPIEndpoint(TestCase):
                       'next_scheduled']:
             self.assertIn(field, data, f'Missing field: {field}')
         self.assertEqual(data['content_type'], 'offline')
+
+
+class TestChannelSchedulerAccessControl(TestCase):
+    """Channel scheduler UI — accessible only to Level 5 (Architect)."""
+
+    def setUp(self):
+        self.owner = _make_user('sched-owner@example.com', level=5)
+        self.tenant = _make_tenant('sched-test', self.owner)
+        self.architect = _make_user('architect@example.com', level=5)
+        self.member = _make_user('member@example.com', level=2)
+        self.client = Client()
+
+    def test_unauthenticated_redirected_to_login(self):
+        response = self.client.get(reverse('channel_overview'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login', response['Location'])
+
+    def test_architect_can_access_overview(self):
+        self.client.force_login(self.architect)
+        response = self.client.get(reverse('channel_overview'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_level2_member_cannot_access_overview(self):
+        self.client.force_login(self.member)
+        response = self.client.get(reverse('channel_overview'))
+        self.assertEqual(response.status_code, 403)
+
+    def test_architect_can_access_add_slot_form(self):
+        self.client.force_login(self.architect)
+        response = self.client.get(
+            reverse('channel_slot_add') + f'?tenant_id={self.tenant.id}'
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_member_cannot_access_add_slot_form(self):
+        self.client.force_login(self.member)
+        response = self.client.get(reverse('channel_slot_add'))
+        self.assertEqual(response.status_code, 403)
+
+    def test_architect_can_access_config_form(self):
+        self.client.force_login(self.architect)
+        response = self.client.get(
+            reverse('channel_config_edit', args=[str(self.tenant.id)])
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_member_cannot_access_config_form(self):
+        self.client.force_login(self.member)
+        response = self.client.get(
+            reverse('channel_config_edit', args=[str(self.tenant.id)])
+        )
+        self.assertEqual(response.status_code, 403)

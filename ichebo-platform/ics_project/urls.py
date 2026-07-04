@@ -51,4 +51,5 @@ urlpatterns = [
     path('api/handbook/', include('handbook.api_urls')),
     path('api/waitlist/', include('waitlist.urls')),
     path('api/broadcast/', include('broadcast.urls')),
+    path('channel/', include('broadcast.channel_urls')),
 ]
