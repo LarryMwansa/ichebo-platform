@@ -1,6 +1,6 @@
 _SUBDOMAIN_SHELLS = {
-    'learn': 'learn/subdomain_shell.html',
-    'bible': 'bible/subdomain_shell.html',
+    'learn': 'workspace_shell.html',
+    'bible': 'workspace_shell.html',
 }
 
 
