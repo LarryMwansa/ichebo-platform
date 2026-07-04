@@ -1,11 +1,14 @@
 {% extends "base_setup.html" %}
-{% block title %}Welcome to ICS{% endblock %}
+{% load static %}
+{% block title %}Welcome — Ichebo{% endblock %}
 
 {% block content %}
 <div class="welcome-shell">
   <div class="welcome-card">
 
-    <div class="welcome-logo">ICS</div>
+    <div class="welcome-logo">
+      <img src="{% static 'images/logo.svg' %}" alt="Ichebo" class="auth-logo" style="height:56px;width:auto;">
+    </div>
 
     <span class="material-symbols-outlined welcome-icon">celebration</span>
 
