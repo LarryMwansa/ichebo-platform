@@ -803,10 +803,8 @@
   box-shadow: var(--shadow-card);
 }
 .welcome-logo {
-  font-size: 1rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--primary);
+  display: flex;
+  justify-content: center;
   margin-bottom: 1.25rem;
 }
 .welcome-icon {
