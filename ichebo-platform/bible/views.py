@@ -3,6 +3,11 @@ from django.views import View
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
+
+
+def landing(request):
+    """Open landing page for bible.ichebo.org — no login required."""
+    return render(request, 'bible/landing.html')
 from .services import (
     get_user_translation, get_chapter_verses, get_all_books,
     get_book_chapters, get_chapter_note_verse_numbers,

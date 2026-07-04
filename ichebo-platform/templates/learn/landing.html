@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learn — Ichebo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/global.css' %}">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sceptre.css' %}">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0E0E0E;
+      color: #F5F3F0;
+      min-height: 100vh;
+    }
+
+    /* Nav */
+    .landing-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .landing-nav__brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .landing-nav__logo { height: 32px; }
+    .landing-nav__back {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+    .landing-nav__back:hover { color: #fff; }
+
+    /* Hero */
+    .hero {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 80px 24px 64px;
+      text-align: center;
+    }
+    .hero__icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 24px;
+      opacity: 0.9;
+    }
+    .hero__label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #AF3236;
+      margin-bottom: 16px;
+    }
+    .hero__title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      color: #F5F3F0;
+    }
+    .hero__title em {
+      font-style: italic;
+      color: #AF3236;
+    }
+    .hero__desc {
+      font-size: 17px;
+      line-height: 1.7;
+      color: rgba(245,243,240,0.65);
+      max-width: 560px;
+      margin: 0 auto 40px;
+    }
+    .hero__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #AF3236;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 32px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .hero__cta:hover { background: #c73b3f; transform: translateY(-1px); }
+
+    /* Features */
+    .features {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 28px 24px;
+    }
+    .feature-card__icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+    .feature-card__title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #F5F3F0;
+      margin-bottom: 8px;
+    }
+    .feature-card__desc {
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(245,243,240,0.55);
+    }
+
+    /* Footer */
+    .landing-footer {
+      text-align: center;
+      padding: 32px 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+    }
+    .landing-footer a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+    }
+    .landing-footer a:hover { color: rgba(255,255,255,0.7); }
+  </style>
+</head>
+<body>
+
+  <nav class="landing-nav">
+    <a href="https://sceptre.ichebo.org/" class="landing-nav__brand">
+      <img src="{% static 'images/sceptre-logo.svg' %}" alt="Ichebo" class="landing-nav__logo">
+    </a>
+    <a href="https://sceptre.ichebo.org/" class="landing-nav__back">← Community</a>
+  </nav>
+
+  <section class="hero">
+    <img src="{% static 'images/learn.svg' %}" alt="Learn" class="hero__icon">
+    <p class="hero__label">Spiritual Formation</p>
+    <h1 class="hero__title">Grow in <em>faith</em><br>and knowledge</h1>
+    <p class="hero__desc">
+      Ichebo Learn is a structured formation engine — programmes, courses, and lessons
+      designed to take you from where you are to where God is calling you.
+    </p>
+    <a href="https://app.ichebo.org/learn/" class="hero__cta">
+      Open My Learning →
+    </a>
+  </section>
+
+  <section class="features">
+    <div class="feature-card">
+      <div class="feature-card__icon">📚</div>
+      <div class="feature-card__title">Structured Programmes</div>
+      <div class="feature-card__desc">Follow curated formation paths built around the apostolic vision and your current level.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card__icon">🎓</div>
+      <div class="feature-card__title">Certifications</div>
+      <div class="feature-card__desc">Complete courses and earn credentials that mark your progress in the formation journey.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card__icon">✍️</div>
+      <div class="feature-card__title">Curriculum Authorship</div>
+      <div class="feature-card__desc">Senior stewards can author programmes and courses, shaping formation for the community.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card__icon">🔍</div>
+      <div class="feature-card__title">Content Review</div>
+      <div class="feature-card__desc">Architects oversee publication, ensuring every resource meets the apostolic standard.</div>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <p>Part of the <a href="https://sceptre.ichebo.org/">Ichebo</a> ecosystem &mdash; Apostolic Christian Services</p>
+  </footer>
+
+</body>
+</html>

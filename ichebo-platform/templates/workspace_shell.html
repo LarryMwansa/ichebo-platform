@@ -179,7 +179,7 @@
                    data-tooltip="My Journal" hx-boost="false">
                     <span class="material-symbols-outlined">history_edu</span>
                 </a>
-                <a href="https://bible.ichebo.org/"
+                <a href="{% url 'bible:reader' %}"
                    class="ics-sidebar__item {% if active_app == 'bible' %}active{% endif %}"
                    data-tooltip="Bible Reader" hx-boost="false">
                     <span class="material-symbols-outlined">menu_book</span>
@@ -189,7 +189,7 @@
                    data-tooltip="Community" hx-boost="false">
                     <span class="material-symbols-outlined">groups</span>
                 </a>
-                <a href="https://learn.ichebo.org/"
+                <a href="{% url 'learn:learn-home' %}"
                    class="ics-sidebar__item {% if active_app == 'formation' %}active{% endif %}"
                    data-tooltip="Formation" hx-boost="false">
                     <span class="material-symbols-outlined">school</span>

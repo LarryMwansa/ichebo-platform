@@ -6,6 +6,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
+
+def landing(request):
+    """Open landing page for learn.ichebo.org — no login required."""
+    return render(request, 'learn/landing.html')
+
 from records.models import Record, Relationship
 from activity.models import Activity
 from governance.services import get_linked_records
