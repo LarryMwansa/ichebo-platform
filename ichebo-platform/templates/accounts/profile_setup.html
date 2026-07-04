@@ -3,18 +3,20 @@
 {% block title %}Profile Setup{% endblock %}
 
 {% block content %}
-<div class="setup-shell">
+<div class="auth-card" style="max-width: 680px;">
 
-  <div class="setup-header">
-    <div class="setup-header__logo">ICS</div>
-    <h1>Complete your profile</h1>
-    <p>This information helps us place you correctly in the Kingdom Growth System.</p>
+  <div class="auth-card__brand">
+    <img src="{% static 'images/logo.svg' %}" alt="Ichebo" class="auth-logo" style="height:110px;width:auto;">
   </div>
 
-  <div class="setup-card">
+  <h1>Complete your profile</h1>
+  <p class="auth-card__subtitle">This information helps us place you correctly in the Kingdom Growth System.</p>
+  <div class="auth-divider"></div>
+
+  <div>
 
     {% if form.non_field_errors %}
-    <div class="setup-errors">
+    <div class="auth-errors">
       {% for error in form.non_field_errors %}{{ error }}{% endfor %}
     </div>
     {% endif %}
@@ -23,178 +25,178 @@
       {% csrf_token %}
 
       <!-- ── Section 1: Personal Details ──────────────────────── -->
-      <p class="setup-section-title">Personal Details</p>
+      <p class="auth-section-title">Personal Details</p>
 
-      <div class="setup-field-row">
-        <div class="setup-field">
+      <div class="auth-field-row">
+        <div class="auth-field">
           <label for="{{ form.title.id_for_label }}">Title</label>
           {{ form.title }}
-          {% if form.title.errors %}<span class="setup-field__error">{{ form.title.errors|join:", " }}</span>{% endif %}
+          {% if form.title.errors %}<span class="auth-field__error">{{ form.title.errors|join:", " }}</span>{% endif %}
         </div>
-        <div class="setup-field">
+        <div class="auth-field">
           <label for="{{ form.gender.id_for_label }}">Gender</label>
           {{ form.gender }}
-          {% if form.gender.errors %}<span class="setup-field__error">{{ form.gender.errors|join:", " }}</span>{% endif %}
+          {% if form.gender.errors %}<span class="auth-field__error">{{ form.gender.errors|join:", " }}</span>{% endif %}
         </div>
       </div>
 
-      <div class="setup-field">
-        <label for="{{ form.full_name.id_for_label }}">Full names <span class="setup-field--required">*</span></label>
+      <div class="auth-field">
+        <label for="{{ form.full_name.id_for_label }}">Full names <span class="auth-field--required">*</span></label>
         {{ form.full_name }}
-        {% if form.full_name.errors %}<span class="setup-field__error">{{ form.full_name.errors|join:", " }}</span>{% endif %}
+        {% if form.full_name.errors %}<span class="auth-field__error">{{ form.full_name.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field-row">
-        <div class="setup-field">
+      <div class="auth-field-row">
+        <div class="auth-field">
           <label for="{{ form.date_of_birth.id_for_label }}">Date of birth</label>
           {{ form.date_of_birth }}
-          {% if form.date_of_birth.errors %}<span class="setup-field__error">{{ form.date_of_birth.errors|join:", " }}</span>{% endif %}
+          {% if form.date_of_birth.errors %}<span class="auth-field__error">{{ form.date_of_birth.errors|join:", " }}</span>{% endif %}
         </div>
-        <div class="setup-field">
+        <div class="auth-field">
           <label for="{{ form.marital_status.id_for_label }}">Marital status</label>
           {{ form.marital_status }}
-          {% if form.marital_status.errors %}<span class="setup-field__error">{{ form.marital_status.errors|join:", " }}</span>{% endif %}
+          {% if form.marital_status.errors %}<span class="auth-field__error">{{ form.marital_status.errors|join:", " }}</span>{% endif %}
         </div>
       </div>
 
-      <div class="setup-field">
+      <div class="auth-field">
         <label for="{{ form.phone_number.id_for_label }}">Phone number</label>
         {{ form.phone_number }}
-        {% if form.phone_number.errors %}<span class="setup-field__error">{{ form.phone_number.errors|join:", " }}</span>{% endif %}
+        {% if form.phone_number.errors %}<span class="auth-field__error">{{ form.phone_number.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field">
-        <label for="{{ form.country.id_for_label }}">Country <span class="setup-field--required">*</span></label>
+      <div class="auth-field">
+        <label for="{{ form.country.id_for_label }}">Country <span class="auth-field--required">*</span></label>
         {{ form.country }}
-        {% if form.country.errors %}<span class="setup-field__error">{{ form.country.errors|join:", " }}</span>{% endif %}
+        {% if form.country.errors %}<span class="auth-field__error">{{ form.country.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field">
+      <div class="auth-field">
         <label for="{{ form.address.id_for_label }}">Address</label>
         {{ form.address }}
-        {% if form.address.errors %}<span class="setup-field__error">{{ form.address.errors|join:", " }}</span>{% endif %}
+        {% if form.address.errors %}<span class="auth-field__error">{{ form.address.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field">
+      <div class="auth-field">
         <label for="{{ form.id_number.id_for_label }}">{{ form.id_number.label }}</label>
         {{ form.id_number }}
-        <span class="setup-field__hint">{{ form.id_number.help_text }}</span>
-        {% if form.id_number.errors %}<span class="setup-field__error">{{ form.id_number.errors|join:", " }}</span>{% endif %}
+        <span class="auth-field__hint">{{ form.id_number.help_text }}</span>
+        {% if form.id_number.errors %}<span class="auth-field__error">{{ form.id_number.errors|join:", " }}</span>{% endif %}
       </div>
 
       <!-- ── Section 2: Qualifications, Gifts & Skills ─────────── -->
-      <p class="setup-section-title">Qualifications, Gifts &amp; Skills</p>
+      <p class="auth-section-title">Qualifications, Gifts &amp; Skills</p>
 
-      <div class="setup-field">
+      <div class="auth-field">
         <label for="{{ form.occupation.id_for_label }}">{{ form.occupation.label }}</label>
         {{ form.occupation }}
-        {% if form.occupation.errors %}<span class="setup-field__error">{{ form.occupation.errors|join:", " }}</span>{% endif %}
+        {% if form.occupation.errors %}<span class="auth-field__error">{{ form.occupation.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field">
+      <div class="auth-field">
         <label for="{{ form.education.id_for_label }}">{{ form.education.label }}</label>
         {{ form.education }}
-        {% if form.education.errors %}<span class="setup-field__error">{{ form.education.errors|join:", " }}</span>{% endif %}
+        {% if form.education.errors %}<span class="auth-field__error">{{ form.education.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field">
+      <div class="auth-field">
         <label for="{{ form.interests.id_for_label }}">{{ form.interests.label }}</label>
         {{ form.interests }}
-        {% if form.interests.errors %}<span class="setup-field__error">{{ form.interests.errors|join:", " }}</span>{% endif %}
+        {% if form.interests.errors %}<span class="auth-field__error">{{ form.interests.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field">
+      <div class="auth-field">
         <label for="{{ form.gifts_skills.id_for_label }}">{{ form.gifts_skills.label }}</label>
         {{ form.gifts_skills }}
-        <span class="setup-field__hint">{{ form.gifts_skills.help_text }}</span>
-        {% if form.gifts_skills.errors %}<span class="setup-field__error">{{ form.gifts_skills.errors|join:", " }}</span>{% endif %}
+        <span class="auth-field__hint">{{ form.gifts_skills.help_text }}</span>
+        {% if form.gifts_skills.errors %}<span class="auth-field__error">{{ form.gifts_skills.errors|join:", " }}</span>{% endif %}
       </div>
 
       <!-- ── Section 3: Faith Background ──────────────────────── -->
-      <p class="setup-section-title">Faith Background</p>
+      <p class="auth-section-title">Faith Background</p>
 
-      <div class="setup-field">
-        <label>{{ form.induction_pathway.label }} <span class="setup-field--required">*</span></label>
-        <div class="setup-radio-group">
+      <div class="auth-field">
+        <label>{{ form.induction_pathway.label }} <span class="auth-field--required">*</span></label>
+        <div class="auth-radio-group">
           {% for choice in form.induction_pathway %}
             <label>{{ choice.tag }} {{ choice.choice_label }}</label>
           {% endfor %}
         </div>
-        {% if form.induction_pathway.errors %}<span class="setup-field__error">{{ form.induction_pathway.errors|join:", " }}</span>{% endif %}
+        {% if form.induction_pathway.errors %}<span class="auth-field__error">{{ form.induction_pathway.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field">
+      <div class="auth-field">
         <label>{{ form.accepted_christ.label }}</label>
-        <div class="setup-radio-group setup-inline-radios">
+        <div class="auth-radio-group setup-inline-radios">
           {% for choice in form.accepted_christ %}
             <label>{{ choice.tag }} {{ choice.choice_label }}</label>
           {% endfor %}
         </div>
-        {% if form.accepted_christ.errors %}<span class="setup-field__error">{{ form.accepted_christ.errors|join:", " }}</span>{% endif %}
+        {% if form.accepted_christ.errors %}<span class="auth-field__error">{{ form.accepted_christ.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field">
+      <div class="auth-field">
         <label>{{ form.church_member.label }}</label>
-        <div class="setup-radio-group setup-inline-radios">
+        <div class="auth-radio-group setup-inline-radios">
           {% for choice in form.church_member %}
             <label>{{ choice.tag }} {{ choice.choice_label }}</label>
           {% endfor %}
         </div>
-        {% if form.church_member.errors %}<span class="setup-field__error">{{ form.church_member.errors|join:", " }}</span>{% endif %}
+        {% if form.church_member.errors %}<span class="auth-field__error">{{ form.church_member.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field">
+      <div class="auth-field">
         <label for="{{ form.church_name.id_for_label }}">{{ form.church_name.label }}</label>
         {{ form.church_name }}
-        {% if form.church_name.errors %}<span class="setup-field__error">{{ form.church_name.errors|join:", " }}</span>{% endif %}
+        {% if form.church_name.errors %}<span class="auth-field__error">{{ form.church_name.errors|join:", " }}</span>{% endif %}
       </div>
 
-      <div class="setup-field-row">
-        <div class="setup-field">
+      <div class="auth-field-row">
+        <div class="auth-field">
           <label for="{{ form.referee_1_name.id_for_label }}">{{ form.referee_1_name.label }}</label>
           {{ form.referee_1_name }}
-          {% if form.referee_1_name.errors %}<span class="setup-field__error">{{ form.referee_1_name.errors|join:", " }}</span>{% endif %}
+          {% if form.referee_1_name.errors %}<span class="auth-field__error">{{ form.referee_1_name.errors|join:", " }}</span>{% endif %}
         </div>
-        <div class="setup-field">
+        <div class="auth-field">
           <label for="{{ form.referee_2_name.id_for_label }}">{{ form.referee_2_name.label }}</label>
           {{ form.referee_2_name }}
-          {% if form.referee_2_name.errors %}<span class="setup-field__error">{{ form.referee_2_name.errors|join:", " }}</span>{% endif %}
+          {% if form.referee_2_name.errors %}<span class="auth-field__error">{{ form.referee_2_name.errors|join:", " }}</span>{% endif %}
         </div>
       </div>
 
-      <div class="setup-field-row">
-        <div class="setup-field">
+      <div class="auth-field-row">
+        <div class="auth-field">
           <label for="{{ form.referee_letter_1.id_for_label }}">{{ form.referee_letter_1.label }}</label>
           {{ form.referee_letter_1 }}
-          <span class="setup-field__hint">{{ form.referee_letter_1.help_text }}</span>
+          <span class="auth-field__hint">{{ form.referee_letter_1.help_text }}</span>
           {% if require_uploads %}
-            {% if form.referee_letter_1.errors %}<span class="setup-field__error">{{ form.referee_letter_1.errors|join:", " }}</span>{% endif %}
+            {% if form.referee_letter_1.errors %}<span class="auth-field__error">{{ form.referee_letter_1.errors|join:", " }}</span>{% endif %}
           {% else %}
-            <span class="setup-dev-notice">Optional in dev mode</span>
+            <span class="auth-dev-notice">Optional in dev mode</span>
           {% endif %}
         </div>
-        <div class="setup-field">
+        <div class="auth-field">
           <label for="{{ form.referee_letter_2.id_for_label }}">{{ form.referee_letter_2.label }}</label>
           {{ form.referee_letter_2 }}
-          <span class="setup-field__hint">{{ form.referee_letter_2.help_text }}</span>
+          <span class="auth-field__hint">{{ form.referee_letter_2.help_text }}</span>
           {% if require_uploads %}
-            {% if form.referee_letter_2.errors %}<span class="setup-field__error">{{ form.referee_letter_2.errors|join:", " }}</span>{% endif %}
+            {% if form.referee_letter_2.errors %}<span class="auth-field__error">{{ form.referee_letter_2.errors|join:", " }}</span>{% endif %}
           {% else %}
-            <span class="setup-dev-notice">Optional in dev mode</span>
+            <span class="auth-dev-notice">Optional in dev mode</span>
           {% endif %}
         </div>
       </div>
 
       <!-- Terms -->
-      <div class="setup-terms">
+      <div class="auth-terms">
         {{ form.terms_accepted }}
         <label for="{{ form.terms_accepted.id_for_label }}">{{ form.terms_accepted.label }}</label>
       </div>
       {% if form.terms_accepted.errors %}
-        <span class="setup-field__error">{{ form.terms_accepted.errors|join:", " }}</span>
+        <span class="auth-field__error">{{ form.terms_accepted.errors|join:", " }}</span>
       {% endif %}
 
-      <button type="submit" class="setup-submit">Complete Registration</button>
+      <button type="submit" class="auth-btn">Complete Registration</button>
     </form>
 
   </div>

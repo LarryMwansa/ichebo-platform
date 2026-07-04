@@ -906,3 +906,63 @@
 }
 .welcome-cta:hover { opacity: 0.88; }
 .welcome-cta:active { transform: scale(0.98); }
+
+/* ── Profile setup extensions ── */
+.auth-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 540px) {
+  .auth-field-row { grid-template-columns: 1fr; }
+}
+.auth-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin: 28px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.auth-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+.auth-radio-group.auth-inline-radios {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.auth-radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text);
+  cursor: pointer;
+}
+.auth-terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 20px 0 8px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.auth-terms input[type="checkbox"] {
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+}
+.auth-field--required { color: var(--error); }
+.auth-dev-notice {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+}
