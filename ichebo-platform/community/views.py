@@ -850,9 +850,15 @@ def htmx_deactivate_member(request, permission_id):
     if not _require_level(request, 3) or request.method != 'POST':
         return HttpResponse('')
 
-    # UserPermission imported at module level
+    perm = UserPermission.objects.filter(id=permission_id).select_related('user').first()
+    if not perm:
+        return HttpResponse('')
 
-    UserPermission.objects.filter(id=permission_id).update(is_active=False)
+    perm.is_active = False
+    perm.save(update_fields=['is_active'])
+
+    # Block login — Django's authenticate() rejects is_active=False users
+    User.objects.filter(id=perm.user_id).update(is_active=False, status='suspended')
 
     return HttpResponse(
         '<div class="announcement-card" style="border-color:var(--error)">'
