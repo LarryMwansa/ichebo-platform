@@ -17,14 +17,14 @@
       <div class="label-caps" style="padding: 0 1rem;">{{ language }}</div>
       <div class="list-group">
         {% for ver in lang_versions %}
-        <button class="list-item {% if ver == current_translation %}bible-picker-item--active{% endif %}"
-                onclick="mSelectVersion('{{ ver.code }}', '{{ book_code }}', {{ chapter }})"
+        <button class="list-item {% if ver.code == current_translation.code %}bible-picker-item--active{% endif %}"
+                onclick="mSelectVersion('{{ ver.code }}', '{{ book_code }}', '{{ chapter }}')"
                 style="width: 100%; border:none; text-align:left; background: transparent; cursor: pointer;">
           <div class="list-item__content">
-            <div class="list-item__title" style="color: {% if ver == current_translation %}var(--primary){% else %}var(--text){% endif %}; font-weight: {% if ver == current_translation %}700{% else %}500{% endif %};">{{ ver.name }}</div>
+            <div class="list-item__title" style="color: {% if ver.code == current_translation.code %}var(--primary){% else %}var(--text){% endif %}; font-weight: {% if ver.code == current_translation.code %}700{% else %}500{% endif %};">{{ ver.name }}</div>
             <div class="list-item__meta">{{ ver.code }}</div>
           </div>
-          {% if ver == current_translation %}
+          {% if ver.code == current_translation.code %}
           <div class="list-item__action"><span class="material-symbols-outlined" style="color: var(--primary);">check_circle</span></div>
           {% endif %}
         </button>
@@ -46,20 +46,25 @@
 
 <script>
 async function mSelectVersion(translationCode, bookCode, chapter) {
+  const csrfToken = '{{ csrf_token }}' || (document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '');
   const formData = new FormData();
   formData.append('translation_code', translationCode);
-  formData.append('book_code', bookCode);
-  formData.append('chapter', chapter);
+  formData.append('book_code', bookCode || 'GEN');
+  formData.append('chapter', chapter || '1');
+  formData.append('csrfmiddlewaretoken', csrfToken);
 
   try {
     await fetch('{% url "bible:htmx-set-translation" %}', {
       method: 'POST',
-      headers: { 'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '' },
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'HX-Request': 'true'
+      },
       body: formData,
     });
   } catch(e) { console.error(e); }
 
   localStorage.setItem('ics_ui.bible_translation', translationCode);
-  window.location.href = `/bible/${bookCode}/${chapter}/`;
+  window.location.href = `/bible/${bookCode || 'GEN'}/${chapter || '1'}/`;
 }
 </script>
