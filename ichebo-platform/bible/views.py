@@ -596,16 +596,19 @@ def htmx_set_translation(request):
         request.user, translation, book_code, chapter
     )
     book = BibleBook.objects.filter(code=book_code).first()
+    translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
 
     context = {
         'translation': translation,
+        'translations': translations,
         'book': book,
         'chapter': chapter,
         'verses': verses,
         'personal_noted': personal_noted,
         'tenant_noted': tenant_noted,
     }
-    return render(request, 'bible/_chapter.html', context)
+    return render(request, 'bible/_chapter_response.html', context)
+
 
 @login_required
 def htmx_appearance_sheet(request):

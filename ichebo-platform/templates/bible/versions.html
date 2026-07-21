@@ -59,7 +59,7 @@
 </div>
 
 <script>
-function selectVersion(translationCode) {
+async function selectVersion(translationCode) {
   // Get the current passage from the referring page if available
   const referrer = document.referrer || '/bible/';
 
@@ -67,6 +67,20 @@ function selectVersion(translationCode) {
   const pathMatch = referrer.match(/\/bible\/([A-Z0-9]+)\/(\d+)\//);
   const bookCode = pathMatch ? pathMatch[1] : 'GEN';
   const chapter = pathMatch ? pathMatch[2] : '1';
+
+  // Save to backend
+  const formData = new FormData();
+  formData.append('translation_code', translationCode);
+  formData.append('book_code', bookCode);
+  formData.append('chapter', chapter);
+
+  try {
+    await fetch('{% url "bible:htmx-set-translation" %}', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '' },
+      body: formData,
+    });
+  } catch (e) { console.error(e); }
 
   // Save to localStorage
   localStorage.setItem('ics_ui.bible_translation', translationCode);
