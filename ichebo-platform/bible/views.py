@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
 
@@ -591,23 +592,14 @@ def htmx_set_translation(request):
         request.user.save(update_fields=['preferred_bible_translation'])
         save_reading_position(request.user, book_code, chapter)
 
-    verses = get_chapter_verses(translation, book_code, chapter)
-    personal_noted, tenant_noted = get_chapter_note_verse_numbers(
-        request.user, translation, book_code, chapter
-    )
-    book = BibleBook.objects.filter(code=book_code).first()
-    translations = BibleTranslation.objects.filter(is_public=True).order_by('language_full', 'name')
+    target_url = reverse('bible:reader-chapter', kwargs={'book_code': book_code, 'chapter': chapter})
 
-    context = {
-        'translation': translation,
-        'translations': translations,
-        'book': book,
-        'chapter': chapter,
-        'verses': verses,
-        'personal_noted': personal_noted,
-        'tenant_noted': tenant_noted,
-    }
-    return render(request, 'bible/_chapter_response.html', context)
+    if request.headers.get('HX-Request'):
+        response = HttpResponse(status=200)
+        response['HX-Redirect'] = target_url
+        return response
+
+    return redirect(target_url)
 
 
 @login_required
