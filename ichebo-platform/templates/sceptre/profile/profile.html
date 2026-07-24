@@ -1,13 +1,51 @@
 <!-- templates/sceptre/profile/profile.html -->
 {% extends "sceptre/base.html" %}
-{% block title %}Profile{% endblock %}
+{% block title %}My Profile{% endblock %}
+
 {% block content %}
-<div style="padding: 24px 28px;">
-  <div style="margin-bottom: 20px;">
-    <div class="ws-label-tag">Identity</div>
-    <h1 class="ws-page-title" style="font-size: 1.25rem; margin-top: 8px;">{{ user.get_full_name|default:user.username }}</h1>
+<div style="background:var(--sc-ink);min-height:100vh;padding:3rem 0;">
+  <div class="sc-container">
+    <div class="sc-label-tag" style="margin-bottom:1rem;">My Profile</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;color:#fff;letter-spacing:-0.02em;margin-bottom:2rem;">
+      {{ user.get_full_name|default:user.username }}
+    </h1>
+
+    <div style="display:grid;grid-template-columns:1fr;gap:1rem;max-width:520px;">
+
+      {% if tenant %}
+        <div class="schedule-item">
+          <div class="schedule-title">Active Community</div>
+          <div class="schedule-name">{{ tenant.name }}</div>
+          <div class="schedule-type">{{ tenant.tier|title|cut:"_" }} · {{ tenant.status|title }}</div>
+        </div>
+      {% endif %}
+
+      <div class="schedule-item">
+        <div class="schedule-title">Account</div>
+        <div class="schedule-name">{{ user.email }}</div>
+        <div class="schedule-type">Member since {{ user.date_joined|date:"F Y" }}</div>
+      </div>
+
+      {% if is_steward %}
+        <div class="schedule-item live">
+          <div class="schedule-title">Role</div>
+          <div class="schedule-name">Community Steward</div>
+          <div class="schedule-type">You have community management access.</div>
+        </div>
+      {% endif %}
+
+      <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:1rem;">
+        <a href="https://app.ichebo.org/profile/" class="sc-btn sc-btn--outline" style="justify-content:center;">
+          <span class="material-symbols-outlined" style="font-size:18px;">manage_accounts</span>
+          Manage Account on Platform
+        </a>
+        <a href="https://app.ichebo.org/accounts/logout/?next=/" class="sc-btn sc-btn--outline" style="justify-content:center;opacity:0.6;">
+          <span class="material-symbols-outlined" style="font-size:18px;">logout</span>
+          Sign out
+        </a>
+      </div>
+
+    </div>
   </div>
-  <p style="color: var(--text); font-size: 13px;">Level: {{ user.competence_level }}</p>
-  <p style="font-size: 13px;"><a href="/profile/" style="color: var(--primary);">Full profile settings</a></p>
 </div>
 {% endblock %}

@@ -19,6 +19,10 @@
        class="nav-link {% if request.resolver_match.url_name == 'community' %}nav-link--active{% endif %}">
       Community
     </a>
+    <a href="{% url 'find_community' %}"
+       class="nav-link {% if request.resolver_match.url_name == 'find_community' or request.resolver_match.url_name == 'community_profile' %}nav-link--active{% endif %}">
+      Find a Community
+    </a>
     <a href="{% url 'learn' %}"
        class="nav-link {% if request.resolver_match.url_name == 'learn' %}nav-link--active{% endif %}">
       Learn
@@ -53,6 +57,10 @@
   <a href="{% url 'community' %}"
      class="nav-link {% if request.resolver_match.url_name == 'community' %}nav-link--active{% endif %}">
     Community
+  </a>
+  <a href="{% url 'find_community' %}"
+     class="nav-link {% if request.resolver_match.url_name == 'find_community' or request.resolver_match.url_name == 'community_profile' %}nav-link--active{% endif %}">
+    Find a Community
   </a>
   <a href="{% url 'learn' %}"
      class="nav-link {% if request.resolver_match.url_name == 'learn' %}nav-link--active{% endif %}">

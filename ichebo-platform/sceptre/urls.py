@@ -53,4 +53,8 @@ urlpatterns = [
     path('steward/announcements/', views.steward_announcements, name='steward_announcements'),
     path('steward/support/', views.steward_support_redirect, name='steward_support'),
     path('steward/settings/', views.steward_settings, name='steward_settings'),
+
+    # Public routes — no login required
+    path('find-a-community/', views.community_directory, name='find_community'),
+    path('c/<slug:slug>/', views.community_profile, name='community_profile'),
 ]

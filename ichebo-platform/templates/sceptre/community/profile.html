@@ -1,0 +1,124 @@
+<!-- templates/sceptre/community/profile.html -->
+{% extends "sceptre/base.html" %}
+{% block title %}{{ community.name }}{% endblock %}
+{% block meta_description %}{{ community.name }} — a Sceptre Community. {% if community.description %}{{ community.description|truncatechars:160 }}{% else %}Kingdom community life through Sceptre.{% endif %}{% endblock %}
+
+{% block content %}
+
+<!-- Community hero -->
+<section class="community-profile-hero">
+  <div class="sc-container">
+    <div class="community-profile-hero__top">
+      <div>
+        <div class="community-profile-hero__avatar">
+          {{ community.name|slice:":2"|upper }}
+        </div>
+        <div class="sc-label-tag" style="margin-top:1rem;">
+          {{ community.tier|title|cut:"_" }} · {{ community.affiliation|title }}
+        </div>
+        <h1 class="community-profile-hero__name">{{ community.name }}</h1>
+        {% if community.area_of_operation %}
+          <div class="community-profile-hero__location">
+            <span class="material-symbols-outlined">location_on</span>
+            {{ community.area_of_operation }}
+          </div>
+        {% endif %}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;align-items:flex-start;">
+        <div class="card-status {% if community.status == 'active' %}card-status--active{% else %}card-status--pending{% endif %}">
+          <span class="material-symbols-outlined" style="font-size:10px;">circle</span>
+          {{ community.status|title }}
+        </div>
+        {% if user.is_authenticated %}
+          <a href="{% url 'community' %}" class="sc-btn sc-btn--primary sc-btn--sm">
+            Go to My Community
+          </a>
+        {% else %}
+          <a href="https://join.ichebo.org/" class="sc-btn sc-btn--primary sc-btn--sm">
+            Join this Community <span class="material-symbols-outlined sc-btn--icon">arrow_forward</span>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Meta stats row -->
+    <div class="community-profile-meta">
+      <div class="community-profile-meta__item">
+        <strong>{{ member_count }}</strong>
+        Members
+      </div>
+      {% if community.community_theme %}
+        <div class="community-profile-meta__item">
+          <strong>{{ community.community_theme }}</strong>
+          Theme
+        </div>
+      {% endif %}
+      {% if steward_names %}
+        <div class="community-profile-meta__item">
+          <strong>{{ steward_names|join:", " }}</strong>
+          {% if steward_names|length == 1 %}Coordinator{% else %}Leadership{% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Body content -->
+<div class="community-profile-body">
+
+  {% if community.description %}
+    <section class="community-profile-section">
+      <div class="sc-container">
+        <h2>About this Community</h2>
+        <p style="font-size:1rem;color:#3a3a3a;line-height:1.8;max-width:68ch;">{{ community.description }}</p>
+      </div>
+    </section>
+  {% endif %}
+
+  {% if recent_broadcasts %}
+    <section class="community-profile-section">
+      <div class="sc-container">
+        <h2>Recent Broadcasts</h2>
+        <div class="vod-grid" style="background:transparent;gap:1rem;">
+          {% for broadcast in recent_broadcasts %}
+            <div class="vod-card" style="border:1px solid #ECE9E4;border-radius:8px;">
+              <div class="vod-thumb" style="background:#0E0E0E;">
+                <div class="vod-play material-symbols-outlined">play_arrow</div>
+                <div class="vod-series-tag">{{ broadcast.record_type|title|default:"Broadcast" }}</div>
+              </div>
+              <div class="vod-content" style="background:#fff;">
+                <div class="vod-title" style="color:#1A1A1A;">{{ broadcast.title }}</div>
+                <div class="vod-meta" style="color:#6B6B6B;">
+                  <span>{{ broadcast.created_at|date:"j M Y" }}</span>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- Join CTA -->
+  <section class="community-profile-section" style="background:var(--sc-ink);border-bottom:none;">
+    <div class="sc-container" style="text-align:center;padding:3rem 0;">
+      <div class="sc-label-tag" style="justify-content:center;margin-bottom:1rem;">Sceptre Community</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:#fff;line-height:1.15;letter-spacing:-0.02em;margin-bottom:1rem;">
+        Become part of {{ community.name }}.
+      </h2>
+      <p style="font-size:1rem;color:rgba(255,255,255,0.55);margin-bottom:2rem;max-width:48ch;margin-inline:auto;">
+        Kingdom community life — worship, formation, governance. One calling, one body.
+      </p>
+      {% if user.is_authenticated %}
+        <a href="{% url 'community' %}" class="sc-btn sc-btn--primary">Go to My Community</a>
+      {% else %}
+        <a href="https://join.ichebo.org/" class="sc-btn sc-btn--primary">
+          Apply to Join <span class="material-symbols-outlined sc-btn--icon">arrow_forward</span>
+        </a>
+      {% endif %}
+    </div>
+  </section>
+
+</div><!-- /.community-profile-body -->
+
+{% endblock %}

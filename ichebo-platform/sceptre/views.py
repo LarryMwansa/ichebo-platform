@@ -137,8 +137,29 @@ def community_area(request):
 
 @require_sceptre_participant
 def learn_summary(request):
-    """Learn — redirect to learn.ichebo.org."""
-    return redirect('https://learn.ichebo.org/')
+    """Learn — in-surface summary of enrolled programmes, with link to learn.ichebo.org."""
+    tenant = _get_tenant_for_user(request.user)
+    user_is_steward = is_steward(request.user)
+
+    programmes = []
+    try:
+        from learn.models import Programme
+        if tenant:
+            programmes = list(
+                Programme.objects.filter(
+                    tenant=tenant,
+                    is_active=True,
+                    deleted_at__isnull=True,
+                ).order_by('order', 'name')[:8]
+            )
+    except Exception:
+        pass
+
+    return render(request, 'sceptre/learn/learn.html', {
+        'tenant': tenant,
+        'is_steward': user_is_steward,
+        'programmes': programmes,
+    })
 
 
 @require_sceptre_participant
@@ -157,8 +178,118 @@ def support_redirect(request):
 def profile_summary(request):
     """Profile summary — interim until identity.ichebo.org ships."""
     user_is_steward = is_steward(request.user)
+    tenant = _get_tenant_for_user(request.user)
     return render(request, 'sceptre/profile/profile.html', {
         'is_steward': user_is_steward,
+        'tenant': tenant,
+    })
+
+
+# ── Public views (no auth required) ───────────────────────────────────────
+
+def community_directory(request):
+    """
+    Public community directory — no login required.
+    Adapted from v1 find-a-church.html; serves dynamic Tenant data.
+    GET params: ?q=  ?theme=  ?format=  ?status=
+    """
+    from tenants.models import Tenant
+
+    qs = Tenant.objects.filter(
+        status='active',
+        deleted_at__isnull=True,
+        is_agency=False,
+        tier='church_node',
+    ).order_by('name')
+
+    q = request.GET.get('q', '').strip()
+    theme = request.GET.get('theme', '').strip()
+    fmt = request.GET.get('format', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+
+    if q:
+        from django.db.models import Q as DQ
+        qs = qs.filter(
+            DQ(name__icontains=q) |
+            DQ(community_theme__icontains=q) |
+            DQ(area_of_operation__icontains=q)
+        )
+    if theme:
+        qs = qs.filter(community_theme__icontains=theme)
+
+    communities = list(qs[:60])
+
+    # Distinct theme list for filter chips
+    themes = list(
+        Tenant.objects.filter(
+            status='active', deleted_at__isnull=True,
+            is_agency=False, tier='church_node',
+        ).exclude(community_theme='')
+        .values_list('community_theme', flat=True)
+        .distinct()
+        .order_by('community_theme')[:20]
+    )
+
+    return render(request, 'sceptre/community/directory.html', {
+        'communities': communities,
+        'themes': themes,
+        'total_count': len(communities),
+        'q': q,
+        'theme': theme,
+    })
+
+
+def community_profile(request, slug):
+    """
+    Public community profile page — no login required.
+    Resolves Tenant by slug; 404 if not found or not active.
+    """
+    from django.shortcuts import get_object_or_404
+    from tenants.models import Tenant, UserPermission
+
+    community = get_object_or_404(
+        Tenant,
+        slug=slug,
+        deleted_at__isnull=True,
+    )
+
+    # Member count
+    member_count = UserPermission.objects.filter(
+        tenant=community,
+        is_active=True,
+        deleted_at__isnull=True,
+    ).count()
+
+    # Public steward names
+    stewards = list(
+        UserPermission.objects.filter(
+            tenant=community,
+            role__in=UserPermission.STEWARD_ROLES,
+            is_active=True,
+            deleted_at__isnull=True,
+        ).select_related('user').values_list('user__first_name', 'user__last_name')[:5]
+    )
+    steward_names = [f"{fn} {ln}".strip() for fn, ln in stewards]
+
+    # Recent broadcasts for this community
+    recent_broadcasts = []
+    try:
+        from records.models import Record
+        recent_broadcasts = list(
+            Record.objects.filter(
+                record_family='broadcast',
+                tenant=community,
+                deleted_at__isnull=True,
+            ).order_by('-created_at')[:3]
+        )
+    except Exception:
+        pass
+
+    return render(request, 'sceptre/community/profile.html', {
+        'community': community,
+        'member_count': member_count,
+        'steward_names': steward_names,
+        'recent_broadcasts': recent_broadcasts,
     })
 
 

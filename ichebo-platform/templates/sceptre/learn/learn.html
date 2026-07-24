@@ -1,14 +1,46 @@
 <!-- templates/sceptre/learn/learn.html -->
 {% extends "sceptre/base.html" %}
 {% block title %}Learn{% endblock %}
+
 {% block content %}
-<div style="padding: 24px 28px;">
-  <div style="margin-bottom: 20px;">
-    <div class="ws-label-tag">Formation</div>
-    <h1 class="ws-page-title" style="font-size: 1.25rem; margin-top: 8px;">Learn</h1>
+<div style="background:var(--sc-ink);min-height:100vh;padding:3rem 0;">
+  <div class="sc-container">
+
+    <div class="sc-label-tag" style="margin-bottom:1rem;">Formation & Learning</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;color:#fff;letter-spacing:-0.02em;margin-bottom:0.5rem;">
+      Your Formation Journey.
+    </h1>
+    <p style="font-size:1rem;color:rgba(255,255,255,0.5);margin-bottom:3rem;max-width:52ch;">
+      Certificate, Diploma, and advanced programmes available through the Ichebo Learn platform.
+    </p>
+
+    {% if programmes %}
+      <div style="display:grid;grid-template-columns:1fr;gap:0.75rem;max-width:640px;margin-bottom:3rem;">
+        {% for prog in programmes %}
+          <a href="https://learn.ichebo.org/" class="schedule-item" style="text-decoration:none;display:block;">
+            <div class="schedule-top">
+              <div class="schedule-day">{{ prog.tier|default:"PROG"|upper|slice:":4" }}</div>
+            </div>
+            <div class="schedule-name">{{ prog.name }}</div>
+            {% if prog.description %}<div class="schedule-type">{{ prog.description|truncatechars:80 }}</div>{% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="series-grid" style="margin-bottom:3rem;opacity:0.6;">
+        <div class="series-card"><span class="series-icon material-symbols-outlined">school</span><div class="series-name">Certificate in Kingdom Governance</div><div class="series-count">Foundation level</div></div>
+        <div class="series-card"><span class="series-icon material-symbols-outlined">workspace_premium</span><div class="series-name">Diploma in Formation &amp; Mission</div><div class="series-count">Intermediate</div></div>
+        <div class="series-card"><span class="series-icon material-symbols-outlined">menu_book</span><div class="series-name">Scripture &amp; Governance</div><div class="series-count">Bible foundations</div></div>
+        <div class="series-card"><span class="series-icon material-symbols-outlined">gavel</span><div class="series-name">Kingdom Governance System</div><div class="series-count">Advanced</div></div>
+      </div>
+    {% endif %}
+
+    <a href="https://learn.ichebo.org/" class="sc-btn sc-btn--primary" style="font-size:15px;">
+      Go to Full Learning Platform
+      <span class="material-symbols-outlined sc-btn--icon">open_in_new</span>
+    </a>
+    <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:1rem;">You will be taken to learn.ichebo.org</p>
+
   </div>
-  <p style="color: var(--text); font-size: 13px;">Your formation journey continues at
-    <a href="/learn/" style="color: var(--primary);">the Learn platform</a>.
-  </p>
 </div>
 {% endblock %}

@@ -1,0 +1,198 @@
+<!-- templates/sceptre/community/directory.html -->
+{% extends "sceptre/base.html" %}
+{% block title %}Find a Community{% endblock %}
+{% block meta_description %}Find a Sceptre Community near you. Search by location, theme, or format. Connect with Kingdom community life in your neighbourhood.{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="dir-hero">
+  <div class="sc-container">
+    <div class="sc-label-tag--primary sc-label-tag">Find a Sceptre Community</div>
+    <h1>Find a<br><em>Church Node</em><br>near you.</h1>
+    <p class="dir-hero__sub">A Sceptre Community may be in a home, a neighbourhood hall, a workplace, or online. Search below to find Kingdom community life in your area.</p>
+  </div>
+</section>
+
+<!-- Search -->
+<div class="search-section">
+  <div class="sc-container">
+    <form method="get" action="" class="search-box">
+      <div class="search-row">
+        <div class="search-field">
+          <label class="search-label" for="dir-q">Search</label>
+          <input type="text" class="search-input" id="dir-q" name="q" value="{{ q }}" placeholder="Name, location, or theme">
+        </div>
+        <div class="search-field">
+          <label class="search-label" for="dir-theme">Community Theme</label>
+          <select class="search-input" id="dir-theme" name="theme">
+            <option value="">All themes</option>
+            {% for t in themes %}
+              <option value="{{ t }}" {% if t == theme %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="search-field">
+          <label class="search-label" for="dir-format">Format</label>
+          <select class="search-input" id="dir-format" name="format">
+            <option value="">Any format</option>
+            <option value="in-person">In-person</option>
+            <option value="online">Digital / Online</option>
+            <option value="hybrid">Hybrid</option>
+          </select>
+        </div>
+        <button type="submit" class="search-btn">
+          <span class="material-symbols-outlined" style="font-size:18px;">search</span>Search
+        </button>
+      </div>
+      <div class="filter-row">
+        <span class="filter-quick">Quick:</span>
+        <a href="{% url 'find_community' %}" class="filter-chip {% if not q and not theme %}active{% endif %}">All Communities</a>
+        <a href="{% url 'find_community' %}?status=active" class="filter-chip">Active Nodes</a>
+        <a href="{% url 'find_community' %}?status=forming" class="filter-chip">Forming</a>
+        {% for t in themes|slice:":4" %}
+          <a href="{% url 'find_community' %}?theme={{ t|urlencode }}" class="filter-chip {% if t == theme %}active{% endif %}">{{ t }}</a>
+        {% endfor %}
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Results -->
+<section class="results-section">
+  <div class="sc-container">
+    <div class="results-header">
+      <div class="results-count">
+        Showing <strong>{{ total_count }}</strong> Sceptre Communit{% if total_count == 1 %}y{% else %}ies{% endif %}
+        {% if q %} matching <em>"{{ q }}"</em>{% endif %}
+      </div>
+    </div>
+    {% if communities %}
+      <div class="community-grid sc-fade-up">
+        {% for c in communities %}
+          <a href="{% url 'community_profile' c.slug %}" class="community-card" style="text-decoration:none;">
+            <div class="card-header">
+              <div class="card-avatar">{{ c.name|slice:":2"|upper }}</div>
+              <div class="card-status {% if c.status == 'active' %}card-status--active{% else %}card-status--pending{% endif %}">
+                <span class="material-symbols-outlined" style="font-size:10px;">circle</span>
+                {{ c.status|title }}
+              </div>
+            </div>
+            <div>
+              <div class="card-name">{{ c.name }}</div>
+              {% if c.location %}
+                <div class="card-location">
+                  <span class="material-symbols-outlined">location_on</span>
+                  {{ c.area_of_operation|default:c.location|truncatechars:50 }}
+                </div>
+              {% endif %}
+            </div>
+            {% if c.community_theme %}
+              <div class="card-theme">
+                <span class="material-symbols-outlined" style="font-size:12px;">category</span>
+                {{ c.community_theme }}
+              </div>
+            {% endif %}
+            <div class="card-meta">
+              <div class="card-meta-item"><strong>{{ c.tier|title|cut:"_" }}</strong>Type</div>
+              <div class="card-meta-item"><strong>{{ c.affiliation|title }}</strong>Affiliation</div>
+            </div>
+            <span class="card-link">
+              View Community <span class="material-symbols-outlined">arrow_forward</span>
+            </span>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align:center;padding:4rem 0;">
+        <div style="font-size:3rem;margin-bottom:1rem;">🔍</div>
+        <p style="font-size:1.1rem;font-weight:600;color:#1A1A1A;margin-bottom:0.5rem;">No communities found{% if q %} for "{{ q }}"{% endif %}</p>
+        <p style="font-size:14px;color:#6B6B6B;margin-bottom:2rem;">Try adjusting your search or filters.</p>
+        <a href="{% url 'find_community' %}" class="sc-btn sc-btn--primary" style="background:var(--sc-primary);color:#fff;border:none;">Clear filters</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Map placeholder -->
+<section class="map-section">
+  <div class="sc-container">
+    <div class="map-section__header">
+      <div>
+        <div class="sc-label-tag--primary sc-label-tag">Community Map</div>
+        <p>Sceptre Communities distributed across the civic geography of the network.</p>
+      </div>
+    </div>
+    <div class="map-placeholder">
+      <span class="map-placeholder-icon material-symbols-outlined">map</span>
+      <p>Interactive community map</p>
+      <p class="map-placeholder-coming">Coming soon — geographic community map will display here</p>
+    </div>
+  </div>
+</section>
+
+<!-- Not found / Start a community CTA -->
+<section class="not-found-section">
+  <div class="sc-container">
+    <div class="not-found-grid">
+      <div class="sc-fade-up">
+        <div class="not-found-eyebrow">Nothing Near You?</div>
+        <h2 class="not-found-title">No community in your area yet.<br>That can change.</h2>
+        <p class="not-found-body">The Sceptre Community network grows through multiplication. A community in your area may be one calling away. You could be the person who starts it.</p>
+        <div class="not-found-ctas">
+          <a href="https://join.ichebo.org/" class="sc-btn sc-btn--primary">
+            Start a Community <span class="material-symbols-outlined sc-btn--icon">arrow_forward</span>
+          </a>
+          <a href="{% url 'find_community' %}?format=online" class="sc-btn sc-btn--outline">Join Online Community</a>
+        </div>
+      </div>
+      <div class="not-found-options sc-fade-up" style="transition-delay:0.15s;">
+        <a href="https://join.ichebo.org/" class="option-card">
+          <span class="option-icon material-symbols-outlined">add_home</span>
+          <div>
+            <div class="option-title">Start a Sceptre Community</div>
+            <div class="option-desc">3 people, a calling, and a willingness to learn. We'll walk you through every step of the Triple-Thread Survey and community formation.</div>
+          </div>
+        </a>
+        <a href="{% url 'find_community' %}?format=online" class="option-card">
+          <span class="option-icon material-symbols-outlined">public</span>
+          <div>
+            <div class="option-title">Join the Online Community</div>
+            <div class="option-desc">The global digital Sceptre Community is open to all. Engage with Kingdom life online while you build local community.</div>
+          </div>
+        </a>
+        <a href="https://learn.ichebo.org/" class="option-card">
+          <span class="option-icon material-symbols-outlined">school</span>
+          <div>
+            <div class="option-title">Begin Formation Training</div>
+            <div class="option-desc">You can start the Certificate programme and formation journey independently. Training prepares you for community — and for starting one.</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.sc-fade-up').forEach(function (el) { observer.observe(el); });
+
+    // Filter chip active toggle
+    document.querySelectorAll('.filter-chip').forEach(function (chip) {
+      chip.addEventListener('click', function (e) {
+        if (chip.tagName === 'BUTTON') {
+          e.preventDefault();
+          document.querySelectorAll('.filter-chip').forEach(function (c) { c.classList.remove('active'); });
+          chip.classList.add('active');
+        }
+      });
+    });
+  })();
+</script>
+
+{% endblock %}
