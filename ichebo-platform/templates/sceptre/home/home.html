@@ -1,13 +1,82 @@
 <!-- templates/sceptre/home/home.html -->
 {% extends "sceptre/base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Channel{% endblock %}
+{% block meta_description %}Watch live services, formation teachings, and community sessions from your Sceptre Community.{% endblock %}
 
 {% block content %}
-<div id="channel-area"
-     hx-get="{% url 'now_playing_partial' %}"
-     hx-trigger="load, every 60s"
-     hx-swap="innerHTML">
-  {% include "sceptre/home/_now_playing.html" with now_playing=None tenant_id=tenant_id %}
+
+<!-- Channel hero heading -->
+<div class="channel-hero-heading" style="background: var(--sc-ink);">
+  <div class="sc-container">
+    <div class="sc-label-tag">Watch</div>
+    <h1>Kingdom on broadcast.</h1>
+  </div>
+</div>
+
+<!-- Channel player + schedule sidebar -->
+<div style="background: var(--sc-ink); padding-bottom: 3rem;">
+  <div class="sc-container">
+    <div class="live-grid">
+
+      <!-- Player -->
+      <div>
+        <div id="channel-area"
+             hx-get="{% url 'now_playing_partial' %}"
+             hx-trigger="load, every 60s"
+             hx-swap="innerHTML">
+          {% include "sceptre/home/_now_playing.html" with now_playing=None tenant_id=tenant_id %}
+        </div>
+        <div class="player-info">
+          <div>
+            <div class="player-info__title">
+              {% if tenant %}{{ tenant.name }} Channel{% else %}Ichebo Channel{% endif %}
+            </div>
+            <div class="player-info__meta">Live &amp; On-Demand</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule sidebar -->
+      <div class="schedule-sidebar">
+        <div class="schedule-title">Broadcast Schedule</div>
+        {% if schedule %}
+          {% for item in schedule %}
+            <div class="schedule-item{% if item.is_live %} live{% endif %}">
+              <div class="schedule-top">
+                <div class="schedule-day">{{ item.day_abbr }}</div>
+                <div class="schedule-time{% if item.is_live %} schedule-time--live{% endif %}">
+                  {% if item.is_live %}<span class="live-dot" style="background:var(--sc-primary);display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;"></span>LIVE{% else %}{{ item.time_str }}{% endif %}
+                </div>
+              </div>
+              <div class="schedule-name">{{ item.title }}</div>
+              <div class="schedule-type">{{ item.description }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="schedule-item" style="opacity:0.5;">
+            <div class="schedule-top"><div class="schedule-day">SUN</div><div class="schedule-time">09:00</div></div>
+            <div class="schedule-name">Kingdom Worship Service</div>
+            <div class="schedule-type">Worship · Teaching · Prayer</div>
+          </div>
+          <div class="schedule-item" style="opacity:0.5;">
+            <div class="schedule-top"><div class="schedule-day">WED</div><div class="schedule-time">19:00</div></div>
+            <div class="schedule-name">Formation Teaching</div>
+            <div class="schedule-type">Deep Study · Kingdom Governance</div>
+          </div>
+          <div class="schedule-item" style="opacity:0.5;">
+            <div class="schedule-top"><div class="schedule-day">FRI</div><div class="schedule-time">06:00</div></div>
+            <div class="schedule-name">Community Prayer</div>
+            <div class="schedule-type">Intercession · Decree · Alignment</div>
+          </div>
+        {% endif %}
+        <a href="#notify" class="schedule-notify">
+          <span class="material-symbols-outlined" style="font-size:16px;">notifications</span>
+          Get broadcast notifications
+        </a>
+      </div>
+
+    </div><!-- /.live-grid -->
+  </div>
 </div>
 
 <!-- Quick-access tiles -->
@@ -31,4 +100,123 @@
     </a>
   </div>
 </div>
+
+<!-- Content tabs -->
+<div class="content-tabs">
+  <div class="sc-container">
+    <div class="tabs-inner">
+      <button class="tab-btn active" id="tab-recent" onclick="switchTab('recent', this)">Recent Broadcasts</button>
+      <button class="tab-btn" id="tab-series" onclick="switchTab('series', this)">Teaching Series</button>
+      <button class="tab-btn" id="tab-formation" onclick="switchTab('formation', this)">Formation</button>
+      <button class="tab-btn" id="tab-governance" onclick="switchTab('governance', this)">Sessions</button>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Broadcasts -->
+<section class="vod-section" id="tab-panel-recent">
+  <div class="sc-container">
+    <div class="vod-section-header">
+      <div>
+        <div class="sc-label-tag">On Demand</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:#fff;line-height:1.15;letter-spacing:-0.02em;">Recent Broadcasts</h2>
+      </div>
+    </div>
+    <div class="vod-grid sc-fade-up">
+      {% if recent_broadcasts %}
+        {% for broadcast in recent_broadcasts %}
+          <div class="vod-card">
+            <div class="vod-thumb">
+              <div class="vod-play material-symbols-outlined">play_arrow</div>
+              <div class="vod-series-tag">{{ broadcast.record_type|title|default:"Broadcast" }}</div>
+            </div>
+            <div class="vod-content">
+              <div class="vod-title">{{ broadcast.title }}</div>
+              <div class="vod-meta">
+                <span>{{ broadcast.created_at|date:"j M Y" }}</span>
+                <div class="vod-sep"></div>
+                <span>{{ broadcast.record_family|title }}</span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        {% for i in "123456" %}
+          <div class="vod-card" style="opacity:0.35;">
+            <div class="vod-thumb"><div class="vod-play material-symbols-outlined">play_arrow</div><div class="vod-series-tag">Broadcast</div></div>
+            <div class="vod-content">
+              <div style="background:rgba(255,255,255,0.06);height:16px;border-radius:3px;margin-bottom:8px;"></div>
+              <div style="background:rgba(255,255,255,0.04);height:12px;border-radius:3px;width:60%;"></div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Teaching Series & Programmes -->
+<section class="series-section" id="tab-panel-series" style="display:none;">
+  <div class="sc-container">
+    <div class="sc-label-tag">Browse by Series</div>
+    <h2 class="series-heading">Teaching series &amp; programmes.</h2>
+    <div class="series-grid sc-fade-up">
+      {% if programmes %}
+        {% for prog in programmes %}
+          <a href="https://learn.ichebo.org/" class="series-card">
+            <span class="series-icon material-symbols-outlined">school</span>
+            <div class="series-name">{{ prog.name }}</div>
+            <div class="series-count">{% if prog.lesson_count %}{{ prog.lesson_count }} lessons{% endif %}</div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">gavel</span><div class="series-name">Kingdom Governance System</div><div class="series-count">12 lessons</div></div>
+        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">groups</span><div class="series-name">Building a Church Node</div><div class="series-count">8 lessons</div></div>
+        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">school</span><div class="series-name">Formation Pathways</div><div class="series-count">10 lessons</div></div>
+        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">workspace_premium</span><div class="series-name">Leaders Forum</div><div class="series-count">6 lessons</div></div>
+        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">volunteer_activism</span><div class="series-name">The Kingdom Mandate</div><div class="series-count">5 lessons</div></div>
+        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">self_improvement</span><div class="series-name">Spiritual Formation</div><div class="series-count">9 lessons</div></div>
+        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">travel_explore</span><div class="series-name">Mission &amp; Church Planting</div><div class="series-count">7 lessons</div></div>
+        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">menu_book</span><div class="series-name">Scripture &amp; Governance</div><div class="series-count">11 lessons</div></div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Broadcast notification CTA -->
+<section id="notify" class="notify-section">
+  <div class="sc-container">
+    <div class="notify-inner">
+      <div class="sc-fade-up">
+        <h2 class="notify-title">Never miss a live broadcast.</h2>
+        <p class="notify-body">Get notified before every live service, formation teaching, and leaders session. Email reminders, no spam.</p>
+      </div>
+      <div class="sc-fade-up" style="transition-delay:0.15s;">
+        <div class="notify-form">
+          <input type="email" class="notify-input" id="notify-email-input" placeholder="Your email address">
+          <button class="notify-btn" id="notify-submit-btn">Notify Me</button>
+        </div>
+        <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:0.75rem;">We send broadcast reminders only. Unsubscribe at any time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    window.switchTab = function (tab, btn) {
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('tab-panel-recent').style.display = (tab === 'recent') ? '' : 'none';
+      document.getElementById('tab-panel-series').style.display = (tab !== 'recent') ? '' : 'none';
+    };
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.sc-fade-up').forEach(function (el) { observer.observe(el); });
+  })();
+</script>
+
 {% endblock %}

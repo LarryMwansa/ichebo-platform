@@ -25,15 +25,65 @@ def _get_tenant_for_user(user):
 @require_sceptre_participant
 def participant_home(request):
     """
-    Participant home — channel video first, four quick-access tiles below.
+    Participant home — channel video first, schedule sidebar, VOD grid,
+    series/programmes grid, notification CTA.
     """
+    from django.db.models import Q
+    from records.models import Record
+
     tenant = _get_tenant_for_user(request.user)
     user_is_steward = is_steward(request.user)
+
+    # Recent broadcasts — last 6 records with video content for this tenant.
+    # Gracefully empty when no broadcasts exist yet.
+    recent_broadcasts = []
+    if tenant:
+        recent_broadcasts = list(
+            Record.objects.filter(
+                record_family='broadcast',
+                deleted_at__isnull=True,
+            ).filter(
+                Q(tenant_id=tenant.id) | Q(tenant_id__isnull=True)
+            ).order_by('-created_at')[:6]
+        )
+
+    # Programmes — tenant's active Learn programmes (max 8).
+    # Imported inline to avoid a hard dependency on learn app at module level.
+    programmes = []
+    try:
+        from learn.models import Programme
+        if tenant:
+            programmes = list(
+                Programme.objects.filter(
+                    tenant=tenant,
+                    is_active=True,
+                    deleted_at__isnull=True,
+                ).order_by('order', 'name')[:8]
+            )
+    except Exception:
+        pass  # learn app may not be available or Programme model may differ
+
+    # Schedule — upcoming ChannelSlots for this tenant.
+    schedule = []
+    try:
+        from broadcast.models import ChannelSlot
+        if tenant:
+            schedule = list(
+                ChannelSlot.objects.filter(
+                    tenant=tenant,
+                    deleted_at__isnull=True,
+                ).order_by('day_of_week', 'start_time')[:6]
+            )
+    except Exception:
+        pass
 
     return render(request, 'sceptre/home/home.html', {
         'tenant': tenant,
         'tenant_id': str(tenant.id) if tenant else '',
         'is_steward': user_is_steward,
+        'recent_broadcasts': recent_broadcasts,
+        'programmes': programmes,
+        'schedule': schedule,
     })
 
 
