@@ -314,11 +314,11 @@ def steward_gatherings(request):
     tenant = _get_tenant_for_user(request.user)
     now = timezone.now()
     gatherings = Record.objects.filter(
-        record_family='community', record_type='gathering', related_tenant=tenant
-    ).order_by('target_date')
+        record_family='community', record_type='gathering', tenant=tenant
+    ).order_by('custom_fields__scheduled_at')
     
-    upcoming = gatherings.filter(target_date__gte=now)
-    past = gatherings.filter(target_date__lt=now).order_by('-target_date')[:10]
+    upcoming = gatherings.filter(custom_fields__scheduled_at__gte=now.isoformat())
+    past = gatherings.filter(custom_fields__scheduled_at__lt=now.isoformat()).order_by('-custom_fields__scheduled_at')[:10]
     return render(request, 'sceptre/steward/gatherings.html', {
         'upcoming': upcoming, 'past': past
     })
@@ -345,7 +345,7 @@ def steward_announcements(request):
     from records.models import Record
     tenant = _get_tenant_for_user(request.user)
     announcements = Record.objects.filter(
-        record_family='community', record_type='announcement', related_tenant=tenant
+        record_family='community', record_type='announcement', tenant=tenant
     ).order_by('-created_at')
     return render(request, 'sceptre/steward/announcements.html', {'announcements': announcements})
 

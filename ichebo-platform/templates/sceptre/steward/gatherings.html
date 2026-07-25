@@ -26,7 +26,7 @@
               {% for gathering in upcoming %}
               <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <td style="padding: 16px; font-size: 15px; color: #fff; font-weight: 500;">{{ gathering.title }}</td>
-                <td style="padding: 16px; font-size: 14px; color: rgba(255,255,255,0.8);">{{ gathering.target_date|date:"l, j M Y" }}<br><span style="font-size:12px;color:rgba(255,255,255,0.5);">{{ gathering.target_date|time:"H:i" }}</span></td>
+                <td style="padding: 16px; font-size: 14px; color: rgba(255,255,255,0.8);">{{ gathering.custom_fields.scheduled_at|default:gathering.created_at|date:"l, j M Y" }}<br><span style="font-size:12px;color:rgba(255,255,255,0.5);">{{ gathering.custom_fields.scheduled_at|default:gathering.created_at|time:"H:i" }}</span></td>
                 <td style="padding: 16px; font-size: 14px; color: rgba(255,255,255,0.8);">{{ gathering.metadata.format|default:"In-person"|title }}</td>
               </tr>
               {% empty %}
@@ -51,7 +51,7 @@
               {% for gathering in past %}
               <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <td style="padding: 16px; font-size: 15px; color: rgba(255,255,255,0.6);">{{ gathering.title }}</td>
-                <td style="padding: 16px; font-size: 14px; color: rgba(255,255,255,0.5);">{{ gathering.target_date|date:"j M Y" }}</td>
+                <td style="padding: 16px; font-size: 14px; color: rgba(255,255,255,0.5);">{{ gathering.custom_fields.scheduled_at|default:gathering.created_at|date:"j M Y" }}</td>
               </tr>
               {% empty %}
               <tr>
