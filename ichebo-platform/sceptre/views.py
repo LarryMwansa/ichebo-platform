@@ -299,8 +299,9 @@ def community_profile(request, slug):
 def steward_members(request):
     """Native Sceptre member roster."""
     from tenants.models import UserPermission
+    tenant = _get_tenant_for_user(request.user)
     members = UserPermission.objects.filter(
-        tenant=request.tenant, is_active=True
+        tenant=tenant, is_active=True
     ).select_related('user').order_by('-level', 'user__first_name')
     return render(request, 'sceptre/steward/members.html', {'members': members})
 
@@ -310,9 +311,10 @@ def steward_gatherings(request):
     """Native Sceptre gatherings list."""
     from records.models import Record
     from django.utils import timezone
+    tenant = _get_tenant_for_user(request.user)
     now = timezone.now()
     gatherings = Record.objects.filter(
-        record_family='community', record_type='gathering', related_tenant=request.tenant
+        record_family='community', record_type='gathering', related_tenant=tenant
     ).order_by('target_date')
     
     upcoming = gatherings.filter(target_date__gte=now)
@@ -326,7 +328,8 @@ def steward_gatherings(request):
 def steward_formation(request):
     """Native Sceptre formation pipeline."""
     from tenants.models import UserPermission
-    members = UserPermission.objects.filter(tenant=request.tenant, is_active=True).select_related('user')
+    tenant = _get_tenant_for_user(request.user)
+    members = UserPermission.objects.filter(tenant=tenant, is_active=True).select_related('user')
     seekers = members.filter(level=0).order_by('user__first_name')
     disciples = members.filter(level__in=[1, 2]).order_by('user__first_name')
     stewards = members.filter(level__gte=3).order_by('-level', 'user__first_name')
@@ -340,8 +343,9 @@ def steward_formation(request):
 def steward_announcements(request):
     """Native Sceptre announcements list."""
     from records.models import Record
+    tenant = _get_tenant_for_user(request.user)
     announcements = Record.objects.filter(
-        record_family='community', record_type='announcement', related_tenant=request.tenant
+        record_family='community', record_type='announcement', related_tenant=tenant
     ).order_by('-created_at')
     return render(request, 'sceptre/steward/announcements.html', {'announcements': announcements})
 
