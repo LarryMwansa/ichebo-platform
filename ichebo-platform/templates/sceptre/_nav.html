@@ -13,7 +13,7 @@
   <div class="top-nav__links">
     <a href="{% url 'home' %}"
        class="nav-link {% if request.resolver_match.url_name == 'home' %}nav-link--active{% endif %}">
-      Channel
+      Watch
     </a>
     <a href="{% url 'community' %}"
        class="nav-link {% if request.resolver_match.url_name == 'community' %}nav-link--active{% endif %}">
@@ -52,7 +52,7 @@
 <div class="nav-links-mobile" id="nav-links-mobile" hidden>
   <a href="{% url 'home' %}"
      class="nav-link {% if request.resolver_match.url_name == 'home' %}nav-link--active{% endif %}">
-    Channel
+    Watch
   </a>
   <a href="{% url 'community' %}"
      class="nav-link {% if request.resolver_match.url_name == 'community' %}nav-link--active{% endif %}">
