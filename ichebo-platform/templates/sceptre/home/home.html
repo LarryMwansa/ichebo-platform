@@ -4,6 +4,8 @@
 {% block meta_description %}Watch live services, formation teachings, and community sessions from your Sceptre Community.{% endblock %}
 
 {% block content %}
+<div style="background: var(--sc-ink); color: #fff; min-height: calc(100vh - 56px);">
+
 
 <!-- Channel hero heading -->
 <div class="channel-hero-heading" style="background: var(--sc-ink);">
@@ -197,5 +199,5 @@
     document.querySelectorAll('.sc-fade-up').forEach(function (el) { observer.observe(el); });
   })();
 </script>
-
+</div>
 {% endblock %}
