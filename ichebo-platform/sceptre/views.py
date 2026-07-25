@@ -297,26 +297,53 @@ def community_profile(request, slug):
 
 @require_sceptre_steward
 def steward_members(request):
-    """Member roster — delegate to community app's member management."""
-    return redirect('/community/members/')
+    """Native Sceptre member roster."""
+    from tenants.models import UserPermission
+    members = UserPermission.objects.filter(
+        tenant=request.tenant, is_active=True
+    ).select_related('user').order_by('-level', 'user__first_name')
+    return render(request, 'sceptre/steward/members.html', {'members': members})
 
 
 @require_sceptre_steward
 def steward_gatherings(request):
-    return redirect('/community/gatherings/')
+    """Native Sceptre gatherings list."""
+    from records.models import Record
+    from django.utils import timezone
+    now = timezone.now()
+    gatherings = Record.objects.filter(
+        record_family='community', record_type='gathering', related_tenant=request.tenant
+    ).order_by('target_date')
+    
+    upcoming = gatherings.filter(target_date__gte=now)
+    past = gatherings.filter(target_date__lt=now).order_by('-target_date')[:10]
+    return render(request, 'sceptre/steward/gatherings.html', {
+        'upcoming': upcoming, 'past': past
+    })
 
 
 @require_sceptre_steward
 def steward_formation(request):
-    return redirect('/community/pipeline/')
+    """Native Sceptre formation pipeline."""
+    from tenants.models import UserPermission
+    members = UserPermission.objects.filter(tenant=request.tenant, is_active=True).select_related('user')
+    seekers = members.filter(level=0).order_by('user__first_name')
+    disciples = members.filter(level__in=[1, 2]).order_by('user__first_name')
+    stewards = members.filter(level__gte=3).order_by('-level', 'user__first_name')
+    
+    return render(request, 'sceptre/steward/formation.html', {
+        'seekers': seekers, 'disciples': disciples, 'stewards': stewards
+    })
 
 
 @require_sceptre_steward
 def steward_announcements(request):
-    # Announcement authorship is composed inline on the steward
-    # dashboard via the community/htmx/announcement/create/ HTMX
-    # endpoint — there is no separate authorship page to redirect to.
-    return redirect('/community/management/')
+    """Native Sceptre announcements list."""
+    from records.models import Record
+    announcements = Record.objects.filter(
+        record_family='community', record_type='announcement', related_tenant=request.tenant
+    ).order_by('-created_at')
+    return render(request, 'sceptre/steward/announcements.html', {'announcements': announcements})
 
 
 @require_sceptre_steward

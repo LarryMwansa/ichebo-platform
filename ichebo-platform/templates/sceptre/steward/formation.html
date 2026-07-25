@@ -1,0 +1,73 @@
+{% extends "sceptre/base.html" %}
+{% block title %}Formation - Steward Management{% endblock %}
+{% block content %}
+<div style="background: var(--sc-ink); color: #fff; min-height: calc(100vh - 56px);">
+  <div class="channel-hero-heading" style="background: var(--sc-ink);">
+    <div class="sc-container">
+      <div class="sc-label-tag">Steward Management</div>
+      <h1>Formation Pipeline.</h1>
+    </div>
+  </div>
+  <div style="background: var(--sc-ink); padding-bottom: 5rem;">
+    <div class="sc-container">
+      <div style="max-width: 900px; display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        
+        <!-- Seekers -->
+        <div>
+          <h2 style="font-size: 16px; margin-bottom: 16px; font-weight: 600; color: rgba(255,255,255,0.7); display: flex; justify-content: space-between;">
+            Seekers (Level 0) <span style="background:rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 12px; font-size: 12px;">{{ seekers.count }}</span>
+          </h2>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px;">
+            {% for person in seekers %}
+              <div style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <div style="font-size: 14px; font-weight: 500; color: #fff;">{{ person.user.get_full_name|default:person.user.email }}</div>
+                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px;">{{ person.role|title }}</div>
+              </div>
+            {% empty %}
+              <div style="padding: 24px 0; text-align: center; color: rgba(255,255,255,0.4); font-size: 13px;">No seekers in pipeline.</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Disciples -->
+        <div>
+          <h2 style="font-size: 16px; margin-bottom: 16px; font-weight: 600; color: rgba(255,255,255,0.7); display: flex; justify-content: space-between;">
+            Disciples (Level 1-2) <span style="background:rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 12px; font-size: 12px;">{{ disciples.count }}</span>
+          </h2>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px;">
+            {% for person in disciples %}
+              <div style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <div style="font-size: 14px; font-weight: 500; color: #fff;">{{ person.user.get_full_name|default:person.user.email }}</div>
+                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px;">Level {{ person.level }}</div>
+              </div>
+            {% empty %}
+              <div style="padding: 24px 0; text-align: center; color: rgba(255,255,255,0.4); font-size: 13px;">No disciples in pipeline.</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Stewards -->
+        <div>
+          <h2 style="font-size: 16px; margin-bottom: 16px; font-weight: 600; color: rgba(255,255,255,0.7); display: flex; justify-content: space-between;">
+            Stewards (Level 3+) <span style="background:rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 12px; font-size: 12px;">{{ stewards.count }}</span>
+          </h2>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px;">
+            {% for person in stewards %}
+              <div style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <div style="font-size: 14px; font-weight: 500; color: #fff;">{{ person.user.get_full_name|default:person.user.email }}</div>
+                <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px;">{{ person.get_role_display|default:person.role|title }}</div>
+              </div>
+            {% empty %}
+              <div style="padding: 24px 0; text-align: center; color: rgba(255,255,255,0.4); font-size: 13px;">No active stewards.</div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+      <div style="max-width: 900px; margin-top: 32px; text-align: right;">
+        <a href="https://app.ichebo.org/community/pipeline/" target="_blank" style="color: var(--sc-primary); font-size: 14px; text-decoration: none;">Manage in full dashboard &rarr;</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -123,11 +123,72 @@
         <p>Sceptre Communities distributed across the civic geography of the network.</p>
       </div>
     </div>
-    <div class="map-placeholder">
-      <span class="map-placeholder-icon material-symbols-outlined">map</span>
-      <p>Interactive community map</p>
-      <p class="map-placeholder-coming">Coming soon — geographic community map will display here</p>
-    </div>
+    <div id="community-map" style="height: 500px; width: 100%; border-radius: 12px; background: #111; z-index: 1;"></div>
+    
+    <!-- Leaflet JS & Map Logic -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the map, centered globally (since no coordinates exist yet)
+        var map = L.map('community-map', {
+          zoomControl: false,
+          scrollWheelZoom: false
+        }).setView([20, 0], 2);
+
+        // Add zoom control to bottom right
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // CartoDB Dark Matter tile layer for that sleek dark aesthetic
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20
+        }).addTo(map);
+
+        // Define a custom red pin for Sceptre
+        var sceptreIcon = L.divIcon({
+          className: 'custom-pin',
+          html: '<div style="background:var(--sc-primary); width:12px; height:12px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 10px rgba(175,50,54,0.8);"></div>',
+          iconSize: [16, 16],
+          iconAnchor: [8, 8]
+        });
+
+        // Loop over the backend communities list
+        var hasValidCoords = false;
+        var markers = [];
+        
+        {% for comm in communities %}
+          {% if comm.location.lat and comm.location.lng %}
+            hasValidCoords = true;
+            var marker = L.marker([{{ comm.location.lat }}, {{ comm.location.lng }}], {icon: sceptreIcon}).addTo(map);
+            marker.bindPopup("<b style=\"color: #111;\">{{ comm.name|escapejs }}</b><br><a href=\"{% url 'community_profile' comm.slug %}\" style=\"color: var(--sc-primary);\">View Community</a>");
+            markers.push(marker);
+          {% endif %}
+        {% endfor %}
+
+        // If no coordinates are present in the DB, drop a few mock pins just to show the map works
+        if (!hasValidCoords) {
+          console.log("No valid coordinates found in DB. Showing mock pins.");
+          var mockCoords = [
+            [51.5074, -0.1278], // London
+            [40.7128, -74.0060], // New York
+            [-15.3875, 28.3228]  // Lusaka
+          ];
+          mockCoords.forEach(function(coord, i) {
+            var marker = L.marker(coord, {icon: sceptreIcon}).addTo(map);
+            marker.bindPopup('<b style="color: #111;">Sceptre Example Node</b><br><span style="color: #666; font-size:12px;">Add lat/lng via admin to show real communities here.</span>');
+            markers.push(marker);
+          });
+        }
+        
+        // Fit map bounds to pins if we have any
+        if (markers.length > 0) {
+          var group = new L.featureGroup(markers);
+          map.fitBounds(group.getBounds().pad(0.5));
+        }
+      });
+    </script>
   </div>
 </section>
 

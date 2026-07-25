@@ -110,15 +110,9 @@
           </div>
         {% endfor %}
       {% else %}
-        {% for i in "123456" %}
-          <div class="vod-card" style="opacity:0.35;">
-            <div class="vod-thumb"><div class="vod-play material-symbols-outlined">play_arrow</div><div class="vod-series-tag">Broadcast</div></div>
-            <div class="vod-content">
-              <div style="background:rgba(255,255,255,0.06);height:16px;border-radius:3px;margin-bottom:8px;"></div>
-              <div style="background:rgba(255,255,255,0.04);height:12px;border-radius:3px;width:60%;"></div>
-            </div>
-          </div>
-        {% endfor %}
+        <div style="grid-column: 1 / -1; padding: 4rem 1rem; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px;">
+          <div style="color: rgba(255,255,255,0.5); font-size: 15px;">There are no recent broadcasts to display.</div>
+        </div>
       {% endif %}
     </div>
   </div>
@@ -139,14 +133,9 @@
           </a>
         {% endfor %}
       {% else %}
-        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">gavel</span><div class="series-name">Kingdom Governance System</div><div class="series-count">12 lessons</div></div>
-        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">groups</span><div class="series-name">Building a Church Node</div><div class="series-count">8 lessons</div></div>
-        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">school</span><div class="series-name">Formation Pathways</div><div class="series-count">10 lessons</div></div>
-        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">workspace_premium</span><div class="series-name">Leaders Forum</div><div class="series-count">6 lessons</div></div>
-        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">volunteer_activism</span><div class="series-name">The Kingdom Mandate</div><div class="series-count">5 lessons</div></div>
-        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">self_improvement</span><div class="series-name">Spiritual Formation</div><div class="series-count">9 lessons</div></div>
-        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">travel_explore</span><div class="series-name">Mission &amp; Church Planting</div><div class="series-count">7 lessons</div></div>
-        <div class="series-card" style="opacity:0.4;"><span class="series-icon material-symbols-outlined">menu_book</span><div class="series-name">Scripture &amp; Governance</div><div class="series-count">11 lessons</div></div>
+        <div style="grid-column: 1 / -1; padding: 4rem 1rem; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px;">
+          <div style="color: rgba(255,255,255,0.5); font-size: 15px;">There are no active teaching programmes.</div>
+        </div>
       {% endif %}
     </div>
   </div>

@@ -1,0 +1,45 @@
+{% extends "sceptre/base.html" %}
+{% block title %}Members - Steward Management{% endblock %}
+{% block content %}
+<div style="background: var(--sc-ink); color: #fff; min-height: calc(100vh - 56px);">
+  <div class="channel-hero-heading" style="background: var(--sc-ink);">
+    <div class="sc-container">
+      <div class="sc-label-tag">Steward Management</div>
+      <h1>Community Members.</h1>
+    </div>
+  </div>
+  <div style="background: var(--sc-ink); padding-bottom: 5rem;">
+    <div class="sc-container">
+      <div style="max-width: 900px;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02);">
+                <th style="padding: 16px; font-weight: 600; font-size: 13px; color: rgba(255,255,255,0.5);">Name</th>
+                <th style="padding: 16px; font-weight: 600; font-size: 13px; color: rgba(255,255,255,0.5);">Level</th>
+                <th style="padding: 16px; font-weight: 600; font-size: 13px; color: rgba(255,255,255,0.5);">Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for member in members %}
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 16px; font-size: 15px; color: #fff;">{{ member.user.get_full_name|default:member.user.email }}</td>
+                <td style="padding: 16px; font-size: 14px; color: rgba(255,255,255,0.8);">Level {{ member.level }}</td>
+                <td style="padding: 16px; font-size: 14px; color: rgba(255,255,255,0.8);">{{ member.get_role_display|default:member.role|title }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3" style="padding: 32px; text-align: center; color: rgba(255,255,255,0.5); font-size: 14px;">No active members found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top: 24px; text-align: right;">
+          <a href="https://app.ichebo.org/community/members/" target="_blank" style="color: var(--sc-primary); font-size: 14px; text-decoration: none;">Manage in full dashboard &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
