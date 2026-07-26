@@ -60,7 +60,6 @@ body.sceptre-shell {
 .top-nav__logo {
   height: 32px;
   width: auto;
-  filter: brightness(0) invert(1);
 }
 .nav-hamburger {
   display: flex; align-items: center; justify-content: center;
