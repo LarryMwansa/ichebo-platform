@@ -169,9 +169,43 @@ def bible_redirect(request):
 
 
 @require_sceptre_participant
-def support_redirect(request):
-    """Support — redirect to the community support request list on app.ichebo.org."""
-    return redirect('https://app.ichebo.org/community/support/')
+def support_area(request):
+    """Support — native sceptre support request list."""
+    from django.utils import timezone
+    from records.models import Record
+    
+    tenant = _get_tenant_for_user(request.user)
+    user_is_steward = is_steward(request.user)
+
+    now = timezone.now()
+    requests = Record.objects.filter(
+        record_family='community',
+        record_type='support_request',
+        created_by=request.user,
+        deleted_at__isnull=True,
+    ).order_by('-created_at')
+
+    # Annotate overdue state at read-time
+    request_items = []
+    for req in requests:
+        due_at_str = req.custom_fields.get('response_due_at')
+        is_overdue = False
+        if due_at_str and req.status != 'completed':
+            from django.utils.dateparse import parse_datetime
+            due_at = parse_datetime(due_at_str)
+            if due_at and now > due_at:
+                is_overdue = True
+        request_items.append({
+            'record': req,
+            'is_overdue': is_overdue,
+        })
+
+    return render(request, 'sceptre/support/support.html', {
+        'request_items': request_items,
+        'now': now,
+        'tenant': tenant,
+        'is_steward': user_is_steward,
+    })
 
 
 @require_sceptre_participant
@@ -351,12 +385,189 @@ def steward_announcements(request):
 
 
 @require_sceptre_steward
-def steward_support_redirect(request):
-    return redirect('https://app.ichebo.org/community/support/')
+def steward_support_queue(request):
+    """Native Sceptre steward support queue."""
+    from django.utils import timezone
+    from records.models import Record
+    from tenants.models import UserPermission
+
+    user = request.user
+    
+    # Collect tenant paths this steward oversees
+    steward_permissions = UserPermission.objects.filter(
+        user=user,
+        role__in=UserPermission.STEWARD_ROLES,
+        is_active=True,
+    ).values_list('tenant__path', flat=True)
+
+    from django.db.models import Q
+    tenant_filter = Q()
+    for path in steward_permissions:
+        if path:
+            tenant_filter |= Q(tenant__path__startswith=path)
+
+    # Also include requests assigned directly to this steward
+    tenant_filter |= Q(custom_fields__assigned_steward_id=str(user.id))
+
+    now = timezone.now()
+    qs = Record.objects.filter(
+        record_family='community',
+        record_type='support_request',
+        deleted_at__isnull=True,
+    ).filter(tenant_filter)
+
+    requests_list = list(qs.exclude(status='completed').order_by('created_at')) + \
+        list(qs.filter(status='completed').order_by('-created_at')[:20])
+
+    queue_items = []
+    for r in requests_list:
+        due_at_raw = (r.custom_fields or {}).get('response_due_at')
+        due_at = None
+        overdue = False
+        if due_at_raw:
+            from django.utils.dateparse import parse_datetime
+            due_at = parse_datetime(due_at_raw)
+            if due_at and r.status != 'completed' and now > due_at:
+                overdue = True
+        queue_items.append({
+            'record': r,
+            'due_at': due_at,
+            'is_overdue': overdue,
+        })
+        
+    # Sort: overdue first, then by due_at ascending, then by created_at
+    queue_items.sort(key=lambda x: (
+        not x['is_overdue'],
+        x['due_at'] or now,
+    ))
+
+    return render(request, 'sceptre/steward/support.html', {
+        'queue_items': queue_items,
+        'now': now,
+    })
 
 
 @require_sceptre_steward
 def steward_settings(request):
     return render(request, 'sceptre/steward/settings.html', {
-        'is_steward': True,
+        'tenant': _get_tenant_for_user(request.user)
     })
+
+
+@require_sceptre_participant
+def htmx_sceptre_create_support_request(request):
+    """
+    POST → create a support_request Record, routed to a steward.
+    """
+    from django.utils import timezone
+    from datetime import timedelta
+    from django.http import HttpResponse
+    from django.urls import reverse
+    
+    from records.models import Record
+    from community.services import resolve_steward_for_tenant
+    
+    if request.method != 'POST':
+        return HttpResponse('')
+
+    user = request.user
+    title = request.POST.get('title', '').strip()
+    content = request.POST.get('content', '').strip()
+
+    if not title or not content:
+        return HttpResponse(
+            '<p class="form-error" style="color:#ef4444; margin-bottom: 1rem; font-size: 14px;">Please enter a subject and a description.</p>'
+        )
+
+    tenant = _get_tenant_for_user(request.user)
+    steward = resolve_steward_for_tenant(tenant) if tenant else None
+    response_due_at = timezone.now() + timedelta(hours=72)
+
+    record = Record.objects.create(
+        tenant=tenant,
+        created_by=user,
+        record_class='organizational',
+        record_family='community',
+        record_type='support_request',
+        title=title,
+        content=content,
+        status='submitted',
+        custom_fields={
+            'response_due_at': response_due_at.isoformat(),
+            'assigned_steward_id': str(steward.id) if steward else None,
+        },
+        permissions_data={'visibility': 'member_and_assigned_steward'}
+    )
+    
+    # Send HX-Redirect back to support area to reload the list
+    response = HttpResponse(status=204)
+    response['HX-Redirect'] = reverse('support')
+    return response
+
+@require_sceptre_steward
+def htmx_sceptre_acknowledge_support_request(request, record_id):
+    """
+    POST → steward acknowledges support request (status submitted -> active)
+    """
+    from records.models import Record
+    from django.utils import timezone
+    from django.shortcuts import get_object_or_404
+    from django.http import HttpResponse
+    from django.urls import reverse
+
+    if request.method != 'POST':
+        return HttpResponse('')
+
+    record = get_object_or_404(
+        Record,
+        id=record_id,
+        record_family='community',
+        record_type='support_request',
+        status='submitted',
+        deleted_at__isnull=True,
+    )
+
+    custom = dict(record.custom_fields)
+    custom['acknowledged_at'] = timezone.now().isoformat()
+    custom['assigned_steward_id'] = str(request.user.id)
+    record.custom_fields = custom
+    record.status = 'active'
+    record.save()
+    
+    response = HttpResponse(status=204)
+    response['HX-Redirect'] = reverse('steward_support')
+    return response
+
+
+@require_sceptre_steward
+def htmx_sceptre_resolve_support_request(request, record_id):
+    """
+    POST → steward resolves support request (status active -> completed)
+    """
+    from records.models import Record
+    from django.utils import timezone
+    from django.shortcuts import get_object_or_404
+    from django.http import HttpResponse
+    from django.urls import reverse
+
+    if request.method != 'POST':
+        return HttpResponse('')
+
+    record = get_object_or_404(
+        Record,
+        id=record_id,
+        record_family='community',
+        record_type='support_request',
+        status='active',
+        deleted_at__isnull=True,
+    )
+
+    custom = dict(record.custom_fields)
+    custom['resolved_at'] = timezone.now().isoformat()
+    record.custom_fields = custom
+    record.status = 'completed'
+    record.save()
+    
+    response = HttpResponse(status=204)
+    response['HX-Redirect'] = reverse('steward_support')
+    return response

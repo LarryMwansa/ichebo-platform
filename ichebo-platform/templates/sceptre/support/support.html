@@ -1,0 +1,95 @@
+<!-- templates/sceptre/support/support.html -->
+{% extends "sceptre/base.html" %}
+{% block title %}Community Support{% endblock %}
+{% block content %}
+<div style="background: var(--sc-ink); color: #fff; min-height: calc(100vh - 56px);">
+
+  <!-- Hero heading -->
+  <div class="channel-hero-heading" style="background: var(--sc-ink);">
+    <div class="sc-container">
+      <div class="sc-label-tag">Support</div>
+      <h1>How can we help?</h1>
+    </div>
+  </div>
+
+  <div style="background: var(--sc-ink); padding-bottom: 5rem;">
+    <div class="sc-container" style="display: grid; grid-template-columns: 1fr 350px; gap: 40px; align-items: start;">
+      
+      <!-- My Requests List -->
+      <div>
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 24px; color: #fff;">My Requests</h2>
+        
+        {% for item in request_items %}
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 24px; margin-bottom: 16px; {% if item.is_overdue %}border-left: 4px solid #ef4444;{% endif %}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div style="font-size: 18px; font-weight: 700; color: #fff;">{{ item.record.title }}</div>
+              {% if item.record.status == 'submitted' %}
+                <span style="background: rgba(255,255,255,0.1); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Submitted</span>
+              {% elif item.record.status == 'active' %}
+                <span style="background: rgba(59,130,246,0.2); color: #60a5fa; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Acknowledged</span>
+              {% elif item.record.status == 'completed' %}
+                <span style="background: rgba(16,185,129,0.2); color: #34d399; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Resolved</span>
+              {% endif %}
+            </div>
+            
+            <div style="font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 8px;">
+              Submitted {{ item.record.created_at|date:"d M Y" }}
+              {% if item.is_overdue %}
+                <span style="color: #ef4444; margin-left: 8px; font-weight: 500;">(Overdue)</span>
+              {% endif %}
+            </div>
+            
+            {% if item.record.content %}
+            <div style="font-size: 15px; color: rgba(255,255,255,0.8); margin-top: 16px; line-height: 1.6;">
+              {{ item.record.content|linebreaks }}
+            </div>
+            {% endif %}
+          </div>
+        {% empty %}
+          <div style="padding: 4rem 2rem; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px;">
+            <div style="color: rgba(255,255,255,0.5); font-size: 15px;">You have not submitted any support requests yet.</div>
+          </div>
+        {% endfor %}
+      </div>
+      
+      <!-- Submit Request Form -->
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 24px; position: sticky; top: 80px;">
+        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 24px; color: #fff;">Raise a Request</h3>
+        
+        <div id="form-error-target"></div>
+        
+        <form hx-post="{% url 'sceptre_create_support_request' %}" hx-target="#form-error-target" hx-swap="innerHTML">
+          {% csrf_token %}
+          <div style="margin-bottom: 16px;">
+            <label for="title" style="display: block; font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 8px;">Subject</label>
+            <input type="text" id="title" name="title" required 
+                   style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; color: #fff; font-family: inherit; font-size: 14px; box-sizing: border-box;"
+                   placeholder="Briefly describe your request">
+          </div>
+          
+          <div style="margin-bottom: 24px;">
+            <label for="content" style="display: block; font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 8px;">Message</label>
+            <textarea id="content" name="content" required rows="5"
+                      style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; color: #fff; font-family: inherit; font-size: 14px; resize: vertical; box-sizing: border-box;"
+                      placeholder="Describe what you need help with"></textarea>
+          </div>
+          
+          <button type="submit" style="width: 100%; background: #fff; color: var(--sc-ink); border: none; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+            Submit Request
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<style>
+  @media (max-width: 768px) {
+    .sc-container {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+{% endblock %}

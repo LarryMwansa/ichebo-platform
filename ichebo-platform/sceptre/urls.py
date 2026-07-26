@@ -43,7 +43,8 @@ urlpatterns = [
     path('community/', views.community_area, name='community'),
     path('learn/', views.learn_summary, name='learn'),
     path('bible/', views.bible_redirect, name='bible'),
-    path('support/', views.support_redirect, name='support'),
+    path('support/', views.support_area, name='support'),
+    path('support/new/', views.htmx_sceptre_create_support_request, name='sceptre_create_support_request'),
     path('profile/', views.profile_summary, name='profile'),
 
     # Steward routes (gated at view level)
@@ -51,7 +52,9 @@ urlpatterns = [
     path('steward/gatherings/', views.steward_gatherings, name='steward_gatherings'),
     path('steward/formation/', views.steward_formation, name='steward_formation'),
     path('steward/announcements/', views.steward_announcements, name='steward_announcements'),
-    path('steward/support/', views.steward_support_redirect, name='steward_support'),
+    path('steward/support/', views.steward_support_queue, name='steward_support'),
+    path('steward/support/<uuid:record_id>/acknowledge/', views.htmx_sceptre_acknowledge_support_request, name='sceptre_acknowledge_support_request'),
+    path('steward/support/<uuid:record_id>/resolve/', views.htmx_sceptre_resolve_support_request, name='sceptre_resolve_support_request'),
     path('steward/settings/', views.steward_settings, name='steward_settings'),
 
     # Public routes — no login required

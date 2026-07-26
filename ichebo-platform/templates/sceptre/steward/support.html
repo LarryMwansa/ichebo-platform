@@ -1,0 +1,86 @@
+<!-- templates/sceptre/steward/support.html -->
+{% extends "sceptre/base.html" %}
+{% block title %}Support Queue - Steward Management{% endblock %}
+{% block content %}
+<div style="background: var(--sc-ink); color: #fff; min-height: calc(100vh - 56px);">
+  <div class="channel-hero-heading" style="background: var(--sc-ink);">
+    <div class="sc-container">
+      <div class="sc-label-tag">Steward Management</div>
+      <h1>Support Queue.</h1>
+    </div>
+  </div>
+  <div style="background: var(--sc-ink); padding-bottom: 5rem;">
+    <div class="sc-container">
+      <div style="max-width: 900px;">
+
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02);">
+                <th style="padding: 16px; font-weight: 600; font-size: 13px; color: rgba(255,255,255,0.5);">Request</th>
+                <th style="padding: 16px; font-weight: 600; font-size: 13px; color: rgba(255,255,255,0.5);">Status / SLA</th>
+                <th style="padding: 16px; font-weight: 600; font-size: 13px; color: rgba(255,255,255,0.5); text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in queue_items %}
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); {% if item.is_overdue %}background: rgba(239,68,68,0.05);{% endif %}">
+                <td style="padding: 16px;">
+                  <div style="font-size: 15px; color: #fff; font-weight: 600; margin-bottom: 4px;">{{ item.record.title }}</div>
+                  <div style="font-size: 13px; color: rgba(255,255,255,0.6);">From: {{ item.record.created_by.first_name }} {{ item.record.created_by.last_name }}</div>
+                  <div style="font-size: 14px; color: rgba(255,255,255,0.8); margin-top: 8px;">{{ item.record.content|truncatechars:100 }}</div>
+                </td>
+                <td style="padding: 16px; vertical-align: top;">
+                  {% if item.record.status == 'submitted' %}
+                    <div style="display: inline-block; background: rgba(255,255,255,0.1); color: #fff; padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 600; margin-bottom: 8px;">New</div>
+                  {% elif item.record.status == 'active' %}
+                    <div style="display: inline-block; background: rgba(59,130,246,0.2); color: #60a5fa; padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 600; margin-bottom: 8px;">Acknowledged</div>
+                  {% elif item.record.status == 'completed' %}
+                    <div style="display: inline-block; background: rgba(16,185,129,0.2); color: #34d399; padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 600; margin-bottom: 8px;">Resolved</div>
+                  {% endif %}
+                  
+                  {% if item.due_at and item.record.status != 'completed' %}
+                    <div style="font-size: 12px; color: {% if item.is_overdue %}#ef4444{% else %}rgba(255,255,255,0.5){% endif %}; font-weight: 500;">
+                      Due: {{ item.due_at|date:"d M H:i" }}
+                      {% if item.is_overdue %}(Overdue){% endif %}
+                    </div>
+                  {% endif %}
+                </td>
+                <td style="padding: 16px; text-align: right; vertical-align: middle;">
+                  <div id="support-action-{{ item.record.id }}">
+                    {% if item.record.status == 'submitted' %}
+                      <button hx-post="{% url 'sceptre_acknowledge_support_request' item.record.id %}" 
+                              hx-target="#support-action-{{ item.record.id }}"
+                              style="background: #fff; color: var(--sc-ink); border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                        Acknowledge
+                      </button>
+                    {% elif item.record.status == 'active' %}
+                      <button hx-post="{% url 'sceptre_resolve_support_request' item.record.id %}" 
+                              hx-target="#support-action-{{ item.record.id }}"
+                              style="background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.3); padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                        Resolve
+                      </button>
+                    {% else %}
+                      <span style="color: rgba(255,255,255,0.3); font-size: 13px;">—</span>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3" style="padding: 32px; text-align: center; color: rgba(255,255,255,0.5); font-size: 14px;">No support requests to review.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 24px; text-align: right;">
+          <a href="https://app.ichebo.org/community/support/" target="_blank" style="color: var(--sc-primary); font-size: 14px; text-decoration: none;">Manage in full dashboard &rarr;</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
