@@ -58,7 +58,7 @@ body.sceptre-shell {
    (var(--sc-ink)), unlike that nav's theme-dependent background, so no
    light-mode override is needed here. */
 .top-nav__logo {
-  height: 36px;
+  height: 32px;
   width: auto;
   filter: brightness(0) invert(1);
 }
@@ -104,7 +104,7 @@ body.sceptre-shell {
 
 @media (min-width: 800px) {
   .top-nav { padding: 0 var(--sc-space-m); gap: var(--sc-space-l); }
-  .top-nav__logo { height: 56px; }
+  .top-nav__logo { height: 40px; }
   .nav-hamburger { display: none; }
   .top-nav__links { display: flex; }
   .top-nav__right { gap: var(--sc-space-s); }
