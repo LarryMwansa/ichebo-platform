@@ -431,6 +431,23 @@ def steward_settings(request):
         'tenant': _get_tenant_for_user(request.user)
     })
 
+@require_sceptre_steward
+def htmx_steward_settings_general(request):
+    from django.http import HttpResponse
+    if request.method == 'POST':
+        tenant = _get_tenant_for_user(request.user)
+        if not tenant:
+            return HttpResponse("Unauthorized", status=403)
+        
+        tenant.name = request.POST.get('name', tenant.name)
+        tenant.slug = request.POST.get('slug', tenant.slug)
+        tenant.description = request.POST.get('description', tenant.description)
+        tenant.area_of_operation = request.POST.get('area_of_operation', tenant.area_of_operation)
+        tenant.save()
+        
+        return HttpResponse('<div class="sc-toast sc-toast--success">Settings saved successfully</div>')
+    return HttpResponse('')
+
 
 @require_sceptre_participant
 def htmx_sceptre_create_support_request(request):

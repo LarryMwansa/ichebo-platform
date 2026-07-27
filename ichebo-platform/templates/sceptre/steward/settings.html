@@ -1,12 +1,150 @@
-<!-- templates/sceptre/steward/settings.html -->
 {% extends "sceptre/base.html" %}
 {% block title %}Community Settings{% endblock %}
+
 {% block content %}
-<div style="padding: 24px 28px;">
-  <div style="margin-bottom: 20px;">
-    <div class="ws-label-tag">Community Management</div>
-    <h1 class="ws-page-title" style="font-size: 1.25rem; margin-top: 8px;">Settings</h1>
+<div style="padding: 32px; max-width: 1200px; margin: 0 auto; min-height: calc(100vh - 120px);">
+  
+  <div style="margin-bottom: 40px;">
+    <div class="ws-label-tag" style="background: rgba(175,50,54,0.15); color: var(--sc-primary); border: 1px solid rgba(175,50,54,0.3); padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 12px;">Steward Dashboard</div>
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #fff; margin: 0;">Community Settings</h1>
+    <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 8px;">Configure profile, access rules, and appearance for {{ tenant.name }}.</p>
   </div>
-  <p style="font-size: 13px;"><a href="/community/management/" style="color: var(--primary);">Community management</a></p>
+
+  <div style="display: flex; gap: 40px; flex-direction: row; flex-wrap: wrap;">
+    
+    <!-- Sidebar Navigation -->
+    <aside style="width: 240px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;">
+      <button id="tab-general-link" onclick="showTab('tab-general')" class="settings-tab-link active-tab" style="background: transparent; border: none; text-align: left; padding: 12px 16px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 12px;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">storefront</span>
+        General Profile
+      </button>
+      <button id="tab-appearance-link" onclick="showTab('tab-appearance')" class="settings-tab-link" style="background: transparent; border: none; text-align: left; padding: 12px 16px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 12px;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">palette</span>
+        Appearance & Theme
+      </button>
+      <button id="tab-access-link" onclick="showTab('tab-access')" class="settings-tab-link" style="background: transparent; border: none; text-align: left; padding: 12px 16px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 12px;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">admin_panel_settings</span>
+        Access & Members
+      </button>
+      <button id="tab-advanced-link" onclick="showTab('tab-advanced')" class="settings-tab-link" style="background: transparent; border: none; text-align: left; padding: 12px 16px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 12px;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">construction</span>
+        Advanced Settings
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div style="flex-grow: 1; min-width: 300px;">
+      
+      <!-- General Settings Tab -->
+      <div id="tab-general" class="settings-tab-content" style="display: block;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 32px;">
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 24px;">General Profile</h2>
+          
+          <form hx-post="{% url 'htmx_steward_settings_general' %}" hx-target="#general-save-toast" hx-swap="innerHTML">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 24px;">
+              <label style="display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px;">Community Name</label>
+              <input type="text" name="name" value="{{ tenant.name }}" class="sc-input" style="width: 100%; max-width: 500px;" required>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+              <label style="display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px;">URL Slug</label>
+              <div style="display: flex; align-items: center; gap: 8px; font-family: 'Inter', sans-serif; color: rgba(255,255,255,0.5);">
+                <span>sceptre.ichebo.org/c/</span>
+                <input type="text" name="slug" value="{{ tenant.slug }}" class="sc-input" style="flex: 1; max-width: 330px;" required>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+              <label style="display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px;">Description</label>
+              <textarea name="description" class="sc-input" style="width: 100%; height: 120px; resize: vertical;" placeholder="Describe the vision and purpose of this community...">{{ tenant.description|default:"" }}</textarea>
+            </div>
+
+            <div style="margin-bottom: 32px;">
+              <label style="display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px;">Area of Operation</label>
+              <input type="text" name="area_of_operation" value="{{ tenant.area_of_operation }}" class="sc-input" style="width: 100%; max-width: 500px;" placeholder="e.g. Lusaka, Zambia">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <button type="submit" class="sc-btn sc-btn--primary">Save Changes</button>
+              <div id="general-save-toast"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Appearance Tab -->
+      <div id="tab-appearance" class="settings-tab-content" style="display: none;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 32px;">
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 24px;">Appearance & Theme</h2>
+          
+          <div style="border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 40px; text-align: center; color: rgba(255,255,255,0.5); font-family: 'Inter', sans-serif;">
+            <span class="material-symbols-outlined" style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">brush</span>
+            <p style="margin: 0;">Community theme configuration and logo uploads are coming soon.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Access Tab -->
+      <div id="tab-access" class="settings-tab-content" style="display: none;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 32px;">
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 8px;">Access & Members</h2>
+          <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.6); margin: 0 0 24px;">
+            Manage how users can join your community. <br>
+            <strong style="color: #fff;">Note:</strong> Regardless of these settings, users are only eligible to join a community after they have successfully completed Induction and reached the required Level (certified inductees).
+          </p>
+
+          <div style="border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 40px; text-align: center; color: rgba(255,255,255,0.5); font-family: 'Inter', sans-serif;">
+            <span class="material-symbols-outlined" style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">group_add</span>
+            <p style="margin: 0;">Privacy toggles and steward invitation management are currently under development.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Tab -->
+      <div id="tab-advanced" class="settings-tab-content" style="display: none;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(175,50,54,0.3); border-radius: 16px; padding: 32px;">
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 24px;">Advanced Settings</h2>
+          
+          <div style="margin-bottom: 32px;">
+            <label style="display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px;">Hierarchy Path</label>
+            <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 8px; font-family: monospace; color: rgba(255,255,255,0.6);">
+              {{ tenant.path }}
+            </div>
+            <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 8px;">The internal materialized path representing this community's position in the global hierarchy.</p>
+          </div>
+
+          <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px;">
+            <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #ff6b6b; margin: 0 0 12px;">Danger Zone</h3>
+            <p style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6); margin: 0 0 16px;">Suspending this community will hide it from the directory and prevent members from accessing it.</p>
+            <button class="sc-btn sc-btn--outline" style="border-color: rgba(175,50,54,0.5); color: #ff6b6b;" onclick="alert('Community suspension requires global admin approval.')">
+              <span class="material-symbols-outlined">block</span> Suspend Community
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
+
+<style>
+  .settings-tab-link.active-tab {
+    background: rgba(255,255,255,0.06) !important;
+    color: #fff !important;
+  }
+  .settings-tab-link:hover {
+    background: rgba(255,255,255,0.03);
+  }
+</style>
+
+<script>
+  function showTab(tabId) {
+    document.querySelectorAll('.settings-tab-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.settings-tab-link').forEach(el => el.classList.remove('active-tab'));
+    document.getElementById(tabId).style.display = 'block';
+    document.getElementById(tabId + '-link').classList.add('active-tab');
+  }
+</script>
 {% endblock %}
