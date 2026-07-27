@@ -16,10 +16,10 @@
   <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 36px; margin-bottom: 40px;">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
       <span style="font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--sc-primary); background: rgba(175,50,54,0.15); border: 1px solid rgba(175,50,54,0.3); padding: 4px 12px; border-radius: 20px;">
-        Level {{ programme.custom_fields.required_level|default:"1" }}
+        Level {{ programme.required_level }}
       </span>
-      <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5);">
-        Estimated {{ programme.custom_fields.estimated_hours|default:"2-4" }} hours
+      <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); text-transform: capitalize;">
+        {{ programme.record_type }}
       </span>
     </div>
 
@@ -35,55 +35,68 @@
     <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
       {% if is_enrolled %}
         <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #4ade80; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); padding: 10px 20px; border-radius: 10px; display: inline-flex; align-items: center; gap: 6px;">
-          <span class="material-symbols-outlined">check_circle</span> You are enrolled in this programme
+          <span class="material-symbols-outlined">check_circle</span> You are enrolled in this pathway
         </span>
       {% else %}
-        <form method="post" action="{% url 'community_enrol' programme.id %}">
-          {% csrf_token %}
-          <button type="submit" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: #fff; background: var(--sc-primary); border: none; padding: 12px 28px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(175,50,54,0.4);">
-            <span>Enrol in Programme</span>
-            <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
-          </button>
-        </form>
+        {% if user.is_authenticated %}
+          <form method="post" action="{% url 'community_enrol' programme.id %}">
+            {% csrf_token %}
+            <button type="submit" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: #fff; background: var(--sc-primary); border: none; padding: 12px 28px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(175,50,54,0.4);">
+              <span>Enrol Now</span>
+              <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+            </button>
+          </form>
+        {% else %}
+          <a href="{% url 'register_ui' %}" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: #fff; background: var(--sc-primary); padding: 12px 28px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            <span>Sign In to Enrol</span>
+            <span class="material-symbols-outlined" style="font-size: 18px;">login</span>
+          </a>
+        {% endif %}
       {% endif %}
     </div>
   </div>
 
-  <!-- Syllabus & Modules Section -->
+  <!-- Syllabus & Curriculum Section -->
   <div>
     <h2 style="font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #fff; margin: 0 0 24px;">
-      Curriculum & Modules
+      Curriculum & Syllabus
     </h2>
 
-    {% if modules %}
-      <div style="display: flex; flex-direction: column; gap: 16px;">
-        {% for m in modules %}
+    {% if curriculum %}
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for item in curriculum %}
           <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
               <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; margin: 0;">
-                Module {{ forloop.counter }}: {{ m.title }}
+                {{ item.course.title }}
               </h3>
             </div>
             
-            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.5; margin: 0 0 16px;">
-              {{ m.summary|default:"No description provided." }}
-            </p>
+            {% if item.course.summary %}
+              <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.5; margin: 0 0 16px;">
+                {{ item.course.summary }}
+              </p>
+            {% endif %}
 
-            <!-- Lessons List inside Module -->
-            {% if m.lessons %}
-              <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 16px;">
-                {% for lesson in m.lessons %}
+            <!-- Lessons List inside Course -->
+            {% if item.lessons %}
+              <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 16px; margin-top: 12px;">
+                {% for lesson in item.lessons %}
                   <a href="{% url 'community_lesson_viewer' lesson.id %}"
                      style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 12px 16px; text-decoration: none; color: inherit; transition: background 0.15s;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                       <span class="material-symbols-outlined" style="color: var(--sc-primary); font-size: 20px;">play_lesson</span>
                       <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9);">
-                        Lesson {{ forloop.counter }}: {{ lesson.title }}
+                        {{ lesson.title }}
                       </span>
                     </div>
                     <span class="material-symbols-outlined" style="font-size: 18px; color: rgba(255,255,255,0.4);">chevron_right</span>
                   </a>
                 {% endfor %}
+              </div>
+            {% else %}
+              <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.4); font-style: italic; margin-top: 12px;">
+                No lessons attached to this module yet.
               </div>
             {% endif %}
 

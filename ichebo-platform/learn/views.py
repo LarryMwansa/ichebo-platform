@@ -19,11 +19,19 @@ def landing(request):
 
 def community_learn_catalog(request):
     """Open course catalog page for learn.ichebo.org in Sceptre dark mode styling."""
-    programmes = Record.objects.filter(
-        record_type='programme',
-        status='active',
-        deleted_at__isnull=True,
-    ).order_by('-created_at')
+    programmes = list(
+        Record.objects.filter(
+            record_family='learning',
+            record_type__in=['programme', 'induction', 'course'],
+            status='active',
+            deleted_at__isnull=True,
+        )
+    )
+    # Sort by required level (Level 0 Induction first, then Level 1, 2, 3...)
+    programmes.sort(key=lambda p: (p.permissions_data or {}).get('required_level', 1 if p.record_type != 'induction' else 0))
+
+    for p in programmes:
+        p.required_level = (p.permissions_data or {}).get('required_level', 1 if p.record_type != 'induction' else 0)
 
     enrolled_ids = set()
     user = getattr(request, 'user', None)
@@ -77,27 +85,57 @@ def community_my_learning(request):
 
 
 def community_programme_detail(request, programme_id):
-    """Syllabus breakdown for a learning programme on learn.ichebo.org."""
-    programme = get_object_or_404(Record, id=programme_id, record_type='programme', deleted_at__isnull=True)
+    """Syllabus breakdown for a learning programme, induction, or course on learn.ichebo.org."""
+    programme = get_object_or_404(
+        Record,
+        id=programme_id,
+        record_family='learning',
+        record_type__in=['programme', 'induction', 'course'],
+        deleted_at__isnull=True
+    )
+    programme.required_level = (programme.permissions_data or {}).get('required_level', 1 if programme.record_type != 'induction' else 0)
 
-    module_rels = Relationship.objects.filter(
-        source_id=programme_id,
-        relationship_type='contains',
-        target__record_type='module',
-        target__deleted_at__isnull=True,
-    ).select_related('target')
+    # Get linked courses/modules
+    course_ids = Relationship.objects.filter(
+        to_record_id=programme_id,
+        relationship_type='part_of'
+    ).values_list('from_record_id', flat=True)
 
-    modules = []
-    for rel in module_rels:
-        mod = rel.target
-        lesson_rels = Relationship.objects.filter(
-            source_id=mod.id,
-            relationship_type='contains',
-            target__record_type='lesson',
-            target__deleted_at__isnull=True,
-        ).select_related('target')
-        mod.lessons = [l_rel.target for l_rel in lesson_rels]
-        modules.append(mod)
+    courses = Record.objects.filter(
+        id__in=course_ids,
+        record_type='course',
+        status='active',
+        deleted_at__isnull=True
+    ).order_by('created_at')
+
+    curriculum = []
+    if courses.exists():
+        for course in courses:
+            lesson_ids = Relationship.objects.filter(
+                to_record_id=course.id,
+                relationship_type='part_of'
+            ).values_list('from_record_id', flat=True)
+            lessons = Record.objects.filter(
+                id__in=lesson_ids,
+                record_type__in=['lesson', 'assignment', 'quiz'],
+                status='active',
+                deleted_at__isnull=True
+            ).order_by('created_at')
+            curriculum.append({'course': course, 'lessons': list(lessons)})
+    else:
+        # Check if lessons are linked directly to this programme/induction
+        lesson_ids = Relationship.objects.filter(
+            to_record_id=programme_id,
+            relationship_type='part_of'
+        ).values_list('from_record_id', flat=True)
+        lessons = Record.objects.filter(
+            id__in=lesson_ids,
+            record_type__in=['lesson', 'assignment', 'quiz'],
+            status='active',
+            deleted_at__isnull=True
+        ).order_by('created_at')
+        if lessons.exists():
+            curriculum.append({'course': programme, 'lessons': list(lessons)})
 
     is_enrolled = False
     user = getattr(request, 'user', None)
@@ -110,29 +148,29 @@ def community_programme_detail(request, programme_id):
 
     return render(request, 'learn/community_programme_detail.html', {
         'programme': programme,
-        'modules': modules,
+        'curriculum': curriculum,
         'is_enrolled': is_enrolled,
     })
 
 
 def community_lesson_viewer(request, lesson_id):
     """Distraction-free lesson text/video viewer."""
-    lesson = get_object_or_404(Record, id=lesson_id, record_type='lesson', deleted_at__isnull=True)
+    lesson = get_object_or_404(Record, id=lesson_id, record_type__in=['lesson', 'assignment', 'quiz'], deleted_at__isnull=True)
 
-    mod_rel = Relationship.objects.filter(
-        target_id=lesson_id,
-        relationship_type='contains',
-        source__record_type='module'
+    parent_rel = Relationship.objects.filter(
+        from_record_id=lesson_id,
+        relationship_type='part_of'
     ).first()
     programme = None
-    if mod_rel:
-        prog_rel = Relationship.objects.filter(
-            target_id=mod_rel.source_id,
-            relationship_type='contains',
-            source__record_type='programme'
-        ).first()
-        if prog_rel:
-            programme = prog_rel.source
+    if parent_rel and parent_rel.to_record:
+        programme = parent_rel.to_record
+        if programme.record_type == 'course':
+            prog_rel = Relationship.objects.filter(
+                from_record_id=programme.id,
+                relationship_type='part_of'
+            ).first()
+            if prog_rel and prog_rel.to_record:
+                programme = prog_rel.to_record
 
     return render(request, 'learn/community_lesson_viewer.html', {
         'lesson': lesson,
@@ -144,7 +182,7 @@ def community_lesson_viewer(request, lesson_id):
 def community_enrol(request, programme_id):
     """1-click enrolment action from community reader."""
     if request.method == 'POST':
-        programme = get_object_or_404(Record, id=programme_id, record_type='programme')
+        programme = get_object_or_404(Record, id=programme_id, record_family='learning')
         from learn.services import enrol_in_programme
         try:
             enrol_in_programme(request.user, programme)
