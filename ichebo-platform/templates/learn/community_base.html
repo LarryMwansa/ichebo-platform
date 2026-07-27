@@ -1,0 +1,90 @@
+<!-- templates/learn/community_base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Community Learning{% endblock %} — Ichebo</title>
+  <meta name="description" content="{% block meta_description %}Study qualification programmes and courses on Ichebo Community Learn.{% endblock %}">
+  {% load static %}
+  <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/workspace.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sceptre_v2.css' %}">
+  <script src="{% static 'js/htmx.min.js' %}" defer></script>
+</head>
+<body class="sceptre-shell" style="background: var(--sc-ink); color: #fff; min-height: 100vh; display: flex; flex-direction: column;">
+  
+  <!-- Top Navigation Header -->
+  <nav class="top-nav">
+    <div class="top-nav__brand">
+      <button type="button" class="nav-hamburger" id="nav-hamburger" aria-expanded="false" aria-controls="nav-links-mobile" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <a href="{% url 'learn-landing' %}" style="display: flex; align-items: center; text-decoration: none;">
+        <img src="{% static 'images/sceptre.svg' %}" alt="Ichebo" class="top-nav__logo">
+      </a>
+      <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--sc-primary); background: rgba(175,50,54,0.15); padding: 2px 8px; border-radius: 4px; margin-left: 8px;">
+        Learn
+      </span>
+    </div>
+
+    <div class="top-nav__links">
+      <a href="https://sceptre.ichebo.org/" class="nav-link">Sceptre Hub</a>
+      <a href="{% url 'learn-landing' %}" class="nav-link {% if request.resolver_match.url_name == 'learn-landing' %}nav-link--active{% endif %}">Catalog</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'community_my_learning' %}" class="nav-link {% if request.resolver_match.url_name == 'community_my_learning' %}nav-link--active{% endif %}">My Learning</a>
+      {% endif %}
+      <a href="https://bible.ichebo.org/" class="nav-link">Scripture</a>
+      <a href="https://sceptre.ichebo.org/find-a-community/" class="nav-link">Find a Community</a>
+      <a href="https://sceptre.ichebo.org/support/" class="nav-link">Support</a>
+    </div>
+
+    <div class="top-nav__right">
+      {% if user.is_authenticated %}
+        <a href="https://sceptre.ichebo.org/profile/" class="avatar" title="{{ user.username }}">
+          {{ user.get_full_name|default:user.username|slice:":1"|upper }}
+        </a>
+      {% else %}
+        <a href="{% url 'register_ui' %}" style="color: #fff; font-size: 13px; text-decoration: none; font-weight: 500;">Sign In</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- Mobile nav links dropdown -->
+  <div class="nav-links-mobile" id="nav-links-mobile" hidden>
+    <a href="https://sceptre.ichebo.org/" class="nav-link">Sceptre Hub</a>
+    <a href="{% url 'learn-landing' %}" class="nav-link {% if request.resolver_match.url_name == 'learn-landing' %}nav-link--active{% endif %}">Catalog</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'community_my_learning' %}" class="nav-link {% if request.resolver_match.url_name == 'community_my_learning' %}nav-link--active{% endif %}">My Learning</a>
+    {% endif %}
+    <a href="https://bible.ichebo.org/" class="nav-link">Scripture</a>
+    <a href="https://sceptre.ichebo.org/find-a-community/" class="nav-link">Find a Community</a>
+    <a href="https://sceptre.ichebo.org/support/" class="nav-link">Support</a>
+  </div>
+
+  <script>
+    (function () {
+      var hamburger = document.getElementById('nav-hamburger');
+      var mobileLinks = document.getElementById('nav-links-mobile');
+      if (!hamburger || !mobileLinks) return;
+
+      hamburger.addEventListener('click', function () {
+        var isHidden = mobileLinks.hidden;
+        mobileLinks.hidden = !isHidden;
+        hamburger.setAttribute('aria-expanded', String(isHidden));
+      });
+    })();
+  </script>
+
+  <main class="sceptre-main" style="flex: 1;">
+    {% block content %}{% endblock %}
+  </main>
+
+</body>
+</html>

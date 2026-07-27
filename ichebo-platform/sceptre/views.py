@@ -137,29 +137,8 @@ def community_area(request):
 
 @require_sceptre_participant
 def learn_summary(request):
-    """Learn — in-surface summary of enrolled programmes, with link to learn.ichebo.org."""
-    tenant = _get_tenant_for_user(request.user)
-    user_is_steward = is_steward(request.user)
-
-    programmes = []
-    try:
-        from learn.models import Programme
-        if tenant:
-            programmes = list(
-                Programme.objects.filter(
-                    tenant=tenant,
-                    is_active=True,
-                    deleted_at__isnull=True,
-                ).order_by('order', 'name')[:8]
-            )
-    except Exception:
-        pass
-
-    return render(request, 'sceptre/learn/learn.html', {
-        'tenant': tenant,
-        'is_steward': user_is_steward,
-        'programmes': programmes,
-    })
+    """Learn — redirect to learn.ichebo.org community learning surface."""
+    return redirect('https://learn.ichebo.org/')
 
 
 def bible_redirect(request):

@@ -1,0 +1,119 @@
+<!-- templates/learn/community_my_learning.html -->
+{% extends "learn/community_base.html" %}
+{% block title %}My Learning Dashboard{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px;">
+
+  <!-- User Profile Header Banner -->
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 32px; margin-bottom: 48px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--sc-primary); color: #fff; font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(175,50,54,0.4);">
+        {{ user.get_full_name|default:user.username|slice:":1"|upper }}
+      </div>
+      <div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #fff; margin: 0 0 4px;">
+          {{ user.get_full_name|default:user.username }}
+        </h2>
+        <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6);">
+          Learner Profile · {{ user.email }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Competence Badge -->
+    <div style="background: rgba(175,50,54,0.15); border: 1px solid rgba(175,50,54,0.4); border-radius: 12px; padding: 12px 20px; text-align: center;">
+      <div style="font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--sc-primary);">
+        Competence Level
+      </div>
+      <div style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #fff; margin-top: 2px;">
+        Level {{ user.competence_level|default:0 }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Enrolments Section -->
+  <div style="margin-bottom: 56px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+      <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #fff; margin: 0;">
+        Active Enrolments ({{ enrolments|length }})
+      </h3>
+      <a href="{% url 'learn-landing' %}" style="font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--sc-primary); text-decoration: none;">Browse Catalog →</a>
+    </div>
+
+    {% if enrolments %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+        {% for e in enrolments %}
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; color: var(--sc-primary); text-transform: uppercase; margin-bottom: 6px;">
+                Programme
+              </div>
+              <h4 style="font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #fff; margin: 0 0 12px;">
+                {{ e.programme.title|default:e.programme.name }}
+              </h4>
+            </div>
+
+            <div>
+              <!-- Progress Bar -->
+              <div style="margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px;">
+                  <span>Progress</span>
+                  <span style="font-weight: 700; color: #fff;">{{ e.progress|default:0 }}%</span>
+                </div>
+                <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
+                  <div style="height: 100%; background: var(--sc-primary); width: {{ e.progress|default:0 }}%;"></div>
+                </div>
+              </div>
+
+              <a href="{% url 'community_programme_detail' e.programme.id %}"
+                 style="display: block; text-align: center; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: #fff; background: var(--sc-primary); padding: 8px 16px; border-radius: 8px; text-decoration: none;">
+                Continue Learning
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="padding: 32px; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.08); border-radius: 12px; font-family: 'Inter', sans-serif; color: rgba(255,255,255,0.5);">
+        You are not currently enrolled in any learning programmes. <a href="{% url 'learn-landing' %}" style="color: var(--sc-primary); font-weight: 600;">Browse the course catalog</a> to get started!
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Certifications Section -->
+  <div>
+    <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #fff; margin: 0 0 24px;">
+      Awarded Certifications
+    </h3>
+
+    {% if certifications %}
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for cert in certifications %}
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <span class="material-symbols-outlined" style="font-size: 28px; color: #4ade80;">verified</span>
+              <div>
+                <div style="font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; color: #fff;">
+                  {{ cert.title }}
+                </div>
+                <div style="font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px;">
+                  Issued on {{ cert.updated_at|date:"N j, Y" }}
+                </div>
+              </div>
+            </div>
+            <span style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: #4ade80; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); padding: 4px 12px; border-radius: 20px;">
+              Verified
+            </span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="padding: 32px; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.08); border-radius: 12px; font-family: 'Inter', sans-serif; color: rgba(255,255,255,0.5);">
+        No completed certifications recorded yet.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

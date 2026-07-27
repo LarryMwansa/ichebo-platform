@@ -7,13 +7,149 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 
-def landing(request):
-    """Open landing page for learn.ichebo.org — no login required."""
-    return render(request, 'learn/landing.html')
-
 from records.models import Record, Relationship
 from activity.models import Activity
 from governance.services import get_linked_records
+
+
+def landing(request):
+    """Open landing page for learn.ichebo.org in Sceptre dark mode styling."""
+    return community_learn_catalog(request)
+
+
+def community_learn_catalog(request):
+    """Open course catalog page for learn.ichebo.org in Sceptre dark mode styling."""
+    programmes = Record.objects.filter(
+        record_type='programme',
+        status='active',
+        deleted_at__isnull=True,
+    ).order_by('-created_at')
+
+    enrolled_ids = set()
+    if request.user.is_authenticated:
+        enrolled_ids = set(
+            Activity.objects.filter(
+                activity_type='programme',
+                assigned_to=request.user,
+                status__in=['pending', 'in_progress', 'completed']
+            ).values_list('metadata__programme_record_id', flat=True)
+        )
+
+    return render(request, 'learn/community_catalog.html', {
+        'programmes': programmes,
+        'enrolled_ids': {str(i) for i in enrolled_ids if i},
+    })
+
+
+@login_required
+def community_my_learning(request):
+    """Learner dashboard for learn.ichebo.org."""
+    user = request.user
+    raw_enrolments = Activity.objects.filter(
+        activity_type='programme',
+        assigned_to=user,
+        status__in=['pending', 'in_progress', 'completed'],
+    ).order_by('-created_at')
+
+    enrolments = []
+    for e in raw_enrolments:
+        prog_id = (e.metadata or {}).get('programme_record_id')
+        prog = Record.objects.filter(id=prog_id).first() if prog_id else None
+        if prog:
+            enrolments.append({
+                'activity': e,
+                'programme': prog,
+                'progress': (e.metadata or {}).get('progress', 0),
+            })
+
+    certifications = Record.objects.filter(
+        record_type='certification',
+        created_by=user,
+        status='active',
+        deleted_at__isnull=True,
+    ).order_by('-updated_at')
+
+    return render(request, 'learn/community_my_learning.html', {
+        'enrolments': enrolments,
+        'certifications': certifications,
+    })
+
+
+def community_programme_detail(request, programme_id):
+    """Syllabus breakdown for a learning programme on learn.ichebo.org."""
+    programme = get_object_or_404(Record, id=programme_id, record_type='programme', deleted_at__isnull=True)
+
+    module_rels = Relationship.objects.filter(
+        source_id=programme_id,
+        relationship_type='contains',
+        target__record_type='module',
+        target__deleted_at__isnull=True,
+    ).select_related('target')
+
+    modules = []
+    for rel in module_rels:
+        mod = rel.target
+        lesson_rels = Relationship.objects.filter(
+            source_id=mod.id,
+            relationship_type='contains',
+            target__record_type='lesson',
+            target__deleted_at__isnull=True,
+        ).select_related('target')
+        mod.lessons = [l_rel.target for l_rel in lesson_rels]
+        modules.append(mod)
+
+    is_enrolled = False
+    if request.user.is_authenticated:
+        is_enrolled = Activity.objects.filter(
+            activity_type='programme',
+            assigned_to=request.user,
+            metadata__programme_record_id=str(programme_id)
+        ).exists()
+
+    return render(request, 'learn/community_programme_detail.html', {
+        'programme': programme,
+        'modules': modules,
+        'is_enrolled': is_enrolled,
+    })
+
+
+def community_lesson_viewer(request, lesson_id):
+    """Distraction-free lesson text/video viewer."""
+    lesson = get_object_or_404(Record, id=lesson_id, record_type='lesson', deleted_at__isnull=True)
+
+    mod_rel = Relationship.objects.filter(
+        target_id=lesson_id,
+        relationship_type='contains',
+        source__record_type='module'
+    ).first()
+    programme = None
+    if mod_rel:
+        prog_rel = Relationship.objects.filter(
+            target_id=mod_rel.source_id,
+            relationship_type='contains',
+            source__record_type='programme'
+        ).first()
+        if prog_rel:
+            programme = prog_rel.source
+
+    return render(request, 'learn/community_lesson_viewer.html', {
+        'lesson': lesson,
+        'programme': programme,
+    })
+
+
+@login_required
+def community_enrol(request, programme_id):
+    """1-click enrolment action from community reader."""
+    if request.method == 'POST':
+        programme = get_object_or_404(Record, id=programme_id, record_type='programme')
+        from learn.services import enrol_in_programme
+        try:
+            enrol_in_programme(request.user, programme)
+        except Exception:
+            pass
+        return redirect('community_programme_detail', programme_id=programme_id)
+    return redirect('community_programme_detail', programme_id=programme_id)
 
 
 def _user_level(user):

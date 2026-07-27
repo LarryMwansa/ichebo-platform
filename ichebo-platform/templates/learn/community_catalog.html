@@ -1,0 +1,75 @@
+<!-- templates/learn/community_catalog.html -->
+{% extends "learn/community_base.html" %}
+{% block title %}Course Catalog{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px;">
+
+  <!-- Hero Banner -->
+  <div style="text-align: center; margin-bottom: 56px; max-width: 720px; margin-left: auto; margin-right: auto;">
+    <div style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--sc-primary); margin-bottom: 12px;">
+      Community Pathways
+    </div>
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 700; color: #fff; margin: 0 0 16px;">
+      Formation & Learning
+    </h1>
+    <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: rgba(255,255,255,0.7); line-height: 1.6; margin: 0;">
+      Equipping community members and leaders with structured qualification pathways, interactive modules, and competence certifications.
+    </p>
+  </div>
+
+  <!-- Programmes Grid -->
+  {% if programmes %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+      {% for p in programmes %}
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, border-color 0.2s;" class="course-card">
+          
+          <div>
+            <!-- Level & Category Badge -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+              <span style="font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--sc-primary); background: rgba(175,50,54,0.15); border: 1px solid rgba(175,50,54,0.3); padding: 4px 10px; border-radius: 20px;">
+                Level {{ p.custom_fields.required_level|default:"1" }}
+              </span>
+              {% if p.id in enrolled_ids %}
+                <span style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: #4ade80; display: flex; align-items: center; gap: 4px;">
+                  <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Enrolled
+                </span>
+              {% endif %}
+            </div>
+
+            <!-- Title & Summary -->
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 10px; line-height: 1.3;">
+              {{ p.title }}
+            </h3>
+            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.5; margin: 0 0 20px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+              {{ p.summary|default:p.description|default:"No description provided." }}
+            </p>
+          </div>
+
+          <!-- Card Footer -->
+          <div style="padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;">
+              <span class="material-symbols-outlined" style="font-size: 16px;">auto_stories</span>
+              <span>{{ p.custom_fields.estimated_hours|default:"2-4" }} hrs</span>
+            </div>
+
+            <a href="{% url 'community_programme_detail' p.id %}"
+               style="font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: #fff; background: var(--sc-primary); padding: 8px 16px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;">
+              <span>View Course</span>
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+            </a>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="padding: 60px 24px; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; max-width: 600px; margin: 0 auto;">
+      <span class="material-symbols-outlined" style="font-size: 48px; color: rgba(255,255,255,0.3); margin-bottom: 12px;">school</span>
+      <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: #fff; margin: 0 0 8px;">No Courses Available Yet</h3>
+      <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.5); margin: 0;">Training stewards create and publish qualification programmes for your community.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

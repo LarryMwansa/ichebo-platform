@@ -1,0 +1,101 @@
+<!-- templates/learn/community_programme_detail.html -->
+{% extends "learn/community_base.html" %}
+{% block title %}{{ programme.title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 960px; margin: 0 auto; padding: 40px 24px 80px;">
+
+  <!-- Breadcrumb -->
+  <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+    <a href="{% url 'learn-landing' %}" style="color: rgba(255,255,255,0.7); text-decoration: none;">Course Catalog</a>
+    <span>/</span>
+    <span style="color: var(--sc-primary); font-weight: 600;">{{ programme.title }}</span>
+  </div>
+
+  <!-- Header Banner -->
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 36px; margin-bottom: 40px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+      <span style="font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--sc-primary); background: rgba(175,50,54,0.15); border: 1px solid rgba(175,50,54,0.3); padding: 4px 12px; border-radius: 20px;">
+        Level {{ programme.custom_fields.required_level|default:"1" }}
+      </span>
+      <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5);">
+        Estimated {{ programme.custom_fields.estimated_hours|default:"2-4" }} hours
+      </span>
+    </div>
+
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: #fff; margin: 0 0 16px;">
+      {{ programme.title }}
+    </h1>
+
+    <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: rgba(255,255,255,0.75); line-height: 1.6; margin: 0 0 24px;">
+      {{ programme.summary|default:programme.description }}
+    </p>
+
+    <!-- Enrolment Trigger Button -->
+    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+      {% if is_enrolled %}
+        <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #4ade80; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); padding: 10px 20px; border-radius: 10px; display: inline-flex; align-items: center; gap: 6px;">
+          <span class="material-symbols-outlined">check_circle</span> You are enrolled in this programme
+        </span>
+      {% else %}
+        <form method="post" action="{% url 'community_enrol' programme.id %}">
+          {% csrf_token %}
+          <button type="submit" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: #fff; background: var(--sc-primary); border: none; padding: 12px 28px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(175,50,54,0.4);">
+            <span>Enrol in Programme</span>
+            <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Syllabus & Modules Section -->
+  <div>
+    <h2 style="font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #fff; margin: 0 0 24px;">
+      Curriculum & Modules
+    </h2>
+
+    {% if modules %}
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        {% for m in modules %}
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; margin: 0;">
+                Module {{ forloop.counter }}: {{ m.title }}
+              </h3>
+            </div>
+            
+            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.5; margin: 0 0 16px;">
+              {{ m.summary|default:m.description }}
+            </p>
+
+            <!-- Lessons List inside Module -->
+            {% if m.lessons %}
+              <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 16px;">
+                {% for lesson in m.lessons %}
+                  <a href="{% url 'community_lesson_viewer' lesson.id %}"
+                     style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 12px 16px; text-decoration: none; color: inherit; transition: background 0.15s;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <span class="material-symbols-outlined" style="color: var(--sc-primary); font-size: 20px;">play_lesson</span>
+                      <span style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9);">
+                        Lesson {{ forloop.counter }}: {{ lesson.title }}
+                      </span>
+                    </div>
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: rgba(255,255,255,0.4);">chevron_right</span>
+                  </a>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="padding: 32px; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.08); border-radius: 12px; font-family: 'Inter', sans-serif; color: rgba(255,255,255,0.5);">
+        Curriculum modules are being finalized for this programme.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

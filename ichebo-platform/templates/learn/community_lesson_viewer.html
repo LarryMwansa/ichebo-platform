@@ -1,0 +1,70 @@
+<!-- templates/learn/community_lesson_viewer.html -->
+{% extends "learn/community_base.html" %}
+{% block title %}{{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto; padding: 40px 24px 80px;">
+
+  <!-- Breadcrumb -->
+  <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+    <a href="{% url 'learn-landing' %}" style="color: rgba(255,255,255,0.7); text-decoration: none;">Course Catalog</a>
+    <span>/</span>
+    {% if programme %}
+      <a href="{% url 'community_programme_detail' programme.id %}" style="color: rgba(255,255,255,0.7); text-decoration: none;">{{ programme.title }}</a>
+      <span>/</span>
+    {% endif %}
+    <span style="color: var(--sc-primary); font-weight: 600;">Lesson Viewer</span>
+  </div>
+
+  <!-- Main Lesson Article -->
+  <article style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 40px; margin-bottom: 32px;">
+    
+    <header style="margin-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 24px;">
+      <h1 style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #fff; margin: 0 0 12px; line-height: 1.3;">
+        {{ lesson.title }}
+      </h1>
+      {% if lesson.custom_fields.estimated_minutes %}
+        <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;">
+          <span class="material-symbols-outlined" style="font-size: 16px;">timer</span>
+          <span>Estimated time: {{ lesson.custom_fields.estimated_minutes }} mins</span>
+        </div>
+      {% endif %}
+    </header>
+
+    <!-- Video Embed if present -->
+    {% if lesson.custom_fields.video_url %}
+      <div style="margin-bottom: 32px; position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: #000;">
+        <iframe src="{{ lesson.custom_fields.video_url }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allowfullscreen></iframe>
+      </div>
+    {% endif %}
+
+    <!-- Lesson Text Body -->
+    <div style="font-family: 'Inter', sans-serif; font-size: 16px; color: rgba(255,255,255,0.85); line-height: 1.8; white-space: pre-wrap;">
+      {{ lesson.description|default:lesson.summary|default:"Lesson content is being finalized." }}
+    </div>
+
+  </article>
+
+  <!-- Navigation / Completion Footer -->
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+    {% if programme %}
+      <a href="{% url 'community_programme_detail' programme.id %}"
+         style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+        <span>Back to Course Syllabus</span>
+      </a>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'community_my_learning' %}">
+        {% csrf_token %}
+        <button type="submit" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: #fff; background: var(--sc-primary); border: none; padding: 10px 24px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+          <span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span>
+          <span>Mark Completed</span>
+        </button>
+      </form>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
