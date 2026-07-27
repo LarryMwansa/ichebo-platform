@@ -87,30 +87,35 @@
 </div>
 
 <!-- Book & Chapter Picker Modal Drawer -->
-<div id="pickerModal" hidden style="position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px;">
-  <div style="background: var(--sc-ink-2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; width: 100%; max-width: 640px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+<div id="pickerModal" style="position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 24px;">
+  <div style="background: var(--sc-ink-2); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; width: 100%; max-width: 680px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
     
     <!-- Modal Header -->
     <div style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between;">
       <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #fff;">Select Book & Chapter</h3>
-      <button type="button" id="closePickerBtn" style="background: transparent; border: none; color: rgba(255,255,255,0.6); cursor: pointer; padding: 4px;">
-        <span class="material-symbols-outlined">close</span>
+      <button type="button" id="closePickerBtn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: rgba(255,255,255,0.8); cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
       </button>
     </div>
 
     <!-- Books List & Chapters Grid -->
     <div style="flex: 1; overflow-y: auto; padding: 24px;">
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;">
         {% for b in books %}
           <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 12px;">
-            <div style="font-size: 14px; font-weight: 700; color: {% if b.code == book.code %}var(--sc-primary){% else %}#fff{% endif %}; margin-bottom: 8px;">
+            <div style="font-size: 13px; font-weight: 700; color: {% if b.code == book.code %}var(--sc-primary){% else %}#fff{% endif %}; margin-bottom: 8px;">
               {{ b.name }}
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-              {% for ch in b.chapters_list|default:"1" %}
+              {% for ch in b.chapters_list %}
                 <a href="{% url 'community_bible_reader' b.code ch %}" 
-                   style="font-size: 11px; font-weight: 600; color: {% if b.code == book.code and ch == chapter %}#fff{% else %}rgba(255,255,255,0.6){% endif %}; background: {% if b.code == book.code and ch == chapter %}var(--sc-primary){% else %}rgba(255,255,255,0.05){% endif %}; padding: 3px 6px; border-radius: 4px; text-decoration: none;">
+                   style="font-size: 11px; font-weight: 600; color: {% if b.code == book.code and ch == chapter %}#fff{% else %}rgba(255,255,255,0.6){% endif %}; background: {% if b.code == book.code and ch == chapter %}var(--sc-primary){% else %}rgba(255,255,255,0.06){% endif %}; padding: 3px 6px; border-radius: 4px; text-decoration: none;">
                   {{ ch }}
+                </a>
+              {% empty %}
+                <a href="{% url 'community_bible_reader' b.code 1 %}" 
+                   style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.06); padding: 3px 6px; border-radius: 4px; text-decoration: none;">
+                  1
                 </a>
               {% endfor %}
             </div>
@@ -130,36 +135,52 @@
     var fontIncBtn = document.getElementById('fontIncBtn');
     var fontDecBtn = document.getElementById('fontDecBtn');
 
-    if (openBtn && modal) {
-      openBtn.addEventListener('click', function() { modal.hidden = false; });
+    function openModal() {
+      if (modal) modal.style.display = 'flex';
     }
-    if (closeBtn && modal) {
-      closeBtn.addEventListener('click', function() { modal.hidden = true; });
+
+    function closeModal() {
+      if (modal) modal.style.display = 'none';
+    }
+
+    if (openBtn) {
+      openBtn.addEventListener('click', openModal);
+    }
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeModal);
     }
     if (modal) {
       modal.addEventListener('click', function(e) {
-        if (e.target === modal) modal.hidden = true;
+        if (e.target === modal) closeModal();
       });
     }
 
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
     // Dynamic Font Resizer
     var currentSize = 20;
-    fontIncBtn.addEventListener('click', function() {
-      if (currentSize < 32) {
-        currentSize += 2;
-        document.querySelectorAll('.bible-chapter-body').forEach(function(el) {
-          el.style.fontSize = currentSize + 'px';
-        });
-      }
-    });
-    fontDecBtn.addEventListener('click', function() {
-      if (currentSize > 14) {
-        currentSize -= 2;
-        document.querySelectorAll('.bible-chapter-body').forEach(function(el) {
-          el.style.fontSize = currentSize + 'px';
-        });
-      }
-    });
+    if (fontIncBtn) {
+      fontIncBtn.addEventListener('click', function() {
+        if (currentSize < 32) {
+          currentSize += 2;
+          document.querySelectorAll('.bible-chapter-body').forEach(function(el) {
+            el.style.fontSize = currentSize + 'px';
+          });
+        }
+      });
+    }
+    if (fontDecBtn) {
+      fontDecBtn.addEventListener('click', function() {
+        if (currentSize > 14) {
+          currentSize -= 2;
+          document.querySelectorAll('.bible-chapter-body').forEach(function(el) {
+            el.style.fontSize = currentSize + 'px';
+          });
+        }
+      });
+    }
   })();
 </script>
 {% endblock %}

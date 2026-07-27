@@ -632,6 +632,9 @@ def community_bible_reader(request, book_code=DEFAULT_BOOK, chapter=DEFAULT_CHAP
 
     translation = get_user_translation(request.user)
     books = list(get_all_books())
+    for b in books:
+        b.chapters_list = list(get_book_chapters(b.code))
+
     book = BibleBook.objects.filter(code=book_code).first()
     
     if not book:
