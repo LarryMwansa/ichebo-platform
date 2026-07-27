@@ -40,7 +40,7 @@
 
     <!-- Lesson Text Body -->
     <div style="font-family: 'Inter', sans-serif; font-size: 16px; color: rgba(255,255,255,0.85); line-height: 1.8; white-space: pre-wrap;">
-      {{ lesson.summary|default:lesson.notes|default:"Lesson content is being finalized." }}
+      {{ lesson.content|default:lesson.summary|default:"Lesson content is being finalized." }}
     </div>
 
   </article>
