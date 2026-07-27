@@ -243,7 +243,7 @@ const LearnVideoUpload = {
             const titleInput = document.querySelector('input[name="title"]');
             const initResp = await fetch('/api/media/upload/init/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': this._csrfToken() },
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
                 credentials: 'same-origin',
                 body: JSON.stringify({
                     title: (titleInput && titleInput.value.trim()) || file.name,
@@ -280,7 +280,7 @@ const LearnVideoUpload = {
             this._setProgress(sfx, 75, 'Processing…');
             const completeResp = await fetch('/api/media/upload/complete/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': this._csrfToken() },
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
                 credentials: 'same-origin',
                 body: JSON.stringify({
                     upload_id: init.upload_id,
