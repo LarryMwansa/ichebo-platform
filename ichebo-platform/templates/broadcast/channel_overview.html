@@ -64,7 +64,13 @@
                     <span style="color: var(--muted); font-size: 11px; text-transform: uppercase;
                                   font-weight: 700; letter-spacing: 0.06em;">Loop Default</span><br>
                     <span style="font-family: monospace; font-size: 12px;">
-                        {{ config.loop_default_video_id|default:"Not set" }}
+                        {% if config.loop_default_video_id %}
+                            {{ config.loop_default_video_id }}
+                        {% elif config.loop_default_external_url %}
+                            <a href="{{ config.loop_default_external_url }}" target="_blank" style="color: var(--primary);">{{ config.loop_default_external_url|truncatechars:40 }}</a>
+                        {% else %}
+                            Not set
+                        {% endif %}
                     </span>
                 </div>
                 <div>
