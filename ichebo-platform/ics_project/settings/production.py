@@ -49,7 +49,7 @@ DATABASES['default']['CONN_MAX_AGE'] = 60  # noqa: F405
 # which conflicts with STORAGES and raises ImproperlyConfigured on startup.
 
 STORAGES['staticfiles'] = {  # noqa: F405
-    'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
+    'BACKEND': 'ics_project.storage.NonStrictManifestStaticFilesStorage',
 }
 
 # ── Logging ───────────────────────────────────────────────────────────────────
