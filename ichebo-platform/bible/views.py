@@ -630,7 +630,8 @@ def community_bible_reader(request, book_code=DEFAULT_BOOK, chapter=DEFAULT_CHAP
         if position:
             book_code, chapter = position
 
-    session_code = request.session.get('bible_translation_code')
+    session = getattr(request, 'session', {})
+    session_code = session.get('bible_translation_code') if hasattr(session, 'get') else None
     translation = get_user_translation(request.user, session_code=session_code)
     books = list(get_all_books())
     for b in books:
@@ -693,7 +694,8 @@ def htmx_community_chapter(request, book_code, chapter):
     """
     HTMX endpoint returning partial chapter verses for bible.ichebo.org.
     """
-    session_code = request.session.get('bible_translation_code')
+    session = getattr(request, 'session', {})
+    session_code = session.get('bible_translation_code') if hasattr(session, 'get') else None
     translation = get_user_translation(request.user, session_code=session_code)
     book = BibleBook.objects.filter(code=book_code).first()
     verses = get_chapter_verses(translation, book_code, chapter) if translation and book else []
@@ -721,7 +723,8 @@ def community_set_translation(request):
         chapter = DEFAULT_CHAPTER
 
     if translation_code:
-        request.session['bible_translation_code'] = translation_code
+        if hasattr(request, 'session'):
+            request.session['bible_translation_code'] = translation_code
         if request.user.is_authenticated:
             translation = BibleTranslation.objects.filter(code=translation_code, is_public=True).first()
             if translation:
@@ -737,7 +740,8 @@ def htmx_community_search(request):
     HTMX search endpoint: returns matching verses for query 'q'.
     """
     query = request.GET.get('q', '').strip()
-    session_code = request.session.get('bible_translation_code')
+    session = getattr(request, 'session', {})
+    session_code = session.get('bible_translation_code') if hasattr(session, 'get') else None
     translation = get_user_translation(request.user, session_code=session_code)
     
     results = []
