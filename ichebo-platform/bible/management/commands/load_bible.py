@@ -29,28 +29,49 @@ class Command(BaseCommand):
     help = 'Load a Bible translation from a flat JSON source file'
 
     def add_arguments(self, parser):
-        parser.add_argument('translation_code', type=str,
-                            help='Translation code: KJV | ASV | WEB')
+        parser.add_argument('translation_code', type=str, nargs='?', default=None,
+                            help='Translation code: KJV | ASV | WEB | etc.')
+        parser.add_argument('--all', action='store_true',
+                            help='Load all public domain Bible JSON files in json_bibles directory')
         parser.add_argument('--set-default', action='store_true',
                             help='Set this translation as the platform default')
         parser.add_argument('--file', type=str, default=None,
                             help='Path to JSON file (optional)')
 
     def handle(self, *args, **options):
-        code = options['translation_code'].upper()
+        if options['all']:
+            json_dir = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                'data', 'json_bibles'
+            )
+            if not os.path.exists(json_dir):
+                self.stderr.write(f"json_bibles directory not found: {json_dir}")
+                return
+            for fname in sorted(os.listdir(json_dir)):
+                if fname.endswith('.json'):
+                    code = fname.replace('.json', '').upper()
+                    fpath = os.path.join(json_dir, fname)
+                    is_default = (code == 'KJV')
+                    self.load_single_file(code, fpath, is_default=is_default)
+            return
+
+        code = (options['translation_code'] or 'KJV').upper()
 
         if options['file']:
             data_path = options['file']
         else:
-            data_path = os.path.join(
-                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-                'data', f'{code.lower()}.json'
-            )
+            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+            data_path = os.path.join(base_dir, 'data', 'json_bibles', f'{code.lower()}.json')
+            if not os.path.exists(data_path):
+                data_path = os.path.join(base_dir, 'data', f'{code.lower()}.json')
 
         if not os.path.exists(data_path):
             self.stderr.write(f"Data file not found: {data_path}")
             return
 
+        self.load_single_file(code, data_path, is_default=options['set_default'])
+
+    def load_single_file(self, code, data_path, is_default=False):
         self.stdout.write(f"Loading {code} from {data_path}…")
 
         with open(data_path, 'r', encoding='utf-8') as f:
@@ -59,6 +80,7 @@ class Command(BaseCommand):
         meta = data.get('metadata', {})
         restrict = meta.get('restrict', 0)
         is_copyright_val = bool(meta.get('copyright', 0))
+        is_public_val = (restrict == 0 and not is_copyright_val)
 
         translation, created = BibleTranslation.objects.update_or_create(
             code=code,
@@ -70,8 +92,8 @@ class Command(BaseCommand):
                 'description':         meta.get('description'),
                 'copyright_statement': meta.get('copyright_statement'),
                 'is_copyright':        is_copyright_val,
-                'is_public':           restrict == 0,
-                'is_default':          options['set_default'],
+                'is_public':           is_public_val,
+                'is_default':          is_default,
             }
         )
 

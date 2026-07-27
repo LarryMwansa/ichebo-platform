@@ -648,7 +648,7 @@ def community_bible_reader(request, book_code=DEFAULT_BOOK, chapter=DEFAULT_CHAP
         chapter = chapters[0]
 
     verses = get_chapter_verses(translation, book_code, chapter) if translation and book else []
-    translations = BibleTranslation.objects.filter(is_public=True)
+    translations = BibleTranslation.objects.filter(is_public=True, is_copyright=False)
 
     if request.user.is_authenticated and book:
         save_reading_position(request.user, book_code, chapter)

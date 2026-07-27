@@ -10,14 +10,14 @@ def get_user_translation(user, session_code=None):
     if user and getattr(user, 'is_authenticated', False):
         pref_id = getattr(user, 'preferred_bible_translation_id', None)
         if pref_id:
-            translation = BibleTranslation.objects.filter(pk=pref_id, is_public=True).first()
+            translation = BibleTranslation.objects.filter(pk=pref_id, is_public=True, is_copyright=False).first()
             if translation:
                 return translation
     if session_code:
-        translation = BibleTranslation.objects.filter(code=session_code, is_public=True).first()
+        translation = BibleTranslation.objects.filter(code=session_code, is_public=True, is_copyright=False).first()
         if translation:
             return translation
-    return BibleTranslation.objects.filter(is_default=True).first() or BibleTranslation.objects.filter(is_public=True).first()
+    return BibleTranslation.objects.filter(is_default=True, is_public=True).first() or BibleTranslation.objects.filter(is_public=True, is_copyright=False).first()
 
 
 def save_reading_position(user, book_code, chapter):
