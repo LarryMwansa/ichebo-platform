@@ -30,7 +30,8 @@ APP_LEVEL_REQUIREMENTS = {
 
 
 def formation(request):
-    if not request.user.is_authenticated:
+    user = getattr(request, 'user', None)
+    if not user or not getattr(user, 'is_authenticated', False):
         return {
             'user_level': 0,
             'user_level_name': 'Guest',
