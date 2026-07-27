@@ -1,12 +1,9 @@
 """
 SiteRouterMiddleware — sets request.site and request.urlconf based on the
-incoming Host header. Serves sceptre.ichebo.org from the same Django
-process as app.ichebo.org, with its own URL conf (ADR-023).
-
-request.urlconf is the real Django mechanism for per-request URL conf
-override — the resolver checks it automatically on every request, no
-separate dispatcher function in ics_project/urls.py is needed.
+incoming Host header. Serves sceptre.ichebo.org, learn.ichebo.org, and
+bible.ichebo.org from the same Django process with per-request URL confs (ADR-023).
 """
+from django.urls import set_urlconf
 
 
 class SiteRouterMiddleware:
@@ -18,13 +15,19 @@ class SiteRouterMiddleware:
         if host == 'sceptre.ichebo.org':
             request.site = 'community'
             request.urlconf = 'sceptre.urls'
+            set_urlconf('sceptre.urls')
         elif host == 'learn.ichebo.org':
             request.site = 'learn'
             request.urlconf = 'learn.subdomain_urls'
+            set_urlconf('learn.subdomain_urls')
         elif host == 'bible.ichebo.org':
             request.site = 'bible'
             request.urlconf = 'bible.subdomain_urls'
+            set_urlconf('bible.subdomain_urls')
         else:
             request.site = 'agency'
-            # request.urlconf left unset — Django falls back to ROOT_URLCONF
-        return self.get_response(request)
+            set_urlconf(None)
+
+        response = self.get_response(request)
+        set_urlconf(None)
+        return response
