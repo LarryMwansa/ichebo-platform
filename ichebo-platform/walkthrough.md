@@ -30,3 +30,8 @@ Successfully restyled and expanded the Community Settings page (`/steward/settin
   - **Appearance & Theme:** Added a stylish placeholder for future color customization and logo uploads.
   - **Access & Members:** Outlined the UI for privacy settings, explicitly highlighting the Kingdom principle that "users are only eligible to join a community after they have successfully completed Induction and reached the required Level (certified inductees)."
   - **Advanced Settings:** Exposed the community's internal hierarchy `path` and added a stylized red UI block for Community Suspension.
+
+### Backend Implementations (Phase 4 Continuation)
+- **Appearance Settings (`htmx_steward_settings_appearance`):** Replaced the placeholder with a functional form. Supports `multipart/form-data` uploads for Community Logos and saves a hex `community_theme` color.
+- **Access Rules (`htmx_steward_settings_access`):** Wired up the privacy toggles to save directly to the `Tenant.settings_data['privacy']` JSON field.
+- **Suspend Logic (`htmx_steward_settings_suspend`):** The Danger Zone button now uses `hx-confirm` for safety. On submission, it updates the `Tenant.status` to `suspended` and dynamically swaps the button with a persistent red warning block instructing the steward to contact global admins for reversal.
