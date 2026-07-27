@@ -630,7 +630,8 @@ def community_bible_reader(request, book_code=DEFAULT_BOOK, chapter=DEFAULT_CHAP
         if position:
             book_code, chapter = position
 
-    translation = get_user_translation(request.user)
+    session_code = request.session.get('bible_translation_code')
+    translation = get_user_translation(request.user, session_code=session_code)
     books = list(get_all_books())
     for b in books:
         b.chapters_list = list(get_book_chapters(b.code))
@@ -692,7 +693,8 @@ def htmx_community_chapter(request, book_code, chapter):
     """
     HTMX endpoint returning partial chapter verses for bible.ichebo.org.
     """
-    translation = get_user_translation(request.user)
+    session_code = request.session.get('bible_translation_code')
+    translation = get_user_translation(request.user, session_code=session_code)
     book = BibleBook.objects.filter(code=book_code).first()
     verses = get_chapter_verses(translation, book_code, chapter) if translation and book else []
     
@@ -703,4 +705,53 @@ def htmx_community_chapter(request, book_code, chapter):
         'verses': verses,
     }
     return render(request, 'bible/_community_chapter.html', context)
+
+
+def community_set_translation(request):
+    """
+    Update translation preference via POST parameter 'translation_code',
+    saving to session for guest users and user profile if authenticated.
+    Redirects back to /read/<book_code>/<chapter>/
+    """
+    translation_code = request.POST.get('translation_code') or request.GET.get('translation_code')
+    book_code = request.POST.get('book_code') or request.GET.get('book_code') or DEFAULT_BOOK
+    try:
+        chapter = int(request.POST.get('chapter') or request.GET.get('chapter') or DEFAULT_CHAPTER)
+    except (ValueError, TypeError):
+        chapter = DEFAULT_CHAPTER
+
+    if translation_code:
+        request.session['bible_translation_code'] = translation_code
+        if request.user.is_authenticated:
+            translation = BibleTranslation.objects.filter(code=translation_code, is_public=True).first()
+            if translation:
+                request.user.preferred_bible_translation = translation
+                request.user.save(update_fields=['preferred_bible_translation'])
+
+    target_url = reverse('community_bible_reader', kwargs={'book_code': book_code, 'chapter': chapter})
+    return redirect(target_url)
+
+
+def htmx_community_search(request):
+    """
+    HTMX search endpoint: returns matching verses for query 'q'.
+    """
+    query = request.GET.get('q', '').strip()
+    session_code = request.session.get('bible_translation_code')
+    translation = get_user_translation(request.user, session_code=session_code)
+    
+    results = []
+    if query and len(query) >= 2:
+        results = BibleVerse.objects.filter(
+            translation=translation,
+            text__icontains=query
+        ).select_related('book').order_by('book__order', 'chapter', 'verse')[:35]
+
+    context = {
+        'query': query,
+        'translation': translation,
+        'results': results,
+    }
+    return render(request, 'bible/_community_search_drawer.html', context)
+
 

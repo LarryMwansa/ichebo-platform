@@ -1,0 +1,32 @@
+<!-- templates/bible/_community_search_drawer.html -->
+<div>
+  {% if query %}
+    <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 16px; font-family: 'Inter', sans-serif;">
+      Found <strong>{{ results|length }}</strong> results for <span style="color: var(--sc-primary);">"{{ query }}"</span> in {{ translation.code }}
+    </div>
+
+    {% if results %}
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for v in results %}
+          <a href="{% url 'community_bible_reader' v.book.code v.chapter %}#v-{{ v.verse }}"
+             style="display: block; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 16px; text-decoration: none; color: inherit; transition: background 0.15s;">
+            <div style="font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; color: var(--sc-primary); margin-bottom: 4px;">
+              {{ v.book.name }} {{ v.chapter }}:{{ v.verse }}
+            </div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.5;">
+              {{ v.text }}
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="padding: 32px 16px; text-align: center; color: rgba(255,255,255,0.5); font-family: 'Inter', sans-serif; font-size: 14px;">
+        No scripture verses found matching "{{ query }}" in {{ translation.name }}.
+      </div>
+    {% endif %}
+  {% else %}
+    <div style="padding: 32px 16px; text-align: center; color: rgba(255,255,255,0.4); font-family: 'Inter', sans-serif; font-size: 14px;">
+      Type a word, phrase, or topic to search scripture across {{ translation.code }}.
+    </div>
+  {% endif %}
+</div>

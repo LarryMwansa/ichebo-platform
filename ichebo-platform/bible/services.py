@@ -5,14 +5,19 @@ Template views call these functions; they do not call DRF endpoints internally.
 from .models import BibleTranslation, BibleBook, BibleVerse
 
 
-def get_user_translation(user):
-    """Return the user's preferred translation, falling back to system default."""
-    pref_id = getattr(user, 'preferred_bible_translation_id', None)
-    if pref_id:
-        translation = BibleTranslation.objects.filter(pk=pref_id, is_public=True).first()
+def get_user_translation(user, session_code=None):
+    """Return the user's preferred translation, falling back to session or system default."""
+    if user and getattr(user, 'is_authenticated', False):
+        pref_id = getattr(user, 'preferred_bible_translation_id', None)
+        if pref_id:
+            translation = BibleTranslation.objects.filter(pk=pref_id, is_public=True).first()
+            if translation:
+                return translation
+    if session_code:
+        translation = BibleTranslation.objects.filter(code=session_code, is_public=True).first()
         if translation:
             return translation
-    return BibleTranslation.objects.filter(is_default=True).first()
+    return BibleTranslation.objects.filter(is_default=True).first() or BibleTranslation.objects.filter(is_public=True).first()
 
 
 def save_reading_position(user, book_code, chapter):

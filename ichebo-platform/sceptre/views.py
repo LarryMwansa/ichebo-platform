@@ -162,9 +162,8 @@ def learn_summary(request):
     })
 
 
-@require_sceptre_participant
 def bible_redirect(request):
-    """Bible — redirect to bible.ichebo.org."""
+    """Bible — open redirect to bible.ichebo.org."""
     return redirect('https://bible.ichebo.org/')
 
 

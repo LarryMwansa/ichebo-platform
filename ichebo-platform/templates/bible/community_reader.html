@@ -7,7 +7,7 @@
 
   <!-- Sticky Top Controls Bar -->
   <div style="position: sticky; top: 56px; z-index: 90; background: rgba(14,14,14,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 12px 24px;">
-    <div style="max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+    <div style="max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
       
       <!-- Book & Chapter Picker Trigger -->
       <button type="button" id="openPickerBtn" 
@@ -17,16 +17,25 @@
         <span class="material-symbols-outlined" style="font-size: 18px; color: rgba(255,255,255,0.5);">expand_more</span>
       </button>
 
-      <!-- Translation & Font Controls -->
-      <div style="display: flex; align-items: center; gap: 16px;">
+      <!-- Right Action Controls -->
+      <div style="display: flex; align-items: center; gap: 12px;">
         
-        <!-- Translation badge -->
-        <div style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); padding: 6px 12px; border-radius: 20px;">
-          {{ translation.code }}
-        </div>
+        <!-- Search Trigger Button -->
+        <button type="button" id="openSearchBtn"
+                style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: rgba(255,255,255,0.85); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <span class="material-symbols-outlined" style="font-size: 18px;">search</span>
+          <span>Search</span>
+        </button>
+
+        <!-- Translation Selector Button -->
+        <button type="button" id="openTransBtn"
+                style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: #fff; background: rgba(175,50,54,0.25); border: 1px solid rgba(175,50,54,0.4); padding: 6px 14px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+          <span>{{ translation.code }}</span>
+          <span class="material-symbols-outlined" style="font-size: 16px; color: rgba(255,255,255,0.7);">unfold_more</span>
+        </button>
 
         <!-- Font Size Adjusters -->
-        <div style="display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.05); border-radius: 6px; padding: 2px;">
+        <div style="display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 2px;">
           <button type="button" id="fontDecBtn" style="background: transparent; border: none; color: rgba(255,255,255,0.7); padding: 4px 8px; cursor: pointer; font-size: 12px; font-weight: 700;" title="Decrease font size">A-</button>
           <div style="width: 1px; height: 12px; background: rgba(255,255,255,0.1);"></div>
           <button type="button" id="fontIncBtn" style="background: transparent; border: none; color: rgba(255,255,255,0.7); padding: 4px 8px; cursor: pointer; font-size: 14px; font-weight: 700;" title="Increase font size">A+</button>
@@ -51,7 +60,7 @@
         </h1>
       </div>
 
-      <!-- Dynamic Verse Content (Swappable by HTMX if needed) -->
+      <!-- Dynamic Verse Content -->
       <div id="scripture-container">
         {% include "bible/_community_chapter.html" %}
       </div>
@@ -86,19 +95,15 @@
 
 </div>
 
-<!-- Book & Chapter Picker Modal Drawer -->
+<!-- 1. Book & Chapter Picker Modal Drawer -->
 <div id="pickerModal" style="position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 24px;">
   <div style="background: var(--sc-ink-2); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; width: 100%; max-width: 680px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
-    
-    <!-- Modal Header -->
     <div style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between;">
       <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #fff;">Select Book & Chapter</h3>
       <button type="button" id="closePickerBtn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: rgba(255,255,255,0.8); cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center;">
         <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
       </button>
     </div>
-
-    <!-- Books List & Chapters Grid -->
     <div style="flex: 1; overflow-y: auto; padding: 24px;">
       <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;">
         {% for b in books %}
@@ -123,40 +128,101 @@
         {% endfor %}
       </div>
     </div>
+  </div>
+</div>
 
+<!-- 2. Translation Selector Modal -->
+<div id="transModal" style="position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 24px;">
+  <div style="background: var(--sc-ink-2); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; width: 100%; max-width: 480px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
+    <div style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between;">
+      <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #fff;">Select Translation</h3>
+      <button type="button" id="closeTransBtn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: rgba(255,255,255,0.8); cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+      </button>
+    </div>
+    <div style="padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 8px;">
+      {% for t in translations %}
+        <form method="post" action="{% url 'community_set_translation' %}">
+          {% csrf_token %}
+          <input type="hidden" name="translation_code" value="{{ t.code }}">
+          <input type="hidden" name="book_code" value="{{ book.code }}">
+          <input type="hidden" name="chapter" value="{{ chapter }}">
+          <button type="submit" style="width: 100%; text-align: left; background: {% if t.code == translation.code %}rgba(175,50,54,0.15){% else %}rgba(255,255,255,0.03){% endif %}; border: 1px solid {% if t.code == translation.code %}rgba(175,50,54,0.4){% else %}rgba(255,255,255,0.06){% endif %}; border-radius: 10px; padding: 14px 18px; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif;">{{ t.name }} ({{ t.code }})</div>
+              <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px;">{{ t.language_full }} {% if t.year %}· {{ t.year }}{% endif %}</div>
+            </div>
+            {% if t.code == translation.code %}
+              <span class="material-symbols-outlined" style="color: var(--sc-primary);">check_circle</span>
+            {% endif %}
+          </button>
+        </form>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- 3. Scripture Search Modal Drawer -->
+<div id="searchModal" style="position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 24px;">
+  <div style="background: var(--sc-ink-2); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; width: 100%; max-width: 640px; height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
+    <div style="padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 12px;">
+      <span class="material-symbols-outlined" style="color: var(--sc-primary); font-size: 24px;">search</span>
+      <input type="search" name="q" placeholder="Search scripture in {{ translation.code }} (e.g. grace, covenant)..." autofocus
+             hx-get="{% url 'htmx_community_search' %}" hx-trigger="keyup changed delay:300ms, search" hx-target="#search-results"
+             style="flex: 1; background: transparent; border: none; outline: none; color: #fff; font-family: 'Inter', sans-serif; font-size: 16px;">
+      <button type="button" id="closeSearchBtn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: rgba(255,255,255,0.8); cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+      </button>
+    </div>
+    <div id="search-results" style="flex: 1; overflow-y: auto; padding: 20px;">
+      {% include "bible/_community_search_drawer.html" with query="" %}
+    </div>
   </div>
 </div>
 
 <script>
   (function() {
-    var modal = document.getElementById('pickerModal');
-    var openBtn = document.getElementById('openPickerBtn');
-    var closeBtn = document.getElementById('closePickerBtn');
+    var pickerModal = document.getElementById('pickerModal');
+    var transModal = document.getElementById('transModal');
+    var searchModal = document.getElementById('searchModal');
+
+    var openPickerBtn = document.getElementById('openPickerBtn');
+    var closePickerBtn = document.getElementById('closePickerBtn');
+
+    var openTransBtn = document.getElementById('openTransBtn');
+    var closeTransBtn = document.getElementById('closeTransBtn');
+
+    var openSearchBtn = document.getElementById('openSearchBtn');
+    var closeSearchBtn = document.getElementById('closeSearchBtn');
+
     var fontIncBtn = document.getElementById('fontIncBtn');
     var fontDecBtn = document.getElementById('fontDecBtn');
 
-    function openModal() {
-      if (modal) modal.style.display = 'flex';
+    function closeAll() {
+      if (pickerModal) pickerModal.style.display = 'none';
+      if (transModal) transModal.style.display = 'none';
+      if (searchModal) searchModal.style.display = 'none';
     }
 
-    function closeModal() {
-      if (modal) modal.style.display = 'none';
-    }
+    if (openPickerBtn) openPickerBtn.addEventListener('click', function() { closeAll(); pickerModal.style.display = 'flex'; });
+    if (closePickerBtn) closePickerBtn.addEventListener('click', closeAll);
 
-    if (openBtn) {
-      openBtn.addEventListener('click', openModal);
-    }
-    if (closeBtn) {
-      closeBtn.addEventListener('click', closeModal);
-    }
-    if (modal) {
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal) closeModal();
-      });
-    }
+    if (openTransBtn) openTransBtn.addEventListener('click', function() { closeAll(); transModal.style.display = 'flex'; });
+    if (closeTransBtn) closeTransBtn.addEventListener('click', closeAll);
+
+    if (openSearchBtn) openSearchBtn.addEventListener('click', function() { closeAll(); searchModal.style.display = 'flex'; });
+    if (closeSearchBtn) closeSearchBtn.addEventListener('click', closeAll);
+
+    [pickerModal, transModal, searchModal].forEach(function(m) {
+      if (m) {
+        m.addEventListener('click', function(e) {
+          if (e.target === m) closeAll();
+        });
+      }
+    });
 
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') closeAll();
     });
 
     // Dynamic Font Resizer

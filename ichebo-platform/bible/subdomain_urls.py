@@ -12,6 +12,8 @@ urlpatterns = [
     path('', bible_views.community_bible_reader, name='home'),
     path('read/<str:book_code>/<int:chapter>/', bible_views.community_bible_reader, name='community_bible_reader'),
     path('htmx/chapter/<str:book_code>/<int:chapter>/', bible_views.htmx_community_chapter, name='htmx_community_chapter'),
+    path('set-translation/', bible_views.community_set_translation, name='community_set_translation'),
+    path('htmx/search/', bible_views.htmx_community_search, name='htmx_community_search'),
 
     # Auth routes — available if the landing page links to login
     path('accounts/', include('django.contrib.auth.urls')),
