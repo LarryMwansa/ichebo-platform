@@ -23,6 +23,9 @@
   <!-- Top Navigation Header -->
   <nav class="top-nav">
     <div class="top-nav__brand">
+      <button type="button" class="nav-hamburger" id="nav-hamburger" aria-expanded="false" aria-controls="nav-links-mobile" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <a href="{% url 'home' %}" style="display: flex; align-items: center; text-decoration: none;">
         <img src="{% static 'images/sceptre.svg' %}" alt="Ichebo" class="top-nav__logo">
       </a>
@@ -36,6 +39,7 @@
       <a href="{% url 'home' %}" class="nav-link nav-link--active">Scripture</a>
       <a href="https://sceptre.ichebo.org/find-a-community/" class="nav-link">Find a Community</a>
       <a href="https://sceptre.ichebo.org/learn/" class="nav-link">Learn</a>
+      <a href="https://sceptre.ichebo.org/support/" class="nav-link">Support</a>
     </div>
 
     <div class="top-nav__right">
@@ -48,6 +52,29 @@
       {% endif %}
     </div>
   </nav>
+
+  <!-- Mobile nav links dropdown -->
+  <div class="nav-links-mobile" id="nav-links-mobile" hidden>
+    <a href="https://sceptre.ichebo.org/" class="nav-link">Sceptre Hub</a>
+    <a href="{% url 'home' %}" class="nav-link nav-link--active">Scripture</a>
+    <a href="https://sceptre.ichebo.org/find-a-community/" class="nav-link">Find a Community</a>
+    <a href="https://sceptre.ichebo.org/learn/" class="nav-link">Learn</a>
+    <a href="https://sceptre.ichebo.org/support/" class="nav-link">Support</a>
+  </div>
+
+  <script>
+    (function () {
+      var hamburger = document.getElementById('nav-hamburger');
+      var mobileLinks = document.getElementById('nav-links-mobile');
+      if (!hamburger || !mobileLinks) return;
+
+      hamburger.addEventListener('click', function () {
+        var isHidden = mobileLinks.hidden;
+        mobileLinks.hidden = !isHidden;
+        hamburger.setAttribute('aria-expanded', String(isHidden));
+      });
+    })();
+  </script>
 
   <main class="sceptre-main">
     {% block content %}{% endblock %}
