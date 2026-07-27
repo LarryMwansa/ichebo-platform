@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -25,9 +26,26 @@ import (
 // app.ichebo.org); every other /engine/ route is called server-to-server
 // (Django's webhook handlers, MediaMTX's hooks), which never needs CORS
 // because the browser is never the caller.
-func withCORS(allowedOrigin string, next http.HandlerFunc) http.HandlerFunc {
+func withCORS(allowedOriginsStr string, next http.HandlerFunc) http.HandlerFunc {
+	origins := strings.Split(allowedOriginsStr, ",")
+	for i := range origins {
+		origins[i] = strings.TrimSpace(origins[i])
+	}
+	
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+		reqOrigin := r.Header.Get("Origin")
+		allowed := ""
+		for _, o := range origins {
+			if o == reqOrigin {
+				allowed = o
+				break
+			}
+		}
+		if allowed == "" && len(origins) > 0 {
+			allowed = origins[0] // Fallback
+		}
+		
+		w.Header().Set("Access-Control-Allow-Origin", allowed)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Chunk-Checksum")
 		if r.Method == http.MethodOptions {
