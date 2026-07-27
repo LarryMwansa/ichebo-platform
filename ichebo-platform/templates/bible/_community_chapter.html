@@ -3,9 +3,11 @@
   {% if verses %}
     <div style="margin-bottom: 2rem;">
       {% for verse in verses %}
-        <div class="verse-node" id="v-{{ verse.verse }}" style="margin-bottom: 16px; position: relative; display: flex; align-items: baseline; gap: 10px;">
+        <div class="verse-node" id="v-{{ verse.verse }}" 
+             data-book="{{ book.name }}" data-book-code="{{ book.code }}" data-chapter="{{ chapter }}" data-verse="{{ verse.verse }}" data-text="{{ verse.text }}"
+             style="margin-bottom: 16px; position: relative; display: flex; align-items: baseline; gap: 10px; cursor: pointer; border-radius: 6px; padding: 4px 6px; margin-left: -6px; margin-right: -6px; transition: background 0.15s;">
           <span style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: var(--sc-primary); flex-shrink: 0; min-width: 24px; text-align: right; user-select: none; opacity: 0.85;">{{ verse.verse }}</span>
-          <span>{{ verse.text }}</span>
+          <span class="verse-text">{{ verse.text }}</span>
         </div>
       {% endfor %}
     </div>

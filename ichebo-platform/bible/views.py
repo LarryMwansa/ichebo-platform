@@ -759,3 +759,73 @@ def htmx_community_search(request):
     return render(request, 'bible/_community_search_drawer.html', context)
 
 
+from django.http import JsonResponse
+
+def _get_user_bookmarks(request):
+    """Retrieve bookmarks list from session or user profile."""
+    if request.user.is_authenticated:
+        prefs = request.user.preferences or {}
+        return prefs.get('bible_bookmarks', [])
+    session = getattr(request, 'session', {})
+    if hasattr(session, 'get'):
+        return session.get('bible_bookmarks', [])
+    return []
+
+
+def _save_user_bookmarks(request, bookmarks):
+    """Save bookmarks list to session or user profile."""
+    if hasattr(request, 'session'):
+        request.session['bible_bookmarks'] = bookmarks
+    if request.user.is_authenticated:
+        prefs = request.user.preferences or {}
+        prefs['bible_bookmarks'] = bookmarks
+        request.user.preferences = prefs
+        request.user.save(update_fields=['preferences'])
+
+
+def community_toggle_bookmark(request):
+    """Toggle a verse bookmark."""
+    if request.method == 'POST':
+        book_code = request.POST.get('book_code')
+        book_name = request.POST.get('book_name') or book_code
+        try:
+            chapter = int(request.POST.get('chapter') or 1)
+            verse = int(request.POST.get('verse') or 1)
+        except (ValueError, TypeError):
+            chapter, verse = 1, 1
+        text = request.POST.get('text', '').strip()
+        translation_code = request.POST.get('translation_code', 'KJV')
+
+        bookmarks = _get_user_bookmarks(request)
+        existing_index = next((i for i, b in enumerate(bookmarks) if b.get('book_code') == book_code and b.get('chapter') == chapter and b.get('verse') == verse and b.get('translation_code') == translation_code), None)
+
+        if existing_index is not None:
+            bookmarks.pop(existing_index)
+            status = 'removed'
+        else:
+            bookmarks.insert(0, {
+                'book_code': book_code,
+                'book_name': book_name,
+                'chapter': chapter,
+                'verse': verse,
+                'text': text,
+                'translation_code': translation_code,
+            })
+            status = 'added'
+
+        _save_user_bookmarks(request, bookmarks)
+
+        if request.headers.get('HX-Request') or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return render(request, 'bible/_community_bookmarks_drawer.html', {'bookmarks': bookmarks})
+        return JsonResponse({'status': status, 'bookmarks_count': len(bookmarks)})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+def htmx_community_bookmarks(request):
+    """HTMX endpoint returning saved bookmarks partial."""
+    bookmarks = _get_user_bookmarks(request)
+    return render(request, 'bible/_community_bookmarks_drawer.html', {'bookmarks': bookmarks})
+
+
+

@@ -1,0 +1,42 @@
+<!-- templates/bible/_community_bookmarks_drawer.html -->
+<div>
+  {% if bookmarks %}
+    <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 16px; font-family: 'Inter', sans-serif;">
+      <strong>{{ bookmarks|length }}</strong> saved scripture verse{% if bookmarks|length > 1 %}s{% endif %}
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      {% for b in bookmarks %}
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <a href="{% url 'community_bible_reader' b.book_code b.chapter %}#v-{{ b.verse }}"
+               style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: var(--sc-primary); text-decoration: none;">
+              {{ b.book_name }} {{ b.chapter }}:{{ b.verse }} <span style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5);">({{ b.translation_code }})</span>
+            </a>
+            
+            <form method="post" action="{% url 'community_toggle_bookmark' %}" hx-post="{% url 'community_toggle_bookmark' %}" hx-target="#bookmarks-content">
+              {% csrf_token %}
+              <input type="hidden" name="book_code" value="{{ b.book_code }}">
+              <input type="hidden" name="book_name" value="{{ b.book_name }}">
+              <input type="hidden" name="chapter" value="{{ b.chapter }}">
+              <input type="hidden" name="verse" value="{{ b.verse }}">
+              <input type="hidden" name="translation_code" value="{{ b.translation_code }}">
+              <button type="submit" style="background: transparent; border: none; color: rgba(255,255,255,0.4); cursor: pointer; padding: 4px; display: flex; align-items: center;" title="Remove Bookmark">
+                <span class="material-symbols-outlined" style="font-size: 18px;">bookmark_remove</span>
+              </button>
+            </form>
+          </div>
+          <div style="font-family: 'Playfair Display', serif; font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.5;">
+            {{ b.text }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="padding: 40px 16px; text-align: center; color: rgba(255,255,255,0.4); font-family: 'Inter', sans-serif;">
+      <span class="material-symbols-outlined" style="font-size: 36px; color: rgba(255,255,255,0.2); margin-bottom: 8px;">bookmark_border</span>
+      <div style="font-size: 14px;">No saved bookmarks yet.</div>
+      <div style="font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 4px;">Click any verse in the reader to copy or bookmark it!</div>
+    </div>
+  {% endif %}
+</div>
