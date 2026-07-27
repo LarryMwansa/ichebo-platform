@@ -448,6 +448,49 @@ def htmx_steward_settings_general(request):
         return HttpResponse('<div class="sc-toast sc-toast--success">Settings saved successfully</div>')
     return HttpResponse('')
 
+@require_sceptre_steward
+def htmx_steward_settings_appearance(request):
+    from django.http import HttpResponse
+    if request.method == 'POST':
+        tenant = _get_tenant_for_user(request.user)
+        if not tenant:
+            return HttpResponse("Unauthorized", status=403)
+        
+        tenant.community_theme = request.POST.get('community_theme', tenant.community_theme)
+        if 'logo' in request.FILES:
+            tenant.logo = request.FILES['logo']
+        tenant.save()
+        return HttpResponse('<div class="sc-toast sc-toast--success">Appearance settings saved</div>')
+    return HttpResponse('')
+
+@require_sceptre_steward
+def htmx_steward_settings_access(request):
+    from django.http import HttpResponse
+    if request.method == 'POST':
+        tenant = _get_tenant_for_user(request.user)
+        if not tenant:
+            return HttpResponse("Unauthorized", status=403)
+        
+        privacy = request.POST.get('privacy', 'public')
+        tenant.settings_data['privacy'] = privacy
+        tenant.save()
+        return HttpResponse('<div class="sc-toast sc-toast--success">Access rules saved</div>')
+    return HttpResponse('')
+
+@require_sceptre_steward
+def htmx_steward_settings_suspend(request):
+    from django.http import HttpResponse
+    if request.method == 'POST':
+        tenant = _get_tenant_for_user(request.user)
+        if not tenant:
+            return HttpResponse("Unauthorized", status=403)
+        
+        tenant.status = 'suspended'
+        tenant.save()
+        # Return a message instructing them to contact an admin
+        return HttpResponse('<div style="padding: 16px; background: rgba(175,50,54,0.2); border: 1px solid #ff6b6b; border-radius: 8px; color: #ff6b6b; font-family: \'Inter\', sans-serif;">Community suspended. It is now hidden from the directory. Contact a global administrator to undo this.</div>')
+    return HttpResponse('')
+
 
 @require_sceptre_participant
 def htmx_sceptre_create_support_request(request):

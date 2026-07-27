@@ -57,6 +57,9 @@ urlpatterns = [
     path('steward/support/<uuid:record_id>/resolve/', views.htmx_sceptre_resolve_support_request, name='sceptre_resolve_support_request'),
     path('steward/settings/', views.steward_settings, name='steward_settings'),
     path('steward/settings/htmx/general/', views.htmx_steward_settings_general, name='htmx_steward_settings_general'),
+    path('steward/settings/htmx/appearance/', views.htmx_steward_settings_appearance, name='htmx_steward_settings_appearance'),
+    path('steward/settings/htmx/access/', views.htmx_steward_settings_access, name='htmx_steward_settings_access'),
+    path('steward/settings/htmx/suspend/', views.htmx_steward_settings_suspend, name='htmx_steward_settings_suspend'),
 
     # Public routes — no login required
     path('find-a-community/', views.community_directory, name='find_community'),

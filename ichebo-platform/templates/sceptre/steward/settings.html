@@ -80,10 +80,30 @@
         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 32px;">
           <h2 style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 24px;">Appearance & Theme</h2>
           
-          <div style="border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 40px; text-align: center; color: rgba(255,255,255,0.5); font-family: 'Inter', sans-serif;">
-            <span class="material-symbols-outlined" style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">brush</span>
-            <p style="margin: 0;">Community theme configuration and logo uploads are coming soon.</p>
-          </div>
+          <form hx-post="{% url 'htmx_steward_settings_appearance' %}" hx-target="#appearance-save-toast" hx-swap="innerHTML" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="margin-bottom: 24px;">
+              <label style="display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px;">Community Logo</label>
+              {% if tenant.logo %}
+              <div style="margin-bottom: 12px;">
+                <img src="{{ tenant.logo.url }}" alt="Current Logo" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;">
+              </div>
+              {% endif %}
+              <input type="file" name="logo" class="sc-input" accept="image/*" style="width: 100%; max-width: 500px; padding: 8px; font-family: 'Inter', sans-serif;">
+              <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 8px;">Upload a square image. Recommended size: 512x512px.</p>
+            </div>
+
+            <div style="margin-bottom: 32px;">
+              <label style="display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px;">Primary Theme Color</label>
+              <input type="color" name="community_theme" value="{{ tenant.community_theme|default:'#af3236' }}" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px; width: 60px; height: 36px; cursor: pointer;">
+              <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 8px;">Select an accent color for your community page.</p>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <button type="submit" class="sc-btn sc-btn--primary">Save Appearance</button>
+              <div id="appearance-save-toast"></div>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -96,10 +116,34 @@
             <strong style="color: #fff;">Note:</strong> Regardless of these settings, users are only eligible to join a community after they have successfully completed Induction and reached the required Level (certified inductees).
           </p>
 
-          <div style="border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 40px; text-align: center; color: rgba(255,255,255,0.5); font-family: 'Inter', sans-serif;">
-            <span class="material-symbols-outlined" style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">group_add</span>
-            <p style="margin: 0;">Privacy toggles and steward invitation management are currently under development.</p>
-          </div>
+          <form hx-post="{% url 'htmx_steward_settings_access' %}" hx-target="#access-save-toast" hx-swap="innerHTML">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 32px;">
+              <label style="display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 12px;">Community Privacy Mode</label>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
+                  <input type="radio" name="privacy" value="public" {% if tenant.settings_data.privacy == 'public' or not tenant.settings_data.privacy %}checked{% endif %} style="margin-top: 4px;">
+                  <div>
+                    <div style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #fff;">Open (Public)</div>
+                    <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5);">Any eligible user can join this community instantly.</div>
+                  </div>
+                </label>
+                <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
+                  <input type="radio" name="privacy" value="approval" {% if tenant.settings_data.privacy == 'approval' %}checked{% endif %} style="margin-top: 4px;">
+                  <div>
+                    <div style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #fff;">Approval Required</div>
+                    <div style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.5);">Eligible users can request to join, but a Steward must approve them.</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <button type="submit" class="sc-btn sc-btn--primary">Save Access Rules</button>
+              <div id="access-save-toast"></div>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -119,9 +163,15 @@
           <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px;">
             <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #ff6b6b; margin: 0 0 12px;">Danger Zone</h3>
             <p style="font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,0.6); margin: 0 0 16px;">Suspending this community will hide it from the directory and prevent members from accessing it.</p>
-            <button class="sc-btn sc-btn--outline" style="border-color: rgba(175,50,54,0.5); color: #ff6b6b;" onclick="alert('Community suspension requires global admin approval.')">
-              <span class="material-symbols-outlined">block</span> Suspend Community
-            </button>
+            
+            <form hx-post="{% url 'htmx_steward_settings_suspend' %}" hx-target="#suspend-response" hx-swap="innerHTML" hx-confirm="Are you sure you want to suspend this community? This action will hide it from all users and requires global admin intervention to undo.">
+              {% csrf_token %}
+              <div id="suspend-response">
+                <button type="submit" class="sc-btn sc-btn--outline" style="border-color: rgba(175,50,54,0.5); color: #ff6b6b;">
+                  <span class="material-symbols-outlined">block</span> Suspend Community
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
