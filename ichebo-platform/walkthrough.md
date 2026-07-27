@@ -35,3 +35,7 @@ Successfully restyled and expanded the Community Settings page (`/steward/settin
 - **Appearance Settings (`htmx_steward_settings_appearance`):** Replaced the placeholder with a functional form. Supports `multipart/form-data` uploads for Community Logos and saves a hex `community_theme` color.
 - **Access Rules (`htmx_steward_settings_access`):** Wired up the privacy toggles to save directly to the `Tenant.settings_data['privacy']` JSON field.
 - **Suspend Logic (`htmx_steward_settings_suspend`):** The Danger Zone button now uses `hx-confirm` for safety. On submission, it updates the `Tenant.status` to `suspended` and dynamically swaps the button with a persistent red warning block instructing the steward to contact global admins for reversal.
+
+### Bible App Fixes (Phase 3 Continuation)
+- **Mobile Navigation (`community_base.html`):** The navigation links in the mobile hamburger dropdown have been updated to match the global Sceptre Hub navigation perfectly, ensuring the "Sceptre Community" links are accessible on mobile devices.
+- **Gating Translations:** Cleaned up the `BibleTranslation` database records. Ensured that only the local `json_bibles` files are loaded and correctly set as `is_public=True`. This prevents copyrighted/missing translations (e.g. NIV, MSG) from incorrectly displaying on the public translation list.

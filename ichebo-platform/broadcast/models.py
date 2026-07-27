@@ -26,6 +26,7 @@ class ChannelConfig(SoftDeleteMixin, models.Model):
     # read time via media.models.VideoRecord(record), a typed wrapper
     # around Record, not a separate model with its own primary key.
     loop_default_video_id = models.UUIDField(null=True, blank=True)
+    loop_default_external_url = models.URLField(blank=True, null=True, help_text="Fallback to a YouTube or direct mp4 URL if no UUID is provided")
     # Ordered list of media-family Record UUIDs (strings)
     fallback_playlist = models.JSONField(default=list, blank=True)
     # Current index in fallback_playlist — advances on each resolution call

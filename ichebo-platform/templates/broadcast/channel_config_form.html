@@ -43,19 +43,68 @@
             <div>
                 <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
                                letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
-                    Loop Default Video ID (UUID)
+                    Loop Default Video
                 </label>
-                <input type="text" name="loop_default_video_id"
-                       value="{{ config.loop_default_video_id|default:'' }}"
-                       placeholder="Paste the UUID of a media Record"
+                
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; background: var(--card-1); padding: 16px; border-radius: 8px;">
+                    <div class="video-upload" id="video-upload-loop" data-suffix="-loop">
+                        <input type="hidden" name="loop_default_video_id" id="video-upload-id-loop" value="{{ config.loop_default_video_id|default:'' }}">
+                        
+                        <div id="video-upload-idle-loop" style="{% if config.loop_default_video_id %}display:none;{% endif %}">
+                            <label for="video-upload-file-loop"
+                                   style="display: flex; align-items: center; justify-content: center; gap: 8px;
+                                          height: 80px; border: 2px dashed var(--border); border-radius: 8px;
+                                          cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 600;
+                                          transition: border-color 0.15s, color 0.15s;">
+                                <span class="material-symbols-outlined">upload_file</span>
+                                <span>Upload a video file for Loop Default</span>
+                            </label>
+                            <input type="file" id="video-upload-file-loop" accept="video/mp4,video/webm,video/quicktime,video/ogg" style="display: none;">
+                        </div>
+
+                        <div id="video-upload-progress-loop" style="display:none;">
+                            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
+                                <span id="video-upload-status-loop" style="font-size:12px; font-weight:700; color:var(--text);">Uploading…</span>
+                                <span id="video-upload-pct-loop" style="font-size:11px; color:var(--muted);">0%</span>
+                            </div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar-fill" id="video-upload-bar-loop" style="width:0%;"></div>
+                            </div>
+                        </div>
+
+                        <div id="video-upload-done-loop" style="display:{% if config.loop_default_video_id %}flex{% else %}none{% endif %};
+                                    align-items:center; gap:10px; padding:10px 12px; background:var(--card-2); border-radius:8px;">
+                            <span class="material-symbols-outlined" style="color:var(--success);">check_circle</span>
+                            <span id="video-upload-filename-loop" style="font-size:12px; color:var(--text); flex:1;
+                                  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                {% if config.loop_default_video_id %}Video attached ({{ config.loop_default_video_id }}){% endif %}
+                            </span>
+                            <button type="button" id="video-upload-replace-loop"
+                                    style="background:none; border:none; color:var(--primary); font-size:12px;
+                                           font-weight:700; cursor:pointer;">
+                                Replace
+                            </button>
+                        </div>
+
+                        <div id="video-upload-error-loop" style="display:none; color:var(--error); font-size:12px; margin-top:6px;"></div>
+                    </div>
+                </div>
+
+                <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px;">
+                    OR FALLBACK TO EXTERNAL URL
+                </div>
+                <input type="text" name="loop_default_external_url"
+                       value="{{ config.loop_default_external_url|default:'' }}"
+                       placeholder="e.g. https://youtube.com/watch?v=... or direct .mp4"
                        style="display: block; width: 100%; height: 40px; padding: 0 12px;
                               background: var(--card-2); border: 1px solid var(--border);
                               border-radius: 8px; font-size: 13px; color: var(--text);
-                              outline: none; box-sizing: border-box; font-family: monospace;"
+                              outline: none; box-sizing: border-box;"
                        onfocus="this.style.borderColor='var(--primary)'"
                        onblur="this.style.borderColor='var(--border)'">
+                
                 <div style="font-size: 11px; color: var(--muted); margin-top: 5px;">
-                    Leave blank to disable loop default.
+                    Leave both blank to disable loop default.
                 </div>
             </div>
 
@@ -98,4 +147,15 @@
         </div>
     </form>
 </div>
+
+{% load static %}
+<script>
+    window.ICHEBO_MEDIA_ENGINE_URL = "{{ media_engine_public_url|default:'https://video.ichebo.org'|escapejs }}";
+</script>
+<script src="{% static 'js/media_video_upload.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    LearnVideoUpload.init('-loop');
+});
+</script>
 {% endblock %}

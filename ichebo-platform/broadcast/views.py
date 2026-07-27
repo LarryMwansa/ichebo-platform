@@ -124,6 +124,7 @@ def channel_config_edit(request, tenant_id):
 
     if request.method == 'POST':
         loop_default = request.POST.get('loop_default_video_id', '').strip()
+        loop_external = request.POST.get('loop_default_external_url', '').strip()
         fallback_raw = request.POST.get('fallback_playlist', '').strip()
 
         fallback_list = [
@@ -136,6 +137,7 @@ def channel_config_edit(request, tenant_id):
             errors.append('Loop default must be a valid UUID.')
 
         if not errors:
+            config.loop_default_external_url = loop_external
             config.fallback_playlist = fallback_list
             config.save()
             return redirect(f'/channel/?tenant_id={tenant_id}')
@@ -147,4 +149,5 @@ def channel_config_edit(request, tenant_id):
         'errors': errors,
         'active_app': 'channel',
         'ws_page_title': f'Fallback Config — {tenant.name}',
+        'media_engine_public_url': getattr(settings, 'MEDIA_ENGINE_PUBLIC_URL', 'https://video.ichebo.org'),
     })
