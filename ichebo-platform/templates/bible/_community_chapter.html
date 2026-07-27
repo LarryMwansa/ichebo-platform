@@ -1,0 +1,17 @@
+<!-- templates/bible/_community_chapter.html -->
+<div class="bible-chapter-body" style="font-family: 'Playfair Display', Georgia, serif; font-size: 20px; line-height: 1.8; color: rgba(255,255,255,0.92); max-width: 720px; margin: 0 auto;">
+  {% if verses %}
+    <div style="margin-bottom: 2rem;">
+      {% for verse in verses %}
+        <span class="verse-node" id="v-{{ verse.verse }}" style="position: relative; padding: 2px 0;">
+          <sup style="font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; color: var(--sc-primary); margin-right: 4px; user-select: none;">{{ verse.verse }}</sup>
+          <span>{{ verse.text }}</span>
+        </span>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="padding: 4rem 2rem; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; font-family: 'Inter', sans-serif;">
+      <div style="color: rgba(255,255,255,0.5); font-size: 15px;">Scripture text for this chapter is unavailable in the selected translation.</div>
+    </div>
+  {% endif %}
+</div>

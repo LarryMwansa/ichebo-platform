@@ -616,3 +616,88 @@ def htmx_search_sheet(request):
     Returns the scripture search bottom sheet.
     """
     return render(request, 'bible/partials/_search_sheet.html')
+
+
+# ── COMMUNITY BIBLE (bible.ichebo.org Standalone Surface) ───────────────────
+
+def community_bible_reader(request, book_code=DEFAULT_BOOK, chapter=DEFAULT_CHAPTER):
+    """
+    Main reader view for bible.ichebo.org.
+    Open access / standalone dark-mode scripture reader for community users.
+    """
+    if book_code == DEFAULT_BOOK and chapter == DEFAULT_CHAPTER and request.user.is_authenticated:
+        position = get_reading_position(request.user)
+        if position:
+            book_code, chapter = position
+
+    translation = get_user_translation(request.user)
+    books = list(get_all_books())
+    book = BibleBook.objects.filter(code=book_code).first()
+    
+    if not book:
+        book = books[0] if books else None
+        book_code = book.code if book else DEFAULT_BOOK
+
+    chapters = list(get_book_chapters(book_code)) if book else []
+    if chapter not in chapters and chapters:
+        chapter = chapters[0]
+
+    verses = get_chapter_verses(translation, book_code, chapter) if translation and book else []
+    translations = BibleTranslation.objects.filter(is_public=True)
+
+    if request.user.is_authenticated and book:
+        save_reading_position(request.user, book_code, chapter)
+
+    # Compute Next/Prev Navigation
+    prev_info = None
+    next_info = None
+
+    if book and chapters:
+        current_book_index = next((i for i, b in enumerate(books) if b.code == book.code), None)
+        
+        # Previous Chapter
+        if chapter > 1:
+            prev_info = {'book_code': book.code, 'chapter': chapter - 1, 'label': f"{book.name} {chapter - 1}"}
+        elif current_book_index is not None and current_book_index > 0:
+            prev_b = books[current_book_index - 1]
+            prev_b_chaps = list(get_book_chapters(prev_b.code))
+            if prev_b_chaps:
+                prev_info = {'book_code': prev_b.code, 'chapter': prev_b_chaps[-1], 'label': f"{prev_b.name} {prev_b_chaps[-1]}"}
+
+        # Next Chapter
+        if chapter < len(chapters):
+            next_info = {'book_code': book.code, 'chapter': chapter + 1, 'label': f"{book.name} {chapter + 1}"}
+        elif current_book_index is not None and current_book_index < len(books) - 1:
+            next_b = books[current_book_index + 1]
+            next_info = {'book_code': next_b.code, 'chapter': 1, 'label': f"{next_b.name} 1"}
+
+    context = {
+        'translation': translation,
+        'translations': translations,
+        'books': books,
+        'book': book,
+        'chapters': chapters,
+        'chapter': chapter,
+        'verses': verses,
+        'prev_info': prev_info,
+        'next_info': next_info,
+    }
+    return render(request, 'bible/community_reader.html', context)
+
+
+def htmx_community_chapter(request, book_code, chapter):
+    """
+    HTMX endpoint returning partial chapter verses for bible.ichebo.org.
+    """
+    translation = get_user_translation(request.user)
+    book = BibleBook.objects.filter(code=book_code).first()
+    verses = get_chapter_verses(translation, book_code, chapter) if translation and book else []
+    
+    context = {
+        'translation': translation,
+        'book': book,
+        'chapter': chapter,
+        'verses': verses,
+    }
+    return render(request, 'bible/_community_chapter.html', context)
+

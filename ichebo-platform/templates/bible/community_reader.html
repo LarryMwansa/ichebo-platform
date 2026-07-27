@@ -1,0 +1,165 @@
+<!-- templates/bible/community_reader.html -->
+{% extends "bible/community_base.html" %}
+{% block title %}{{ book.name }} {{ chapter }} ({{ translation.code }}){% endblock %}
+
+{% block content %}
+<div style="background: var(--sc-ink); color: #fff; min-height: calc(100vh - 56px); display: flex; flex-direction: column;">
+
+  <!-- Sticky Top Controls Bar -->
+  <div style="position: sticky; top: 56px; z-index: 90; background: rgba(14,14,14,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 12px 24px;">
+    <div style="max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+      
+      <!-- Book & Chapter Picker Trigger -->
+      <button type="button" id="openPickerBtn" 
+              style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 8px 16px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--sc-primary);">menu_book</span>
+        <span>{{ book.name }} {{ chapter }}</span>
+        <span class="material-symbols-outlined" style="font-size: 18px; color: rgba(255,255,255,0.5);">expand_more</span>
+      </button>
+
+      <!-- Translation & Font Controls -->
+      <div style="display: flex; align-items: center; gap: 16px;">
+        
+        <!-- Translation badge -->
+        <div style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); padding: 6px 12px; border-radius: 20px;">
+          {{ translation.code }}
+        </div>
+
+        <!-- Font Size Adjusters -->
+        <div style="display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.05); border-radius: 6px; padding: 2px;">
+          <button type="button" id="fontDecBtn" style="background: transparent; border: none; color: rgba(255,255,255,0.7); padding: 4px 8px; cursor: pointer; font-size: 12px; font-weight: 700;" title="Decrease font size">A-</button>
+          <div style="width: 1px; height: 12px; background: rgba(255,255,255,0.1);"></div>
+          <button type="button" id="fontIncBtn" style="background: transparent; border: none; color: rgba(255,255,255,0.7); padding: 4px 8px; cursor: pointer; font-size: 14px; font-weight: 700;" title="Increase font size">A+</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripture Content Body -->
+  <div style="flex: 1; padding: 40px 24px 60px;">
+    <div style="max-width: 760px; margin: 0 auto;">
+      
+      <!-- Book Header -->
+      <div style="text-align: center; margin-bottom: 40px;">
+        <div style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--sc-primary); margin-bottom: 8px;">
+          {{ book.testament|default:"Holy Bible" }}
+        </div>
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: #fff; margin: 0;">
+          {{ book.name }} {{ chapter }}
+        </h1>
+      </div>
+
+      <!-- Dynamic Verse Content (Swappable by HTMX if needed) -->
+      <div id="scripture-container">
+        {% include "bible/_community_chapter.html" %}
+      </div>
+
+      <!-- Bottom Paging Navigation -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 60px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); font-family: 'Inter', sans-serif;">
+        
+        {% if prev_info %}
+          <a href="{% url 'community_bible_reader' prev_info.book_code prev_info.chapter %}"
+             style="display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; font-weight: 600; padding: 10px 16px; background: rgba(255,255,255,0.04); border-radius: 8px; transition: background 0.2s;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+            <span>{{ prev_info.label }}</span>
+          </a>
+        {% else %}
+          <div></div>
+        {% endif %}
+
+        {% if next_info %}
+          <a href="{% url 'community_bible_reader' next_info.book_code next_info.chapter %}"
+             style="display: flex; align-items: center; gap: 8px; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; padding: 10px 18px; background: var(--sc-primary); border-radius: 8px; transition: background 0.2s;">
+            <span>{{ next_info.label }}</span>
+            <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+          </a>
+        {% else %}
+          <div></div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Book & Chapter Picker Modal Drawer -->
+<div id="pickerModal" hidden style="position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px;">
+  <div style="background: var(--sc-ink-2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; width: 100%; max-width: 640px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+    
+    <!-- Modal Header -->
+    <div style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between;">
+      <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #fff;">Select Book & Chapter</h3>
+      <button type="button" id="closePickerBtn" style="background: transparent; border: none; color: rgba(255,255,255,0.6); cursor: pointer; padding: 4px;">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Books List & Chapters Grid -->
+    <div style="flex: 1; overflow-y: auto; padding: 24px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
+        {% for b in books %}
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 14px; font-weight: 700; color: {% if b.code == book.code %}var(--sc-primary){% else %}#fff{% endif %}; margin-bottom: 8px;">
+              {{ b.name }}
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              {% for ch in b.chapters_list|default:"1" %}
+                <a href="{% url 'community_bible_reader' b.code ch %}" 
+                   style="font-size: 11px; font-weight: 600; color: {% if b.code == book.code and ch == chapter %}#fff{% else %}rgba(255,255,255,0.6){% endif %}; background: {% if b.code == book.code and ch == chapter %}var(--sc-primary){% else %}rgba(255,255,255,0.05){% endif %}; padding: 3px 6px; border-radius: 4px; text-decoration: none;">
+                  {{ ch }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  (function() {
+    var modal = document.getElementById('pickerModal');
+    var openBtn = document.getElementById('openPickerBtn');
+    var closeBtn = document.getElementById('closePickerBtn');
+    var fontIncBtn = document.getElementById('fontIncBtn');
+    var fontDecBtn = document.getElementById('fontDecBtn');
+
+    if (openBtn && modal) {
+      openBtn.addEventListener('click', function() { modal.hidden = false; });
+    }
+    if (closeBtn && modal) {
+      closeBtn.addEventListener('click', function() { modal.hidden = true; });
+    }
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) modal.hidden = true;
+      });
+    }
+
+    // Dynamic Font Resizer
+    var currentSize = 20;
+    fontIncBtn.addEventListener('click', function() {
+      if (currentSize < 32) {
+        currentSize += 2;
+        document.querySelectorAll('.bible-chapter-body').forEach(function(el) {
+          el.style.fontSize = currentSize + 'px';
+        });
+      }
+    });
+    fontDecBtn.addEventListener('click', function() {
+      if (currentSize > 14) {
+        currentSize -= 2;
+        document.querySelectorAll('.bible-chapter-body').forEach(function(el) {
+          el.style.fontSize = currentSize + 'px';
+        });
+      }
+    });
+  })();
+</script>
+{% endblock %}

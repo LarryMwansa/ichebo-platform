@@ -8,8 +8,10 @@ from accounts.urls import template_urlpatterns as accounts_template_urlpatterns
 from bible import views as bible_views
 
 urlpatterns = [
-    # Open landing — no auth required
-    path('', bible_views.landing, name='bible-landing'),
+    # Community Scripture Reader (Open access / Standalone)
+    path('', bible_views.community_bible_reader, name='home'),
+    path('read/<str:book_code>/<int:chapter>/', bible_views.community_bible_reader, name='community_bible_reader'),
+    path('htmx/chapter/<str:book_code>/<int:chapter>/', bible_views.htmx_community_chapter, name='htmx_community_chapter'),
 
     # Auth routes — available if the landing page links to login
     path('accounts/', include('django.contrib.auth.urls')),

@@ -1,0 +1,57 @@
+<!-- templates/bible/community_base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Holy Bible{% endblock %} — Ichebo</title>
+  <meta name="description" content="{% block meta_description %}Read and study Holy Scripture on Ichebo Community Bible.{% endblock %}">
+  {% load static %}
+  <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/workspace.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sceptre_v2.css' %}">
+  <script src="{% static 'js/htmx.min.js' %}" defer></script>
+</head>
+<body class="sceptre-shell">
+  
+  <!-- Top Navigation Header -->
+  <nav class="top-nav">
+    <div class="top-nav__brand">
+      <a href="{% url 'home' %}" style="display: flex; align-items: center; text-decoration: none;">
+        <img src="{% static 'images/sceptre.svg' %}" alt="Ichebo" class="top-nav__logo">
+      </a>
+      <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--sc-primary); background: rgba(175,50,54,0.15); padding: 2px 8px; border-radius: 4px; margin-left: 8px;">
+        Bible
+      </span>
+    </div>
+
+    <div class="top-nav__links">
+      <a href="https://sceptre.ichebo.org/" class="nav-link">Sceptre Hub</a>
+      <a href="{% url 'home' %}" class="nav-link nav-link--active">Scripture</a>
+      <a href="https://sceptre.ichebo.org/find-a-community/" class="nav-link">Find a Community</a>
+      <a href="https://sceptre.ichebo.org/learn/" class="nav-link">Learn</a>
+    </div>
+
+    <div class="top-nav__right">
+      {% if user.is_authenticated %}
+        <a href="https://sceptre.ichebo.org/profile/" class="avatar">
+          {{ user.get_full_name|default:user.username|slice:":1"|upper }}
+        </a>
+      {% else %}
+        <a href="{% url 'register_ui' %}" style="color: #fff; font-size: 13px; text-decoration: none; font-weight: 500;">Sign In</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <main class="sceptre-main">
+    {% block content %}{% endblock %}
+  </main>
+
+</body>
+</html>
