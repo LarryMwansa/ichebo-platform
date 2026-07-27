@@ -3,10 +3,10 @@
   {% if verses %}
     <div style="margin-bottom: 2rem;">
       {% for verse in verses %}
-        <span class="verse-node" id="v-{{ verse.verse }}" style="position: relative; padding: 2px 0;">
-          <sup style="font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; color: var(--sc-primary); margin-right: 4px; user-select: none;">{{ verse.verse }}</sup>
+        <div class="verse-node" id="v-{{ verse.verse }}" style="margin-bottom: 16px; position: relative; display: flex; align-items: baseline; gap: 10px;">
+          <span style="font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: var(--sc-primary); flex-shrink: 0; min-width: 24px; text-align: right; user-select: none; opacity: 0.85;">{{ verse.verse }}</span>
           <span>{{ verse.text }}</span>
-        </span>
+        </div>
       {% endfor %}
     </div>
   {% else %}
