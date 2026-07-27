@@ -19,14 +19,23 @@ def landing(request):
 
 def community_learn_catalog(request):
     """Open course catalog page for learn.ichebo.org in Sceptre dark mode styling."""
-    programmes = list(
-        Record.objects.filter(
-            record_family='learning',
-            record_type__in=['programme', 'induction', 'course'],
-            status='active',
-            deleted_at__isnull=True,
-        )
+    all_learning = Record.objects.filter(
+        record_family='learning',
+        record_type__in=['programme', 'induction', 'course'],
+        status='active',
+        deleted_at__isnull=True,
     )
+    
+    # Exclude courses that are already part of a programme or induction
+    child_course_ids = Relationship.objects.filter(
+        relationship_type='part_of',
+        to_record__record_type__in=['programme', 'induction']
+    ).values_list('from_record_id', flat=True)
+
+    programmes = list(all_learning.exclude(
+        record_type='course',
+        id__in=child_course_ids
+    ))
     # Sort by required level (Level 0 Induction first, then Level 1, 2, 3...)
     programmes.sort(key=lambda p: (p.permissions_data or {}).get('required_level', 1 if p.record_type != 'induction' else 0))
 
