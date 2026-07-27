@@ -28,7 +28,7 @@
     </h1>
 
     <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: rgba(255,255,255,0.75); line-height: 1.6; margin: 0 0 24px;">
-      {{ programme.summary|default:programme.description }}
+      {{ programme.summary|default:programme.notes }}
     </p>
 
     <!-- Enrolment Trigger Button -->
@@ -66,7 +66,7 @@
             </div>
             
             <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.5; margin: 0 0 16px;">
-              {{ m.summary|default:m.description }}
+              {{ m.summary|default:m.notes }}
             </p>
 
             <!-- Lessons List inside Module -->
