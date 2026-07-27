@@ -11,12 +11,16 @@ from learn import views as learn_views
 
 urlpatterns = [
     # Open landing & course catalog — no auth required
+    path('', learn_views.community_learn_catalog, name='home'),
     path('', learn_views.community_learn_catalog, name='learn-landing'),
     path('catalog/', learn_views.community_learn_catalog, name='community_learn_catalog'),
     path('my-learning/', learn_views.community_my_learning, name='community_my_learning'),
     path('programme/<uuid:programme_id>/', learn_views.community_programme_detail, name='community_programme_detail'),
     path('lesson/<uuid:lesson_id>/', learn_views.community_lesson_viewer, name='community_lesson_viewer'),
     path('enrol/<uuid:programme_id>/', learn_views.community_enrol, name='community_enrol'),
+
+    # Include learn.urls under 'learn' namespace for template compatibility
+    path('app/', include(('learn.urls', 'learn'))),
 
     # Auth routes — needed so login/register resolve under learn.ichebo.org
     path('accounts/', include('django.contrib.auth.urls')),
