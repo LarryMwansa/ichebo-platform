@@ -14,7 +14,7 @@ from .services import (
     get_book_chapters, get_chapter_note_verse_numbers,
     save_reading_position, get_reading_position,
 )
-from .models import BibleBook, BibleTranslation
+from .models import BibleBook, BibleTranslation, BibleVerse
 
 DEFAULT_BOOK = 'GEN'
 DEFAULT_CHAPTER = 1
