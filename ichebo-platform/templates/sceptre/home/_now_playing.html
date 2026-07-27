@@ -14,18 +14,55 @@
               allowfullscreen>
       </iframe>
     {% else %}
-      <video id="channel-video"
-             style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
-             controls
-             autoplay
-             muted
-             {% if now_playing.is_live %}playsinline{% endif %}>
-        {% if now_playing.is_live %}
-          <source src="{{ now_playing.hls_url }}" type="application/x-mpegURL">
-        {% else %}
-          <source src="{{ now_playing.video_url }}" type="video/mp4">
-        {% endif %}
-      </video>
+      {% if now_playing.is_live %}
+        <video id="channel-video"
+               style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
+               controls autoplay muted playsinline
+               data-src="{{ now_playing.hls_url }}">
+        </video>
+      {% else %}
+        <video id="channel-video"
+               style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
+               controls autoplay muted
+               data-src="{{ now_playing.video_url }}">
+        </video>
+      {% endif %}
+
+      <script>
+      (function() {
+          var video = document.getElementById('channel-video');
+          if (!video) return;
+          var src = video.getAttribute('data-src');
+          if (!src) return;
+
+          function attach() {
+              if (src.indexOf('.m3u8') !== -1 && window.Hls && window.Hls.isSupported()) {
+                  var hls = new window.Hls();
+                  hls.loadSource(src);
+                  hls.attachMedia(video);
+              } else {
+                  video.src = src;
+              }
+          }
+
+          if (src.indexOf('.m3u8') !== -1) {
+              if (window.Hls) {
+                  attach();
+              } else if (window.__hlsJsLoading) {
+                  window.__hlsJsLoading.then(attach);
+              } else {
+                  window.__hlsJsLoading = new Promise(function(resolve) {
+                      var script = document.createElement('script');
+                      script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js';
+                      script.onload = function() { resolve(); attach(); };
+                      document.head.appendChild(script);
+                  });
+              }
+          } else {
+              attach();
+          }
+      })();
+      </script>
   
       <div class="unmute-prompt" onclick="document.getElementById('channel-video').muted = false; this.style.display = 'none';">
         <svg viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
