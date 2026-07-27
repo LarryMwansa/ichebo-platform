@@ -40,8 +40,12 @@
                   var hls = new window.Hls();
                   hls.loadSource(src);
                   hls.attachMedia(video);
+                  hls.on(window.Hls.Events.MANIFEST_PARSED, function() {
+                      video.play().catch(function(e) { console.log('Autoplay blocked:', e); });
+                  });
               } else {
                   video.src = src;
+                  video.play().catch(function(e) { console.log('Autoplay blocked:', e); });
               }
           }
 
