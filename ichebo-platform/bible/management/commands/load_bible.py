@@ -72,20 +72,21 @@ class Command(BaseCommand):
         self.load_single_file(code, data_path, is_default=options['set_default'])
 
     def load_single_file(self, code, data_path, is_default=False):
-        self.stdout.write(f"Loading {code} from {data_path}…")
-
         with open(data_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
         meta = data.get('metadata', {})
+        code_str = (meta.get('shortname') or code).upper()[:10]
+        self.stdout.write(f"Loading {code_str} from {data_path}…")
+
         restrict = meta.get('restrict', 0)
         is_copyright_val = bool(meta.get('copyright', 0))
         is_public_val = (restrict == 0 and not is_copyright_val)
 
         translation, created = BibleTranslation.objects.update_or_create(
-            code=code,
+            code=code_str,
             defaults={
-                'name':                meta.get('name', code),
+                'name':                meta.get('name', code_str),
                 'language':            meta.get('lang_short', 'en'),
                 'language_full':       meta.get('lang') or 'English',
                 'year':                meta.get('year'),
