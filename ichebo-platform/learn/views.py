@@ -26,11 +26,12 @@ def community_learn_catalog(request):
     ).order_by('-created_at')
 
     enrolled_ids = set()
-    if request.user.is_authenticated:
+    user = getattr(request, 'user', None)
+    if user and getattr(user, 'is_authenticated', False):
         enrolled_ids = set(
             Activity.objects.filter(
                 activity_type='programme',
-                assigned_to=request.user,
+                assigned_to=user,
                 status__in=['pending', 'in_progress', 'completed']
             ).values_list('metadata__programme_record_id', flat=True)
         )
@@ -99,10 +100,11 @@ def community_programme_detail(request, programme_id):
         modules.append(mod)
 
     is_enrolled = False
-    if request.user.is_authenticated:
+    user = getattr(request, 'user', None)
+    if user and getattr(user, 'is_authenticated', False):
         is_enrolled = Activity.objects.filter(
             activity_type='programme',
-            assigned_to=request.user,
+            assigned_to=user,
             metadata__programme_record_id=str(programme_id)
         ).exists()
 
