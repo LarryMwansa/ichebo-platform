@@ -152,7 +152,7 @@
 <script>
     window.ICHEBO_MEDIA_ENGINE_URL = "{{ media_engine_public_url|default:'https://video.ichebo.org'|escapejs }}";
 </script>
-<script src="{% static 'js/media_video_upload.js' %}"></script>
+<script src="{% static 'js/media_video_upload.js' %}?v=2"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     LearnVideoUpload.init('-loop');
