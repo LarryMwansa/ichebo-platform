@@ -56,7 +56,32 @@ def resolve_now_playing(tenant):
     if config and config.loop_default_video_id:
         return _build_vod_response(str(config.loop_default_video_id), source='loop')
 
+    if config and config.loop_default_external_url:
+        return _build_external_response(config.loop_default_external_url, source='loop')
+
     return _offline_response()
+
+import re
+
+def _build_external_response(url, source='loop'):
+    is_youtube = False
+    embed_url = url
+    
+    yt_match = re.search(r'(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]+)', url)
+    if yt_match:
+        is_youtube = True
+        video_id = yt_match.group(1)
+        # Using mute=1 because most browsers block autoplay unmuted
+        embed_url = f"https://www.youtube.com/embed/{video_id}?autoplay=1&mute=1&loop=1&playlist={video_id}"
+        
+    return {
+        'content_type': 'vod',
+        'source': source,
+        'title': 'Loop Default',
+        'is_live': False,
+        'video_url': embed_url,
+        'is_youtube': is_youtube,
+    }
 
 
 def _build_slot_response(slot):
