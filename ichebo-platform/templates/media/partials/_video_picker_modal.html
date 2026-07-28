@@ -92,6 +92,11 @@ Requires context:
         
         // Close modal
         openPicker.style.display = 'none';
+
+        // Dispatch custom event so listeners can do custom behavior
+        window.dispatchEvent(new CustomEvent('videoSelected', {
+            detail: { pickerId: pickerId, recordId: recordId, videoUrl: videoUrl, title: title }
+        }));
     };
     
     // Also hook the upload completion to automatically select it

@@ -104,11 +104,20 @@
 
             {# Fallback playlist — one UUID per line #}
             <div>
-                <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
-                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
-                    Fallback Playlist (one media Record UUID per line)
-                </label>
-                <textarea name="fallback_playlist" rows="8"
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 6px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                                   letter-spacing: 0.07em; color: var(--muted);">
+                        Fallback Playlist (one media Record UUID per line)
+                    </label>
+                    <button type="button" onclick="document.getElementById('video-picker-overlay-playlist').style.display='flex'"
+                            style="display: flex; align-items: center; gap: 4px; padding: 4px 8px;
+                                   background: var(--card-2); border: 1px solid var(--border); border-radius: 6px;
+                                   color: var(--primary); font-size: 11px; font-weight: 600; cursor: pointer;">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">add_circle</span>
+                        Add from Library
+                    </button>
+                </div>
+                <textarea name="fallback_playlist" id="fallback-playlist-textarea" rows="8"
                           placeholder="Paste one UUID per line — videos play in order, then restart"
                           style="display: block; width: 100%; padding: 10px 12px;
                                  background: var(--card-2); border: 1px solid var(--border);
@@ -143,15 +152,37 @@
 </div>
 
 {% include "media/partials/_video_picker_modal.html" with picker_id="loop" tenant_id=tenant.id %}
+{% include "media/partials/_video_picker_modal.html" with picker_id="playlist" tenant_id=tenant.id %}
 
 {% load static %}
 <script>
     window.ICHEBO_MEDIA_ENGINE_URL = "{{ media_engine_public_url|default:'https://video.ichebo.org'|escapejs }}";
-</script>
+
+    // Handle custom videoSelected events from the picker
+    window.addEventListener('videoSelected', function(e) {
+        if (e.detail.pickerId === 'playlist') {
+            const textarea = document.getElementById('fallback-playlist-textarea');
+            if (textarea) {
+                // Append the UUID
+                const val = textarea.value.trim();
+                if (val) {
+                    textarea.value = val + '\n' + e.detail.recordId;
+                } else {
+                    textarea.value = e.detail.recordId;
+                }
+                
+                // Show a brief toast confirmation
+                if (window.IcheboVideoUpload && window.IcheboVideoUpload._showToast) {
+                    window.IcheboVideoUpload._showToast('Added ' + e.detail.title + ' to playlist', 'success');
+                }
+            }
+        }
+    });
 
 // Also listen for HTMX load in case the form is injected dynamically later
 document.body.addEventListener('htmx:load', function() {
     LearnVideoUpload.init('-loop');
+    LearnVideoUpload.init('-playlist');
 });
 </script>
 {% endblock %}

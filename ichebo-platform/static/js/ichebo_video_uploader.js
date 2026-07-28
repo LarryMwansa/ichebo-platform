@@ -56,7 +56,21 @@ const IcheboVideoUpload = {
         return match ? match[1] : '';
     },
 
+    _showToast(msg, level='error') {
+        const container = document.getElementById('ws-toast-container');
+        if (!container) return alert(msg);
+        const el = document.createElement('div');
+        const colors = { success: 'var(--success)', error: 'var(--error)', warning: '#f59e0b', info: 'var(--primary)' };
+        const icons = { success: 'check_circle', error: 'error', warning: 'warning', info: 'info' };
+        el.className = `ws-toast ws-toast--${level}`;
+        el.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;min-width:280px;max-width:400px;background:var(--card);border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.15);font-size:13px;color:var(--text);pointer-events:all;animation:ws-toast-in 0.2s ease;';
+        el.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;color:${colors[level]||colors.success}">${icons[level]||'check_circle'}</span><span style="flex:1;line-height:1.4">${msg}</span><button type="button" onclick="this.closest('.ws-toast').remove()" style="background:none;border:none;cursor:pointer;padding:2px;color:var(--muted);display:flex;align-items:center;"><span class="material-symbols-outlined" style="font-size:16px">close</span></button>`;
+        container.appendChild(el);
+        setTimeout(() => { if(document.body.contains(el)) el.remove(); }, 6000);
+    },
+
     _showError(sfx, msg) {
+        this._showToast(msg, 'error');
         const el = document.getElementById('video-upload-error' + sfx);
         if (el) { el.textContent = msg; el.style.display = 'block'; }
         document.getElementById('video-upload-progress' + sfx).style.display = 'none';

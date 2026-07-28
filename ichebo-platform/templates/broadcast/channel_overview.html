@@ -47,14 +47,16 @@
                         Fallback Config
                     </a>
                 {% elif view_mode == 'library' %}
-                    <div class="ws-label-tag" style="margin-bottom: 4px;">Actions</div>
-                    <button type="button" onclick="document.getElementById('video-upload-modal-library').style.display='flex'"
-                       style="display: flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 16px; width: 100%;
-                              background: var(--primary); color: #fff; border: none; border-radius: 8px; cursor: pointer;
-                              font-size: 13px; font-weight: 600; text-decoration: none;">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">upload</span>
-                        Upload Video
-                    </button>
+                    <div style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
+                                      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 12px;">
+                            Upload New Video
+                        </div>
+                        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+                            {% csrf_token %}
+                            {% include "media/partials/_universal_upload_modal.html" with mount_suffix="-library-direct" %}
+                        </div>
+                    </div>
                 {% endif %}
             {% else %}
                 <div style="font-size: 12px; color: var(--muted); text-align: center; padding: 20px 0;">
@@ -157,23 +159,7 @@
                 </div>
             {% endif %}
 
-            <!-- Upload Modal (hidden by default) -->
-            <div id="video-upload-modal-library" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-                {% csrf_token %}
-                <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; width: 90%; max-width: 500px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden;">
-                    
-                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--card);">
-                        <h2 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text);">Upload Video</h2>
-                        <button type="button" onclick="document.getElementById('video-upload-modal-library').style.display='none'" style="background: none; border: none; color: var(--muted); cursor: pointer; padding: 4px;">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-
-                    <div style="padding: 20px;">
-                        {% include "media/partials/_universal_upload_modal.html" with mount_suffix="-library-direct" %}
-                    </div>
-                </div>
-            </div>
+            {# The upload modal has been replaced by the direct upload widget in the options bar #}
 
             {% load static %}
             <script>
