@@ -114,11 +114,18 @@ def _build_live_response(broadcast):
 
 
 def _build_vod_response(video_id, source):
+    from records.models import Record
+    try:
+        record = Record.objects.get(id=video_id)
+        video_url = record.custom_fields.get('video_url', '')
+    except Record.DoesNotExist:
+        video_url = ''
+
     return {
         'content_type': 'vod',
         'source': source,
-        'title': None,
-        'video_url': '',  # resolved by the client from _video_id
+        'title': record.title if 'record' in locals() else None,
+        'video_url': video_url,
         'hls_url': None,
         'is_live': False,
         'thumbnail_url': None,
