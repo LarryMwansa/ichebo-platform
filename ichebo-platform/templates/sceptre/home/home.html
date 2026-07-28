@@ -25,6 +25,7 @@
         <div id="channel-area"
              hx-get="{% url 'now_playing_partial' %}"
              hx-trigger="load, every 60s"
+             hx-include="[name='current_playing_signature']"
              hx-swap="innerHTML">
           {% include "sceptre/home/_now_playing.html" with now_playing=None tenant_id=tenant_id %}
         </div>

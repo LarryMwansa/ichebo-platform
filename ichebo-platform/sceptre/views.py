@@ -96,9 +96,24 @@ def now_playing_partial(request):
     directly — no HTTP round-trip to this server's own API.
     """
     from broadcast.services import resolve_now_playing
+    from django.http import HttpResponse
 
     tenant = _get_tenant_for_user(request.user)
     now_playing = resolve_now_playing(tenant) if tenant else None
+
+    if now_playing and now_playing.get('content_type') != 'offline':
+        vid_url = now_playing.get('video_url') or now_playing.get('hls_url') or ''
+        title = now_playing.get('title') or ''
+        new_sig = f"{now_playing.get('source')}-{vid_url}-{title}"
+    else:
+        new_sig = "offline"
+
+    current_sig = request.GET.get('current_playing_signature')
+    
+    # If the exact same content is already playing, return 204 No Content.
+    # HTMX will completely ignore a 204 response and leave the DOM (and video player) untouched.
+    if current_sig == new_sig:
+        return HttpResponse(status=204)
 
     return render(request, 'sceptre/home/_now_playing.html', {
         'now_playing': now_playing,

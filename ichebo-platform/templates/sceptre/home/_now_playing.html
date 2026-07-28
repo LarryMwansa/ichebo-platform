@@ -99,6 +99,8 @@
     {% endif %}
   </div>
 
+  <input type="hidden" name="current_playing_signature" value="{{ now_playing.source }}-{{ now_playing.video_url|default:now_playing.hls_url }}-{{ now_playing.title }}">
+
 {% else %}
 
   <div class="channel-hero">
@@ -119,5 +121,7 @@
     <span class="vod-badge" style="background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.25);">OFFLINE</span>
     <span class="now-playing-strip__title" style="color: rgba(255,255,255,0.25);">No content scheduled right now</span>
   </div>
+
+  <input type="hidden" name="current_playing_signature" value="offline">
 
 {% endif %}
