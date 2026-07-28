@@ -159,6 +159,7 @@
 
             <!-- Upload Modal (hidden by default) -->
             <div id="video-upload-modal-library" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                {% csrf_token %}
                 <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; width: 90%; max-width: 500px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden;">
                     
                     <div style="padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--card);">

@@ -100,7 +100,10 @@ const IcheboVideoUpload = {
                 credentials: 'same-origin',
                 body: JSON.stringify(reqBody),
             });
-            if (!initResp.ok) throw new Error((await initResp.json()).error || 'Upload init failed');
+            if (!initResp.ok) {
+                const errData = await initResp.json();
+                throw new Error(errData.error || errData.detail || 'Upload init failed');
+            }
             const init = await initResp.json();
 
             // 2. Chunk PUTs — straight to the Go engine, not through Django
@@ -137,7 +140,10 @@ const IcheboVideoUpload = {
                     quality_profiles: [], // empty = engine's own DefaultProfiles
                 }),
             });
-            if (!completeResp.ok) throw new Error((await completeResp.json()).error || 'Upload finalize failed');
+            if (!completeResp.ok) {
+                const completeErr = await completeResp.json();
+                throw new Error(completeErr.error || completeErr.detail || 'Upload finalize failed');
+            }
 
             // 4. Poll the media Record until transcoding finishes.
             await this._pollUntilComplete(sfx, init.record_id, file.name);
