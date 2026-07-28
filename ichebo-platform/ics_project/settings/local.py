@@ -13,3 +13,23 @@ DATABASES = {
 
 # Disable some checks for development
 ALLOWED_HOSTS = ['*']
+
+import logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': '/home/mantis/projects/ichebo-platform/ichebo-platform/django_500.log',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
