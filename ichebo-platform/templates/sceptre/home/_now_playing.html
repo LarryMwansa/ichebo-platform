@@ -27,7 +27,8 @@
         {% else %}
           <video id="channel-video-{{ safe_id }}"
                  style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
-                 controls autoplay muted
+                 controls autoplay muted playsinline
+                 {% if now_playing.source == 'loop' %}loop{% endif %}
                  data-src="{{ now_playing.video_url }}">
           </video>
         {% endif %}
@@ -36,6 +37,18 @@
         (function() {
             var video = document.getElementById('channel-video-{{ safe_id }}');
             if (!video) return;
+            
+            video.addEventListener('ended', function() {
+                {% if now_playing.source == 'loop' %}
+                    video.currentTime = 0;
+                    video.play().catch(function(e){});
+                {% else %}
+                    if (typeof htmx !== 'undefined') {
+                        htmx.trigger('#channel-area', 'load');
+                    }
+                {% endif %}
+            });
+
             if (video.dataset.hlsAttached === 'true') return;
             video.dataset.hlsAttached = 'true';
 

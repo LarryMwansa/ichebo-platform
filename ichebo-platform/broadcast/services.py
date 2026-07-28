@@ -46,11 +46,11 @@ def resolve_now_playing(tenant):
     config = ChannelConfig.objects.filter(tenant=tenant).first()
 
     if config and config.fallback_playlist:
-        pos = config.fallback_position % len(config.fallback_playlist)
+        # Architecturally sound fallback rotation: 
+        # Deterministic based on the current hour so all concurrent viewers see the same fallback,
+        # and we do not mutate database state on a GET polling request.
+        pos = (now.hour) % len(config.fallback_playlist)
         video_id = config.fallback_playlist[pos]
-        ChannelConfig.objects.filter(pk=config.pk).update(
-            fallback_position=config.fallback_position + 1
-        )
         return _build_vod_response(video_id, source='fallback')
 
     if config and config.loop_default_video_id:
