@@ -70,11 +70,11 @@ per-inclusion.
 <script>
     window.ICHEBO_MEDIA_ENGINE_URL = "{{ media_engine_public_url|default:'https://video.ichebo.org'|escapejs }}";
 </script>
-<script src="{% static 'js/learn_video_upload.js' %}"></script>
+<script src="{% static 'js/ichebo_video_uploader.js' %}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.video-upload').forEach(function(el) {
-        LearnVideoUpload.init(el.dataset.suffix);
+        IcheboVideoUpload.init(el.dataset.suffix);
     });
 });
 </script>

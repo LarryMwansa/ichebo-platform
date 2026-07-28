@@ -10,7 +10,7 @@
  * render this widget — see _video_upload.html's mount_suffix comment),
  * keyed by suffix the same way EditorialUI is.
  */
-const LearnVideoUpload = {
+const IcheboVideoUpload = {
     CHUNK_POLL_INTERVAL_MS: 2000,
     _instances: {},
 
@@ -82,16 +82,23 @@ const LearnVideoUpload = {
         try {
             // 1. Init — Django creates the media Record and forwards to the engine.
             const titleInput = document.querySelector('input[name="title"]');
+            const tenantInput = document.querySelector('input[name="tenant_id"]') || document.querySelector('select[name="tenant_id"]');
+            
+            const reqBody = {
+                title: (titleInput && titleInput.value.trim()) || file.name,
+                filename: file.name,
+                file_size_bytes: file.size,
+                content_type: file.type || 'video/mp4',
+            };
+            if (tenantInput && tenantInput.value) {
+                reqBody.tenant_id = tenantInput.value;
+            }
+
             const initResp = await fetch('/api/media/upload/init/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRFToken': this._csrfToken() },
                 credentials: 'same-origin',
-                body: JSON.stringify({
-                    title: (titleInput && titleInput.value.trim()) || file.name,
-                    filename: file.name,
-                    file_size_bytes: file.size,
-                    content_type: file.type || 'video/mp4',
-                }),
+                body: JSON.stringify(reqBody),
             });
             if (!initResp.ok) throw new Error((await initResp.json()).error || 'Upload init failed');
             const init = await initResp.json();

@@ -7,4 +7,5 @@ urlpatterns = [
     path('slots/add/', views.channel_slot_add, name='channel_slot_add'),
     path('slots/<uuid:slot_id>/delete/', views.channel_slot_delete, name='channel_slot_delete'),
     path('config/<uuid:tenant_id>/', views.channel_config_edit, name='channel_config_edit'),
+    path('media/<uuid:record_id>/delete/', views.channel_media_delete, name='channel_media_delete'),
 ]

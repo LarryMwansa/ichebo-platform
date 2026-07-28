@@ -25,27 +25,38 @@ def channel_overview(request):
     _require_architect(request)
 
     tenant_id = request.GET.get('tenant_id')
+    view_mode = request.GET.get('view', 'scheduler')
     tenants = Tenant.objects.filter(deleted_at__isnull=True).order_by('name')
     selected_tenant = None
     slots = []
     config = None
+    videos = []
 
     if tenant_id:
         selected_tenant = get_object_or_404(Tenant, id=tenant_id, deleted_at__isnull=True)
-        slots = ChannelSlot.objects.filter(
-            tenant=selected_tenant,
-            deleted_at__isnull=True,
-        ).order_by('scheduled_start')
-        config = ChannelConfig.objects.filter(tenant=selected_tenant).first()
+        
+        if view_mode == 'library':
+            from records.models import Record
+            from media.models import VideoRecord
+            qs = Record.objects.filter(record_family='media', tenant=selected_tenant).order_by('-created_at')
+            videos = [VideoRecord(r) for r in qs[:100]]
+        else:
+            slots = ChannelSlot.objects.filter(
+                tenant=selected_tenant,
+                deleted_at__isnull=True,
+            ).order_by('scheduled_start')
+            config = ChannelConfig.objects.filter(tenant=selected_tenant).first()
 
     return render(request, 'broadcast/channel_overview.html', {
         'tenants': tenants,
         'selected_tenant': selected_tenant,
+        'view_mode': view_mode,
         'slots': slots,
         'config': config,
+        'videos': videos,
         'now': timezone.now(),
         'active_app': 'channel',
-        'ws_page_title': 'Channel Scheduler',
+        'ws_page_title': 'Channel & Media',
     })
 
 
@@ -156,3 +167,21 @@ def channel_config_edit(request, tenant_id):
         'ws_page_title': f'Fallback Config — {tenant.name}',
         'media_engine_public_url': getattr(settings, 'MEDIA_ENGINE_PUBLIC_URL', 'https://video.ichebo.org'),
     })
+
+
+@login_required
+def channel_media_delete(request, record_id):
+    _require_architect(request)
+    if request.method == 'POST':
+        from records.models import Record
+        tenant_id = request.POST.get('tenant_id', '')
+        record = get_object_or_404(Record, id=record_id, record_family='media', deleted_at__isnull=True)
+        # Note: True hard delete vs soft delete. Records supports soft delete.
+        record.soft_delete()
+        
+        # We redirect back to the library view
+        url = '/channel/?view=library'
+        if tenant_id:
+            url += f'&tenant_id={tenant_id}'
+        return redirect(url)
+    return HttpResponseForbidden()
