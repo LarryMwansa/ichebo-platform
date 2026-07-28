@@ -36,6 +36,9 @@
         (function() {
             var video = document.getElementById('channel-video-{{ safe_id }}');
             if (!video) return;
+            if (video.dataset.hlsAttached === 'true') return;
+            video.dataset.hlsAttached = 'true';
+
             var src = video.getAttribute('data-src');
             if (!src) return;
 
