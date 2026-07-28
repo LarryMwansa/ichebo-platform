@@ -57,6 +57,7 @@ def channel_overview(request):
         'now': timezone.now(),
         'active_app': 'channel',
         'ws_page_title': 'Channel & Media',
+        'media_engine_public_url': getattr(settings, 'MEDIA_ENGINE_PUBLIC_URL', 'https://video.ichebo.org'),
     })
 
 
