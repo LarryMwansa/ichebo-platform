@@ -4,6 +4,8 @@ from . import views
 urlpatterns = [
     path('upload/init/', views.UploadInitView.as_view(), name='media-upload-init'),
     path('upload/complete/', views.UploadCompleteView.as_view(), name='media-upload-complete'),
+    path('upload-token/', views.UploadPortalTokenView.as_view(), name='media-upload-token'),
+    path('upload-complete-webhook/', views.UploadCompleteWebhookView.as_view(), name='media-upload-complete-webhook'),
     path('videos/', views.VideoListView.as_view(), name='media-video-list'),
     path('videos/<uuid:record_id>/', views.VideoDetailView.as_view(), name='media-video-detail'),
     path('videos/<uuid:record_id>/chapters/', views.ChapterMarkersView.as_view(), name='media-chapter-markers'),

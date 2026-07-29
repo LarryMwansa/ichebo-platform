@@ -1,3 +1,6 @@
+import hashlib
+import hmac
+import time
 import uuid
 from django.conf import settings
 from django.utils import timezone
@@ -11,6 +14,48 @@ from records.models import Record
 from .engine_client import post_with_retry
 from .models import TranscodeJob, VideoRecord
 from .serializers import VideoRecordSerializer
+
+# ---------------------------------------------------------------------------
+# Upload-token helpers
+# ---------------------------------------------------------------------------
+# Tokens are HMAC-SHA256 signed strings with the format:
+#   <tenant_id>:<user_id>:<expires_unix>:<hmac_hex>
+# This gives us:
+#   - Authenticity (only Django's MEDIA_ENGINE_API_KEY can produce a valid token)
+#   - Expiry        (Go engine checks expires_unix before accepting)
+#   - Tenant scope  (video is automatically associated with the right tenant)
+# No database row needed — pure stateless verification on both ends.
+
+_TOKEN_TTL_SECONDS = 600  # 10 minutes
+
+
+def _make_upload_token(tenant_id: str, user_id: str) -> str:
+    """Return a signed upload token valid for _TOKEN_TTL_SECONDS."""
+    api_key = getattr(settings, 'MEDIA_ENGINE_API_KEY', '')
+    expires = int(time.time()) + _TOKEN_TTL_SECONDS
+    payload = f"{tenant_id}:{user_id}:{expires}"
+    sig = hmac.new(api_key.encode(), payload.encode(), hashlib.sha256).hexdigest()
+    return f"{payload}:{sig}"
+
+
+def _verify_upload_token(token: str) -> dict | None:
+    """
+    Verify a token previously issued by _make_upload_token.
+    Returns {'tenant_id': str, 'user_id': str} on success, None on failure.
+    """
+    api_key = getattr(settings, 'MEDIA_ENGINE_API_KEY', '')
+    try:
+        tenant_id, user_id, expires_str, sig = token.split(':', 3)
+    except ValueError:
+        return None
+    expires = int(expires_str)
+    if int(time.time()) > expires:
+        return None  # expired
+    expected_payload = f"{tenant_id}:{user_id}:{expires_str}"
+    expected_sig = hmac.new(api_key.encode(), expected_payload.encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(sig, expected_sig):
+        return None  # tampered
+    return {'tenant_id': tenant_id, 'user_id': user_id}
 
 
 class UploadInitView(APIView):
@@ -327,3 +372,126 @@ class ChapterMarkersView(APIView):
         record.save(update_fields=['custom_fields'])
 
         return Response({'chapter_markers': clean})
+
+
+class UploadPortalTokenView(APIView):
+    """GET /api/media/upload-token/?tenant_id=<uuid>
+
+    Issues a short-lived (10 min) HMAC-signed token that the Go engine's
+    upload page validates before accepting a file. This means the user never
+    needs to authenticate directly with the Go engine — they authenticate
+    here in the Django session, get a token, and open the upload portal URL
+    in a new tab. The token encodes tenant_id and user_id so the completed
+    upload can be attributed correctly when the webhook fires.
+
+    Authentication: SessionAuthentication (browser) or TokenAuthentication (app).
+    """
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        tenant_id = request.query_params.get('tenant_id', '')
+        if not tenant_id:
+            return Response({'error': 'tenant_id is required'}, status=400)
+
+        token = _make_upload_token(str(tenant_id), str(request.user.id))
+        engine_public_url = getattr(settings, 'MEDIA_ENGINE_PUBLIC_URL', 'https://video.ichebo.org')
+
+        upload_url = (
+            f"{engine_public_url}/upload"
+            f"?token={token}"
+            f"&tenant_id={tenant_id}"
+            f"&callback={request.build_absolute_uri('/api/media/upload-complete-webhook/')}"
+        )
+
+        return Response({
+            'upload_url': upload_url,
+            'expires_in_seconds': _TOKEN_TTL_SECONDS,
+        })
+
+
+class UploadCompleteWebhookView(APIView):
+    """POST /api/media/upload-complete-webhook/
+
+    Called by the Go engine's upload page after upload + transcode completes.
+    Payload:
+        {
+          "token":            "<upload token issued by UploadPortalTokenView>",
+          "title":            "My Video.mp4",
+          "tenant_id":        "<uuid>",
+          "video_url":        "https://cdn.ichebo.org/videos/<id>/index.m3u8",
+          "thumbnail_url":    "https://...",
+          "duration_seconds": 342,
+          "file_size_bytes":  104857600,
+          "record_type":      "teaching_video"   # optional, default broadcast_video
+        }
+
+    Security: Bearer token (shared MEDIA_ENGINE_API_KEY) + HMAC token validation.
+    No Django session required — called server-to-server from the Go engine.
+    """
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        # 1. Verify shared API key (same mechanism as TranscodeCompleteWebhookView).
+        api_key = getattr(settings, 'MEDIA_ENGINE_API_KEY', '')
+        auth = request.headers.get('Authorization', '')
+        if auth != f'Bearer {api_key}':
+            return Response({'error': 'Unauthorized'}, status=401)
+
+        # 2. Verify the upload token is still valid and extract claims.
+        token = request.data.get('token', '')
+        claims = _verify_upload_token(token)
+        if claims is None:
+            return Response({'error': 'Invalid or expired upload token'}, status=400)
+
+        tenant_id = request.data.get('tenant_id') or claims['tenant_id']
+        title = request.data.get('title', 'Untitled Video').strip() or 'Untitled Video'
+        video_url = request.data.get('video_url', '')
+        thumbnail_url = request.data.get('thumbnail_url', '')
+        duration_seconds = request.data.get('duration_seconds', 0)
+        file_size_bytes = request.data.get('file_size_bytes', 0)
+        record_type = request.data.get('record_type', 'broadcast_video')
+        job_id = request.data.get('job_id', '')
+
+        # 3. Create the media Record (it does not exist yet — unlike the old
+        #    chunked-upload flow, creation happens here on completion, not on init).
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        try:
+            user = User.objects.get(id=claims['user_id'])
+        except User.DoesNotExist:
+            user = None
+
+        record = Record.objects.create(
+            id=uuid.uuid4(),
+            tenant_id=tenant_id if tenant_id else None,
+            created_by=user,
+            record_class='organizational',
+            record_family='media',
+            record_type=record_type,
+            title=title,
+            status='active',
+            custom_fields={
+                'transcoding_status': 'complete',
+                'video_url': video_url,
+                'thumbnail_url': thumbnail_url,
+                'duration_seconds': duration_seconds,
+                'file_size_bytes': file_size_bytes,
+            },
+        )
+
+        # 4. Create TranscodeJob record for audit trail (if job_id provided).
+        if job_id:
+            TranscodeJob.objects.create(
+                record=record,
+                job_id=job_id,
+                status='complete',
+                progress_pct=100,
+                completed_at=timezone.now(),
+            )
+
+        return Response({
+            'record_id': str(record.id),
+            'status': 'created',
+        }, status=201)

@@ -49,15 +49,30 @@
                 {% elif view_mode == 'library' %}
                     <div style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
                         <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
-                                      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 12px;">
-                            Upload New Video
+                                      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 10px;">
+                            Upload Video
                         </div>
-                        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
-                            {% csrf_token %}
-                            {% include "media/partials/_universal_upload_modal.html" with mount_suffix="-library-direct" %}
+                        <button id="open-upload-portal-btn" type="button"
+                                onclick="openUploadPortal('{{ selected_tenant.id }}')"
+                                style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px;
+                                       background: var(--primary); border: none; border-radius: 8px;
+                                       color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+                            Open Upload Portal
+                        </button>
+                        <div style="font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.5;">
+                            Opens <strong>video.ichebo.org</strong> in a new tab. Your video will appear here automatically once transcoding completes.
                         </div>
+                        <button type="button" onclick="location.reload()"
+                                style="display: flex; align-items: center; gap: 6px; margin-top: 12px; padding: 8px 12px;
+                                       background: var(--card-2); border: 1px solid var(--border); border-radius: 7px;
+                                       color: var(--muted); font-size: 12px; cursor: pointer; width: 100%;">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">refresh</span>
+                            Refresh Library
+                        </button>
                     </div>
                 {% endif %}
+
             {% else %}
                 <div style="font-size: 12px; color: var(--muted); text-align: center; padding: 20px 0;">
                     Select a community to see options.
@@ -164,26 +179,42 @@
             {% load static %}
             <script>
                 window.ICHEBO_MEDIA_ENGINE_URL = "{{ media_engine_public_url|default:'https://video.ichebo.org'|escapejs }}";
-            </script>
-            <script src="{% static 'js/ichebo_video_uploader.js' %}"></script>
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                IcheboVideoUpload.init('-library-direct');
-                
-                // Watch for completion to auto-refresh the page
-                const doneDiv = document.getElementById('video-upload-done-library-direct');
-                if (doneDiv) {
-                    const observer = new MutationObserver(function(mutations) {
-                        mutations.forEach(function(mutation) {
-                            if (mutation.attributeName === 'style' && doneDiv.style.display === 'flex') {
-                                // Reload page to show new video
-                                window.location.reload();
-                            }
+
+                /**
+                 * openUploadPortal — fetches a short-lived signed token from Django,
+                 * then opens video.ichebo.org/upload in a new tab with that token.
+                 * No CORS issues: the browser is now on video.ichebo.org the whole time.
+                 */
+                async function openUploadPortal(tenantId) {
+                    const btn = document.getElementById('open-upload-portal-btn');
+                    if (btn) { btn.disabled = true; btn.textContent = 'Opening...'; }
+
+                    try {
+                        const resp = await fetch('/api/media/upload-token/?tenant_id=' + encodeURIComponent(tenantId), {
+                            credentials: 'same-origin'
                         });
-                    });
-                    observer.observe(doneDiv, { attributes: true });
+                        if (!resp.ok) throw new Error('Token request failed: ' + resp.status);
+                        const data = await resp.json();
+                        window.open(data.upload_url, '_blank', 'noopener');
+                    } catch(e) {
+                        // Show toast if the apostolic shell toast system is available
+                        const container = document.getElementById('ws-toast-container');
+                        if (container) {
+                            const el = document.createElement('div');
+                            el.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;min-width:280px;background:var(--card);border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,.15);font-size:13px;color:var(--text);';
+                            el.innerHTML = '<span class="material-symbols-outlined" style="color:var(--error);font-size:18px">error</span><span>' + e.message + '</span>';
+                            container.appendChild(el);
+                            setTimeout(() => el.remove(), 6000);
+                        } else {
+                            alert('Could not open upload portal: ' + e.message);
+                        }
+                    } finally {
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">open_in_new</span> Open Upload Portal';
+                        }
+                    }
                 }
-            });
             </script>
 
         {% else %}

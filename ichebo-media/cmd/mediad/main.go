@@ -16,6 +16,7 @@ import (
 	"github.com/ichebo/media/pkg/stream"
 	"github.com/ichebo/media/pkg/transcode"
 	"github.com/ichebo/media/pkg/upload"
+	"github.com/ichebo/media/pkg/uploadportal"
 	"github.com/ichebo/media/pkg/webhook"
 )
 
@@ -137,11 +138,27 @@ func main() {
 
 	transcodeHandler := transcode.NewHandler(queue)
 
+	// ── Upload portal ─────────────────────────────────────────────────────────
+	portalHandler := uploadportal.NewHandler(uploadportal.Config{
+		APIKey:         cfg.DjangoAPIKey,
+		DjangoCallback: cfg.DjangoWebhookURL,
+	})
+
 	// ── HTTP routes ──────────────────────────────────────────────────────────
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/health", health.Handler)
 	mux.HandleFunc("/engine/status", transcode.EngineStatusHandler(queue, cfg.WorkerCount))
+
+	// Upload portal — the browser-facing upload page served at /upload
+	// Wrapped in CORS so the token-validation redirect from app.ichebo.org works.
+	mux.HandleFunc("/upload", withCORS(cfg.CORSAllowedOrigin, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		portalHandler.ServeUploadPage(w, r)
+	}))
 
 	// Upload routes — wrapped in withCORS since these are called directly
 	// from the browser (see withCORS's doc comment for why the other
