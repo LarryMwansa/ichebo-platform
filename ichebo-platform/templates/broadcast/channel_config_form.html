@@ -51,9 +51,9 @@
                         <input type="hidden" name="loop_default_video_id" id="video-upload-id-loop" value="{{ config.loop_default_video_id|default:'' }}">
                         
                         <div id="video-upload-idle-loop" style="{% if config.loop_default_video_id %}display:none;{% endif %}">
-                            <button type="button" onclick="document.getElementById('video-picker-overlay-loop').style.display='flex'"
+                            <button type="button" onclick="openVideoPickerModal('loop')"
                                     style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-                                           height: 80px; border: 2px dashed var(--border); border-radius: 8px; background: none;
+                                           height: 70px; border: 2px dashed var(--border); border-radius: 8px; background: none;
                                            cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 600;
                                            transition: border-color 0.15s, color 0.15s;"
                                     onmouseover="this.style.borderColor='var(--primary)'; this.style.color='var(--primary)'"
@@ -64,13 +64,13 @@
                         </div>
 
                         <div id="video-upload-done-loop" style="display:{% if config.loop_default_video_id %}flex{% else %}none{% endif %};
-                                    align-items:center; gap:10px; padding:10px 12px; background:var(--card-2); border-radius:8px;">
+                                    align-items:center; gap:10px; padding:12px 14px; background:var(--card-2); border: 1px solid var(--border); border-radius:8px;">
                             <span class="material-symbols-outlined" style="color:var(--success);">check_circle</span>
                             <span id="video-upload-filename-loop" style="font-size:12px; color:var(--text); flex:1;
                                   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                                 {% if config.loop_default_video_id %}Video attached ({{ config.loop_default_video_id }}){% endif %}
                             </span>
-                            <button type="button" onclick="document.getElementById('video-picker-overlay-loop').style.display='flex'"
+                            <button type="button" onclick="openVideoPickerModal('loop')"
                                     style="background:none; border:none; color:var(--primary); font-size:12px;
                                            font-weight:700; cursor:pointer;">
                                 Replace
@@ -109,7 +109,7 @@
                                    letter-spacing: 0.07em; color: var(--muted);">
                         Fallback Playlist (one media Record UUID per line)
                     </label>
-                    <button type="button" onclick="document.getElementById('video-picker-overlay-playlist').style.display='flex'"
+                    <button type="button" onclick="openVideoPickerModal('playlist')"
                             style="display: flex; align-items: center; gap: 4px; padding: 4px 8px;
                                    background: var(--card-2); border: 1px solid var(--border); border-radius: 6px;
                                    color: var(--primary); font-size: 11px; font-weight: 600; cursor: pointer;">
@@ -158,31 +158,33 @@
 <script>
     window.ICHEBO_MEDIA_ENGINE_URL = "{{ media_engine_public_url|default:'https://video.ichebo.org'|escapejs }}";
 
+    async function openUploadPortal(tenantId) {
+        try {
+            const resp = await fetch('/api/media/upload-token/?tenant_id=' + encodeURIComponent(tenantId), {
+                credentials: 'same-origin'
+            });
+            if (!resp.ok) throw new Error('Token request failed: ' + resp.status);
+            const data = await resp.json();
+            window.open(data.upload_url, '_blank', 'noopener');
+        } catch(e) {
+            alert('Could not open upload portal: ' + e.message);
+        }
+    }
+
     // Handle custom videoSelected events from the picker
     window.addEventListener('videoSelected', function(e) {
         if (e.detail.pickerId === 'playlist') {
             const textarea = document.getElementById('fallback-playlist-textarea');
             if (textarea) {
-                // Append the UUID
                 const val = textarea.value.trim();
                 if (val) {
                     textarea.value = val + '\n' + e.detail.recordId;
                 } else {
                     textarea.value = e.detail.recordId;
                 }
-                
-                // Show a brief toast confirmation
-                if (window.IcheboVideoUpload && window.IcheboVideoUpload._showToast) {
-                    window.IcheboVideoUpload._showToast('Added ' + e.detail.title + ' to playlist', 'success');
-                }
             }
         }
     });
-
-// Also listen for HTMX load in case the form is injected dynamically later
-document.body.addEventListener('htmx:load', function() {
-    LearnVideoUpload.init('-loop');
-    LearnVideoUpload.init('-playlist');
-});
 </script>
 {% endblock %}
+
