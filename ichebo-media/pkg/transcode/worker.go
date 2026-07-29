@@ -341,6 +341,8 @@ func (wp *WorkerPool) notifyDjango(job *Job, videoURL, thumbURL string, duration
 	payload := webhook.TranscodeCompletePayload{
 		JobID:           job.ID,
 		RecordID:        job.RecordID,
+		TenantID:        job.TenantID,
+		Title:           job.Title,
 		Status:          job.Status,
 		VideoURL:        videoURL,
 		ThumbnailURL:    thumbURL,

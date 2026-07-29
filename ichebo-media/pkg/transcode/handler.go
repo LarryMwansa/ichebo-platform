@@ -18,10 +18,11 @@ func NewHandler(queue *Queue) *Handler {
 }
 
 type TranscodeRequest struct {
-	UploadID       string   `json:"upload_id"`
-	RecordID       string   `json:"record_id"`
-	RawObjectKey   string   `json:"raw_object_key"`
-	TenantID       string   `json:"tenant_id"`
+	UploadID        string   `json:"upload_id"`
+	RecordID        string   `json:"record_id"`
+	RawObjectKey    string   `json:"raw_object_key"`
+	TenantID        string   `json:"tenant_id"`
+	Title           string   `json:"title"`
 	QualityProfiles []string `json:"quality_profiles"`
 }
 
@@ -45,6 +46,7 @@ func (h *Handler) StartTranscode(w http.ResponseWriter, r *http.Request) {
 		UploadID:     req.UploadID,
 		RecordID:     req.RecordID,
 		TenantID:     req.TenantID,
+		Title:        req.Title,
 		RawObjectKey: req.RawObjectKey,
 		Profiles:     req.QualityProfiles,
 		Status:       StatusQueued,

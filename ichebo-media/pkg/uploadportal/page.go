@@ -250,6 +250,7 @@ async function startUpload(file){
         record_id: recordId,
         raw_object_key: completeData.raw_object_key,
         tenant_id: TENANT_ID,
+        title: title,
         quality_profiles: []
       })
     });
@@ -261,7 +262,7 @@ async function startUpload(file){
   for(var i=0; i<600; i++){
     await sleep(2000);
     try {
-      var r5 = await fetch(ENGINE_BASE+'/engine/transcode/'+jobData.job_id);
+      var r5 = await fetch(ENGINE_BASE+'/engine/transcode/'+jobData.job_id+'/status');
       if(!r5.ok) continue;
       var d = await r5.json();
       setProgress(Math.min(80+(d.progress_pct||0)*0.18, 98));

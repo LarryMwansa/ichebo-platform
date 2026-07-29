@@ -290,9 +290,50 @@ class TranscodeCompleteWebhookView(APIView):
             return self._handle_broadcast_archive(record_id, job_status, video_url)
 
         # Update Record.custom_fields atomically.
+        # For portal uploads the Record doesn't exist yet — create it now.
         try:
             record = Record.objects.get(id=record_id, record_family='media')
         except Record.DoesNotExist:
+            # Portal upload: the webhook is the first notification Django gets.
+            # tenant_id and title are included since the portal flow wired them in.
+            tenant_id = request.data.get('tenant_id', '')
+            title = request.data.get('title', '') or f'Video {record_id[:8]}'
+
+            if not tenant_id:
+                # Can't attach to a tenant — log and swallow silently.
+                import logging
+                logging.getLogger(__name__).warning(
+                    'transcode-complete webhook for unknown record %s has no tenant_id — skipping',
+                    record_id,
+                )
+                return Response(status=status.HTTP_200_OK)
+
+            from tenants.models import Tenant
+            try:
+                tenant = Tenant.objects.get(id=tenant_id)
+            except (Tenant.DoesNotExist, ValueError):
+                return Response(status=status.HTTP_200_OK)
+
+            record = Record.objects.create(
+                id=record_id,
+                tenant=tenant,
+                record_family='media',
+                title=title,
+                status='active' if job_status == 'complete' else 'processing',
+                custom_fields={
+                    'transcoding_status': job_status,
+                    'video_url': video_url,
+                    'thumbnail_url': thumbnail_url,
+                    'duration_seconds': duration_seconds,
+                    'quality_variants': quality_variants,
+                    'source': 'upload_portal',
+                },
+            )
+            TranscodeJob.objects.filter(job_id=job_id).update(
+                status=job_status,
+                progress_pct=100 if job_status == 'complete' else 0,
+                completed_at=timezone.now() if job_status in ('complete', 'failed') else None,
+            )
             return Response(status=status.HTTP_200_OK)
 
         record.custom_fields.update({

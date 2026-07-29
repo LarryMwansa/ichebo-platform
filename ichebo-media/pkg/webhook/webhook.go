@@ -10,14 +10,16 @@ import (
 
 // TranscodeCompletePayload is sent to Django when a transcode job finishes.
 type TranscodeCompletePayload struct {
-	JobID           string          `json:"job_id"`
-	RecordID        string          `json:"record_id"`
-	Status          string          `json:"status"`
-	VideoURL        string          `json:"video_url"`
-	ThumbnailURL    string          `json:"thumbnail_url"`
-	DurationSeconds int             `json:"duration_seconds"`
+	JobID           string           `json:"job_id"`
+	RecordID        string           `json:"record_id"`
+	TenantID        string           `json:"tenant_id"`
+	Title           string           `json:"title,omitempty"`
+	Status          string           `json:"status"`
+	VideoURL        string           `json:"video_url"`
+	ThumbnailURL    string           `json:"thumbnail_url"`
+	DurationSeconds int              `json:"duration_seconds"`
 	QualityVariants []QualityVariant `json:"quality_variants"`
-	FileSizeBytes   int64           `json:"file_size_bytes"`
+	FileSizeBytes   int64            `json:"file_size_bytes"`
 }
 
 // QualityVariant describes one quality level in the transcode result.

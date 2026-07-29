@@ -19,6 +19,7 @@ type Job struct {
 	UploadID     string
 	RecordID     string
 	TenantID     string
+	Title        string
 	RawObjectKey string
 	Profiles     []string
 	Status       string
