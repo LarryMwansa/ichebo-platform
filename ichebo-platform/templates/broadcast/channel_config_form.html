@@ -3,8 +3,75 @@
 
 {% block title %}Fallback Config — {{ tenant.name }}{% endblock %}
 
+{% block context_header %}
+    Channel & Media
+{% endblock %}
+
+{% block context_content %}
+    <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+        <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Architecture</div>
+        <a href="{% url 'channel_overview' %}?view=scheduler&tenant_id={{ tenant.id }}" class="ctx-btn">
+            <span class="material-symbols-outlined">calendar_month</span>
+            Scheduler
+        </a>
+        <a href="{% url 'channel_overview' %}?view=library&tenant_id={{ tenant.id }}" class="ctx-btn">
+            <span class="material-symbols-outlined">video_library</span>
+            Media Library
+        </a>
+        <a href="{% url 'channel_config_edit' tenant.id %}" class="ctx-btn active">
+            <span class="material-symbols-outlined">settings</span>
+            Fallback Config
+        </a>
+    </div>
+{% endblock %}
+
+{% block ws_options %}
+    <div class="ics-options-bar__content">
+        <div style="display: flex; flex-direction: column; gap: 16px; padding: var(--space-s);">
+            
+            <!-- Upload Portal Action -->
+            <div>
+                <div class="ws-label-tag" style="margin-bottom: 8px;">Upload Portal</div>
+                <button type="button" onclick="openUploadPortal('{{ tenant.id }}')"
+                        style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 14px;
+                               background: var(--primary); border: none; border-radius: 8px;
+                               color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+                    Open Upload Portal
+                </button>
+                <div style="font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.4;">
+                    Upload videos directly to <strong>video.ichebo.org</strong>.
+                </div>
+            </div>
+
+            <!-- Media Library Picker Grid in Options Bar -->
+            <div style="border-top: 1px solid var(--border); padding-top: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);">
+                        Media Library Picker
+                    </div>
+                    <button type="button" onclick="htmx.trigger('#config-picker-grid', 'reloadPickerGrid')" title="Refresh Library"
+                            style="background: none; border: none; color: var(--muted); cursor: pointer; display: flex; align-items: center;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
+                    </button>
+                </div>
+                <div style="font-size: 11px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+                    Click a video card below to assign it as the <strong>Loop Default Video</strong> or append to <strong>Playlist</strong>.
+                </div>
+
+                <div id="config-picker-grid"
+                     hx-get="{% url 'media:htmx_picker_grid' %}?tenant_id={{ tenant.id }}"
+                     hx-trigger="load, reloadPickerGrid from:body">
+                    <div style="text-align: center; padding: 30px 10px; color: var(--muted); font-size: 12px;">Loading media library...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
 {% block ws_content %}
-<div style="padding: 0 32px 48px; max-width: 560px;">
+<div style="padding: 0 32px 48px; max-width: 640px;">
 
     <div style="margin-bottom: 28px;">
         <div class="ws-label-tag" style="margin-bottom: 8px;">—— CHANNEL SCHEDULER</div>
@@ -30,61 +97,52 @@
                 padding: 16px 20px; margin-bottom: 24px; font-size: 13px; color: var(--muted);
                 line-height: 1.6;">
         <strong style="color: var(--text);">Fallback hierarchy</strong> (lowest to highest priority):<br>
-        1. Loop Default — a single video that plays on repeat when nothing else is scheduled.<br>
-        2. Fallback Playlist — an ordered list of videos that rotate in sequence.<br>
+        1. <strong>Loop Default</strong> — a single video that plays on repeat when nothing else is scheduled.<br>
+        2. <strong>Fallback Playlist</strong> — an ordered list of videos that rotate in sequence.<br>
         Scheduled <em>ChannelSlots</em> and live broadcasts always take priority over these.
     </div>
 
     <form method="post">
         {% csrf_token %}
-        <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="display: flex; flex-direction: column; gap: 24px;">
 
-            {# Loop default video UUID #}
+            {# 1. Loop default video #}
             <div>
                 <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
-                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
-                    Loop Default Video
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 8px;">
+                    1. Loop Default Video
                 </label>
                 
-                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; background: var(--card-1); padding: 16px; border-radius: 8px;">
-                    <div>
-                        <input type="hidden" name="loop_default_video_id" id="video-upload-id-loop" value="{{ config.loop_default_video_id|default:'' }}">
-                        
-                        <div id="video-upload-idle-loop" style="{% if config.loop_default_video_id %}display:none;{% endif %}">
-                            <button type="button" onclick="openVideoPickerModal('loop')"
-                                    style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-                                           height: 70px; border: 2px dashed var(--border); border-radius: 8px; background: none;
-                                           cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 600;
-                                           transition: border-color 0.15s, color 0.15s;"
-                                    onmouseover="this.style.borderColor='var(--primary)'; this.style.color='var(--primary)'"
-                                    onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--muted)'">
+                <div style="display: flex; flex-direction: column; gap: 12px; background: var(--card-1); border: 1px solid var(--border); padding: 16px; border-radius: 8px;">
+                    <input type="hidden" name="loop_default_video_id" id="video-upload-id-loop" value="{{ config.loop_default_video_id|default:'' }}">
+                    
+                    <div id="video-upload-idle-loop" style="{% if config.loop_default_video_id %}display:none;{% endif %}">
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--card-2); border: 1px dashed var(--border); border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px;">
                                 <span class="material-symbols-outlined">video_library</span>
-                                <span>Select Video from Media Library</span>
-                            </button>
+                                <span>No video attached. Pick a video from the Options Bar on the right.</span>
+                            </div>
                         </div>
+                    </div>
 
-                        <div id="video-upload-done-loop" style="display:{% if config.loop_default_video_id %}flex{% else %}none{% endif %};
-                                    align-items:center; gap:10px; padding:12px 14px; background:var(--card-2); border: 1px solid var(--border); border-radius:8px;">
-                            <span class="material-symbols-outlined" style="color:var(--success);">check_circle</span>
-                            <span id="video-upload-filename-loop" style="font-size:12px; color:var(--text); flex:1;
-                                  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                {% if config.loop_default_video_id %}Video attached ({{ config.loop_default_video_id }}){% endif %}
-                            </span>
-                            <button type="button" onclick="openVideoPickerModal('loop')"
-                                    style="background:none; border:none; color:var(--primary); font-size:12px;
-                                           font-weight:700; cursor:pointer;">
-                                Replace
-                            </button>
-                            <button type="button" onclick="document.getElementById('video-upload-id-loop').value=''; document.getElementById('video-upload-done-loop').style.display='none'; document.getElementById('video-upload-idle-loop').style.display='block';"
-                                    style="background:none; border:none; color:var(--error); font-size:12px;
-                                           font-weight:700; cursor:pointer; margin-left: 8px;">
-                                Remove
-                            </button>
+                    <div id="video-upload-done-loop" style="display:{% if config.loop_default_video_id %}flex{% else %}none{% endif %};
+                                align-items:center; gap:10px; padding:12px 14px; background:var(--card-2); border: 1px solid var(--border); border-radius:8px;">
+                        <span class="material-symbols-outlined" style="color:var(--success);">check_circle</span>
+                        <div style="flex: 1; overflow: hidden;">
+                            <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Attached Video</div>
+                            <div id="video-upload-filename-loop" style="font-size:13px; font-weight: 600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                {% if config.loop_default_video_id %}Video Record ({{ config.loop_default_video_id }}){% endif %}
+                            </div>
                         </div>
+                        <button type="button" onclick="document.getElementById('video-upload-id-loop').value=''; document.getElementById('video-upload-done-loop').style.display='none'; document.getElementById('video-upload-idle-loop').style.display='block';"
+                                style="background:none; border:none; color:var(--error); font-size:12px;
+                                       font-weight:700; cursor:pointer; padding: 4px 8px;">
+                            Remove
+                        </button>
                     </div>
                 </div>
 
-                <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px;">
+                <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 12px 0 6px;">
                     OR FALLBACK TO EXTERNAL URL
                 </div>
                 <input type="text" name="loop_default_external_url"
@@ -102,23 +160,14 @@
                 </div>
             </div>
 
-            {# Fallback playlist — one UUID per line #}
+            {# 2. Fallback playlist #}
             <div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 6px;">
-                    <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
-                                   letter-spacing: 0.07em; color: var(--muted);">
-                        Fallback Playlist (one media Record UUID per line)
-                    </label>
-                    <button type="button" onclick="openVideoPickerModal('playlist')"
-                            style="display: flex; align-items: center; gap: 4px; padding: 4px 8px;
-                                   background: var(--card-2); border: 1px solid var(--border); border-radius: 6px;
-                                   color: var(--primary); font-size: 11px; font-weight: 600; cursor: pointer;">
-                        <span class="material-symbols-outlined" style="font-size: 14px;">add_circle</span>
-                        Add from Library
-                    </button>
-                </div>
-                <textarea name="fallback_playlist" id="fallback-playlist-textarea" rows="8"
-                          placeholder="Paste one UUID per line — videos play in order, then restart"
+                <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    2. Fallback Playlist (one media Record UUID per line)
+                </label>
+                <textarea name="fallback_playlist" id="fallback-playlist-textarea" rows="7"
+                          placeholder="Paste or pick videos from the Options Bar on the right — one UUID per line"
                           style="display: block; width: 100%; padding: 10px 12px;
                                  background: var(--card-2); border: 1px solid var(--border);
                                  border-radius: 8px; font-size: 12px; color: var(--text);
@@ -151,9 +200,6 @@
     </form>
 </div>
 
-{% include "media/partials/_video_picker_modal.html" with picker_id="loop" tenant_id=tenant.id %}
-{% include "media/partials/_video_picker_modal.html" with picker_id="playlist" tenant_id=tenant.id %}
-
 {% load static %}
 <script>
     window.ICHEBO_MEDIA_ENGINE_URL = "{{ media_engine_public_url|default:'https://video.ichebo.org'|escapejs }}";
@@ -171,20 +217,33 @@
         }
     }
 
-    // Handle custom videoSelected events from the picker
-    window.addEventListener('videoSelected', function(e) {
-        if (e.detail.pickerId === 'playlist') {
-            const textarea = document.getElementById('fallback-playlist-textarea');
-            if (textarea) {
-                const val = textarea.value.trim();
-                if (val) {
-                    textarea.value = val + '\n' + e.detail.recordId;
-                } else {
-                    textarea.value = e.detail.recordId;
-                }
+    // Called when clicking a video card in the Options Bar Media Library picker
+    window.selectMediaVideo = function(recordId, videoUrl, title) {
+        // 1. Set Loop Default Video if currently empty or replaced
+        const idInput = document.getElementById('video-upload-id-loop');
+        if (idInput) {
+            idInput.value = recordId;
+            const idleDiv = document.getElementById('video-upload-idle-loop');
+            if (idleDiv) idleDiv.style.display = 'none';
+            const doneDiv = document.getElementById('video-upload-done-loop');
+            if (doneDiv) {
+                doneDiv.style.display = 'flex';
+                const filenameSpan = document.getElementById('video-upload-filename-loop');
+                if (filenameSpan) filenameSpan.textContent = title || recordId;
             }
         }
-    });
+
+        // 2. Also append to playlist textarea
+        const textarea = document.getElementById('fallback-playlist-textarea');
+        if (textarea) {
+            const val = textarea.value.trim();
+            if (val && !val.includes(recordId)) {
+                textarea.value = val + '\n' + recordId;
+            } else if (!val) {
+                textarea.value = recordId;
+            }
+        }
+    };
 </script>
 {% endblock %}
 
