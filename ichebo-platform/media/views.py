@@ -314,9 +314,15 @@ class TranscodeCompleteWebhookView(APIView):
             except (Tenant.DoesNotExist, ValueError):
                 return Response(status=status.HTTP_200_OK)
 
+            # Use first superuser as system actor for webhook-created records.
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            system_user = User.objects.filter(is_superuser=True).order_by('date_joined').first()
+
             record = Record.objects.create(
                 id=record_id,
                 tenant=tenant,
+                created_by=system_user,
                 record_family='media',
                 title=title,
                 status='active' if job_status == 'complete' else 'processing',
