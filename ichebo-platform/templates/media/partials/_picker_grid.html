@@ -1,52 +1,171 @@
 {% if not videos %}
-<div style="text-align: center; padding: 40px 20px; color: var(--muted);">
-    <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.5;">videocam_off</span>
-    <p style="margin-top: 12px; font-weight: 500;">No videos found.</p>
-    <p style="font-size: 13px;">Upload a video to get started.</p>
+<div style="text-align: center; padding: 30px 16px; color: var(--muted);">
+    <span class="material-symbols-outlined" style="font-size: 40px; opacity: 0.4;">videocam_off</span>
+    <p style="margin: 8px 0 0; font-weight: 600; font-size: 13px;">No videos found</p>
+    <p style="font-size: 11px; margin: 4px 0 0; color: var(--muted);">Upload a video to get started.</p>
 </div>
 {% else %}
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
-    {% for video in videos %}
-    <div class="video-picker-card" 
-         onclick="window.selectMediaVideo('{{ video.record.id }}', '{{ video.video_url|escapejs }}', '{{ video.record.title|escapejs }}')"
-         style="cursor: pointer; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--card); transition: transform 0.15s, border-color 0.15s;">
-        <div style="aspect-ratio: 16/9; background: #000; position: relative;">
-            {% if video.thumbnail_url %}
-                <img src="{{ video.thumbnail_url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="">
-            {% else %}
-                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--muted);">
-                    <span class="material-symbols-outlined">movie</span>
+
+    {% if mode == 'options_bar' %}
+        {# Compact vertical list view designed for the ~260px wide Options Bar #}
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            {% for video in videos %}
+            <div class="options-bar-picker-item"
+                 onclick="window.selectMediaVideo('{{ video.record.id }}', '{{ video.video_url|escapejs }}', '{{ video.record.title|escapejs }}', '{{ picker_context }}')"
+                 style="display: flex; align-items: center; gap: 10px; padding: 8px; background: var(--card-2);
+                        border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.15s, background 0.15s;">
+                
+                <div style="width: 56px; height: 36px; background: #000; border-radius: 4px; overflow: hidden; flex-shrink: 0; position: relative;">
+                    {% if video.thumbnail_url %}
+                        <img src="{{ video.thumbnail_url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="">
+                    {% else %}
+                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--muted);">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">movie</span>
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
-            
-            {% if video.duration_seconds %}
-                <div style="position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px;">
-                    {{ video.duration_seconds }}s <!-- Wait, I should format this. Let's just output seconds for now or assume there's a filter -->
+
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{ video.record.title|default:"Untitled Video" }}
+                    </div>
+                    <div style="font-size: 10px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 6px;">
+                        {% if video.transcoding_status == 'complete' %}
+                            <span style="color: var(--success); font-weight: 600;">Ready</span>
+                        {% elif video.transcoding_status == 'failed' %}
+                            <span style="color: var(--error);">Failed</span>
+                        {% else %}
+                            <span style="color: var(--primary);">Processing...</span>
+                        {% endif %}
+                        {% if video.duration_seconds %}
+                            <span>• {{ video.duration_seconds }}s</span>
+                        {% endif %}
+                    </div>
                 </div>
-            {% endif %}
-        </div>
-        <div style="padding: 10px;">
-            <div style="font-size: 13px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                {{ video.record.title|default:"Untitled Video" }}
+
+                <div style="flex-shrink: 0;">
+                    {% if picker_context == 'loop' %}
+                        <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--card-1); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border);">Set Loop</span>
+                    {% elif picker_context == 'playlist' %}
+                        <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--card-1); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border);">+ Add</span>
+                    {% elif picker_context == 'slot' %}
+                        <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--card-1); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border);">Attach</span>
+                    {% else %}
+                        <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--card-1); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border);">Select</span>
+                    {% endif %}
+                </div>
             </div>
-            <div style="font-size: 11px; color: var(--muted); margin-top: 4px; display: flex; justify-content: space-between;">
-                <span>{{ video.record.created_at|date:"M d, Y" }}</span>
-                {% if video.transcoding_status == 'complete' %}
-                    <span style="color: var(--success);"><span class="material-symbols-outlined" style="font-size:12px; vertical-align:middle;">check_circle</span> Ready</span>
-                {% elif video.transcoding_status == 'failed' %}
-                    <span style="color: var(--error);">Failed</span>
-                {% else %}
-                    <span style="color: var(--primary);">Processing...</span>
-                {% endif %}
-            </div>
+            {% endfor %}
         </div>
-    </div>
-    {% endfor %}
-</div>
-<style>
-    .video-picker-card:hover {
-        border-color: var(--primary) !important;
-        transform: translateY(-2px);
-    }
-</style>
+
+    {% elif mode == 'list' %}
+        {# Table List view for Main Stage #}
+        <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--card);">
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+                <thead>
+                    <tr style="background: var(--card-2); border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);">
+                        <th style="padding: 10px 14px;">Preview</th>
+                        <th style="padding: 10px 14px;">Title</th>
+                        <th style="padding: 10px 14px;">Date</th>
+                        <th style="padding: 10px 14px;">Duration</th>
+                        <th style="padding: 10px 14px;">Status</th>
+                        <th style="padding: 10px 14px; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for video in videos %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 10px 14px; width: 64px;">
+                            <div style="width: 56px; height: 36px; background: #000; border-radius: 4px; overflow: hidden; position: relative;">
+                                {% if video.thumbnail_url %}
+                                    <img src="{{ video.thumbnail_url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="">
+                                {% else %}
+                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--muted);">
+                                        <span class="material-symbols-outlined" style="font-size: 16px;">movie</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td style="padding: 10px 14px; font-weight: 600; color: var(--text);">
+                            {{ video.record.title|default:"Untitled Video" }}
+                        </td>
+                        <td style="padding: 10px 14px; color: var(--muted); font-size: 12px;">
+                            {{ video.record.created_at|date:"M d, Y" }}
+                        </td>
+                        <td style="padding: 10px 14px; color: var(--muted); font-size: 12px;">
+                            {% if video.duration_seconds %}{{ video.duration_seconds }}s{% else %}—{% endif %}
+                        </td>
+                        <td style="padding: 10px 14px;">
+                            {% if video.transcoding_status == 'complete' %}
+                                <span style="color: var(--success); font-weight: 600; font-size: 12px;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle;">check_circle</span> Ready</span>
+                            {% elif video.transcoding_status == 'failed' %}
+                                <span style="color: var(--error); font-weight: 600; font-size: 12px;">Failed</span>
+                            {% else %}
+                                <span style="color: var(--primary); font-weight: 600; font-size: 12px;">Processing...</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 10px 14px; text-align: right;">
+                            <button type="button" onclick="deleteMediaRecord('{{ video.record.id }}')"
+                                    style="background: none; border: none; color: var(--error); cursor: pointer; padding: 4px;" title="Delete Video">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% else %}
+        {# Grid View for Main Stage #}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+            {% for video in videos %}
+            <div class="video-picker-card"
+                 style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--card); transition: transform 0.15s, border-color 0.15s;">
+                <div style="aspect-ratio: 16/9; background: #000; position: relative;">
+                    {% if video.thumbnail_url %}
+                        <img src="{{ video.thumbnail_url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="">
+                    {% else %}
+                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--muted);">
+                            <span class="material-symbols-outlined">movie</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if video.duration_seconds %}
+                        <div style="position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.8); color: #fff; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px;">
+                            {{ video.duration_seconds }}s
+                        </div>
+                    {% endif %}
+                </div>
+                <div style="padding: 10px;">
+                    <div style="font-size: 13px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{ video.record.title|default:"Untitled Video" }}
+                    </div>
+                    <div style="font-size: 11px; color: var(--muted); margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>{{ video.record.created_at|date:"M d, Y" }}</span>
+                        {% if video.transcoding_status == 'complete' %}
+                            <span style="color: var(--success);"><span class="material-symbols-outlined" style="font-size:12px; vertical-align:middle;">check_circle</span> Ready</span>
+                        {% elif video.transcoding_status == 'failed' %}
+                            <span style="color: var(--error);">Failed</span>
+                        {% else %}
+                            <span style="color: var(--primary);">Processing...</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <style>
+        .options-bar-picker-item:hover {
+            border-color: var(--primary) !important;
+            background: var(--card-1) !important;
+        }
+        .video-picker-card:hover {
+            border-color: var(--primary) !important;
+            transform: translateY(-2px);
+        }
+    </style>
 {% endif %}
+

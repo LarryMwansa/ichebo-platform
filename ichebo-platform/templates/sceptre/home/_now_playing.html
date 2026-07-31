@@ -33,21 +33,58 @@
           </video>
         {% endif %}
 
+        {% if now_playing.source == 'fallback' and now_playing.playlist_items %}
+          {{ now_playing.playlist_items|json_script:"fallback-playlist-data" }}
+        {% endif %}
+
         <script>
         (function() {
             var video = document.getElementById('channel-video-{{ safe_id }}');
             if (!video) return;
+
+            {% if now_playing.source == 'fallback' and now_playing.playlist_items %}
+            var playlistElement = document.getElementById('fallback-playlist-data');
+            var playlistList = playlistElement ? JSON.parse(playlistElement.textContent || '[]') : [];
+            var currentIndex = {{ now_playing.playlist_index|default:0 }};
+            {% endif %}
             
             video.addEventListener('ended', function() {
                 {% if now_playing.source == 'loop' %}
                     video.currentTime = 0;
                     video.play().catch(function(e){});
+                {% elif now_playing.source == 'fallback' and now_playing.playlist_items %}
+                    if (playlistList && playlistList.length > 0) {
+                        currentIndex = (currentIndex + 1) % playlistList.length;
+                        var nextVideo = playlistList[currentIndex];
+                        if (nextVideo && nextVideo.video_url) {
+                            var titleEl = document.querySelector('.now-playing-strip__title');
+                            if (titleEl) titleEl.textContent = nextVideo.title || '';
+                            
+                            var nextSrc = nextVideo.video_url;
+                            if (nextSrc.indexOf('.m3u8') !== -1 && window.Hls && window.Hls.isSupported()) {
+                                var hls = new window.Hls();
+                                hls.loadSource(nextSrc);
+                                hls.attachMedia(video);
+                                hls.on(window.Hls.Events.MANIFEST_PARSED, function() {
+                                    video.play().catch(function(e){});
+                                });
+                            } else {
+                                video.src = nextSrc;
+                                video.play().catch(function(e){});
+                            }
+                        }
+                    } else {
+                        if (typeof htmx !== 'undefined') {
+                            htmx.trigger('#channel-area', 'load');
+                        }
+                    }
                 {% else %}
                     if (typeof htmx !== 'undefined') {
                         htmx.trigger('#channel-area', 'load');
                     }
                 {% endif %}
             });
+
 
             if (video.dataset.hlsAttached === 'true') return;
             video.dataset.hlsAttached = 'true';

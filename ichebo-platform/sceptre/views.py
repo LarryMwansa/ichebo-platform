@@ -102,9 +102,13 @@ def now_playing_partial(request):
     now_playing = resolve_now_playing(tenant) if tenant else None
 
     if now_playing and now_playing.get('content_type') != 'offline':
-        vid_url = now_playing.get('video_url') or now_playing.get('hls_url') or ''
-        title = now_playing.get('title') or ''
-        new_sig = f"{now_playing.get('source')}-{vid_url}-{title}"
+        if now_playing.get('source') == 'fallback' and now_playing.get('playlist_config_hash'):
+            t_id = str(tenant.id) if tenant else ''
+            new_sig = f"fallback-{t_id}-{now_playing.get('playlist_config_hash')}"
+        else:
+            vid_url = now_playing.get('video_url') or now_playing.get('hls_url') or ''
+            title = now_playing.get('title') or ''
+            new_sig = f"{now_playing.get('source')}-{vid_url}-{title}"
     else:
         new_sig = "offline"
 

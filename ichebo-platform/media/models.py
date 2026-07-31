@@ -37,11 +37,19 @@ class VideoRecord:
 
     @property
     def video_url(self) -> str | None:
-        return self._r.custom_fields.get('video_url')
+        url = self._r.custom_fields.get('video_url')
+        if not url or not str(url).startswith('http'):
+            job_id = self._r.custom_fields.get('transcode_job_id') or str(self._r.id)
+            return f"https://video.ichebo.org/hls/{job_id}/index.m3u8"
+        return url
 
     @property
     def thumbnail_url(self) -> str | None:
-        return self._r.custom_fields.get('thumbnail_url')
+        url = self._r.custom_fields.get('thumbnail_url')
+        if not url or not str(url).startswith('http'):
+            job_id = self._r.custom_fields.get('transcode_job_id') or str(self._r.id)
+            return f"https://video.ichebo.org/hls/{job_id}/thumb.jpg"
+        return url
 
     @property
     def duration_seconds(self) -> int | None:

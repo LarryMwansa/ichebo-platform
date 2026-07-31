@@ -46,12 +46,31 @@ def resolve_now_playing(tenant):
     config = ChannelConfig.objects.filter(tenant=tenant).first()
 
     if config and config.fallback_playlist:
-        # Architecturally sound fallback rotation: 
-        # Deterministic based on the current hour so all concurrent viewers see the same fallback,
-        # and we do not mutate database state on a GET polling request.
-        pos = (now.hour) % len(config.fallback_playlist)
-        video_id = config.fallback_playlist[pos]
-        return _build_vod_response(video_id, source='fallback')
+        from records.models import Record
+        playlist_items = []
+        for vid_id in config.fallback_playlist:
+            try:
+                r = Record.objects.get(id=vid_id)
+                v_url = r.custom_fields.get('video_url', '')
+                if not v_url or not str(v_url).startswith('http'):
+                    v_url = f"https://video.ichebo.org/hls/{r.id}/index.m3u8"
+                playlist_items.append({
+                    'id': str(r.id),
+                    'title': r.title,
+                    'video_url': v_url,
+                })
+            except Record.DoesNotExist:
+                pass
+
+        if playlist_items:
+            current_item = playlist_items[0]
+            res = _build_vod_response(current_item['id'], source='fallback')
+            res['title'] = current_item['title']
+            res['video_url'] = current_item['video_url']
+            res['playlist_items'] = playlist_items
+            res['playlist_index'] = 0
+            res['playlist_config_hash'] = ','.join([i['id'] for i in playlist_items])
+            return res
 
     if config and config.loop_default_video_id:
         return _build_vod_response(str(config.loop_default_video_id), source='loop')

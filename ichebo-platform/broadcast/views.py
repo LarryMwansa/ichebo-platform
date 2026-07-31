@@ -25,27 +25,31 @@ def channel_overview(request):
     _require_architect(request)
 
     tenant_id = request.GET.get('tenant_id')
-    view_mode = request.GET.get('view', 'scheduler')
+    view_mode = request.GET.get('view', 'center')  # Default to Media Center Home Page
     tenants = Tenant.objects.filter(deleted_at__isnull=True).order_by('name')
     selected_tenant = None
     slots = []
     config = None
     videos = []
 
-    if tenant_id:
+    if not tenant_id and tenants.exists():
+        selected_tenant = tenants.first()
+    elif tenant_id:
         selected_tenant = get_object_or_404(Tenant, id=tenant_id, deleted_at__isnull=True)
+
+    if selected_tenant:
+        from records.models import Record
+        from media.models import VideoRecord
         
-        if view_mode == 'library':
-            from records.models import Record
-            from media.models import VideoRecord
-            qs = Record.objects.filter(record_family='media', tenant=selected_tenant).order_by('-created_at')
+        if view_mode in ('library', 'center'):
+            qs = Record.objects.filter(record_family='media', tenant=selected_tenant, deleted_at__isnull=True).order_by('-created_at')
             videos = [VideoRecord(r) for r in qs[:100]]
-        else:
-            slots = ChannelSlot.objects.filter(
-                tenant=selected_tenant,
-                deleted_at__isnull=True,
-            ).order_by('scheduled_start')
-            config = ChannelConfig.objects.filter(tenant=selected_tenant).first()
+            
+        slots = ChannelSlot.objects.filter(
+            tenant=selected_tenant,
+            deleted_at__isnull=True,
+        ).order_by('scheduled_start')
+        config = ChannelConfig.objects.filter(tenant=selected_tenant).first()
 
     return render(request, 'broadcast/channel_overview.html', {
         'tenants': tenants,
@@ -56,7 +60,7 @@ def channel_overview(request):
         'videos': videos,
         'now': timezone.now(),
         'active_app': 'channel',
-        'ws_page_title': 'Channel & Media',
+        'ws_page_title': 'Media Center & Broadcasting',
         'media_engine_public_url': getattr(settings, 'MEDIA_ENGINE_PUBLIC_URL', 'https://video.ichebo.org'),
     })
 
@@ -66,7 +70,9 @@ def channel_slot_add(request):
     _require_architect(request)
 
     tenants = Tenant.objects.filter(deleted_at__isnull=True).order_by('name')
-    preselect_tenant_id = request.GET.get('tenant_id', '')
+    preselect_tenant_id = request.GET.get('tenant_id', '').strip()
+    if not preselect_tenant_id and tenants.exists():
+        preselect_tenant_id = str(tenants.first().id)
 
     errors = []
     data = {}
@@ -76,6 +82,7 @@ def channel_slot_add(request):
         tenant_id = data.get('tenant_id', '').strip()
         title = data.get('title', '').strip()
         content_type = data.get('content_type', 'vod')
+        video_record_id_raw = data.get('video_record_id', '').strip()
         scheduled_start_raw = data.get('scheduled_start', '').strip()
         scheduled_end_raw = data.get('scheduled_end', '').strip()
         tz_offset = data.get('tz_offset_minutes', '0')
@@ -86,6 +93,13 @@ def channel_slot_add(request):
             errors.append('Title is required.')
         if not scheduled_start_raw or not scheduled_end_raw:
             errors.append('Start and end times are required.')
+
+        video_record_id = None
+        if content_type == 'vod' and video_record_id_raw:
+            try:
+                video_record_id = uuid.UUID(video_record_id_raw)
+            except ValueError:
+                errors.append('Selected VOD video UUID is invalid.')
 
         if not errors:
             from community.views import _parse_local_datetime
@@ -102,11 +116,12 @@ def channel_slot_add(request):
                     tenant=tenant,
                     title=title,
                     content_type=content_type,
+                    video_record_id=video_record_id,
                     scheduled_start=start_dt,
                     scheduled_end=end_dt,
                     created_by=request.user,
                 )
-                return redirect(f'/channel/?tenant_id={tenant_id}')
+                return redirect(f'/channel/?view=scheduler&tenant_id={tenant_id}')
 
     return render(request, 'broadcast/channel_slot_form.html', {
         'tenants': tenants,
@@ -115,6 +130,7 @@ def channel_slot_add(request):
         'preselect_tenant_id': preselect_tenant_id,
         'active_app': 'channel',
         'ws_page_title': 'Add Channel Slot',
+        'media_engine_public_url': getattr(settings, 'MEDIA_ENGINE_PUBLIC_URL', 'https://video.ichebo.org'),
     })
 
 

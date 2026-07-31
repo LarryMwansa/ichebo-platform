@@ -3,8 +3,84 @@
 
 {% block title %}Add Channel Slot{% endblock %}
 
+{% block context_header %}
+    Channel & Media
+{% endblock %}
+
+{% block context_content %}
+    <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+        <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Architecture</div>
+        <a href="{% url 'channel_overview' %}?view=center{% if preselect_tenant_id %}&tenant_id={{ preselect_tenant_id }}{% endif %}" class="ctx-btn">
+            <span class="material-symbols-outlined">grid_view</span>
+            Media Center
+        </a>
+        <a href="{% url 'channel_overview' %}?view=scheduler{% if preselect_tenant_id %}&tenant_id={{ preselect_tenant_id }}{% endif %}" class="ctx-btn">
+            <span class="material-symbols-outlined">calendar_month</span>
+            Scheduler
+        </a>
+        <a href="{% url 'channel_slot_add' %}{% if preselect_tenant_id %}?tenant_id={{ preselect_tenant_id }}{% endif %}" class="ctx-btn active">
+            <span class="material-symbols-outlined">add_circle</span>
+            Add Channel Slot
+        </a>
+        {% if preselect_tenant_id %}
+        <a href="{% url 'channel_config_edit' preselect_tenant_id %}" class="ctx-btn">
+            <span class="material-symbols-outlined">settings</span>
+            Fallback Config
+        </a>
+        {% endif %}
+        <a href="{% url 'channel_overview' %}?view=library{% if preselect_tenant_id %}&tenant_id={{ preselect_tenant_id }}{% endif %}" class="ctx-btn">
+            <span class="material-symbols-outlined">video_library</span>
+            Media Library
+        </a>
+    </div>
+{% endblock %}
+
+{% block ws_options_tabs %}
+    <div class="ics-options-tabs">
+        <button class="ics-options-tab active" id="tab-picker" onclick="switchSlotOptionTab('picker')">Media Picker</button>
+        <button class="ics-options-tab" id="tab-upload" onclick="switchSlotOptionTab('upload')">Upload Portal</button>
+    </div>
+
+    <div class="ics-options-bar__content">
+        <!-- Tab 1: Video Picker -->
+        <div class="ws-options-pane active" id="pane-picker" style="padding: var(--space-s);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);">
+                    Select VOD Video
+                </div>
+                <button type="button" onclick="fetchPickerGrid('slot-picker-grid', 'options_bar', 'slot', document.getElementById('id_tenant_id').value)" title="Refresh Library"
+                        style="background: none; border: none; color: var(--muted); cursor: pointer; display: flex; align-items: center;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
+                </button>
+            </div>
+            <div style="font-size: 11px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+                Click any video row below to attach it to this VOD slot.
+            </div>
+
+            <div id="slot-picker-grid">
+                <div style="text-align: center; padding: 20px; color: var(--muted); font-size: 12px;">Loading media library...</div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Upload Portal -->
+        <div class="ws-options-pane" id="pane-upload" style="display: none; padding: var(--space-s);">
+            <div class="ws-label-tag" style="margin-bottom: 8px;">Upload Portal</div>
+            <button type="button" onclick="openUploadPortalFromForm()"
+                    style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 14px;
+                           background: var(--primary); border: none; border-radius: 8px;
+                           color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+                Open Upload Portal
+            </button>
+            <div style="font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.5;">
+                Opens <strong>video.ichebo.org</strong> in a new tab. Transcoded videos appear in the Media Picker automatically.
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
 {% block ws_content %}
-<div style="padding: 0 32px 48px; max-width: 560px;">
+<div style="padding: 0 32px 48px; max-width: 580px;">
 
     <div style="margin-bottom: 28px;">
         <div class="ws-label-tag" style="margin-bottom: 8px;">—— CHANNEL SCHEDULER</div>
@@ -23,12 +99,11 @@
     </div>
     {% endif %}
 
-    <form method="post">
+    <form method="post" id="add-slot-form">
         {% csrf_token %}
-        {# Hidden tz offset — JS fills this before submit #}
         <input type="hidden" name="tz_offset_minutes" id="id_tz_offset">
 
-        <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
 
             {# Community #}
             <div>
@@ -36,7 +111,7 @@
                                letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
                     Community
                 </label>
-                <select name="tenant_id"
+                <select name="tenant_id" id="id_tenant_id" onchange="onTenantChanged(this.value)"
                         style="display: block; width: 100%; height: 40px; padding: 0 12px;
                                background: var(--card-2); border: 1px solid var(--border);
                                border-radius: 8px; font-size: 13px; color: var(--text);
@@ -72,14 +147,43 @@
                                letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
                     Content Type
                 </label>
-                <select name="content_type"
+                <select name="content_type" id="id_content_type" onchange="toggleVODSection(this.value)"
                         style="display: block; width: 100%; height: 40px; padding: 0 12px;
                                background: var(--card-2); border: 1px solid var(--border);
                                border-radius: 8px; font-size: 13px; color: var(--text);
                                outline: none; cursor: pointer;">
-                    <option value="vod" {% if data.content_type != 'live' %}selected{% endif %}>Video on Demand</option>
+                    <option value="vod" {% if data.content_type != 'live' %}selected{% endif %}>Video on Demand (VOD)</option>
                     <option value="live" {% if data.content_type == 'live' %}selected{% endif %}>Live Broadcast</option>
                 </select>
+            </div>
+
+            {# VOD Video Attachment Card (Visible when content_type == 'vod') #}
+            <div id="vod-attachment-wrapper" style="{% if data.content_type == 'live' %}display: none;{% endif %}">
+                <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Attached VOD Video Record
+                </label>
+                <input type="hidden" name="video_record_id" id="id_video_record_id" value="{{ data.video_record_id|default:'' }}">
+                
+                <div id="vod-idle-state" style="display: {% if data.video_record_id %}none{% else %}flex{% endif %}; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-2); border: 1px dashed var(--border); border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px;">
+                        <span class="material-symbols-outlined">movie</span>
+                        <span>No video attached. Pick a video from the Options Bar on the right.</span>
+                    </div>
+                </div>
+
+                <div id="vod-selected-state" style="display: {% if data.video_record_id %}flex{% else %}none{% endif %}; align-items: center; gap: 12px; padding: 12px 16px; background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;">
+                    <span class="material-symbols-outlined" style="color: var(--success);">check_circle</span>
+                    <div style="flex: 1; overflow: hidden;">
+                        <div style="font-size: 10px; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Attached VOD Video</div>
+                        <div id="vod-selected-title" style="font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            {% if data.video_record_id %}Video Record ({{ data.video_record_id }}){% endif %}
+                        </div>
+                    </div>
+                    <button type="button" onclick="removeVODAttachment()" style="background: none; border: none; color: var(--error); font-size: 12px; font-weight: 700; cursor: pointer;">
+                        Remove
+                    </button>
+                </div>
             </div>
 
             {# Start / End (side by side) #}
@@ -125,7 +229,7 @@
                            cursor: pointer;">
                 Add Slot
             </button>
-            <a href="{% url 'channel_overview' %}{% if data.tenant_id %}?tenant_id={{ data.tenant_id }}{% elif preselect_tenant_id %}?tenant_id={{ preselect_tenant_id }}{% endif %}"
+            <a href="{% url 'channel_overview' %}{% if data.tenant_id %}?view=scheduler&tenant_id={{ data.tenant_id }}{% elif preselect_tenant_id %}?view=scheduler&tenant_id={{ preselect_tenant_id }}{% endif %}"
                style="display: inline-flex; align-items: center; height: 40px; padding: 0 16px;
                       background: var(--card-2); border: 1px solid var(--border); color: var(--text);
                       border-radius: 8px; font-size: 13px; text-decoration: none;">
@@ -136,6 +240,89 @@
 </div>
 
 <script>
-document.getElementById('id_tz_offset').value = new Date().getTimezoneOffset();
+    document.getElementById('id_tz_offset').value = new Date().getTimezoneOffset();
+
+    function fetchPickerGrid(gridId, mode, pickerContext, tenantId) {
+        const el = document.getElementById(gridId);
+        if (!el) return;
+        if (!tenantId) {
+            const tSel = document.getElementById('id_tenant_id');
+            if (tSel && tSel.value) tenantId = tSel.value;
+        }
+        if (!tenantId) return;
+
+        const url = '/media-center/htmx/picker-grid/?mode=' + encodeURIComponent(mode) +
+                    '&picker_context=' + encodeURIComponent(pickerContext) +
+                    '&tenant_id=' + encodeURIComponent(tenantId);
+        fetch(url, { credentials: 'same-origin' })
+            .then(r => r.text())
+            .then(html => { el.innerHTML = html; })
+            .catch(err => console.error('Picker load error:', err));
+    }
+
+    function switchSlotOptionTab(tabName) {
+        document.getElementById('tab-picker').classList.toggle('active', tabName === 'picker');
+        document.getElementById('tab-upload').classList.toggle('active', tabName === 'upload');
+        const pickerPane = document.getElementById('pane-picker');
+        const uploadPane = document.getElementById('pane-upload');
+
+        pickerPane.style.display = tabName === 'picker' ? 'block' : 'none';
+        uploadPane.style.display = tabName === 'upload' ? 'block' : 'none';
+
+        if (tabName === 'picker') {
+            const tenantId = document.getElementById('id_tenant_id').value;
+            fetchPickerGrid('slot-picker-grid', 'options_bar', 'slot', tenantId);
+        }
+    }
+
+    function toggleVODSection(contentType) {
+        const wrapper = document.getElementById('vod-attachment-wrapper');
+        if (wrapper) wrapper.style.display = contentType === 'vod' ? 'block' : 'none';
+    }
+
+    function onTenantChanged(tenantId) {
+        if (!tenantId) return;
+        fetchPickerGrid('slot-picker-grid', 'options_bar', 'slot', tenantId);
+    }
+
+    async function openUploadPortalFromForm() {
+        const tenantId = document.getElementById('id_tenant_id').value;
+        if (!tenantId) return alert('Please select a community first.');
+        try {
+            const resp = await fetch('/api/media/upload-token/?tenant_id=' + encodeURIComponent(tenantId), { credentials: 'same-origin' });
+            if (!resp.ok) throw new Error('Token failed');
+            const data = await resp.json();
+            window.open(data.upload_url, '_blank', 'noopener');
+        } catch(e) { alert('Upload portal error: ' + e.message); }
+    }
+
+    window.selectMediaVideo = function(recordId, videoUrl, title) {
+        document.getElementById('id_video_record_id').value = recordId;
+        document.getElementById('vod-idle-state').style.display = 'none';
+        document.getElementById('vod-selected-state').style.display = 'flex';
+        document.getElementById('vod-selected-title').textContent = title || recordId;
+    };
+
+    function removeVODAttachment() {
+        document.getElementById('id_video_record_id').value = '';
+        document.getElementById('vod-idle-state').style.display = 'flex';
+        document.getElementById('vod-selected-state').style.display = 'none';
+    }
+
+    // Load immediately
+    const initialTenant = document.getElementById('id_tenant_id')?.value;
+    if (initialTenant) {
+        fetchPickerGrid('slot-picker-grid', 'options_bar', 'slot', initialTenant);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const tenantSelect = document.getElementById('id_tenant_id');
+        if (tenantSelect && tenantSelect.value) {
+            fetchPickerGrid('slot-picker-grid', 'options_bar', 'slot', tenantSelect.value);
+        }
+    });
 </script>
 {% endblock %}
+
+
+

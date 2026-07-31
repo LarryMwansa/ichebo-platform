@@ -10,62 +10,90 @@
 {% block context_content %}
     <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
         <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Architecture</div>
+        <a href="{% url 'channel_overview' %}?view=center&tenant_id={{ tenant.id }}" class="ctx-btn">
+            <span class="material-symbols-outlined">grid_view</span>
+            Media Center
+        </a>
         <a href="{% url 'channel_overview' %}?view=scheduler&tenant_id={{ tenant.id }}" class="ctx-btn">
             <span class="material-symbols-outlined">calendar_month</span>
             Scheduler
         </a>
-        <a href="{% url 'channel_overview' %}?view=library&tenant_id={{ tenant.id }}" class="ctx-btn">
-            <span class="material-symbols-outlined">video_library</span>
-            Media Library
+        <a href="{% url 'channel_slot_add' %}?tenant_id={{ tenant.id }}" class="ctx-btn">
+            <span class="material-symbols-outlined">add_circle</span>
+            Add Channel Slot
         </a>
         <a href="{% url 'channel_config_edit' tenant.id %}" class="ctx-btn active">
             <span class="material-symbols-outlined">settings</span>
             Fallback Config
         </a>
+        <a href="{% url 'channel_overview' %}?view=library&tenant_id={{ tenant.id }}" class="ctx-btn">
+            <span class="material-symbols-outlined">video_library</span>
+            Media Library
+        </a>
     </div>
 {% endblock %}
 
-{% block ws_options %}
+{% block ws_options_tabs %}
+    <div class="ics-options-tabs">
+        <button class="ics-options-tab active" id="tab-cfg-loop" onclick="switchConfigOptionTab('loop')">Loop Video</button>
+        <button class="ics-options-tab" id="tab-cfg-playlist" onclick="switchConfigOptionTab('playlist')">Playlist</button>
+        <button class="ics-options-tab" id="tab-cfg-upload" onclick="switchConfigOptionTab('upload')">Upload</button>
+    </div>
+
     <div class="ics-options-bar__content">
-        <div style="display: flex; flex-direction: column; gap: 16px; padding: var(--space-s);">
-            
-            <!-- Upload Portal Action -->
-            <div>
-                <div class="ws-label-tag" style="margin-bottom: 8px;">Upload Portal</div>
-                <button type="button" onclick="openUploadPortal('{{ tenant.id }}')"
-                        style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 14px;
-                               background: var(--primary); border: none; border-radius: 8px;
-                               color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
-                    Open Upload Portal
+        <!-- Tab 1: Loop Video Picker -->
+        <div class="ws-options-pane active" id="pane-cfg-loop" style="padding: var(--space-s);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);">
+                    Select Loop Default
+                </div>
+                <button type="button" onclick="fetchPickerGrid('loop-picker-grid', 'options_bar', 'loop', '{{ tenant.id }}')" title="Refresh Library"
+                        style="background: none; border: none; color: var(--muted); cursor: pointer; display: flex; align-items: center;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
                 </button>
-                <div style="font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.4;">
-                    Upload videos directly to <strong>video.ichebo.org</strong>.
-                </div>
+            </div>
+            <div style="font-size: 11px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+                Click a video to assign as the <strong>Loop Default Video</strong>.
             </div>
 
-            <!-- Media Library Picker Grid in Options Bar -->
-            <div style="border-top: 1px solid var(--border); padding-top: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);">
-                        Media Library Picker
-                    </div>
-                    <button type="button" onclick="htmx.trigger('#config-picker-grid', 'reloadPickerGrid')" title="Refresh Library"
-                            style="background: none; border: none; color: var(--muted); cursor: pointer; display: flex; align-items: center;">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
-                    </button>
-                </div>
-                <div style="font-size: 11px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
-                    Click a video card below to assign it as the <strong>Loop Default Video</strong> or append to <strong>Playlist</strong>.
-                </div>
+            <div id="loop-picker-grid">
+                <div style="text-align: center; padding: 20px; color: var(--muted); font-size: 12px;">Loading media library...</div>
+            </div>
+        </div>
 
-                <div id="config-picker-grid"
-                     hx-get="{% url 'media:htmx_picker_grid' %}?tenant_id={{ tenant.id }}"
-                     hx-trigger="load, reloadPickerGrid from:body">
-                    <div style="text-align: center; padding: 30px 10px; color: var(--muted); font-size: 12px;">Loading media library...</div>
+        <!-- Tab 2: Playlist Builder -->
+        <div class="ws-options-pane" id="pane-cfg-playlist" style="display: none; padding: var(--space-s);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);">
+                    Playlist Builder
                 </div>
+                <button type="button" onclick="fetchPickerGrid('playlist-picker-grid', 'options_bar', 'playlist', '{{ tenant.id }}')" title="Refresh Library"
+                        style="background: none; border: none; color: var(--muted); cursor: pointer; display: flex; align-items: center;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
+                </button>
+            </div>
+            <div style="font-size: 11px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+                Click <strong>+ Add</strong> to append a video UUID to your <strong>Fallback Playlist</strong>.
             </div>
 
+            <div id="playlist-picker-grid">
+                <div style="text-align: center; padding: 20px; color: var(--muted); font-size: 12px;">Loading media library...</div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Upload Portal -->
+        <div class="ws-options-pane" id="pane-cfg-upload" style="display: none; padding: var(--space-s);">
+            <div class="ws-label-tag" style="margin-bottom: 8px;">Upload Portal</div>
+            <button type="button" onclick="openUploadPortal('{{ tenant.id }}')"
+                    style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 14px;
+                           background: var(--primary); border: none; border-radius: 8px;
+                           color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+                Open Upload Portal
+            </button>
+            <div style="font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.5;">
+                Opens <strong>video.ichebo.org</strong> in a new tab. Transcoded videos appear in your pickers automatically.
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -190,7 +218,7 @@
                            cursor: pointer;">
                 Save Config
             </button>
-            <a href="{% url 'channel_overview' %}?tenant_id={{ tenant.id }}"
+            <a href="{% url 'channel_overview' %}?view=scheduler&tenant_id={{ tenant.id }}"
                style="display: inline-flex; align-items: center; height: 40px; padding: 0 16px;
                       background: var(--card-2); border: 1px solid var(--border); color: var(--text);
                       border-radius: 8px; font-size: 13px; text-decoration: none;">
@@ -203,6 +231,38 @@
 {% load static %}
 <script>
     window.ICHEBO_MEDIA_ENGINE_URL = "{{ media_engine_public_url|default:'https://video.ichebo.org'|escapejs }}";
+
+    function fetchPickerGrid(gridId, mode, pickerContext, tenantId) {
+        const el = document.getElementById(gridId);
+        if (!el) return;
+        const url = '/media-center/htmx/picker-grid/?mode=' + encodeURIComponent(mode) +
+                    '&picker_context=' + encodeURIComponent(pickerContext) +
+                    '&tenant_id=' + encodeURIComponent(tenantId);
+        fetch(url, { credentials: 'same-origin' })
+            .then(r => r.text())
+            .then(html => { el.innerHTML = html; })
+            .catch(err => console.error('Picker load error:', err));
+    }
+
+    function switchConfigOptionTab(tabName) {
+        document.getElementById('tab-cfg-loop').classList.toggle('active', tabName === 'loop');
+        document.getElementById('tab-cfg-playlist').classList.toggle('active', tabName === 'playlist');
+        document.getElementById('tab-cfg-upload').classList.toggle('active', tabName === 'upload');
+
+        const loopPane = document.getElementById('pane-cfg-loop');
+        const playlistPane = document.getElementById('pane-cfg-playlist');
+        const uploadPane = document.getElementById('pane-cfg-upload');
+
+        loopPane.style.display = tabName === 'loop' ? 'block' : 'none';
+        playlistPane.style.display = tabName === 'playlist' ? 'block' : 'none';
+        uploadPane.style.display = tabName === 'upload' ? 'block' : 'none';
+
+        if (tabName === 'loop') {
+            fetchPickerGrid('loop-picker-grid', 'options_bar', 'loop', '{{ tenant.id }}');
+        } else if (tabName === 'playlist') {
+            fetchPickerGrid('playlist-picker-grid', 'options_bar', 'playlist', '{{ tenant.id }}');
+        }
+    }
 
     async function openUploadPortal(tenantId) {
         try {
@@ -218,32 +278,43 @@
     }
 
     // Called when clicking a video card in the Options Bar Media Library picker
-    window.selectMediaVideo = function(recordId, videoUrl, title) {
-        // 1. Set Loop Default Video if currently empty or replaced
-        const idInput = document.getElementById('video-upload-id-loop');
-        if (idInput) {
-            idInput.value = recordId;
-            const idleDiv = document.getElementById('video-upload-idle-loop');
-            if (idleDiv) idleDiv.style.display = 'none';
-            const doneDiv = document.getElementById('video-upload-done-loop');
-            if (doneDiv) {
-                doneDiv.style.display = 'flex';
-                const filenameSpan = document.getElementById('video-upload-filename-loop');
-                if (filenameSpan) filenameSpan.textContent = title || recordId;
+    window.selectMediaVideo = function(recordId, videoUrl, title, context) {
+        if (context === 'playlist') {
+            const textarea = document.getElementById('fallback-playlist-textarea');
+            if (textarea) {
+                const val = textarea.value.trim();
+                if (val && !val.includes(recordId)) {
+                    textarea.value = val + '\n' + recordId;
+                } else if (!val) {
+                    textarea.value = recordId;
+                }
             }
-        }
-
-        // 2. Also append to playlist textarea
-        const textarea = document.getElementById('fallback-playlist-textarea');
-        if (textarea) {
-            const val = textarea.value.trim();
-            if (val && !val.includes(recordId)) {
-                textarea.value = val + '\n' + recordId;
-            } else if (!val) {
-                textarea.value = recordId;
+        } else {
+            const idInput = document.getElementById('video-upload-id-loop');
+            if (idInput) {
+                idInput.value = recordId;
+                const idleDiv = document.getElementById('video-upload-idle-loop');
+                if (idleDiv) idleDiv.style.display = 'none';
+                const doneDiv = document.getElementById('video-upload-done-loop');
+                if (doneDiv) {
+                    doneDiv.style.display = 'flex';
+                    const filenameSpan = document.getElementById('video-upload-filename-loop');
+                    if (filenameSpan) filenameSpan.textContent = title || recordId;
+                }
             }
         }
     };
+
+    // Load both grids immediately
+    fetchPickerGrid('loop-picker-grid', 'options_bar', 'loop', '{{ tenant.id }}');
+    fetchPickerGrid('playlist-picker-grid', 'options_bar', 'playlist', '{{ tenant.id }}');
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchPickerGrid('loop-picker-grid', 'options_bar', 'loop', '{{ tenant.id }}');
+        fetchPickerGrid('playlist-picker-grid', 'options_bar', 'playlist', '{{ tenant.id }}');
+    });
 </script>
 {% endblock %}
+
+
 
