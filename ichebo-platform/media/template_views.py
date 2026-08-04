@@ -9,11 +9,15 @@ def htmx_picker_grid(request):
     mode = request.GET.get('mode', 'options_bar')  # options_bar | grid | list
     picker_context = request.GET.get('picker_context', 'generic')  # slot | loop | playlist | generic
 
+    from django.db.models import Q
     qs = Record.objects.filter(record_family='media', deleted_at__isnull=True).order_by('-created_at')
-    
     if tenant_id:
-        qs = qs.filter(tenant_id=tenant_id)
-        
+        qs = qs.filter(
+            Q(tenant_id=tenant_id) |
+            Q(tenant__name__icontains='Global') |
+            Q(tenant__name__icontains='Default') |
+            Q(tenant__isnull=True)
+        )
     videos = [VideoRecord(r) for r in qs[:50]]
     
     return render(request, 'media/partials/_picker_grid.html', {

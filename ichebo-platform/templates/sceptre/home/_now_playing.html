@@ -149,7 +149,7 @@
     {% endif %}
   </div>
 
-  <input type="hidden" name="current_playing_signature" value="{{ now_playing.source }}-{{ now_playing.video_url|default:now_playing.hls_url }}-{{ now_playing.title }}">
+  <input type="hidden" name="current_playing_signature" value="{{ now_playing.playing_signature|default:'offline' }}">
 
 {% else %}
 

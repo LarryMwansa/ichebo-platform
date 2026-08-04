@@ -77,8 +77,6 @@
     <div class="tabs-inner">
       <button class="tab-btn active" id="tab-recent" onclick="switchTab('recent', this)">Recent Broadcasts</button>
       <button class="tab-btn" id="tab-series" onclick="switchTab('series', this)">Teaching Series</button>
-      <button class="tab-btn" id="tab-formation" onclick="switchTab('formation', this)">Formation</button>
-      <button class="tab-btn" id="tab-governance" onclick="switchTab('governance', this)">Sessions</button>
     </div>
   </div>
 </div>
@@ -94,18 +92,22 @@
     </div>
     <div class="vod-grid sc-fade-up">
       {% if recent_broadcasts %}
-        {% for broadcast in recent_broadcasts %}
-          <div class="vod-card">
-            <div class="vod-thumb">
-              <div class="vod-play material-symbols-outlined">play_arrow</div>
-              <div class="vod-series-tag">{{ broadcast.record_type|title|default:"Broadcast" }}</div>
+        {% for video in recent_broadcasts %}
+          <div class="vod-card" onclick="openRecentVideoModal('{{ video.video_url }}', '{{ video.title|escapejs }}')" style="cursor: pointer;">
+            <div class="vod-thumb" style="{% if video.thumbnail_url %}background-image: url('{{ video.thumbnail_url }}'); background-size: cover; background-position: center;{% else %}background: #1e1e24;{% endif %} position: relative; display: flex; align-items: center; justify-content: center;">
+              <div class="vod-play material-symbols-outlined" style="font-size: 36px; color: #fff;">play_circle</div>
+              <div class="vod-series-tag" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px; font-size: 10px; text-transform: uppercase; color: #fff;">
+                {{ video.record_type|title|default:"Media" }}
+              </div>
             </div>
-            <div class="vod-content">
-              <div class="vod-title">{{ broadcast.title }}</div>
-              <div class="vod-meta">
-                <span>{{ broadcast.created_at|date:"j M Y" }}</span>
-                <div class="vod-sep"></div>
-                <span>{{ broadcast.record_family|title }}</span>
+            <div class="vod-content" style="padding: 12px 14px;">
+              <div class="vod-title" style="font-size: 14px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ video.title }}
+              </div>
+              <div class="vod-meta" style="font-size: 12px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 8px;">
+                <span>{{ video.created_at|date:"j M Y" }}</span>
+                <span class="vod-sep">•</span>
+                <span>On Demand</span>
               </div>
             </div>
           </div>
@@ -127,15 +129,21 @@
     <div class="series-grid sc-fade-up">
       {% if programmes %}
         {% for prog in programmes %}
-          <a href="https://learn.ichebo.org/" class="series-card">
+          <a href="{{ prog.url|default:'https://learn.ichebo.org/' }}" class="series-card" style="text-decoration: none;">
             <span class="series-icon material-symbols-outlined">school</span>
             <div class="series-name">{{ prog.name }}</div>
-            <div class="series-count">{% if prog.lesson_count %}{{ prog.lesson_count }} lessons{% endif %}</div>
+            {% if prog.is_enrolled %}
+              <div class="series-count" style="color: var(--sc-primary, #6366f1); font-weight: 600;">
+                In Progress ({{ prog.progress|default:0 }}%)
+              </div>
+            {% elif prog.lesson_count %}
+              <div class="series-count">{{ prog.lesson_count }} lessons</div>
+            {% endif %}
           </a>
         {% endfor %}
       {% else %}
         <div style="grid-column: 1 / -1; padding: 4rem 1rem; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px;">
-          <div style="color: rgba(255,255,255,0.5); font-size: 15px;">There are no active teaching programmes.</div>
+          <div style="color: rgba(255,255,255,0.5); font-size: 15px;">There are no active teaching programmes right now.</div>
         </div>
       {% endif %}
     </div>

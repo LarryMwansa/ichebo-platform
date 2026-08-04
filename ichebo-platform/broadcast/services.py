@@ -64,12 +64,14 @@ def resolve_now_playing(tenant):
 
         if playlist_items:
             current_item = playlist_items[0]
+            config_hash = ','.join([i['id'] for i in playlist_items])
             res = _build_vod_response(current_item['id'], source='fallback')
             res['title'] = current_item['title']
             res['video_url'] = current_item['video_url']
             res['playlist_items'] = playlist_items
             res['playlist_index'] = 0
-            res['playlist_config_hash'] = ','.join([i['id'] for i in playlist_items])
+            res['playlist_config_hash'] = config_hash
+            res['playing_signature'] = f"fallback-{tenant.id if tenant else ''}-{config_hash}"
             return res
 
     if config and config.loop_default_video_id:
@@ -90,7 +92,6 @@ def _build_external_response(url, source='loop'):
     if yt_match:
         is_youtube = True
         video_id = yt_match.group(1)
-        # Using mute=1 because most browsers block autoplay unmuted
         embed_url = f"https://www.youtube.com/embed/{video_id}?autoplay=1&mute=1&loop=1&playlist={video_id}"
         
     return {
@@ -100,6 +101,7 @@ def _build_external_response(url, source='loop'):
         'is_live': False,
         'video_url': embed_url,
         'is_youtube': is_youtube,
+        'playing_signature': f"external-{url}",
     }
 
 
@@ -114,6 +116,7 @@ def _build_slot_response(slot):
         'thumbnail_url': None,
         'ends_at': slot.scheduled_end.isoformat(),
         'next_scheduled': _get_next_slot(slot.tenant, slot.scheduled_end),
+        'playing_signature': f"scheduled-{slot.id}-{slot.scheduled_end.isoformat()}",
     }
 
 
@@ -129,6 +132,7 @@ def _build_live_response(broadcast):
         'thumbnail_url': None,
         'ends_at': None,
         'next_scheduled': None,
+        'playing_signature': f"live-{broadcast.id}",
     }
 
 
@@ -137,6 +141,8 @@ def _build_vod_response(video_id, source):
     try:
         record = Record.objects.get(id=video_id)
         video_url = record.custom_fields.get('video_url', '')
+        if not video_url or not str(video_url).startswith('http'):
+            video_url = f"https://video.ichebo.org/hls/{record.id}/index.m3u8"
     except Record.DoesNotExist:
         video_url = ''
 
@@ -151,6 +157,7 @@ def _build_vod_response(video_id, source):
         'ends_at': None,
         'next_scheduled': None,
         '_video_id': video_id,
+        'playing_signature': f"vod-{source}-{video_id}",
     }
 
 
@@ -165,6 +172,7 @@ def _offline_response():
         'thumbnail_url': None,
         'ends_at': None,
         'next_scheduled': None,
+        'playing_signature': 'offline',
     }
 
 
@@ -175,6 +183,16 @@ def _resolve_slot_video_url(slot):
             bs = BroadcastSchedule.objects.get(id=slot.broadcast_schedule_id)
             return bs.viewer_hls_url or bs.hls_url or ''
         except BroadcastSchedule.DoesNotExist:
+            return ''
+    elif slot.content_type == 'vod' and slot.video_record_id:
+        from records.models import Record
+        try:
+            r = Record.objects.get(id=slot.video_record_id)
+            v_url = r.custom_fields.get('video_url', '')
+            if not v_url or not str(v_url).startswith('http'):
+                v_url = f"https://video.ichebo.org/hls/{r.id}/index.m3u8"
+            return v_url
+        except Record.DoesNotExist:
             return ''
     return ''
 
@@ -189,6 +207,6 @@ def _get_next_slot(tenant, after):
     if next_slot:
         return {
             'title': next_slot.title,
-            'starts_at': next_slot.scheduled_start.isoformat(),
+            'starts_at': next_slot.scheduled_start.strftime("%H:%M"),
         }
     return None

@@ -35,47 +35,86 @@ def participant_home(request):
     user_is_steward = is_steward(request.user)
 
     # Recent broadcasts — last 6 records with video content for this tenant.
-    # Gracefully empty when no broadcasts exist yet.
     recent_broadcasts = []
     if tenant:
-        recent_broadcasts = list(
+        from media.models import VideoRecord
+        raw_recs = list(
             Record.objects.filter(
-                record_family='broadcast',
+                record_family__in=['media', 'broadcast'],
                 deleted_at__isnull=True,
             ).filter(
-                Q(tenant_id=tenant.id) | Q(tenant_id__isnull=True)
+                Q(tenant_id=tenant.id) | Q(tenant__name__icontains='Global') | Q(tenant__name__icontains='Default') | Q(tenant_id__isnull=True)
             ).order_by('-created_at')[:6]
         )
+        recent_broadcasts = [VideoRecord(r) for r in raw_recs]
 
-    # Programmes — tenant's active Learn programmes (max 8).
-    # Imported inline to avoid a hard dependency on learn app at module level.
+    # Programmes / Active Enrolments — user's active Learn courses or tenant's teaching programmes.
     programmes = []
     try:
-        from learn.models import Programme
-        if tenant:
-            programmes = list(
-                Programme.objects.filter(
-                    tenant=tenant,
-                    is_active=True,
-                    deleted_at__isnull=True,
-                ).order_by('order', 'name')[:8]
-            )
-    except Exception:
-        pass  # learn app may not be available or Programme model may differ
+        from activity.models import Activity
+        if request.user and request.user.is_authenticated:
+            active_activities = Activity.objects.filter(
+                assigned_to=request.user,
+                activity_type__in=['programme', 'project'],
+                status__in=['pending', 'in_progress'],
+                deleted_at__isnull=True,
+            ).order_by('-updated_at')[:8]
+
+            for act in active_activities:
+                programmes.append({
+                    'name': act.title,
+                    'progress': getattr(act, 'progress', 0),
+                    'is_enrolled': True,
+                    'url': f'https://learn.ichebo.org/course/{act.linked_record_id}/' if act.linked_record_id else 'https://learn.ichebo.org/',
+                })
+
+        if not programmes and tenant:
+            learn_records = Record.objects.filter(
+                record_family='learn',
+                record_type__in=['programme', 'course'],
+                deleted_at__isnull=True,
+            ).filter(
+                Q(tenant_id=tenant.id) | Q(tenant__name__icontains='Global') | Q(tenant__name__icontains='Default') | Q(tenant_id__isnull=True)
+            ).order_by('-created_at')[:8]
+
+            for r in learn_records:
+                programmes.append({
+                    'name': r.title,
+                    'progress': None,
+                    'is_enrolled': False,
+                    'url': f'https://learn.ichebo.org/course/{r.id}/',
+                })
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("Teaching series query error: %s", e)
 
     # Schedule — upcoming ChannelSlots for this tenant.
     schedule = []
     try:
         from broadcast.models import ChannelSlot
+        from django.utils import timezone
         if tenant:
-            schedule = list(
+            now = timezone.now()
+            raw_slots = list(
                 ChannelSlot.objects.filter(
                     tenant=tenant,
                     deleted_at__isnull=True,
-                ).order_by('day_of_week', 'start_time')[:6]
+                    scheduled_end__gte=now,
+                ).order_by('scheduled_start')[:6]
             )
-    except Exception:
-        pass
+            for slot in raw_slots:
+                is_currently_active = (slot.scheduled_start <= now <= slot.scheduled_end)
+                schedule.append({
+                    'id': str(slot.id),
+                    'title': slot.title,
+                    'day_abbr': slot.scheduled_start.strftime("%a").upper(),
+                    'time_str': f"{slot.scheduled_start.strftime('%H:%M')} - {slot.scheduled_end.strftime('%H:%M')}",
+                    'description': 'Live Broadcast' if slot.content_type == 'live' else 'Video on Demand',
+                    'is_live': is_currently_active,
+                })
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("Schedule query error: %s", e)
 
     return render(request, 'sceptre/home/home.html', {
         'tenant': tenant,
@@ -101,17 +140,7 @@ def now_playing_partial(request):
     tenant = _get_tenant_for_user(request.user)
     now_playing = resolve_now_playing(tenant) if tenant else None
 
-    if now_playing and now_playing.get('content_type') != 'offline':
-        if now_playing.get('source') == 'fallback' and now_playing.get('playlist_config_hash'):
-            t_id = str(tenant.id) if tenant else ''
-            new_sig = f"fallback-{t_id}-{now_playing.get('playlist_config_hash')}"
-        else:
-            vid_url = now_playing.get('video_url') or now_playing.get('hls_url') or ''
-            title = now_playing.get('title') or ''
-            new_sig = f"{now_playing.get('source')}-{vid_url}-{title}"
-    else:
-        new_sig = "offline"
-
+    new_sig = now_playing.get('playing_signature', 'offline') if now_playing else 'offline'
     current_sig = request.GET.get('current_playing_signature')
     
     # If the exact same content is already playing, return 204 No Content.

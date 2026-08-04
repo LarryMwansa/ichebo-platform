@@ -42,7 +42,15 @@ def channel_overview(request):
         from media.models import VideoRecord
         
         if view_mode in ('library', 'center'):
-            qs = Record.objects.filter(record_family='media', tenant=selected_tenant, deleted_at__isnull=True).order_by('-created_at')
+            from django.db.models import Q
+            qs = Record.objects.filter(
+                Q(tenant=selected_tenant) |
+                Q(tenant__name__icontains='Global') |
+                Q(tenant__name__icontains='Default') |
+                Q(tenant__isnull=True),
+                record_family='media',
+                deleted_at__isnull=True,
+            ).order_by('-created_at')
             videos = [VideoRecord(r) for r in qs[:100]]
             
         slots = ChannelSlot.objects.filter(
