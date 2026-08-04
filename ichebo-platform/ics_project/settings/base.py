@@ -89,6 +89,7 @@ INSTALLED_APPS = [
     'waitlist',
     'broadcast',
     'sceptre',
+    'join',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

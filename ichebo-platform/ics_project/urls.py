@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 from accounts import views as accounts_views
 from accounts.urls import template_urlpatterns as accounts_template_urlpatterns
 
@@ -42,7 +43,7 @@ urlpatterns = [
     path('api/paraclete/', include('paraclete.urls', namespace='paraclete-api')),
     path('notifications/', include('notifications.template_urls', namespace='notifications')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/register/', accounts_views.RegisterView.as_view(), name='register_ui'),
+    path('accounts/register/', RedirectView.as_view(url='https://join.ichebo.org/accounts/register/', permanent=True), name='register_ui'),
     path('accounts/', include((accounts_template_urlpatterns, 'accounts'))),
     path('', include('dashboard.urls', namespace='dashboard')),
     path('video/', include('video_live.urls', namespace='video_live')),

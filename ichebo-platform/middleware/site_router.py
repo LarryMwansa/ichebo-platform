@@ -29,6 +29,10 @@ class SiteRouterMiddleware:
             request.site = 'handbook'
             request.urlconf = 'handbook.subdomain_urls'
             set_urlconf('handbook.subdomain_urls')
+        elif host == 'join.ichebo.org':
+            request.site = 'join'
+            request.urlconf = 'join.subdomain_urls'
+            set_urlconf('join.subdomain_urls')
         else:
             request.site = 'agency'
             set_urlconf(None)
