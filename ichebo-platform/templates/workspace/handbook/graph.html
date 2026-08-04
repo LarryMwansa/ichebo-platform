@@ -115,10 +115,12 @@
         <span class="material-symbols-outlined">menu_book</span>
         Records
     </a>
+    {% if request.site != 'handbook' %}
     <a href="{% url 'governance:mandate-home' %}" class="ctx-btn">
         <span class="material-symbols-outlined">gavel</span>
         Mandate Branch
     </a>
+    {% endif %}
 
 </div>
 {% endblock %}
