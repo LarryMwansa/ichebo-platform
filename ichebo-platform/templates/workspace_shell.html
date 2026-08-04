@@ -157,7 +157,8 @@
 
     <div class="ics-shell" id="ics-shell">
         
-        <!-- Column 1: Primary Sidebar (Global Nav) -->
+        <!-- Column 1: Primary Sidebar (Global Nav) — hidden on reader subdomains -->
+        {% if request.site != 'handbook' %}
         <aside class="ics-sidebar" aria-label="Global Navigation">
             <a href="{% url 'dashboard:index' %}" class="ics-sidebar__logo">
                 <img src="{% static 'images/device.svg' %}" alt="Ichebo" class="ics-logo" style="width: 100%;">
@@ -199,7 +200,7 @@
                    data-tooltip="Governance" hx-boost="false">
                     <span class="material-symbols-outlined">gavel</span>
                 </a>
-                <a href="{% url 'handbook:home' %}"
+                <a href="https://handbook.ichebo.org/handbook/"
                    class="ics-sidebar__item {% if active_app == 'handbook' %}active{% endif %}"
                    data-tooltip="Handbook" hx-boost="false">
                     <span class="material-symbols-outlined">auto_stories</span>
@@ -222,6 +223,7 @@
             </div>
 
         </aside>
+        {% endif %}
 
         <!-- Column 2: Context Bar (App Tools / Navigation) -->
         <nav class="ics-context-bar" id="ics-context-bar" aria-label="App Context">
@@ -254,13 +256,14 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: var(--space-s);">
-                    
+
                     {# Search Bar #}
                     <div class="ws-topbar__search" onclick="window.WorkspaceUI.openSearch()" style="cursor: pointer;">
                         <span class="material-symbols-outlined">search</span>
                         <input type="text" placeholder="Search ( / )" aria-label="Search" readonly>
                     </div>
 
+                    {% if request.site != 'handbook' %}
                     {# Notifications — live badge via HTMX polling #}
                     <a href="{% url 'notifications:list' %}"
                        class="ws-icon-btn {% if active_app == 'notifications' %}active{% endif %}"
@@ -274,16 +277,18 @@
                               hx-swap="outerHTML"
                               style="display: none;"></span>
                     </a>
+                    {% endif %}
 
                     {# Theme Toggle #}
                     <button class="ws-icon-btn" id="ics-theme-toggle" onclick="WorkspaceUI.toggleTheme()" title="Toggle Theme">
                         <span class="material-symbols-outlined">contrast</span>
                     </button>
 
+                    {% if request.site != 'handbook' %}
                     <div style="width: 1px; height: 24px; background: var(--border); margin: 0 var(--space-3xs);"></div>
 
                     {# Level Badge (Formation History) #}
-                    <a href="{% url 'accounts:formation-history' %}" class="ws-sidebar__level-dot" 
+                    <a href="{% url 'accounts:formation-history' %}" class="ws-sidebar__level-dot"
                          style="background: var(--level-{{ user.competence_level|default:0 }}); width: 24px; height: 24px; font-size: 10px; text-decoration: none; display: flex; align-items: center; justify-content: center; color: #fff;"
                          title="Level {{ user.competence_level }} Steward — View Formation History">
                         {{ user.competence_level|default:0 }}
@@ -302,6 +307,7 @@
                     <a href="{% url 'accounts:settings' %}" class="ws-icon-btn {% if active_app == 'accounts' %}active{% endif %}" title="Institutional Settings">
                         <span class="material-symbols-outlined">settings</span>
                     </a>
+                    {% endif %}
 
                     <button class="ws-icon-btn" id="ics-options-toggle" onclick="WorkspaceUI.toggleOptions()" title="Toggle Options (⌘+] )">
                         <span class="material-symbols-outlined">dock_to_right</span>

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from records.models import Record, Relationship
 from activity.models import Activity
@@ -104,24 +105,27 @@ def _level(user):
 
 # ── Handbook Home ─────────────────────────────────────────────────────────────
 
-@login_required
 def handbook_home(request):
-    if _level(request.user) < 3:
-        return HttpResponseForbidden()
+    is_authenticated = request.user.is_authenticated
+    access = _get_access(request.user) if is_authenticated else None
+    is_superuser = is_authenticated and (request.user.is_staff or request.user.is_superuser)
 
-    access = _get_access(request.user)
     active_branch = request.GET.get('branch', 'reference')
     if active_branch not in RECORD_TYPES_BY_BRANCH:
         active_branch = 'reference'
-    status_filter = request.GET.get('status', '')
 
+    # Keys branch requires auth + Level 4
+    if active_branch == 'keys':
+        if not is_authenticated:
+            from django.contrib.auth.views import redirect_to_login
+            return redirect_to_login(request.get_full_path())
+        if _level(request.user) < KEYS_ACCESS_LEVEL and not is_superuser:
+            return HttpResponseForbidden('Keys Library requires Level 4 or above.')
+
+    status_filter = request.GET.get('status', '')
     records_by_type = {}
 
-    is_superuser = request.user.is_staff or request.user.is_superuser
-
     if active_branch == 'keys':
-        if _level(request.user) < KEYS_ACCESS_LEVEL and not request.user.is_superuser:
-            return HttpResponseForbidden('Keys Library requires Level 4 or above.')
         qs = _keys_qs(request.user)
         if status_filter:
             qs = qs.filter(status=status_filter)
@@ -131,18 +135,23 @@ def handbook_home(request):
                 records_by_type[rtype] = list(type_qs)
         can_write_branch = True
     else:
-        if not access and not is_superuser:
-            can_write_branch = False
-            qs = Record.objects.none()
+        # Authenticated authors/editors see drafts; everyone else (including anonymous) sees published
+        include_drafts = is_superuser or _can_write(access)
+        if is_authenticated and (access or is_superuser):
+            qs = _governance_qs(request.user, access, include_drafts=include_drafts)
         else:
-            qs = _governance_qs(request.user, access, include_drafts=is_superuser or _can_write(access))
-            if status_filter:
-                qs = qs.filter(status=status_filter)
-            for rtype in RECORD_TYPES_BY_BRANCH.get(active_branch, []):
-                type_qs = qs.filter(record_type=rtype).order_by('-updated_at')[:20]
-                if type_qs.exists():
-                    records_by_type[rtype] = list(type_qs)
-            can_write_branch = is_superuser or _can_write(access)
+            qs = Record.objects.filter(
+                record_family='governance',
+                status__in=['active', 'locked'],
+                deleted_at__isnull=True,
+            ).exclude(record_type='key')
+        if status_filter and is_authenticated and (access or is_superuser):
+            qs = qs.filter(status=status_filter)
+        for rtype in RECORD_TYPES_BY_BRANCH.get(active_branch, []):
+            type_qs = qs.filter(record_type=rtype).order_by('-updated_at')[:20]
+            if type_qs.exists():
+                records_by_type[rtype] = list(type_qs)
+        can_write_branch = is_superuser or _can_write(access)
 
     return render(request, 'workspace/handbook/home.html', {
         'active_app':            'handbook',
@@ -162,23 +171,21 @@ def handbook_home(request):
 
 # ── Handbook Record Detail ────────────────────────────────────────────────────
 
-@login_required
 def handbook_record(request, record_id):
-    if _level(request.user) < 3:
-        return HttpResponseForbidden()
-
-    access = _get_access(request.user)
+    is_authenticated = request.user.is_authenticated
+    access = _get_access(request.user) if is_authenticated else None
+    is_superuser = is_authenticated and (request.user.is_staff or request.user.is_superuser)
 
     # Keys — personal records stored under record_family='reference'
-    key_record = Record.objects.filter(
-        pk=record_id,
-        record_family='reference',
-        record_type__in=KEY_TYPES,
-        created_by=request.user,
-        deleted_at__isnull=True,
-    ).first()
-
-    is_superuser = request.user.is_staff or request.user.is_superuser
+    key_record = None
+    if is_authenticated:
+        key_record = Record.objects.filter(
+            pk=record_id,
+            record_family='reference',
+            record_type__in=KEY_TYPES,
+            created_by=request.user,
+            deleted_at__isnull=True,
+        ).first()
 
     if key_record:
         if _level(request.user) < KEYS_ACCESS_LEVEL and not is_superuser:
@@ -186,9 +193,15 @@ def handbook_record(request, record_id):
         record = key_record
         can_write = True
     else:
-        if not access and not is_superuser:
-            return HttpResponseForbidden()
-        qs = _governance_qs(request.user, access, include_drafts=True)
+        # Authenticated authors/editors see drafts; anonymous and readers see only published
+        if is_authenticated and (access or is_superuser):
+            qs = _governance_qs(request.user, access, include_drafts=True)
+        else:
+            qs = Record.objects.filter(
+                record_family='governance',
+                status__in=['active', 'locked'],
+                deleted_at__isnull=True,
+            ).exclude(record_type='key')
         record = get_object_or_404(qs, pk=record_id)
         can_write = is_superuser or _can_write(access)
 
@@ -207,17 +220,21 @@ def handbook_record(request, record_id):
     )
 
     from django.urls import reverse
-    recent_records = Record.objects.filter(
-        created_by=request.user,
-        record_family='governance',
-        deleted_at__isnull=True,
-    ).order_by('-updated_at')[:8]
-    gov_drafts = Record.objects.filter(
-        created_by=request.user,
-        record_family='governance',
-        status='draft',
-        deleted_at__isnull=True,
-    ).order_by('-updated_at')[:5]
+    if is_authenticated:
+        recent_records = Record.objects.filter(
+            created_by=request.user,
+            record_family='governance',
+            deleted_at__isnull=True,
+        ).order_by('-updated_at')[:8]
+        gov_drafts = Record.objects.filter(
+            created_by=request.user,
+            record_family='governance',
+            status='draft',
+            deleted_at__isnull=True,
+        ).order_by('-updated_at')[:5]
+    else:
+        recent_records = []
+        gov_drafts = []
 
     return render(request, 'workspace/handbook/record.html', {
         'active_app':           'handbook',
@@ -714,10 +731,7 @@ def handbook_relationship_list(request, record_id):
 
 # ── Knowledge Graph ──────────────────────────────────────────────────────────
 
-@login_required
 def handbook_graph(request):
-    if _level(request.user) < 3:
-        return HttpResponseForbidden()
     qs = Record.objects.filter(deleted_at__isnull=True)
     return render(request, 'workspace/handbook/graph.html', {
         'active_app':        'handbook',
@@ -729,7 +743,6 @@ def handbook_graph(request):
     })
 
 
-@login_required
 def handbook_graph_data(request):
     from django.http import JsonResponse
     records_qs = Record.objects.filter(deleted_at__isnull=True)

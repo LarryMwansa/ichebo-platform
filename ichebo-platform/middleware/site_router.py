@@ -1,7 +1,8 @@
 """
 SiteRouterMiddleware — sets request.site and request.urlconf based on the
-incoming Host header. Serves sceptre.ichebo.org, learn.ichebo.org, and
-bible.ichebo.org from the same Django process with per-request URL confs (ADR-023).
+incoming Host header. Serves sceptre.ichebo.org, learn.ichebo.org,
+bible.ichebo.org, and handbook.ichebo.org from the same Django process
+with per-request URL confs (ADR-023).
 """
 from django.urls import set_urlconf
 
@@ -24,6 +25,10 @@ class SiteRouterMiddleware:
             request.site = 'bible'
             request.urlconf = 'bible.subdomain_urls'
             set_urlconf('bible.subdomain_urls')
+        elif host == 'handbook.ichebo.org':
+            request.site = 'handbook'
+            request.urlconf = 'handbook.subdomain_urls'
+            set_urlconf('handbook.subdomain_urls')
         else:
             request.site = 'agency'
             set_urlconf(None)
