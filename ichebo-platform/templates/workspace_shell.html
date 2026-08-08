@@ -157,8 +157,66 @@
 
     <div class="ics-shell" id="ics-shell">
         
-        <!-- Column 1: Primary Sidebar (Global Nav) — hidden on reader subdomains -->
-        {% if request.site != 'handbook' %}
+        <!-- Column 1: Primary Sidebar (Global Nav) -->
+        {% if request.site == 'handbook' %}
+        <aside class="ics-sidebar" aria-label="Global Navigation">
+            <a href="https://app.ichebo.org/" class="ics-sidebar__logo">
+                <img src="{% static 'images/device.svg' %}" alt="Ichebo" class="ics-logo" style="width: 100%;">
+            </a>
+
+            <nav class="ics-sidebar__nav">
+                <a href="https://app.ichebo.org/dashboard/"
+                   class="ics-sidebar__item"
+                   data-tooltip="Dashboard" hx-boost="false">
+                    <span class="material-symbols-outlined">dashboard</span>
+                </a>
+                <a href="https://app.ichebo.org/activity/"
+                   class="ics-sidebar__item"
+                   data-tooltip="Activity" hx-boost="false">
+                    <span class="material-symbols-outlined">task_alt</span>
+                </a>
+                <a href="https://app.ichebo.org/records/"
+                   class="ics-sidebar__item"
+                   data-tooltip="My Journal" hx-boost="false">
+                    <span class="material-symbols-outlined">history_edu</span>
+                </a>
+                <a href="https://bible.ichebo.org/"
+                   class="ics-sidebar__item"
+                   data-tooltip="Bible Reader" hx-boost="false">
+                    <span class="material-symbols-outlined">menu_book</span>
+                </a>
+                <a href="https://sceptre.ichebo.org/"
+                   class="ics-sidebar__item"
+                   data-tooltip="Community" hx-boost="false">
+                    <span class="material-symbols-outlined">groups</span>
+                </a>
+                <a href="https://app.ichebo.org/learn/"
+                   class="ics-sidebar__item"
+                   data-tooltip="Formation" hx-boost="false">
+                    <span class="material-symbols-outlined">school</span>
+                </a>
+                <a href="https://app.ichebo.org/governance/"
+                   class="ics-sidebar__item"
+                   data-tooltip="Governance" hx-boost="false">
+                    <span class="material-symbols-outlined">gavel</span>
+                </a>
+                <a href="/handbook/"
+                   class="ics-sidebar__item active"
+                   data-tooltip="Handbook" hx-boost="false">
+                    <span class="material-symbols-outlined">auto_stories</span>
+                </a>
+            </nav>
+
+            <div class="ics-sidebar__bottom">
+                <a href="https://app.ichebo.org/tenants/"
+                   class="ics-sidebar__item"
+                   data-tooltip="Tenancy Hub" hx-boost="false">
+                    <span class="material-symbols-outlined">account_balance</span>
+                </a>
+            </div>
+
+        </aside>
+        {% else %}
         <aside class="ics-sidebar" aria-label="Global Navigation">
             <a href="{% url 'dashboard:index' %}" class="ics-sidebar__logo">
                 <img src="{% static 'images/device.svg' %}" alt="Ichebo" class="ics-logo" style="width: 100%;">
