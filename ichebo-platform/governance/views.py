@@ -559,7 +559,7 @@ def htmx_global_search(request):
             {'title': 'New Journal Entry', 'icon': 'add', 'url': '/records/htmx/create/', 'target': '#ws-detail'},
             {'title': 'Jump to Reference Library', 'icon': 'library_books', 'url': '/governance/reference/', 'target': '#ws-content'},
             {'title': 'Jump to Mandate Branch', 'icon': 'gavel', 'url': '/governance/mandate/', 'target': '#ws-content'},
-            {'title': 'My Identity Profile', 'icon': 'person', 'url': '/accounts/profile/', 'target': '#ws-content'},
+            {'title': 'My Identity Profile', 'icon': 'person', 'url': 'https://identity.ichebo.org/accounts/profile/', 'target': '_top'},
         ]
         return render(request, 'governance/_global_search_results.html', {
             'suggestions': suggestions,

@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     'broadcast',
     'sceptre',
     'join',
+    'identity',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -197,9 +198,22 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_URL = 'https://identity.ichebo.org/accounts/login/'
+LOGIN_REDIRECT_URL = 'https://app.ichebo.org/'
+LOGOUT_REDIRECT_URL = 'https://identity.ichebo.org/accounts/login/'
+
+# Allow cross-domain ?next= redirects after login across all *.ichebo.org surfaces.
+# Django's is_safe_url() blocks cross-domain redirects by default; this whitelist
+# enables the ?next=https://sceptre.ichebo.org/ pattern used by @login_required.
+ALLOWED_REDIRECT_HOSTS = [
+    'app.ichebo.org',
+    'sceptre.ichebo.org',
+    'learn.ichebo.org',
+    'bible.ichebo.org',
+    'handbook.ichebo.org',
+    'join.ichebo.org',
+    'identity.ichebo.org',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

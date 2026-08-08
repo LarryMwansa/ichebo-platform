@@ -359,8 +359,9 @@ def invitation_accept(request, token):
     if request.method == 'POST':
         if not request.user.is_authenticated:
             from django.urls import reverse
+            from django.conf import settings as django_settings
             accept_url = reverse('tenants:invitation-accept', kwargs={'token': token})
-            return redirect(f'/accounts/login/?next={accept_url}')
+            return redirect(f'{django_settings.LOGIN_URL}?next={accept_url}')
         try:
             accept_invitation(token, request.user)
             return render(request, 'tenants/invitation_accepted.html', {

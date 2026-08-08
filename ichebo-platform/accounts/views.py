@@ -297,7 +297,7 @@ class VerifyEmailView(View):
 class ProfileSetupView(LoginRequiredMixin, View):
     """Step 2 — collect full profile and place user in Induction Tenant."""
 
-    login_url = '/accounts/login/'
+    login_url = None  # falls back to settings.LOGIN_URL (identity.ichebo.org)
 
     def _ctx(self, form):
         return {
@@ -399,7 +399,7 @@ class ProfileSetupView(LoginRequiredMixin, View):
 class WelcomeView(LoginRequiredMixin, View):
     """Post-registration welcome and orientation screen."""
 
-    login_url = '/accounts/login/'
+    login_url = None  # falls back to settings.LOGIN_URL (identity.ichebo.org)
 
     def get(self, request):
         user = request.user
@@ -426,7 +426,7 @@ NEXT_PROGRAMME = {
 class FormationHistoryView(LoginRequiredMixin, View):
     """Full formation history — timeline of level advancements."""
 
-    login_url = '/accounts/login/'
+    login_url = None  # falls back to settings.LOGIN_URL (identity.ichebo.org)
 
     def get(self, request):
         from learn.models import CertificationConfirmation
