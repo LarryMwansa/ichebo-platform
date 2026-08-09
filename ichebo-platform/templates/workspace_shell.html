@@ -404,7 +404,7 @@
             {% endblock %}
         </aside>
         
-        {% if request.site != 'handbook' %}{% include "components/_search_overlay.html" %}{% endif %}
+        {% if request.site != 'handbook' and request.site != 'identity' %}{% include "components/_search_overlay.html" %}{% endif %}
 
     </div>
 
@@ -535,7 +535,7 @@
     {% block extra_body %}{% endblock %}
 
     {# ── Mobile shell: visible below 1024px, hidden on desktop via shell_v2.css ── #}
-    {% if request.site != 'handbook' %}
+    {% if request.site != 'handbook' and request.site != 'identity' %}
     <div id="ws-mobile-shell" style="display:none;">
         {% include "components/_navbar.html" %}
         {% include "components/_app_drawer.html" %}
