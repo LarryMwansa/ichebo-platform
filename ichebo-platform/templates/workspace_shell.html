@@ -218,42 +218,42 @@
         </aside>
         {% else %}
         <aside class="ics-sidebar" aria-label="Global Navigation">
-            <a href="{% url 'dashboard:index' %}" class="ics-sidebar__logo">
+            <a href="https://app.ichebo.org/dashboard/" class="ics-sidebar__logo">
                 <img src="{% static 'images/device.svg' %}" alt="Ichebo" class="ics-logo" style="width: 100%;">
             </a>
 
             <nav class="ics-sidebar__nav">
-                <a href="{% url 'dashboard:index' %}"
+                <a href="https://app.ichebo.org/dashboard/"
                    class="ics-sidebar__item {% if active_app == 'dashboard' %}active{% endif %}"
                    data-tooltip="Dashboard" hx-boost="false">
                     <span class="material-symbols-outlined">dashboard</span>
                 </a>
-                <a href="{% url 'activity:activity-home' %}"
+                <a href="https://app.ichebo.org/activity/"
                    class="ics-sidebar__item {% if active_app == 'activity' %}active{% endif %}"
                    data-tooltip="Activity" hx-boost="false">
                     <span class="material-symbols-outlined">task_alt</span>
                 </a>
-                <a href="{% url 'records:records-home' %}"
+                <a href="https://app.ichebo.org/records/"
                    class="ics-sidebar__item {% if active_app == 'records' %}active{% endif %}"
                    data-tooltip="My Journal" hx-boost="false">
                     <span class="material-symbols-outlined">history_edu</span>
                 </a>
-                <a href="{% url 'bible:reader' %}"
+                <a href="https://app.ichebo.org/bible/"
                    class="ics-sidebar__item {% if active_app == 'bible' %}active{% endif %}"
                    data-tooltip="Bible Reader" hx-boost="false">
                     <span class="material-symbols-outlined">menu_book</span>
                 </a>
-                <a href="{% url 'community:community-home' %}"
+                <a href="https://sceptre.ichebo.org/"
                    class="ics-sidebar__item {% if active_app == 'community' %}active{% endif %}"
                    data-tooltip="Community" hx-boost="false">
                     <span class="material-symbols-outlined">groups</span>
                 </a>
-                <a href="{% url 'learn:learn-home' %}"
+                <a href="https://app.ichebo.org/learn/"
                    class="ics-sidebar__item {% if active_app == 'formation' %}active{% endif %}"
                    data-tooltip="Formation" hx-boost="false">
                     <span class="material-symbols-outlined">school</span>
                 </a>
-                <a href="{% url 'governance:home' %}"
+                <a href="https://app.ichebo.org/governance/"
                    class="ics-sidebar__item {% if active_app == 'governance' %}active{% endif %}"
                    data-tooltip="Governance" hx-boost="false">
                     <span class="material-symbols-outlined">gavel</span>
@@ -263,17 +263,10 @@
                    data-tooltip="Handbook" hx-boost="false">
                     <span class="material-symbols-outlined">auto_stories</span>
                 </a>
-                {% if request.user.competence_level >= 5 %}
-                <a href="{% url 'channel_overview' %}"
-                   class="ics-sidebar__item {% if active_app == 'channel' %}active{% endif %}"
-                   data-tooltip="Channel Scheduler" hx-boost="false">
-                    <span class="material-symbols-outlined">live_tv</span>
-                </a>
-                {% endif %}
             </nav>
 
             <div class="ics-sidebar__bottom">
-                <a href="{% url 'tenants:steward-dashboard' %}"
+                <a href="https://app.ichebo.org/tenants/"
                    class="ics-sidebar__item {% if active_app == 'tenancy' %}active{% endif %}"
                    data-tooltip="Tenancy Hub" hx-boost="false">
                     <span class="material-symbols-outlined">account_balance</span>
@@ -321,7 +314,7 @@
                         <input type="text" placeholder="Search ( / )" aria-label="Search" readonly>
                     </div>
 
-                    {% if request.site != 'handbook' %}
+                    {% if request.site != 'handbook' and request.site != 'identity' %}
                     {# Notifications — live badge via HTMX polling #}
                     <a href="{% url 'notifications:list' %}"
                        class="ws-icon-btn {% if active_app == 'notifications' %}active{% endif %}"
@@ -352,8 +345,8 @@
                         {{ user.competence_level|default:0 }}
                     </a>
 
-                    {# Profile Avatar (You Page) #}
-                    <a href="{% url 'dashboard:you' %}" class="ws-sidebar__avatar" style="width: 32px; height: 32px; margin: 0;" title="You — View Profile">
+                    {# Profile Avatar #}
+                    <a href="https://app.ichebo.org/you/" class="ws-sidebar__avatar" style="width: 32px; height: 32px; margin: 0;" title="You — View Profile">
                         {% if user.avatar %}
                             <img src="{{ user.avatar.url }}" alt="{{ user.display_name }}">
                         {% else %}
