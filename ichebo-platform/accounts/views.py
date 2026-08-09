@@ -455,6 +455,55 @@ class FormationHistoryView(LoginRequiredMixin, View):
         })
 
 
+def _mask_id(id_number):
+    if not id_number:
+        return None
+    if len(id_number) > 4:
+        return '•' * (len(id_number) - 4) + id_number[-4:]
+    return '•' * len(id_number)
+
+
+class ManageAccountView(LoginRequiredMixin, View):
+    """Manage Account — full personal identity data, Google-account style."""
+
+    login_url = None  # falls back to settings.LOGIN_URL (identity.ichebo.org)
+
+    def get(self, request):
+        profile = getattr(request.user, 'profile', None)
+        memberships = UserPermission.objects.filter(
+            user=request.user, is_active=True,
+        ).select_related('tenant')
+        masked_id = _mask_id(profile.id_number if profile else None)
+        return render(request, 'accounts/manage_account.html', {
+            'profile_user': request.user,
+            'profile': profile,
+            'memberships': memberships,
+            'masked_id': masked_id,
+            'active_app': 'accounts',
+            'ws_page_title': 'Manage Account',
+        })
+
+
+@login_required
+def htmx_reveal_id_number(request):
+    """HTMX GET: decrypt and reveal ID number for 30s, then partner endpoint re-masks."""
+    profile = getattr(request.user, 'profile', None)
+    id_number = profile.id_number if profile else None
+    return render(request, 'accounts/_id_number_revealed.html', {
+        'id_number': id_number,
+    })
+
+
+@login_required
+def htmx_mask_id_number(request):
+    """HTMX GET: return the masked ID number span (called 30s after reveal)."""
+    profile = getattr(request.user, 'profile', None)
+    id_number = profile.id_number if profile else None
+    return render(request, 'accounts/_id_number_masked.html', {
+        'masked': _mask_id(id_number),
+    })
+
+
 @login_required
 def htmx_formation_card(request):
     """HTMX GET: formation card partial for the dashboard."""

@@ -1,0 +1,454 @@
+{% extends "workspace_shell.html" %}
+{% load static %}
+
+{% block title %}Manage Account — {{ profile_user.display_name|default:profile_user.username }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
+
+{% block watermark %}IDENTITY{% endblock %}
+
+{% block breadcrumb %}
+    <span class="ws-topbar__breadcrumb-item">Manage Account</span>
+{% endblock %}
+
+{% block context_header %}Account{% endblock %}
+{% block context_content %}
+{% if request.site == 'identity' %}
+  {% with app_root="https://app.ichebo.org" %}
+  <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Identity</div>
+    <a href="{% url 'accounts:profile' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">person</span>
+        Registry Profile
+    </a>
+    <a href="{% url 'accounts:manage-account' %}" class="ctx-btn active">
+        <span class="material-symbols-outlined">badge</span>
+        Manage Account
+    </a>
+    <a href="{% url 'accounts:settings' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        Settings
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Work</div>
+    <a href="{{ app_root }}/activity/" class="ctx-btn">
+        <span class="material-symbols-outlined">task_alt</span>
+        Active Duties
+    </a>
+    <a href="{{ app_root }}/records/" class="ctx-btn">
+        <span class="material-symbols-outlined">description</span>
+        My Records
+    </a>
+    <a href="{{ app_root }}/learn/" class="ctx-btn">
+        <span class="material-symbols-outlined">school</span>
+        Formation Academy
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Community</div>
+    <a href="https://sceptre.ichebo.org/" class="ctx-btn">
+        <span class="material-symbols-outlined">group</span>
+        Community Mandate
+    </a>
+    <a href="{{ app_root }}/tenants/" class="ctx-btn">
+        <span class="material-symbols-outlined">account_balance</span>
+        Tenancy Hub
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
+        {% csrf_token %}
+        <button type="submit" class="ctx-btn" style="width:100%;background:none;border:none;cursor:pointer;color:var(--danger,#e53e3e);text-align:left;">
+            <span class="material-symbols-outlined">logout</span>
+            Sign out
+        </button>
+    </form>
+
+  </div>
+  {% endwith %}
+{% else %}
+<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Identity</div>
+    <a href="{% url 'accounts:profile' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">person</span>
+        Registry Profile
+    </a>
+    <a href="{% url 'accounts:manage-account' %}" class="ctx-btn active">
+        <span class="material-symbols-outlined">badge</span>
+        Manage Account
+    </a>
+    <a href="{% url 'accounts:settings' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        Settings
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Work</div>
+    <a href="{% url 'activity:activity-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">task_alt</span>
+        Active Duties
+    </a>
+    <a href="{% url 'records:records-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">description</span>
+        My Records
+    </a>
+    <a href="{% url 'learn:learn-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">school</span>
+        Formation Academy
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Community</div>
+    <a href="{% url 'community:community-home' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">group</span>
+        Community Mandate
+    </a>
+    <a href="{% url 'tenants:steward-dashboard' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">account_balance</span>
+        Tenancy Hub
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
+        {% csrf_token %}
+        <button type="submit" class="ctx-btn" style="width:100%;background:none;border:none;cursor:pointer;color:var(--danger,#e53e3e);text-align:left;">
+            <span class="material-symbols-outlined">logout</span>
+            Sign out
+        </button>
+    </form>
+
+</div>
+{% endif %}
+{% endblock %}
+
+{% block ws_content %}
+<div class="ws-layout--full-page">
+  <div class="ws-full-page-inner">
+
+    <!-- Page header -->
+    <div style="margin-bottom: var(--space-xl);">
+      <div class="label-caps" style="color: var(--primary); margin-bottom: var(--space-2xs);">Account Management</div>
+      <h1 class="editorial-title" style="font-size: var(--fz-4); margin: 0;">
+        {{ profile_user.display_name|default:profile_user.username }}
+      </h1>
+      {% if profile and profile.member_number %}
+      <div style="font-size: var(--fz-xs); color: var(--muted); margin-top: var(--space-2xs); font-family: monospace; letter-spacing: 0.04em;">
+        {{ profile.member_number }}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Section 1: Personal Info -->
+    <div class="profile-card">
+      <div class="label-caps" style="color: var(--primary); margin-bottom: 16px;">Personal Information</div>
+
+      {% if profile %}
+
+        {% if profile.full_name %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">person</span>
+            <span class="profile-row-label">Full Name</span>
+          </div>
+          <span class="profile-row-value">
+            {% if profile.title %}{{ profile.get_title_display }} {% endif %}{{ profile.full_name }}
+          </span>
+        </div>
+        {% endif %}
+
+        {% if profile.date_of_birth %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">cake</span>
+            <span class="profile-row-label">Date of Birth</span>
+          </div>
+          <span class="profile-row-value">{{ profile.date_of_birth|date:"j F Y" }}{% if profile.age %} &nbsp;<span style="color:var(--muted);font-size:var(--fz-xs);">({{ profile.age }} yrs)</span>{% endif %}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.gender %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">wc</span>
+            <span class="profile-row-label">Gender</span>
+          </div>
+          <span class="profile-row-value">{{ profile.get_gender_display }}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.marital_status %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">favorite</span>
+            <span class="profile-row-label">Marital Status</span>
+          </div>
+          <span class="profile-row-value">{{ profile.get_marital_status_display }}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.country %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">flag</span>
+            <span class="profile-row-label">Country</span>
+          </div>
+          <span class="profile-row-value">{{ profile.country }}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.phone_number %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">phone</span>
+            <span class="profile-row-label">Phone</span>
+          </div>
+          <span class="profile-row-value">{{ profile.phone_number }}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.address %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">home</span>
+            <span class="profile-row-label">Address</span>
+          </div>
+          <span class="profile-row-value" style="white-space: pre-line;">{{ profile.address }}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.occupation %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">work</span>
+            <span class="profile-row-label">Occupation</span>
+          </div>
+          <span class="profile-row-value">{{ profile.occupation }}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.education %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">school</span>
+            <span class="profile-row-label">Education</span>
+          </div>
+          <span class="profile-row-value">{{ profile.education }}</span>
+        </div>
+        {% endif %}
+
+      {% else %}
+        <p style="color: var(--muted); font-size: var(--fz-s);">Profile not yet completed. <a href="{% url 'accounts:profile-setup' %}" style="color: var(--primary);">Complete your profile →</a></p>
+      {% endif %}
+    </div>
+
+    <!-- Section 2: Kingdom Identity -->
+    <div class="profile-card">
+      <div class="label-caps" style="color: var(--primary); margin-bottom: 16px;">Kingdom Identity</div>
+
+      {% if profile and profile.member_number %}
+      <div class="profile-row">
+        <div class="profile-row-left">
+          <span class="material-symbols-outlined profile-row-icon">tag</span>
+          <span class="profile-row-label">Member Number</span>
+        </div>
+        <span class="profile-row-value" style="font-family: monospace; letter-spacing: 0.05em;">{{ profile.member_number }}</span>
+      </div>
+      {% endif %}
+
+      <!-- National ID — masked, click to reveal -->
+      <div class="profile-row">
+        <div class="profile-row-left">
+          <span class="material-symbols-outlined profile-row-icon">fingerprint</span>
+          <span class="profile-row-label">National ID</span>
+        </div>
+        {% if profile and profile.id_number %}
+          {% include "accounts/_id_number_masked.html" with masked=masked_id %}
+        {% else %}
+          <span class="profile-row-value" style="color: var(--muted); font-style: italic;">Not provided</span>
+        {% endif %}
+      </div>
+
+      {% if profile %}
+
+        {% if profile.accepted_christ is not None %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">church</span>
+            <span class="profile-row-label">Accepted Christ</span>
+          </div>
+          <span class="profile-row-value">{% if profile.accepted_christ %}Yes{% else %}No{% endif %}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.church_member is not None %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">groups</span>
+            <span class="profile-row-label">Church Member</span>
+          </div>
+          <span class="profile-row-value">
+            {% if profile.church_member %}Yes{% if profile.church_name %} — {{ profile.church_name }}{% endif %}{% else %}No{% endif %}
+          </span>
+        </div>
+        {% endif %}
+
+      {% endif %}
+    </div>
+
+    <!-- Section 3: Security & Access -->
+    <div class="profile-card">
+      <div class="label-caps" style="color: var(--primary); margin-bottom: 16px;">Security &amp; Access</div>
+
+      <div class="profile-row">
+        <div class="profile-row-left">
+          <span class="material-symbols-outlined profile-row-icon">mail</span>
+          <span class="profile-row-label">Email Address</span>
+        </div>
+        <span class="profile-row-value">{{ profile_user.email }}</span>
+      </div>
+
+      <div class="profile-row">
+        <div class="profile-row-left">
+          <span class="material-symbols-outlined profile-row-icon">lock</span>
+          <span class="profile-row-label">Password</span>
+        </div>
+        <a href="{% url 'password_change' %}" class="btn-touch btn-sm" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: var(--fz-xs);">
+          <span class="material-symbols-outlined" style="font-size: 16px;">key</span>
+          Change password
+        </a>
+      </div>
+
+      <div class="profile-row">
+        <div class="profile-row-left">
+          <span class="material-symbols-outlined profile-row-icon">verified_user</span>
+          <span class="profile-row-label">Account Status</span>
+        </div>
+        <span class="status-badge status-badge--{{ profile_user.status }}">{{ profile_user.get_status_display }}</span>
+      </div>
+
+      <div class="profile-row">
+        <div class="profile-row-left">
+          <span class="material-symbols-outlined profile-row-icon">calendar_today</span>
+          <span class="profile-row-label">Member Since</span>
+        </div>
+        <span class="profile-row-value">{{ profile_user.date_joined|date:"j F Y" }}</span>
+      </div>
+
+      {% if profile_user.last_login %}
+      <div class="profile-row">
+        <div class="profile-row-left">
+          <span class="material-symbols-outlined profile-row-icon">login</span>
+          <span class="profile-row-label">Last Sign-in</span>
+        </div>
+        <span class="profile-row-value">{{ profile_user.last_login|date:"j F Y, H:i" }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Section 4: Formation & Referees -->
+    <div class="profile-card">
+      <div class="label-caps" style="color: var(--primary); margin-bottom: 16px;">Formation &amp; Referees</div>
+
+      {% if profile_user.induction_pathway %}
+      <div class="profile-row">
+        <div class="profile-row-left">
+          <span class="material-symbols-outlined profile-row-icon">route</span>
+          <span class="profile-row-label">Induction Pathway</span>
+        </div>
+        <span class="profile-row-value">{{ profile_user.get_induction_pathway_display }}</span>
+      </div>
+      {% endif %}
+
+      {% if profile_user.induction_enrolled_at %}
+      <div class="profile-row">
+        <div class="profile-row-left">
+          <span class="material-symbols-outlined profile-row-icon">event</span>
+          <span class="profile-row-label">Enrolled</span>
+        </div>
+        <span class="profile-row-value">{{ profile_user.induction_enrolled_at|date:"j F Y" }}</span>
+      </div>
+      {% endif %}
+
+      {% if profile_user.induction_completed_at %}
+      <div class="profile-row">
+        <div class="profile-row-left">
+          <span class="material-symbols-outlined profile-row-icon">verified</span>
+          <span class="profile-row-label">Completed</span>
+        </div>
+        <span class="profile-row-value">{{ profile_user.induction_completed_at|date:"j F Y" }}</span>
+      </div>
+      {% endif %}
+
+      {% if profile %}
+
+        {% if profile.referee_1_name %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">how_to_reg</span>
+            <span class="profile-row-label">Referee 1</span>
+          </div>
+          <span class="profile-row-value">{{ profile.referee_1_name }}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.referee_2_name %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">how_to_reg</span>
+            <span class="profile-row-label">Referee 2</span>
+          </div>
+          <span class="profile-row-value">{{ profile.referee_2_name }}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.interests %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">interests</span>
+            <span class="profile-row-label">Interests</span>
+          </div>
+          <span class="profile-row-value" style="white-space: pre-line;">{{ profile.interests }}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.gifts_skills %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">auto_awesome</span>
+            <span class="profile-row-label">Gifts &amp; Skills</span>
+          </div>
+          <span class="profile-row-value" style="white-space: pre-line;">{{ profile.gifts_skills }}</span>
+        </div>
+        {% endif %}
+
+        {% if profile.terms_accepted and profile.terms_accepted_at %}
+        <div class="profile-row">
+          <div class="profile-row-left">
+            <span class="material-symbols-outlined profile-row-icon">task_alt</span>
+            <span class="profile-row-label">Terms Accepted</span>
+          </div>
+          <span class="profile-row-value">{{ profile.terms_accepted_at|date:"j F Y" }}</span>
+        </div>
+        {% endif %}
+
+      {% endif %}
+
+      {% if not profile_user.induction_pathway and not profile %}
+        <p style="color: var(--muted); font-size: var(--fz-s);">Formation details appear here after completing your induction profile.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

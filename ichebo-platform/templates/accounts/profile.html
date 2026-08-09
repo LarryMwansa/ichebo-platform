@@ -15,12 +15,75 @@
 
 {% block context_header %}Profile{% endblock %}
 {% block context_content %}
+{% if request.site == 'identity' %}
+  {% with app_root="https://app.ichebo.org" %}
+  <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Identity</div>
+    <a href="{% url 'accounts:profile' %}" class="ctx-btn active">
+        <span class="material-symbols-outlined">person</span>
+        Registry Profile
+    </a>
+    <a href="{% url 'accounts:manage-account' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">badge</span>
+        Manage Account
+    </a>
+    <a href="{% url 'accounts:settings' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        Settings
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Work</div>
+    <a href="{{ app_root }}/activity/" class="ctx-btn">
+        <span class="material-symbols-outlined">task_alt</span>
+        Active Duties
+    </a>
+    <a href="{{ app_root }}/records/" class="ctx-btn">
+        <span class="material-symbols-outlined">description</span>
+        My Records
+    </a>
+    <a href="{{ app_root }}/learn/" class="ctx-btn">
+        <span class="material-symbols-outlined">school</span>
+        Formation Academy
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Community</div>
+    <a href="https://sceptre.ichebo.org/" class="ctx-btn">
+        <span class="material-symbols-outlined">group</span>
+        Community Mandate
+    </a>
+    <a href="{{ app_root }}/tenants/" class="ctx-btn">
+        <span class="material-symbols-outlined">account_balance</span>
+        Tenancy Hub
+    </a>
+
+    <div class="ctx-divider"></div>
+
+    <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
+        {% csrf_token %}
+        <button type="submit" class="ctx-btn" style="width:100%;background:none;border:none;cursor:pointer;color:var(--danger,#e53e3e);text-align:left;">
+            <span class="material-symbols-outlined">logout</span>
+            Sign out
+        </button>
+    </form>
+
+  </div>
+  {% endwith %}
+{% else %}
 <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
 
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Identity</div>
     <a href="{% url 'accounts:profile' %}" class="ctx-btn active">
         <span class="material-symbols-outlined">person</span>
         Registry Profile
+    </a>
+    <a href="{% url 'accounts:manage-account' %}" class="ctx-btn">
+        <span class="material-symbols-outlined">badge</span>
+        Manage Account
     </a>
     <a href="{% url 'accounts:settings' %}" class="ctx-btn">
         <span class="material-symbols-outlined">manage_accounts</span>
@@ -66,6 +129,7 @@
     </form>
 
 </div>
+{% endif %}
 {% endblock %}
 
 {% block ws_content %}

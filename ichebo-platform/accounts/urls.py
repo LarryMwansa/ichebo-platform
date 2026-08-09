@@ -29,4 +29,8 @@ template_urlpatterns = [
     # H1 — Formation
     path('formation/', views.FormationHistoryView.as_view(), name='formation-history'),
     path('htmx/formation-card/', views.htmx_formation_card, name='htmx-formation-card'),
+    # Manage Account
+    path('manage/', views.ManageAccountView.as_view(), name='manage-account'),
+    path('htmx/manage/reveal-id/', views.htmx_reveal_id_number, name='htmx-reveal-id'),
+    path('htmx/manage/mask-id/', views.htmx_mask_id_number, name='htmx-mask-id'),
 ]

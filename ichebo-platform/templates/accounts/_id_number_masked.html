@@ -1,0 +1,13 @@
+<!-- Masked ID number — click to reveal for 30s -->
+<span
+  id="id-number-reveal"
+  class="profile-row-value"
+  hx-get="{% url 'accounts:htmx-reveal-id' %}"
+  hx-trigger="click"
+  hx-target="#id-number-reveal"
+  hx-swap="outerHTML"
+  style="cursor: pointer; font-family: monospace; letter-spacing: 0.1em; color: var(--muted);"
+  title="Click to reveal">
+  {% if masked %}{{ masked }}{% else %}<em>Not provided</em>{% endif %}
+  <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-left: 4px; opacity: 0.5;">visibility</span>
+</span>

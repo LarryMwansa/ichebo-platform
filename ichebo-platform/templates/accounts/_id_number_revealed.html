@@ -1,0 +1,11 @@
+<!-- Revealed ID number — auto-re-masks after 30s -->
+<span
+  id="id-number-reveal"
+  class="profile-row-value"
+  hx-get="{% url 'accounts:htmx-mask-id' %}"
+  hx-trigger="load delay:30s"
+  hx-target="#id-number-reveal"
+  hx-swap="outerHTML"
+  style="font-family: monospace; letter-spacing: 0.05em;">
+  {% if id_number %}{{ id_number }}{% else %}<em style="color:var(--muted);">Not provided</em>{% endif %}
+</span>
