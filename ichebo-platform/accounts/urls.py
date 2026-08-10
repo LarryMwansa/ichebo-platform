@@ -29,6 +29,8 @@ template_urlpatterns = [
     # H1 — Formation
     path('formation/', views.FormationHistoryView.as_view(), name='formation-history'),
     path('htmx/formation-card/', views.htmx_formation_card, name='htmx-formation-card'),
+    # You hub (migrated from app.ichebo.org/you/)
+    path('you/', views.YouView.as_view(), name='you'),
     # Manage Account
     path('manage/', views.ManageAccountView.as_view(), name='manage-account'),
     path('manage/password/', views.PasswordChangeView.as_view(), name='password-change'),

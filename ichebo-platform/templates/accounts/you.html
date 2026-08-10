@@ -1,0 +1,206 @@
+{% extends "identity/base.html" %}
+{% load static %}
+
+{% block title %}You — {{ user.display_name|default:user.email }}{% endblock %}
+
+{% block identity_content %}
+
+<!-- Hero -->
+<div class="id-hero id-hero--with-avatar">
+  <div class="id-hero__avatar">
+    {% if user.avatar_url %}
+      <img src="{{ user.avatar_url }}" alt="{{ user.display_name }}">
+    {% else %}
+      {{ user.display_name|default:user.email|first|upper }}
+    {% endif %}
+  </div>
+  <div class="id-hero__identity">
+    <div class="id-hero__eyebrow">Personal Hub</div>
+    <div class="id-hero__name">{{ user.display_name|default:user.username }}</div>
+    <div class="id-hero__badge">
+      {{ user.status|default:"Seeker"|upper }} &middot; LEVEL {{ user.competence_level }}
+    </div>
+  </div>
+</div>
+
+<!-- Content -->
+<div class="id-content--wide">
+
+  <!-- Formation progress + stats -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem; align-items: start;">
+
+    <div>
+      <div class="id-section-title">Formation Progress</div>
+      <div class="id-progress">
+        <div class="id-progress__header">
+          <span>Advancement</span>
+          <span>Level {{ user.competence_level }} / 7</span>
+        </div>
+        <div class="id-progress__bar">
+          <div class="id-progress__fill" style="width: {% widthratio user.competence_level 7 100 %}%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="id-section-title">Registry Inventory</div>
+      <div class="id-stat-grid">
+        <div class="id-stat">
+          <div class="id-stat__num">{{ user.competence_level }}</div>
+          <div class="id-stat__label">Level</div>
+        </div>
+        <div class="id-stat">
+          <div class="id-stat__num">{{ activity_count|default:"0" }}</div>
+          <div class="id-stat__label">Acts</div>
+        </div>
+        <div class="id-stat">
+          <div class="id-stat__num">{{ record_count|default:"0" }}</div>
+          <div class="id-stat__label">Records</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Apostolic Digest -->
+  <div class="id-section">
+    <div class="id-section-title">Apostolic Digest</div>
+
+    {% if digest.overdue_items or digest.due_today or digest.pending_reminders %}
+    <div class="id-list">
+      {% for item in digest.overdue_items %}
+      <div class="id-list-item" style="cursor:default;">
+        <div class="id-list-item__icon id-list-item__icon--error">
+          <span class="material-symbols-outlined">priority_high</span>
+        </div>
+        <div class="id-list-item__content">
+          <div class="id-list-item__title">{{ item.title }}</div>
+          <div class="id-list-item__meta" style="color:#dc2626;">Overdue &middot; {{ item.activity_type|upper }}</div>
+        </div>
+      </div>
+      {% endfor %}
+
+      {% for item in digest.due_today %}
+      <div class="id-list-item" style="cursor:default;">
+        <div class="id-list-item__icon id-list-item__icon--warn">
+          <span class="material-symbols-outlined">schedule</span>
+        </div>
+        <div class="id-list-item__content">
+          <div class="id-list-item__title">{{ item.title }}</div>
+          <div class="id-list-item__meta">Today &middot; {{ item.due_at|slice:"11:16"|default:"All day" }}</div>
+        </div>
+      </div>
+      {% endfor %}
+
+      {% for r in digest.pending_reminders %}
+      <div class="id-list-item" style="cursor:default;">
+        <div class="id-list-item__icon">
+          <span class="material-symbols-outlined">notifications_active</span>
+        </div>
+        <div class="id-list-item__content">
+          <div class="id-list-item__title">{{ r.title }}</div>
+          <div class="id-list-item__meta">Reminder &middot; {{ r.due_at|slice:"11:16"|default:"All day" }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="id-empty">
+      <span class="material-symbols-outlined">check_circle</span>
+      No urgent mandates. Your schedule is clear.
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Jurisdictional Access -->
+  <div class="id-section">
+    <div class="id-section-title">Jurisdictional Access</div>
+    <div class="id-list">
+
+      <a href="{% url 'accounts:profile' %}" class="id-list-item">
+        <div class="id-list-item__icon">
+          <span class="material-symbols-outlined">person</span>
+        </div>
+        <div class="id-list-item__content">
+          <div class="id-list-item__title">Registry Profile</div>
+          <div class="id-list-item__meta">Personal identity and stewardship credentials</div>
+        </div>
+        <span class="material-symbols-outlined id-list-item__arrow">arrow_forward_ios</span>
+      </a>
+
+      <a href="{% url 'accounts:manage-account' %}" class="id-list-item">
+        <div class="id-list-item__icon">
+          <span class="material-symbols-outlined">badge</span>
+        </div>
+        <div class="id-list-item__content">
+          <div class="id-list-item__title">Manage Account</div>
+          <div class="id-list-item__meta">Kingdom identity, national ID, security &amp; formation</div>
+        </div>
+        <span class="material-symbols-outlined id-list-item__arrow">arrow_forward_ios</span>
+      </a>
+
+      <a href="https://app.ichebo.org/activity/" class="id-list-item" hx-boost="false">
+        <div class="id-list-item__icon">
+          <span class="material-symbols-outlined">task_alt</span>
+        </div>
+        <div class="id-list-item__content">
+          <div class="id-list-item__title">Active Duties</div>
+          <div class="id-list-item__meta">Habits, tasks, and daily reporting</div>
+        </div>
+        <span class="material-symbols-outlined id-list-item__arrow">arrow_forward_ios</span>
+      </a>
+
+      <a href="https://sceptre.ichebo.org/" class="id-list-item" hx-boost="false">
+        <div class="id-list-item__icon">
+          <span class="material-symbols-outlined">group</span>
+        </div>
+        <div class="id-list-item__content">
+          <div class="id-list-item__title">Community Mandate</div>
+          <div class="id-list-item__meta">Membership and jurisdictional fellowship</div>
+        </div>
+        <span class="material-symbols-outlined id-list-item__arrow">arrow_forward_ios</span>
+      </a>
+
+      <a href="https://app.ichebo.org/learn/" class="id-list-item" hx-boost="false">
+        <div class="id-list-item__icon">
+          <span class="material-symbols-outlined">school</span>
+        </div>
+        <div class="id-list-item__content">
+          <div class="id-list-item__title">Formation Academy</div>
+          <div class="id-list-item__meta">Enrolments and competence progression</div>
+        </div>
+        <span class="material-symbols-outlined id-list-item__arrow">arrow_forward_ios</span>
+      </a>
+
+      <a href="{% url 'accounts:settings' %}" class="id-list-item">
+        <div class="id-list-item__icon id-list-item__icon--muted">
+          <span class="material-symbols-outlined">settings</span>
+        </div>
+        <div class="id-list-item__content">
+          <div class="id-list-item__title">Registry Settings</div>
+          <div class="id-list-item__meta">Preferences, region, and security</div>
+        </div>
+        <span class="material-symbols-outlined id-list-item__arrow">arrow_forward_ios</span>
+      </a>
+
+    </div>
+  </div>
+
+  {% if digest.habit_streaks %}
+  <div class="id-section">
+    <div class="id-section-title">Active Streaks</div>
+    <div class="id-list">
+      {% for h in digest.habit_streaks %}
+      <a href="https://app.ichebo.org/activity/{{ h.activity_id }}/" class="id-list-item" hx-boost="false">
+        <div class="id-list-item__content">
+          <div class="id-list-item__title">{{ h.title|truncatechars:40 }}</div>
+        </div>
+        <span style="font-size:14px;font-weight:800;color:{% if h.streak > 0 %}var(--primary){% else %}var(--muted){% endif %};">{{ h.streak }}d</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

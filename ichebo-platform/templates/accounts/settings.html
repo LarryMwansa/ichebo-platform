@@ -1,49 +1,42 @@
-{% extends "workspace_shell.html" %}
+{% extends "identity/base.html" %}
 {% load static %}
 
-{% block watermark %}SETTINGS{% endblock %}
-
-{% block breadcrumb %}
-    <span class="ws-topbar__breadcrumb-item">Settings</span>
-{% endblock %}
-
-{% block ws_content %}
-<div class="ws-full-page-inner" style="padding: var(--space-l) 0;">
-    <div class="ws-page-header" style="margin-bottom: var(--space-l);">
-      <div class="ws-page-header__left">
-        <div class="label-tag" style="margin-bottom: var(--space-xs);">Configuration</div>
-        <h2 class="editorial-title" style="font-size: var(--fz-3); margin: 0;">Institutional <em>Settings</em></h2>
-      </div>
-    </div>
-
-    <div class="settings-v2-container">
-        {% include "accounts/_settings_appearance.html" %}
-        {% include "accounts/_settings_region.html" %}
-    </div>
-</div>
-{% endblock %}
-
-{% block content %}
-<div class="ws-full-page-inner" style="padding: var(--space-l) 0;">
-    <a href="https://app.ichebo.org/you/"
-       style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:var(--space-s);padding:0 var(--space-m);letter-spacing:0.02em;">
-      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
-      You
-    </a>
-    <div class="ws-page-header" style="margin-bottom: var(--space-l);">
-      <div class="ws-page-header__left">
-        <div class="label-tag" style="margin-bottom: var(--space-xs);">Configuration</div>
-        <h2 class="editorial-title" style="font-size: var(--fz-3); margin: 0;">Institutional <em>Settings</em></h2>
-      </div>
-    </div>
-
-    <div class="settings-v2-container">
-        {% include "accounts/_settings_appearance.html" %}
-        {% include "accounts/_settings_region.html" %}
-    </div>
-</div>
-{% endblock %}
+{% block title %}Settings — Ichebo{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+{% endblock %}
+
+{% block identity_content %}
+
+<!-- Hero -->
+<div class="id-hero">
+  <div class="id-hero__eyebrow">Configuration</div>
+  <h1 class="id-hero__title">Institutional <em>Settings</em></h1>
+</div>
+
+<!-- Tab strip -->
+<div class="id-tabs">
+  <a href="{% url 'accounts:profile' %}" class="id-tab">
+    <span class="material-symbols-outlined">person</span> Registry Profile
+  </a>
+  <a href="{% url 'accounts:manage-account' %}" class="id-tab">
+    <span class="material-symbols-outlined">badge</span> Manage Account
+  </a>
+  <a href="{% url 'accounts:formation-history' %}" class="id-tab">
+    <span class="material-symbols-outlined">history_edu</span> Formation
+  </a>
+  <a href="{% url 'accounts:settings' %}" class="id-tab active">
+    <span class="material-symbols-outlined">manage_accounts</span> Settings
+  </a>
+</div>
+
+<!-- Content -->
+<div class="id-content">
+  <div class="settings-v2-container">
+    {% include "accounts/_settings_appearance.html" %}
+    {% include "accounts/_settings_region.html" %}
+  </div>
+</div>
+
 {% endblock %}

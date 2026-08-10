@@ -1,49 +1,250 @@
 {% extends "base_auth.html" %}
 {% load static %}
 {% block title %}Sign In{% endblock %}
+
 {% block content %}
-<div class="auth-card">
+<style>
+  /* Override auth-shell for the new identity login layout */
+  body.auth-shell { background: var(--ink, #0e0e0e); align-items: stretch; padding: 0; }
+  .auth-main { padding: 0; align-items: stretch; min-height: 100vh; }
 
-  <div class="auth-card__brand">
-    <img src="{% static 'images/logo.svg' %}" alt="Ichebo" class="auth-logo" style="height:56px;width:auto;">
-  </div>
+  .id-login-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
 
-  <h1>Sign In</h1>
-  <p class="auth-card__subtitle">Welcome back. Enter your credentials to continue.</p>
-  <div class="auth-divider"></div>
+  /* Left — editorial dark panel */
+  .id-login-left {
+    background: var(--ink, #0e0e0e);
+    padding: clamp(2.5rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .id-login-left::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 20% 60%, rgba(175,50,54,0.18) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .id-login-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 1;
+  }
+  .id-login-brand img { height: 36px; width: auto; filter: brightness(0) invert(1); }
 
-  {% if form.non_field_errors %}
-  <div class="auth-errors">
-    {% for error in form.non_field_errors %}
-      <span>{{ error }}</span>
-    {% endfor %}
-  </div>
-  {% endif %}
+  .id-login-hero { position: relative; z-index: 1; }
+  .id-login-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--primary, #af3236);
+    margin-bottom: 1.25rem;
+  }
+  .id-login-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 2px;
+    background: var(--primary, #af3236);
+    display: block;
+    flex-shrink: 0;
+  }
+  .id-login-headline {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: #fff;
+    text-wrap: balance;
+    margin-bottom: 1.25rem;
+  }
+  .id-login-headline em { font-style: italic; color: rgba(255,255,255,0.55); }
+  .id-login-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.7;
+    max-width: 38ch;
+  }
 
-  <form method="post">
-    {% csrf_token %}
+  .id-login-footer-note {
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+    position: relative;
+    z-index: 1;
+  }
 
-    <div class="auth-field">
-      <label for="{{ form.username.id_for_label }}">Email address</label>
-      {{ form.username }}
-      {% if form.username.errors %}
-        <span class="auth-field__error">{{ form.username.errors|join:", " }}</span>
-      {% endif %}
+  /* Right — form panel */
+  .id-login-right {
+    background: var(--card, #f5f3f0);
+    padding: clamp(2.5rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  html.dark .id-login-right { background: var(--ink-2, #1a1a1a); }
+
+  .id-login-form-head { margin-bottom: 2rem; }
+  .id-login-form-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text, #0e0e0e);
+    margin-bottom: 0.35rem;
+  }
+  html.dark .id-login-form-title { color: var(--stone, #f5f3f0); }
+  .id-login-form-sub { font-size: 13.5px; color: var(--muted, #6b6b6b); }
+
+  .id-login-errors {
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 13px;
+    color: #dc2626;
+    margin-bottom: 1.25rem;
+  }
+
+  .id-lf { margin-bottom: 1.125rem; }
+  .id-lf label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted, #6b6b6b);
+    margin-bottom: 6px;
+  }
+  .id-lf input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid rgba(0,0,0,0.14);
+    border-radius: 6px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    color: var(--text, #0e0e0e);
+    background: #fff;
+    box-sizing: border-box;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  html.dark .id-lf input {
+    background: var(--ink, #0e0e0e);
+    color: var(--stone, #f5f3f0);
+    border-color: rgba(255,255,255,0.12);
+  }
+  .id-lf input:focus {
+    outline: none;
+    border-color: var(--primary, #af3236);
+    box-shadow: 0 0 0 3px rgba(175,50,54,0.12);
+  }
+  .id-lf__error { font-size: 12px; color: #dc2626; margin-top: 4px; }
+
+  .id-login-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--primary, #af3236);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 0.5rem;
+  }
+  .id-login-btn:hover { background: var(--primary-dark, #8c2a2d); }
+
+  .id-login-form-footer {
+    margin-top: 1.5rem;
+    font-size: 13px;
+    color: var(--muted, #6b6b6b);
+    text-align: center;
+  }
+  .id-login-form-footer a { color: var(--primary, #af3236); font-weight: 600; text-decoration: none; }
+  .id-login-form-footer a:hover { text-decoration: underline; }
+
+  /* Single-column on mobile */
+  @media (max-width: 700px) {
+    .id-login-wrap { grid-template-columns: 1fr; }
+    .id-login-left { display: none; }
+    .id-login-right { background: var(--card, #f5f3f0); min-height: 100vh; }
+  }
+</style>
+
+<div class="id-login-wrap">
+
+  <!-- Left: editorial panel -->
+  <div class="id-login-left">
+    <div class="id-login-brand">
+      <img src="{% static 'images/logo.svg' %}" alt="Ichebo">
     </div>
 
-    <div class="auth-field">
-      <label for="{{ form.password.id_for_label }}">Password</label>
-      {{ form.password }}
-      {% if form.password.errors %}
-        <span class="auth-field__error">{{ form.password.errors|join:", " }}</span>
-      {% endif %}
-      <span class="auth-field__hint">Minimum 10 characters · at least one uppercase, one lowercase, one number, and one special character.</span>
+    <div class="id-login-hero">
+      <div class="id-login-eyebrow">Kingdom Identity</div>
+      <h1 class="id-login-headline">Your <em>identity</em><br>in the Kingdom.</h1>
+      <p class="id-login-sub">One account across the entire Ichebo network — platform, community, formation, and governance.</p>
     </div>
 
-    <button type="submit" class="auth-btn">Sign In</button>
-  </form>
+    <div class="id-login-footer-note">identity.ichebo.org &mdash; Ichebo Christian Services</div>
+  </div>
 
-  <p class="auth-footer">No account yet? <a href="{% url 'accounts:signup' %}">Create one</a></p>
+  <!-- Right: form panel -->
+  <div class="id-login-right">
+    <div class="id-login-form-head">
+      <div class="id-login-form-title">Sign in</div>
+      <div class="id-login-form-sub">Welcome back. Enter your credentials to continue.</div>
+    </div>
+
+    {% if form.non_field_errors %}
+    <div class="id-login-errors">
+      {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+      <div class="id-lf">
+        <label for="{{ form.username.id_for_label }}">Email address</label>
+        <input type="email"
+               name="{{ form.username.html_name }}"
+               id="{{ form.username.id_for_label }}"
+               autocomplete="email"
+               autofocus
+               value="{{ form.username.value|default:'' }}">
+        {% if form.username.errors %}<div class="id-lf__error">{{ form.username.errors|join:", " }}</div>{% endif %}
+      </div>
+
+      <div class="id-lf">
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        <input type="password"
+               name="{{ form.password.html_name }}"
+               id="{{ form.password.id_for_label }}"
+               autocomplete="current-password">
+        {% if form.password.errors %}<div class="id-lf__error">{{ form.password.errors|join:", " }}</div>{% endif %}
+      </div>
+
+      <button type="submit" class="id-login-btn">Sign in to Ichebo</button>
+    </form>
+
+    <div class="id-login-form-footer">
+      No account? <a href="https://join.ichebo.org/accounts/signup/">Create one at join.ichebo.org</a>
+    </div>
+  </div>
 
 </div>
 {% endblock %}

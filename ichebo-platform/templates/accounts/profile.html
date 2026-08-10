@@ -1,4 +1,4 @@
-{% extends "workspace_shell.html" %}
+{% extends "identity/base.html" %}
 {% load static %}
 
 {% block title %}Profile — {{ profile_user.display_name|default:profile_user.username }}{% endblock %}
@@ -7,179 +7,46 @@
   <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
 {% endblock %}
 
-{% block watermark %}IDENTITY{% endblock %}
+{% block identity_content %}
 
-{% block breadcrumb %}
-    <span class="ws-topbar__breadcrumb-item">Profile</span>
-{% endblock %}
-
-{% block context_header %}Profile{% endblock %}
-{% block context_content %}
-{% if request.site == 'identity' %}
-  {% with app_root="https://app.ichebo.org" %}
-  <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
-
-    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Identity</div>
-    <a href="{% url 'accounts:profile' %}" class="ctx-btn active">
-        <span class="material-symbols-outlined">person</span>
-        Registry Profile
-    </a>
-    <a href="{% url 'accounts:manage-account' %}" class="ctx-btn">
-        <span class="material-symbols-outlined">badge</span>
-        Manage Account
-    </a>
-    <a href="{% url 'accounts:settings' %}" class="ctx-btn">
-        <span class="material-symbols-outlined">manage_accounts</span>
-        Settings
-    </a>
-
-    <div class="ctx-divider"></div>
-
-    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Work</div>
-    <a href="{{ app_root }}/activity/" class="ctx-btn">
-        <span class="material-symbols-outlined">task_alt</span>
-        Active Duties
-    </a>
-    <a href="{{ app_root }}/records/" class="ctx-btn">
-        <span class="material-symbols-outlined">description</span>
-        My Records
-    </a>
-    <a href="{{ app_root }}/learn/" class="ctx-btn">
-        <span class="material-symbols-outlined">school</span>
-        Formation Academy
-    </a>
-
-    <div class="ctx-divider"></div>
-
-    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Community</div>
-    <a href="https://sceptre.ichebo.org/" class="ctx-btn">
-        <span class="material-symbols-outlined">group</span>
-        Community Mandate
-    </a>
-    <a href="{{ app_root }}/tenants/" class="ctx-btn">
-        <span class="material-symbols-outlined">account_balance</span>
-        Tenancy Hub
-    </a>
-
-    <div class="ctx-divider"></div>
-
-    <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
-        {% csrf_token %}
-        <button type="submit" class="ctx-btn" style="width:100%;background:none;border:none;cursor:pointer;color:var(--danger,#e53e3e);text-align:left;">
-            <span class="material-symbols-outlined">logout</span>
-            Sign out
-        </button>
-    </form>
-
+<!-- Hero -->
+<div class="id-hero id-hero--with-avatar">
+  <div class="id-hero__avatar">
+    {% if profile_user.avatar_url %}
+      <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}">
+    {% else %}
+      {{ profile_user.display_name|default:profile_user.email|first|upper }}
+    {% endif %}
   </div>
-  {% endwith %}
-{% else %}
-<div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
-
-    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Identity</div>
-    <a href="{% url 'accounts:profile' %}" class="ctx-btn active">
-        <span class="material-symbols-outlined">person</span>
-        Registry Profile
-    </a>
-    <a href="{% url 'accounts:manage-account' %}" class="ctx-btn">
-        <span class="material-symbols-outlined">badge</span>
-        Manage Account
-    </a>
-    <a href="{% url 'accounts:settings' %}" class="ctx-btn">
-        <span class="material-symbols-outlined">manage_accounts</span>
-        Settings
-    </a>
-
-    <div class="ctx-divider"></div>
-
-    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">My Work</div>
-    <a href="https://app.ichebo.org/activity/" class="ctx-btn">
-        <span class="material-symbols-outlined">task_alt</span>
-        Active Duties
-    </a>
-    <a href="https://app.ichebo.org/records/" class="ctx-btn">
-        <span class="material-symbols-outlined">description</span>
-        My Records
-    </a>
-    <a href="https://app.ichebo.org/learn/" class="ctx-btn">
-        <span class="material-symbols-outlined">school</span>
-        Formation Academy
-    </a>
-
-    <div class="ctx-divider"></div>
-
-    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Community</div>
-    <a href="https://sceptre.ichebo.org/" class="ctx-btn">
-        <span class="material-symbols-outlined">group</span>
-        Community Mandate
-    </a>
-    <a href="https://app.ichebo.org/tenants/" class="ctx-btn">
-        <span class="material-symbols-outlined">account_balance</span>
-        Tenancy Hub
-    </a>
-
-    <div class="ctx-divider"></div>
-
-    <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
-        {% csrf_token %}
-        <button type="submit" class="ctx-btn" style="width:100%;background:none;border:none;cursor:pointer;color:var(--danger,#e53e3e);text-align:left;">
-            <span class="material-symbols-outlined">logout</span>
-            Sign out
-        </button>
-    </form>
-
-</div>
-{% endif %}
-{% endblock %}
-
-{% block ws_content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner">
-
-    <div class="card-dark" style="padding: var(--space-l); margin-bottom: var(--space-xl); background: var(--ink); border: none; display: flex; align-items: center; gap: var(--space-l);">
-      <div style="width: 80px; height: 80px; border-radius: var(--radius-m); overflow: hidden; background: var(--stone-2); display: flex; align-items: center; justify-content: center; border: 2px solid var(--primary); flex-shrink: 0;">
-        {% if profile_user.avatar_url %}
-          <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}" style="width: 100%; height: 100%; object-fit: cover;">
-        {% else %}
-          <span style="font-size: 32px; font-weight: 800; color: var(--text);">{{ profile_user.display_name|default:profile_user.email|first|upper }}</span>
-        {% endif %}
-      </div>
-      <div>
-        <h1 class="editorial-title" style="font-size: var(--fz-4); margin: 0 0 var(--space-2xs); color: #fff;">{{ profile_user.display_name|default:profile_user.username }}</h1>
-        <div class="label-tag" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);">{{ profile_user.status|default:"Seeker"|upper }} · LEVEL {{ profile_user.competence_level }}</div>
-      </div>
+  <div class="id-hero__identity">
+    <div class="id-hero__eyebrow">Registry Profile</div>
+    <div class="id-hero__name">{{ profile_user.display_name|default:profile_user.username }}</div>
+    <div class="id-hero__badge">
+      {{ profile_user.status|default:"Seeker"|upper }} &middot; LEVEL {{ profile_user.competence_level }}
     </div>
-
-    {% include "accounts/_profile_identity.html" %}
-    {% include "accounts/_profile_formation.html" %}
-
   </div>
 </div>
-{% endblock %}
 
-{% block content %}
-<div class="ws-layout--full-page">
-  <div class="ws-full-page-inner">
-  <a href="https://app.ichebo.org/you/"
-     style="display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;padding:var(--space-s) var(--space-m) 0;letter-spacing:0.02em;">
-    <span class="material-symbols-outlined" style="font-size:16px;">arrow_back_ios</span>
-    You
+<!-- Tab strip -->
+<div class="id-tabs">
+  <a href="{% url 'accounts:profile' %}" class="id-tab active">
+    <span class="material-symbols-outlined">person</span> Registry Profile
   </a>
-    <div class="card-dark" style="padding: var(--space-l); margin-bottom: var(--space-xl); background: var(--ink); border: none; display: flex; align-items: center; gap: var(--space-l);">
-      <div style="width: 80px; height: 80px; border-radius: var(--radius-m); overflow: hidden; background: var(--stone-2); display: flex; align-items: center; justify-content: center; border: 2px solid var(--primary); flex-shrink: 0;">
-        {% if profile_user.avatar_url %}
-          <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}" style="width: 100%; height: 100%; object-fit: cover;">
-        {% else %}
-          <span style="font-size: 32px; font-weight: 800; color: var(--text);">{{ profile_user.display_name|default:profile_user.email|first|upper }}</span>
-        {% endif %}
-      </div>
-      <div>
-        <h1 style="font-size: var(--fz-4); margin: 0 0 var(--space-2xs); color: #fff; font-weight: 800;">{{ profile_user.display_name|default:profile_user.username }}</h1>
-        <div class="label-tag" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);">{{ profile_user.status|default:"Seeker"|upper }} · LEVEL {{ profile_user.competence_level }}</div>
-      </div>
-    </div>
-    {% include "accounts/_profile_identity.html" %}
-    {% include "accounts/_profile_formation.html" %}
-  </div>
+  <a href="{% url 'accounts:manage-account' %}" class="id-tab">
+    <span class="material-symbols-outlined">badge</span> Manage Account
+  </a>
+  <a href="{% url 'accounts:formation-history' %}" class="id-tab">
+    <span class="material-symbols-outlined">history_edu</span> Formation
+  </a>
+  <a href="{% url 'accounts:settings' %}" class="id-tab">
+    <span class="material-symbols-outlined">manage_accounts</span> Settings
+  </a>
 </div>
+
+<!-- Content -->
+<div class="id-content">
+  {% include "accounts/_profile_identity.html" %}
+  {% include "accounts/_profile_formation.html" %}
+</div>
+
 {% endblock %}

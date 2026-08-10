@@ -464,6 +464,32 @@ def _mask_id(id_number):
     return '•' * len(id_number)
 
 
+class YouView(LoginRequiredMixin, View):
+    """Personal identity hub — migrated from app.ichebo.org/you/ to identity."""
+
+    login_url = None  # falls back to settings.LOGIN_URL (identity.ichebo.org)
+
+    def get(self, request):
+        from activity.models import Activity
+        from records.models import Record
+        from paraclete.service import build_digest
+
+        user = request.user
+        activity_count = Activity.objects.filter(
+            created_by=user, deleted_at__isnull=True,
+        ).count()
+        record_count = Record.objects.filter(
+            created_by=user, deleted_at__isnull=True,
+        ).count()
+        digest = build_digest(user)
+        return render(request, 'accounts/you.html', {
+            'activity_count': activity_count,
+            'record_count': record_count,
+            'digest': digest,
+            'active_app': 'accounts',
+        })
+
+
 class ManageAccountView(LoginRequiredMixin, View):
     """Manage Account — full personal identity data, Google-account style."""
 

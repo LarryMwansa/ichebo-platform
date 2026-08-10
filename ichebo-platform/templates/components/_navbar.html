@@ -37,7 +37,7 @@
     <!-- Level badge -->
     {% if user.is_authenticated %}
     <div class="nav-right-item">
-      <a href="{% url 'accounts:formation-history' %}"
+      <a href="https://identity.ichebo.org/accounts/formation/" hx-boost="false"
          class="level-badge {{ user_level_colour }}"
          title="{{ user_level_name }} — Level {{ user_level }}">
         {{ user_level }}
@@ -67,7 +67,7 @@
           </div>
         </div>
         <div class="profile-menu-items">
-          <a href="{% url 'accounts:settings' %}" role="menuitem">
+          <a href="https://identity.ichebo.org/accounts/settings/" role="menuitem" hx-boost="false">
             <span class="material-symbols-outlined">settings</span> Settings
           </a>
           <form method="post" action="{% url 'logout' %}" class="logout-form">

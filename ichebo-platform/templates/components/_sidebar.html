@@ -132,16 +132,16 @@
     <div class="ws-sidebar__section">
       <span class="ws-sidebar__section-label">Admin</span>
 
-      <a href="{% url 'accounts:settings' %}"
+      <a href="https://identity.ichebo.org/accounts/settings/"
          class="ws-sidebar__nav-item {% if active_app == 'settings' %}active{% endif %}"
-         aria-current="{% if active_app == 'settings' %}page{% endif %}">
+         aria-current="{% if active_app == 'settings' %}page{% endif %}" hx-boost="false">
         <span class="material-symbols-outlined" aria-hidden="true">settings</span>
         Settings
       </a>
 
-      <a href="{% url 'accounts:profile' %}"
+      <a href="https://identity.ichebo.org/accounts/profile/"
          class="ws-sidebar__nav-item {% if active_app == 'profile' %}active{% endif %}"
-         aria-current="{% if active_app == 'profile' %}page{% endif %}">
+         aria-current="{% if active_app == 'profile' %}page{% endif %}" hx-boost="false">
         <span class="material-symbols-outlined" aria-hidden="true">manage_accounts</span>
         Profile
       </a>
@@ -153,7 +153,7 @@
 
   {# ── Bottom user block ── #}
   {% if user.is_authenticated %}
-  <a href="{% url 'accounts:profile' %}" class="ws-sidebar__user" aria-label="View your profile">
+  <a href="https://identity.ichebo.org/accounts/you/" class="ws-sidebar__user" aria-label="View your profile" hx-boost="false">
 
     <div class="ws-sidebar__avatar">
       {% if user.avatar_url %}

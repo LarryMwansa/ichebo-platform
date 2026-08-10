@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" class="{% block html_class %}{% endblock %}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>{% block title %}Ichebo{% endblock %} — Identity</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Inter:wght@300;400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+
+  {% load static %}
+  <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/global.css' %}">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/identity.css' %}">
+
+  <script src="{% static 'js/storage.js' %}"></script>
+  <script>
+    (function() {
+      var t = localStorage.getItem('ics_theme') || 'light';
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    })();
+  </script>
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="id-body">
+
+  <!-- ── Topbar ── -->
+  <header class="id-topbar">
+    <a href="https://app.ichebo.org/" class="id-topbar__brand" aria-label="Ichebo home">
+      <img src="{% static 'images/logo.svg' %}" alt="Ichebo" class="id-topbar__logo">
+    </a>
+
+    <nav class="id-topbar__nav" aria-label="Identity navigation">
+      {% if user.is_authenticated %}
+      <a href="{% url 'accounts:you' %}" class="id-topnav-link {% if request.resolver_match.url_name == 'you' %}active{% endif %}">
+        <span class="material-symbols-outlined">home</span>
+        <span class="id-topnav-label">Overview</span>
+      </a>
+      <a href="{% url 'accounts:profile' %}" class="id-topnav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        <span class="material-symbols-outlined">person</span>
+        <span class="id-topnav-label">Profile</span>
+      </a>
+      <a href="{% url 'accounts:manage-account' %}" class="id-topnav-link {% if request.resolver_match.url_name == 'manage-account' %}active{% endif %}">
+        <span class="material-symbols-outlined">badge</span>
+        <span class="id-topnav-label">Account</span>
+      </a>
+      <a href="{% url 'accounts:settings' %}" class="id-topnav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        <span class="id-topnav-label">Settings</span>
+      </a>
+      {% endif %}
+    </nav>
+
+    <div class="id-topbar__right">
+      {% if user.is_authenticated %}
+      <div class="id-user-chip">
+        <div class="id-user-chip__avatar">
+          {% if user.avatar_url %}
+            <img src="{{ user.avatar_url }}" alt="{{ user.display_name|default:user.email }}">
+          {% else %}
+            {{ user.display_name|default:user.email|first|upper }}
+          {% endif %}
+        </div>
+        <span class="id-user-chip__name">{{ user.display_name|default:user.email }}</span>
+        <div class="id-user-chip__menu" role="menu">
+          <a href="{% url 'accounts:you' %}" class="id-chip-item" role="menuitem">
+            <span class="material-symbols-outlined">home</span> Overview
+          </a>
+          <a href="https://app.ichebo.org/" class="id-chip-item" role="menuitem">
+            <span class="material-symbols-outlined">dashboard</span> Back to App
+          </a>
+          <div class="id-chip-divider"></div>
+          <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
+            {% csrf_token %}
+            <button type="submit" class="id-chip-item id-chip-item--danger" role="menuitem">
+              <span class="material-symbols-outlined">logout</span> Sign out
+            </button>
+          </form>
+        </div>
+      </div>
+      {% else %}
+      <a href="{% url 'accounts:login' %}" class="id-btn id-btn--primary">Sign in</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- ── Page content ── -->
+  <main class="id-main">
+    {% block identity_content %}{% endblock %}
+  </main>
+
+  <script src="{% static 'js/htmx.min.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

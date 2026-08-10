@@ -339,14 +339,14 @@
                     <div style="width: 1px; height: 24px; background: var(--border); margin: 0 var(--space-3xs);"></div>
 
                     {# Level Badge (Formation History) #}
-                    <a href="{% url 'accounts:formation-history' %}" class="ws-sidebar__level-dot"
+                    <a href="https://identity.ichebo.org/accounts/formation/" class="ws-sidebar__level-dot" hx-boost="false"
                          style="background: var(--level-{{ user.competence_level|default:0 }}); width: 24px; height: 24px; font-size: 10px; text-decoration: none; display: flex; align-items: center; justify-content: center; color: #fff;"
                          title="Level {{ user.competence_level }} Steward — View Formation History">
                         {{ user.competence_level|default:0 }}
                     </a>
 
                     {# Profile Avatar #}
-                    <a href="https://app.ichebo.org/you/" class="ws-sidebar__avatar" style="width: 32px; height: 32px; margin: 0;" title="You — View Profile">
+                    <a href="https://identity.ichebo.org/accounts/you/" class="ws-sidebar__avatar" style="width: 32px; height: 32px; margin: 0;" title="You — View Profile" hx-boost="false">
                         {% if user.avatar %}
                             <img src="{{ user.avatar.url }}" alt="{{ user.display_name }}">
                         {% else %}
@@ -355,7 +355,7 @@
                     </a>
 
                     {# Settings #}
-                    <a href="{% url 'accounts:settings' %}" class="ws-icon-btn {% if active_app == 'accounts' %}active{% endif %}" title="Institutional Settings">
+                    <a href="https://identity.ichebo.org/accounts/settings/" class="ws-icon-btn {% if active_app == 'accounts' %}active{% endif %}" title="Institutional Settings" hx-boost="false">
                         <span class="material-symbols-outlined">settings</span>
                     </a>
                     {% endif %}
