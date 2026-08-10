@@ -1,0 +1,30 @@
+{# accounts/_avatar.html — HTMX swap target for avatar upload zone #}
+<div class="id-avatar-zone" id="avatar-zone">
+  <label for="avatar-input" class="id-avatar-zone__label" title="Upload profile photo">
+    <div class="id-hero__avatar">
+      {% if user.avatar_url %}
+        <img src="{{ user.avatar_url }}" alt="{{ user.display_name }}">
+      {% else %}
+        {{ user.display_name|default:user.email|first|upper }}
+      {% endif %}
+      <div class="id-avatar-zone__overlay">
+        <span class="material-symbols-outlined">photo_camera</span>
+      </div>
+    </div>
+  </label>
+  <input
+    type="file"
+    id="avatar-input"
+    name="avatar"
+    accept="image/jpeg,image/png,image/webp,image/gif"
+    style="display:none;"
+    hx-post="{% url 'accounts:htmx-avatar' %}"
+    hx-target="#avatar-zone"
+    hx-swap="outerHTML"
+    hx-encoding="multipart/form-data"
+    hx-trigger="change"
+    hx-include="[name='csrfmiddlewaretoken']">
+  {% if error %}
+  <div class="id-avatar-zone__error">{{ error }}</div>
+  {% endif %}
+</div>

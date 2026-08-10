@@ -36,4 +36,5 @@ template_urlpatterns = [
     path('manage/password/', views.PasswordChangeView.as_view(), name='password-change'),
     path('htmx/manage/reveal-id/', views.htmx_reveal_id_number, name='htmx-reveal-id'),
     path('htmx/manage/mask-id/', views.htmx_mask_id_number, name='htmx-mask-id'),
+    path('htmx/avatar/', views.htmx_avatar_upload, name='htmx-avatar'),
 ]

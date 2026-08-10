@@ -558,6 +558,42 @@ def htmx_mask_id_number(request):
 
 
 @login_required
+def htmx_avatar_upload(request):
+    """HTMX POST: accept a profile image, validate, save to MinIO, return updated avatar partial."""
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    file = request.FILES.get('avatar')
+    if not file:
+        return render(request, 'accounts/_avatar.html', {
+            'user': request.user,
+            'error': 'No file received.',
+        })
+
+    allowed_types = {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
+    if file.content_type not in allowed_types:
+        return render(request, 'accounts/_avatar.html', {
+            'user': request.user,
+            'error': 'Only JPEG, PNG, WebP or GIF images are accepted.',
+        })
+
+    max_bytes = 5 * 1024 * 1024  # 5 MB
+    if file.size > max_bytes:
+        return render(request, 'accounts/_avatar.html', {
+            'user': request.user,
+            'error': 'Image must be under 5 MB.',
+        })
+
+    user = request.user
+    # Delete old avatar from storage before replacing
+    if user.avatar:
+        user.avatar.delete(save=False)
+
+    user.avatar.save(file.name, file, save=True)
+    return render(request, 'accounts/_avatar.html', {'user': user})
+
+
+@login_required
 def htmx_formation_card(request):
     """HTMX GET: formation card partial for the dashboard."""
     from learn.models import CertificationConfirmation
