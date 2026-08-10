@@ -53,7 +53,16 @@ class User(AbstractUser):
 
     @property
     def avatar_url(self):
-        return self.avatar.url if self.avatar else None
+        if not self.avatar:
+            return None
+        url = self.avatar.url
+        # boto3 generates server-to-server URLs using MINIO_ENDPOINT (localhost:9000).
+        # Rewrite to the public nginx proxy path so browsers can fetch the file.
+        if 'localhost:9000' in url:
+            # Strip the signed query string and rewrite host
+            path = url.split('?')[0].replace('http://localhost:9000/ics-media/', '/media/')
+            return path
+        return url
 
     def __str__(self):
         return self.email

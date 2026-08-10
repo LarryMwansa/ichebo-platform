@@ -284,8 +284,7 @@ AWS_ACCESS_KEY_ID = config('MINIO_ACCESS_KEY', default=None)
 AWS_SECRET_ACCESS_KEY = config('MINIO_SECRET_KEY', default=None)
 AWS_STORAGE_BUCKET_NAME = 'ics-media'
 AWS_S3_FILE_OVERWRITE = False
-AWS_QUERYSTRING_AUTH = False          # public URLs via nginx proxy — no signed params
-AWS_S3_CUSTOM_DOMAIN = config('MEDIA_PUBLIC_HOST', default=None)  # e.g. app.ichebo.org
+AWS_QUERYSTRING_AUTH = False          # no signed params — nginx proxy handles auth
 MEDIA_URL = config('MEDIA_URL', default='/media/')
 
 
