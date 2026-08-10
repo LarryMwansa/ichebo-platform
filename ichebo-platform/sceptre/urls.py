@@ -61,6 +61,9 @@ urlpatterns = [
     path('steward/settings/htmx/access/', views.htmx_steward_settings_access, name='htmx_steward_settings_access'),
     path('steward/settings/htmx/suspend/', views.htmx_steward_settings_suspend, name='htmx_steward_settings_suspend'),
 
+    # Tenant context switcher — Prime stewards only (validates oversight in view)
+    path('switch-tenant/', views.switch_tenant, name='switch_tenant'),
+
     # Public routes — no login required
     path('find-a-community/', views.community_directory, name='find_community'),
     path('c/<slug:slug>/', views.community_profile, name='community_profile'),

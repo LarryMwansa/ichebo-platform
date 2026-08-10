@@ -11,6 +11,7 @@ from records.models import Record, Relationship
 from activity.models import Activity
 from accounts.models import User
 from tenants.models import Tenant, UserPermission
+from tenants.service import get_oversight_tenant_ids
 from .models import MembershipRequest
 from .services import resolve_steward_for_tenant
 from .constants import (
@@ -242,6 +243,18 @@ def my_community(request):
     stage_info = KGS_PARTICIPATION_STAGES.get(level, ('Member', 'Formation'))
     level_label = KGS_COMPETENCE_LABELS.get(level, 'Member')
 
+    # Prime Tenancy stewards (Level 5 / superuser) see a list of all tenants
+    # they oversee so they can navigate to any community and open it in sceptre.
+    oversight_tenants = []
+    is_prime_steward = level >= 5 or user.is_superuser
+    if is_prime_steward:
+        oversight_ids = get_oversight_tenant_ids(user)
+        oversight_tenants = list(
+            Tenant.objects.filter(id__in=oversight_ids, is_agency=False, status='active')
+            .exclude(tier__in=['handbook'])
+            .order_by('tier', 'name')
+        )
+
     return render(request, 'community/my_community.html', {
         'primary_perm':        primary_perm,
         'shepherd':            shepherd,
@@ -254,6 +267,8 @@ def my_community(request):
         'stage_name':          stage_info[0],
         'participation_stage': stage_info[1],
         'participation_steps': range(1, 6),
+        'is_prime_steward':    is_prime_steward,
+        'oversight_tenants':   oversight_tenants,
         'active_app':          'community',
         'active_community_tab': 'home',
     })

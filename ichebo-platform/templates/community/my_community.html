@@ -116,6 +116,49 @@
         </div>
 
     </div>
+
+    {# ── Prime Tenancy: All Communities ── #}
+    {% if is_prime_steward and oversight_tenants %}
+    <div style="margin-top: 48px;">
+        <div class="ws-label-tag" style="margin-bottom: 6px;">Prime Oversight</div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 800;
+                   color: var(--text); margin: 0 0 6px;">All Communities</h2>
+        <p style="font-size: 13px; color: var(--muted); margin: 0 0 24px;">
+            As Prime Tenancy steward you have oversight of every active community.
+            Open any community in Sceptre to manage it directly.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;">
+            {% for t in oversight_tenants %}
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+                        padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;">
+                <div>
+                    <div style="font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 4px;">
+                        {{ t.name }}
+                    </div>
+                    <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
+                                color: var(--muted);">{{ t.tier|title }}{% if t.affiliation %} · {{ t.affiliation|title }}{% endif %}</div>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: auto;">
+                    <a href="{% url 'community:community-home' %}?tenant={{ t.slug }}"
+                       style="flex: 1; text-align: center; font-size: 12px; font-weight: 600;
+                              color: var(--primary); text-decoration: none; padding: 7px 10px;
+                              border: 1px solid var(--border); border-radius: 8px; background: var(--card-2);">
+                        View
+                    </a>
+                    <a href="https://sceptre.ichebo.org/switch-tenant/?tenant={{ t.slug }}"
+                       target="_blank" rel="noopener"
+                       style="flex: 1; text-align: center; font-size: 12px; font-weight: 600;
+                              color: #fff; text-decoration: none; padding: 7px 10px;
+                              border-radius: 8px; background: var(--primary);">
+                        Open in Sceptre
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}
 
@@ -148,6 +191,27 @@
     <div style="padding: 20px 0; text-align: center;">
         <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.12; display: block; color: var(--text);">person_search</span>
         <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">No shepherd assigned yet.</p>
+    </div>
+    {% endif %}
+
+    {% if is_prime_steward and oversight_tenants %}
+    <div style="height: 1px; background: var(--border); margin: 20px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 12px;">Open in Sceptre</div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+        {% for t in oversight_tenants %}
+        <a href="https://sceptre.ichebo.org/switch-tenant/?tenant={{ t.slug }}"
+           target="_blank" rel="noopener"
+           style="display: flex; align-items: center; justify-content: space-between;
+                  padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+                  background: var(--card-2); text-decoration: none; gap: 8px;">
+            <div>
+                <div style="font-size: 12px; font-weight: 600; color: var(--text);">{{ t.name }}</div>
+                <div style="font-size: 10px; color: var(--muted); text-transform: uppercase;
+                            letter-spacing: 0.06em;">{{ t.tier|title }}</div>
+            </div>
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary); flex-shrink: 0;">open_in_new</span>
+        </a>
+        {% endfor %}
     </div>
     {% endif %}
 
@@ -360,6 +424,33 @@
     </a>
     {% endif %}
   </div>
+
+  {# ── Prime Tenancy: All Communities (mobile) ── #}
+  {% if is_prime_steward and oversight_tenants %}
+  <div style="margin-bottom: var(--space-m);">
+    <div class="label-caps" style="margin-bottom: var(--space-xs);">All Communities — Prime Oversight</div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      {% for t in oversight_tenants %}
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l);
+                  padding: 14px var(--space-m); display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+        <div>
+          <div style="font-size: 13px; font-weight: 700; color: var(--text);">{{ t.name }}</div>
+          <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);">
+            {{ t.tier|title }}
+          </div>
+        </div>
+        <a href="https://sceptre.ichebo.org/switch-tenant/?tenant={{ t.slug }}"
+           target="_blank" rel="noopener"
+           style="display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
+                  color: var(--primary); text-decoration: none; white-space: nowrap; flex-shrink: 0;">
+          Sceptre
+          <span class="material-symbols-outlined" style="font-size: 14px;">open_in_new</span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
 
 </div>
 {% endif %}

@@ -6,13 +6,29 @@ from django.shortcuts import render, redirect
 from sceptre.auth import require_sceptre_participant, require_sceptre_steward, is_steward
 
 
-def _get_tenant_for_user(user):
-    """Resolve the user's active community tenant — their highest-level
-    UserPermission, matching the established pattern
-    (community/views.py:_get_user_permissions). Without .order_by('-level'),
-    a user with multiple UserPermission rows would resolve to an
-    arbitrary one rather than their highest-level tenant."""
-    from tenants.models import UserPermission
+def _get_tenant_for_user(user, request=None):
+    """Resolve the user's active community tenant.
+
+    Prime stewards can switch context: if the session holds a
+    'sceptre_tenant_slug' set by switch_tenant_view, and the user
+    genuinely has oversight of that tenant (via get_oversight_tenant_ids),
+    that tenant is used instead of their highest-level UserPermission."""
+    from tenants.models import Tenant, UserPermission
+    from tenants.service import get_oversight_tenant_ids
+
+    if request is not None:
+        slug = request.session.get('sceptre_tenant_slug')
+        if slug:
+            try:
+                candidate = Tenant.objects.get(slug=slug, status='active')
+                oversight_ids = get_oversight_tenant_ids(user)
+                if candidate.id in oversight_ids:
+                    return candidate
+            except Tenant.DoesNotExist:
+                pass
+            # Clear stale / unauthorised slug
+            request.session.pop('sceptre_tenant_slug', None)
+
     perm = (
         UserPermission.objects.filter(user=user, is_active=True)
         .select_related('tenant')
@@ -31,7 +47,7 @@ def participant_home(request):
     from django.db.models import Q
     from records.models import Record
 
-    tenant = _get_tenant_for_user(request.user)
+    tenant = _get_tenant_for_user(request.user, request)
     user_is_steward = is_steward(request.user)
 
     # Recent broadcasts — last 6 records with video content for this tenant.
@@ -137,7 +153,7 @@ def now_playing_partial(request):
     from broadcast.services import resolve_now_playing
     from django.http import HttpResponse
 
-    tenant = _get_tenant_for_user(request.user)
+    tenant = _get_tenant_for_user(request.user, request)
     now_playing = resolve_now_playing(tenant) if tenant else None
 
     new_sig = now_playing.get('playing_signature', 'offline') if now_playing else 'offline'
@@ -157,7 +173,7 @@ def now_playing_partial(request):
 @require_sceptre_participant
 def community_area(request):
     """Community area — announcements, gatherings, community info summary."""
-    tenant = _get_tenant_for_user(request.user)
+    tenant = _get_tenant_for_user(request.user, request)
     user_is_steward = is_steward(request.user)
 
     from django.db.models import Q
@@ -200,7 +216,7 @@ def support_area(request):
     from django.utils import timezone
     from records.models import Record
     
-    tenant = _get_tenant_for_user(request.user)
+    tenant = _get_tenant_for_user(request.user, request)
     user_is_steward = is_steward(request.user)
 
     now = timezone.now()
@@ -238,7 +254,7 @@ def support_area(request):
 def profile_summary(request):
     """Profile summary — interim until identity.ichebo.org ships."""
     user_is_steward = is_steward(request.user)
-    tenant = _get_tenant_for_user(request.user)
+    tenant = _get_tenant_for_user(request.user, request)
     return render(request, 'sceptre/profile/profile.html', {
         'is_steward': user_is_steward,
         'tenant': tenant,
@@ -359,7 +375,7 @@ def community_profile(request, slug):
 def steward_members(request):
     """Native Sceptre member roster."""
     from tenants.models import UserPermission
-    tenant = _get_tenant_for_user(request.user)
+    tenant = _get_tenant_for_user(request.user, request)
     members = UserPermission.objects.filter(
         tenant=tenant, is_active=True
     ).select_related('user').order_by('-level', 'user__first_name')
@@ -371,7 +387,7 @@ def steward_gatherings(request):
     """Native Sceptre gatherings list."""
     from records.models import Record
     from django.utils import timezone
-    tenant = _get_tenant_for_user(request.user)
+    tenant = _get_tenant_for_user(request.user, request)
     now = timezone.now()
     gatherings = Record.objects.filter(
         record_family='community', record_type='gathering', tenant=tenant
@@ -388,7 +404,7 @@ def steward_gatherings(request):
 def steward_formation(request):
     """Native Sceptre formation pipeline."""
     from tenants.models import UserPermission
-    tenant = _get_tenant_for_user(request.user)
+    tenant = _get_tenant_for_user(request.user, request)
     members = UserPermission.objects.filter(tenant=tenant, is_active=True).select_related('user')
     seekers = members.filter(level=0).order_by('user__first_name')
     disciples = members.filter(level__in=[1, 2]).order_by('user__first_name')
@@ -403,7 +419,7 @@ def steward_formation(request):
 def steward_announcements(request):
     """Native Sceptre announcements list."""
     from records.models import Record
-    tenant = _get_tenant_for_user(request.user)
+    tenant = _get_tenant_for_user(request.user, request)
     announcements = Record.objects.filter(
         record_family='community', record_type='announcement', tenant=tenant
     ).order_by('-created_at')
@@ -476,14 +492,14 @@ def steward_support_queue(request):
 @require_sceptre_steward
 def steward_settings(request):
     return render(request, 'sceptre/steward/settings.html', {
-        'tenant': _get_tenant_for_user(request.user)
+        'tenant': _get_tenant_for_user(request.user, request)
     })
 
 @require_sceptre_steward
 def htmx_steward_settings_general(request):
     from django.http import HttpResponse
     if request.method == 'POST':
-        tenant = _get_tenant_for_user(request.user)
+        tenant = _get_tenant_for_user(request.user, request)
         if not tenant:
             return HttpResponse("Unauthorized", status=403)
         
@@ -500,7 +516,7 @@ def htmx_steward_settings_general(request):
 def htmx_steward_settings_appearance(request):
     from django.http import HttpResponse
     if request.method == 'POST':
-        tenant = _get_tenant_for_user(request.user)
+        tenant = _get_tenant_for_user(request.user, request)
         if not tenant:
             return HttpResponse("Unauthorized", status=403)
         
@@ -515,7 +531,7 @@ def htmx_steward_settings_appearance(request):
 def htmx_steward_settings_access(request):
     from django.http import HttpResponse
     if request.method == 'POST':
-        tenant = _get_tenant_for_user(request.user)
+        tenant = _get_tenant_for_user(request.user, request)
         if not tenant:
             return HttpResponse("Unauthorized", status=403)
         
@@ -529,7 +545,7 @@ def htmx_steward_settings_access(request):
 def htmx_steward_settings_suspend(request):
     from django.http import HttpResponse
     if request.method == 'POST':
-        tenant = _get_tenant_for_user(request.user)
+        tenant = _get_tenant_for_user(request.user, request)
         if not tenant:
             return HttpResponse("Unauthorized", status=403)
         
@@ -565,7 +581,7 @@ def htmx_sceptre_create_support_request(request):
             '<p class="form-error" style="color:#ef4444; margin-bottom: 1rem; font-size: 14px;">Please enter a subject and a description.</p>'
         )
 
-    tenant = _get_tenant_for_user(request.user)
+    tenant = _get_tenant_for_user(request.user, request)
     steward = resolve_steward_for_tenant(tenant) if tenant else None
     response_due_at = timezone.now() + timedelta(hours=72)
 
@@ -653,7 +669,43 @@ def htmx_sceptre_resolve_support_request(request, record_id):
     record.custom_fields = custom
     record.status = 'completed'
     record.save()
-    
+
     response = HttpResponse(status=204)
     response['HX-Redirect'] = reverse('steward_support')
     return response
+
+
+# ---------------------------------------------------------------------------
+# Tenant switcher — Prime Tenancy stewards only
+# ---------------------------------------------------------------------------
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def switch_tenant(request):
+    """Accept ?tenant=<slug> from app.ichebo.org community page and store it
+    in the session so all sceptre views render in the context of that tenant.
+    Only honoured for users who have oversight of the requested tenant.
+
+    GET  ?tenant=<slug>  → set session, redirect to home
+    GET  ?tenant=clear   → clear override, redirect to home
+    """
+    from tenants.models import Tenant
+    from tenants.service import get_oversight_tenant_ids
+
+    slug = request.GET.get('tenant', '').strip()
+
+    if slug == 'clear':
+        request.session.pop('sceptre_tenant_slug', None)
+        return redirect('home')
+
+    if slug:
+        try:
+            candidate = Tenant.objects.get(slug=slug, status='active')
+            oversight_ids = get_oversight_tenant_ids(request.user)
+            if candidate.id in oversight_ids:
+                request.session['sceptre_tenant_slug'] = slug
+        except Tenant.DoesNotExist:
+            pass
+
+    return redirect('home')
