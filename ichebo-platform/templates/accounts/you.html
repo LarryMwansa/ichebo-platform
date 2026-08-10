@@ -6,19 +6,23 @@
 {% block identity_content %}
 
 <!-- Hero -->
-<div class="id-hero id-hero--with-avatar">
-  <div class="id-hero__avatar">
-    {% if user.avatar_url %}
-      <img src="{{ user.avatar_url }}" alt="{{ user.display_name }}">
-    {% else %}
-      {{ user.display_name|default:user.email|first|upper }}
-    {% endif %}
-  </div>
-  <div class="id-hero__identity">
-    <div class="id-hero__eyebrow">Personal Hub</div>
-    <div class="id-hero__name">{{ user.display_name|default:user.username }}</div>
-    <div class="id-hero__badge">
-      {{ user.status|default:"Seeker"|upper }} &middot; LEVEL {{ user.competence_level }}
+<div class="id-hero id-hero--contained">
+  <div class="id-content--wide">
+    <div class="id-hero--with-avatar">
+      <div class="id-hero__avatar">
+        {% if user.avatar_url %}
+          <img src="{{ user.avatar_url }}" alt="{{ user.display_name }}">
+        {% else %}
+          {{ user.display_name|default:user.email|first|upper }}
+        {% endif %}
+      </div>
+      <div class="id-hero__identity">
+        <div class="id-hero__eyebrow">Personal Hub</div>
+        <div class="id-hero__name">{{ user.display_name|default:user.username }}</div>
+        <div class="id-hero__badge">
+          {{ user.status|default:"Seeker"|upper }} &middot; LEVEL {{ user.competence_level }}
+        </div>
+      </div>
     </div>
   </div>
 </div>
