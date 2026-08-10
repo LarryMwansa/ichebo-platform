@@ -331,11 +331,13 @@
 .id-tabs-wrap {
   background: var(--ink, #0e0e0e);
   border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 0 clamp(1rem, 5vw, 2.5rem);
 }
 .id-tabs-wrap .id-tabs {
   max-width: 720px;
   margin-inline: auto;
-  padding: 0 clamp(1rem, 5vw, 2.5rem);
+  padding: 0;
+  background: transparent;
   border-bottom: none;
 }
 
