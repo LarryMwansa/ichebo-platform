@@ -1,0 +1,24 @@
+{% extends "sceptre/base.html" %}
+{% block title %}Step Locked{% endblock %}
+
+{% block content %}
+<div style="background: var(--sc-ink); min-height: calc(100vh - 56px);
+            display:flex;align-items:center;justify-content:center;padding:2rem;">
+  <div style="text-align:center;max-width:380px;">
+    <span class="material-symbols-outlined"
+          style="font-size:48px;color:rgba(255,255,255,0.15);display:block;margin-bottom:1rem;">lock</span>
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:800;
+               color:#fff;margin:0 0 0.75rem;">Step locked</h2>
+    <p style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.7;margin:0 0 1.5rem;">
+      Complete the previous steps to unlock <em>{{ step.title }}</em>.
+    </p>
+    <a href="{% url 'induction_track' %}"
+       style="display:inline-flex;align-items:center;gap:6px;padding:12px 22px;
+              background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);
+              border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+      Back to programme
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "sceptre/base.html" %}
+{% block title %}{{ step.title }}{% endblock %}
+
+{% block content %}
+<div style="background: var(--sc-ink); min-height: calc(100vh - 56px); padding-bottom: 5rem;">
+
+  {# ── Back nav ── #}
+  <div style="border-bottom:1px solid rgba(255,255,255,0.07);padding:14px 0;">
+    <div class="sc-container">
+      <a href="{% url 'induction_track' %}"
+         style="display:inline-flex;align-items:center;gap:6px;font-size:13px;
+                color:rgba(255,255,255,0.45);text-decoration:none;font-weight:600;">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+        Induction Programme
+      </a>
+    </div>
+  </div>
+
+  <div class="sc-container" style="max-width:720px;padding-top:2.5rem;">
+
+    {# Header #}
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
+      <div class="sc-label-tag">Module {{ step.module }}</div>
+      <div class="sc-label-tag" style="background:rgba(255,255,255,0.05);">
+        {% if step.step_type == 'final_test' %}Final Test{% elif step.step_type == 'module_test' %}Module Test{% else %}Knowledge Check{% endif %}
+      </div>
+    </div>
+
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2rem);
+               font-weight:800;color:#fff;line-height:1.2;margin:0 0 0.5rem;">
+      {{ step.title }}
+    </h1>
+    <p style="font-size:13px;color:rgba(255,255,255,0.4);margin:0 0 2rem;">
+      Pass score: {{ step.pass_score }}% &nbsp;·&nbsp; {{ questions|length }} question{{ questions|length|pluralize }}
+      {% if prog and prog.attempts %}&nbsp;·&nbsp; Attempt {{ prog.attempts|add:1 }}{% endif %}
+    </p>
+
+    <form method="post" id="quiz-form">
+      {% csrf_token %}
+
+      {% for question in questions %}
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+                  border-radius:12px;padding:1.5rem 1.75rem;margin-bottom:1.25rem;">
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:1rem;line-height:1.5;">
+          {{ forloop.counter }}. {{ question.question_text }}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          {% for answer in question.answers.all %}
+          <label style="display:flex;align-items:center;gap:12px;padding:11px 14px;
+                        border:1px solid rgba(255,255,255,0.08);border-radius:8px;
+                        cursor:pointer;transition:border-color 0.15s;"
+                 class="quiz-option">
+            <input type="radio" name="answer" value="{{ answer.id }}"
+                   style="accent-color:var(--sc-primary,#6366f1);width:16px;height:16px;flex-shrink:0;">
+            <span style="font-size:13px;color:rgba(255,255,255,0.75);">{{ answer.answer_text }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+
+      <div style="margin-top:2rem;">
+        <button type="submit"
+                style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;
+                       background:var(--sc-primary,#6366f1);color:#fff;border:none;
+                       border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">
+          <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+          Submit answers
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.quiz-option').forEach(function(label) {
+    label.addEventListener('click', function() {
+      var name = label.querySelector('input').name;
+      document.querySelectorAll('input[name="' + name + '"]').forEach(function(inp) {
+        inp.closest('.quiz-option').style.borderColor = 'rgba(255,255,255,0.08)';
+        inp.closest('.quiz-option').style.background = 'transparent';
+      });
+      label.style.borderColor = 'rgba(99,102,241,0.6)';
+      label.style.background = 'rgba(99,102,241,0.1)';
+    });
+  });
+</script>
+{% endblock %}

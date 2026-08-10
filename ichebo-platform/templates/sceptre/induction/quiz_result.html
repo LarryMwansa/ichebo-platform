@@ -1,0 +1,78 @@
+{% extends "sceptre/base.html" %}
+{% block title %}{{ step.title }} — Result{% endblock %}
+
+{% block content %}
+<div style="background: var(--sc-ink); min-height: calc(100vh - 56px); padding-bottom: 5rem;">
+
+  <div class="sc-container" style="max-width:600px;padding-top:4rem;text-align:center;">
+
+    {# Score ring #}
+    <div style="width:100px;height:100px;border-radius:50%;margin:0 auto 1.5rem;
+                display:flex;align-items:center;justify-content:center;
+                background:{% if result.passed %}rgba(34,197,94,0.1){% else %}rgba(239,68,68,0.1){% endif %};
+                border:3px solid {% if result.passed %}rgba(34,197,94,0.4){% else %}rgba(239,68,68,0.4){% endif %};">
+      <div>
+        <div style="font-size:26px;font-weight:900;color:{% if result.passed %}#4ade80{% else %}#f87171{% endif %};
+                    font-family:'Playfair Display',serif;line-height:1;">{{ result.score }}%</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;
+                    color:rgba(255,255,255,0.35);">score</div>
+      </div>
+    </div>
+
+    {% if result.passed %}
+      {% if prog.status == 'awaiting_steward' %}
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:800;color:#fff;margin:0 0 0.75rem;">
+        Final Test Passed!
+      </h2>
+      <p style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7;margin:0 0 2rem;max-width:400px;margin-inline:auto;">
+        You scored {{ result.score }}% — above the {{ step.pass_score }}% threshold.
+        Your result has been sent to your steward for final confirmation.
+        You'll be notified once your formation level is updated.
+      </p>
+      {% else %}
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:800;color:#fff;margin:0 0 0.75rem;">
+        Passed!
+      </h2>
+      <p style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7;margin:0 0 2rem;max-width:400px;margin-inline:auto;">
+        You scored {{ result.score }}% — {{ result.correct }} of {{ result.total }} correct.
+        The next step has been unlocked.
+      </p>
+      {% endif %}
+      <a href="{% url 'induction_track' %}"
+         style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;
+                background:var(--sc-primary,#6366f1);color:#fff;border-radius:10px;
+                font-size:14px;font-weight:700;text-decoration:none;">
+        <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
+        Continue programme
+      </a>
+    {% else %}
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:800;color:#fff;margin:0 0 0.75rem;">
+        Not quite — try again
+      </h2>
+      <p style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7;margin:0 0 0.5rem;max-width:400px;margin-inline:auto;">
+        You scored {{ result.score }}% — {{ result.correct }} of {{ result.total }} correct.
+        You need {{ step.pass_score }}% to pass. Review the lesson and try again.
+      </p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.3);margin:0 0 2rem;">
+        Attempt {{ prog.attempts }} of unlimited — no penalty for retrying.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="{% url 'induction_quiz' step.id %}"
+           style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;
+                  background:var(--sc-primary,#6366f1);color:#fff;border-radius:10px;
+                  font-size:14px;font-weight:700;text-decoration:none;">
+          <span class="material-symbols-outlined" style="font-size:18px;">refresh</span>
+          Try again
+        </a>
+        <a href="{% url 'induction_track' %}"
+           style="display:inline-flex;align-items:center;gap:8px;padding:14px 24px;
+                  background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);border-radius:10px;
+                  font-size:14px;font-weight:700;text-decoration:none;">
+          Back to programme
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

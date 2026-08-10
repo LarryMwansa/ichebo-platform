@@ -1,0 +1,74 @@
+{% extends "sceptre/base.html" %}
+{% block title %}{{ step.title }}{% endblock %}
+
+{% block content %}
+<div style="background: var(--sc-ink); min-height: calc(100vh - 56px); padding-bottom: 5rem;">
+
+  {# ── Back nav ── #}
+  <div style="border-bottom:1px solid rgba(255,255,255,0.07);padding:14px 0;">
+    <div class="sc-container">
+      <a href="{% url 'induction_track' %}"
+         style="display:inline-flex;align-items:center;gap:6px;font-size:13px;
+                color:rgba(255,255,255,0.45);text-decoration:none;font-weight:600;">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+        Induction Programme
+      </a>
+    </div>
+  </div>
+
+  <div class="sc-container" style="max-width:720px;padding-top:2.5rem;">
+
+    {# Module tag + lesson tag #}
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
+      <div class="sc-label-tag">Module {{ step.module }}</div>
+      <div class="sc-label-tag" style="background:rgba(255,255,255,0.05);">Lesson</div>
+    </div>
+
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);
+               font-weight:800;color:#fff;line-height:1.2;margin:0 0 2rem;">
+      {{ step.title }}
+    </h1>
+
+    {# Already passed badge #}
+    {% if prog and prog.status == 'passed' %}
+    <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;
+                background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);
+                border-radius:20px;margin-bottom:1.5rem;">
+      <span class="material-symbols-outlined" style="font-size:14px;color:#4ade80;">check_circle</span>
+      <span style="font-size:12px;font-weight:700;color:#4ade80;">Completed</span>
+    </div>
+    {% endif %}
+
+    {# Lesson content #}
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+                border-radius:12px;padding:2rem 2.25rem;margin-bottom:2rem;
+                font-size:15px;line-height:1.8;color:rgba(255,255,255,0.8);">
+      {{ step.content|linebreaks }}
+    </div>
+
+    {# Complete / Review action #}
+    {% if prog and prog.status == 'passed' %}
+    <div style="display:flex;gap:12px;align-items:center;">
+      <a href="{% url 'induction_track' %}"
+         style="display:inline-flex;align-items:center;gap:6px;padding:12px 24px;
+                background:rgba(255,255,255,0.07);border-radius:10px;
+                font-size:14px;font-weight:700;color:rgba(255,255,255,0.6);text-decoration:none;">
+        Back to programme
+      </a>
+    </div>
+    {% else %}
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit"
+              style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;
+                     background:var(--sc-primary,#6366f1);color:#fff;border:none;
+                     border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">
+        <span class="material-symbols-outlined" style="font-size:18px;">check</span>
+        Mark as complete &amp; continue
+      </button>
+    </form>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

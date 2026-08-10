@@ -1,0 +1,150 @@
+{% extends "sceptre/base.html" %}
+{% load core_tags %}
+{% block title %}Induction Programme{% endblock %}
+
+{% block content %}
+<div style="background: var(--sc-ink); min-height: calc(100vh - 56px); padding-bottom: 4rem;">
+
+  {# ── Hero ── #}
+  <div style="padding: 3rem 0 2rem; border-bottom: 1px solid rgba(255,255,255,0.07);">
+    <div class="sc-container">
+      <div class="sc-label-tag" style="margin-bottom: 0.75rem;">Induction Programme</div>
+      <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);
+                 font-weight:800;color:#fff;line-height:1.1;margin:0 0 1rem;">
+        Your Kingdom<br><em style="opacity:0.7;font-style:italic;">formation journey.</em>
+      </h1>
+      <p style="font-size:14px;color:rgba(255,255,255,0.55);max-width:480px;line-height:1.7;margin:0 0 1.5rem;">
+        Four modules. Work through each step at your own pace — complete a lesson,
+        pass the quiz, and the next step unlocks automatically.
+      </p>
+
+      {# Progress bar #}
+      <div style="max-width:400px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.4);">Overall Progress</span>
+          <span style="font-size:12px;font-weight:700;color:#fff;">{{ pct }}%</span>
+        </div>
+        <div style="height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:{{ pct }}%;background:var(--sc-primary,#6366f1);
+                      border-radius:3px;transition:width 0.4s ease;"></div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:5px;">
+          {{ passed }} of {{ total }} steps complete
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Awaiting steward confirmation ── #}
+  {% if current_prog and current_prog.status == 'awaiting_steward' %}
+  <div class="sc-container" style="padding-top:2rem;">
+    <div style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);
+                border-radius:12px;padding:24px 28px;max-width:600px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;
+                  color:#818cf8;font-weight:700;margin-bottom:8px;">Final Test Submitted</div>
+      <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px;">
+        Awaiting steward confirmation
+      </div>
+      <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:0;line-height:1.6;">
+        You passed the Final Test with a score of {{ current_prog.score }}%.
+        A steward will review and confirm your completion shortly.
+        Once confirmed, your formation level will advance.
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── Module accordion ── #}
+  <div class="sc-container" style="padding-top:2.5rem;">
+    {% for module_num, steps in modules.items %}
+    {% with module_label=module_labels|get_item:module_num %}
+    <div style="margin-bottom:2rem;">
+
+      {# Module header #}
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;padding-bottom:0.75rem;
+                  border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--sc-primary,#6366f1);
+                    display:flex;align-items:center;justify-content:center;
+                    font-size:12px;font-weight:800;color:#fff;flex-shrink:0;">{{ module_num }}</div>
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;
+                      color:rgba(255,255,255,0.35);font-weight:700;">Module {{ module_num }}</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;">{{ module_label }}</div>
+        </div>
+      </div>
+
+      {# Steps #}
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        {% for step, prog in steps %}
+        {% with status=prog.status|default:"locked" %}
+
+        {# Determine step URL and state #}
+        {% if step.step_type == 'lesson' %}
+          {% url 'induction_lesson' step.id as step_url %}
+        {% else %}
+          {% url 'induction_quiz' step.id as step_url %}
+        {% endif %}
+
+        <div style="background:{% if status == 'passed' %}rgba(34,197,94,0.06){% elif status == 'locked' %}rgba(255,255,255,0.02){% else %}rgba(99,102,241,0.08){% endif %};
+                    border:1px solid {% if status == 'passed' %}rgba(34,197,94,0.2){% elif status == 'locked' %}rgba(255,255,255,0.06){% else %}rgba(99,102,241,0.25){% endif %};
+                    border-radius:10px;padding:14px 18px;
+                    display:flex;align-items:center;gap:14px;
+                    {% if status != 'locked' %}cursor:pointer;{% endif %}">
+
+          {# Status icon #}
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;
+                      display:flex;align-items:center;justify-content:center;
+                      background:{% if status == 'passed' %}rgba(34,197,94,0.15){% elif status == 'awaiting_steward' %}rgba(99,102,241,0.2){% elif status == 'locked' %}rgba(255,255,255,0.05){% else %}rgba(99,102,241,0.15){% endif %};">
+            {% if status == 'passed' %}
+              <span class="material-symbols-outlined" style="font-size:16px;color:#4ade80;">check_circle</span>
+            {% elif status == 'awaiting_steward' %}
+              <span class="material-symbols-outlined" style="font-size:16px;color:#818cf8;">schedule</span>
+            {% elif status == 'locked' %}
+              <span class="material-symbols-outlined" style="font-size:16px;color:rgba(255,255,255,0.2);">lock</span>
+            {% else %}
+              <span class="material-symbols-outlined" style="font-size:16px;color:#818cf8;">
+                {% if step.step_type == 'lesson' %}menu_book{% else %}quiz{% endif %}
+              </span>
+            {% endif %}
+          </div>
+
+          {# Title + meta #}
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:{% if status == 'locked' %}500{% else %}700{% endif %};
+                        color:{% if status == 'locked' %}rgba(255,255,255,0.3){% elif status == 'passed' %}rgba(255,255,255,0.7){% else %}#fff{% endif %};
+                        margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              {{ step.title }}
+            </div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.06em;">
+              {{ step.get_step_type_display }}
+              {% if prog and prog.score is not None %} · {{ prog.score }}%{% endif %}
+            </div>
+          </div>
+
+          {# Action #}
+          {% if status != 'locked' and status != 'awaiting_steward' %}
+          <a href="{{ step_url }}"
+             style="flex-shrink:0;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;
+                    text-decoration:none;
+                    {% if status == 'passed' %}background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);
+                    {% else %}background:var(--sc-primary,#6366f1);color:#fff;{% endif %}">
+            {% if status == 'passed' %}Review{% else %}Start{% endif %}
+          </a>
+          {% elif status == 'awaiting_steward' %}
+          <span style="flex-shrink:0;font-size:11px;color:#818cf8;font-weight:700;">Pending</span>
+          {% else %}
+          <span class="material-symbols-outlined" style="flex-shrink:0;font-size:18px;color:rgba(255,255,255,0.15);">lock</span>
+          {% endif %}
+
+        </div>
+        {% endwith %}
+        {% endfor %}
+      </div>
+
+    </div>
+    {% endwith %}
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

@@ -201,8 +201,138 @@ def community_area(request):
 
 @require_sceptre_participant
 def learn_summary(request):
-    """Learn — redirect to learn.ichebo.org community learning surface."""
+    """Learn — Level 0 sees induction track; Level 1+ redirects to learn.ichebo.org."""
+    user = request.user
+    if user.competence_level == 0:
+        return induction_track(request)
     return redirect('https://learn.ichebo.org/')
+
+
+# ---------------------------------------------------------------------------
+# Induction learning surface — Level 0 only
+# ---------------------------------------------------------------------------
+
+@require_sceptre_participant
+def induction_track(request):
+    """The induction programme track — step list for Level 0 users."""
+    from learn.induction_service import enrol_user, get_progress_for_user, get_current_step
+
+    user = request.user
+    enrol_user(user)
+
+    progress = get_progress_for_user(user)
+    current_step, current_prog = get_current_step(user)
+
+    # Group by module for the accordion display
+    modules = {}
+    for step, prog in progress:
+        modules.setdefault(step.module, []).append((step, prog))
+
+    module_labels = {
+        1: 'Keys to the Kingdom',
+        2: 'Repentance & Reformation',
+        3: 'Secret to a Fulfilled Life',
+        4: 'The Sceptre Community',
+    }
+
+    total = len(progress)
+    passed = sum(1 for _, p in progress if p and p.status == 'passed')
+    pct = int((passed / total) * 100) if total else 0
+
+    return render(request, 'sceptre/induction/track.html', {
+        'modules': modules,
+        'module_labels': module_labels,
+        'current_step': current_step,
+        'current_prog': current_prog,
+        'total': total,
+        'passed': passed,
+        'pct': pct,
+        'tenant': _get_tenant_for_user(request.user, request),
+        'is_steward': is_steward(request.user),
+    })
+
+
+@require_sceptre_participant
+def induction_lesson(request, step_id):
+    """Read a single lesson. Marks it complete on POST."""
+    from learn.models import InductionStep
+    from learn.induction_service import enrol_user, mark_lesson_read, get_progress_for_user
+
+    user = request.user
+    if user.competence_level != 0:
+        return redirect('learn')
+
+    enrol_user(user)
+    step = get_object_or_404(InductionStep, id=step_id, step_type='lesson', is_active=True)
+
+    from learn.models import InductionProgress
+    prog = InductionProgress.objects.filter(user=user, step=step).first()
+
+    if prog and prog.status == 'locked':
+        return render(request, 'sceptre/induction/locked.html', {
+            'step': step,
+            'tenant': _get_tenant_for_user(request.user, request),
+            'is_steward': is_steward(request.user),
+        })
+
+    if request.method == 'POST':
+        mark_lesson_read(user, step)
+        return redirect('induction_track')
+
+    return render(request, 'sceptre/induction/lesson.html', {
+        'step': step,
+        'prog': prog,
+        'tenant': _get_tenant_for_user(request.user, request),
+        'is_steward': is_steward(request.user),
+    })
+
+
+@require_sceptre_participant
+def induction_quiz(request, step_id):
+    """Display and submit a quiz or module test."""
+    from learn.models import InductionStep, InductionProgress
+    from learn.induction_service import enrol_user, submit_quiz
+
+    user = request.user
+    if user.competence_level != 0:
+        return redirect('learn')
+
+    enrol_user(user)
+    step = get_object_or_404(
+        InductionStep, id=step_id,
+        step_type__in=('quiz', 'module_test', 'final_test'),
+        is_active=True,
+    )
+
+    prog = InductionProgress.objects.filter(user=user, step=step).first()
+
+    if prog and prog.status == 'locked':
+        return render(request, 'sceptre/induction/locked.html', {
+            'step': step,
+            'tenant': _get_tenant_for_user(request.user, request),
+            'is_steward': is_steward(request.user),
+        })
+
+    questions = list(step.questions.prefetch_related('answers'))
+
+    if request.method == 'POST':
+        answer_ids = request.POST.getlist('answer')
+        result = submit_quiz(user, step, answer_ids)
+        return render(request, 'sceptre/induction/quiz_result.html', {
+            'step': step,
+            'result': result,
+            'prog': result['prog'],
+            'tenant': _get_tenant_for_user(request.user, request),
+            'is_steward': is_steward(request.user),
+        })
+
+    return render(request, 'sceptre/induction/quiz.html', {
+        'step': step,
+        'prog': prog,
+        'questions': questions,
+        'tenant': _get_tenant_for_user(request.user, request),
+        'is_steward': is_steward(request.user),
+    })
 
 
 def bible_redirect(request):
@@ -413,6 +543,50 @@ def steward_formation(request):
     return render(request, 'sceptre/steward/formation.html', {
         'seekers': seekers, 'disciples': disciples, 'stewards': stewards
     })
+
+
+@require_sceptre_steward
+def induction_final_test_queue(request):
+    """Steward view — learners who passed the Final Test awaiting confirmation."""
+    from learn.models import InductionProgress
+    awaiting = (
+        InductionProgress.objects
+        .filter(status='awaiting_steward')
+        .select_related('user', 'step')
+        .order_by('completed_at')
+    )
+    return render(request, 'sceptre/induction/final_test_queue.html', {
+        'awaiting': awaiting,
+        'tenant': _get_tenant_for_user(request.user, request),
+        'is_steward': True,
+    })
+
+
+@require_sceptre_steward
+def htmx_confirm_final_test(request, user_id):
+    """POST — steward confirms a learner's Final Test, advancing them to Level 1."""
+    from django.http import HttpResponse
+    from accounts.models import User as UserModel
+    from learn.induction_service import confirm_final_test
+
+    if request.method != 'POST':
+        return HttpResponse('', status=405)
+
+    try:
+        learner = UserModel.objects.get(id=user_id)
+    except UserModel.DoesNotExist:
+        return HttpResponse('<p style="color:var(--error)">User not found.</p>')
+
+    confirmed = confirm_final_test(learner, confirmed_by=request.user)
+    if confirmed:
+        return HttpResponse(
+            f'<div style="padding:12px 16px;background:rgba(34,197,94,0.1);border:1px solid '
+            f'rgba(34,197,94,0.3);border-radius:8px;font-size:13px;color:#4ade80;">'
+            f'✓ {learner.display_name or learner.email} confirmed — now Level 1.</div>'
+        )
+    return HttpResponse(
+        '<div style="color:var(--error);font-size:13px;">No pending final test found.</div>'
+    )
 
 
 @require_sceptre_steward
