@@ -10,37 +10,43 @@
 {% block identity_content %}
 
 <!-- Hero -->
-<div class="id-hero id-hero--with-avatar">
-  <div class="id-hero__avatar">
-    {% if profile_user.avatar_url %}
-      <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}">
-    {% else %}
-      {{ profile_user.display_name|default:profile_user.email|first|upper }}
-    {% endif %}
-  </div>
-  <div class="id-hero__identity">
-    <div class="id-hero__eyebrow">Registry Profile</div>
-    <div class="id-hero__name">{{ profile_user.display_name|default:profile_user.username }}</div>
-    <div class="id-hero__badge">
-      {{ profile_user.status|default:"Seeker"|upper }} &middot; LEVEL {{ profile_user.competence_level }}
+<div class="id-hero id-hero--contained">
+  <div class="id-content--wide">
+    <div class="id-hero--with-avatar">
+      <div class="id-hero__avatar">
+        {% if profile_user.avatar_url %}
+          <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name|default:profile_user.email }}">
+        {% else %}
+          {{ profile_user.display_name|default:profile_user.email|first|upper }}
+        {% endif %}
+      </div>
+      <div class="id-hero__identity">
+        <div class="id-hero__eyebrow">Registry Profile</div>
+        <div class="id-hero__name">{{ profile_user.display_name|default:profile_user.username }}</div>
+        <div class="id-hero__badge">
+          {{ profile_user.status|default:"Seeker"|upper }} &middot; LEVEL {{ profile_user.competence_level }}
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Tab strip -->
-<div class="id-tabs">
-  <a href="{% url 'accounts:profile' %}" class="id-tab active">
-    <span class="material-symbols-outlined">person</span> Registry Profile
-  </a>
-  <a href="{% url 'accounts:manage-account' %}" class="id-tab">
-    <span class="material-symbols-outlined">badge</span> Manage Account
-  </a>
-  <a href="{% url 'accounts:formation-history' %}" class="id-tab">
-    <span class="material-symbols-outlined">history_edu</span> Formation
-  </a>
-  <a href="{% url 'accounts:settings' %}" class="id-tab">
-    <span class="material-symbols-outlined">manage_accounts</span> Settings
-  </a>
+<div class="id-tabs-wrap">
+  <div class="id-tabs">
+    <a href="{% url 'accounts:profile' %}" class="id-tab active">
+      <span class="material-symbols-outlined">person</span> Registry Profile
+    </a>
+    <a href="{% url 'accounts:manage-account' %}" class="id-tab">
+      <span class="material-symbols-outlined">badge</span> Manage Account
+    </a>
+    <a href="{% url 'accounts:formation-history' %}" class="id-tab">
+      <span class="material-symbols-outlined">history_edu</span> Formation
+    </a>
+    <a href="{% url 'accounts:settings' %}" class="id-tab">
+      <span class="material-symbols-outlined">manage_accounts</span> Settings
+    </a>
+  </div>
 </div>
 
 <!-- Content -->

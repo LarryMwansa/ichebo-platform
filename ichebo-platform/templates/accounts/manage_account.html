@@ -10,32 +10,36 @@
 {% block identity_content %}
 
 <!-- Hero -->
-<div class="id-hero">
-  <div class="id-hero__eyebrow">Account Management</div>
-  <h1 class="id-hero__title">
-    {{ profile_user.display_name|default:profile_user.username }}
-  </h1>
-  {% if profile and profile.member_number %}
-  <div class="id-hero__sub" style="font-family: monospace; letter-spacing: 0.06em; font-size: 13px; color: rgba(255,255,255,0.4);">
-    {{ profile.member_number }}
+<div class="id-hero id-hero--contained">
+  <div class="id-content--wide">
+    <div class="id-hero__eyebrow">Account Management</div>
+    <h1 class="id-hero__title">
+      {{ profile_user.display_name|default:profile_user.username }}
+    </h1>
+    {% if profile and profile.member_number %}
+    <div class="id-hero__sub" style="font-family: monospace; letter-spacing: 0.06em; font-size: 13px; color: rgba(255,255,255,0.4);">
+      {{ profile.member_number }}
+    </div>
+    {% endif %}
   </div>
-  {% endif %}
 </div>
 
 <!-- Tab strip -->
-<div class="id-tabs">
-  <a href="{% url 'accounts:profile' %}" class="id-tab">
-    <span class="material-symbols-outlined">person</span> Registry Profile
-  </a>
-  <a href="{% url 'accounts:manage-account' %}" class="id-tab active">
-    <span class="material-symbols-outlined">badge</span> Manage Account
-  </a>
-  <a href="{% url 'accounts:formation-history' %}" class="id-tab">
-    <span class="material-symbols-outlined">history_edu</span> Formation
-  </a>
-  <a href="{% url 'accounts:settings' %}" class="id-tab">
-    <span class="material-symbols-outlined">manage_accounts</span> Settings
-  </a>
+<div class="id-tabs-wrap">
+  <div class="id-tabs">
+    <a href="{% url 'accounts:profile' %}" class="id-tab">
+      <span class="material-symbols-outlined">person</span> Registry Profile
+    </a>
+    <a href="{% url 'accounts:manage-account' %}" class="id-tab active">
+      <span class="material-symbols-outlined">badge</span> Manage Account
+    </a>
+    <a href="{% url 'accounts:formation-history' %}" class="id-tab">
+      <span class="material-symbols-outlined">history_edu</span> Formation
+    </a>
+    <a href="{% url 'accounts:settings' %}" class="id-tab">
+      <span class="material-symbols-outlined">manage_accounts</span> Settings
+    </a>
+  </div>
 </div>
 
 <!-- Content -->

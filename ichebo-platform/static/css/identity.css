@@ -328,6 +328,17 @@
 }
 
 /* ── Page tab strip (Profile / Account / Settings) ─────────── */
+.id-tabs-wrap {
+  background: var(--ink, #0e0e0e);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.id-tabs-wrap .id-tabs {
+  max-width: 720px;
+  margin-inline: auto;
+  padding: 0 clamp(1rem, 5vw, 2.5rem);
+  border-bottom: none;
+}
+
 .id-tabs {
   background: var(--ink, #0e0e0e);
   border-bottom: 1px solid rgba(255,255,255,0.07);
@@ -367,6 +378,14 @@
   max-width: 960px;
   margin-inline: auto;
   padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 2.5rem);
+}
+
+/* ── Card gap — profile-card and settings-section stack with space ── */
+.id-content .profile-card + .profile-card,
+.id-content .settings-section + .settings-section,
+.id-content .profile-card + .settings-section,
+.id-content .settings-section + .profile-card {
+  margin-top: 1.25rem;
 }
 
 /* ── Section ──────────────────────────────────────────────── */
