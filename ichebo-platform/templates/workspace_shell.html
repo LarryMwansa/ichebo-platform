@@ -185,7 +185,12 @@
                    data-tooltip="Bible Reader" hx-boost="false">
                     <span class="material-symbols-outlined">menu_book</span>
                 </a>
-                <a href="https://sceptre.ichebo.org/"
+                <a href="https://app.ichebo.org/channel/"
+                   class="ics-sidebar__item"
+                   data-tooltip="Media Centre" hx-boost="false">
+                    <span class="material-symbols-outlined">live_tv</span>
+                </a>
+                <a href="https://app.ichebo.org/community/"
                    class="ics-sidebar__item"
                    data-tooltip="Community" hx-boost="false">
                     <span class="material-symbols-outlined">groups</span>
@@ -242,6 +247,11 @@
                    class="ics-sidebar__item {% if active_app == 'bible' %}active{% endif %}"
                    data-tooltip="Bible Reader" hx-boost="false">
                     <span class="material-symbols-outlined">menu_book</span>
+                </a>
+                <a href="https://app.ichebo.org/channel/"
+                   class="ics-sidebar__item {% if active_app == 'media' %}active{% endif %}"
+                   data-tooltip="Media Centre" hx-boost="false">
+                    <span class="material-symbols-outlined">live_tv</span>
                 </a>
                 <a href="https://app.ichebo.org/community/"
                    class="ics-sidebar__item {% if active_app == 'community' %}active{% endif %}"
