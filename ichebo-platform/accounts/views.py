@@ -1,7 +1,8 @@
 import json
 
-from django.contrib.auth import login as auth_login, get_user_model
+from django.contrib.auth import login as auth_login, get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings as django_settings
 from django.http import HttpResponse
@@ -481,6 +482,32 @@ class ManageAccountView(LoginRequiredMixin, View):
             'masked_id': masked_id,
             'active_app': 'accounts',
             'ws_page_title': 'Manage Account',
+        })
+
+
+class PasswordChangeView(LoginRequiredMixin, View):
+    """Branded password change — replaces Django's raw built-in for end-users."""
+
+    login_url = None  # falls back to settings.LOGIN_URL (identity.ichebo.org)
+
+    def get(self, request):
+        form = PasswordChangeForm(request.user)
+        return render(request, 'accounts/password_change.html', {
+            'form': form,
+            'active_app': 'accounts',
+            'ws_page_title': 'Change Password',
+        })
+
+    def post(self, request):
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            return redirect('accounts:manage-account')
+        return render(request, 'accounts/password_change.html', {
+            'form': form,
+            'active_app': 'accounts',
+            'ws_page_title': 'Change Password',
         })
 
 

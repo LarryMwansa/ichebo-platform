@@ -31,6 +31,7 @@ template_urlpatterns = [
     path('htmx/formation-card/', views.htmx_formation_card, name='htmx-formation-card'),
     # Manage Account
     path('manage/', views.ManageAccountView.as_view(), name='manage-account'),
+    path('manage/password/', views.PasswordChangeView.as_view(), name='password-change'),
     path('htmx/manage/reveal-id/', views.htmx_reveal_id_number, name='htmx-reveal-id'),
     path('htmx/manage/mask-id/', views.htmx_mask_id_number, name='htmx-mask-id'),
 ]
