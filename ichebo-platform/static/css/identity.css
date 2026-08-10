@@ -4,6 +4,18 @@
    clean card-less layout. Matches website-v1 / sceptre_v2 language.
    ============================================================ */
 
+/* ── Global reset overrides (global.css conflicts) ────────── */
+/* global.css sets overflow:hidden on main/section and white-space:nowrap
+   on a/button — both break the identity layout. */
+.id-body main,
+.id-body section {
+  overflow: visible;
+}
+.id-body a,
+.id-body button {
+  white-space: normal;
+}
+
 /* ── Body ─────────────────────────────────────────────────── */
 .id-body {
   min-height: 100vh;
