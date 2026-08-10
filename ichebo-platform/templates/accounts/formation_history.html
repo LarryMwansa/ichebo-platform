@@ -39,7 +39,7 @@
         </div>
         <div style="font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em;">{{ active_enrolment.progress }}% complete</div>
         {% if active_enrolment.linked_record %}
-        <a href="{% url 'learn:learn-programme' active_enrolment.linked_record.id %}" class="btn-touch btn-touch--primary" style="margin-top: var(--space-m);">
+        <a href="https://app.ichebo.org/learn/programme/{{ active_enrolment.linked_record.id }}/" class="btn-touch btn-touch--primary" style="margin-top: var(--space-m);">
           Continue Programme
           <span class="material-symbols-outlined">arrow_forward</span>
         </a>
@@ -102,7 +102,7 @@
 <div class="dashboard">
 
   <div class="dash-header">
-    <a href="{% url 'dashboard:you' %}" class="dash-back">
+    <a href="https://app.ichebo.org/you/" class="dash-back">
       <span class="material-symbols-outlined">arrow_back</span>
     </a>
     <div class="dash-greeting">
@@ -139,7 +139,7 @@
         {{ active_enrolment.progress }}% complete
       </div>
       {% if active_enrolment.linked_record %}
-      <a href="{% url 'learn:learn-programme' active_enrolment.linked_record.id %}"
+      <a href="https://app.ichebo.org/learn/programme/{{ active_enrolment.linked_record.id }}/"
          class="btn-touch btn-touch--primary" style="margin-top: 0.75rem; width: 100%; justify-content: center; text-decoration: none;">
         Continue Programme
       </a>
