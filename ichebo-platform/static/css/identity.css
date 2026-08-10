@@ -224,6 +224,7 @@
   flex-wrap: wrap;
 }
 .id-hero__avatar {
+  position: relative;
   width: clamp(64px, 10vw, 88px);
   height: clamp(64px, 10vw, 88px);
   border-radius: var(--radius-m, 12px);
@@ -238,7 +239,16 @@
   overflow: hidden;
   flex-shrink: 0;
 }
-.id-hero__avatar img { width: 100%; height: 100%; object-fit: cover; }
+/* Absolute fill defeats global.css img { height: auto } which would
+   otherwise make the img taller than the container and clip badly. */
+.id-hero__avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
 
 /* ── Avatar upload zone ───────────────────────────────────── */
 .id-avatar-zone { position: relative; flex-shrink: 0; }
