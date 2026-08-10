@@ -19,13 +19,15 @@
        class="nav-link {% if request.resolver_match.url_name == 'community' %}nav-link--active{% endif %}">
       Announcements
     </a>
+    {% if user.competence_level >= 1 %}
     <a href="{% url 'find_community' %}"
        class="nav-link {% if request.resolver_match.url_name == 'find_community' or request.resolver_match.url_name == 'community_profile' %}nav-link--active{% endif %}">
       Find a Community
     </a>
+    {% endif %}
     <a href="{% url 'learn' %}"
        class="nav-link {% if request.resolver_match.url_name == 'learn' %}nav-link--active{% endif %}">
-      Learn
+      {% if user.competence_level == 0 %}Induction Training{% else %}Learn{% endif %}
     </a>
     <a href="{% url 'bible' %}" class="nav-link">Bible</a>
     <a href="{% url 'support' %}" class="nav-link">Support</a>
@@ -58,13 +60,15 @@
      class="nav-link {% if request.resolver_match.url_name == 'community' %}nav-link--active{% endif %}">
     Announcements
   </a>
+  {% if user.competence_level >= 1 %}
   <a href="{% url 'find_community' %}"
      class="nav-link {% if request.resolver_match.url_name == 'find_community' or request.resolver_match.url_name == 'community_profile' %}nav-link--active{% endif %}">
     Find a Community
   </a>
+  {% endif %}
   <a href="{% url 'learn' %}"
      class="nav-link {% if request.resolver_match.url_name == 'learn' %}nav-link--active{% endif %}">
-    Learn
+    {% if user.competence_level == 0 %}Induction Training{% else %}Learn{% endif %}
   </a>
   <a href="{% url 'bible' %}" class="nav-link">Bible</a>
   <a href="{% url 'support' %}" class="nav-link">Support</a>
