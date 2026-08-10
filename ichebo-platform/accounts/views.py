@@ -408,6 +408,7 @@ class WelcomeView(LoginRequiredMixin, View):
         return render(request, 'accounts/welcome.html', {
             'profile': profile,
             'member_number': profile.member_number if profile else None,
+            'user': user,
         })
 
 
