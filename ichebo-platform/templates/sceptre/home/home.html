@@ -10,8 +10,17 @@
 <!-- Channel hero heading -->
 <div class="channel-hero-heading" style="background: var(--sc-ink);">
   <div class="sc-container">
-    <div class="sc-label-tag">Watch</div>
-    <h1>Kingdom on broadcast.</h1>
+    {% if user.competence_level == 0 %}
+      <div class="sc-label-tag">Induction &nbsp;·&nbsp; Watch</div>
+      {% if user.induction_pathway == 'reconditioning' %}
+        <h1>Kingdom alignment<br><em style="font-style:italic;opacity:0.75;">on broadcast.</em></h1>
+      {% else %}
+        <h1>Begin here.<br><em style="font-style:italic;opacity:0.75;">Kingdom foundations on broadcast.</em></h1>
+      {% endif %}
+    {% else %}
+      <div class="sc-label-tag">Watch</div>
+      <h1>Kingdom on broadcast.</h1>
+    {% endif %}
   </div>
 </div>
 
@@ -76,7 +85,9 @@
   <div class="sc-container">
     <div class="tabs-inner">
       <button class="tab-btn active" id="tab-recent" onclick="switchTab('recent', this)">Recent Broadcasts</button>
-      <button class="tab-btn" id="tab-series" onclick="switchTab('series', this)">Teaching Series</button>
+      <button class="tab-btn" id="tab-series" onclick="switchTab('series', this)">
+        {% if user.competence_level == 0 %}Induction Programme{% else %}Teaching Series{% endif %}
+      </button>
     </div>
   </div>
 </div>
@@ -124,8 +135,18 @@
 <!-- Teaching Series & Programmes -->
 <section class="series-section" id="tab-panel-series" style="display:none;">
   <div class="sc-container">
-    <div class="sc-label-tag">Browse by Series</div>
-    <h2 class="series-heading">Teaching series &amp; programmes.</h2>
+    {% if user.competence_level == 0 %}
+      {% if user.induction_pathway == 'reconditioning' %}
+        <div class="sc-label-tag">Your Programme</div>
+        <h2 class="series-heading">Induction — Kingdom alignment track.</h2>
+      {% else %}
+        <div class="sc-label-tag">Your Programme</div>
+        <h2 class="series-heading">Induction — start your journey here.</h2>
+      {% endif %}
+    {% else %}
+      <div class="sc-label-tag">Browse by Series</div>
+      <h2 class="series-heading">Teaching series &amp; programmes.</h2>
+    {% endif %}
     <div class="series-grid sc-fade-up">
       {% if programmes %}
         {% for prog in programmes %}
@@ -143,7 +164,11 @@
         {% endfor %}
       {% else %}
         <div style="grid-column: 1 / -1; padding: 4rem 1rem; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px;">
-          <div style="color: rgba(255,255,255,0.5); font-size: 15px;">There are no active teaching programmes right now.</div>
+          {% if user.competence_level == 0 %}
+            <div style="color: rgba(255,255,255,0.5); font-size: 15px;">Your Induction programme will appear here once your placement is confirmed by a steward.</div>
+          {% else %}
+            <div style="color: rgba(255,255,255,0.5); font-size: 15px;">There are no active teaching programmes right now.</div>
+          {% endif %}
         </div>
       {% endif %}
     </div>
