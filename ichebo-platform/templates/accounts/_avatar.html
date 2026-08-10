@@ -7,9 +7,9 @@
       {% else %}
         {{ user.display_name|default:user.email|first|upper }}
       {% endif %}
-      <div class="id-avatar-zone__overlay">
-        <span class="material-symbols-outlined">photo_camera</span>
-      </div>
+    </div>
+    <div class="id-avatar-zone__badge">
+      <span class="material-symbols-outlined">photo_camera</span>
     </div>
   </label>
   <input

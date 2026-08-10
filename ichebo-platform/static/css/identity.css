@@ -251,36 +251,53 @@
 }
 
 /* ── Avatar upload zone ───────────────────────────────────── */
-.id-avatar-zone { position: relative; flex-shrink: 0; }
-.id-avatar-zone__label { display: block; cursor: pointer; }
-.id-avatar-zone__label .id-hero__avatar { position: relative; }
-.id-avatar-zone__overlay {
+.id-avatar-zone {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-block;
+}
+.id-avatar-zone__label {
+  display: block;
+  cursor: pointer;
+}
+
+/* Camera badge — pinned to bottom-right corner of the avatar */
+.id-avatar-zone__badge {
   position: absolute;
-  inset: 0;
-  border-radius: var(--radius-m, 12px);
-  background: rgba(0,0,0,0.45);
+  bottom: -6px;
+  right: -6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary, #af3236);
+  border: 2px solid var(--ink, #0e0e0e);
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  transition: opacity 0.15s;
+  transition: background 0.15s, transform 0.15s;
+  pointer-events: none;
 }
-.id-avatar-zone__overlay .material-symbols-outlined {
-  font-size: 28px;
+.id-avatar-zone__badge .material-symbols-outlined {
+  font-size: 14px;
   color: #fff;
 }
-.id-avatar-zone__label:hover .id-avatar-zone__overlay { opacity: 1; }
+.id-avatar-zone__label:hover .id-avatar-zone__badge {
+  background: var(--primary-dark, #8c2a2d);
+  transform: scale(1.1);
+}
+
 .id-avatar-zone__error {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 10px);
   left: 0;
   white-space: normal;
   font-size: 11px;
   color: #f87171;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.8);
   border-radius: 4px;
   padding: 4px 8px;
   min-width: 160px;
+  z-index: 10;
 }
 
 .id-hero__identity { flex: 1; min-width: 0; }
