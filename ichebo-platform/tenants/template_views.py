@@ -43,12 +43,19 @@ def _make_unique_slug(base_slug):
     return slug
 
 
+_INDUCTION_OVERSIGHT_SLUGS = frozenset(['prime', 'formation-teaching', 'community-life-care'])
+
+
 def _is_steward_of(user, tenant):
     """True if the user is a direct steward of this exact tenant, OR holds
     a steward role on an ancestor tenant (hierarchical oversight — e.g. a
     global-steward on Prime is a steward of every descendant, not just
     Prime itself). See get_oversight_tenant_ids's docstring for the
-    template-views-never-walked-the-hierarchy bug this closes."""
+    template-views-never-walked-the-hierarchy bug this closes.
+
+    Induction exception: Formation & Teaching and Community Life & Care
+    stewards are constitutionally responsible for the Induction tenant
+    even though it is not a path-descendant of their agency paths."""
     if UserPermission.objects.filter(
         tenant=tenant, user=user, is_active=True, role__in=UserPermission.STEWARD_ROLES
     ).exists():
@@ -57,7 +64,15 @@ def _is_steward_of(user, tenant):
     oversight_perms = UserPermission.objects.filter(
         user=user, is_active=True, role__in=UserPermission.STEWARD_ROLES,
     ).select_related('tenant')
-    return any(tenant.path.startswith(p.tenant.path) for p in oversight_perms)
+
+    if any(tenant.path.startswith(p.tenant.path) for p in oversight_perms):
+        return True
+
+    # Explicit oversight of Induction by its responsible agencies
+    if tenant.tier == 'induction':
+        return any(p.tenant.slug in _INDUCTION_OVERSIGHT_SLUGS for p in oversight_perms)
+
+    return False
 
 
 # ---------------------------------------------------------------------------

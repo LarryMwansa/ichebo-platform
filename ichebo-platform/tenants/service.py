@@ -15,6 +15,13 @@ def get_oversight_tenant_ids(user):
     with that prefix, not just Prime itself. Superusers see every tenant,
     matching TenantViewSet's existing superuser behavior.
 
+    Induction exception: Formation & Teaching and Community Life & Care
+    stewards are constitutionally responsible for the Induction tenant even
+    though /global/induction/ is not a path-descendant of their agency paths
+    (/global/formation-teaching/, /global/community-life-care/). Their
+    oversight of Induction is added explicitly here. Prime Tenancy stewards
+    already cover Induction via the path__startswith=/global/ rule.
+
     This logic previously existed only in tenants/views.py's TenantViewSet
     (the DRF API) — every template-rendered page (steward_dashboard,
     my_tenants, tenant_detail's is_steward check, community's
@@ -44,6 +51,18 @@ def get_oversight_tenant_ids(user):
     q = Q(id__in=direct_tenant_ids)
     for perm in oversight_perms:
         q |= Q(path__startswith=perm.tenant.path)
+
+    # Formation & Teaching and Community Life & Care stewards oversee the
+    # Induction tenant directly even though it is not a path-descendant of
+    # their agency. Add it explicitly when any of those agency perms exist.
+    induction_agency_slugs = {'formation-teaching', 'community-life-care'}
+    has_induction_oversight = any(
+        perm.tenant.slug in induction_agency_slugs
+        for perm in oversight_perms
+    )
+    if has_induction_oversight:
+        q |= Q(tier='induction')
+
     return set(Tenant.objects.filter(q).values_list('id', flat=True))
 
 
