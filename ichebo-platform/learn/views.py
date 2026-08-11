@@ -3,6 +3,7 @@ import json
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
@@ -875,9 +876,21 @@ def author_lesson_form(request, record_id=None):
                 )
         return redirect('learn:learn-author')
 
+    questions = []
+    if record and record.record_type == 'quiz':
+        from learn.models import AssessmentQuestion
+        questions = (
+            AssessmentQuestion.objects
+            .filter(record=record, deleted_at__isnull=True)
+            .prefetch_related('options')
+            .order_by('order')
+        )
+
     return render(request, 'learn/author_lesson_form.html', {
         'courses': courses,
         'record': record,
+        'questions': questions,
+        'attachments': record.learning_attachments.all() if record else [],
         'media_engine_public_url': settings.MEDIA_ENGINE_PUBLIC_URL,
     })
 
@@ -1603,3 +1616,217 @@ def htmx_linked_records(request, record_id):
         'can_add_link': True,
         'context': 'learning',
     })
+
+
+# ── Assessment question authoring (Level 4+) ─────────────────────────────────
+#
+# Before this, quiz questions existed only in a seed script — record_type='quiz'
+# was authorable but its questions were not, so a steward could create an
+# assessment and had no way to put anything in it.
+
+MAX_OPTIONS_PER_QUESTION = 5
+
+
+def _authorable_record(request, record_id, record_type=None):
+    """The record if this user may author it, else raise 403/404.
+
+    Mirrors htmx_author_delete: architects (5+) may edit any learning record;
+    Level 4 authors only their own, and only before it goes live.
+    """
+    if _user_level(request.user) < 4:
+        raise PermissionDenied('Authoring requires Level 4.')
+
+    lookup = {'id': record_id, 'record_family': 'learning', 'deleted_at__isnull': True}
+    if record_type:
+        lookup['record_type'] = record_type
+
+    if _user_level(request.user) < 5:
+        lookup['created_by'] = request.user
+        lookup['status__in'] = ['draft', 'submitted', 'approved']
+
+    return get_object_or_404(Record, **lookup)
+
+
+def _question_list_response(request, record):
+    from learn.models import AssessmentQuestion
+    questions = (
+        AssessmentQuestion.objects
+        .filter(record=record, deleted_at__isnull=True)
+        .prefetch_related('options')
+        .order_by('order')
+    )
+    return render(request, 'learn/partials/_question_list.html', {
+        'record': record,
+        'questions': questions,
+    })
+
+
+@login_required
+def htmx_question_list(request, record_id):
+    return _question_list_response(request, _authorable_record(request, record_id, 'quiz'))
+
+
+@login_required
+def htmx_question_form(request, record_id):
+    """Blank form, or one populated from ?question_id=."""
+    from learn.models import AssessmentQuestion
+
+    record = _authorable_record(request, record_id, 'quiz')
+
+    question = None
+    options = []
+    correct_index = None
+    question_id = request.GET.get('question_id')
+    if question_id:
+        question = get_object_or_404(
+            AssessmentQuestion, id=question_id, record=record, deleted_at__isnull=True
+        )
+        options = list(question.options.order_by('order'))
+        for index, option in enumerate(options):
+            if option.is_correct:
+                correct_index = index
+                break
+
+    return render(request, 'learn/partials/_question_form.html', {
+        'record': record,
+        'question': question,
+        'options': options,
+        'correct_index': correct_index,
+        'option_range': range(MAX_OPTIONS_PER_QUESTION),
+    })
+
+
+@login_required
+def htmx_question_cancel(request):
+    return HttpResponse('')
+
+
+@login_required
+def htmx_question_save(request, record_id):
+    """Create or update one question and replace its options wholesale."""
+    from learn.models import AssessmentOption, AssessmentQuestion
+
+    record = _authorable_record(request, record_id, 'quiz')
+    if request.method != 'POST':
+        return HttpResponse('', status=405)
+
+    question_text = (request.POST.get('question_text') or '').strip()
+    if not question_text:
+        return _question_list_response(request, record)
+
+    texts = [t.strip() for t in request.POST.getlist('option_text')]
+    try:
+        correct_index = int(request.POST.get('correct_index', 0))
+    except (TypeError, ValueError):
+        correct_index = 0
+
+    # Keep the author's chosen answer aligned with its text after blanks are
+    # dropped — indexes refer to the form rows, not the surviving options.
+    kept = [(i, t) for i, t in enumerate(texts) if t]
+    if len(kept) < 2:
+        # Refuse silently rather than saving an unanswerable question; the
+        # form's own copy explains the rule.
+        return _question_list_response(request, record)
+
+    question_id = request.POST.get('question_id')
+    with transaction.atomic():
+        if question_id:
+            question = get_object_or_404(
+                AssessmentQuestion, id=question_id, record=record, deleted_at__isnull=True
+            )
+            question.question_text = question_text
+            question.save(update_fields=['question_text'])
+            question.options.all().delete()
+        else:
+            last = (
+                AssessmentQuestion.objects
+                .filter(record=record, deleted_at__isnull=True)
+                .order_by('-order').first()
+            )
+            question = AssessmentQuestion.objects.create(
+                record=record,
+                question_text=question_text,
+                question_type='single_choice',
+                order=(last.order + 1) if last else 0,
+            )
+
+        marked_correct = False
+        for position, (original_index, text) in enumerate(kept):
+            is_correct = original_index == correct_index
+            marked_correct = marked_correct or is_correct
+            AssessmentOption.objects.create(
+                question=question,
+                answer_text=text,
+                is_correct=is_correct,
+                order=position,
+            )
+
+        if not marked_correct:
+            # The chosen row was left blank. Without a correct option the
+            # question can never be scored right, so default to the first.
+            first = question.options.order_by('order').first()
+            if first:
+                first.is_correct = True
+                first.save(update_fields=['is_correct'])
+
+    return _question_list_response(request, record)
+
+
+@login_required
+def htmx_question_delete(request, question_id):
+    from learn.models import AssessmentQuestion
+
+    if request.method != 'POST':
+        return HttpResponse('', status=405)
+
+    question = get_object_or_404(
+        AssessmentQuestion, id=question_id, deleted_at__isnull=True
+    )
+    record = _authorable_record(request, question.record_id, 'quiz')
+    question.soft_delete()
+
+    _renumber_questions(record)
+    return _question_list_response(request, record)
+
+
+@login_required
+def htmx_question_move(request, question_id, direction):
+    """Swap a question with its neighbour, then normalise the ordering."""
+    from learn.models import AssessmentQuestion
+
+    if request.method != 'POST':
+        return HttpResponse('', status=405)
+
+    question = get_object_or_404(
+        AssessmentQuestion, id=question_id, deleted_at__isnull=True
+    )
+    record = _authorable_record(request, question.record_id, 'quiz')
+
+    siblings = list(
+        AssessmentQuestion.objects
+        .filter(record=record, deleted_at__isnull=True).order_by('order')
+    )
+    index = next((i for i, q in enumerate(siblings) if q.id == question.id), None)
+    swap_with = index - 1 if direction == 'up' else index + 1
+
+    if index is not None and 0 <= swap_with < len(siblings):
+        with transaction.atomic():
+            siblings[index], siblings[swap_with] = siblings[swap_with], siblings[index]
+            for position, q in enumerate(siblings):
+                if q.order != position:
+                    q.order = position
+                    q.save(update_fields=['order'])
+
+    return _question_list_response(request, record)
+
+
+def _renumber_questions(record):
+    from learn.models import AssessmentQuestion
+    questions = (
+        AssessmentQuestion.objects
+        .filter(record=record, deleted_at__isnull=True).order_by('order')
+    )
+    for position, question in enumerate(questions):
+        if question.order != position:
+            question.order = position
+            question.save(update_fields=['order'])

@@ -1,0 +1,70 @@
+{% comment %}
+Add / edit one question and its answer options.
+
+Options are saved as a set on the parent question POST (option_text[] plus
+correct_index) rather than through per-option endpoints — one atomic write,
+and no way to end up with a question whose options are half-saved.
+
+Params: record, question (optional), options (optional)
+{% endcomment %}
+<form hx-post="{% url 'learn:htmx-question-save' record.id %}"
+      hx-target="#question-list" hx-swap="outerHTML"
+      style="border:1px solid var(--primary);border-radius:8px;background:var(--card-2);
+             padding:16px;margin-bottom:12px;">
+  {% csrf_token %}
+  {% if question %}<input type="hidden" name="question_id" value="{{ question.id }}">{% endif %}
+
+  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+              color:var(--muted);margin-bottom:6px;">
+    {% if question %}Edit question{% else %}New question{% endif %}
+  </div>
+
+  <input type="text" name="question_text" required maxlength="500"
+         value="{{ question.question_text|default:'' }}"
+         placeholder="e.g. What does the Kingdom of God refer to?"
+         style="display:block;width:100%;height:38px;padding:0 12px;margin-bottom:12px;
+                background:var(--card);border:1px solid var(--border);border-radius:6px;
+                font-size:13px;color:var(--text);outline:none;box-sizing:border-box;">
+
+  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+              color:var(--muted);margin-bottom:6px;">
+    Answers — select the correct one
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+    {% for i in option_range %}
+    <label style="display:flex;align-items:center;gap:9px;">
+      <input type="radio" name="correct_index" value="{{ i }}"
+             {% if correct_index == i %}checked{% elif not question and i == 0 %}checked{% endif %}
+             style="flex-shrink:0;accent-color:var(--primary);">
+      <input type="text" name="option_text" maxlength="500"
+             value="{% for o in options %}{% if forloop.counter0 == i %}{{ o.answer_text }}{% endif %}{% endfor %}"
+             placeholder="Answer {{ forloop.counter }}{% if i > 1 %} (optional){% endif %}"
+             style="flex:1;height:34px;padding:0 10px;background:var(--card);
+                    border:1px solid var(--border);border-radius:6px;font-size:12px;
+                    color:var(--text);outline:none;box-sizing:border-box;">
+    </label>
+    {% endfor %}
+  </div>
+
+  <p style="font-size:11px;color:var(--muted);margin:0 0 12px;">
+    Blank answers are ignored. Two are required — a question with one answer
+    cannot be got wrong.
+  </p>
+
+  <div style="display:flex;gap:8px;">
+    <button type="submit"
+            style="padding:9px 18px;background:var(--primary);color:#fff;border:none;
+                   border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
+      {% if question %}Save changes{% else %}Add question{% endif %}
+    </button>
+    <button type="button"
+            hx-get="{% url 'learn:htmx-question-cancel' %}"
+            hx-target="#question-editor" hx-swap="innerHTML"
+            style="padding:9px 16px;background:var(--card);color:var(--muted);
+                   border:1px solid var(--border);border-radius:8px;font-size:12px;
+                   font-weight:600;cursor:pointer;">
+      Cancel
+    </button>
+  </div>
+</form>

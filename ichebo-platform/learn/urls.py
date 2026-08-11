@@ -36,6 +36,14 @@ urlpatterns = [
     path('htmx/induction/confirm-prompt/<uuid:user_id>/', views.htmx_induction_confirm_prompt, name='htmx-induction-confirm-prompt'),
     path('htmx/induction/confirm/<uuid:user_id>/', views.htmx_induction_confirm, name='htmx-induction-confirm'),
 
+    # ── Assessment question authoring (Level 4+) ───────────────────────────
+    path('htmx/questions/<uuid:record_id>/', views.htmx_question_list, name='htmx-question-list'),
+    path('htmx/questions/<uuid:record_id>/form/', views.htmx_question_form, name='htmx-question-form'),
+    path('htmx/questions/<uuid:record_id>/save/', views.htmx_question_save, name='htmx-question-save'),
+    path('htmx/question/<uuid:question_id>/delete/', views.htmx_question_delete, name='htmx-question-delete'),
+    path('htmx/question/<uuid:question_id>/move/<str:direction>/', views.htmx_question_move, name='htmx-question-move'),
+    path('htmx/question/cancel/', views.htmx_question_cancel, name='htmx-question-cancel'),
+
     # ── HTMX action routes ─────────────────────────────────────────────────
     path('htmx/enrol/<uuid:programme_id>/', views.htmx_enrol, name='htmx-enrol'),
     path('htmx/complete-lesson/<uuid:lesson_id>/',

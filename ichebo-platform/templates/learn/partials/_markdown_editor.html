@@ -1,0 +1,158 @@
+{% comment %}
+A markdown writing canvas that upgrades a textarea in place.
+
+Params:
+  field_name    — the POST field (default "content")
+  value         — initial markdown
+  mount_suffix  — "" / "-mobile"; every id is suffixed so the desktop and
+                  mobile copies of a learn form don't collide
+  placeholder   — shown in the empty state
+  min_height    — canvas height (default 420px)
+
+Why not include workspace/editorial/partials/editor.html: that partial IS a
+page — it owns the <form>, the title input, the save button and an HTMX save
+contract. Lesson authoring is a multi-field form (unit type, course, video,
+pass score, draft vs submit), so this mounts the same CodeMirror 6 engine
+(static/js/codemirror-md.bundle.js, window.createMarkdownEditor) onto a hidden
+textarea instead, keeping ordinary form submission intact.
+
+The textarea stays the source of truth for POST; CodeMirror writes back to it
+on every change, exactly as editorial_v2.js does for the Desk.
+{% endcomment %}
+{% load static %}
+{% with sfx=mount_suffix|default:"" fname=field_name|default:"content" %}
+
+<div class="lmd" id="lmd-{{ sfx }}" data-lmd-suffix="{{ sfx }}">
+
+  <div class="lmd__bar">
+    <span class="lmd__hint">Markdown — headings, <strong>bold</strong>, lists, links, tables</span>
+    <span class="lmd__spacer"></span>
+    <span class="lmd__count" id="lmd-count{{ sfx }}"></span>
+    <button type="button" class="lmd__btn" id="lmd-preview-btn{{ sfx }}"
+            data-target="{{ sfx }}">
+      <span class="material-symbols-outlined" style="font-size:15px;">visibility</span>
+      Preview
+    </button>
+  </div>
+
+  {# Source of truth for form submission. CodeMirror mirrors into it. #}
+  <textarea name="{{ fname }}" id="lmd-textarea{{ sfx }}"
+            style="display:none;">{{ value|default:'' }}</textarea>
+
+  <div class="lmd__mount" id="lmd-mount{{ sfx }}"
+       style="min-height:{{ min_height|default:'420px' }};"></div>
+
+  <div class="lmd__preview editorial-preview-pane learn-md-body"
+       id="lmd-preview{{ sfx }}"
+       style="display:none;min-height:{{ min_height|default:'420px' }};"></div>
+
+  {# Plain-textarea fallback, shown only if CodeMirror fails to load. #}
+  <textarea id="lmd-fallback{{ sfx }}" rows="18" style="display:none;"
+            placeholder="{{ placeholder|default:'Draft your lesson content using Markdown…' }}"
+            class="lmd__fallback"></textarea>
+</div>
+
+{% if not sfx %}
+<link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
+<style>
+  .lmd { border:1px solid var(--border); border-radius:8px; background:var(--card-2); overflow:hidden; }
+  .lmd__bar { display:flex; align-items:center; gap:10px; padding:7px 10px;
+              border-bottom:1px solid var(--border); background:var(--card); }
+  .lmd__hint { font-size:11px; color:var(--muted); }
+  .lmd__hint strong { color:var(--text); }
+  .lmd__spacer { flex:1; }
+  .lmd__count { font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .lmd__btn { display:inline-flex; align-items:center; gap:5px; padding:5px 10px;
+              border:1px solid var(--border); border-radius:6px; background:var(--card-2);
+              color:var(--text); font-size:11px; font-weight:600; cursor:pointer; }
+  .lmd__btn:hover { border-color:var(--primary); }
+  .lmd__btn[aria-pressed="true"] { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .lmd__mount .cm-editor { height:100%; }
+  .lmd__preview { padding:20px 24px; overflow-y:auto; }
+  .lmd__fallback { display:block; width:100%; padding:12px 14px; background:var(--card-2);
+                   border:0; color:var(--text); font-size:13px; line-height:1.6;
+                   font-family:ui-monospace,'Cascadia Code','Fira Code',monospace;
+                   outline:none; resize:vertical; box-sizing:border-box; }
+</style>
+<script src="{% static 'js/codemirror-md.bundle.js' %}"></script>
+<script>
+(function () {
+  function words(text) {
+    var t = (text || '').trim();
+    return t ? t.split(/\s+/).length : 0;
+  }
+
+  function mount(root) {
+    if (root.dataset.lmdReady) return;
+    var sfx = root.dataset.lmdSuffix || '';
+    var textarea = document.getElementById('lmd-textarea' + sfx);
+    var host     = document.getElementById('lmd-mount' + sfx);
+    var preview  = document.getElementById('lmd-preview' + sfx);
+    var count    = document.getElementById('lmd-count' + sfx);
+    var btn      = document.getElementById('lmd-preview-btn' + sfx);
+    var fallback = document.getElementById('lmd-fallback' + sfx);
+    if (!textarea || !host) return;
+    root.dataset.lmdReady = '1';
+
+    function tick() { if (count) count.textContent = words(textarea.value) + ' words'; }
+    tick();
+
+    if (typeof window.createMarkdownEditor === 'function') {
+      window.createMarkdownEditor({
+        targetId: 'lmd-mount' + sfx,
+        initialValue: textarea.value,
+        darkMode: document.documentElement.classList.contains('dark') ||
+                  document.body.classList.contains('dark'),
+        onChange: function (val) { textarea.value = val; tick(); },
+      });
+    } else if (fallback) {
+      // CodeMirror unavailable — degrade to a plain textarea rather than
+      // leaving the author with no way to type.
+      host.style.display = 'none';
+      fallback.style.display = 'block';
+      fallback.value = textarea.value;
+      fallback.addEventListener('input', function () {
+        textarea.value = fallback.value; tick();
+      });
+    }
+
+    if (btn && preview) {
+      btn.addEventListener('click', function () {
+        var showing = preview.style.display !== 'none';
+        if (showing) {
+          preview.style.display = 'none';
+          host.style.display = '';
+          btn.setAttribute('aria-pressed', 'false');
+          return;
+        }
+        function render() {
+          marked.setOptions({ breaks: true, gfm: true });
+          preview.innerHTML = marked.parse(textarea.value || '_Nothing written yet._');
+          preview.style.display = '';
+          host.style.display = 'none';
+          btn.setAttribute('aria-pressed', 'true');
+        }
+        if (typeof marked !== 'undefined') { render(); }
+        else {
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+          s.onload = render;
+          document.head.appendChild(s);
+        }
+      });
+    }
+  }
+
+  function mountAll() { document.querySelectorAll('[data-lmd-suffix]').forEach(mount); }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountAll);
+  } else {
+    mountAll();
+  }
+  document.body.addEventListener('htmx:afterSwap', mountAll);
+})();
+</script>
+{% endif %}
+
+{% endwith %}

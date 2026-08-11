@@ -155,11 +155,15 @@ stale desktop copy, and Save submitted that stale copy instead.
 
         <div class="editorial-toolbar__right">
             <span class="editorial-status" id="word-count{{ sfx }}" style="min-width: 60px; text-align: right;"></span>
+            {# submit_label lets a consumer name the action for its own surface
+               (e.g. "Save Lesson" in Curriculum Authoring); defaults to the
+               journal/handbook wording this partial was written for. #}
             <button type="submit" form="editorial-form{{ sfx }}"
                     id="editorial-save-btn{{ sfx }}"
-                    class="ws-topbar__cta editorial-save-btn" title="Save to Registry">
+                    class="ws-topbar__cta editorial-save-btn"
+                    title="{{ submit_label|default:'Save to Registry' }}">
                 <span class="material-symbols-outlined editorial-save-btn__icon">cloud_upload</span>
-                <span class="editorial-save-btn__label">Save to Registry</span>
+                <span class="editorial-save-btn__label">{{ submit_label|default:'Save to Registry' }}</span>
             </button>
         </div>
     </div>

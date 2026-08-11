@@ -1,0 +1,92 @@
+{% comment %}
+The full question list for a quiz Record. Swapped wholesale by every
+question HTMX action, so there is one render path and no partial-update
+drift to reason about.
+
+Params: record, questions
+{% endcomment %}
+<div id="question-list">
+
+  {% for q in questions %}
+  <div style="border:1px solid var(--border);border-radius:8px;background:var(--card-2);
+              padding:14px 16px;margin-bottom:10px;">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:22px;height:22px;border-radius:50%;background:var(--primary);
+                  color:#fff;font-size:11px;font-weight:800;flex-shrink:0;
+                  display:flex;align-items:center;justify-content:center;">
+        {{ forloop.counter }}
+      </div>
+
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;">
+          {{ q.question_text }}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          {% for o in q.options.all %}
+          <div style="display:flex;align-items:center;gap:7px;font-size:12px;
+                      color:{% if o.is_correct %}var(--text){% else %}var(--muted){% endif %};">
+            <span class="material-symbols-outlined"
+                  style="font-size:14px;color:{% if o.is_correct %}#16a34a{% else %}var(--border){% endif %};">
+              {% if o.is_correct %}check_circle{% else %}radio_button_unchecked{% endif %}
+            </span>
+            {{ o.answer_text }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <button type="button" title="Move up"
+                hx-post="{% url 'learn:htmx-question-move' q.id 'up' %}"
+                hx-target="#question-list" hx-swap="outerHTML"
+                {% if forloop.first %}disabled{% endif %}
+                style="border:1px solid var(--border);border-radius:6px;background:var(--card);
+                       color:var(--muted);cursor:pointer;padding:3px 6px;
+                       {% if forloop.first %}opacity:.35;cursor:default;{% endif %}">
+          <span class="material-symbols-outlined" style="font-size:15px;">arrow_upward</span>
+        </button>
+        <button type="button" title="Move down"
+                hx-post="{% url 'learn:htmx-question-move' q.id 'down' %}"
+                hx-target="#question-list" hx-swap="outerHTML"
+                {% if forloop.last %}disabled{% endif %}
+                style="border:1px solid var(--border);border-radius:6px;background:var(--card);
+                       color:var(--muted);cursor:pointer;padding:3px 6px;
+                       {% if forloop.last %}opacity:.35;cursor:default;{% endif %}">
+          <span class="material-symbols-outlined" style="font-size:15px;">arrow_downward</span>
+        </button>
+        <button type="button" title="Edit"
+                hx-get="{% url 'learn:htmx-question-form' record.id %}?question_id={{ q.id }}"
+                hx-target="#question-editor" hx-swap="innerHTML"
+                style="border:1px solid var(--border);border-radius:6px;background:var(--card);
+                       color:var(--muted);cursor:pointer;padding:3px 6px;">
+          <span class="material-symbols-outlined" style="font-size:15px;">edit</span>
+        </button>
+        <button type="button" title="Delete"
+                hx-post="{% url 'learn:htmx-question-delete' q.id %}"
+                hx-target="#question-list" hx-swap="outerHTML"
+                hx-confirm="Delete this question and its answers?"
+                style="border:1px solid var(--border);border-radius:6px;background:var(--card);
+                       color:#dc2626;cursor:pointer;padding:3px 6px;">
+          <span class="material-symbols-outlined" style="font-size:15px;">delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div style="border:1px dashed var(--border);border-radius:8px;padding:22px;
+              text-align:center;color:var(--muted);font-size:12px;margin-bottom:10px;">
+    No questions yet. Learners cannot pass an assessment with no questions,
+    so add at least one before publishing.
+  </div>
+  {% endfor %}
+
+  <button type="button"
+          hx-get="{% url 'learn:htmx-question-form' record.id %}"
+          hx-target="#question-editor" hx-swap="innerHTML"
+          style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;
+                 border:1px solid var(--border);border-radius:8px;background:var(--card-2);
+                 color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">
+    <span class="material-symbols-outlined" style="font-size:16px;">add</span>
+    Add question
+  </button>
+</div>

@@ -82,16 +82,7 @@
                         (Markdown supported)
                     </span>
                 </label>
-                <textarea name="content" rows="18"
-                          placeholder="Draft your lesson content using Markdown…"
-                          style="display: block; width: 100%; padding: 12px 14px;
-                                 background: var(--card-2); border: 1px solid var(--border);
-                                 border-radius: 8px; font-size: 13px; color: var(--text);
-                                 font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
-                                 line-height: 1.6; outline: none; resize: vertical;
-                                 box-sizing: border-box;"
-                          onfocus="this.style.borderColor='var(--primary)'"
-                          onblur="this.style.borderColor='var(--border)'">{{ record.content|default:'' }}</textarea>
+                {% include "learn/partials/_markdown_editor.html" with value=record.content mount_suffix="" %}
             </div>
 
             <div>
@@ -104,6 +95,22 @@
                 </label>
                 {% include "learn/partials/_video_upload.html" with mount_suffix="" video_url_value=record.custom_fields.video_url %}
             </div>
+
+            {% if record and record.record_type == 'quiz' %}
+            {# Questions live in their own HTMX island — saved as they are
+               edited, independently of the lesson form's draft/submit. #}
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Questions
+                    <span style="font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--muted);">
+                        (saved immediately — pass mark {{ record.custom_fields.pass_score|default:70 }}%)
+                    </span>
+                </label>
+                <div id="question-editor"></div>
+                {% include "learn/partials/_question_list.html" %}
+            </div>
+            {% endif %}
 
             {% if not record %}
             <div>
@@ -269,10 +276,7 @@
             Instructional Content
             <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);"> (Markdown)</span>
           </label>
-          <textarea name="content" rows="12"
-                    placeholder="Draft your lesson content using Markdown…"
-                    class="form-input-touch"
-                    style="width:100%;resize:vertical;padding-top:12px;padding-bottom:12px;font-family:ui-monospace,'Cascadia Code','Fira Code',monospace;line-height:1.6;">{{ record.content|default:'' }}</textarea>
+          {% include "learn/partials/_markdown_editor.html" with value=record.content mount_suffix="-mobile" min_height="300px" %}
         </div>
 
         <div>
