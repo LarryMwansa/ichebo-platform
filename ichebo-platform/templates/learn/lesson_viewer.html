@@ -97,9 +97,12 @@
     {% endif %}
 
     {# ── Lesson content ── #}
-    <div style="font-size: 15px; line-height: 1.8; color: var(--text); margin-bottom: 40px;">
-        {{ lesson.content|linebreaks }}
+    <div style="margin-bottom: 40px;">
+        {% include "learn/partials/_markdown_body.html" with text=lesson.content %}
     </div>
+
+    {# ── Attachments ── #}
+    {% include "learn/partials/_attachments.html" with attachments=attachments %}
 
     {# ── Quiz ── #}
     {% if lesson.record_type == 'quiz' and lesson.custom_fields.questions %}
@@ -252,10 +255,12 @@
     {% endif %}
 
     {% if lesson.content %}
-    <div style="font-size:15px;line-height:1.8;color:var(--text);margin-bottom:var(--space-m);">
-      {{ lesson.content|linebreaks }}
+    <div style="margin-bottom:var(--space-m);">
+      {% include "learn/partials/_markdown_body.html" with text=lesson.content mount_suffix="-mobile" %}
     </div>
     {% endif %}
+
+    {% include "learn/partials/_attachments.html" with attachments=attachments mount_suffix="-mobile" %}
 
     {% if lesson.record_type == 'quiz' and lesson.custom_fields.questions %}
     {% include "learn/partials/quiz.html" %}

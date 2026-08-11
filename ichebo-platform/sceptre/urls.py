@@ -47,6 +47,11 @@ urlpatterns = [
     path('learn/induction/quiz/<uuid:step_id>/', views.induction_quiz, name='induction_quiz'),
     path('learn/induction/final-test-queue/', views.induction_final_test_queue, name='induction_final_test_queue'),
     path('learn/induction/confirm/<uuid:user_id>/', views.htmx_confirm_final_test, name='htmx_confirm_final_test'),
+    # Gated lesson attachments. Mounted under the 'learn' namespace so the
+    # shared attachments partial can reverse {% url 'learn:lesson-file' %}
+    # here as well as on app and learn.ichebo.org. Sits after the routes
+    # above, which all match more specific paths.
+    path('learn/', include(('learn.file_urls', 'learn'))),
     path('bible/', views.bible_redirect, name='bible'),
     path('support/', views.support_area, name='support'),
     path('support/new/', views.htmx_sceptre_create_support_request, name='sceptre_create_support_request'),

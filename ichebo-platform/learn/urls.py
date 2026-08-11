@@ -13,6 +13,9 @@ urlpatterns = [
     path('course/<uuid:course_id>/', views.course_detail, name='learn-course'),
     path('lesson/<uuid:lesson_id>/', views.lesson_viewer, name='learn-lesson'),
     path('certifications/', views.certification_queue_view, name='learn-cert-queue'),
+    # Gated attachment download — nginx refuses media/learn/protected/ directly,
+    # so this is the only route to a lesson file.
+    path('lesson-file/<uuid:attachment_id>/', views.lesson_file, name='lesson-file'),
 
     # Authorship (Level 4+)
     path('author/', views.authorship, name='learn-author'),

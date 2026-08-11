@@ -2,9 +2,10 @@
 import json
 
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 
 
 from records.models import Record, Relationship
@@ -163,9 +164,21 @@ def community_lesson_viewer(request, lesson_id):
             if prog_rel and prog_rel.to_record:
                 programme = prog_rel.to_record
 
+    # This surface previously pushed the raw custom_fields.video_url straight
+    # into an <iframe>. For an uploaded lesson that URL is an .m3u8 manifest,
+    # so the frame rendered blank; a plain YouTube watch URL failed too, since
+    # it was never converted to an /embed/ URL. Build the same context the app
+    # lesson viewer does and hand it to the shared player.
+    from core.utils.video import get_embed_url, get_video_type
+    raw_video_url = (lesson.custom_fields or {}).get('video_url', '')
+
     return render(request, 'learn/community_lesson_viewer.html', {
         'lesson': lesson,
         'programme': programme,
+        'video_url': raw_video_url,
+        'embed_url': get_embed_url(raw_video_url) if raw_video_url else None,
+        'video_type': get_video_type(raw_video_url) if raw_video_url else None,
+        'attachments': lesson.learning_attachments.all(),
     })
 
 
@@ -447,10 +460,68 @@ def lesson_viewer(request, lesson_id):
         'video_url': raw_video_url,
         'embed_url': embed_url,
         'video_type': video_type,
+        'attachments': lesson.learning_attachments.all(),
         'is_author': is_author,
         'is_owner': is_owner,
         'can_delete': can_delete,
     })
+
+
+# ── Gated lesson file download ───────────────────────────────────────────────
+
+@login_required
+def lesson_file(request, attachment_id):
+    """Stream a lesson attachment, but only to someone entitled to read it.
+
+    Attachments live under media/learn/protected/, which nginx refuses to
+    serve — see deploy/nginx/ics.conf. That refusal is the real boundary;
+    this view is the only way in. Never link at attachment.file.url.
+    """
+    from django.http import FileResponse
+    from learn.engine import get_step, programme_for_step
+    from learn.models import LearningAttachment
+
+    attachment = get_object_or_404(
+        LearningAttachment, id=attachment_id, deleted_at__isnull=True
+    )
+    lesson = attachment.record
+    user = request.user
+
+    def _serve():
+        return FileResponse(
+            attachment.file.open('rb'),
+            filename=attachment.original_name,
+            content_type=attachment.content_type or 'application/octet-stream',
+            # PDFs render inline in the viewer's iframe; anything else downloads.
+            as_attachment=not attachment.is_pdf,
+        )
+
+    # Authors and architects can always read their own curriculum.
+    if _user_level(user) >= 4:
+        return _serve()
+
+    programme, _course = programme_for_step(lesson)
+    if programme is None:
+        raise Http404('This file is not part of a published programme.')
+
+    required_level = (programme.permissions_data or {}).get('required_level', 1)
+    if _user_level(user) < required_level:
+        raise PermissionDenied('Your formation level does not reach this programme.')
+
+    step = get_step(user, programme, lesson.id)
+    if step is None:
+        raise PermissionDenied('This step is not part of your pathway.')
+
+    # get_step describes the curriculum, not the learner's enrolment in it —
+    # it returns a Step for anyone, with activity=None if they never enrolled.
+    # The task Activity is the enrolment record, so that is what to check.
+    if step.activity is None:
+        raise PermissionDenied('You are not enrolled in this programme.')
+
+    if not step.unlocked:
+        raise PermissionDenied('This step is still locked.')
+
+    return _serve()
 
 
 # ── Certification Queue (steward view) ────────────────────────────────────────
