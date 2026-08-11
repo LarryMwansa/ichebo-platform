@@ -44,6 +44,11 @@ urlpatterns = [
     path('htmx/question/<uuid:question_id>/move/<str:direction>/', views.htmx_question_move, name='htmx-question-move'),
     path('htmx/question/cancel/', views.htmx_question_cancel, name='htmx-question-cancel'),
 
+    # ── Lesson attachments + curriculum ordering (Level 4+) ────────────────
+    path('htmx/attachments/<uuid:record_id>/upload/', views.htmx_attachment_upload, name='htmx-attachment-upload'),
+    path('htmx/attachment/<uuid:attachment_id>/delete/', views.htmx_attachment_delete, name='htmx-attachment-delete'),
+    path('htmx/reorder/<uuid:relationship_id>/<str:direction>/', views.htmx_reorder_step, name='htmx-reorder-step'),
+
     # ── HTMX action routes ─────────────────────────────────────────────────
     path('htmx/enrol/<uuid:programme_id>/', views.htmx_enrol, name='htmx-enrol'),
     path('htmx/complete-lesson/<uuid:lesson_id>/',

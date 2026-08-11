@@ -1,0 +1,71 @@
+{% comment %}
+Lesson file attachments — upload, list, remove.
+
+Documents only. Video has its own widget (_video_upload.html) because it goes
+through the media engine's chunked upload and gets transcoded to HLS; this is
+a plain multipart POST straight to Django.
+
+Params: record, attachments, error
+{% endcomment %}
+<div id="attachment-editor">
+
+  {% if error %}
+  <div style="padding:9px 12px;margin-bottom:10px;border-radius:6px;
+              background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.25);
+              font-size:12px;color:#dc2626;">
+    {{ error }}
+  </div>
+  {% endif %}
+
+  {% for att in attachments %}
+  <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;
+              border:1px solid var(--border);border-radius:8px;background:var(--card-2);">
+    <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);flex-shrink:0;">
+      {% if att.is_pdf %}picture_as_pdf{% else %}description{% endif %}
+    </span>
+    <span style="flex:1;min-width:0;">
+      <span style="display:block;font-size:12px;font-weight:600;color:var(--text);
+                   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+        {{ att.original_name }}
+      </span>
+      <span style="display:block;font-size:11px;color:var(--muted);">
+        {{ att.size_bytes|filesizeformat }}{% if att.is_pdf %} · renders inline for learners{% endif %}
+      </span>
+    </span>
+    <button type="button" title="Remove"
+            hx-post="{% url 'learn:htmx-attachment-delete' att.id %}"
+            hx-target="#attachment-editor" hx-swap="outerHTML"
+            hx-confirm="Remove {{ att.original_name }}? The file is deleted too."
+            style="border:1px solid var(--border);border-radius:6px;background:var(--card);
+                   color:#dc2626;cursor:pointer;padding:3px 6px;flex-shrink:0;">
+      <span class="material-symbols-outlined" style="font-size:15px;">delete</span>
+    </button>
+  </div>
+  {% endfor %}
+
+  {% if record %}
+  <form hx-post="{% url 'learn:htmx-attachment-upload' record.id %}"
+        hx-target="#attachment-editor" hx-swap="outerHTML"
+        hx-encoding="multipart/form-data"
+        hx-indicator="#attachment-spinner">
+    {% csrf_token %}
+    <label style="display:flex;align-items:center;justify-content:center;gap:8px;
+                  padding:14px;border:1px dashed var(--border);border-radius:8px;
+                  background:var(--card-2);cursor:pointer;color:var(--muted);font-size:12px;">
+      <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
+      <span>Attach a handout, worksheet or slide deck — up to 25 MB</span>
+      <input type="file" name="attachment" hidden
+             onchange="this.closest('form').requestSubmit()">
+    </label>
+    <span id="attachment-spinner" class="htmx-indicator"
+          style="display:block;font-size:11px;color:var(--muted);margin-top:6px;">
+      Uploading…
+    </span>
+  </form>
+  {% else %}
+  <div style="padding:14px;border:1px dashed var(--border);border-radius:8px;
+              background:var(--card-2);color:var(--muted);font-size:12px;text-align:center;">
+    Save a draft first, then attach files to it.
+  </div>
+  {% endif %}
+</div>

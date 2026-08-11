@@ -1,0 +1,67 @@
+{% comment %}
+Ordered children of a programme or course, with move controls.
+
+Order lives on the part_of Relationship, not the Record, so the buttons act
+on edge.id — the same lesson can sit at a different position in another
+course.
+
+Not drag-and-drop: that needs a JS library this project doesn't carry, and it
+is unusable in the mobile block, which renders alongside the desktop one.
+
+Params: parent, edges — [(child_record, edge)] from engine.ordered_child_edges
+{% endcomment %}
+<div id="curriculum-order">
+  {% for child, edge in edges %}
+  <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;
+              border:1px solid var(--border);border-radius:8px;background:var(--card-2);">
+
+    <span style="width:22px;height:22px;border-radius:50%;background:var(--card);
+                 border:1px solid var(--border);color:var(--muted);font-size:11px;
+                 font-weight:700;flex-shrink:0;display:flex;align-items:center;
+                 justify-content:center;font-variant-numeric:tabular-nums;">
+      {{ forloop.counter }}
+    </span>
+
+    <span style="flex:1;min-width:0;">
+      <span style="display:block;font-size:12px;font-weight:600;color:var(--text);
+                   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+        {{ child.title }}
+      </span>
+      <span style="display:block;font-size:11px;color:var(--muted);text-transform:uppercase;
+                   letter-spacing:.05em;">
+        {{ child.record_type }}
+        {% if edge.metadata.pathway and edge.metadata.pathway != 'all' %}
+          · {{ edge.metadata.pathway }} only
+        {% endif %}
+        {% if child.status != 'active' %} · {{ child.status }}{% endif %}
+      </span>
+    </span>
+
+    <span style="display:flex;gap:4px;flex-shrink:0;">
+      <button type="button" title="Move up"
+              hx-post="{% url 'learn:htmx-reorder-step' edge.id 'up' %}"
+              hx-target="#curriculum-order" hx-swap="outerHTML"
+              {% if forloop.first %}disabled{% endif %}
+              style="border:1px solid var(--border);border-radius:6px;background:var(--card);
+                     color:var(--muted);cursor:pointer;padding:3px 6px;
+                     {% if forloop.first %}opacity:.35;cursor:default;{% endif %}">
+        <span class="material-symbols-outlined" style="font-size:15px;">arrow_upward</span>
+      </button>
+      <button type="button" title="Move down"
+              hx-post="{% url 'learn:htmx-reorder-step' edge.id 'down' %}"
+              hx-target="#curriculum-order" hx-swap="outerHTML"
+              {% if forloop.last %}disabled{% endif %}
+              style="border:1px solid var(--border);border-radius:6px;background:var(--card);
+                     color:var(--muted);cursor:pointer;padding:3px 6px;
+                     {% if forloop.last %}opacity:.35;cursor:default;{% endif %}">
+        <span class="material-symbols-outlined" style="font-size:15px;">arrow_downward</span>
+      </button>
+    </span>
+  </div>
+  {% empty %}
+  <div style="padding:18px;border:1px dashed var(--border);border-radius:8px;
+              color:var(--muted);font-size:12px;text-align:center;">
+    Nothing in this {{ parent.record_type }} yet.
+  </div>
+  {% endfor %}
+</div>

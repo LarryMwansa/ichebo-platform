@@ -12,7 +12,7 @@ from django.http import Http404, HttpResponse
 from records.models import Record, Relationship
 from activity.models import Activity
 from governance.services import get_linked_records
-from learn.engine import STEP_TYPES, ordered_children
+from learn.engine import STEP_TYPES, ordered_child_edges, ordered_children
 
 
 def landing(request):
@@ -604,6 +604,8 @@ def programme_manage(request, record_id):
     return render(request, 'learn/programme_manage.html', {
         'record': record,
         'curriculum': curriculum,
+        'edges': ordered_child_edges(record),
+        'parent': record,
         'can_delete': can_delete,
         'is_owner': is_owner,
         'user_level': user_level,
@@ -636,6 +638,10 @@ def course_manage(request, record_id):
     return render(request, 'learn/course_manage.html', {
         'record': record,
         'lessons': list(lessons),
+        # Edges rather than records: order lives on the part_of relationship,
+        # which is what the reorder controls act on.
+        'edges': ordered_child_edges(record),
+        'parent': record,
         'programme': programme,
         'can_delete': can_delete,
         'is_owner': is_owner,
@@ -1830,3 +1836,139 @@ def _renumber_questions(record):
         if question.order != position:
             question.order = position
             question.save(update_fields=['order'])
+
+
+# ── Lesson attachments (Level 4+) ────────────────────────────────────────────
+#
+# Documents only. Video goes through the media engine's chunked upload and
+# lives in custom_fields['video_url']; sending a PDF down that path would
+# hand it to FFmpeg.
+
+ATTACHMENT_MAX_BYTES = 25 * 1024 * 1024
+
+ATTACHMENT_TYPES = {
+    'application/pdf',
+    'image/jpeg', 'image/png', 'image/webp', 'image/gif',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'audio/mpeg', 'audio/mp4',
+    'text/plain', 'text/markdown', 'text/csv',
+}
+
+
+def _attachment_list_response(request, record, error=''):
+    return render(request, 'learn/partials/_attachment_editor.html', {
+        'record': record,
+        'attachments': record.learning_attachments.filter(deleted_at__isnull=True),
+        'error': error,
+    })
+
+
+@login_required
+def htmx_attachment_upload(request, record_id):
+    from learn.models import LearningAttachment
+
+    record = _authorable_record(request, record_id)
+    if request.method != 'POST':
+        return HttpResponse('', status=405)
+
+    upload = request.FILES.get('attachment')
+    if not upload:
+        return _attachment_list_response(request, record, 'No file received.')
+
+    if upload.content_type not in ATTACHMENT_TYPES:
+        return _attachment_list_response(
+            request, record,
+            f'{upload.content_type or "That file type"} is not accepted. '
+            'Use a PDF, document, spreadsheet, slide deck, image, audio or text file.',
+        )
+
+    if upload.size > ATTACHMENT_MAX_BYTES:
+        return _attachment_list_response(
+            request, record,
+            'Files must be under 25 MB. Longer material belongs in a video, '
+            'which uploads separately.',
+        )
+
+    last = record.learning_attachments.filter(deleted_at__isnull=True).order_by('-order').first()
+    attachment = LearningAttachment(
+        record=record,
+        original_name=upload.name[:255],
+        content_type=upload.content_type,
+        size_bytes=upload.size,
+        uploaded_by=request.user,
+        order=(last.order + 1) if last else 0,
+    )
+    attachment.file.save(upload.name, upload, save=False)
+    attachment.save()
+
+    return _attachment_list_response(request, record)
+
+
+@login_required
+def htmx_attachment_delete(request, attachment_id):
+    from learn.models import LearningAttachment
+
+    if request.method != 'POST':
+        return HttpResponse('', status=405)
+
+    attachment = get_object_or_404(
+        LearningAttachment, id=attachment_id, deleted_at__isnull=True
+    )
+    record = _authorable_record(request, attachment.record_id)
+
+    # Drop the bytes as well as the row — an orphaned object on MinIO stays
+    # reachable to anyone who already knows its key.
+    attachment.file.delete(save=False)
+    attachment.soft_delete()
+
+    return _attachment_list_response(request, record)
+
+
+# ── Curriculum reordering (Level 4+) ─────────────────────────────────────────
+
+@login_required
+def htmx_reorder_step(request, relationship_id, direction):
+    """Swap a curriculum item with its neighbour and normalise 1..n.
+
+    Order is a property of the part_of edge, so this moves the Relationship,
+    not the Record — the same lesson may sit at a different position in
+    another course.
+    """
+    if request.method != 'POST':
+        return HttpResponse('', status=405)
+    if _user_level(request.user) < 4:
+        raise PermissionDenied('Reordering requires Level 4.')
+
+    edge = get_object_or_404(
+        Relationship, id=relationship_id,
+        relationship_type='part_of', deleted_at__isnull=True,
+    )
+    parent = edge.to_record
+    if parent is None:
+        raise Http404('This item has no parent to be ordered within.')
+
+    siblings = list(
+        Relationship.objects
+        .filter(to_record=parent, relationship_type='part_of', deleted_at__isnull=True)
+        .order_by('sequence_order', 'from_record__created_at')
+    )
+    index = next((i for i, e in enumerate(siblings) if e.id == edge.id), None)
+    swap_with = index - 1 if direction == 'up' else index + 1
+
+    if index is not None and 0 <= swap_with < len(siblings):
+        with transaction.atomic():
+            siblings[index], siblings[swap_with] = siblings[swap_with], siblings[index]
+            for position, e in enumerate(siblings, start=1):
+                if e.sequence_order != position:
+                    e.sequence_order = position
+                    e.save(update_fields=['sequence_order'])
+
+    return render(request, 'learn/partials/_curriculum_order.html', {
+        'parent': parent,
+        'edges': ordered_child_edges(parent),
+    })

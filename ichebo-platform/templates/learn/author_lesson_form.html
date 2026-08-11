@@ -96,6 +96,17 @@
                 {% include "learn/partials/_video_upload.html" with mount_suffix="" video_url_value=record.custom_fields.video_url %}
             </div>
 
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+                               letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">
+                    Attachments
+                    <span style="font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--muted);">
+                        (optional — PDFs render inline for learners)
+                    </span>
+                </label>
+                {% include "learn/partials/_attachment_editor.html" %}
+            </div>
+
             {% if record and record.record_type == 'quiz' %}
             {# Questions live in their own HTMX island — saved as they are
                edited, independently of the lesson form's draft/submit. #}

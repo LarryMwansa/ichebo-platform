@@ -85,6 +85,17 @@
     </div>
 
     {# ── Curriculum ── #}
+    {% if edges %}
+    <div class="ws-label-tag" style="margin-bottom: 16px;">Module Order</div>
+    <p style="font-size:12px;color:var(--muted);margin:0 0 12px;">
+        The order learners meet these in. Reordering here moves the whole
+        module, not the steps inside it.
+    </p>
+    <div style="margin-bottom: 40px;">
+        {% include "learn/partials/_curriculum_order.html" %}
+    </div>
+    {% endif %}
+
     <div class="ws-label-tag" style="margin-bottom: 16px;">Curriculum Structure</div>
 
     {% if curriculum %}
