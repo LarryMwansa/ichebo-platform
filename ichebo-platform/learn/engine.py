@@ -162,7 +162,10 @@ class Step:
     pass_score: int
     max_attempts: int
     activity: Optional[Activity] = None
-    attempts: list = field(default_factory=list)
+    # The rows themselves. `attempts` below is the COUNT — templates written
+    # against the old InductionProgress.attempts expect an integer there
+    # (e.g. {{ prog.attempts|add:1 }}), so the name has to stay numeric.
+    attempt_rows: list = field(default_factory=list)
     unlocked: bool = False
     status: str = 'locked'
 
@@ -206,15 +209,23 @@ class Step:
         return self.status in ('passed', 'awaiting_steward')
 
     @property
-    def attempt_count(self):
-        return len(self.attempts)
+    def attempts(self):
+        """How many times this has been submitted."""
+        return len(self.attempt_rows)
+
+    # Alias — reads better at call sites that mean the number, not the rows.
+    attempt_count = attempts
 
     @property
     def score(self):
         """Best score achieved, or None if never attempted."""
-        if not self.attempts:
+        if not self.attempt_rows:
             return None
-        return max(a.score for a in self.attempts)
+        return max(a.score for a in self.attempt_rows)
+
+    @property
+    def last_attempt(self):
+        return self.attempt_rows[0] if self.attempt_rows else None
 
     @property
     def video_url(self):
@@ -280,7 +291,7 @@ def get_steps(user, programme):
             pass_score=step_cfg['pass_score'],
             max_attempts=step_cfg['max_attempts'],
             activity=activity,
-            attempts=attempts,
+            attempt_rows=attempts,
             unlocked=(not course_cfg['sequential_unlock']) or previous_complete,
         )
 
@@ -552,7 +563,7 @@ def score_assessment(user, step, selected_option_ids):
     )
 
     # Keep the in-memory step consistent for anything rendering off it after.
-    step.attempts.insert(0, attempt)
+    step.attempt_rows.insert(0, attempt)
 
     if passed:
         mark_lesson_complete(user, step)

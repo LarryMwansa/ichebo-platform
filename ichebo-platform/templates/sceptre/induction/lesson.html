@@ -39,12 +39,23 @@
     </div>
     {% endif %}
 
-    {# Lesson content #}
-    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
-                border-radius:12px;padding:2rem 2.25rem;margin-bottom:2rem;
-                font-size:15px;line-height:1.8;color:rgba(255,255,255,0.8);">
-      {{ step.content|linebreaks }}
+    {# Video, if this lesson has one #}
+    {% if video_url %}
+    <div style="margin-bottom:2rem;">
+      {% include "video/_player.html" with title=step.title video_url=video_url embed_url=embed_url video_type=video_type %}
     </div>
+    {% endif %}
+
+    {# Lesson content — markdown, rendered client-side #}
+    {% if step.content %}
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);
+                border-radius:12px;padding:2rem 2.25rem;margin-bottom:2rem;">
+      {% include "learn/partials/_markdown_body.html" with text=step.content %}
+    </div>
+    {% endif %}
+
+    {# Handouts, worksheets, slides #}
+    {% include "learn/partials/_attachments.html" with attachments=attachments %}
 
     {# Complete / Review action #}
     {% if prog and prog.status == 'passed' %}

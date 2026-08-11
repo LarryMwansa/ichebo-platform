@@ -199,6 +199,14 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 LOGIN_URL = 'https://identity.ichebo.org/accounts/login/'
+
+# Where a Level 0 member does their induction. app.ichebo.org is the steward
+# and agency backend; Levels 0–2 belong on the community surfaces, so anything
+# on app that a Level 0 lands on redirects here instead.
+SCEPTRE_INDUCTION_URL = config(
+    'SCEPTRE_INDUCTION_URL',
+    default='https://sceptre.ichebo.org/learn/induction/',
+)
 LOGIN_REDIRECT_URL = 'https://app.ichebo.org/'
 LOGOUT_REDIRECT_URL = 'https://identity.ichebo.org/accounts/login/'
 

@@ -1,3 +1,5 @@
+from django.conf import settings
+
 _SUBDOMAIN_SHELLS = {
     'learn': 'learn/subdomain_shell.html',
     'bible': 'bible/subdomain_shell.html',
@@ -14,6 +16,11 @@ def htmx_base(request):
     site = getattr(request, 'site', 'agency')
     shell = _SUBDOMAIN_SHELLS.get(site, 'workspace_shell.html')
 
-    if request.headers.get('HX-Request'):
-        return {'base_template': 'base_partial.html', 'shell_template': shell}
-    return {'base_template': 'base.html', 'shell_template': shell}
+    base = 'base_partial.html' if request.headers.get('HX-Request') else 'base.html'
+    return {
+        'base_template': base,
+        'shell_template': shell,
+        # Settings aren't reachable from templates; the nav needs this to send
+        # Level 0 members to induction rather than the agency Formation app.
+        'SCEPTRE_INDUCTION_URL': settings.SCEPTRE_INDUCTION_URL,
+    }

@@ -195,7 +195,7 @@
                    data-tooltip="Community" hx-boost="false">
                     <span class="material-symbols-outlined">groups</span>
                 </a>
-                <a href="https://app.ichebo.org/learn/"
+                <a href="{% if user.is_authenticated and user.competence_level == 0 %}{{ SCEPTRE_INDUCTION_URL }}{% else %}https://app.ichebo.org/learn/{% endif %}"
                    class="ics-sidebar__item"
                    data-tooltip="Formation" hx-boost="false">
                     <span class="material-symbols-outlined">school</span>
@@ -258,7 +258,7 @@
                    data-tooltip="Community" hx-boost="false">
                     <span class="material-symbols-outlined">groups</span>
                 </a>
-                <a href="https://app.ichebo.org/learn/"
+                <a href="{% if user.is_authenticated and user.competence_level == 0 %}{{ SCEPTRE_INDUCTION_URL }}{% else %}https://app.ichebo.org/learn/{% endif %}"
                    class="ics-sidebar__item {% if active_app == 'formation' %}active{% endif %}"
                    data-tooltip="Formation" hx-boost="false">
                     <span class="material-symbols-outlined">school</span>

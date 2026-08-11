@@ -1,5 +1,4 @@
 {% extends "sceptre/base.html" %}
-{% load core_tags %}
 {% block title %}Induction Programme{% endblock %}
 
 {% block content %}
@@ -36,7 +35,7 @@
   </div>
 
   {# ── Awaiting steward confirmation ── #}
-  {% if current_prog and current_prog.status == 'awaiting_steward' %}
+  {% if awaiting_cert %}
   <div class="sc-container" style="padding-top:2rem;">
     <div style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);
                 border-radius:12px;padding:24px 28px;max-width:600px;">
@@ -46,9 +45,10 @@
         Awaiting steward confirmation
       </div>
       <p style="font-size:13px;color:rgba(255,255,255,0.55);margin:0;line-height:1.6;">
-        You passed the Final Test with a score of {{ current_prog.score }}%.
+        You have completed every step of the induction programme.
         A steward will review and confirm your completion shortly.
-        Once confirmed, your formation level will advance.
+        Once confirmed, your formation level will advance and you'll be
+        placed in your community.
       </p>
     </div>
   </div>
@@ -56,8 +56,7 @@
 
   {# ── Module accordion ── #}
   <div class="sc-container" style="padding-top:2.5rem;">
-    {% for module_num, steps in modules.items %}
-    {% with module_label=module_labels|get_item:module_num %}
+    {% for module in modules %}
     <div style="margin-bottom:2rem;">
 
       {# Module header #}
@@ -65,18 +64,18 @@
                   border-bottom:1px solid rgba(255,255,255,0.07);">
         <div style="width:28px;height:28px;border-radius:50%;background:var(--sc-primary,#6366f1);
                     display:flex;align-items:center;justify-content:center;
-                    font-size:12px;font-weight:800;color:#fff;flex-shrink:0;">{{ module_num }}</div>
+                    font-size:12px;font-weight:800;color:#fff;flex-shrink:0;">{{ forloop.counter }}</div>
         <div>
           <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;
-                      color:rgba(255,255,255,0.35);font-weight:700;">Module {{ module_num }}</div>
-          <div style="font-size:15px;font-weight:700;color:#fff;">{{ module_label }}</div>
+                      color:rgba(255,255,255,0.35);font-weight:700;">Module {{ forloop.counter }}</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;">{{ module.course.title }}</div>
         </div>
       </div>
 
       {# Steps #}
       <div style="display:flex;flex-direction:column;gap:8px;">
-        {% for step, prog in steps %}
-        {% with status=prog.status|default:"locked" %}
+        {% for step in module.steps %}
+        {% with status=step.status prog=step %}
 
         {# Determine step URL and state #}
         {% if step.step_type == 'lesson' %}
@@ -142,7 +141,6 @@
       </div>
 
     </div>
-    {% endwith %}
     {% endfor %}
   </div>
 

@@ -18,28 +18,49 @@
 
   <div class="sc-container" style="padding-top:2rem;">
     {% if awaiting %}
-    <div style="display:flex;flex-direction:column;gap:12px;max-width:640px;">
-      {% for prog in awaiting %}
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:720px;">
+      {% for row in awaiting %}
       <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
-                  border-radius:12px;padding:20px 24px;" id="final-row-{{ prog.user.id }}">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-          <div>
+                  border-radius:12px;padding:20px 24px;" id="final-row-{{ row.learner.id }}">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:220px;">
             <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;">
-              {{ prog.user.display_name|default:prog.user.email }}
+              {{ row.learner.display_name|default:row.learner.email }}
             </div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.4);">
-              {{ prog.user.email }}
-              &nbsp;·&nbsp; Score: <strong style="color:#fff;">{{ prog.score }}%</strong>
-              {% if prog.completed_at %}
-              &nbsp;·&nbsp; Submitted {{ prog.completed_at|date:"d M Y" }}
+            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">
+              {{ row.learner.email }}
+              {% if row.score is not None %}
+              &nbsp;·&nbsp; Final Test: <strong style="color:#fff;">{{ row.score }}%</strong>
               {% endif %}
+              &nbsp;·&nbsp; Submitted {{ row.cert.created_at|date:"d M Y" }}
             </div>
+
+            {# Placement is mandatory — confirming without one is refused,
+               because it would end the learner's induction membership and
+               leave them in no community at all. #}
+            <label for="placement-{{ row.learner.id }}"
+                   style="display:block;font-size:10px;text-transform:uppercase;
+                          letter-spacing:0.08em;color:rgba(255,255,255,0.4);
+                          font-weight:700;margin-bottom:5px;">
+              Place into community
+            </label>
+            <select id="placement-{{ row.learner.id }}" name="placement_tenant_id"
+                    style="width:100%;max-width:320px;padding:9px 12px;border-radius:8px;
+                           background:rgba(255,255,255,0.05);color:#fff;font-size:13px;
+                           border:1px solid rgba(255,255,255,0.14);">
+              <option value="">Select a community…</option>
+              {% for t in placements %}
+              <option value="{{ t.id }}">{{ t.name }}</option>
+              {% endfor %}
+            </select>
           </div>
+
           <button
-            hx-post="{% url 'htmx_confirm_final_test' prog.user.id %}"
-            hx-target="#final-row-{{ prog.user.id }}"
+            hx-post="{% url 'htmx_confirm_final_test' row.learner.id %}"
+            hx-include="#placement-{{ row.learner.id }}"
+            hx-target="#final-row-{{ row.learner.id }}"
             hx-swap="outerHTML"
-            hx-confirm="Confirm {{ prog.user.display_name|default:prog.user.email }} — advance to Level 1?"
+            hx-confirm="Confirm {{ row.learner.display_name|default:row.learner.email }} — advance to Level 1?"
             style="padding:10px 20px;background:var(--sc-primary,#6366f1);color:#fff;
                    border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;
                    white-space:nowrap;">

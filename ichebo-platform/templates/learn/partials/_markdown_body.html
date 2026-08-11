@@ -1,0 +1,89 @@
+{% comment %}
+Renders lesson/course markdown consistently on every surface.
+
+Params:
+  text          — the raw markdown (Record.content)
+  mount_suffix  — "" for the desktop block, "-mobile" for the mobile one.
+                  Every learn template renders both blocks in the same file,
+                  so ids must not collide; the script/style below is emitted
+                  only for the un-suffixed mount.
+
+Content is auto-escaped and read back via textContent, never |safe — the body
+is author-supplied and must not be able to inject markup.
+
+marked.js is loaded from CDN by workspace_shell.html, but the learn subdomain,
+community, and sceptre shells don't load it, so this self-loads with a retry.
+{% endcomment %}
+{% load static %}
+{% with sfx=mount_suffix|default:"" %}
+
+<div id="md-body{{ sfx }}" class="editorial-preview-pane learn-md-body">{{ text|default:"" }}</div>
+
+{% if not sfx %}
+<link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
+<script>
+(function () {
+  function renderAll() {
+    document.querySelectorAll('.learn-md-body').forEach(function (el) {
+      if (el.dataset.mdRendered) return;
+      marked.setOptions({ breaks: true, gfm: true });
+      el.innerHTML = marked.parse(el.textContent.trim());
+      el.dataset.mdRendered = '1';
+    });
+  }
+  if (typeof marked !== 'undefined') {
+    renderAll();
+  } else {
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+    s.onload = renderAll;
+    document.head.appendChild(s);
+  }
+})();
+</script>
+<style>
+  /* editorial_v2.css is written for the app's light surface. On the dark
+     sceptre / learn-subdomain shells its prose colours disappear, so restate
+     them against the dark ground. Scoped to .learn-md-body so the app's own
+     editor preview is untouched. */
+  .learn-md-body { font-size: 15px; line-height: 1.8; color: rgba(255,255,255,0.82); }
+  .learn-md-body h1,
+  .learn-md-body h2,
+  .learn-md-body h3,
+  .learn-md-body h4 { color: #fff; font-family: 'Playfair Display', serif; }
+  .learn-md-body h1 { font-size: 1.7rem; margin: 1.6rem 0 .8rem; }
+  .learn-md-body h2 { font-size: 1.35rem; margin: 1.5rem 0 .7rem; }
+  .learn-md-body h3 { font-size: 1.1rem; margin: 1.3rem 0 .6rem; }
+  .learn-md-body p { margin: 0 0 1rem; }
+  .learn-md-body ul,
+  .learn-md-body ol { margin: 0 0 1rem 1.25rem; }
+  .learn-md-body li { margin-bottom: .4rem; }
+  .learn-md-body a { color: #a5b4fc; }
+  .learn-md-body strong { color: #fff; }
+  .learn-md-body blockquote {
+    margin: 1rem 0; padding: .6rem 1rem;
+    border-left: 3px solid rgba(99,102,241,.5);
+    background: rgba(255,255,255,.03);
+    color: rgba(255,255,255,.7);
+  }
+  .learn-md-body code {
+    background: rgba(255,255,255,.07); padding: .12em .4em;
+    border-radius: 4px; font-size: .9em;
+  }
+  .learn-md-body pre {
+    background: rgba(0,0,0,.35); padding: 1rem; border-radius: 10px;
+    overflow-x: auto; margin: 0 0 1rem;
+  }
+  .learn-md-body pre code { background: none; padding: 0; }
+  .learn-md-body table { width: 100%; border-collapse: collapse; margin: 0 0 1rem; }
+  .learn-md-body th,
+  .learn-md-body td {
+    border: 1px solid rgba(255,255,255,.12); padding: .5rem .7rem; text-align: left;
+  }
+  .learn-md-body th { background: rgba(255,255,255,.05); color: #fff; }
+  .learn-md-body hr { border: 0; border-top: 1px solid rgba(255,255,255,.1); margin: 1.6rem 0; }
+  .learn-md-body img { max-width: 100%; border-radius: 8px; }
+</style>
+{% endif %}
+
+{% endwith %}

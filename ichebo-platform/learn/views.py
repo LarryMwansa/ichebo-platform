@@ -37,6 +37,15 @@ def community_learn_catalog(request):
         record_type='course',
         id__in=child_course_ids
     ))
+
+    # Induction stays visible to anonymous visitors — it is the entry offer,
+    # and this catalogue is the public shop window. It is hidden from a
+    # signed-in Level 0 member, whose actual route is the sceptre track;
+    # showing it here as well would present two doors to the same programme.
+    viewer = getattr(request, 'user', None)
+    if viewer is not None and viewer.is_authenticated and _user_level(viewer) < 1:
+        programmes = [p for p in programmes if p.record_type != 'induction']
+
     # Sort by required level (Level 0 Induction first, then Level 1, 2, 3...)
     programmes.sort(key=lambda p: (p.permissions_data or {}).get('required_level', 1 if p.record_type != 'induction' else 0))
 
@@ -178,10 +187,27 @@ def _user_level(user):
     return getattr(user, 'competence_level', 0)
 
 
+def _induction_redirect(user):
+    """Send a Level 0 member to induction on sceptre, or None to carry on.
+
+    app.ichebo.org is the steward and agency backend. A Level 0 member's
+    formation happens on sceptre, so every Formation page here bounces them
+    there — including deep links, which is why this is applied to each view
+    rather than only the landing page.
+    """
+    if user.is_authenticated and _user_level(user) == 0:
+        return redirect(settings.SCEPTRE_INDUCTION_URL)
+    return None
+
+
 # ── My Learning home ─────────────────────────────────────────────────────────
 
 @login_required
 def my_learning(request):
+    bounce = _induction_redirect(request.user)
+    if bounce:
+        return bounce
+
     user = request.user
     level = _user_level(user)
 
@@ -236,6 +262,10 @@ def my_learning(request):
 
 @login_required
 def catalogue(request):
+    bounce = _induction_redirect(request.user)
+    if bounce:
+        return bounce
+
     user_level = _user_level(request.user)
     programmes = sorted(
         Record.objects.filter(
@@ -262,6 +292,10 @@ def catalogue(request):
 
 @login_required
 def programme_detail(request, programme_id):
+    bounce = _induction_redirect(request.user)
+    if bounce:
+        return bounce
+
     user = request.user
     user_level = _user_level(user)
 
@@ -309,6 +343,10 @@ def programme_detail(request, programme_id):
 
 @login_required
 def course_detail(request, course_id):
+    bounce = _induction_redirect(request.user)
+    if bounce:
+        return bounce
+
     is_author = _user_level(request.user) >= 4
     visible_statuses = ['active', 'locked', 'draft', 'submitted'] if is_author else ['active', 'locked']
 
@@ -346,6 +384,10 @@ def course_detail(request, course_id):
 
 @login_required
 def lesson_viewer(request, lesson_id):
+    bounce = _induction_redirect(request.user)
+    if bounce:
+        return bounce
+
     lesson = get_object_or_404(
         Record, id=lesson_id,
         record_type__in=['lesson', 'assignment', 'quiz'],

@@ -1,6 +1,7 @@
 """
 sceptre.ichebo.org — participant and steward views.
 """
+from django.http import Http404
 from django.shortcuts import render, redirect
 
 from sceptre.auth import require_sceptre_participant, require_sceptre_steward, is_steward
@@ -212,126 +213,158 @@ def learn_summary(request):
 # Induction learning surface — Level 0 only
 # ---------------------------------------------------------------------------
 
+def _induction_programme():
+    """The induction programme Record, or None if it hasn't been set up."""
+    from records.models import Record
+    return Record.objects.filter(
+        record_family='learning',
+        record_type='induction',
+        status__in=['active', 'locked'],
+        deleted_at__isnull=True,
+    ).first()
+
+
+def _induction_chrome(request):
+    """Context every induction page needs for the sceptre shell."""
+    return {
+        'tenant': _get_tenant_for_user(request.user, request),
+        'is_steward': is_steward(request.user),
+    }
+
+
+def _resolve_step(request, record_id, record_type):
+    """Return (programme, step) for a learner, or (programme, None) if absent.
+
+    Enrolment is topped up here so a learner who enrolled before a step was
+    published still sees it. enrol_and_sync only writes when the step count
+    and task-Activity count actually disagree, so a normal page load stays
+    read-only.
+    """
+    from learn import engine
+
+    programme = _induction_programme()
+    if programme is None:
+        return None, None
+
+    engine.enrol_and_sync(request.user, programme)
+
+    step = engine.get_step(request.user, programme, record_id)
+    if step is None or step.record.record_type != record_type:
+        return programme, None
+    return programme, step
+
+
 @require_sceptre_participant
 def induction_track(request):
     """The induction programme track — step list for Level 0 users."""
-    from learn.induction_service import enrol_user, get_progress_for_user, get_current_step
+    from learn import engine
 
-    user = request.user
-    enrol_user(user)
+    programme = _induction_programme()
+    if programme is None:
+        return render(request, 'sceptre/induction/track.html', {
+            'modules': [], 'total': 0, 'passed': 0, 'pct': 0,
+            'current_step': None, 'awaiting_cert': None,
+            **_induction_chrome(request),
+        })
 
-    progress = get_progress_for_user(user)
-    current_step, current_prog = get_current_step(user)
+    engine.enrol_and_sync(request.user, programme)
 
-    # Group by module for the accordion display
-    modules = {}
-    for step, prog in progress:
-        modules.setdefault(step.module, []).append((step, prog))
-
-    module_labels = {
-        1: 'Keys to the Kingdom',
-        2: 'Repentance & Reformation',
-        3: 'Secret to a Fulfilled Life',
-        4: 'The Sceptre Community',
-    }
-
-    total = len(progress)
-    passed = sum(1 for _, p in progress if p and p.status == 'passed')
-    pct = int((passed / total) * 100) if total else 0
+    steps = engine.get_steps(request.user, programme)
+    passed, total, pct = engine.progress_summary(steps)
 
     return render(request, 'sceptre/induction/track.html', {
-        'modules': modules,
-        'module_labels': module_labels,
-        'current_step': current_step,
-        'current_prog': current_prog,
+        'programme': programme,
+        'modules': engine.group_by_course(steps),
+        'current_step': engine.get_current_step(steps),
+        'awaiting_cert': engine.awaiting_confirmation(request.user, programme),
         'total': total,
         'passed': passed,
         'pct': pct,
-        'tenant': _get_tenant_for_user(request.user, request),
-        'is_steward': is_steward(request.user),
+        **_induction_chrome(request),
     })
 
 
 @require_sceptre_participant
 def induction_lesson(request, step_id):
     """Read a single lesson. Marks it complete on POST."""
-    from learn.models import InductionStep
-    from learn.induction_service import enrol_user, mark_lesson_read, get_progress_for_user
+    from core.utils.video import get_embed_url, get_video_type
+    from learn import engine
 
-    user = request.user
-    if user.competence_level != 0:
-        return redirect('learn')
+    programme, step = _resolve_step(request, step_id, 'lesson')
+    if step is None:
+        raise Http404('Lesson not found in the induction curriculum.')
 
-    enrol_user(user)
-    step = get_object_or_404(InductionStep, id=step_id, step_type='lesson', is_active=True)
-
-    from learn.models import InductionProgress
-    prog = InductionProgress.objects.filter(user=user, step=step).first()
-
-    if prog and prog.status == 'locked':
+    if not step.unlocked:
         return render(request, 'sceptre/induction/locked.html', {
-            'step': step,
-            'tenant': _get_tenant_for_user(request.user, request),
-            'is_steward': is_steward(request.user),
+            'step': step, **_induction_chrome(request),
         })
 
     if request.method == 'POST':
-        mark_lesson_read(user, step)
+        try:
+            engine.mark_lesson_complete(request.user, step)
+        except engine.EngineError:
+            pass
         return redirect('induction_track')
 
+    video_url = step.video_url
     return render(request, 'sceptre/induction/lesson.html', {
         'step': step,
-        'prog': prog,
-        'tenant': _get_tenant_for_user(request.user, request),
-        'is_steward': is_steward(request.user),
+        'prog': step,                       # template shim: .status, .score
+        'attachments': step.record.learning_attachments.all(),
+        'video_url': video_url,
+        'embed_url': get_embed_url(video_url) if video_url else None,
+        'video_type': get_video_type(video_url) if video_url else None,
+        **_induction_chrome(request),
     })
 
 
 @require_sceptre_participant
 def induction_quiz(request, step_id):
-    """Display and submit a quiz or module test."""
-    from learn.models import InductionStep, InductionProgress
-    from learn.induction_service import enrol_user, submit_quiz
+    """Display and submit a quiz, module test, or the final test."""
+    from learn import engine
+    from learn.models import AssessmentQuestion
 
-    user = request.user
-    if user.competence_level != 0:
-        return redirect('learn')
+    programme, step = _resolve_step(request, step_id, 'quiz')
+    if step is None:
+        raise Http404('Assessment not found in the induction curriculum.')
 
-    enrol_user(user)
-    step = get_object_or_404(
-        InductionStep, id=step_id,
-        step_type__in=('quiz', 'module_test', 'final_test'),
-        is_active=True,
-    )
-
-    prog = InductionProgress.objects.filter(user=user, step=step).first()
-
-    if prog and prog.status == 'locked':
+    if not step.unlocked:
         return render(request, 'sceptre/induction/locked.html', {
-            'step': step,
-            'tenant': _get_tenant_for_user(request.user, request),
-            'is_steward': is_steward(request.user),
+            'step': step, **_induction_chrome(request),
         })
-
-    questions = list(step.questions.prefetch_related('answers'))
 
     if request.method == 'POST':
-        answer_ids = request.POST.getlist('answer')
-        result = submit_quiz(user, step, answer_ids)
+        try:
+            result = engine.score_assessment(
+                request.user, step, request.POST.getlist('answer')
+            )
+        except engine.EngineError as exc:
+            return render(request, 'sceptre/induction/locked.html', {
+                'step': step, 'message': str(exc), **_induction_chrome(request),
+            })
+
+        # Re-resolve so the template sees post-submission state — in
+        # particular awaiting_steward once the final test is passed.
+        refreshed = engine.get_step(request.user, programme, step_id) or step
         return render(request, 'sceptre/induction/quiz_result.html', {
-            'step': step,
+            'step': refreshed,
             'result': result,
-            'prog': result['prog'],
-            'tenant': _get_tenant_for_user(request.user, request),
-            'is_steward': is_steward(request.user),
+            'prog': refreshed,
+            **_induction_chrome(request),
         })
+
+    questions = list(
+        AssessmentQuestion.objects
+        .filter(record=step.record)
+        .prefetch_related('options')
+        .order_by('order')
+    )
 
     return render(request, 'sceptre/induction/quiz.html', {
         'step': step,
-        'prog': prog,
+        'prog': step,
         'questions': questions,
-        'tenant': _get_tenant_for_user(request.user, request),
-        'is_steward': is_steward(request.user),
+        **_induction_chrome(request),
     })
 
 
@@ -548,15 +581,43 @@ def steward_formation(request):
 @require_sceptre_steward
 def induction_final_test_queue(request):
     """Steward view — learners who passed the Final Test awaiting confirmation."""
-    from learn.models import InductionProgress
-    awaiting = (
-        InductionProgress.objects
-        .filter(status='awaiting_steward')
-        .select_related('user', 'step')
-        .order_by('completed_at')
-    )
+    from learn import engine
+    from learn.models import AssessmentAttempt
+    from tenants.models import Tenant
+    from tenants.service import get_oversight_tenant_ids
+
+    programme = _induction_programme()
+    pending = list(engine.pending_confirmations(
+        programme=programme, context='induction_completion',
+    ))
+
+    # Best final-test score per learner, for the queue rows.
+    scores = {}
+    if pending:
+        learner_ids = [cert.created_by_id for cert in pending]
+        for attempt in AssessmentAttempt.objects.filter(
+            user_id__in=learner_ids, passed=True,
+            record__custom_fields__is_final_assessment=True,
+        ).order_by('-created_at'):
+            scores.setdefault(attempt.user_id, attempt.score)
+
+    awaiting = [
+        {'cert': cert, 'learner': cert.created_by, 'score': scores.get(cert.created_by_id)}
+        for cert in pending
+    ]
+
+    # Communities this steward may place a learner into. Confirming without one
+    # is refused by confirm_certification_record — it would strip the learner's
+    # induction membership and leave them with nothing.
+    placements = Tenant.objects.filter(
+        id__in=get_oversight_tenant_ids(request.user),
+        is_agency=False,
+        status='active',
+    ).exclude(tier__in=['handbook', 'induction']).order_by('name')
+
     return render(request, 'sceptre/induction/final_test_queue.html', {
         'awaiting': awaiting,
+        'placements': placements,
         'tenant': _get_tenant_for_user(request.user, request),
         'is_steward': True,
     })
@@ -564,28 +625,58 @@ def induction_final_test_queue(request):
 
 @require_sceptre_steward
 def htmx_confirm_final_test(request, user_id):
-    """POST — steward confirms a learner's Final Test, advancing them to Level 1."""
+    """POST — steward confirms a learner's Final Test, advancing them to Level 1.
+
+    Routed through services.confirm_certification_record, the sole authorised
+    writer of competence_level. The previous implementation called
+    induction_service.confirm_final_test, which set competence_level=1 with a
+    bare .update() and never touched tenant placement.
+    """
     from django.http import HttpResponse
     from accounts.models import User as UserModel
-    from learn.induction_service import confirm_final_test
+    from learn import engine
+    from learn.services import CertificationError, confirm_certification_record
 
     if request.method != 'POST':
         return HttpResponse('', status=405)
 
+    def _error(message):
+        return HttpResponse(
+            f'<div id="final-row-{user_id}" style="padding:14px 18px;'
+            f'background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);'
+            f'border-radius:10px;font-size:13px;color:#f87171;">{message}</div>'
+        )
+
     try:
         learner = UserModel.objects.get(id=user_id)
     except UserModel.DoesNotExist:
-        return HttpResponse('<p style="color:var(--error)">User not found.</p>')
+        return _error('Learner not found.')
 
-    confirmed = confirm_final_test(learner, confirmed_by=request.user)
-    if confirmed:
-        return HttpResponse(
-            f'<div style="padding:12px 16px;background:rgba(34,197,94,0.1);border:1px solid '
-            f'rgba(34,197,94,0.3);border-radius:8px;font-size:13px;color:#4ade80;">'
-            f'✓ {learner.display_name or learner.email} confirmed — now Level 1.</div>'
+    programme = _induction_programme()
+    if programme is None:
+        return _error('Induction programme is not set up.')
+
+    cert = engine.awaiting_confirmation(learner, programme)
+    if cert is None:
+        return _error('No certification is awaiting confirmation for this learner.')
+
+    try:
+        confirm_certification_record(
+            cert_record=cert,
+            confirmed_by=request.user,
+            notes=request.POST.get('notes', ''),
+            placement_tenant_id=request.POST.get('placement_tenant_id') or None,
         )
+    except CertificationError as exc:
+        return _error(str(exc))
+
+    learner.refresh_from_db()
     return HttpResponse(
-        '<div style="color:var(--error);font-size:13px;">No pending final test found.</div>'
+        f'<div id="final-row-{user_id}" style="padding:14px 18px;'
+        f'background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);'
+        f'border-radius:10px;font-size:13px;color:#4ade80;">'
+        f'✓ {learner.display_name or learner.email} confirmed — now Level '
+        f'{learner.competence_level}.</div>'
     )
 
 
