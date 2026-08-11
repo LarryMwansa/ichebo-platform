@@ -6,9 +6,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from records.models import Record, Relationship
+from records.models import Record
 from activity.models import Activity
-from .models import CertificationConfirmation
 from .serializers import (
     CertificationConfirmSerializer,
     ProgrammeListSerializer,
@@ -133,30 +132,13 @@ def programme_curriculum(request, programme_id):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    course_ids = Relationship.objects.filter(
-        to_record_id=programme_id,
-        relationship_type='part_of',
-        deleted_at__isnull=True,
-    ).values_list('from_record_id', flat=True)
+    from learn.engine import STEP_TYPES, ordered_children
 
-    courses = Record.objects.filter(
-        id__in=course_ids,
-        record_type='course',
-        status__in=['active', 'locked'],
-    ).order_by('created_at')
+    courses = ordered_children(programme_id, ['course'], ['active', 'locked'])
 
     curriculum = []
     for course in courses:
-        lesson_ids = Relationship.objects.filter(
-            to_record_id=course.id,
-            relationship_type='part_of',
-            deleted_at__isnull=True,
-        ).values_list('from_record_id', flat=True)
-        lessons = Record.objects.filter(
-            id__in=lesson_ids,
-            record_type__in=['lesson', 'assignment', 'quiz'],
-            status__in=['active', 'locked'],
-        ).order_by('created_at')
+        lessons = ordered_children(course, STEP_TYPES, ['active', 'locked'])
         curriculum.append({
             'course': CourseSerializer(course).data,
             'lessons': LessonSerializer(lessons, many=True).data,

@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from records.models import Record, Relationship
 from activity.models import Activity
 from governance.services import get_linked_records
+from learn.engine import STEP_TYPES, ordered_children
 
 
 def landing(request):
@@ -104,47 +105,19 @@ def community_programme_detail(request, programme_id):
     )
     programme.required_level = (programme.permissions_data or {}).get('required_level', 1 if programme.record_type != 'induction' else 0)
 
-    # Get linked courses/modules
-    course_ids = Relationship.objects.filter(
-        to_record_id=programme_id,
-        relationship_type='part_of'
-    ).values_list('from_record_id', flat=True)
-
-    courses = Record.objects.filter(
-        id__in=course_ids,
-        record_type='course',
-        status='active',
-        deleted_at__isnull=True
-    ).order_by('created_at')
+    # Get linked courses/modules, in curriculum order
+    courses = ordered_children(programme_id, ['course'], ['active'])
 
     curriculum = []
-    if courses.exists():
+    if courses:
         for course in courses:
-            lesson_ids = Relationship.objects.filter(
-                to_record_id=course.id,
-                relationship_type='part_of'
-            ).values_list('from_record_id', flat=True)
-            lessons = Record.objects.filter(
-                id__in=lesson_ids,
-                record_type__in=['lesson', 'assignment', 'quiz'],
-                status='active',
-                deleted_at__isnull=True
-            ).order_by('created_at')
-            curriculum.append({'course': course, 'lessons': list(lessons)})
+            lessons = ordered_children(course, STEP_TYPES, ['active'])
+            curriculum.append({'course': course, 'lessons': lessons})
     else:
         # Check if lessons are linked directly to this programme/induction
-        lesson_ids = Relationship.objects.filter(
-            to_record_id=programme_id,
-            relationship_type='part_of'
-        ).values_list('from_record_id', flat=True)
-        lessons = Record.objects.filter(
-            id__in=lesson_ids,
-            record_type__in=['lesson', 'assignment', 'quiz'],
-            status='active',
-            deleted_at__isnull=True
-        ).order_by('created_at')
-        if lessons.exists():
-            curriculum.append({'course': programme, 'lessons': list(lessons)})
+        lessons = ordered_children(programme_id, STEP_TYPES, ['active'])
+        if lessons:
+            curriculum.append({'course': programme, 'lessons': lessons})
 
     is_enrolled = False
     user = getattr(request, 'user', None)
@@ -302,30 +275,15 @@ def programme_detail(request, programme_id):
     if user_level < required_level:
         return render(request, 'learn/locked.html', {'programme': programme})
 
-    course_ids = Relationship.objects.filter(
-        to_record_id=programme_id,
-        relationship_type='part_of'
-    ).values_list('from_record_id', flat=True)
-
     is_author = _user_level(user) >= 4
     visible_statuses = ['active', 'locked', 'draft', 'submitted'] if is_author else ['active', 'locked']
 
-    courses = Record.objects.filter(
-        id__in=course_ids, record_type='course',
-        status__in=visible_statuses
-    ).order_by('created_at')
+    courses = ordered_children(programme_id, ['course'], visible_statuses)
 
     curriculum = []
     for course in courses:
-        lesson_ids = Relationship.objects.filter(
-            to_record_id=course.id, relationship_type='part_of'
-        ).values_list('from_record_id', flat=True)
-        lessons = Record.objects.filter(
-            id__in=lesson_ids,
-            record_type__in=['lesson', 'assignment', 'quiz'],
-            status__in=visible_statuses
-        ).order_by('created_at')
-        curriculum.append({'course': course, 'lessons': list(lessons)})
+        lessons = ordered_children(course, STEP_TYPES, visible_statuses)
+        curriculum.append({'course': course, 'lessons': lessons})
 
     already_enrolled = Activity.objects.filter(
         activity_type='programme',
@@ -360,15 +318,7 @@ def course_detail(request, course_id):
         status__in=visible_statuses
     )
 
-    lesson_ids = Relationship.objects.filter(
-        to_record_id=course_id, relationship_type='part_of'
-    ).values_list('from_record_id', flat=True)
-
-    lessons = Record.objects.filter(
-        id__in=lesson_ids,
-        record_type__in=['lesson', 'assignment', 'quiz'],
-        status__in=visible_statuses
-    ).order_by('created_at')
+    lessons = ordered_children(course_id, STEP_TYPES, visible_statuses)
 
     # Resolve parent programme via relationship
     programme_rel = Relationship.objects.filter(
@@ -411,13 +361,8 @@ def lesson_viewer(request, lesson_id):
     if parent_rel:
         course = Record.objects.filter(id=parent_rel.to_record_id).first()
         if course:
-            sibling_ids = Relationship.objects.filter(
-                to_record_id=course.id, relationship_type='part_of'
-            ).values_list('from_record_id', flat=True)
-            siblings = list(Record.objects.filter(
-                id__in=sibling_ids,
-                status__in=['active', 'locked']
-            ).order_by('created_at'))
+            # Curriculum order — this drives prev/next lesson navigation.
+            siblings = ordered_children(course, statuses=['active', 'locked'])
             # Resolve the parent programme for the back link
             prog_rel = Relationship.objects.filter(
                 from_record_id=course.id, relationship_type='part_of'
@@ -535,24 +480,12 @@ def programme_manage(request, record_id):
 
     can_delete = (user_level >= 5) or (is_owner and record.status in ('draft', 'submitted', 'approved'))
 
-    # Build course+lesson tree
-    course_ids = Relationship.objects.filter(
-        to_record_id=record_id, relationship_type='part_of'
-    ).values_list('from_record_id', flat=True)
-    courses = Record.objects.filter(
-        id__in=course_ids, record_type='course', deleted_at__isnull=True
-    ).order_by('created_at')
+    # Build course+lesson tree, in curriculum order
+    courses = ordered_children(record_id, ['course'])
     curriculum = []
     for course in courses:
-        lesson_ids = Relationship.objects.filter(
-            to_record_id=course.id, relationship_type='part_of'
-        ).values_list('from_record_id', flat=True)
-        lessons = Record.objects.filter(
-            id__in=lesson_ids,
-            record_type__in=['lesson', 'assignment', 'quiz'],
-            deleted_at__isnull=True,
-        ).order_by('created_at')
-        curriculum.append({'course': course, 'lessons': list(lessons)})
+        lessons = ordered_children(course, STEP_TYPES)
+        curriculum.append({'course': course, 'lessons': lessons})
 
     return render(request, 'learn/programme_manage.html', {
         'record': record,
@@ -579,14 +512,7 @@ def course_manage(request, record_id):
 
     can_delete = (user_level >= 5) or (is_owner and record.status in ('draft', 'submitted', 'approved'))
 
-    lesson_ids = Relationship.objects.filter(
-        to_record_id=record_id, relationship_type='part_of'
-    ).values_list('from_record_id', flat=True)
-    lessons = Record.objects.filter(
-        id__in=lesson_ids,
-        record_type__in=['lesson', 'assignment', 'quiz'],
-        deleted_at__isnull=True,
-    ).order_by('created_at')
+    lessons = ordered_children(record_id, STEP_TYPES)
 
     programme_rel = Relationship.objects.filter(
         from_record_id=record_id, relationship_type='part_of'

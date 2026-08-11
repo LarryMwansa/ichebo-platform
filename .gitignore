@@ -384,3 +384,5 @@ doc/api/
 
 
 .v2-templates
+# Runtime backups written by migrate_induction_to_records — environment-specific
+ichebo-platform/learn/fixtures/induction_legacy_*.json

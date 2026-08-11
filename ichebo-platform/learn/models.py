@@ -171,3 +171,164 @@ class InductionProgress(models.Model):
 
     def __str__(self):
         return f"{self.user} — {self.step.title} ({self.status})"
+
+
+# ---------------------------------------------------------------------------
+# Curriculum engine — generic, Record-backed
+#
+# These replace the induction-specific models above. Any learning Record can
+# carry questions and be assessed; nothing here knows what induction is.
+#
+# Deliberately absent: a per-step progress table. Completion already lives on
+# the activity.Activity tree (programme → project → task), which is what drives
+# progress rollup and the certification signal. A second status column would
+# duplicate it and drift — the old InductionProgress did exactly that, and its
+# _unlock_next only ever unlocked the immediately-following step, so inserting
+# a step mid-curriculum left existing learners permanently blocked. Unlock is
+# derived from the Activity chain instead; see learn/engine.py.
+# ---------------------------------------------------------------------------
+
+class AssessmentQuestion(SoftDeleteMixin, models.Model):
+    """A question on any learning Record (normally record_type='quiz')."""
+
+    QUESTION_TYPES = [
+        ('single_choice', 'Single Choice'),
+        ('multi_choice', 'Multiple Choice'),
+        ('free_text', 'Free Text'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    record = models.ForeignKey(
+        'records.Record',
+        on_delete=models.CASCADE,
+        related_name='assessment_questions',
+    )
+    question_text = models.TextField()
+    question_type = models.CharField(
+        max_length=20, choices=QUESTION_TYPES, default='single_choice'
+    )
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    # deleted_at — provided by SoftDeleteMixin
+
+    class Meta:
+        ordering = ['order']
+        indexes = [
+            models.Index(fields=['record', 'order']),
+        ]
+
+    def __str__(self):
+        return f"Q{self.order}: {self.question_text[:60]}"
+
+    @property
+    def answers(self):
+        """Alias for `options`.
+
+        Kept so templates written against the old InductionQuestion.answers
+        related name (templates/sceptre/induction/quiz.html) need no edit.
+        """
+        return self.options
+
+
+class AssessmentOption(SoftDeleteMixin, models.Model):
+    """One selectable answer on an AssessmentQuestion."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    question = models.ForeignKey(
+        AssessmentQuestion,
+        on_delete=models.CASCADE,
+        related_name='options',
+    )
+    answer_text = models.CharField(max_length=500)
+    is_correct = models.BooleanField(default=False)
+    order = models.IntegerField(default=0)
+    # deleted_at — provided by SoftDeleteMixin
+
+    class Meta:
+        ordering = ['order']
+        indexes = [
+            models.Index(fields=['question', 'order']),
+        ]
+
+    def __str__(self):
+        mark = '✓' if self.is_correct else '·'
+        return f"{mark} {self.answer_text[:60]}"
+
+
+class AssessmentAttempt(models.Model):
+    """One submission of an assessment. Immutable — never updated, only added.
+
+    Attempt history is the audit trail: a learner's current state is the latest
+    row, and the whole sequence is available for reporting on which questions
+    trip people up. Not soft-deletable — an attempt happened or it didn't.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='assessment_attempts',
+    )
+    record = models.ForeignKey(
+        'records.Record',
+        on_delete=models.CASCADE,
+        related_name='assessment_attempts',
+    )
+    attempt_number = models.IntegerField(default=1)
+    score = models.IntegerField()                   # 0–100
+    passed = models.BooleanField(default=False)
+    # {question_id: [option_id, ...]} — what was actually submitted
+    responses = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'record']),
+            models.Index(fields=['record', 'passed']),
+        ]
+
+    def __str__(self):
+        return f"{self.user} — {self.record.title} attempt {self.attempt_number}: {self.score}%"
+
+
+class LearningAttachment(SoftDeleteMixin, models.Model):
+    """A file attached to a learning Record — handout, worksheet, slides, PDF.
+
+    Stored under learn/protected/ so nginx can refuse to serve it directly;
+    reaching it goes through learn.views.lesson_file, which checks enrolment.
+    Video is NOT here — it goes through the media engine and lives in
+    Record.custom_fields['video_url'].
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    record = models.ForeignKey(
+        'records.Record',
+        on_delete=models.CASCADE,
+        related_name='learning_attachments',
+    )
+    file = models.FileField(upload_to='learn/protected/%Y/%m/')
+    original_name = models.CharField(max_length=255)
+    content_type = models.CharField(max_length=100)
+    size_bytes = models.BigIntegerField(default=0)
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name='learning_attachments',
+    )
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    # deleted_at — provided by SoftDeleteMixin
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        indexes = [
+            models.Index(fields=['record', 'order']),
+        ]
+
+    def __str__(self):
+        return f"{self.original_name} ({self.record.title})"
+
+    @property
+    def is_pdf(self):
+        return self.content_type == 'application/pdf'

@@ -47,13 +47,38 @@ def auto_create_draft_certification(sender, instance, **kwargs):
     ).exists():
         return
 
-    # Fetch programme for its title and required level
+    # Fetch programme for its title and required level.
+    # Induction is record_type='induction', not 'programme' — filtering on
+    # 'programme' alone silently swallowed every inductee's certification,
+    # which is why induction used to write competence_level directly.
     try:
-        programme = Record.objects.get(id=programme_record_id, record_type='programme')
+        programme = Record.objects.get(
+            id=programme_record_id,
+            record_type__in=['programme', 'induction'],
+        )
     except Record.DoesNotExist:
         return
 
-    target_level = (programme.permissions_data or {}).get('required_level', 1)
+    is_induction = programme.record_type == 'induction'
+
+    if is_induction:
+        # Induction advances Level 0 → 1. Its required_level is 0 (that is who
+        # is allowed *in*), so reading target_level from it would make
+        # confirm_certification_record reject the confirmation as "already at
+        # or above the target level".
+        target_level = 1
+    else:
+        target_level = (programme.permissions_data or {}).get('required_level', 1)
+
+    metadata = {
+        'source_app': 'learn',
+        'programme_record_id': str(programme_record_id),
+        'learner_id': str(learner.id),
+        'target_level': target_level,
+    }
+    if is_induction:
+        # Tells confirm_certification_record to also run tenant placement.
+        metadata['context'] = 'induction_completion'
 
     Record.objects.create(
         created_by=learner,
@@ -64,12 +89,7 @@ def auto_create_draft_certification(sender, instance, **kwargs):
         origin='system',
         title=f'Certification — {programme.title}',
         status='draft',
-        metadata={
-            'source_app': 'learn',
-            'programme_record_id': str(programme_record_id),
-            'learner_id': str(learner.id),
-            'target_level': target_level,
-        },
+        metadata=metadata,
         permissions_data={
             'visibility': 'tenant',
             'required_level': 3,

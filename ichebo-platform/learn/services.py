@@ -9,7 +9,6 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from activity.models import Activity
-from records.models import Record, Relationship
 from .models import CertificationConfirmation
 
 User = get_user_model()
@@ -90,20 +89,34 @@ def enrol_in_programme(user, programme, tenant=None):
         },
     )
 
-    # Traverse part_of graph: course → programme
-    course_ids = Relationship.objects.filter(
-        to_record=programme,
-        relationship_type='part_of',
-        deleted_at__isnull=True,
-    ).values_list('from_record_id', flat=True)
+    # Traverse part_of graph: course → programme.
+    # Imported here rather than at module level — engine imports services.
+    from learn.engine import STEP_TYPES, ordered_child_edges, ordered_children, pathway_for
 
-    courses = Record.objects.filter(
-        id__in=course_ids,
-        record_type='course',
-        status__in=['active', 'locked'],
-    ).order_by('created_at')
+    # Which pathway's steps this learner should get. A programme that doesn't
+    # fork returns {'all'}, so every step is included and this is a no-op.
+    #
+    # This filter is not optional: without it a forked programme enrols the
+    # learner in BOTH branches, they can only ever complete their own, and the
+    # programme Activity sticks below 100% forever — so the certification
+    # signal never fires and nobody is ever advanced.
+    pathways = pathway_for(user, programme)
+
+    courses = ordered_children(programme, ['course'], ['active', 'locked'])
 
     for course in courses:
+        lessons = [
+            record
+            for record, edge in ordered_child_edges(
+                course, STEP_TYPES, ['active', 'locked']
+            )
+            if ((edge.metadata or {}).get('pathway') or 'all') in pathways
+        ]
+        if not lessons:
+            # Every step in this course belongs to another pathway — creating
+            # an empty course Activity would drag the rollup down permanently.
+            continue
+
         course_activity = Activity.objects.create(
             tenant=tenant,
             created_by=user,
@@ -120,18 +133,6 @@ def enrol_in_programme(user, programme, tenant=None):
                 'programme_record_id': str(programme.id),
             },
         )
-
-        lesson_ids = Relationship.objects.filter(
-            to_record=course,
-            relationship_type='part_of',
-            deleted_at__isnull=True,
-        ).values_list('from_record_id', flat=True)
-
-        lessons = Record.objects.filter(
-            id__in=lesson_ids,
-            record_type__in=['lesson', 'assignment', 'quiz'],
-            status__in=['active', 'locked'],
-        ).order_by('created_at')
 
         for lesson in lessons:
             Activity.objects.create(
@@ -257,7 +258,9 @@ def confirm_certification_record(cert_record, confirmed_by, notes='', placement_
         learner.save(update_fields=['competence_level'])
 
         if context == 'induction_completion':
-            _handle_induction_placement(learner, new_level, placement_tenant_id)
+            _handle_induction_placement(
+                learner, new_level, placement_tenant_id, confirmed_by
+            )
             # Store placement tenant name on cert record metadata for signal
             if placement_tenant_id:
                 from tenants.models import Tenant as _Tenant
@@ -279,7 +282,7 @@ def confirm_certification_record(cert_record, confirmed_by, notes='', placement_
         )
 
 
-def _handle_induction_placement(learner, new_level, placement_tenant_id):
+def _handle_induction_placement(learner, new_level, placement_tenant_id, confirmed_by):
     """
     Called when confirming an induction completion certification.
     Deactivates the Induction Tenant permission and creates a Level 1
@@ -287,7 +290,23 @@ def _handle_induction_placement(learner, new_level, placement_tenant_id):
     Imported inline to avoid circular imports with tenants/accounts apps.
     """
     from django.utils import timezone
-    from tenants.models import UserPermission
+    from tenants.models import Tenant, UserPermission
+
+    # A placement tenant is mandatory. Without this guard the deactivation
+    # below still runs and nothing replaces it, so the learner is advanced to
+    # Level 1 with no community at all — invisible until they next try to use
+    # the platform. Refusing up front keeps the transaction intact and leaves
+    # the certification in 'draft' for the steward to retry properly.
+    if not placement_tenant_id:
+        raise CertificationError(
+            'A placement community is required to confirm an induction. '
+            'Choose the community this member is joining, then confirm again.'
+        )
+
+    try:
+        placement_tenant = Tenant.objects.get(id=placement_tenant_id)
+    except Tenant.DoesNotExist:
+        raise CertificationError(f'Placement tenant {placement_tenant_id} does not exist.')
 
     # Deactivate induction tenant permission
     UserPermission.objects.filter(
@@ -296,23 +315,22 @@ def _handle_induction_placement(learner, new_level, placement_tenant_id):
         is_active=True,
     ).update(is_active=False)
 
-    # Create home tenant permission if placement specified
-    if placement_tenant_id:
-        from tenants.models import Tenant
-        try:
-            placement_tenant = Tenant.objects.get(id=placement_tenant_id)
-        except Tenant.DoesNotExist:
-            raise CertificationError(f'Placement tenant {placement_tenant_id} does not exist.')
-
-        UserPermission.objects.get_or_create(
-            user=learner,
-            tenant=placement_tenant,
-            defaults={
-                'level': new_level,
-                'role': 'member',
-                'is_active': True,
-            },
-        )
+    # created_by and tenant_path are both NOT NULL on UserPermission, and
+    # 'member' is not in ROLE_CHOICES — omitting them made this raise
+    # IntegrityError, which is why induction placement had never once
+    # completed. Mirrors tenants/service.py:135, the canonical creation site.
+    UserPermission.objects.get_or_create(
+        user=learner,
+        tenant=placement_tenant,
+        defaults={
+            'created_by': confirmed_by,
+            'granted_by': confirmed_by,
+            'tenant_path': placement_tenant.path,
+            'level': new_level,
+            'role': 'disciple',
+            'is_active': True,
+        },
+    )
 
     # Set induction_completed_at if the field exists
     if hasattr(learner, 'induction_completed_at'):

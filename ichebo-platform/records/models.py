@@ -162,6 +162,13 @@ class Relationship(SoftDeleteMixin, models.Model):
 
     direction = models.CharField(max_length=20, choices=DIRECTION_CHOICES)
     relationship_type = models.CharField(max_length=30, choices=RELATIONSHIP_TYPE_CHOICES)
+    # Position of from_record within to_record. Curriculum order (lesson within
+    # course, course within programme) is a property of the edge, not the
+    # lesson — the same lesson can sit at a different position in two courses.
+    # Deliberately not unique: soft-deleted edges linger, and reordering swaps
+    # two rows, which would trip a unique constraint mid-transaction. Sort by
+    # (sequence_order, created_at) so untouched legacy edges keep a stable order.
+    sequence_order = models.IntegerField(default=0, db_index=True)
     notes = models.TextField(blank=True, null=True)
     # Extra context stored by the creating app (e.g. linked_activity_id for gathering dual-write)
     metadata = models.JSONField(default=dict, blank=True)
@@ -178,4 +185,5 @@ class Relationship(SoftDeleteMixin, models.Model):
             models.Index(fields=['to_record']),
             models.Index(fields=['bible_verse']),
             models.Index(fields=['relationship_type']),
+            models.Index(fields=['to_record', 'relationship_type', 'sequence_order']),
         ]

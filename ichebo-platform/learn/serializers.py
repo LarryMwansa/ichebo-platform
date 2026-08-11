@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from records.models import Record, Relationship
+from records.models import Record
 from activity.models import Activity
 from .models import CertificationConfirmation
 
@@ -44,16 +44,8 @@ class CourseSerializer(serializers.ModelSerializer):
         ]
 
     def get_lessons(self, obj):
-        lesson_ids = Relationship.objects.filter(
-            to_record=obj,
-            relationship_type='part_of',
-            deleted_at__isnull=True,
-        ).values_list('from_record_id', flat=True)
-        lessons = Record.objects.filter(
-            id__in=lesson_ids,
-            record_type__in=['lesson', 'assignment', 'quiz'],
-            status__in=['active', 'locked'],
-        ).order_by('created_at')
+        from learn.engine import STEP_TYPES, ordered_children
+        lessons = ordered_children(obj, STEP_TYPES, ['active', 'locked'])
         return LessonSerializer(lessons, many=True).data
 
 
@@ -87,16 +79,8 @@ class ProgrammeDetailSerializer(ProgrammeListSerializer):
         fields = ProgrammeListSerializer.Meta.fields + ['courses', 'content']
 
     def get_courses(self, obj):
-        course_ids = Relationship.objects.filter(
-            to_record=obj,
-            relationship_type='part_of',
-            deleted_at__isnull=True,
-        ).values_list('from_record_id', flat=True)
-        courses = Record.objects.filter(
-            id__in=course_ids,
-            record_type='course',
-            status__in=['active', 'locked'],
-        ).order_by('created_at')
+        from learn.engine import ordered_children
+        courses = ordered_children(obj, ['course'], ['active', 'locked'])
         return CourseSerializer(courses, many=True).data
 
 
