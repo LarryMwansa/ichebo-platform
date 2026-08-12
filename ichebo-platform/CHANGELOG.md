@@ -7,6 +7,31 @@ Versioning: Build layers as defined in `master-roadmap-canonical-2026-05-13.md`
 
 ---
 
+## [Layer 12 — Learn Engine Unification, Curriculum Authoring & Dynamic Broadcasts] — 2026-07-25 to 2026-08-12
+
+Major updates across Learn curriculum authoring, Sceptre home dynamic content, multi-tenant media privacy isolation, and broadcast schedule playback.
+
+### Learn Curriculum Engine & Authoring — 2026-08-05 to 2026-08-12
+
+#### Added
+- **Unified Learn Curriculum Engine (`eb7e0ea`, `f8a8fbb`, `e1584e6`)**: Unified the Learn curriculum engine across all learning surfaces. Sceptre induction routes Level 0 users directly to the unified engine. Added complete automated test coverage for engine execution rules.
+- **Curriculum Authoring & Lesson Viewers (`5f82e93`, `04f7436`, `59608ae`)**: Added interactive Markdown Canvas and Question Editor to Curriculum Authoring. Added lesson file attachments, gated downloads, embedded HLS video playback, and curriculum reordering.
+
+### Sceptre Home Tabs & Media Privacy — 2026-07-25 to 2026-08-02
+
+#### Added
+- **Dynamic Recent Broadcasts (`sceptre/views.py`, `templates/sceptre/home/home.html`)**: Queries active media and broadcast records (`record_family__in=['media', 'broadcast']`) and wraps them with `VideoRecord` objects for title, date, thumbnail, and stream URL. Added click handlers for interactive video modal playback.
+- **Dynamic Teaching Series & Course Progress (`sceptre/views.py`, `home.html`)**: Dynamically displays user active course enrolments (`Activity`) with progress percentages (`In Progress (45%)`) or published teaching series, with a clean fallback (*"There are no active teaching programmes right now."*).
+
+#### Fixed
+- **Multi-Tenant Media Isolation (`media/template_views.py`, `broadcast/views.py`)**: Enforced tenant-scoped media queries using Django `Q` objects (`Q(tenant=selected_tenant) | Q(tenant__name__icontains='Global') | Q(tenant__name__icontains='Default') | Q(tenant__isnull=True)`). Prevents private tenant media from leaking across tenants.
+- **HTMX Player Poll & Cutoff Fix (`broadcast/services.py`, `sceptre/views.py`, `_now_playing.html`)**: Fixed 60s video playback cutoff issue by synchronizing `playing_signature` between backend resolution and hidden form input `<input name="current_playing_signature">`. Periodic 60s polls return `HTTP 204 No Content` to prevent player DOM resets during active playback.
+- **Broadcast Schedule Sidebar Query Fix (`sceptre/views.py`)**: Replaced invalid `order_by('day_of_week')` query (which caused a database `FieldError`) with `scheduled_end__gte=now` ordered by `scheduled_start`.
+- **Primary Sidebar Navigation (`206034b`, `63173c8`)**: Restored **Media Centre** nav icon in the primary sidebar and updated Sceptre tenant-context banner to dark blue with high-contrast text.
+- **Tab Cleanup (`home.html`)**: Removed legacy/inactive *Formation* and *Sessions* tabs from the Sceptre home page.
+
+---
+
 ## [Layer 11 — Video Direction v2 & Production Hardening] — 2026-06-22 to 2026-06-25
 
 Video infrastructure went live on its own dedicated server (DOC G's two-server topology), which then exposed that the web UI had no real path to consume it — leading to a full retirement of the standalone `video_live` app in favour of native video inside Learn and Community. Alongside this, a run of real production bugs were found and fixed: two cross-tenant privacy leaks (live broadcasts, Handbook Keys), a silent miscategorization bug, a tenancy-visibility bug, and several infrastructure gaps found only once the video engine was actually deployed and driven end-to-end.

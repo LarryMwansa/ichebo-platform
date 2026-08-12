@@ -840,6 +840,8 @@ def author_lesson_form(request, record_id=None):
 
     if request.method == 'POST':
         video_url = request.POST.get('video_url', '').strip()
+        video_id = request.POST.get('video_id', '').strip()
+
         is_submit = request.POST.get('action') == 'submit'
 
         if record:
@@ -848,6 +850,8 @@ def author_lesson_form(request, record_id=None):
             custom = record.custom_fields or {}
             if video_url:
                 custom['video_url'] = video_url
+                if video_id:
+                    custom['video_id'] = video_id
             elif 'video_url' in custom:
                 del custom['video_url']
             record.custom_fields = custom
@@ -1872,7 +1876,21 @@ def _attachment_list_response(request, record, error=''):
 def htmx_attachment_upload(request, record_id):
     from learn.models import LearningAttachment
 
-    record = _authorable_record(request, record_id)
+    if str(record_id) == '00000000-0000-0000-0000-000000000000':
+        record = Record.objects.create(
+            created_by=request.user,
+            record_class='organizational',
+            record_family='learning',
+            record_type='lesson',
+            origin='user',
+            title='Untitled Lesson Draft',
+            status='draft',
+            metadata={'source_app': 'learn'},
+            permissions_data={'visibility': 'tenant', 'required_level': 1},
+        )
+    else:
+        record = _authorable_record(request, record_id)
+
     if request.method != 'POST':
         return HttpResponse('', status=405)
 

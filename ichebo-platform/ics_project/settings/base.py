@@ -30,7 +30,14 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 # Flip to True in production once MinIO is configured.
 REQUIRE_REFEREE_UPLOADS = config('REQUIRE_REFEREE_UPLOADS', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1,testserver,.ichebo.org',
+    cast=lambda v: [s.strip() for s in v.split(',') if s.strip()]
+)
+for host in ['.ichebo.org', 'testserver']:
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
 
 # Derived from ALLOWED_HOSTS so the two can't drift apart. Needed because
 # Django's CSRF middleware falls back to strict Referer checking whenever

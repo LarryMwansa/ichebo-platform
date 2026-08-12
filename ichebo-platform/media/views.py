@@ -342,6 +342,16 @@ class TranscodeCompleteWebhookView(APIView):
             )
             return Response(status=status.HTTP_200_OK)
 
+        # Do not rewrite video_url/thumbnail_url here. The engine already
+        # sends the correct, working URL keyed on record_id (verified live:
+        # both /hls/{record_id}/... and /media/videos/{record_id}/... 200,
+        # identical manifest). job_id is a different identifier — the
+        # engine's own transcode job id — and is never a valid key for its
+        # HLS-serving routes (verified: /hls/{job_id}/... and
+        # /media/videos/{job_id}/... both 404). Substituting it here would
+        # take a URL that already works and break it on every transcode
+        # completion.
+
         record.custom_fields.update({
             'transcoding_status': job_status,
             'video_url': video_url,

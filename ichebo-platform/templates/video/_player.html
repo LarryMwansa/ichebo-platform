@@ -70,7 +70,7 @@ guard) even if this partial renders twice.
     </script>
     {% elif video_type == 'hls' %}
     <video class="video-player__video" data-hls-src="{{ embed_url }}"
-           controls playsinline
+           controls autoplay muted playsinline
            style="position: absolute; inset: 0; width: 100%; height: 100%;">
         Your browser does not support the video tag.
     </video>
@@ -80,24 +80,39 @@ guard) even if this partial renders twice.
         var video = wrap.querySelector('.video-player__video');
         if (!video) return;
         var src = video.dataset.hlsSrc;
+        if (!src) return;
 
         function attach() {
-            // Prefer hls.js whenever the browser supports the MediaSource
-            // APIs it needs — checking video.canPlayType('...mpegurl') first
-            // is the common-looking shortcut, but it's an unreliable signal:
-            // confirmed by direct test that a real (headless) Chromium build
-            // reports "maybe" for HLS, mp4, and everything else alike, which
-            // is truthy and would wrongly skip hls.js. Hls.isSupported() is
-            // the actual capability check. Only fall back to native <video>
-            // playback (Safari, or any browser hls.js explicitly can't run
-            // on) when that's false.
-            if (window.Hls && window.Hls.isSupported()) {
+            if (src.indexOf('.m3u8') !== -1 && window.Hls && window.Hls.isSupported()) {
+                if (video._hls) {
+                    try { video._hls.destroy(); } catch(e) {}
+                }
                 var hls = new window.Hls();
                 hls.loadSource(src);
                 hls.attachMedia(video);
-                return;
+                hls.on(window.Hls.Events.MANIFEST_PARSED, function() {
+                    video.play().catch(function(e){});
+                });
+                hls.on(window.Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        switch (data.type) {
+                            case window.Hls.ErrorTypes.NETWORK_ERROR:
+                                hls.startLoad();
+                                break;
+                            case window.Hls.ErrorTypes.MEDIA_ERROR:
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                try { hls.destroy(); } catch(e) {}
+                                break;
+                        }
+                    }
+                });
+                video._hls = hls;
+            } else {
+                video.src = src;
+                video.play().catch(function(e){});
             }
-            video.src = src;
         }
 
         if (window.Hls) {

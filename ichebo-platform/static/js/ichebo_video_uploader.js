@@ -37,12 +37,176 @@ const IcheboVideoUpload = {
             replaceBtn.addEventListener('click', () => {
                 document.getElementById('video-upload-done' + sfx).style.display = 'none';
                 document.getElementById('video-upload-idle' + sfx).style.display = 'block';
+                const tabsEl = document.getElementById('video-upload-mode-tabs' + sfx);
+                if (tabsEl) tabsEl.style.display = 'flex';
                 
                 const urlEl = document.getElementById('video-upload-url' + sfx);
                 if (urlEl) urlEl.value = '';
                 
                 const idEl = document.getElementById('video-upload-id' + sfx);
                 if (idEl) idEl.value = '';
+
+                const playerContainer = document.getElementById('video-preview-container' + sfx);
+                if (playerContainer) playerContainer.innerHTML = '';
+            });
+        }
+    },
+
+    switchMode(sfx, mode) {
+        sfx = sfx || '';
+        window._activeUploadSuffix = sfx;
+        const fileBtn = document.getElementById('btn-upload-file' + sfx);
+        const pickerBtn = document.getElementById('btn-picker' + sfx);
+        if (mode === 'file') {
+            if (fileBtn) { fileBtn.style.borderColor = 'var(--primary)'; fileBtn.style.color = 'var(--primary)'; }
+            if (pickerBtn) { pickerBtn.style.borderColor = 'var(--border)'; pickerBtn.style.color = 'var(--muted)'; }
+            const fileInput = document.getElementById('video-upload-file' + sfx);
+            if (fileInput) fileInput.click();
+        } else {
+            this.openPicker(sfx);
+        }
+    },
+
+    async openPicker(sfx) {
+        sfx = sfx || '';
+        window._activeUploadSuffix = sfx;
+        const modal = document.getElementById('video-picker-modal' + sfx);
+        const body = document.getElementById('video-picker-body' + sfx);
+        if (!modal || !body) return;
+
+        modal.style.display = 'flex';
+        body.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--muted);"><span class="material-symbols-outlined" style="font-size:32px; animation: spin 1s infinite linear;">sync</span><div style="margin-top:8px;">Loading Media Library…</div></div>';
+
+        try {
+            const resp = await fetch('/media-center/htmx/picker-grid/?mode=options_bar', { credentials: 'same-origin' });
+            if (!resp.ok) throw new Error('Failed to load media items');
+            const html = await resp.text();
+            body.innerHTML = html;
+
+            // Wire click handlers on any elements with data attributes.
+            //
+            // Only card.dataset is read here — never getAttribute('onclick')
+            // parsed as a string. The onclick attribute's URL is written
+            // through Django's |escapejs filter (correct: it's JS-string-
+            // literal syntax, e.g. a hyphen becomes -, meant to be
+            // decoded by the browser's JS engine when it executes the
+            // attribute as code). Reading that attribute's raw source text
+            // via getAttribute() and regex-extracting a substring skips that
+            // decoding step entirely, so the - sequences end up copied
+            // into the URL as six literal characters instead of a hyphen —
+            // a URL that 404s everywhere, confirmed against production data
+            // (one lesson's video_url was exactly this, byte for byte).
+            // data-video-url carries the same value through a plain HTML
+            // attribute instead, which needs no such decoding.
+            body.querySelectorAll('[data-video-url], .options-bar-picker-item, .media-picker-card').forEach((card) => {
+                card.style.cursor = 'pointer';
+                card.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const videoUrl = card.dataset.videoUrl || '';
+                    const title = card.dataset.title || card.querySelector('.media-picker-title')?.textContent || 'Selected Video';
+                    const id = card.dataset.recordId || card.dataset.id || '';
+                    this.attachVideo(sfx, videoUrl, title, id);
+                    this.closePicker(sfx);
+                };
+            });
+        } catch (err) {
+            body.innerHTML = `<div style="text-align:center; padding:30px; color:var(--error);">${err.message || 'Unable to load media items'}</div>`;
+        }
+    },
+
+    closePicker(sfx) {
+        sfx = sfx || '';
+        const modal = document.getElementById('video-picker-modal' + sfx);
+        if (modal) modal.style.display = 'none';
+    },
+
+    attachVideo(sfx, videoUrl, title, recordId) {
+        sfx = sfx || '';
+        const urlEl = document.getElementById('video-upload-url' + sfx);
+        if (urlEl) urlEl.value = videoUrl;
+
+        const idEl = document.getElementById('video-upload-id' + sfx);
+        if (idEl) idEl.value = recordId || '';
+
+        document.getElementById('video-upload-idle' + sfx).style.display = 'none';
+        document.getElementById('video-upload-progress' + sfx).style.display = 'none';
+        const tabsEl = document.getElementById('video-upload-mode-tabs' + sfx);
+        if (tabsEl) tabsEl.style.display = 'none';
+
+        document.getElementById('video-upload-filename' + sfx).textContent = title || 'Attached Video';
+        document.getElementById('video-upload-done' + sfx).style.display = 'block';
+
+        this.renderHlsPlayer(sfx, videoUrl);
+    },
+
+    renderHlsPlayer(sfx, videoUrl) {
+        sfx = sfx || '';
+        const playerContainer = document.getElementById('video-preview-container' + sfx);
+        if (!playerContainer) return;
+
+        if (!videoUrl) {
+            playerContainer.innerHTML = '';
+            return;
+        }
+
+        playerContainer.innerHTML = `
+            <div class="video-player-wrap" style="margin-top: 8px; border-radius: 8px; overflow: hidden; background: #000; aspect-ratio: 16/9; position: relative;">
+                <video class="video-player__video" id="video-preview-player${sfx}" data-hls-src="${videoUrl}" controls autoplay muted playsinline style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        `;
+
+        const video = document.getElementById('video-preview-player' + sfx);
+        if (!video) return;
+
+        if (video._hlsInstance) {
+            try { video._hlsInstance.destroy(); } catch(e) {}
+            video._hlsInstance = null;
+        }
+
+        const attach = () => {
+            if (videoUrl.indexOf('.m3u8') !== -1 && window.Hls && window.Hls.isSupported()) {
+                const hls = new window.Hls();
+                hls.loadSource(videoUrl);
+                hls.attachMedia(video);
+                hls.on(window.Hls.Events.MANIFEST_PARSED, function() {
+                    video.play().catch(function(e){});
+                });
+                hls.on(window.Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        switch (data.type) {
+                            case window.Hls.ErrorTypes.NETWORK_ERROR:
+                                hls.startLoad();
+                                break;
+                            case window.Hls.ErrorTypes.MEDIA_ERROR:
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                try { hls.destroy(); } catch(e) {}
+                                break;
+                        }
+                    }
+                });
+                video._hlsInstance = hls;
+            } else {
+                video.src = videoUrl;
+                video.play().catch(function(e){});
+            }
+        };
+
+        if (window.Hls) {
+            attach();
+        } else if (window.__hlsJsLoading) {
+            window.__hlsJsLoading.then(attach);
+        } else {
+            window.__hlsJsLoading = new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js';
+                script.onload = () => { resolve(); attach(); };
+                script.onerror = () => { resolve(); video.src = videoUrl; };
+                document.head.appendChild(script);
             });
         }
     },
@@ -52,8 +216,10 @@ const IcheboVideoUpload = {
     },
 
     _csrfToken() {
-        const match = document.cookie.match(/csrftoken=([^;]+)/);
-        return match ? match[1] : '';
+        const input = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        if (input && input.value) return input.value;
+        const match = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]*)/);
+        return match ? decodeURIComponent(match[1]) : '';
     },
 
     _showToast(msg, level='error') {
@@ -183,15 +349,7 @@ const IcheboVideoUpload = {
             if (!resp.ok) continue;
             const data = await resp.json();
             if (data.transcoding_status === 'complete' && data.video_url) {
-                const urlEl = document.getElementById('video-upload-url' + sfx);
-                if (urlEl) urlEl.value = data.video_url;
-                
-                const idEl = document.getElementById('video-upload-id' + sfx);
-                if (idEl) idEl.value = data.id;
-
-                document.getElementById('video-upload-progress' + sfx).style.display = 'none';
-                document.getElementById('video-upload-filename' + sfx).textContent = filename;
-                document.getElementById('video-upload-done' + sfx).style.display = 'flex';
+                this.attachVideo(sfx, data.video_url, filename, data.id);
                 return;
             }
             if (data.transcoding_status === 'failed') {
@@ -201,4 +359,10 @@ const IcheboVideoUpload = {
         }
         throw new Error('Still processing after 20 minutes — refresh this page later to check status.');
     },
+};
+
+window.selectMediaVideo = function(recordId, videoUrl, title, pickerContext) {
+    const sfx = window._activeUploadSuffix || '';
+    IcheboVideoUpload.attachVideo(sfx, videoUrl, title, recordId);
+    IcheboVideoUpload.closePicker(sfx);
 };

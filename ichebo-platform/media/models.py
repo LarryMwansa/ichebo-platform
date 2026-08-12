@@ -38,17 +38,23 @@ class VideoRecord:
     @property
     def video_url(self) -> str | None:
         url = self._r.custom_fields.get('video_url')
+        # A stored URL that already looks like a URL is trusted as-is — the
+        # engine's own value is correct and must not be rewritten (see the
+        # comment in media.views.TranscodeCompleteWebhookView for why).
+        # Only the fallback below, when there is no stored value at all, is
+        # constructed here — and it must key on the record's own id.
+        # transcode_job_id is a different identifier the engine never serves
+        # by; confirmed against production: a job_id-keyed URL 404s where the
+        # equivalent record_id-keyed URL 200s.
         if not url or not str(url).startswith('http'):
-            job_id = self._r.custom_fields.get('transcode_job_id') or str(self._r.id)
-            return f"https://video.ichebo.org/hls/{job_id}/index.m3u8"
+            return f"https://video.ichebo.org/hls/{self._r.id}/index.m3u8"
         return url
 
     @property
     def thumbnail_url(self) -> str | None:
         url = self._r.custom_fields.get('thumbnail_url')
         if not url or not str(url).startswith('http'):
-            job_id = self._r.custom_fields.get('transcode_job_id') or str(self._r.id)
-            return f"https://video.ichebo.org/hls/{job_id}/thumb.jpg"
+            return f"https://video.ichebo.org/hls/{self._r.id}/thumb.jpg"
         return url
 
     @property
