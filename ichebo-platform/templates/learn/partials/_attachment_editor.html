@@ -6,6 +6,26 @@ through the media engine's chunked upload and gets transcoded to HLS; this is
 a plain multipart POST straight to Django.
 
 Params: record, attachments, error
+
+NO <form> TAG IN THIS PARTIAL — this is load-bearing, not a style choice.
+author_lesson_form.html includes this partial in the middle of ITS OWN outer
+<form method="post">...</form> (title / content / save buttons). A <form>
+nested inside another <form> is invalid HTML5, and browsers respond by
+flattening it — the nested form tag is dropped and its children become part
+of the OUTER form. That meant this.closest('form').requestSubmit() on the
+file input's onchange was submitting the WHOLE LESSON FORM (a normal POST to
+the lesson's own save URL, 302 redirect, full page navigation) instead of
+hitting the attachment upload endpoint — confirmed by watching the real
+network request in a browser: it went to /learn/author/lesson/<id>/, never
+to /learn/htmx/attachments/<id>/upload/. The document was never sent to the
+view that saves it; the page just navigated back to the authoring list.
+
+Fixed by putting hx-post directly on the file input — no form wrapper, so
+no nesting. htmx auto-includes a form-control element's own value when it is
+itself the hx-post trigger (the selected file, encoded as multipart because
+of hx-encoding). The CSRF token travels as an X-CSRFToken header via
+hx-headers rather than a form field, since there is no <form> for a hidden
+input to ride along with — Django's CsrfViewMiddleware accepts either.
 {% endcomment %}
 <div id="attachment-editor">
   {% if error %}
@@ -48,31 +68,34 @@ Params: record, attachments, error
   {% endfor %}
 
   {% if record %}
-  <form hx-post="{% url 'learn:htmx-attachment-upload' record.id %}"
-        hx-target="#attachment-editor" hx-swap="outerHTML"
-        hx-encoding="multipart/form-data"
-        hx-indicator="#attachment-spinner">
-    {% csrf_token %}
-    <label id="attachment-dropzone"
-           style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-                  padding:18px;border:2px dashed var(--border);border-radius:10px;
-                  background:var(--card-2);cursor:pointer;color:var(--muted);font-size:12px;
-                  transition: border-color 0.15s, background 0.15s;"
-           ondragover="event.preventDefault(); this.style.borderColor='var(--primary)';"
-           ondragleave="this.style.borderColor='var(--border)';"
-           ondrop="event.preventDefault(); this.style.borderColor='var(--border)'; const dt = event.dataTransfer; if (dt.files.length) { this.querySelector('input').files = dt.files; this.closest('form').requestSubmit(); }">
-      <span class="material-symbols-outlined" style="font-size:24px;color:var(--primary);">upload_file</span>
-      <span style="font-weight: 600; color: var(--text);">Attach handouts, slide decks, or worksheets (PDF, Word, PPTX, MP3)</span>
-      <span style="font-size: 11px; color: var(--muted);">Click or drag & drop files here — up to 25 MB</span>
-      <input type="file" name="attachment" hidden
-             onchange="this.closest('form').requestSubmit()">
-    </label>
-    <div id="attachment-spinner" class="htmx-indicator"
-          style="font-size:12px;font-weight:600;color:var(--primary);margin-top:8px;display:none;align-items:center;gap:6px;">
-      <span class="material-symbols-outlined" style="font-size:16px;">sync</span>
-      <span>Uploading document…</span>
-    </div>
-  </form>
+  {% with sfx=mount_suffix|default:"" %}
+  <label id="attachment-dropzone{{ sfx }}"
+         style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+                padding:18px;border:2px dashed var(--border);border-radius:10px;
+                background:var(--card-2);cursor:pointer;color:var(--muted);font-size:12px;
+                transition: border-color 0.15s, background 0.15s;"
+         ondragover="event.preventDefault(); this.style.borderColor='var(--primary)';"
+         ondragleave="this.style.borderColor='var(--border)';"
+         ondrop="event.preventDefault(); this.style.borderColor='var(--border)';
+                 const dt = event.dataTransfer; const inp = this.querySelector('input[type=file]');
+                 if (dt.files.length) { inp.files = dt.files; htmx.trigger(inp, 'change'); }">
+    <span class="material-symbols-outlined" style="font-size:24px;color:var(--primary);">upload_file</span>
+    <span style="font-weight: 600; color: var(--text);">Attach handouts, slide decks, or worksheets (PDF, Word, PPTX, MP3)</span>
+    <span style="font-size: 11px; color: var(--muted);">Click or drag & drop files here — up to 25 MB</span>
+    <input type="file" name="attachment" id="attachment-file-input{{ sfx }}" hidden
+           hx-post="{% url 'learn:htmx-attachment-upload' record.id %}"
+           hx-encoding="multipart/form-data"
+           hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+           hx-target="#attachment-editor" hx-swap="outerHTML"
+           hx-trigger="change"
+           hx-indicator="#attachment-spinner{{ sfx }}">
+  </label>
+  <div id="attachment-spinner{{ sfx }}" class="htmx-indicator"
+        style="font-size:12px;font-weight:600;color:var(--primary);margin-top:8px;display:none;align-items:center;gap:6px;">
+    <span class="material-symbols-outlined" style="font-size:16px;">sync</span>
+    <span>Uploading document…</span>
+  </div>
+  {% endwith %}
   {% else %}
   {% comment %}
   No record yet means no LearningAttachment can exist — the FK is required,
