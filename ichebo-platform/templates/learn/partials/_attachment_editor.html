@@ -47,7 +47,8 @@ Params: record, attachments, error
   </div>
   {% endfor %}
 
-  <form hx-post="{% if record %}{% url 'learn:htmx-attachment-upload' record.id %}{% else %}{% url 'learn:htmx-attachment-upload' '00000000-0000-0000-0000-000000000000' %}{% endif %}"
+  {% if record %}
+  <form hx-post="{% url 'learn:htmx-attachment-upload' record.id %}"
         hx-target="#attachment-editor" hx-swap="outerHTML"
         hx-encoding="multipart/form-data"
         hx-indicator="#attachment-spinner">
@@ -72,4 +73,21 @@ Params: record, attachments, error
       <span>Uploading document…</span>
     </div>
   </form>
+  {% else %}
+  {% comment %}
+  No record yet means no LearningAttachment can exist — the FK is required,
+  it cannot be created "unattached" the way the video URL can (that just sits
+  in a hidden field on the main form until Save). A previous version of this
+  form worked around that by silently creating an "Untitled Lesson Draft"
+  record per upload — but the real Save button on the lesson form has no idea
+  that draft exists, so it created ANOTHER new record with the real title,
+  and the attachment stayed on the orphan forever. Every retry made a new
+  orphan. Simplest correct fix: require a save first.
+  {% endcomment %}
+  <div style="padding:18px;border:2px dashed var(--border);border-radius:10px;
+              background:var(--card-2);color:var(--muted);font-size:12px;text-align:center;">
+    <span class="material-symbols-outlined" style="font-size:22px;display:block;margin-bottom:6px;opacity:.5;">upload_file</span>
+    Save this lesson as a draft first, then attach files to it.
+  </div>
+  {% endif %}
 </div>

@@ -10,15 +10,17 @@
         {# Compact vertical list view designed for the ~260px wide Options Bar #}
         <div style="display: flex; flex-direction: column; gap: 8px;">
             {% for video in videos %}
-            {# data-* attributes carry the values for JS that reads them via
-               .dataset (Django's normal HTML-attribute escaping — safe as
-               plain text). The onclick attribute below is kept only for
-               consumers that let it fire as real JS (broadcast's channel
-               config/slot forms); anything that intercepts the click must
-               read .dataset, never getAttribute('onclick') as a string — a
-               JS engine parses \uXXXX escapejs output back into real
-               characters, but a raw attribute read does not, and this card
-               previously had no data-* attributes to fall back to. #}
+            {% comment %}
+            data-* attributes carry the values for JS that reads them via
+            .dataset (Django's normal HTML-attribute escaping — safe as
+            plain text). The onclick attribute below is kept only for
+            consumers that let it fire as real JS (broadcast's channel
+            config/slot forms); anything that intercepts the click must
+            read .dataset, never getAttribute('onclick') as a string — a
+            JS engine parses \uXXXX escapejs output back into real
+            characters, but a raw attribute read does not, and this card
+            previously had no data-* attributes to fall back to.
+            {% endcomment %}
             <div class="options-bar-picker-item"
                  data-video-url="{{ video.video_url }}"
                  data-title="{{ video.record.title }}"

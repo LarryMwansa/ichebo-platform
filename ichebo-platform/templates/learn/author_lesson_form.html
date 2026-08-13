@@ -108,8 +108,10 @@
             </div>
 
             {% if record and record.record_type == 'quiz' %}
-            {# Questions live in their own HTMX island — saved as they are
-               edited, independently of the lesson form's draft/submit. #}
+            {% comment %}
+            Questions live in their own HTMX island — saved as they are
+            edited, independently of the lesson form's draft/submit.
+            {% endcomment %}
             <div>
                 <label style="display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
                                letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">

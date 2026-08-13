@@ -1876,20 +1876,14 @@ def _attachment_list_response(request, record, error=''):
 def htmx_attachment_upload(request, record_id):
     from learn.models import LearningAttachment
 
-    if str(record_id) == '00000000-0000-0000-0000-000000000000':
-        record = Record.objects.create(
-            created_by=request.user,
-            record_class='organizational',
-            record_family='learning',
-            record_type='lesson',
-            origin='user',
-            title='Untitled Lesson Draft',
-            status='draft',
-            metadata={'source_app': 'learn'},
-            permissions_data={'visibility': 'tenant', 'required_level': 1},
-        )
-    else:
-        record = _authorable_record(request, record_id)
+    # No "create a placeholder record on the fly" branch here — see the
+    # {% comment %} in _attachment_editor.html for why: a LearningAttachment
+    # needs a real parent the moment it is created, and an auto-created
+    # record has no path back to the one the author actually saves, so every
+    # such upload silently became unreachable, and every retry made another
+    # abandoned "Untitled Lesson Draft" row. The template only renders this
+    # form once record.id is a saved record's id.
+    record = _authorable_record(request, record_id)
 
     if request.method != 'POST':
         return HttpResponse('', status=405)
