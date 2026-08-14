@@ -162,74 +162,103 @@
 </div>
 {% endblock %}
 
-{% block ws_options %}
-<div style="padding: 0 4px;">
+{% block ws_options_tabs %}
+<div class="ics-options-tabs">
+    <button class="ics-options-tab active" id="tab-relations" onclick="WorkspaceUI.switchOptionsTab('relations')">Relations</button>
+    {% if is_prime_steward %}
+    <button class="ics-options-tab" id="tab-communities" onclick="WorkspaceUI.switchOptionsTab('communities')">Communities</button>
+    {% endif %}
+</div>
 
-    <div class="ws-label-tag" style="margin-bottom: 16px;">Shepherding Context</div>
+<div class="ics-options-bar__content">
 
-    {% if shepherd %}
-    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
-                padding: 14px 16px; margin-bottom: 8px;">
-        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
-                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Assigned Shepherd</div>
-        <div style="font-size: 14px; font-weight: 600; color: var(--text);">
-            {{ shepherd.display_name|default:shepherd.email }}
+    {# ── Relations pane ── #}
+    <div class="ws-options-pane active" id="pane-relations">
+        <div style="padding: var(--space-m);">
+
+            <div class="ws-label-tag" style="margin-bottom: 16px;">Shepherding Context</div>
+
+            {% if shepherd %}
+            <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                        padding: 14px 16px; margin-bottom: 8px;">
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Assigned Shepherd</div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--text);">
+                    {{ shepherd.display_name|default:shepherd.email }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if service_order %}
+            <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                        padding: 14px 16px; margin-bottom: 8px;">
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Service Placement</div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--text);">{{ service_order }}</div>
+            </div>
+            {% endif %}
+
+            {% if not shepherd and not service_order %}
+            <div style="padding: 20px 0; text-align: center;">
+                <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.12; display: block; color: var(--text);">person_search</span>
+                <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">No shepherd assigned yet.</p>
+            </div>
+            {% endif %}
+
+            <div style="height: 1px; background: var(--border); margin: 20px 0;"></div>
+
+            <div class="ws-label-tag" style="margin-bottom: 16px;">Spiritual Inventory</div>
+
+            <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+                        padding: 14px 16px;">
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
+                            letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Active Gifts</div>
+                <div style="display: flex; align-items: baseline; gap: 8px;">
+                    <div style="font-size: 28px; font-weight: 800; color: var(--text); font-family: 'Playfair Display', serif;">
+                        {{ gifts_count }}
+                    </div>
+                    <div style="font-size: 11px; color: var(--muted);">Verified by council</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Communities pane — every tenant under Prime oversight, own scroll ── #}
+    {% if is_prime_steward %}
+    <div class="ws-options-pane" id="pane-communities">
+        <div style="padding: var(--space-m);">
+            <div class="ws-label-tag" style="margin-bottom: 4px;">Open in Sceptre</div>
+            <p style="font-size: 11px; color: var(--muted); margin: 0 0 14px;">
+                {{ oversight_tenants|length }} communit{{ oversight_tenants|length|pluralize:"y,ies" }} under oversight
+            </p>
+
+            {% if oversight_tenants %}
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                {% for t in oversight_tenants %}
+                <a href="https://sceptre.ichebo.org/switch-tenant/?tenant={{ t.slug }}"
+                   target="_blank" rel="noopener"
+                   style="display: flex; align-items: center; justify-content: space-between;
+                          padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+                          background: var(--card-2); text-decoration: none; gap: 8px;">
+                    <div>
+                        <div style="font-size: 12px; font-weight: 600; color: var(--text);">{{ t.name }}</div>
+                        <div style="font-size: 10px; color: var(--muted); text-transform: uppercase;
+                                    letter-spacing: 0.06em;">{{ t.tier|title }}</div>
+                    </div>
+                    <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary); flex-shrink: 0;">open_in_new</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="padding: 20px 0; text-align: center;">
+                <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.12; display: block; color: var(--text);">apartment</span>
+                <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">No communities under oversight yet.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endif %}
 
-    {% if service_order %}
-    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
-                padding: 14px 16px; margin-bottom: 8px;">
-        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
-                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px;">Service Placement</div>
-        <div style="font-size: 14px; font-weight: 600; color: var(--text);">{{ service_order }}</div>
-    </div>
-    {% endif %}
-
-    {% if not shepherd and not service_order %}
-    <div style="padding: 20px 0; text-align: center;">
-        <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.12; display: block; color: var(--text);">person_search</span>
-        <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">No shepherd assigned yet.</p>
-    </div>
-    {% endif %}
-
-    {% if is_prime_steward and oversight_tenants %}
-    <div style="height: 1px; background: var(--border); margin: 20px 0;"></div>
-    <div class="ws-label-tag" style="margin-bottom: 12px;">Open in Sceptre</div>
-    <div style="display: flex; flex-direction: column; gap: 6px;">
-        {% for t in oversight_tenants %}
-        <a href="https://sceptre.ichebo.org/switch-tenant/?tenant={{ t.slug }}"
-           target="_blank" rel="noopener"
-           style="display: flex; align-items: center; justify-content: space-between;
-                  padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
-                  background: var(--card-2); text-decoration: none; gap: 8px;">
-            <div>
-                <div style="font-size: 12px; font-weight: 600; color: var(--text);">{{ t.name }}</div>
-                <div style="font-size: 10px; color: var(--muted); text-transform: uppercase;
-                            letter-spacing: 0.06em;">{{ t.tier|title }}</div>
-            </div>
-            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--primary); flex-shrink: 0;">open_in_new</span>
-        </a>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <div style="height: 1px; background: var(--border); margin: 20px 0;"></div>
-
-    <div class="ws-label-tag" style="margin-bottom: 16px;">Spiritual Inventory</div>
-
-    <div style="background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
-                padding: 14px 16px;">
-        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
-                    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px;">Active Gifts</div>
-        <div style="display: flex; align-items: baseline; gap: 8px;">
-            <div style="font-size: 28px; font-weight: 800; color: var(--text); font-family: 'Playfair Display', serif;">
-                {{ gifts_count }}
-            </div>
-            <div style="font-size: 11px; color: var(--muted);">Verified by council</div>
-        </div>
-    </div>
 </div>
 {% endblock %}
 
