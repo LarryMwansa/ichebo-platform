@@ -254,6 +254,18 @@ def my_community(request):
             .exclude(tier__in=['handbook'])
             .order_by('tier', 'name')
         )
+        # Prime Tenancy is itself agency-flagged (it's the apex of global
+        # oversight, not a member community), so the is_agency=False filter
+        # above always excludes it — but a Prime steward needs to be able to
+        # open Prime's own sceptre view too, not just the communities under
+        # it. Prepend explicitly rather than relying on sort order: it's the
+        # apex tenancy and should read first regardless of where 'global'
+        # falls alphabetically among the other tiers.
+        prime_tenant = Tenant.objects.filter(
+            id__in=oversight_ids, slug='prime', status='active'
+        ).first()
+        if prime_tenant:
+            oversight_tenants.insert(0, prime_tenant)
 
     return render(request, 'community/my_community.html', {
         'primary_perm':        primary_perm,
