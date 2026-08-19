@@ -1,0 +1,2875 @@
+{
+  "country": "South Africa",
+  "country_code": "ZA",
+  "path_segment": "southafrica",
+  "provinces": [
+    {
+      "province": "Eastern Cape",
+      "path_segment": "easterncape",
+      "metros": [
+        {
+          "name": "Buffalo City Metropolitan Municipality",
+          "path_segment": "buffalo-city",
+          "seat": "East London",
+          "places": [
+            "Beacon Bay",
+            "Bisho",
+            "Breidbach",
+            "Dimbaza",
+            "Kidd's Beach",
+            "KuGompo City (East London)",
+            "Mdantsane",
+            "Ntabozuko (Berlin)",
+            "Phakamisa",
+            "Potsdam",
+            "Qonce (King William's Town)",
+            "Zwelitsha"
+          ],
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          },
+          "path": "/global/africa/southafrica/easterncape/buffalo-city/",
+          "tier_level": "metro"
+        },
+        {
+          "name": "Nelson Mandela Bay Metropolitan Municipality",
+          "path_segment": "nelson-mandela-bay",
+          "seat": "Gqeberha",
+          "places": [
+            "Bethelsdorp",
+            "Bloemendal",
+            "Blue Horizon Bay",
+            "Clarendon Marine",
+            "Despatch",
+            "Gqeberha (Port Elizabeth)",
+            "Kariega (Uitenhage)",
+            "KwaNobuhle",
+            "Motherwell",
+            "Summerstrand",
+            "Swartkops"
+          ],
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          },
+          "path": "/global/africa/southafrica/easterncape/nelson-mandela-bay/",
+          "tier_level": "metro"
+        }
+      ],
+      "districts": [
+        {
+          "name": "Alfred Nzo District Municipality",
+          "seat": "Mount Ayliff",
+          "locals": [
+            {
+              "name": "Matatiele Local Municipality",
+              "places": [
+                "Cedarville",
+                "Matatiele"
+              ],
+              "path_segment": "matatiele",
+              "path": "/global/africa/southafrica/easterncape/alfred-nzo/matatiele/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Ntabankulu Local Municipality",
+              "places": [
+                "Tabankulu"
+              ],
+              "path_segment": "ntabankulu",
+              "path": "/global/africa/southafrica/easterncape/alfred-nzo/ntabankulu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Umzimvubu Local Municipality",
+              "places": [
+                "eMaxesibeni (Mount Ayliff)",
+                "KwaBhaca (Mount Frere)"
+              ],
+              "path_segment": "umzimvubu",
+              "path": "/global/africa/southafrica/easterncape/alfred-nzo/umzimvubu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Winnie Madikizela-Mandela Local Municipality",
+              "places": [
+                "Bizana"
+              ],
+              "path_segment": "winnie-madikizela-mandela",
+              "path": "/global/africa/southafrica/easterncape/alfred-nzo/winnie-madikizela-mandela/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "alfred-nzo",
+          "path": "/global/africa/southafrica/easterncape/alfred-nzo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Amathole District Municipality",
+          "seat": "East London",
+          "locals": [
+            {
+              "name": "Amahlathi Local Municipality",
+              "places": [],
+              "path_segment": "amahlathi",
+              "path": "/global/africa/southafrica/easterncape/amathole/amahlathi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Great Kei Local Municipality",
+              "places": [],
+              "path_segment": "great-kei",
+              "path": "/global/africa/southafrica/easterncape/amathole/great-kei/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mbhashe Local Municipality",
+              "places": [],
+              "path_segment": "mbhashe",
+              "path": "/global/africa/southafrica/easterncape/amathole/mbhashe/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mnquma Local Municipality",
+              "places": [],
+              "path_segment": "mnquma",
+              "path": "/global/africa/southafrica/easterncape/amathole/mnquma/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Ngqushwa Local Municipality",
+              "places": [],
+              "path_segment": "ngqushwa",
+              "path": "/global/africa/southafrica/easterncape/amathole/ngqushwa/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Raymond Mhlaba Local Municipality",
+              "places": [],
+              "path_segment": "raymond-mhlaba",
+              "path": "/global/africa/southafrica/easterncape/amathole/raymond-mhlaba/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "amathole",
+          "path": "/global/africa/southafrica/easterncape/amathole/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chris Hani District Municipality",
+          "seat": "Queenstown",
+          "locals": [
+            {
+              "name": "Dr AB Xuma Local Municipality",
+              "places": [],
+              "path_segment": "dr-ab-xuma",
+              "path": "/global/africa/southafrica/easterncape/chris-hani/dr-ab-xuma/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Emalahleni Local Municipality",
+              "places": [],
+              "path_segment": "emalahleni",
+              "path": "/global/africa/southafrica/easterncape/chris-hani/emalahleni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Enoch Mgijima Local Municipality",
+              "places": [],
+              "path_segment": "enoch-mgijima",
+              "path": "/global/africa/southafrica/easterncape/chris-hani/enoch-mgijima/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Intsika Yethu Local Municipality",
+              "places": [],
+              "path_segment": "intsika-yethu",
+              "path": "/global/africa/southafrica/easterncape/chris-hani/intsika-yethu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Inxuba Yethemba Local Municipality",
+              "places": [],
+              "path_segment": "inxuba-yethemba",
+              "path": "/global/africa/southafrica/easterncape/chris-hani/inxuba-yethemba/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Sakhisizwe Local Municipality",
+              "places": [],
+              "path_segment": "sakhisizwe",
+              "path": "/global/africa/southafrica/easterncape/chris-hani/sakhisizwe/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "chris-hani",
+          "path": "/global/africa/southafrica/easterncape/chris-hani/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Joe Gqabi District Municipality",
+          "seat": "Barkly East",
+          "locals": [
+            {
+              "name": "Elundini Local Municipality",
+              "places": [],
+              "path_segment": "elundini",
+              "path": "/global/africa/southafrica/easterncape/joe-gqabi/elundini/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Senqu Local Municipality",
+              "places": [],
+              "path_segment": "senqu",
+              "path": "/global/africa/southafrica/easterncape/joe-gqabi/senqu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Walter Sisulu Local Municipality",
+              "places": [],
+              "path_segment": "walter-sisulu",
+              "path": "/global/africa/southafrica/easterncape/joe-gqabi/walter-sisulu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "joe-gqabi",
+          "path": "/global/africa/southafrica/easterncape/joe-gqabi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "OR Tambo District Municipality",
+          "seat": "Mthatha",
+          "locals": [
+            {
+              "name": "Ingquza Hill Local Municipality",
+              "places": [],
+              "path_segment": "ingquza-hill",
+              "path": "/global/africa/southafrica/easterncape/or-tambo/ingquza-hill/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "King Sabata Dalindyebo Local Municipality",
+              "places": [],
+              "path_segment": "king-sabata-dalindyebo",
+              "path": "/global/africa/southafrica/easterncape/or-tambo/king-sabata-dalindyebo/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mhlontlo Local Municipality",
+              "places": [],
+              "path_segment": "mhlontlo",
+              "path": "/global/africa/southafrica/easterncape/or-tambo/mhlontlo/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Nyandeni Local Municipality",
+              "places": [],
+              "path_segment": "nyandeni",
+              "path": "/global/africa/southafrica/easterncape/or-tambo/nyandeni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Port St Johns Local Municipality",
+              "places": [],
+              "path_segment": "port-st-johns",
+              "path": "/global/africa/southafrica/easterncape/or-tambo/port-st-johns/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "or-tambo",
+          "path": "/global/africa/southafrica/easterncape/or-tambo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Sarah Baartman District Municipality",
+          "seat": "Gqeberha",
+          "locals": [
+            {
+              "name": "Blue Crane Route Local Municipality",
+              "places": [],
+              "path_segment": "blue-crane-route",
+              "path": "/global/africa/southafrica/easterncape/sarah-baartman/blue-crane-route/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Dr Beyers Naudé Local Municipality",
+              "places": [],
+              "path_segment": "dr-beyers-naude",
+              "path": "/global/africa/southafrica/easterncape/sarah-baartman/dr-beyers-naude/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Kouga Local Municipality",
+              "places": [],
+              "path_segment": "kouga",
+              "path": "/global/africa/southafrica/easterncape/sarah-baartman/kouga/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Koukamma Local Municipality",
+              "places": [],
+              "path_segment": "koukamma",
+              "path": "/global/africa/southafrica/easterncape/sarah-baartman/koukamma/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Makana Local Municipality",
+              "places": [],
+              "path_segment": "makana",
+              "path": "/global/africa/southafrica/easterncape/sarah-baartman/makana/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Ndlambe Local Municipality",
+              "places": [],
+              "path_segment": "ndlambe",
+              "path": "/global/africa/southafrica/easterncape/sarah-baartman/ndlambe/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Sundays River Valley Local Municipality",
+              "places": [],
+              "path_segment": "sundays-river-valley",
+              "path": "/global/africa/southafrica/easterncape/sarah-baartman/sundays-river-valley/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "sarah-baartman",
+          "path": "/global/africa/southafrica/easterncape/sarah-baartman/",
+          "tier_level": "district"
+        }
+      ]
+    },
+    {
+      "province": "Free State",
+      "path_segment": "freestate",
+      "metros": [
+        {
+          "name": "Mangaung Metropolitan Municipality",
+          "path_segment": "mangaung",
+          "seat": "Bloemfontein",
+          "places": [],
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          },
+          "path": "/global/africa/southafrica/freestate/mangaung/",
+          "tier_level": "metro"
+        }
+      ],
+      "districts": [
+        {
+          "name": "Fezile Dabi District Municipality",
+          "seat": "Sasolburg",
+          "locals": [
+            {
+              "name": "Moqhaka Local Municipality",
+              "places": [],
+              "path_segment": "moqhaka",
+              "path": "/global/africa/southafrica/freestate/fezile-dabi/moqhaka/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Ngwathe Local Municipality",
+              "places": [],
+              "path_segment": "ngwathe",
+              "path": "/global/africa/southafrica/freestate/fezile-dabi/ngwathe/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Metsimaholo Local Municipality",
+              "places": [],
+              "path_segment": "metsimaholo",
+              "path": "/global/africa/southafrica/freestate/fezile-dabi/metsimaholo/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mafube Local Municipality",
+              "places": [],
+              "path_segment": "mafube",
+              "path": "/global/africa/southafrica/freestate/fezile-dabi/mafube/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "fezile-dabi",
+          "path": "/global/africa/southafrica/freestate/fezile-dabi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lejweleputswa District Municipality",
+          "seat": "Welkom",
+          "locals": [
+            {
+              "name": "Masilonyana Local Municipality",
+              "places": [],
+              "path_segment": "masilonyana",
+              "path": "/global/africa/southafrica/freestate/lejweleputswa/masilonyana/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Tokologo Local Municipality",
+              "places": [],
+              "path_segment": "tokologo",
+              "path": "/global/africa/southafrica/freestate/lejweleputswa/tokologo/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Tswelopele Local Municipality",
+              "places": [],
+              "path_segment": "tswelopele",
+              "path": "/global/africa/southafrica/freestate/lejweleputswa/tswelopele/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Matjhabeng Local Municipality",
+              "places": [],
+              "path_segment": "matjhabeng",
+              "path": "/global/africa/southafrica/freestate/lejweleputswa/matjhabeng/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Nala Local Municipality",
+              "places": [],
+              "path_segment": "nala",
+              "path": "/global/africa/southafrica/freestate/lejweleputswa/nala/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "lejweleputswa",
+          "path": "/global/africa/southafrica/freestate/lejweleputswa/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Thabo Mofutsanyana District Municipality",
+          "seat": "Phuthaditjhaba",
+          "locals": [
+            {
+              "name": "Setsoto Local Municipality",
+              "places": [],
+              "path_segment": "setsoto",
+              "path": "/global/africa/southafrica/freestate/thabo-mofutsanyana/setsoto/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Dihlabeng Local Municipality",
+              "places": [],
+              "path_segment": "dihlabeng",
+              "path": "/global/africa/southafrica/freestate/thabo-mofutsanyana/dihlabeng/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Nketoana Local Municipality",
+              "places": [],
+              "path_segment": "nketoana",
+              "path": "/global/africa/southafrica/freestate/thabo-mofutsanyana/nketoana/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Maluti-a-Phofung Local Municipality",
+              "places": [],
+              "path_segment": "maluti-a-phofung",
+              "path": "/global/africa/southafrica/freestate/thabo-mofutsanyana/maluti-a-phofung/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Phumelela Local Municipality",
+              "places": [],
+              "path_segment": "phumelela",
+              "path": "/global/africa/southafrica/freestate/thabo-mofutsanyana/phumelela/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mantsopa Local Municipality",
+              "places": [],
+              "path_segment": "mantsopa",
+              "path": "/global/africa/southafrica/freestate/thabo-mofutsanyana/mantsopa/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "thabo-mofutsanyana",
+          "path": "/global/africa/southafrica/freestate/thabo-mofutsanyana/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Xhariep District Municipality",
+          "seat": "De Aar / Trompsburg",
+          "locals": [
+            {
+              "name": "Letsemeng Local Municipality",
+              "places": [],
+              "path_segment": "letsemeng",
+              "path": "/global/africa/southafrica/freestate/xhariep/letsemeng/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Kopanong Local Municipality",
+              "places": [],
+              "path_segment": "kopanong",
+              "path": "/global/africa/southafrica/freestate/xhariep/kopanong/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mohokare Local Municipality",
+              "places": [],
+              "path_segment": "mohokare",
+              "path": "/global/africa/southafrica/freestate/xhariep/mohokare/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "xhariep",
+          "path": "/global/africa/southafrica/freestate/xhariep/",
+          "tier_level": "district"
+        }
+      ]
+    },
+    {
+      "province": "Gauteng",
+      "path_segment": "gauteng",
+      "metros": [
+        {
+          "name": "City of Ekurhuleni Metropolitan Municipality",
+          "path_segment": "ekurhuleni",
+          "seat": "Germiston",
+          "places": [],
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          },
+          "path": "/global/africa/southafrica/gauteng/ekurhuleni/",
+          "tier_level": "metro"
+        },
+        {
+          "name": "City of Johannesburg Metropolitan Municipality",
+          "path_segment": "johannesburg",
+          "seat": "Johannesburg",
+          "places": [],
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          },
+          "path": "/global/africa/southafrica/gauteng/johannesburg/",
+          "tier_level": "metro"
+        },
+        {
+          "name": "City of Tshwane Metropolitan Municipality",
+          "path_segment": "tshwane",
+          "seat": "Pretoria",
+          "places": [],
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          },
+          "path": "/global/africa/southafrica/gauteng/tshwane/",
+          "tier_level": "metro"
+        }
+      ],
+      "districts": [
+        {
+          "name": "Sedibeng District Municipality",
+          "seat": "Vereeniging",
+          "locals": [
+            {
+              "name": "Emfuleni Local Municipality",
+              "places": [],
+              "path_segment": "emfuleni",
+              "path": "/global/africa/southafrica/gauteng/sedibeng/emfuleni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Midvaal Local Municipality",
+              "places": [],
+              "path_segment": "midvaal",
+              "path": "/global/africa/southafrica/gauteng/sedibeng/midvaal/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Lesedi Local Municipality",
+              "places": [],
+              "path_segment": "lesedi",
+              "path": "/global/africa/southafrica/gauteng/sedibeng/lesedi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "sedibeng",
+          "path": "/global/africa/southafrica/gauteng/sedibeng/",
+          "tier_level": "district"
+        },
+        {
+          "name": "West Rand District Municipality",
+          "seat": "Randfontein",
+          "locals": [
+            {
+              "name": "Mogale City Local Municipality",
+              "places": [],
+              "path_segment": "mogale-city",
+              "path": "/global/africa/southafrica/gauteng/west-rand/mogale-city/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Rand West City Local Municipality",
+              "places": [],
+              "path_segment": "rand-west-city",
+              "path": "/global/africa/southafrica/gauteng/west-rand/rand-west-city/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Merafong City Local Municipality",
+              "places": [],
+              "path_segment": "merafong-city",
+              "path": "/global/africa/southafrica/gauteng/west-rand/merafong-city/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "west-rand",
+          "path": "/global/africa/southafrica/gauteng/west-rand/",
+          "tier_level": "district"
+        }
+      ]
+    },
+    {
+      "province": "KwaZulu-Natal",
+      "path_segment": "kwazulu-natal",
+      "metros": [
+        {
+          "name": "eThekwini Metropolitan Municipality",
+          "path_segment": "ethekwini",
+          "seat": "Durban",
+          "places": [],
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          },
+          "path": "/global/africa/southafrica/kwazulu-natal/ethekwini/",
+          "tier_level": "metro"
+        }
+      ],
+      "districts": [
+        {
+          "name": "Amajuba District Municipality",
+          "seat": "Newcastle",
+          "locals": [
+            {
+              "name": "Dannhauser Local Municipality",
+              "places": [],
+              "path_segment": "dannhauser",
+              "path": "/global/africa/southafrica/kwazulu-natal/amajuba/dannhauser/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "eMadlangeni Local Municipality",
+              "places": [],
+              "path_segment": "emadlangeni",
+              "path": "/global/africa/southafrica/kwazulu-natal/amajuba/emadlangeni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Newcastle Local Municipality",
+              "places": [],
+              "path_segment": "newcastle",
+              "path": "/global/africa/southafrica/kwazulu-natal/amajuba/newcastle/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "amajuba",
+          "path": "/global/africa/southafrica/kwazulu-natal/amajuba/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Harry Gwala District Municipality",
+          "seat": "Ixopo",
+          "locals": [
+            {
+              "name": "Dr Nkosazana Dlamini-Zuma Local Municipality",
+              "places": [],
+              "path_segment": "dr-nkosazana-dlamini-zuma",
+              "path": "/global/africa/southafrica/kwazulu-natal/harry-gwala/dr-nkosazana-dlamini-zuma/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Greater Kokstad Local Municipality",
+              "places": [],
+              "path_segment": "greater-kokstad",
+              "path": "/global/africa/southafrica/kwazulu-natal/harry-gwala/greater-kokstad/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Johannes Phumani Phungula Local Municipality (formerly Ubuhlebezwe)",
+              "places": [],
+              "path_segment": "johannes-phumani-phungula",
+              "path": "/global/africa/southafrica/kwazulu-natal/harry-gwala/johannes-phumani-phungula/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Umzimkhulu Local Municipality",
+              "places": [],
+              "path_segment": "umzimkhulu",
+              "path": "/global/africa/southafrica/kwazulu-natal/harry-gwala/umzimkhulu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "harry-gwala",
+          "path": "/global/africa/southafrica/kwazulu-natal/harry-gwala/",
+          "tier_level": "district"
+        },
+        {
+          "name": "iLembe District Municipality",
+          "seat": "KwaDukuza",
+          "locals": [
+            {
+              "name": "KwaDukuza Local Municipality",
+              "places": [],
+              "path_segment": "kwadukuza",
+              "path": "/global/africa/southafrica/kwazulu-natal/ilembe/kwadukuza/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mandeni Local Municipality",
+              "places": [],
+              "path_segment": "mandeni",
+              "path": "/global/africa/southafrica/kwazulu-natal/ilembe/mandeni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Maphumulo Local Municipality",
+              "places": [],
+              "path_segment": "maphumulo",
+              "path": "/global/africa/southafrica/kwazulu-natal/ilembe/maphumulo/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Ndwedwe Local Municipality",
+              "places": [],
+              "path_segment": "ndwedwe",
+              "path": "/global/africa/southafrica/kwazulu-natal/ilembe/ndwedwe/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "ilembe",
+          "path": "/global/africa/southafrica/kwazulu-natal/ilembe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "King Cetshwayo District Municipality",
+          "seat": "Richards Bay",
+          "locals": [
+            {
+              "name": "uMhlathuze Local Municipality",
+              "places": [],
+              "path_segment": "umhlathuze",
+              "path": "/global/africa/southafrica/kwazulu-natal/king-cetshwayo/umhlathuze/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "uMlalazi Local Municipality",
+              "places": [],
+              "path_segment": "umlalazi",
+              "path": "/global/africa/southafrica/kwazulu-natal/king-cetshwayo/umlalazi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mthonjaneni Local Municipality",
+              "places": [],
+              "path_segment": "mthonjaneni",
+              "path": "/global/africa/southafrica/kwazulu-natal/king-cetshwayo/mthonjaneni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Nkandla Local Municipality",
+              "places": [],
+              "path_segment": "nkandla",
+              "path": "/global/africa/southafrica/kwazulu-natal/king-cetshwayo/nkandla/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mbonambi Local Municipality",
+              "places": [],
+              "path_segment": "mbonambi",
+              "path": "/global/africa/southafrica/kwazulu-natal/king-cetshwayo/mbonambi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "king-cetshwayo",
+          "path": "/global/africa/southafrica/kwazulu-natal/king-cetshwayo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Ugu District Municipality",
+          "seat": "Port Shepstone",
+          "locals": [
+            {
+              "name": "Ray Nkonyeni Local Municipality",
+              "places": [],
+              "path_segment": "ray-nkonyeni",
+              "path": "/global/africa/southafrica/kwazulu-natal/ugu/ray-nkonyeni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "uMdoni Local Municipality",
+              "places": [],
+              "path_segment": "umdoni",
+              "path": "/global/africa/southafrica/kwazulu-natal/ugu/umdoni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Umzumbe Local Municipality",
+              "places": [],
+              "path_segment": "umzumbe",
+              "path": "/global/africa/southafrica/kwazulu-natal/ugu/umzumbe/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "uMuziwabantu Local Municipality",
+              "places": [],
+              "path_segment": "umuziwabantu",
+              "path": "/global/africa/southafrica/kwazulu-natal/ugu/umuziwabantu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "ugu",
+          "path": "/global/africa/southafrica/kwazulu-natal/ugu/",
+          "tier_level": "district"
+        },
+        {
+          "name": "uMgungundlovu District Municipality",
+          "seat": "Pietermaritzburg",
+          "locals": [
+            {
+              "name": "Msunduzi Local Municipality",
+              "places": [],
+              "path_segment": "msunduzi",
+              "path": "/global/africa/southafrica/kwazulu-natal/umgungundlovu/msunduzi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "uMshwathi Local Municipality",
+              "places": [],
+              "path_segment": "umshwathi",
+              "path": "/global/africa/southafrica/kwazulu-natal/umgungundlovu/umshwathi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "uMngeni Local Municipality",
+              "places": [],
+              "path_segment": "umngeni",
+              "path": "/global/africa/southafrica/kwazulu-natal/umgungundlovu/umngeni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Richmond Local Municipality",
+              "places": [],
+              "path_segment": "richmond",
+              "path": "/global/africa/southafrica/kwazulu-natal/umgungundlovu/richmond/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mkhambathini Local Municipality",
+              "places": [],
+              "path_segment": "mkhambathini",
+              "path": "/global/africa/southafrica/kwazulu-natal/umgungundlovu/mkhambathini/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mpofana Local Municipality",
+              "places": [],
+              "path_segment": "mpofana",
+              "path": "/global/africa/southafrica/kwazulu-natal/umgungundlovu/mpofana/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Impendle Local Municipality",
+              "places": [],
+              "path_segment": "impendle",
+              "path": "/global/africa/southafrica/kwazulu-natal/umgungundlovu/impendle/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "umgungundlovu",
+          "path": "/global/africa/southafrica/kwazulu-natal/umgungundlovu/",
+          "tier_level": "district"
+        },
+        {
+          "name": "uMkhanyakude District Municipality",
+          "seat": "Mkuze",
+          "locals": [
+            {
+              "name": "uMhlabuyalingana Local Municipality",
+              "places": [],
+              "path_segment": "umhlabuyalingana",
+              "path": "/global/africa/southafrica/kwazulu-natal/umkhanyakude/umhlabuyalingana/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Jozini Local Municipality",
+              "places": [],
+              "path_segment": "jozini",
+              "path": "/global/africa/southafrica/kwazulu-natal/umkhanyakude/jozini/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Big Five False Bay Local Municipality",
+              "places": [],
+              "path_segment": "big-five-false-bay",
+              "path": "/global/africa/southafrica/kwazulu-natal/umkhanyakude/big-five-false-bay/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Hlabisa Local Municipality",
+              "places": [],
+              "path_segment": "hlabisa",
+              "path": "/global/africa/southafrica/kwazulu-natal/umkhanyakude/hlabisa/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mtubatuba Local Municipality",
+              "places": [],
+              "path_segment": "mtubatuba",
+              "path": "/global/africa/southafrica/kwazulu-natal/umkhanyakude/mtubatuba/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "umkhanyakude",
+          "path": "/global/africa/southafrica/kwazulu-natal/umkhanyakude/",
+          "tier_level": "district"
+        },
+        {
+          "name": "uMzinyathi District Municipality",
+          "seat": "Dundee",
+          "locals": [
+            {
+              "name": "Endumeni Local Municipality",
+              "places": [],
+              "path_segment": "endumeni",
+              "path": "/global/africa/southafrica/kwazulu-natal/umzinyathi/endumeni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Nquthu Local Municipality",
+              "places": [],
+              "path_segment": "nquthu",
+              "path": "/global/africa/southafrica/kwazulu-natal/umzinyathi/nquthu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Msinga Local Municipality",
+              "places": [],
+              "path_segment": "msinga",
+              "path": "/global/africa/southafrica/kwazulu-natal/umzinyathi/msinga/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Umvoti Local Municipality",
+              "places": [],
+              "path_segment": "umvoti",
+              "path": "/global/africa/southafrica/kwazulu-natal/umzinyathi/umvoti/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "umzinyathi",
+          "path": "/global/africa/southafrica/kwazulu-natal/umzinyathi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "uThukela District Municipality",
+          "seat": "Ladysmith",
+          "locals": [
+            {
+              "name": "Okhahlamba Local Municipality",
+              "places": [],
+              "path_segment": "okhahlamba",
+              "path": "/global/africa/southafrica/kwazulu-natal/uthukela/okhahlamba/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Alfred Duma Local Municipality",
+              "places": [],
+              "path_segment": "alfred-duma",
+              "path": "/global/africa/southafrica/kwazulu-natal/uthukela/alfred-duma/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Inkosi Langalibalele Local Municipality",
+              "places": [],
+              "path_segment": "inkosi-langalibalele",
+              "path": "/global/africa/southafrica/kwazulu-natal/uthukela/inkosi-langalibalele/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "uthukela",
+          "path": "/global/africa/southafrica/kwazulu-natal/uthukela/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Zululand District Municipality",
+          "seat": "Ulundi",
+          "locals": [
+            {
+              "name": "eDumbe Local Municipality",
+              "places": [],
+              "path_segment": "edumbe",
+              "path": "/global/africa/southafrica/kwazulu-natal/zululand/edumbe/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "uPhongolo Local Municipality",
+              "places": [],
+              "path_segment": "uphongolo",
+              "path": "/global/africa/southafrica/kwazulu-natal/zululand/uphongolo/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Abaqulusi Local Municipality",
+              "places": [],
+              "path_segment": "abaqulusi",
+              "path": "/global/africa/southafrica/kwazulu-natal/zululand/abaqulusi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Nongoma Local Municipality",
+              "places": [],
+              "path_segment": "nongoma",
+              "path": "/global/africa/southafrica/kwazulu-natal/zululand/nongoma/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Ulundi Local Municipality",
+              "places": [],
+              "path_segment": "ulundi",
+              "path": "/global/africa/southafrica/kwazulu-natal/zululand/ulundi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "zululand",
+          "path": "/global/africa/southafrica/kwazulu-natal/zululand/",
+          "tier_level": "district"
+        }
+      ]
+    },
+    {
+      "province": "Limpopo",
+      "path_segment": "limpopo",
+      "metros": [],
+      "districts": [
+        {
+          "name": "Capricorn District Municipality",
+          "seat": "Polokwane",
+          "locals": [
+            {
+              "name": "Blouberg Local Municipality",
+              "places": [],
+              "path_segment": "blouberg",
+              "path": "/global/africa/southafrica/limpopo/capricorn/blouberg/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Molemole Local Municipality",
+              "places": [],
+              "path_segment": "molemole",
+              "path": "/global/africa/southafrica/limpopo/capricorn/molemole/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Polokwane Local Municipality",
+              "places": [],
+              "path_segment": "polokwane",
+              "path": "/global/africa/southafrica/limpopo/capricorn/polokwane/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Lepelle-Nkumpi Local Municipality",
+              "places": [],
+              "path_segment": "lepelle-nkumpi",
+              "path": "/global/africa/southafrica/limpopo/capricorn/lepelle-nkumpi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "capricorn",
+          "path": "/global/africa/southafrica/limpopo/capricorn/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mopani District Municipality",
+          "seat": "Giyani",
+          "locals": [
+            {
+              "name": "Ba-Phalaborwa Local Municipality",
+              "places": [],
+              "path_segment": "ba-phalaborwa",
+              "path": "/global/africa/southafrica/limpopo/mopani/ba-phalaborwa/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Greater Giyani Local Municipality",
+              "places": [],
+              "path_segment": "greater-giyani",
+              "path": "/global/africa/southafrica/limpopo/mopani/greater-giyani/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Greater Letaba Local Municipality",
+              "places": [],
+              "path_segment": "greater-letaba",
+              "path": "/global/africa/southafrica/limpopo/mopani/greater-letaba/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Greater Tzaneen Local Municipality",
+              "places": [],
+              "path_segment": "greater-tzaneen",
+              "path": "/global/africa/southafrica/limpopo/mopani/greater-tzaneen/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Maruleng Local Municipality",
+              "places": [],
+              "path_segment": "maruleng",
+              "path": "/global/africa/southafrica/limpopo/mopani/maruleng/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "mopani",
+          "path": "/global/africa/southafrica/limpopo/mopani/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Sekhukhune District Municipality",
+          "seat": "Groblersdal",
+          "locals": [
+            {
+              "name": "Fetakgomo Tubatse Local Municipality",
+              "places": [],
+              "path_segment": "fetakgomo-tubatse",
+              "path": "/global/africa/southafrica/limpopo/sekhukhune/fetakgomo-tubatse/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Ephraim Mogale Local Municipality",
+              "places": [],
+              "path_segment": "ephraim-mogale",
+              "path": "/global/africa/southafrica/limpopo/sekhukhune/ephraim-mogale/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Elias Motsoaledi Local Municipality",
+              "places": [],
+              "path_segment": "elias-motsoaledi",
+              "path": "/global/africa/southafrica/limpopo/sekhukhune/elias-motsoaledi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Makhuduthamaga Local Municipality",
+              "places": [],
+              "path_segment": "makhuduthamaga",
+              "path": "/global/africa/southafrica/limpopo/sekhukhune/makhuduthamaga/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "sekhukhune",
+          "path": "/global/africa/southafrica/limpopo/sekhukhune/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Vhembe District Municipality",
+          "seat": "Thohoyandou",
+          "locals": [
+            {
+              "name": "Musina Local Municipality",
+              "places": [],
+              "path_segment": "musina",
+              "path": "/global/africa/southafrica/limpopo/vhembe/musina/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Collins Chabane Local Municipality",
+              "places": [],
+              "path_segment": "collins-chabane",
+              "path": "/global/africa/southafrica/limpopo/vhembe/collins-chabane/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Thulamela Local Municipality",
+              "places": [],
+              "path_segment": "thulamela",
+              "path": "/global/africa/southafrica/limpopo/vhembe/thulamela/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Makhado Local Municipality",
+              "places": [],
+              "path_segment": "makhado",
+              "path": "/global/africa/southafrica/limpopo/vhembe/makhado/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "vhembe",
+          "path": "/global/africa/southafrica/limpopo/vhembe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Waterberg District Municipality",
+          "seat": "Modimolle",
+          "locals": [
+            {
+              "name": "Thabazimbi Local Municipality",
+              "places": [],
+              "path_segment": "thabazimbi",
+              "path": "/global/africa/southafrica/limpopo/waterberg/thabazimbi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Lephalale Local Municipality",
+              "places": [],
+              "path_segment": "lephalale",
+              "path": "/global/africa/southafrica/limpopo/waterberg/lephalale/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Modimolle-Mookgophong Local Municipality",
+              "places": [],
+              "path_segment": "modimolle-mookgophong",
+              "path": "/global/africa/southafrica/limpopo/waterberg/modimolle-mookgophong/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Bela-Bela Local Municipality",
+              "places": [],
+              "path_segment": "bela-bela",
+              "path": "/global/africa/southafrica/limpopo/waterberg/bela-bela/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mogalakwena Local Municipality",
+              "places": [],
+              "path_segment": "mogalakwena",
+              "path": "/global/africa/southafrica/limpopo/waterberg/mogalakwena/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "waterberg",
+          "path": "/global/africa/southafrica/limpopo/waterberg/",
+          "tier_level": "district"
+        }
+      ]
+    },
+    {
+      "province": "Mpumalanga",
+      "path_segment": "mpumalanga",
+      "metros": [],
+      "districts": [
+        {
+          "name": "Ehlanzeni District Municipality",
+          "seat": "Mbombela",
+          "locals": [
+            {
+              "name": "City of Mbombela Local Municipality",
+              "places": [],
+              "path_segment": "city-of-mbombela",
+              "path": "/global/africa/southafrica/mpumalanga/ehlanzeni/city-of-mbombela/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Bushbuckridge Local Municipality",
+              "places": [],
+              "path_segment": "bushbuckridge",
+              "path": "/global/africa/southafrica/mpumalanga/ehlanzeni/bushbuckridge/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Nkomazi Local Municipality",
+              "places": [],
+              "path_segment": "nkomazi",
+              "path": "/global/africa/southafrica/mpumalanga/ehlanzeni/nkomazi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Thaba Chweu Local Municipality",
+              "places": [],
+              "path_segment": "thaba-chweu",
+              "path": "/global/africa/southafrica/mpumalanga/ehlanzeni/thaba-chweu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "ehlanzeni",
+          "path": "/global/africa/southafrica/mpumalanga/ehlanzeni/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Gert Sibande District Municipality",
+          "seat": "Ermelo",
+          "locals": [
+            {
+              "name": "Chief Albert Luthuli Local Municipality",
+              "places": [],
+              "path_segment": "chief-albert-luthuli",
+              "path": "/global/africa/southafrica/mpumalanga/gert-sibande/chief-albert-luthuli/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Msukaligwa Local Municipality",
+              "places": [],
+              "path_segment": "msukaligwa",
+              "path": "/global/africa/southafrica/mpumalanga/gert-sibande/msukaligwa/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mkhondo Local Municipality",
+              "places": [],
+              "path_segment": "mkhondo",
+              "path": "/global/africa/southafrica/mpumalanga/gert-sibande/mkhondo/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Dr Pixley Ka Isaka Seme Local Municipality",
+              "places": [],
+              "path_segment": "dr-pixley-ka-isaka-seme",
+              "path": "/global/africa/southafrica/mpumalanga/gert-sibande/dr-pixley-ka-isaka-seme/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Lekwa Local Municipality",
+              "places": [],
+              "path_segment": "lekwa",
+              "path": "/global/africa/southafrica/mpumalanga/gert-sibande/lekwa/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Dipaleseng Local Municipality",
+              "places": [],
+              "path_segment": "dipaleseng",
+              "path": "/global/africa/southafrica/mpumalanga/gert-sibande/dipaleseng/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Govan Mbeki Local Municipality",
+              "places": [],
+              "path_segment": "govan-mbeki",
+              "path": "/global/africa/southafrica/mpumalanga/gert-sibande/govan-mbeki/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "gert-sibande",
+          "path": "/global/africa/southafrica/mpumalanga/gert-sibande/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Nkangala District Municipality",
+          "seat": "Middelburg",
+          "locals": [
+            {
+              "name": "Victor Khanye Local Municipality",
+              "places": [],
+              "path_segment": "victor-khanye",
+              "path": "/global/africa/southafrica/mpumalanga/nkangala/victor-khanye/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Emalahleni Local Municipality",
+              "places": [],
+              "path_segment": "emalahleni",
+              "path": "/global/africa/southafrica/mpumalanga/nkangala/emalahleni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Steve Tshwete Local Municipality",
+              "places": [],
+              "path_segment": "steve-tshwete",
+              "path": "/global/africa/southafrica/mpumalanga/nkangala/steve-tshwete/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Emakhazeni Local Municipality",
+              "places": [],
+              "path_segment": "emakhazeni",
+              "path": "/global/africa/southafrica/mpumalanga/nkangala/emakhazeni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Thembisile Hani Local Municipality",
+              "places": [],
+              "path_segment": "thembisile-hani",
+              "path": "/global/africa/southafrica/mpumalanga/nkangala/thembisile-hani/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Dr JS Moroka Local Municipality",
+              "places": [],
+              "path_segment": "dr-js-moroka",
+              "path": "/global/africa/southafrica/mpumalanga/nkangala/dr-js-moroka/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "nkangala",
+          "path": "/global/africa/southafrica/mpumalanga/nkangala/",
+          "tier_level": "district"
+        }
+      ]
+    },
+    {
+      "province": "North West",
+      "path_segment": "northwest",
+      "metros": [],
+      "districts": [
+        {
+          "name": "Bojanala Platinum District Municipality",
+          "seat": "Rustenburg",
+          "locals": [
+            {
+              "name": "Kgetlengrivier Local Municipality",
+              "places": [],
+              "path_segment": "kgetlengrivier",
+              "path": "/global/africa/southafrica/northwest/bojanala-platinum/kgetlengrivier/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Madibeng Local Municipality",
+              "places": [],
+              "path_segment": "madibeng",
+              "path": "/global/africa/southafrica/northwest/bojanala-platinum/madibeng/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Moretele Local Municipality",
+              "places": [],
+              "path_segment": "moretele",
+              "path": "/global/africa/southafrica/northwest/bojanala-platinum/moretele/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Moses Kotane Local Municipality",
+              "places": [],
+              "path_segment": "moses-kotane",
+              "path": "/global/africa/southafrica/northwest/bojanala-platinum/moses-kotane/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Rustenburg Local Municipality",
+              "places": [],
+              "path_segment": "rustenburg",
+              "path": "/global/africa/southafrica/northwest/bojanala-platinum/rustenburg/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "bojanala-platinum",
+          "path": "/global/africa/southafrica/northwest/bojanala-platinum/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Dr Kenneth Kaunda District Municipality",
+          "seat": "Klerksdorp",
+          "locals": [
+            {
+              "name": "City of Matlosana Local Municipality",
+              "places": [],
+              "path_segment": "city-of-matlosana",
+              "path": "/global/africa/southafrica/northwest/dr-kenneth-kaunda/city-of-matlosana/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "JB Marks Local Municipality",
+              "places": [],
+              "path_segment": "jb-marks",
+              "path": "/global/africa/southafrica/northwest/dr-kenneth-kaunda/jb-marks/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Maquassi Hills Local Municipality",
+              "places": [],
+              "path_segment": "maquassi-hills",
+              "path": "/global/africa/southafrica/northwest/dr-kenneth-kaunda/maquassi-hills/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "dr-kenneth-kaunda",
+          "path": "/global/africa/southafrica/northwest/dr-kenneth-kaunda/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Dr Ruth Segomotsi Mompati District Municipality",
+          "seat": "Vryburg",
+          "locals": [
+            {
+              "name": "Greater Taung Local Municipality",
+              "places": [],
+              "path_segment": "greater-taung",
+              "path": "/global/africa/southafrica/northwest/dr-ruth-segomotsi-mompati/greater-taung/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Kagisano-Molopo Local Municipality",
+              "places": [],
+              "path_segment": "kagisano-molopo",
+              "path": "/global/africa/southafrica/northwest/dr-ruth-segomotsi-mompati/kagisano-molopo/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Lekwa-Teemane Local Municipality",
+              "places": [],
+              "path_segment": "lekwa-teemane",
+              "path": "/global/africa/southafrica/northwest/dr-ruth-segomotsi-mompati/lekwa-teemane/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mamusa Local Municipality",
+              "places": [],
+              "path_segment": "mamusa",
+              "path": "/global/africa/southafrica/northwest/dr-ruth-segomotsi-mompati/mamusa/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Naledi Local Municipality",
+              "places": [],
+              "path_segment": "naledi",
+              "path": "/global/africa/southafrica/northwest/dr-ruth-segomotsi-mompati/naledi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "dr-ruth-segomotsi-mompati",
+          "path": "/global/africa/southafrica/northwest/dr-ruth-segomotsi-mompati/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Ngaka Modiri Molema District Municipality",
+          "seat": "Mahikeng",
+          "locals": [
+            {
+              "name": "Ditsobotla Local Municipality",
+              "places": [],
+              "path_segment": "ditsobotla",
+              "path": "/global/africa/southafrica/northwest/ngaka-modiri-molema/ditsobotla/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mahikeng Local Municipality",
+              "places": [],
+              "path_segment": "mahikeng",
+              "path": "/global/africa/southafrica/northwest/ngaka-modiri-molema/mahikeng/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Ramotshere Moiloa Local Municipality",
+              "places": [],
+              "path_segment": "ramotshere-moiloa",
+              "path": "/global/africa/southafrica/northwest/ngaka-modiri-molema/ramotshere-moiloa/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Ratlou Local Municipality",
+              "places": [],
+              "path_segment": "ratlou",
+              "path": "/global/africa/southafrica/northwest/ngaka-modiri-molema/ratlou/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Tswaing Local Municipality",
+              "places": [],
+              "path_segment": "tswaing",
+              "path": "/global/africa/southafrica/northwest/ngaka-modiri-molema/tswaing/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "ngaka-modiri-molema",
+          "path": "/global/africa/southafrica/northwest/ngaka-modiri-molema/",
+          "tier_level": "district"
+        }
+      ]
+    },
+    {
+      "province": "Northern Cape",
+      "path_segment": "northerncape",
+      "metros": [],
+      "districts": [
+        {
+          "name": "Frances Baard District Municipality",
+          "seat": "Kimberley",
+          "locals": [
+            {
+              "name": "Sol Plaatje Local Municipality",
+              "places": [],
+              "path_segment": "sol-plaatje",
+              "path": "/global/africa/southafrica/northerncape/frances-baard/sol-plaatje/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Dikgatlong Local Municipality",
+              "places": [],
+              "path_segment": "dikgatlong",
+              "path": "/global/africa/southafrica/northerncape/frances-baard/dikgatlong/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Magareng Local Municipality",
+              "places": [],
+              "path_segment": "magareng",
+              "path": "/global/africa/southafrica/northerncape/frances-baard/magareng/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Phokwane Local Municipality",
+              "places": [],
+              "path_segment": "phokwane",
+              "path": "/global/africa/southafrica/northerncape/frances-baard/phokwane/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "frances-baard",
+          "path": "/global/africa/southafrica/northerncape/frances-baard/",
+          "tier_level": "district"
+        },
+        {
+          "name": "John Taolo Gaetsewe District Municipality",
+          "seat": "Kuruman",
+          "locals": [
+            {
+              "name": "Joe Morolong Local Municipality",
+              "places": [],
+              "path_segment": "joe-morolong",
+              "path": "/global/africa/southafrica/northerncape/john-taolo-gaetsewe/joe-morolong/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Ga-Segonyana Local Municipality",
+              "places": [],
+              "path_segment": "ga-segonyana",
+              "path": "/global/africa/southafrica/northerncape/john-taolo-gaetsewe/ga-segonyana/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Gamagara Local Municipality",
+              "places": [],
+              "path_segment": "gamagara",
+              "path": "/global/africa/southafrica/northerncape/john-taolo-gaetsewe/gamagara/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "john-taolo-gaetsewe",
+          "path": "/global/africa/southafrica/northerncape/john-taolo-gaetsewe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Namakwa District Municipality",
+          "seat": "Springbok",
+          "locals": [
+            {
+              "name": "Richtersveld Local Municipality",
+              "places": [],
+              "path_segment": "richtersveld",
+              "path": "/global/africa/southafrica/northerncape/namakwa/richtersveld/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Nama Khoi Local Municipality",
+              "places": [],
+              "path_segment": "nama-khoi",
+              "path": "/global/africa/southafrica/northerncape/namakwa/nama-khoi/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Kamiesberg Local Municipality",
+              "places": [],
+              "path_segment": "kamiesberg",
+              "path": "/global/africa/southafrica/northerncape/namakwa/kamiesberg/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Hantam Local Municipality",
+              "places": [],
+              "path_segment": "hantam",
+              "path": "/global/africa/southafrica/northerncape/namakwa/hantam/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Karoo Hoogland Local Municipality",
+              "places": [],
+              "path_segment": "karoo-hoogland",
+              "path": "/global/africa/southafrica/northerncape/namakwa/karoo-hoogland/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Khâi-Ma Local Municipality",
+              "places": [],
+              "path_segment": "khai-ma",
+              "path": "/global/africa/southafrica/northerncape/namakwa/khai-ma/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "namakwa",
+          "path": "/global/africa/southafrica/northerncape/namakwa/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Pixley ka Seme District Municipality",
+          "seat": "De Aar",
+          "locals": [
+            {
+              "name": "Ubuntu Local Municipality",
+              "places": [],
+              "path_segment": "ubuntu",
+              "path": "/global/africa/southafrica/northerncape/pixley-ka-seme/ubuntu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Umsobomvu Local Municipality",
+              "places": [],
+              "path_segment": "umsobomvu",
+              "path": "/global/africa/southafrica/northerncape/pixley-ka-seme/umsobomvu/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Emthanjeni Local Municipality",
+              "places": [],
+              "path_segment": "emthanjeni",
+              "path": "/global/africa/southafrica/northerncape/pixley-ka-seme/emthanjeni/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Kareeberg Local Municipality",
+              "places": [],
+              "path_segment": "kareeberg",
+              "path": "/global/africa/southafrica/northerncape/pixley-ka-seme/kareeberg/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Renosterberg Local Municipality",
+              "places": [],
+              "path_segment": "renosterberg",
+              "path": "/global/africa/southafrica/northerncape/pixley-ka-seme/renosterberg/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Thembelihle Local Municipality",
+              "places": [],
+              "path_segment": "thembelihle",
+              "path": "/global/africa/southafrica/northerncape/pixley-ka-seme/thembelihle/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Siyathemba Local Municipality",
+              "places": [],
+              "path_segment": "siyathemba",
+              "path": "/global/africa/southafrica/northerncape/pixley-ka-seme/siyathemba/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Siyancuma Local Municipality",
+              "places": [],
+              "path_segment": "siyancuma",
+              "path": "/global/africa/southafrica/northerncape/pixley-ka-seme/siyancuma/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "pixley-ka-seme",
+          "path": "/global/africa/southafrica/northerncape/pixley-ka-seme/",
+          "tier_level": "district"
+        },
+        {
+          "name": "ZF Mgcawu District Municipality",
+          "seat": "Upington",
+          "locals": [
+            {
+              "name": "Kai !Garib Local Municipality",
+              "places": [],
+              "path_segment": "kai-garib",
+              "path": "/global/africa/southafrica/northerncape/zf-mgcawu/kai-garib/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "!Kheis Local Municipality",
+              "places": [],
+              "path_segment": "kheis",
+              "path": "/global/africa/southafrica/northerncape/zf-mgcawu/kheis/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Tsantsabane Local Municipality",
+              "places": [],
+              "path_segment": "tsantsabane",
+              "path": "/global/africa/southafrica/northerncape/zf-mgcawu/tsantsabane/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Kgatelopele Local Municipality",
+              "places": [],
+              "path_segment": "kgatelopele",
+              "path": "/global/africa/southafrica/northerncape/zf-mgcawu/kgatelopele/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Dawid Kruiper Local Municipality",
+              "places": [],
+              "path_segment": "dawid-kruiper",
+              "path": "/global/africa/southafrica/northerncape/zf-mgcawu/dawid-kruiper/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "zf-mgcawu",
+          "path": "/global/africa/southafrica/northerncape/zf-mgcawu/",
+          "tier_level": "district"
+        }
+      ]
+    },
+    {
+      "province": "Western Cape",
+      "path_segment": "westerncape",
+      "metros": [
+        {
+          "name": "City of Cape Town Metropolitan Municipality",
+          "path_segment": "cape-town",
+          "seat": "Cape Town",
+          "places": [],
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          },
+          "path": "/global/africa/southafrica/westerncape/cape-town/",
+          "tier_level": "metro"
+        }
+      ],
+      "districts": [
+        {
+          "name": "Cape Winelands District Municipality",
+          "seat": "Worcester",
+          "locals": [
+            {
+              "name": "Witzenberg Local Municipality",
+              "places": [],
+              "path_segment": "witzenberg",
+              "path": "/global/africa/southafrica/westerncape/cape-winelands/witzenberg/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Drakenstein Local Municipality",
+              "places": [],
+              "path_segment": "drakenstein",
+              "path": "/global/africa/southafrica/westerncape/cape-winelands/drakenstein/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Stellenbosch Local Municipality",
+              "places": [],
+              "path_segment": "stellenbosch",
+              "path": "/global/africa/southafrica/westerncape/cape-winelands/stellenbosch/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Breede Valley Local Municipality",
+              "places": [],
+              "path_segment": "breede-valley",
+              "path": "/global/africa/southafrica/westerncape/cape-winelands/breede-valley/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Langeberg Local Municipality",
+              "places": [],
+              "path_segment": "langeberg",
+              "path": "/global/africa/southafrica/westerncape/cape-winelands/langeberg/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "cape-winelands",
+          "path": "/global/africa/southafrica/westerncape/cape-winelands/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Central Karoo District Municipality",
+          "seat": "Beaufort West",
+          "locals": [
+            {
+              "name": "Beaufort West Local Municipality",
+              "places": [],
+              "path_segment": "beaufort-west",
+              "path": "/global/africa/southafrica/westerncape/central-karoo/beaufort-west/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Laingsburg Local Municipality",
+              "places": [],
+              "path_segment": "laingsburg",
+              "path": "/global/africa/southafrica/westerncape/central-karoo/laingsburg/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Prince Albert Local Municipality",
+              "places": [],
+              "path_segment": "prince-albert",
+              "path": "/global/africa/southafrica/westerncape/central-karoo/prince-albert/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "central-karoo",
+          "path": "/global/africa/southafrica/westerncape/central-karoo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Garden Route District Municipality (formerly Eden)",
+          "seat": "George",
+          "locals": [
+            {
+              "name": "Bitou Local Municipality",
+              "places": [],
+              "path_segment": "bitou",
+              "path": "/global/africa/southafrica/westerncape/garden-route/bitou/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "George Local Municipality",
+              "places": [],
+              "path_segment": "george",
+              "path": "/global/africa/southafrica/westerncape/garden-route/george/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Hessequa Local Municipality",
+              "places": [],
+              "path_segment": "hessequa",
+              "path": "/global/africa/southafrica/westerncape/garden-route/hessequa/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Kannaland Local Municipality",
+              "places": [],
+              "path_segment": "kannaland",
+              "path": "/global/africa/southafrica/westerncape/garden-route/kannaland/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Knysna Local Municipality",
+              "places": [],
+              "path_segment": "knysna",
+              "path": "/global/africa/southafrica/westerncape/garden-route/knysna/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Mossel Bay Local Municipality",
+              "places": [],
+              "path_segment": "mossel-bay",
+              "path": "/global/africa/southafrica/westerncape/garden-route/mossel-bay/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Oudtshoorn Local Municipality",
+              "places": [],
+              "path_segment": "oudtshoorn",
+              "path": "/global/africa/southafrica/westerncape/garden-route/oudtshoorn/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "garden-route",
+          "path": "/global/africa/southafrica/westerncape/garden-route/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Overberg District Municipality",
+          "seat": "Bredasdorp",
+          "locals": [
+            {
+              "name": "Theewaterskloof Local Municipality",
+              "places": [],
+              "path_segment": "theewaterskloof",
+              "path": "/global/africa/southafrica/westerncape/overberg/theewaterskloof/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Overstrand Local Municipality",
+              "places": [],
+              "path_segment": "overstrand",
+              "path": "/global/africa/southafrica/westerncape/overberg/overstrand/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Cape Agulhas Local Municipality",
+              "places": [],
+              "path_segment": "cape-agulhas",
+              "path": "/global/africa/southafrica/westerncape/overberg/cape-agulhas/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Swellendam Local Municipality",
+              "places": [],
+              "path_segment": "swellendam",
+              "path": "/global/africa/southafrica/westerncape/overberg/swellendam/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "overberg",
+          "path": "/global/africa/southafrica/westerncape/overberg/",
+          "tier_level": "district"
+        },
+        {
+          "name": "West Coast District Municipality",
+          "seat": "Moorreesburg",
+          "locals": [
+            {
+              "name": "Matzikama Local Municipality",
+              "places": [],
+              "path_segment": "matzikama",
+              "path": "/global/africa/southafrica/westerncape/west-coast/matzikama/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Cederberg Local Municipality",
+              "places": [],
+              "path_segment": "cederberg",
+              "path": "/global/africa/southafrica/westerncape/west-coast/cederberg/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Bergrivier Local Municipality",
+              "places": [],
+              "path_segment": "bergrivier",
+              "path": "/global/africa/southafrica/westerncape/west-coast/bergrivier/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Saldanha Bay Local Municipality",
+              "places": [],
+              "path_segment": "saldanha-bay",
+              "path": "/global/africa/southafrica/westerncape/west-coast/saldanha-bay/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            },
+            {
+              "name": "Swartland Local Municipality",
+              "places": [],
+              "path_segment": "swartland",
+              "path": "/global/africa/southafrica/westerncape/west-coast/swartland/",
+              "tier_level": "local_municipality",
+              "wards": {
+                "count": null,
+                "status": "placeholder"
+              }
+            }
+          ],
+          "path_segment": "west-coast",
+          "path": "/global/africa/southafrica/westerncape/west-coast/",
+          "tier_level": "district"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "generated": "2026-08-18",
+    "source": "Ichebo Sceptre Community geographic dataset — South Africa",
+    "verification": "Province/District/Metro/Local Municipality tier cross-checked against Wikipedia 'List of municipalities in {Province}' pages, individual municipality infoboxes, and provincial government (Mufti/COGTA) municipality directories, 2026-08-18.",
+    "ward_tier_note": "Ward tier is a structural placeholder only (count: null). South Africa moved from 4,468 to 4,488 wards nationally after the December 2025 MDB redelimitation; exact per-municipality ward counts require MDB/IEC gazette lookups and are pending.",
+    "materialised_path_pattern": "/global/africa/{country}/{province}/{district-or-metro}/[{local-municipality}/][{sceptre-community}/]"
+  }
+}

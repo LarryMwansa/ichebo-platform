@@ -1,0 +1,3309 @@
+{
+  "country": "Zambia",
+  "country_code": "ZM",
+  "path_segment": "zambia",
+  "provinces": [
+    {
+      "province": "Central Province",
+      "path_segment": "central",
+      "path": "/global/africa/zambia/central/",
+      "capital": "Kabwe",
+      "districts": [
+        {
+          "name": "Chibombo District",
+          "path_segment": "chibombo",
+          "path": "/global/africa/zambia/central/chibombo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chisamba District",
+          "path_segment": "chisamba",
+          "path": "/global/africa/zambia/central/chisamba/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chitambo District",
+          "path_segment": "chitambo",
+          "path": "/global/africa/zambia/central/chitambo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kabwe District",
+          "path_segment": "kabwe",
+          "path": "/global/africa/zambia/central/kabwe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kapiri Mposhi District",
+          "path_segment": "kapiri-mposhi",
+          "path": "/global/africa/zambia/central/kapiri-mposhi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Luano District",
+          "path_segment": "luano",
+          "path": "/global/africa/zambia/central/luano/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mkushi District",
+          "path_segment": "mkushi",
+          "path": "/global/africa/zambia/central/mkushi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mumbwa District",
+          "path_segment": "mumbwa",
+          "path": "/global/africa/zambia/central/mumbwa/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Ngabwe District",
+          "path_segment": "ngabwe",
+          "path": "/global/africa/zambia/central/ngabwe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Serenje District",
+          "path_segment": "serenje",
+          "path": "/global/africa/zambia/central/serenje/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Shibuyunji District",
+          "path_segment": "shibuyunji",
+          "path": "/global/africa/zambia/central/shibuyunji/",
+          "tier_level": "district"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Bwacha Constituency",
+          "path_segment": "bwacha",
+          "path": "/global/africa/zambia/central/bwacha/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Bwacha South Constituency",
+          "path_segment": "bwacha-south",
+          "path": "/global/africa/zambia/central/bwacha-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chisamba Constituency",
+          "path_segment": "chisamba",
+          "path": "/global/africa/zambia/central/chisamba/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chitambo Constituency",
+          "path_segment": "chitambo",
+          "path": "/global/africa/zambia/central/chitambo/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kabwe Central Constituency",
+          "path_segment": "kabwe-central",
+          "path": "/global/africa/zambia/central/kabwe-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kapiri Mposhi Constituency",
+          "path_segment": "kapiri-mposhi",
+          "path": "/global/africa/zambia/central/kapiri-mposhi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kapiri Mposhi West Constituency",
+          "path_segment": "kapiri-mposhi-west",
+          "path": "/global/africa/zambia/central/kapiri-mposhi-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Katuba Constituency",
+          "path_segment": "katuba",
+          "path": "/global/africa/zambia/central/katuba/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Keembe Constituency",
+          "path_segment": "keembe",
+          "path": "/global/africa/zambia/central/keembe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Keembe West Constituency",
+          "path_segment": "keembe-west",
+          "path": "/global/africa/zambia/central/keembe-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Luano Constituency",
+          "path_segment": "luano",
+          "path": "/global/africa/zambia/central/luano/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lufubu Constituency",
+          "path_segment": "lufubu",
+          "path": "/global/africa/zambia/central/lufubu/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mkushi North Constituency",
+          "path_segment": "mkushi-north",
+          "path": "/global/africa/zambia/central/mkushi-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mkushi South Constituency",
+          "path_segment": "mkushi-south",
+          "path": "/global/africa/zambia/central/mkushi-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Muchinga Constituency",
+          "path_segment": "muchinga",
+          "path": "/global/africa/zambia/central/muchinga/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mumbwa Constituency",
+          "path_segment": "mumbwa",
+          "path": "/global/africa/zambia/central/mumbwa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mumbwa West Constituency",
+          "path_segment": "mumbwa-west",
+          "path": "/global/africa/zambia/central/mumbwa-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mwembeshi Constituency",
+          "path_segment": "mwembeshi",
+          "path": "/global/africa/zambia/central/mwembeshi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mwembezhi West Constituency",
+          "path_segment": "mwembezhi-west",
+          "path": "/global/africa/zambia/central/mwembezhi-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mwomboshi Constituency",
+          "path_segment": "mwomboshi",
+          "path": "/global/africa/zambia/central/mwomboshi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nangoma Constituency",
+          "path_segment": "nangoma",
+          "path": "/global/africa/zambia/central/nangoma/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nkundalila Constituency",
+          "path_segment": "nkundalila",
+          "path": "/global/africa/zambia/central/nkundalila/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Serenje Constituency",
+          "path_segment": "serenje",
+          "path": "/global/africa/zambia/central/serenje/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        }
+      ],
+      "constituency_count": 23
+    },
+    {
+      "province": "Copperbelt Province",
+      "path_segment": "copperbelt",
+      "path": "/global/africa/zambia/copperbelt/",
+      "capital": "Ndola",
+      "districts": [
+        {
+          "name": "Chililabombwe District",
+          "path_segment": "chililabombwe",
+          "path": "/global/africa/zambia/copperbelt/chililabombwe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chingola District",
+          "path_segment": "chingola",
+          "path": "/global/africa/zambia/copperbelt/chingola/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kalulushi District",
+          "path_segment": "kalulushi",
+          "path": "/global/africa/zambia/copperbelt/kalulushi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kitwe District",
+          "path_segment": "kitwe",
+          "path": "/global/africa/zambia/copperbelt/kitwe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Luanshya District",
+          "path_segment": "luanshya",
+          "path": "/global/africa/zambia/copperbelt/luanshya/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lufwanyama District",
+          "path_segment": "lufwanyama",
+          "path": "/global/africa/zambia/copperbelt/lufwanyama/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Masaiti District",
+          "path_segment": "masaiti",
+          "path": "/global/africa/zambia/copperbelt/masaiti/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mpongwe District",
+          "path_segment": "mpongwe",
+          "path": "/global/africa/zambia/copperbelt/mpongwe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mufulira District",
+          "path_segment": "mufulira",
+          "path": "/global/africa/zambia/copperbelt/mufulira/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Ndola District",
+          "path_segment": "ndola",
+          "path": "/global/africa/zambia/copperbelt/ndola/",
+          "tier_level": "district"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Bwana Mkubwa Constituency",
+          "path_segment": "bwana-mkubwa",
+          "path": "/global/africa/zambia/copperbelt/bwana-mkubwa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chambishi Constituency",
+          "path_segment": "chambishi",
+          "path": "/global/africa/zambia/copperbelt/chambishi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chifubu Constituency",
+          "path_segment": "chifubu",
+          "path": "/global/africa/zambia/copperbelt/chifubu/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chililabombwe Constituency",
+          "path_segment": "chililabombwe",
+          "path": "/global/africa/zambia/copperbelt/chililabombwe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chimwemwe Constituency",
+          "path_segment": "chimwemwe",
+          "path": "/global/africa/zambia/copperbelt/chimwemwe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chingola Central Constituency",
+          "path_segment": "chingola-central",
+          "path": "/global/africa/zambia/copperbelt/chingola-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chingola West Constituency",
+          "path_segment": "chingola-west",
+          "path": "/global/africa/zambia/copperbelt/chingola-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Dag Hammerskjoeld Constituency",
+          "path_segment": "dag-hammerskjoeld",
+          "path": "/global/africa/zambia/copperbelt/dag-hammerskjoeld/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kabushi Constituency",
+          "path_segment": "kabushi",
+          "path": "/global/africa/zambia/copperbelt/kabushi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kafulafuta Constituency",
+          "path_segment": "kafulafuta",
+          "path": "/global/africa/zambia/copperbelt/kafulafuta/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kalalangabo Constituency",
+          "path_segment": "kalalangabo",
+          "path": "/global/africa/zambia/copperbelt/kalalangabo/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kalulushi Constituency",
+          "path_segment": "kalulushi",
+          "path": "/global/africa/zambia/copperbelt/kalulushi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kamfinsa Constituency",
+          "path_segment": "kamfinsa",
+          "path": "/global/africa/zambia/copperbelt/kamfinsa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kankoyo Constituency",
+          "path_segment": "kankoyo",
+          "path": "/global/africa/zambia/copperbelt/kankoyo/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kantanshi Constituency",
+          "path_segment": "kantanshi",
+          "path": "/global/africa/zambia/copperbelt/kantanshi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Konkola Constituency",
+          "path_segment": "konkola",
+          "path": "/global/africa/zambia/copperbelt/konkola/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kwacha Constituency",
+          "path_segment": "kwacha",
+          "path": "/global/africa/zambia/copperbelt/kwacha/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Luanshya Constituency",
+          "path_segment": "luanshya",
+          "path": "/global/africa/zambia/copperbelt/luanshya/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lufwanyama East Constituency",
+          "path_segment": "lufwanyama-east",
+          "path": "/global/africa/zambia/copperbelt/lufwanyama-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lufwanyama West Constituency",
+          "path_segment": "lufwanyama-west",
+          "path": "/global/africa/zambia/copperbelt/lufwanyama-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Masaiti Constituency",
+          "path_segment": "masaiti",
+          "path": "/global/africa/zambia/copperbelt/masaiti/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mpongwe East Constituency",
+          "path_segment": "mpongwe-east",
+          "path": "/global/africa/zambia/copperbelt/mpongwe-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mpongwe West Constituency",
+          "path_segment": "mpongwe-west",
+          "path": "/global/africa/zambia/copperbelt/mpongwe-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mufulira Constituency",
+          "path_segment": "mufulira",
+          "path": "/global/africa/zambia/copperbelt/mufulira/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nchanga Constituency",
+          "path_segment": "nchanga",
+          "path": "/global/africa/zambia/copperbelt/nchanga/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Ndola Central Constituency",
+          "path_segment": "ndola-central",
+          "path": "/global/africa/zambia/copperbelt/ndola-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nkana Constituency",
+          "path_segment": "nkana",
+          "path": "/global/africa/zambia/copperbelt/nkana/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Roan Constituency",
+          "path_segment": "roan",
+          "path": "/global/africa/zambia/copperbelt/roan/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Wusakile Constituency",
+          "path_segment": "wusakile",
+          "path": "/global/africa/zambia/copperbelt/wusakile/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        }
+      ],
+      "constituency_count": 29
+    },
+    {
+      "province": "Eastern Province",
+      "path_segment": "eastern",
+      "path": "/global/africa/zambia/eastern/",
+      "capital": "Chipata",
+      "districts": [
+        {
+          "name": "Chadiza District",
+          "path_segment": "chadiza",
+          "path": "/global/africa/zambia/eastern/chadiza/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chama District",
+          "path_segment": "chama",
+          "path": "/global/africa/zambia/eastern/chama/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chasefu District",
+          "path_segment": "chasefu",
+          "path": "/global/africa/zambia/eastern/chasefu/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chipangali District",
+          "path_segment": "chipangali",
+          "path": "/global/africa/zambia/eastern/chipangali/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chipata District",
+          "path_segment": "chipata",
+          "path": "/global/africa/zambia/eastern/chipata/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kasenengwa District",
+          "path_segment": "kasenengwa",
+          "path": "/global/africa/zambia/eastern/kasenengwa/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Katete District",
+          "path_segment": "katete",
+          "path": "/global/africa/zambia/eastern/katete/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lumezi District",
+          "path_segment": "lumezi",
+          "path": "/global/africa/zambia/eastern/lumezi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lundazi District",
+          "path_segment": "lundazi",
+          "path": "/global/africa/zambia/eastern/lundazi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lusangazi District",
+          "path_segment": "lusangazi",
+          "path": "/global/africa/zambia/eastern/lusangazi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mambwe District",
+          "path_segment": "mambwe",
+          "path": "/global/africa/zambia/eastern/mambwe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Nyimba District",
+          "path_segment": "nyimba",
+          "path": "/global/africa/zambia/eastern/nyimba/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Petauke District",
+          "path_segment": "petauke",
+          "path": "/global/africa/zambia/eastern/petauke/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Sinda District",
+          "path_segment": "sinda",
+          "path": "/global/africa/zambia/eastern/sinda/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Vubwi District",
+          "path_segment": "vubwi",
+          "path": "/global/africa/zambia/eastern/vubwi/",
+          "tier_level": "district"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Chadiza East Constituency",
+          "path_segment": "chadiza-east",
+          "path": "/global/africa/zambia/eastern/chadiza-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chadiza West Constituency",
+          "path_segment": "chadiza-west",
+          "path": "/global/africa/zambia/eastern/chadiza-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chama Central Constituency",
+          "path_segment": "chama-central",
+          "path": "/global/africa/zambia/eastern/chama-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chama North Constituency",
+          "path_segment": "chama-north",
+          "path": "/global/africa/zambia/eastern/chama-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chama South Constituency",
+          "path_segment": "chama-south",
+          "path": "/global/africa/zambia/eastern/chama-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chasefu North Constituency",
+          "path_segment": "chasefu-north",
+          "path": "/global/africa/zambia/eastern/chasefu-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chasefu South Constituency",
+          "path_segment": "chasefu-south",
+          "path": "/global/africa/zambia/eastern/chasefu-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chipangali East Constituency",
+          "path_segment": "chipangali-east",
+          "path": "/global/africa/zambia/eastern/chipangali-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chipangali West Constituency",
+          "path_segment": "chipangali-west",
+          "path": "/global/africa/zambia/eastern/chipangali-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chipata Central Constituency",
+          "path_segment": "chipata-central",
+          "path": "/global/africa/zambia/eastern/chipata-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chipata North Constituency",
+          "path_segment": "chipata-north",
+          "path": "/global/africa/zambia/eastern/chipata-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kapoche Constituency",
+          "path_segment": "kapoche",
+          "path": "/global/africa/zambia/eastern/kapoche/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kasenengwa Constituency",
+          "path_segment": "kasenengwa",
+          "path": "/global/africa/zambia/eastern/kasenengwa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kaumbwe Constituency",
+          "path_segment": "kaumbwe",
+          "path": "/global/africa/zambia/eastern/kaumbwe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Luangeni Constituency",
+          "path_segment": "luangeni",
+          "path": "/global/africa/zambia/eastern/luangeni/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lumezi North Constituency",
+          "path_segment": "lumezi-north",
+          "path": "/global/africa/zambia/eastern/lumezi-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lumezi South Constituency",
+          "path_segment": "lumezi-south",
+          "path": "/global/africa/zambia/eastern/lumezi-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lundazi Constituency",
+          "path_segment": "lundazi",
+          "path": "/global/africa/zambia/eastern/lundazi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lusangazi Central Constituency",
+          "path_segment": "lusangazi-central",
+          "path": "/global/africa/zambia/eastern/lusangazi-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Malambo East Constituency",
+          "path_segment": "malambo-east",
+          "path": "/global/africa/zambia/eastern/malambo-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Malambo West Constituency",
+          "path_segment": "malambo-west",
+          "path": "/global/africa/zambia/eastern/malambo-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Milanzi Constituency",
+          "path_segment": "milanzi",
+          "path": "/global/africa/zambia/eastern/milanzi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mkaika Constituency",
+          "path_segment": "mkaika",
+          "path": "/global/africa/zambia/eastern/mkaika/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Msanzala Constituency",
+          "path_segment": "msanzala",
+          "path": "/global/africa/zambia/eastern/msanzala/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nyimba North Constituency",
+          "path_segment": "nyimba-north",
+          "path": "/global/africa/zambia/eastern/nyimba-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nyimba South Constituency",
+          "path_segment": "nyimba-south",
+          "path": "/global/africa/zambia/eastern/nyimba-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Petauke Central Constituency",
+          "path_segment": "petauke-central",
+          "path": "/global/africa/zambia/eastern/petauke-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Sinda Constituency",
+          "path_segment": "sinda",
+          "path": "/global/africa/zambia/eastern/sinda/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Vubwi Constituency",
+          "path_segment": "vubwi",
+          "path": "/global/africa/zambia/eastern/vubwi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        }
+      ],
+      "constituency_count": 29
+    },
+    {
+      "province": "Luapula Province",
+      "path_segment": "luapula",
+      "path": "/global/africa/zambia/luapula/",
+      "capital": "Mansa",
+      "districts": [
+        {
+          "name": "Chembe District",
+          "path_segment": "chembe",
+          "path": "/global/africa/zambia/luapula/chembe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chiengi District",
+          "path_segment": "chiengi",
+          "path": "/global/africa/zambia/luapula/chiengi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chifunabuli District",
+          "path_segment": "chifunabuli",
+          "path": "/global/africa/zambia/luapula/chifunabuli/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chipili District",
+          "path_segment": "chipili",
+          "path": "/global/africa/zambia/luapula/chipili/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kawambwa District",
+          "path_segment": "kawambwa",
+          "path": "/global/africa/zambia/luapula/kawambwa/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lunga District",
+          "path_segment": "lunga",
+          "path": "/global/africa/zambia/luapula/lunga/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mansa District",
+          "path_segment": "mansa",
+          "path": "/global/africa/zambia/luapula/mansa/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Milenge District",
+          "path_segment": "milenge",
+          "path": "/global/africa/zambia/luapula/milenge/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mwansabombwe District",
+          "path_segment": "mwansabombwe",
+          "path": "/global/africa/zambia/luapula/mwansabombwe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mwense District",
+          "path_segment": "mwense",
+          "path": "/global/africa/zambia/luapula/mwense/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Nchelenge District",
+          "path_segment": "nchelenge",
+          "path": "/global/africa/zambia/luapula/nchelenge/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Samfya District",
+          "path_segment": "samfya",
+          "path": "/global/africa/zambia/luapula/samfya/",
+          "tier_level": "district"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Bahati Constituency",
+          "path_segment": "bahati",
+          "path": "/global/africa/zambia/luapula/bahati/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Bangweulu Constituency",
+          "path_segment": "bangweulu",
+          "path": "/global/africa/zambia/luapula/bangweulu/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chembe Constituency",
+          "path_segment": "chembe",
+          "path": "/global/africa/zambia/luapula/chembe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chienge Constituency",
+          "path_segment": "chienge",
+          "path": "/global/africa/zambia/luapula/chienge/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chifunabuli North Constituency",
+          "path_segment": "chifunabuli-north",
+          "path": "/global/africa/zambia/luapula/chifunabuli-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chifunabuli South Constituency",
+          "path_segment": "chifunabuli-south",
+          "path": "/global/africa/zambia/luapula/chifunabuli-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chipili Constituency",
+          "path_segment": "chipili",
+          "path": "/global/africa/zambia/luapula/chipili/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kalungwishi Constituency",
+          "path_segment": "kalungwishi",
+          "path": "/global/africa/zambia/luapula/kalungwishi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kawambwa Constituency",
+          "path_segment": "kawambwa",
+          "path": "/global/africa/zambia/luapula/kawambwa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Luapula Constituency",
+          "path_segment": "luapula",
+          "path": "/global/africa/zambia/luapula/luapula/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Luongo Constituency",
+          "path_segment": "luongo",
+          "path": "/global/africa/zambia/luapula/luongo/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mambilima Constituency",
+          "path_segment": "mambilima",
+          "path": "/global/africa/zambia/luapula/mambilima/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mansa Central Constituency",
+          "path_segment": "mansa-central",
+          "path": "/global/africa/zambia/luapula/mansa-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mansa East Constituency",
+          "path_segment": "mansa-east",
+          "path": "/global/africa/zambia/luapula/mansa-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Milenge Constituency",
+          "path_segment": "milenge",
+          "path": "/global/africa/zambia/luapula/milenge/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mwansabombwe Constituency",
+          "path_segment": "mwansabombwe",
+          "path": "/global/africa/zambia/luapula/mwansabombwe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mwense Constituency",
+          "path_segment": "mwense",
+          "path": "/global/africa/zambia/luapula/mwense/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mweru Constituency",
+          "path_segment": "mweru",
+          "path": "/global/africa/zambia/luapula/mweru/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nchelenge Constituency",
+          "path_segment": "nchelenge",
+          "path": "/global/africa/zambia/luapula/nchelenge/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Pambashe Constituency",
+          "path_segment": "pambashe",
+          "path": "/global/africa/zambia/luapula/pambashe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        }
+      ],
+      "constituency_count": 20
+    },
+    {
+      "province": "Lusaka Province",
+      "path_segment": "lusaka",
+      "path": "/global/africa/zambia/lusaka/",
+      "capital": "Lusaka",
+      "districts": [
+        {
+          "name": "Chilanga District",
+          "path_segment": "chilanga",
+          "path": "/global/africa/zambia/lusaka/chilanga/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chongwe District",
+          "path_segment": "chongwe",
+          "path": "/global/africa/zambia/lusaka/chongwe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kafue District",
+          "path_segment": "kafue",
+          "path": "/global/africa/zambia/lusaka/kafue/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Luangwa District",
+          "path_segment": "luangwa",
+          "path": "/global/africa/zambia/lusaka/luangwa/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lusaka District",
+          "path_segment": "lusaka",
+          "path": "/global/africa/zambia/lusaka/lusaka/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Rufunsa District",
+          "path_segment": "rufunsa",
+          "path": "/global/africa/zambia/lusaka/rufunsa/",
+          "tier_level": "district"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Chawama Constituency",
+          "path_segment": "chawama",
+          "path": "/global/africa/zambia/lusaka/chawama/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chilanga North Constituency",
+          "path_segment": "chilanga-north",
+          "path": "/global/africa/zambia/lusaka/chilanga-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chilanga South Constituency",
+          "path_segment": "chilanga-south",
+          "path": "/global/africa/zambia/lusaka/chilanga-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chongwe East Constituency",
+          "path_segment": "chongwe-east",
+          "path": "/global/africa/zambia/lusaka/chongwe-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chongwe West Constituency",
+          "path_segment": "chongwe-west",
+          "path": "/global/africa/zambia/lusaka/chongwe-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Feira Constituency",
+          "path_segment": "feira",
+          "path": "/global/africa/zambia/lusaka/feira/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kabwata Constituency",
+          "path_segment": "kabwata",
+          "path": "/global/africa/zambia/lusaka/kabwata/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kafue East Constituency",
+          "path_segment": "kafue-east",
+          "path": "/global/africa/zambia/lusaka/kafue-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kafue West Constituency",
+          "path_segment": "kafue-west",
+          "path": "/global/africa/zambia/lusaka/kafue-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kanyama Constituency",
+          "path_segment": "kanyama",
+          "path": "/global/africa/zambia/lusaka/kanyama/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lima Constituency",
+          "path_segment": "lima",
+          "path": "/global/africa/zambia/lusaka/lima/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lusaka Central Constituency",
+          "path_segment": "lusaka-central",
+          "path": "/global/africa/zambia/lusaka/lusaka-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Makeni Constituency",
+          "path_segment": "makeni",
+          "path": "/global/africa/zambia/lusaka/makeni/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mandevu Constituency",
+          "path_segment": "mandevu",
+          "path": "/global/africa/zambia/lusaka/mandevu/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Matero Constituency",
+          "path_segment": "matero",
+          "path": "/global/africa/zambia/lusaka/matero/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Munali Constituency",
+          "path_segment": "munali",
+          "path": "/global/africa/zambia/lusaka/munali/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Roma Constituency",
+          "path_segment": "roma",
+          "path": "/global/africa/zambia/lusaka/roma/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Rufunsa Constituency",
+          "path_segment": "rufunsa",
+          "path": "/global/africa/zambia/lusaka/rufunsa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        }
+      ],
+      "constituency_count": 18
+    },
+    {
+      "province": "Muchinga Province",
+      "path_segment": "muchinga",
+      "path": "/global/africa/zambia/muchinga/",
+      "capital": "Chinsali",
+      "districts": [
+        {
+          "name": "Chinsali District",
+          "path_segment": "chinsali",
+          "path": "/global/africa/zambia/muchinga/chinsali/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Isoka District",
+          "path_segment": "isoka",
+          "path": "/global/africa/zambia/muchinga/isoka/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kanchibiya District",
+          "path_segment": "kanchibiya",
+          "path": "/global/africa/zambia/muchinga/kanchibiya/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lavushimanda District",
+          "path_segment": "lavushimanda",
+          "path": "/global/africa/zambia/muchinga/lavushimanda/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mafinga District",
+          "path_segment": "mafinga",
+          "path": "/global/africa/zambia/muchinga/mafinga/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mpika District",
+          "path_segment": "mpika",
+          "path": "/global/africa/zambia/muchinga/mpika/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Nakonde District",
+          "path_segment": "nakonde",
+          "path": "/global/africa/zambia/muchinga/nakonde/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Shiwang'andu District",
+          "path_segment": "shiwangandu",
+          "path": "/global/africa/zambia/muchinga/shiwangandu/",
+          "tier_level": "district"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Chilinda Constituency",
+          "path_segment": "chilinda",
+          "path": "/global/africa/zambia/muchinga/chilinda/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chinsali Constituency",
+          "path_segment": "chinsali",
+          "path": "/global/africa/zambia/muchinga/chinsali/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Isoka Constituency",
+          "path_segment": "isoka",
+          "path": "/global/africa/zambia/muchinga/isoka/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kanchibiya Constituency",
+          "path_segment": "kanchibiya",
+          "path": "/global/africa/zambia/muchinga/kanchibiya/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lwitikila Constituency",
+          "path_segment": "lwitikila",
+          "path": "/global/africa/zambia/muchinga/lwitikila/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mafinga North Constituency",
+          "path_segment": "mafinga-north",
+          "path": "/global/africa/zambia/muchinga/mafinga-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mafinga South Constituency",
+          "path_segment": "mafinga-south",
+          "path": "/global/africa/zambia/muchinga/mafinga-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mfuwe Constituency",
+          "path_segment": "mfuwe",
+          "path": "/global/africa/zambia/muchinga/mfuwe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mpika North Constituency",
+          "path_segment": "mpika-north",
+          "path": "/global/africa/zambia/muchinga/mpika-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mpika South Constituency",
+          "path_segment": "mpika-south",
+          "path": "/global/africa/zambia/muchinga/mpika-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mwenzo Constituency",
+          "path_segment": "mwenzo",
+          "path": "/global/africa/zambia/muchinga/mwenzo/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nakonde Constituency",
+          "path_segment": "nakonde",
+          "path": "/global/africa/zambia/muchinga/nakonde/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nkombwa Constituency",
+          "path_segment": "nkombwa",
+          "path": "/global/africa/zambia/muchinga/nkombwa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Shiwa Ng'andu Constituency",
+          "path_segment": "shiwa-ngandu",
+          "path": "/global/africa/zambia/muchinga/shiwa-ngandu/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        }
+      ],
+      "constituency_count": 14
+    },
+    {
+      "province": "Northern Province",
+      "path_segment": "northern",
+      "path": "/global/africa/zambia/northern/",
+      "capital": "Kasama",
+      "districts": [
+        {
+          "name": "Chilubi District",
+          "path_segment": "chilubi",
+          "path": "/global/africa/zambia/northern/chilubi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kaputa District",
+          "path_segment": "kaputa",
+          "path": "/global/africa/zambia/northern/kaputa/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kasama District",
+          "path_segment": "kasama",
+          "path": "/global/africa/zambia/northern/kasama/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lunte District",
+          "path_segment": "lunte",
+          "path": "/global/africa/zambia/northern/lunte/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lupososhi District",
+          "path_segment": "lupososhi",
+          "path": "/global/africa/zambia/northern/lupososhi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Luwingu District",
+          "path_segment": "luwingu",
+          "path": "/global/africa/zambia/northern/luwingu/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mbala District",
+          "path_segment": "mbala",
+          "path": "/global/africa/zambia/northern/mbala/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mporokoso District",
+          "path_segment": "mporokoso",
+          "path": "/global/africa/zambia/northern/mporokoso/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mpulungu District",
+          "path_segment": "mpulungu",
+          "path": "/global/africa/zambia/northern/mpulungu/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mungwi District",
+          "path_segment": "mungwi",
+          "path": "/global/africa/zambia/northern/mungwi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Nsama District",
+          "path_segment": "nsama",
+          "path": "/global/africa/zambia/northern/nsama/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Senga Hill District",
+          "path_segment": "senga-hill",
+          "path": "/global/africa/zambia/northern/senga-hill/",
+          "tier_level": "district"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Chilubi Constituency",
+          "path_segment": "chilubi",
+          "path": "/global/africa/zambia/northern/chilubi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chimbamilonga Constituency",
+          "path_segment": "chimbamilonga",
+          "path": "/global/africa/zambia/northern/chimbamilonga/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kaputa Constituency",
+          "path_segment": "kaputa",
+          "path": "/global/africa/zambia/northern/kaputa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kasama Central Constituency",
+          "path_segment": "kasama-central",
+          "path": "/global/africa/zambia/northern/kasama-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kasama North Constituency",
+          "path_segment": "kasama-north",
+          "path": "/global/africa/zambia/northern/kasama-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kundabwika Constituency",
+          "path_segment": "kundabwika",
+          "path": "/global/africa/zambia/northern/kundabwika/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lubansenshi Constituency",
+          "path_segment": "lubansenshi",
+          "path": "/global/africa/zambia/northern/lubansenshi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lukashya Constituency",
+          "path_segment": "lukashya",
+          "path": "/global/africa/zambia/northern/lukashya/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lunte Constituency",
+          "path_segment": "lunte",
+          "path": "/global/africa/zambia/northern/lunte/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lupososhi Constituency",
+          "path_segment": "lupososhi",
+          "path": "/global/africa/zambia/northern/lupososhi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Luwingu Central Constituency",
+          "path_segment": "luwingu-central",
+          "path": "/global/africa/zambia/northern/luwingu-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Malole Constituency",
+          "path_segment": "malole",
+          "path": "/global/africa/zambia/northern/malole/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mbala Constituency",
+          "path_segment": "mbala",
+          "path": "/global/africa/zambia/northern/mbala/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mpanda Constituency",
+          "path_segment": "mpanda",
+          "path": "/global/africa/zambia/northern/mpanda/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mporokoso Constituency",
+          "path_segment": "mporokoso",
+          "path": "/global/africa/zambia/northern/mporokoso/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mpulungu North Constituency",
+          "path_segment": "mpulungu-north",
+          "path": "/global/africa/zambia/northern/mpulungu-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mpulungu South Constituency",
+          "path_segment": "mpulungu-south",
+          "path": "/global/africa/zambia/northern/mpulungu-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Saise Constituency",
+          "path_segment": "saise",
+          "path": "/global/africa/zambia/northern/saise/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Senga Hill Constituency",
+          "path_segment": "senga-hill",
+          "path": "/global/africa/zambia/northern/senga-hill/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        }
+      ],
+      "constituency_count": 19
+    },
+    {
+      "province": "North-Western Province",
+      "path_segment": "north-western",
+      "path": "/global/africa/zambia/north-western/",
+      "capital": "Solwezi",
+      "districts": [
+        {
+          "name": "Chavuma District",
+          "path_segment": "chavuma",
+          "path": "/global/africa/zambia/north-western/chavuma/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Ikelenge District",
+          "path_segment": "ikelenge",
+          "path": "/global/africa/zambia/north-western/ikelenge/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kabompo District",
+          "path_segment": "kabompo",
+          "path": "/global/africa/zambia/north-western/kabompo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kalumbila District",
+          "path_segment": "kalumbila",
+          "path": "/global/africa/zambia/north-western/kalumbila/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kasempa District",
+          "path_segment": "kasempa",
+          "path": "/global/africa/zambia/north-western/kasempa/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Manyinga District",
+          "path_segment": "manyinga",
+          "path": "/global/africa/zambia/north-western/manyinga/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mufumbwe District",
+          "path_segment": "mufumbwe",
+          "path": "/global/africa/zambia/north-western/mufumbwe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mushindamo District",
+          "path_segment": "mushindamo",
+          "path": "/global/africa/zambia/north-western/mushindamo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mwinilunga District",
+          "path_segment": "mwinilunga",
+          "path": "/global/africa/zambia/north-western/mwinilunga/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Solwezi District",
+          "path_segment": "solwezi",
+          "path": "/global/africa/zambia/north-western/solwezi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Zambezi District",
+          "path_segment": "zambezi",
+          "path": "/global/africa/zambia/north-western/zambezi/",
+          "tier_level": "district"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Chavuma Constituency",
+          "path_segment": "chavuma",
+          "path": "/global/africa/zambia/north-western/chavuma/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Dongwe Constituency",
+          "path_segment": "dongwe",
+          "path": "/global/africa/zambia/north-western/dongwe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Ikeleng'i Constituency",
+          "path_segment": "ikelengi",
+          "path": "/global/africa/zambia/north-western/ikelengi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kabompo East Constituency",
+          "path_segment": "kabompo-east",
+          "path": "/global/africa/zambia/north-western/kabompo-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kabompo West Constituency",
+          "path_segment": "kabompo-west",
+          "path": "/global/africa/zambia/north-western/kabompo-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kalumbila Constituency",
+          "path_segment": "kalumbila",
+          "path": "/global/africa/zambia/north-western/kalumbila/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kasempa Constituency",
+          "path_segment": "kasempa",
+          "path": "/global/africa/zambia/north-western/kasempa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lumwana Constituency",
+          "path_segment": "lumwana",
+          "path": "/global/africa/zambia/north-western/lumwana/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Manyinga Constituency",
+          "path_segment": "manyinga",
+          "path": "/global/africa/zambia/north-western/manyinga/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mufumbwe Constituency",
+          "path_segment": "mufumbwe",
+          "path": "/global/africa/zambia/north-western/mufumbwe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mufwashi Constituency",
+          "path_segment": "mufwashi",
+          "path": "/global/africa/zambia/north-western/mufwashi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mwinilunga East Constituency",
+          "path_segment": "mwinilunga-east",
+          "path": "/global/africa/zambia/north-western/mwinilunga-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mwinilunga West Constituency",
+          "path_segment": "mwinilunga-west",
+          "path": "/global/africa/zambia/north-western/mwinilunga-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Solwezi Central Constituency",
+          "path_segment": "solwezi-central",
+          "path": "/global/africa/zambia/north-western/solwezi-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Solwezi North Constituency",
+          "path_segment": "solwezi-north",
+          "path": "/global/africa/zambia/north-western/solwezi-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Solwezi West Constituency",
+          "path_segment": "solwezi-west",
+          "path": "/global/africa/zambia/north-western/solwezi-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Zambezi Central Constituency",
+          "path_segment": "zambezi-central",
+          "path": "/global/africa/zambia/north-western/zambezi-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Zambezi East Constituency",
+          "path_segment": "zambezi-east",
+          "path": "/global/africa/zambia/north-western/zambezi-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Zambezi West Constituency",
+          "path_segment": "zambezi-west",
+          "path": "/global/africa/zambia/north-western/zambezi-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        }
+      ],
+      "constituency_count": 19
+    },
+    {
+      "province": "Southern Province",
+      "path_segment": "southern",
+      "path": "/global/africa/zambia/southern/",
+      "capital": "Choma",
+      "districts": [
+        {
+          "name": "Chikankata District",
+          "path_segment": "chikankata",
+          "path": "/global/africa/zambia/southern/chikankata/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Chirundu District",
+          "path_segment": "chirundu",
+          "path": "/global/africa/zambia/southern/chirundu/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Choma District",
+          "path_segment": "choma",
+          "path": "/global/africa/zambia/southern/choma/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Gwembe District",
+          "path_segment": "gwembe",
+          "path": "/global/africa/zambia/southern/gwembe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Itezhi-Tezhi District",
+          "path_segment": "itezhi-tezhi",
+          "path": "/global/africa/zambia/southern/itezhi-tezhi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kalomo District",
+          "path_segment": "kalomo",
+          "path": "/global/africa/zambia/southern/kalomo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kazungula District",
+          "path_segment": "kazungula",
+          "path": "/global/africa/zambia/southern/kazungula/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Livingstone District",
+          "path_segment": "livingstone",
+          "path": "/global/africa/zambia/southern/livingstone/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mazabuka District",
+          "path_segment": "mazabuka",
+          "path": "/global/africa/zambia/southern/mazabuka/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Monze District",
+          "path_segment": "monze",
+          "path": "/global/africa/zambia/southern/monze/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Namwala District",
+          "path_segment": "namwala",
+          "path": "/global/africa/zambia/southern/namwala/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Pemba District",
+          "path_segment": "pemba",
+          "path": "/global/africa/zambia/southern/pemba/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Siavonga District",
+          "path_segment": "siavonga",
+          "path": "/global/africa/zambia/southern/siavonga/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Sinazongwe District",
+          "path_segment": "sinazongwe",
+          "path": "/global/africa/zambia/southern/sinazongwe/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Zimba District",
+          "path_segment": "zimba",
+          "path": "/global/africa/zambia/southern/zimba/",
+          "tier_level": "district"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Bweengwa Constituency",
+          "path_segment": "bweengwa",
+          "path": "/global/africa/zambia/southern/bweengwa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chikankata Constituency",
+          "path_segment": "chikankata",
+          "path": "/global/africa/zambia/southern/chikankata/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Chirundu Constituency",
+          "path_segment": "chirundu",
+          "path": "/global/africa/zambia/southern/chirundu/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Choma Central Constituency",
+          "path_segment": "choma-central",
+          "path": "/global/africa/zambia/southern/choma-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Choma South Constituency",
+          "path_segment": "choma-south",
+          "path": "/global/africa/zambia/southern/choma-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Dundumwenzi Constituency",
+          "path_segment": "dundumwenzi",
+          "path": "/global/africa/zambia/southern/dundumwenzi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Gwembe Constituency",
+          "path_segment": "gwembe",
+          "path": "/global/africa/zambia/southern/gwembe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Itezhi-Tezhi East Constituency",
+          "path_segment": "itezhi-tezhi-east",
+          "path": "/global/africa/zambia/southern/itezhi-tezhi-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Itezhi-Tezhi West Constituency",
+          "path_segment": "itezhi-tezhi-west",
+          "path": "/global/africa/zambia/southern/itezhi-tezhi-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kalomo Central Constituency",
+          "path_segment": "kalomo-central",
+          "path": "/global/africa/zambia/southern/kalomo-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kalomo South Constituency",
+          "path_segment": "kalomo-south",
+          "path": "/global/africa/zambia/southern/kalomo-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kariba Constituency",
+          "path_segment": "kariba",
+          "path": "/global/africa/zambia/southern/kariba/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kazungula North Constituency",
+          "path_segment": "kazungula-north",
+          "path": "/global/africa/zambia/southern/kazungula-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kazungula South Constituency",
+          "path_segment": "kazungula-south",
+          "path": "/global/africa/zambia/southern/kazungula-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Livingstone Constituency",
+          "path_segment": "livingstone",
+          "path": "/global/africa/zambia/southern/livingstone/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Magoye East Constituency",
+          "path_segment": "magoye-east",
+          "path": "/global/africa/zambia/southern/magoye-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Magoye West Constituency",
+          "path_segment": "magoye-west",
+          "path": "/global/africa/zambia/southern/magoye-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mapatizya Constituency",
+          "path_segment": "mapatizya",
+          "path": "/global/africa/zambia/southern/mapatizya/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Maramba Constituency",
+          "path_segment": "maramba",
+          "path": "/global/africa/zambia/southern/maramba/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mazabuka Central Constituency",
+          "path_segment": "mazabuka-central",
+          "path": "/global/africa/zambia/southern/mazabuka-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mbabala Constituency",
+          "path_segment": "mbabala",
+          "path": "/global/africa/zambia/southern/mbabala/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Monze Central Constituency",
+          "path_segment": "monze-central",
+          "path": "/global/africa/zambia/southern/monze-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Monze East Constituency",
+          "path_segment": "monze-east",
+          "path": "/global/africa/zambia/southern/monze-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Moomba Constituency",
+          "path_segment": "moomba",
+          "path": "/global/africa/zambia/southern/moomba/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Namwala East Constituency",
+          "path_segment": "namwala-east",
+          "path": "/global/africa/zambia/southern/namwala-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Namwala West Constituency",
+          "path_segment": "namwala-west",
+          "path": "/global/africa/zambia/southern/namwala-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Pemba Constituency",
+          "path_segment": "pemba",
+          "path": "/global/africa/zambia/southern/pemba/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Siavonga Constituency",
+          "path_segment": "siavonga",
+          "path": "/global/africa/zambia/southern/siavonga/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Sinazongwe Constituency",
+          "path_segment": "sinazongwe",
+          "path": "/global/africa/zambia/southern/sinazongwe/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        }
+      ],
+      "constituency_count": 29
+    },
+    {
+      "province": "Western Province",
+      "path_segment": "western",
+      "path": "/global/africa/zambia/western/",
+      "capital": "Mongu",
+      "districts": [
+        {
+          "name": "Kalabo District",
+          "path_segment": "kalabo",
+          "path": "/global/africa/zambia/western/kalabo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Kaoma District",
+          "path_segment": "kaoma",
+          "path": "/global/africa/zambia/western/kaoma/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Limulunga District",
+          "path_segment": "limulunga",
+          "path": "/global/africa/zambia/western/limulunga/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Luampa District",
+          "path_segment": "luampa",
+          "path": "/global/africa/zambia/western/luampa/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Lukulu District",
+          "path_segment": "lukulu",
+          "path": "/global/africa/zambia/western/lukulu/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mitete District",
+          "path_segment": "mitete",
+          "path": "/global/africa/zambia/western/mitete/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mongu District",
+          "path_segment": "mongu",
+          "path": "/global/africa/zambia/western/mongu/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mulobezi District",
+          "path_segment": "mulobezi",
+          "path": "/global/africa/zambia/western/mulobezi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Mwandi District",
+          "path_segment": "mwandi",
+          "path": "/global/africa/zambia/western/mwandi/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Nalolo District",
+          "path_segment": "nalolo",
+          "path": "/global/africa/zambia/western/nalolo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Nkeyema District",
+          "path_segment": "nkeyema",
+          "path": "/global/africa/zambia/western/nkeyema/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Senanga District",
+          "path_segment": "senanga",
+          "path": "/global/africa/zambia/western/senanga/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Sesheke District",
+          "path_segment": "sesheke",
+          "path": "/global/africa/zambia/western/sesheke/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Shang'ombo District",
+          "path_segment": "shangombo",
+          "path": "/global/africa/zambia/western/shangombo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Sikongo District",
+          "path_segment": "sikongo",
+          "path": "/global/africa/zambia/western/sikongo/",
+          "tier_level": "district"
+        },
+        {
+          "name": "Sioma District",
+          "path_segment": "sioma",
+          "path": "/global/africa/zambia/western/sioma/",
+          "tier_level": "district"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Kalabo Central Constituency",
+          "path_segment": "kalabo-central",
+          "path": "/global/africa/zambia/western/kalabo-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kalabo South Constituency",
+          "path_segment": "kalabo-south",
+          "path": "/global/africa/zambia/western/kalabo-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Kaoma Constituency",
+          "path_segment": "kaoma",
+          "path": "/global/africa/zambia/western/kaoma/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Liuwa Constituency",
+          "path_segment": "liuwa",
+          "path": "/global/africa/zambia/western/liuwa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Luampa Constituency",
+          "path_segment": "luampa",
+          "path": "/global/africa/zambia/western/luampa/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Luampa West Constituency",
+          "path_segment": "luampa-west",
+          "path": "/global/africa/zambia/western/luampa-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Luena Constituency",
+          "path_segment": "luena",
+          "path": "/global/africa/zambia/western/luena/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lukulu East Constituency",
+          "path_segment": "lukulu-east",
+          "path": "/global/africa/zambia/western/lukulu-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Lukulu South Constituency",
+          "path_segment": "lukulu-south",
+          "path": "/global/africa/zambia/western/lukulu-south/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mangango Constituency",
+          "path_segment": "mangango",
+          "path": "/global/africa/zambia/western/mangango/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mitete Constituency",
+          "path_segment": "mitete",
+          "path": "/global/africa/zambia/western/mitete/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mongu Central Constituency",
+          "path_segment": "mongu-central",
+          "path": "/global/africa/zambia/western/mongu-central/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mongu East Constituency",
+          "path_segment": "mongu-east",
+          "path": "/global/africa/zambia/western/mongu-east/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mulobezi Constituency",
+          "path_segment": "mulobezi",
+          "path": "/global/africa/zambia/western/mulobezi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Mwandi Constituency",
+          "path_segment": "mwandi",
+          "path": "/global/africa/zambia/western/mwandi/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nalikwanda Constituency",
+          "path_segment": "nalikwanda",
+          "path": "/global/africa/zambia/western/nalikwanda/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nalolo Constituency",
+          "path_segment": "nalolo",
+          "path": "/global/africa/zambia/western/nalolo/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Nkeyema Constituency",
+          "path_segment": "nkeyema",
+          "path": "/global/africa/zambia/western/nkeyema/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Senanga Constituency",
+          "path_segment": "senanga",
+          "path": "/global/africa/zambia/western/senanga/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Senanga North Constituency",
+          "path_segment": "senanga-north",
+          "path": "/global/africa/zambia/western/senanga-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Sesheke Constituency",
+          "path_segment": "sesheke",
+          "path": "/global/africa/zambia/western/sesheke/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Sesheke West Constituency",
+          "path_segment": "sesheke-west",
+          "path": "/global/africa/zambia/western/sesheke-west/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Shangombo North Constituency",
+          "path_segment": "shangombo-north",
+          "path": "/global/africa/zambia/western/shangombo-north/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": true,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Shang'ombo Constituency",
+          "path_segment": "shangombo",
+          "path": "/global/africa/zambia/western/shangombo/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Sikongo Constituency",
+          "path_segment": "sikongo",
+          "path": "/global/africa/zambia/western/sikongo/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        },
+        {
+          "name": "Sioma Constituency",
+          "path_segment": "sioma",
+          "path": "/global/africa/zambia/western/sioma/",
+          "tier_level": "constituency",
+          "created_in_2026_delimitation": false,
+          "wards": {
+            "count": null,
+            "status": "placeholder"
+          }
+        }
+      ],
+      "constituency_count": 26
+    }
+  ],
+  "metadata": {
+    "generated": "2026-08-19",
+    "source": "Ichebo Sceptre Community geographic dataset — Zambia",
+    "correction_notice": "This version corrects a prior draft that stated 156 National Assembly constituencies. The Electoral Commission of Zambia (ECZ) delimitation exercise announced 16 April 2026 (effective 15 May 2026, under the Constitution of Zambia (Amendment) Act No. 13 of 2025) added 70 new constituencies, raising the national total to 226 ahead of the 13 August 2026 general election. This dataset reflects the corrected 226-constituency figure.",
+    "verification": "Province/District tier verified as before. Constituency tier (226 total) verified against elections.org.zm (ECZ home page summary statistics), elections.org.zm/?p=5529 (ECZ announcement), parliament.gov.zm/node/13025 (National Assembly announcement with per-province totals), and parliament.gov.zm/members/constituencies (National Assembly's full constituency-by-province name listing), all checked 2026-08-19. Cross-referenced against lgazambia.org.zm's Central Province page for district-tier corroboration.",
+    "pattern_note": "Zambia's local-government/electoral pattern is Province -> District -> Constituency -> Ward. Constituency does not nest cleanly 1:1 under District administratively — ECZ constituency boundaries can span or subdivide districts. The constituency list here is grouped at PROVINCE level per the official parliament.gov.zm structure; an explicit constituency-to-district assignment is not asserted and would need ECZ delimitation gazettes if required at that precision.",
+    "constituency_tier_note": "226 constituencies nationally (up from 156), all named and listed per province below. Entries marked created_in_2026_delimitation: true are among the 70 new constituencies created in the April 2026 ECZ delimitation.",
+    "ward_tier_note": "Ward tier remains a structural placeholder (count: null). ECZ's official published national total is 1,858 wards; per-constituency ward counts and boundaries require ECZ ward-delimitation gazette lookups, pending.",
+    "materialised_path_pattern": "/global/africa/{country}/{province}/{district-or-constituency}/[{ward}/][{sceptre-community}/]"
+  }
+}

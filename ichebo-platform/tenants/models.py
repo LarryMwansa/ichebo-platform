@@ -12,6 +12,16 @@ class Tenant(SoftDeleteMixin, models.Model):
         ('induction', 'Induction'),
         ('church_node', 'Church Node'),
         ('church_collective', 'Church Collective'),
+        # 'local' and 'ward' — the two geographic scaffold tiers below
+        # District. One canonical value each, reused across every country's
+        # bulk-imported geography regardless of local terminology: Zambia
+        # calls the 'local' tier Constituency, South Africa calls it Local
+        # Municipality (and a Metro also maps here — it has no separate
+        # municipality beneath it, so it plays the same ward-parent role).
+        # Display label stays generic; the country-specific name lives on
+        # the Record/Tenant itself (name field), not the tier vocabulary.
+        ('local', 'Local'),
+        ('ward', 'Ward'),
         ('district', 'District'),
         ('provincial', 'Provincial'),
         ('national', 'National'),
@@ -103,6 +113,11 @@ class UserPermission(SoftDeleteMixin, models.Model):
         ('beginner', 'Beginner'),
         ('disciple', 'Disciple'),
         ('branch-steward', 'Branch Steward'),
+        # Shared by both new geographic tiers (local, ward) rather than
+        # split into two roles — these are freshly-imported scaffold
+        # tenants with no appointed stewards yet; one role covers both
+        # until real usage shows a reason to split them.
+        ('local-steward', 'Local Steward'),
         ('district-steward', 'District Steward'),
         ('provincial-steward', 'Provincial Steward'),
         ('national-steward', 'National Steward'),

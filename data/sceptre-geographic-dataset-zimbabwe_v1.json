@@ -1,0 +1,3222 @@
+{
+  "country": "Zimbabwe",
+  "country_code": "ZW",
+  "path_segment": "zimbabwe",
+  "provinces": [
+    {
+      "province": "Bulawayo Metropolitan Province",
+      "province_type": "Metropolitan Province",
+      "path_segment": "bulawayo",
+      "path": "/global/africa/zimbabwe/bulawayo/",
+      "capital": "Bulawayo",
+      "districts": [
+        {
+          "name": "Bulawayo Urban District",
+          "path_segment": "bulawayo-urban",
+          "path": "/global/africa/zimbabwe/bulawayo/bulawayo-urban/",
+          "tier_level": "district_local_authority"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Bulawayo Central Constituency",
+          "path_segment": "bulawayo-central",
+          "path": "/global/africa/zimbabwe/bulawayo/bulawayo-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Bulawayo North Constituency",
+          "path_segment": "bulawayo-north",
+          "path": "/global/africa/zimbabwe/bulawayo/bulawayo-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Bulawayo South Constituency",
+          "path_segment": "bulawayo-south",
+          "path": "/global/africa/zimbabwe/bulawayo/bulawayo-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Cowdray Park Constituency",
+          "path_segment": "cowdray-park",
+          "path": "/global/africa/zimbabwe/bulawayo/cowdray-park/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Emakhandeni-Luveve Constituency",
+          "path_segment": "emakhandeni-luveve",
+          "path": "/global/africa/zimbabwe/bulawayo/emakhandeni-luveve/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Entumbane-Njube Constituency",
+          "path_segment": "entumbane-njube",
+          "path": "/global/africa/zimbabwe/bulawayo/entumbane-njube/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Lobengula-Magwegwe Constituency",
+          "path_segment": "lobengula-magwegwe",
+          "path": "/global/africa/zimbabwe/bulawayo/lobengula-magwegwe/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mpopoma-Mzilikazi Constituency",
+          "path_segment": "mpopoma-mzilikazi",
+          "path": "/global/africa/zimbabwe/bulawayo/mpopoma-mzilikazi/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Nketa Constituency",
+          "path_segment": "nketa",
+          "path": "/global/africa/zimbabwe/bulawayo/nketa/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Nkulumane Constituency",
+          "path_segment": "nkulumane",
+          "path": "/global/africa/zimbabwe/bulawayo/nkulumane/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Pelandaba-Tshabalala Constituency",
+          "path_segment": "pelandaba-tshabalala",
+          "path": "/global/africa/zimbabwe/bulawayo/pelandaba-tshabalala/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Pumula Constituency",
+          "path_segment": "pumula",
+          "path": "/global/africa/zimbabwe/bulawayo/pumula/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        }
+      ],
+      "constituency_count_verified": 12,
+      "constituency_count_actual": 12,
+      "ward_count_verified": 29
+    },
+    {
+      "province": "Harare Metropolitan Province",
+      "province_type": "Metropolitan Province",
+      "path_segment": "harare",
+      "path": "/global/africa/zimbabwe/harare/",
+      "capital": "Harare",
+      "districts": [
+        {
+          "name": "Chitungwiza Urban District",
+          "path_segment": "chitungwiza-urban",
+          "path": "/global/africa/zimbabwe/harare/chitungwiza-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Epworth Urban District",
+          "path_segment": "epworth-urban",
+          "path": "/global/africa/zimbabwe/harare/epworth-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Harare Rural District",
+          "path_segment": "harare-rural",
+          "path": "/global/africa/zimbabwe/harare/harare-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Harare Urban District",
+          "path_segment": "harare-urban",
+          "path": "/global/africa/zimbabwe/harare/harare-urban/",
+          "tier_level": "district_local_authority"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Budiriro North Constituency",
+          "path_segment": "budiriro-north",
+          "path": "/global/africa/zimbabwe/harare/budiriro-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Budiriro South Constituency",
+          "path_segment": "budiriro-south",
+          "path": "/global/africa/zimbabwe/harare/budiriro-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chitungwiza North Constituency",
+          "path_segment": "chitungwiza-north",
+          "path": "/global/africa/zimbabwe/harare/chitungwiza-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chitungwiza South Constituency",
+          "path_segment": "chitungwiza-south",
+          "path": "/global/africa/zimbabwe/harare/chitungwiza-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Churu Constituency",
+          "path_segment": "churu",
+          "path": "/global/africa/zimbabwe/harare/churu/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Dzivarasekwa Constituency",
+          "path_segment": "dzivarasekwa",
+          "path": "/global/africa/zimbabwe/harare/dzivarasekwa/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Epworth North Constituency",
+          "path_segment": "epworth-north",
+          "path": "/global/africa/zimbabwe/harare/epworth-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Epworth South Constituency",
+          "path_segment": "epworth-south",
+          "path": "/global/africa/zimbabwe/harare/epworth-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Glen Norah Constituency",
+          "path_segment": "glen-norah",
+          "path": "/global/africa/zimbabwe/harare/glen-norah/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Glen View North Constituency",
+          "path_segment": "glen-view-north",
+          "path": "/global/africa/zimbabwe/harare/glen-view-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Glen View South Constituency",
+          "path_segment": "glen-view-south",
+          "path": "/global/africa/zimbabwe/harare/glen-view-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Harare Central Constituency",
+          "path_segment": "harare-central",
+          "path": "/global/africa/zimbabwe/harare/harare-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Harare East Constituency",
+          "path_segment": "harare-east",
+          "path": "/global/africa/zimbabwe/harare/harare-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Harare South Constituency",
+          "path_segment": "harare-south",
+          "path": "/global/africa/zimbabwe/harare/harare-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Harare West Constituency",
+          "path_segment": "harare-west",
+          "path": "/global/africa/zimbabwe/harare/harare-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Hatcliffe Constituency",
+          "path_segment": "hatcliffe",
+          "path": "/global/africa/zimbabwe/harare/hatcliffe/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Hatfield Constituency",
+          "path_segment": "hatfield",
+          "path": "/global/africa/zimbabwe/harare/hatfield/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Highfield Constituency",
+          "path_segment": "highfield",
+          "path": "/global/africa/zimbabwe/harare/highfield/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Hunyani Constituency",
+          "path_segment": "hunyani",
+          "path": "/global/africa/zimbabwe/harare/hunyani/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Kuwadzana East Constituency",
+          "path_segment": "kuwadzana-east",
+          "path": "/global/africa/zimbabwe/harare/kuwadzana-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Kuwadzana West Constituency",
+          "path_segment": "kuwadzana-west",
+          "path": "/global/africa/zimbabwe/harare/kuwadzana-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mabvuku-Tafara Constituency",
+          "path_segment": "mabvuku-tafara",
+          "path": "/global/africa/zimbabwe/harare/mabvuku-tafara/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mbare Constituency",
+          "path_segment": "mbare",
+          "path": "/global/africa/zimbabwe/harare/mbare/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mount Pleasant Constituency",
+          "path_segment": "mount-pleasant",
+          "path": "/global/africa/zimbabwe/harare/mount-pleasant/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Southerton Constituency",
+          "path_segment": "southerton",
+          "path": "/global/africa/zimbabwe/harare/southerton/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "St Mary's Constituency",
+          "path_segment": "st-marys",
+          "path": "/global/africa/zimbabwe/harare/st-marys/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Sunningdale Constituency",
+          "path_segment": "sunningdale",
+          "path": "/global/africa/zimbabwe/harare/sunningdale/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Warren Park Constituency",
+          "path_segment": "warren-park",
+          "path": "/global/africa/zimbabwe/harare/warren-park/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zengeza East Constituency",
+          "path_segment": "zengeza-east",
+          "path": "/global/africa/zimbabwe/harare/zengeza-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zengeza West Constituency",
+          "path_segment": "zengeza-west",
+          "path": "/global/africa/zimbabwe/harare/zengeza-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        }
+      ],
+      "constituency_count_verified": 30,
+      "constituency_count_actual": 30,
+      "ward_count_verified": 77
+    },
+    {
+      "province": "Manicaland Province",
+      "province_type": "Province",
+      "path_segment": "manicaland",
+      "path": "/global/africa/zimbabwe/manicaland/",
+      "capital": "Mutare",
+      "districts": [
+        {
+          "name": "Buhera District",
+          "path_segment": "buhera",
+          "path": "/global/africa/zimbabwe/manicaland/buhera/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Chimanimani District",
+          "path_segment": "chimanimani",
+          "path": "/global/africa/zimbabwe/manicaland/chimanimani/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Chipinge Rural District",
+          "path_segment": "chipinge-rural",
+          "path": "/global/africa/zimbabwe/manicaland/chipinge-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Chipinge Urban District",
+          "path_segment": "chipinge-urban",
+          "path": "/global/africa/zimbabwe/manicaland/chipinge-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Makoni District",
+          "path_segment": "makoni",
+          "path": "/global/africa/zimbabwe/manicaland/makoni/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mutare Rural District",
+          "path_segment": "mutare-rural",
+          "path": "/global/africa/zimbabwe/manicaland/mutare-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mutare Urban District",
+          "path_segment": "mutare-urban",
+          "path": "/global/africa/zimbabwe/manicaland/mutare-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mutasa District",
+          "path_segment": "mutasa",
+          "path": "/global/africa/zimbabwe/manicaland/mutasa/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Nyanga District",
+          "path_segment": "nyanga",
+          "path": "/global/africa/zimbabwe/manicaland/nyanga/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Rusape Urban District",
+          "path_segment": "rusape-urban",
+          "path": "/global/africa/zimbabwe/manicaland/rusape-urban/",
+          "tier_level": "district_local_authority"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Buhera Central Constituency",
+          "path_segment": "buhera-central",
+          "path": "/global/africa/zimbabwe/manicaland/buhera-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Buhera North Constituency",
+          "path_segment": "buhera-north",
+          "path": "/global/africa/zimbabwe/manicaland/buhera-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Buhera South Constituency",
+          "path_segment": "buhera-south",
+          "path": "/global/africa/zimbabwe/manicaland/buhera-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Buhera West Constituency",
+          "path_segment": "buhera-west",
+          "path": "/global/africa/zimbabwe/manicaland/buhera-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chikanga Constituency",
+          "path_segment": "chikanga",
+          "path": "/global/africa/zimbabwe/manicaland/chikanga/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chimanimani East Constituency",
+          "path_segment": "chimanimani-east",
+          "path": "/global/africa/zimbabwe/manicaland/chimanimani-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chimanimani West Constituency",
+          "path_segment": "chimanimani-west",
+          "path": "/global/africa/zimbabwe/manicaland/chimanimani-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chipinge Central Constituency",
+          "path_segment": "chipinge-central",
+          "path": "/global/africa/zimbabwe/manicaland/chipinge-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chipinge East Constituency",
+          "path_segment": "chipinge-east",
+          "path": "/global/africa/zimbabwe/manicaland/chipinge-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chipinge South Constituency",
+          "path_segment": "chipinge-south",
+          "path": "/global/africa/zimbabwe/manicaland/chipinge-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Dangamvura Constituency",
+          "path_segment": "dangamvura",
+          "path": "/global/africa/zimbabwe/manicaland/dangamvura/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Headlands Constituency",
+          "path_segment": "headlands",
+          "path": "/global/africa/zimbabwe/manicaland/headlands/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Makoni Central Constituency",
+          "path_segment": "makoni-central",
+          "path": "/global/africa/zimbabwe/manicaland/makoni-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Makoni North Constituency",
+          "path_segment": "makoni-north",
+          "path": "/global/africa/zimbabwe/manicaland/makoni-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Makoni South Constituency",
+          "path_segment": "makoni-south",
+          "path": "/global/africa/zimbabwe/manicaland/makoni-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Makoni West Constituency",
+          "path_segment": "makoni-west",
+          "path": "/global/africa/zimbabwe/manicaland/makoni-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutare Central Constituency",
+          "path_segment": "mutare-central",
+          "path": "/global/africa/zimbabwe/manicaland/mutare-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutare North Constituency",
+          "path_segment": "mutare-north",
+          "path": "/global/africa/zimbabwe/manicaland/mutare-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutare South Constituency",
+          "path_segment": "mutare-south",
+          "path": "/global/africa/zimbabwe/manicaland/mutare-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutare West Constituency",
+          "path_segment": "mutare-west",
+          "path": "/global/africa/zimbabwe/manicaland/mutare-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutasa Central Constituency",
+          "path_segment": "mutasa-central",
+          "path": "/global/africa/zimbabwe/manicaland/mutasa-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutasa North Constituency",
+          "path_segment": "mutasa-north",
+          "path": "/global/africa/zimbabwe/manicaland/mutasa-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutasa South Constituency",
+          "path_segment": "mutasa-south",
+          "path": "/global/africa/zimbabwe/manicaland/mutasa-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutema-Musikavanhu (Chipinge West) Constituency",
+          "path_segment": "mutema-musikavanhu-chipinge-west",
+          "path": "/global/africa/zimbabwe/manicaland/mutema-musikavanhu-chipinge-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Nyanga North Constituency",
+          "path_segment": "nyanga-north",
+          "path": "/global/africa/zimbabwe/manicaland/nyanga-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Nyanga South Constituency",
+          "path_segment": "nyanga-south",
+          "path": "/global/africa/zimbabwe/manicaland/nyanga-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        }
+      ],
+      "constituency_count_verified": 26,
+      "constituency_count_actual": 26,
+      "ward_count_verified": 260
+    },
+    {
+      "province": "Mashonaland Central Province",
+      "province_type": "Province",
+      "path_segment": "mashonaland-central",
+      "path": "/global/africa/zimbabwe/mashonaland-central/",
+      "capital": "Bindura",
+      "districts": [
+        {
+          "name": "Bindura Rural District",
+          "path_segment": "bindura-rural",
+          "path": "/global/africa/zimbabwe/mashonaland-central/bindura-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Bindura Urban District",
+          "path_segment": "bindura-urban",
+          "path": "/global/africa/zimbabwe/mashonaland-central/bindura-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Guruve District",
+          "path_segment": "guruve",
+          "path": "/global/africa/zimbabwe/mashonaland-central/guruve/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mazowe District",
+          "path_segment": "mazowe",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mazowe/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mbire District",
+          "path_segment": "mbire",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mbire/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mount Darwin District",
+          "path_segment": "mount-darwin",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mount-darwin/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Muzarabani (Centenary) District",
+          "path_segment": "muzarabani-centenary",
+          "path": "/global/africa/zimbabwe/mashonaland-central/muzarabani-centenary/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mvurwi Urban District",
+          "path_segment": "mvurwi-urban",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mvurwi-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Rushinga District",
+          "path_segment": "rushinga",
+          "path": "/global/africa/zimbabwe/mashonaland-central/rushinga/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Shamva District",
+          "path_segment": "shamva",
+          "path": "/global/africa/zimbabwe/mashonaland-central/shamva/",
+          "tier_level": "district_local_authority"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Bindura North Constituency",
+          "path_segment": "bindura-north",
+          "path": "/global/africa/zimbabwe/mashonaland-central/bindura-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Bindura South Constituency",
+          "path_segment": "bindura-south",
+          "path": "/global/africa/zimbabwe/mashonaland-central/bindura-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Guruve North Constituency",
+          "path_segment": "guruve-north",
+          "path": "/global/africa/zimbabwe/mashonaland-central/guruve-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Guruve South Constituency",
+          "path_segment": "guruve-south",
+          "path": "/global/africa/zimbabwe/mashonaland-central/guruve-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mazowe Central Constituency",
+          "path_segment": "mazowe-central",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mazowe-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mazowe North Constituency",
+          "path_segment": "mazowe-north",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mazowe-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mazowe South Constituency",
+          "path_segment": "mazowe-south",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mazowe-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mazowe West Constituency",
+          "path_segment": "mazowe-west",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mazowe-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mbire Constituency",
+          "path_segment": "mbire",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mbire/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mount Darwin East Constituency",
+          "path_segment": "mount-darwin-east",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mount-darwin-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mount Darwin North Constituency",
+          "path_segment": "mount-darwin-north",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mount-darwin-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mount Darwin South Constituency",
+          "path_segment": "mount-darwin-south",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mount-darwin-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mount Darwin West Constituency",
+          "path_segment": "mount-darwin-west",
+          "path": "/global/africa/zimbabwe/mashonaland-central/mount-darwin-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Muzarabani North Constituency",
+          "path_segment": "muzarabani-north",
+          "path": "/global/africa/zimbabwe/mashonaland-central/muzarabani-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Muzarabani South Constituency",
+          "path_segment": "muzarabani-south",
+          "path": "/global/africa/zimbabwe/mashonaland-central/muzarabani-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Rushinga Constituency",
+          "path_segment": "rushinga",
+          "path": "/global/africa/zimbabwe/mashonaland-central/rushinga/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Shamva North Constituency",
+          "path_segment": "shamva-north",
+          "path": "/global/africa/zimbabwe/mashonaland-central/shamva-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Shamva South Constituency",
+          "path_segment": "shamva-south",
+          "path": "/global/africa/zimbabwe/mashonaland-central/shamva-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        }
+      ],
+      "constituency_count_verified": 18,
+      "constituency_count_actual": 18,
+      "ward_count_verified": 238
+    },
+    {
+      "province": "Mashonaland East Province",
+      "province_type": "Province",
+      "path_segment": "mashonaland-east",
+      "path": "/global/africa/zimbabwe/mashonaland-east/",
+      "capital": "Marondera",
+      "districts": [
+        {
+          "name": "Chikomba District",
+          "path_segment": "chikomba",
+          "path": "/global/africa/zimbabwe/mashonaland-east/chikomba/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Goromonzi District",
+          "path_segment": "goromonzi",
+          "path": "/global/africa/zimbabwe/mashonaland-east/goromonzi/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Hwedza (Wedza) District",
+          "path_segment": "hwedza-wedza",
+          "path": "/global/africa/zimbabwe/mashonaland-east/hwedza-wedza/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Marondera Rural District",
+          "path_segment": "marondera-rural",
+          "path": "/global/africa/zimbabwe/mashonaland-east/marondera-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Marondera Urban District",
+          "path_segment": "marondera-urban",
+          "path": "/global/africa/zimbabwe/mashonaland-east/marondera-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mudzi District",
+          "path_segment": "mudzi",
+          "path": "/global/africa/zimbabwe/mashonaland-east/mudzi/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Murehwa District",
+          "path_segment": "murehwa",
+          "path": "/global/africa/zimbabwe/mashonaland-east/murehwa/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mutoko District",
+          "path_segment": "mutoko",
+          "path": "/global/africa/zimbabwe/mashonaland-east/mutoko/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Ruwa Urban District",
+          "path_segment": "ruwa-urban",
+          "path": "/global/africa/zimbabwe/mashonaland-east/ruwa-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Seke District",
+          "path_segment": "seke",
+          "path": "/global/africa/zimbabwe/mashonaland-east/seke/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Uzumba-Maramba-Pfungwe (UMP) District",
+          "path_segment": "uzumba-maramba-pfungwe-ump",
+          "path": "/global/africa/zimbabwe/mashonaland-east/uzumba-maramba-pfungwe-ump/",
+          "tier_level": "district_local_authority"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Chikomba East Constituency",
+          "path_segment": "chikomba-east",
+          "path": "/global/africa/zimbabwe/mashonaland-east/chikomba-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chikomba West Constituency",
+          "path_segment": "chikomba-west",
+          "path": "/global/africa/zimbabwe/mashonaland-east/chikomba-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Goromonzi North Constituency",
+          "path_segment": "goromonzi-north",
+          "path": "/global/africa/zimbabwe/mashonaland-east/goromonzi-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Goromonzi South Constituency",
+          "path_segment": "goromonzi-south",
+          "path": "/global/africa/zimbabwe/mashonaland-east/goromonzi-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Goromonzi West Constituency",
+          "path_segment": "goromonzi-west",
+          "path": "/global/africa/zimbabwe/mashonaland-east/goromonzi-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Maramba-Pfungwe Constituency",
+          "path_segment": "maramba-pfungwe",
+          "path": "/global/africa/zimbabwe/mashonaland-east/maramba-pfungwe/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Marondera Central Constituency",
+          "path_segment": "marondera-central",
+          "path": "/global/africa/zimbabwe/mashonaland-east/marondera-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Marondera East Constituency",
+          "path_segment": "marondera-east",
+          "path": "/global/africa/zimbabwe/mashonaland-east/marondera-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Marondera West Constituency",
+          "path_segment": "marondera-west",
+          "path": "/global/africa/zimbabwe/mashonaland-east/marondera-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mudzi North Constituency",
+          "path_segment": "mudzi-north",
+          "path": "/global/africa/zimbabwe/mashonaland-east/mudzi-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mudzi South Constituency",
+          "path_segment": "mudzi-south",
+          "path": "/global/africa/zimbabwe/mashonaland-east/mudzi-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mudzi West Constituency",
+          "path_segment": "mudzi-west",
+          "path": "/global/africa/zimbabwe/mashonaland-east/mudzi-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Murehwa North Constituency",
+          "path_segment": "murehwa-north",
+          "path": "/global/africa/zimbabwe/mashonaland-east/murehwa-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Murehwa South Constituency",
+          "path_segment": "murehwa-south",
+          "path": "/global/africa/zimbabwe/mashonaland-east/murehwa-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Murehwa West Constituency",
+          "path_segment": "murehwa-west",
+          "path": "/global/africa/zimbabwe/mashonaland-east/murehwa-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutoko East Constituency",
+          "path_segment": "mutoko-east",
+          "path": "/global/africa/zimbabwe/mashonaland-east/mutoko-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutoko North Constituency",
+          "path_segment": "mutoko-north",
+          "path": "/global/africa/zimbabwe/mashonaland-east/mutoko-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mutoko South Constituency",
+          "path_segment": "mutoko-south",
+          "path": "/global/africa/zimbabwe/mashonaland-east/mutoko-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Ruwa Constituency",
+          "path_segment": "ruwa",
+          "path": "/global/africa/zimbabwe/mashonaland-east/ruwa/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Seke Constituency",
+          "path_segment": "seke",
+          "path": "/global/africa/zimbabwe/mashonaland-east/seke/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Uzumba Constituency",
+          "path_segment": "uzumba",
+          "path": "/global/africa/zimbabwe/mashonaland-east/uzumba/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Wedza North Constituency",
+          "path_segment": "wedza-north",
+          "path": "/global/africa/zimbabwe/mashonaland-east/wedza-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Wedza South Constituency",
+          "path_segment": "wedza-south",
+          "path": "/global/africa/zimbabwe/mashonaland-east/wedza-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        }
+      ],
+      "constituency_count_verified": 23,
+      "constituency_count_actual": 23,
+      "ward_count_verified": 229
+    },
+    {
+      "province": "Mashonaland West Province",
+      "province_type": "Province",
+      "path_segment": "mashonaland-west",
+      "path": "/global/africa/zimbabwe/mashonaland-west/",
+      "capital": "Chinhoyi",
+      "districts": [
+        {
+          "name": "Chegutu Rural District",
+          "path_segment": "chegutu-rural",
+          "path": "/global/africa/zimbabwe/mashonaland-west/chegutu-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Chegutu Urban District",
+          "path_segment": "chegutu-urban",
+          "path": "/global/africa/zimbabwe/mashonaland-west/chegutu-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Chinhoyi Urban District",
+          "path_segment": "chinhoyi-urban",
+          "path": "/global/africa/zimbabwe/mashonaland-west/chinhoyi-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Hurungwe (Karoi Rural) District",
+          "path_segment": "hurungwe-karoi-rural",
+          "path": "/global/africa/zimbabwe/mashonaland-west/hurungwe-karoi-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Kadoma Urban District",
+          "path_segment": "kadoma-urban",
+          "path": "/global/africa/zimbabwe/mashonaland-west/kadoma-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Kariba Rural District",
+          "path_segment": "kariba-rural",
+          "path": "/global/africa/zimbabwe/mashonaland-west/kariba-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Kariba Urban District",
+          "path_segment": "kariba-urban",
+          "path": "/global/africa/zimbabwe/mashonaland-west/kariba-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Karoi Urban District",
+          "path_segment": "karoi-urban",
+          "path": "/global/africa/zimbabwe/mashonaland-west/karoi-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Makonde District",
+          "path_segment": "makonde",
+          "path": "/global/africa/zimbabwe/mashonaland-west/makonde/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mhondoro-Ngezi District",
+          "path_segment": "mhondoro-ngezi",
+          "path": "/global/africa/zimbabwe/mashonaland-west/mhondoro-ngezi/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Norton Urban District",
+          "path_segment": "norton-urban",
+          "path": "/global/africa/zimbabwe/mashonaland-west/norton-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Sanyati District",
+          "path_segment": "sanyati",
+          "path": "/global/africa/zimbabwe/mashonaland-west/sanyati/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Zvimba District",
+          "path_segment": "zvimba",
+          "path": "/global/africa/zimbabwe/mashonaland-west/zvimba/",
+          "tier_level": "district_local_authority"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Chakari Constituency",
+          "path_segment": "chakari",
+          "path": "/global/africa/zimbabwe/mashonaland-west/chakari/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chegutu East Constituency",
+          "path_segment": "chegutu-east",
+          "path": "/global/africa/zimbabwe/mashonaland-west/chegutu-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chegutu West Constituency",
+          "path_segment": "chegutu-west",
+          "path": "/global/africa/zimbabwe/mashonaland-west/chegutu-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chinhoyi Constituency",
+          "path_segment": "chinhoyi",
+          "path": "/global/africa/zimbabwe/mashonaland-west/chinhoyi/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Hurungwe Central Constituency",
+          "path_segment": "hurungwe-central",
+          "path": "/global/africa/zimbabwe/mashonaland-west/hurungwe-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Hurungwe East Constituency",
+          "path_segment": "hurungwe-east",
+          "path": "/global/africa/zimbabwe/mashonaland-west/hurungwe-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Hurungwe North Constituency",
+          "path_segment": "hurungwe-north",
+          "path": "/global/africa/zimbabwe/mashonaland-west/hurungwe-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Hurungwe West Constituency",
+          "path_segment": "hurungwe-west",
+          "path": "/global/africa/zimbabwe/mashonaland-west/hurungwe-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Kadoma Central Constituency",
+          "path_segment": "kadoma-central",
+          "path": "/global/africa/zimbabwe/mashonaland-west/kadoma-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Kariba Constituency",
+          "path_segment": "kariba",
+          "path": "/global/africa/zimbabwe/mashonaland-west/kariba/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Magunje Constituency",
+          "path_segment": "magunje",
+          "path": "/global/africa/zimbabwe/mashonaland-west/magunje/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Makonde Constituency",
+          "path_segment": "makonde",
+          "path": "/global/africa/zimbabwe/mashonaland-west/makonde/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mhangura Constituency",
+          "path_segment": "mhangura",
+          "path": "/global/africa/zimbabwe/mashonaland-west/mhangura/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mhondoro-Mubaira Constituency",
+          "path_segment": "mhondoro-mubaira",
+          "path": "/global/africa/zimbabwe/mashonaland-west/mhondoro-mubaira/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mhondoro-Ngezi Constituency",
+          "path_segment": "mhondoro-ngezi",
+          "path": "/global/africa/zimbabwe/mashonaland-west/mhondoro-ngezi/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Muzvezve Constituency",
+          "path_segment": "muzvezve",
+          "path": "/global/africa/zimbabwe/mashonaland-west/muzvezve/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Norton Constituency",
+          "path_segment": "norton",
+          "path": "/global/africa/zimbabwe/mashonaland-west/norton/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Sanyati Constituency",
+          "path_segment": "sanyati",
+          "path": "/global/africa/zimbabwe/mashonaland-west/sanyati/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zvimba East Constituency",
+          "path_segment": "zvimba-east",
+          "path": "/global/africa/zimbabwe/mashonaland-west/zvimba-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zvimba North Constituency",
+          "path_segment": "zvimba-north",
+          "path": "/global/africa/zimbabwe/mashonaland-west/zvimba-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zvimba South Constituency",
+          "path_segment": "zvimba-south",
+          "path": "/global/africa/zimbabwe/mashonaland-west/zvimba-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zvimba West Constituency",
+          "path_segment": "zvimba-west",
+          "path": "/global/africa/zimbabwe/mashonaland-west/zvimba-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        }
+      ],
+      "constituency_count_verified": 22,
+      "constituency_count_actual": 22,
+      "ward_count_verified": 234
+    },
+    {
+      "province": "Masvingo Province",
+      "province_type": "Province",
+      "path_segment": "masvingo",
+      "path": "/global/africa/zimbabwe/masvingo/",
+      "capital": "Masvingo",
+      "districts": [
+        {
+          "name": "Bikita District",
+          "path_segment": "bikita",
+          "path": "/global/africa/zimbabwe/masvingo/bikita/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Chiredzi Rural District",
+          "path_segment": "chiredzi-rural",
+          "path": "/global/africa/zimbabwe/masvingo/chiredzi-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Chiredzi Urban District",
+          "path_segment": "chiredzi-urban",
+          "path": "/global/africa/zimbabwe/masvingo/chiredzi-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Chivi District",
+          "path_segment": "chivi",
+          "path": "/global/africa/zimbabwe/masvingo/chivi/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Gutu District",
+          "path_segment": "gutu",
+          "path": "/global/africa/zimbabwe/masvingo/gutu/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Masvingo Rural District",
+          "path_segment": "masvingo-rural",
+          "path": "/global/africa/zimbabwe/masvingo/masvingo-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Masvingo Urban District",
+          "path_segment": "masvingo-urban",
+          "path": "/global/africa/zimbabwe/masvingo/masvingo-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mwenezi District",
+          "path_segment": "mwenezi",
+          "path": "/global/africa/zimbabwe/masvingo/mwenezi/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Zaka District",
+          "path_segment": "zaka",
+          "path": "/global/africa/zimbabwe/masvingo/zaka/",
+          "tier_level": "district_local_authority"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Bikita East Constituency",
+          "path_segment": "bikita-east",
+          "path": "/global/africa/zimbabwe/masvingo/bikita-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Bikita South Constituency",
+          "path_segment": "bikita-south",
+          "path": "/global/africa/zimbabwe/masvingo/bikita-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Bikita West Constituency",
+          "path_segment": "bikita-west",
+          "path": "/global/africa/zimbabwe/masvingo/bikita-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chiredzi Central Constituency",
+          "path_segment": "chiredzi-central",
+          "path": "/global/africa/zimbabwe/masvingo/chiredzi-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chiredzi East Constituency",
+          "path_segment": "chiredzi-east",
+          "path": "/global/africa/zimbabwe/masvingo/chiredzi-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chiredzi North Constituency",
+          "path_segment": "chiredzi-north",
+          "path": "/global/africa/zimbabwe/masvingo/chiredzi-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chiredzi South Constituency",
+          "path_segment": "chiredzi-south",
+          "path": "/global/africa/zimbabwe/masvingo/chiredzi-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chiredzi West Constituency",
+          "path_segment": "chiredzi-west",
+          "path": "/global/africa/zimbabwe/masvingo/chiredzi-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chivi Central Constituency",
+          "path_segment": "chivi-central",
+          "path": "/global/africa/zimbabwe/masvingo/chivi-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chivi North Constituency",
+          "path_segment": "chivi-north",
+          "path": "/global/africa/zimbabwe/masvingo/chivi-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chivi South Constituency",
+          "path_segment": "chivi-south",
+          "path": "/global/africa/zimbabwe/masvingo/chivi-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gutu Central Constituency",
+          "path_segment": "gutu-central",
+          "path": "/global/africa/zimbabwe/masvingo/gutu-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gutu East Constituency",
+          "path_segment": "gutu-east",
+          "path": "/global/africa/zimbabwe/masvingo/gutu-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gutu South Constituency",
+          "path_segment": "gutu-south",
+          "path": "/global/africa/zimbabwe/masvingo/gutu-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gutu West Constituency",
+          "path_segment": "gutu-west",
+          "path": "/global/africa/zimbabwe/masvingo/gutu-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Masvingo Central Constituency",
+          "path_segment": "masvingo-central",
+          "path": "/global/africa/zimbabwe/masvingo/masvingo-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Masvingo North Constituency",
+          "path_segment": "masvingo-north",
+          "path": "/global/africa/zimbabwe/masvingo/masvingo-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Masvingo South Constituency",
+          "path_segment": "masvingo-south",
+          "path": "/global/africa/zimbabwe/masvingo/masvingo-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Masvingo Urban Constituency",
+          "path_segment": "masvingo-urban",
+          "path": "/global/africa/zimbabwe/masvingo/masvingo-urban/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Masvingo West Constituency",
+          "path_segment": "masvingo-west",
+          "path": "/global/africa/zimbabwe/masvingo/masvingo-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mwenezi East Constituency",
+          "path_segment": "mwenezi-east",
+          "path": "/global/africa/zimbabwe/masvingo/mwenezi-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mwenezi North Constituency",
+          "path_segment": "mwenezi-north",
+          "path": "/global/africa/zimbabwe/masvingo/mwenezi-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mwenezi West Constituency",
+          "path_segment": "mwenezi-west",
+          "path": "/global/africa/zimbabwe/masvingo/mwenezi-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zaka Central Constituency",
+          "path_segment": "zaka-central",
+          "path": "/global/africa/zimbabwe/masvingo/zaka-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zaka North Constituency",
+          "path_segment": "zaka-north",
+          "path": "/global/africa/zimbabwe/masvingo/zaka-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zaka South Constituency",
+          "path_segment": "zaka-south",
+          "path": "/global/africa/zimbabwe/masvingo/zaka-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        }
+      ],
+      "constituency_count_verified": 26,
+      "constituency_count_actual": 26,
+      "ward_count_verified": 242
+    },
+    {
+      "province": "Matabeleland North Province",
+      "province_type": "Province",
+      "path_segment": "matabeleland-north",
+      "path": "/global/africa/zimbabwe/matabeleland-north/",
+      "capital": "Lupane",
+      "districts": [
+        {
+          "name": "Binga District",
+          "path_segment": "binga",
+          "path": "/global/africa/zimbabwe/matabeleland-north/binga/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Bubi District",
+          "path_segment": "bubi",
+          "path": "/global/africa/zimbabwe/matabeleland-north/bubi/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Hwange Rural District",
+          "path_segment": "hwange-rural",
+          "path": "/global/africa/zimbabwe/matabeleland-north/hwange-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Hwange Urban District",
+          "path_segment": "hwange-urban",
+          "path": "/global/africa/zimbabwe/matabeleland-north/hwange-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Lupane District",
+          "path_segment": "lupane",
+          "path": "/global/africa/zimbabwe/matabeleland-north/lupane/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Nkayi District",
+          "path_segment": "nkayi",
+          "path": "/global/africa/zimbabwe/matabeleland-north/nkayi/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Tsholotsho District",
+          "path_segment": "tsholotsho",
+          "path": "/global/africa/zimbabwe/matabeleland-north/tsholotsho/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Umguza District",
+          "path_segment": "umguza",
+          "path": "/global/africa/zimbabwe/matabeleland-north/umguza/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Victoria Falls Urban District",
+          "path_segment": "victoria-falls-urban",
+          "path": "/global/africa/zimbabwe/matabeleland-north/victoria-falls-urban/",
+          "tier_level": "district_local_authority"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Binga North Constituency",
+          "path_segment": "binga-north",
+          "path": "/global/africa/zimbabwe/matabeleland-north/binga-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Binga South Constituency",
+          "path_segment": "binga-south",
+          "path": "/global/africa/zimbabwe/matabeleland-north/binga-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Bubi Constituency",
+          "path_segment": "bubi",
+          "path": "/global/africa/zimbabwe/matabeleland-north/bubi/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Lupane East Constituency",
+          "path_segment": "lupane-east",
+          "path": "/global/africa/zimbabwe/matabeleland-north/lupane-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Lupane West Constituency",
+          "path_segment": "lupane-west",
+          "path": "/global/africa/zimbabwe/matabeleland-north/lupane-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Nkayi North Constituency",
+          "path_segment": "nkayi-north",
+          "path": "/global/africa/zimbabwe/matabeleland-north/nkayi-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Nkayi South Constituency",
+          "path_segment": "nkayi-south",
+          "path": "/global/africa/zimbabwe/matabeleland-north/nkayi-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Tsholotsho North Constituency",
+          "path_segment": "tsholotsho-north",
+          "path": "/global/africa/zimbabwe/matabeleland-north/tsholotsho-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Tsholotsho South Constituency",
+          "path_segment": "tsholotsho-south",
+          "path": "/global/africa/zimbabwe/matabeleland-north/tsholotsho-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Hwange East Constituency",
+          "path_segment": "hwange-east",
+          "path": "/global/africa/zimbabwe/matabeleland-north/hwange-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Hwange Central Constituency",
+          "path_segment": "hwange-central",
+          "path": "/global/africa/zimbabwe/matabeleland-north/hwange-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Hwange West Constituency",
+          "path_segment": "hwange-west",
+          "path": "/global/africa/zimbabwe/matabeleland-north/hwange-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Umguza Constituency",
+          "path_segment": "umguza",
+          "path": "/global/africa/zimbabwe/matabeleland-north/umguza/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        }
+      ],
+      "constituency_count_verified": 13,
+      "constituency_count_actual": 13,
+      "ward_count_verified": 197
+    },
+    {
+      "province": "Matabeleland South Province",
+      "province_type": "Province",
+      "path_segment": "matabeleland-south",
+      "path": "/global/africa/zimbabwe/matabeleland-south/",
+      "capital": "Gwanda",
+      "districts": [
+        {
+          "name": "Beitbridge Rural District",
+          "path_segment": "beitbridge-rural",
+          "path": "/global/africa/zimbabwe/matabeleland-south/beitbridge-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Beitbridge Urban District",
+          "path_segment": "beitbridge-urban",
+          "path": "/global/africa/zimbabwe/matabeleland-south/beitbridge-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Bulilima District",
+          "path_segment": "bulilima",
+          "path": "/global/africa/zimbabwe/matabeleland-south/bulilima/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Gwanda Rural District",
+          "path_segment": "gwanda-rural",
+          "path": "/global/africa/zimbabwe/matabeleland-south/gwanda-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Gwanda Urban District",
+          "path_segment": "gwanda-urban",
+          "path": "/global/africa/zimbabwe/matabeleland-south/gwanda-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Insiza District",
+          "path_segment": "insiza",
+          "path": "/global/africa/zimbabwe/matabeleland-south/insiza/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mangwe Rural District",
+          "path_segment": "mangwe-rural",
+          "path": "/global/africa/zimbabwe/matabeleland-south/mangwe-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mangwe Urban (Plumtree) District",
+          "path_segment": "mangwe-urban-plumtree",
+          "path": "/global/africa/zimbabwe/matabeleland-south/mangwe-urban-plumtree/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Matobo District",
+          "path_segment": "matobo",
+          "path": "/global/africa/zimbabwe/matabeleland-south/matobo/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Umzingwane District",
+          "path_segment": "umzingwane",
+          "path": "/global/africa/zimbabwe/matabeleland-south/umzingwane/",
+          "tier_level": "district_local_authority"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Beitbridge East Constituency",
+          "path_segment": "beitbridge-east",
+          "path": "/global/africa/zimbabwe/matabeleland-south/beitbridge-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Beitbridge West Constituency",
+          "path_segment": "beitbridge-west",
+          "path": "/global/africa/zimbabwe/matabeleland-south/beitbridge-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Bulilima Constituency",
+          "path_segment": "bulilima",
+          "path": "/global/africa/zimbabwe/matabeleland-south/bulilima/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gwanda North Constituency",
+          "path_segment": "gwanda-north",
+          "path": "/global/africa/zimbabwe/matabeleland-south/gwanda-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gwanda South Constituency",
+          "path_segment": "gwanda-south",
+          "path": "/global/africa/zimbabwe/matabeleland-south/gwanda-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gwanda-Tshitaudze Constituency",
+          "path_segment": "gwanda-tshitaudze",
+          "path": "/global/africa/zimbabwe/matabeleland-south/gwanda-tshitaudze/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Insiza North Constituency",
+          "path_segment": "insiza-north",
+          "path": "/global/africa/zimbabwe/matabeleland-south/insiza-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Insiza South Constituency",
+          "path_segment": "insiza-south",
+          "path": "/global/africa/zimbabwe/matabeleland-south/insiza-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mangwe Constituency",
+          "path_segment": "mangwe",
+          "path": "/global/africa/zimbabwe/matabeleland-south/mangwe/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Matobo Constituency",
+          "path_segment": "matobo",
+          "path": "/global/africa/zimbabwe/matabeleland-south/matobo/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Matobo-Mangwe Constituency",
+          "path_segment": "matobo-mangwe",
+          "path": "/global/africa/zimbabwe/matabeleland-south/matobo-mangwe/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Umzingwane Constituency",
+          "path_segment": "umzingwane",
+          "path": "/global/africa/zimbabwe/matabeleland-south/umzingwane/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        }
+      ],
+      "constituency_count_verified": 12,
+      "constituency_count_actual": 12,
+      "ward_count_verified": 168
+    },
+    {
+      "province": "Midlands Province",
+      "province_type": "Province",
+      "path_segment": "midlands",
+      "path": "/global/africa/zimbabwe/midlands/",
+      "capital": "Gweru",
+      "districts": [
+        {
+          "name": "Chirumhanzu District",
+          "path_segment": "chirumhanzu",
+          "path": "/global/africa/zimbabwe/midlands/chirumhanzu/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Gokwe North District",
+          "path_segment": "gokwe-north",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-north/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Gokwe South District",
+          "path_segment": "gokwe-south",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-south/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Gokwe Urban District",
+          "path_segment": "gokwe-urban",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Gweru Rural District",
+          "path_segment": "gweru-rural",
+          "path": "/global/africa/zimbabwe/midlands/gweru-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Gweru Urban District",
+          "path_segment": "gweru-urban",
+          "path": "/global/africa/zimbabwe/midlands/gweru-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Kwekwe Rural District",
+          "path_segment": "kwekwe-rural",
+          "path": "/global/africa/zimbabwe/midlands/kwekwe-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Kwekwe Urban District",
+          "path_segment": "kwekwe-urban",
+          "path": "/global/africa/zimbabwe/midlands/kwekwe-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Mberengwa District",
+          "path_segment": "mberengwa",
+          "path": "/global/africa/zimbabwe/midlands/mberengwa/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Redcliff Urban District",
+          "path_segment": "redcliff-urban",
+          "path": "/global/africa/zimbabwe/midlands/redcliff-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Shurugwi Rural District",
+          "path_segment": "shurugwi-rural",
+          "path": "/global/africa/zimbabwe/midlands/shurugwi-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Shurugwi Urban District",
+          "path_segment": "shurugwi-urban",
+          "path": "/global/africa/zimbabwe/midlands/shurugwi-urban/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Zvishavane Rural District",
+          "path_segment": "zvishavane-rural",
+          "path": "/global/africa/zimbabwe/midlands/zvishavane-rural/",
+          "tier_level": "district_local_authority"
+        },
+        {
+          "name": "Zvishavane Urban District",
+          "path_segment": "zvishavane-urban",
+          "path": "/global/africa/zimbabwe/midlands/zvishavane-urban/",
+          "tier_level": "district_local_authority"
+        }
+      ],
+      "constituencies": [
+        {
+          "name": "Chirumanzu Constituency",
+          "path_segment": "chirumanzu",
+          "path": "/global/africa/zimbabwe/midlands/chirumanzu/",
+          "tier_level": "constituency",
+          "name_confidence": "flagged_for_spotcheck",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chirumanzu-Zibagwe Constituency",
+          "path_segment": "chirumanzu-zibagwe",
+          "path": "/global/africa/zimbabwe/midlands/chirumanzu-zibagwe/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Chiwundura Constituency",
+          "path_segment": "chiwundura",
+          "path": "/global/africa/zimbabwe/midlands/chiwundura/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gokwe Central Constituency",
+          "path_segment": "gokwe-central",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gokwe-Chireya Constituency",
+          "path_segment": "gokwe-chireya",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-chireya/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gokwe-Gumunyu Constituency",
+          "path_segment": "gokwe-gumunyu",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-gumunyu/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gokwe-Kabuyuni Constituency",
+          "path_segment": "gokwe-kabuyuni",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-kabuyuni/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gokwe-Kana Constituency",
+          "path_segment": "gokwe-kana",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-kana/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gokwe-Mapfungautsi Constituency",
+          "path_segment": "gokwe-mapfungautsi",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-mapfungautsi/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gokwe-Nembudziya Constituency",
+          "path_segment": "gokwe-nembudziya",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-nembudziya/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gokwe-Sengwa Constituency",
+          "path_segment": "gokwe-sengwa",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-sengwa/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gokwe-Sasame Constituency",
+          "path_segment": "gokwe-sasame",
+          "path": "/global/africa/zimbabwe/midlands/gokwe-sasame/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Gweru Urban Constituency",
+          "path_segment": "gweru-urban",
+          "path": "/global/africa/zimbabwe/midlands/gweru-urban/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Kwekwe Central Constituency",
+          "path_segment": "kwekwe-central",
+          "path": "/global/africa/zimbabwe/midlands/kwekwe-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mberengwa Central Constituency",
+          "path_segment": "mberengwa-central",
+          "path": "/global/africa/zimbabwe/midlands/mberengwa-central/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mberengwa East Constituency",
+          "path_segment": "mberengwa-east",
+          "path": "/global/africa/zimbabwe/midlands/mberengwa-east/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mberengwa West Constituency",
+          "path_segment": "mberengwa-west",
+          "path": "/global/africa/zimbabwe/midlands/mberengwa-west/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mbizo Constituency",
+          "path_segment": "mbizo",
+          "path": "/global/africa/zimbabwe/midlands/mbizo/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mkoba North Constituency",
+          "path_segment": "mkoba-north",
+          "path": "/global/africa/zimbabwe/midlands/mkoba-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Mkoba South Constituency",
+          "path_segment": "mkoba-south",
+          "path": "/global/africa/zimbabwe/midlands/mkoba-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Redcliff Constituency",
+          "path_segment": "redcliff",
+          "path": "/global/africa/zimbabwe/midlands/redcliff/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Shurugwi North Constituency",
+          "path_segment": "shurugwi-north",
+          "path": "/global/africa/zimbabwe/midlands/shurugwi-north/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Shurugwi South Constituency",
+          "path_segment": "shurugwi-south",
+          "path": "/global/africa/zimbabwe/midlands/shurugwi-south/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Silobela Constituency",
+          "path_segment": "silobela",
+          "path": "/global/africa/zimbabwe/midlands/silobela/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Vungu Constituency",
+          "path_segment": "vungu",
+          "path": "/global/africa/zimbabwe/midlands/vungu/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zhombe Constituency",
+          "path_segment": "zhombe",
+          "path": "/global/africa/zimbabwe/midlands/zhombe/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zvishavane-Ngezi Constituency",
+          "path_segment": "zvishavane-ngezi",
+          "path": "/global/africa/zimbabwe/midlands/zvishavane-ngezi/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        },
+        {
+          "name": "Zvishavane-Runde Constituency",
+          "path_segment": "zvishavane-runde",
+          "path": "/global/africa/zimbabwe/midlands/zvishavane-runde/",
+          "tier_level": "constituency",
+          "name_confidence": "verified",
+          "wards": {
+            "count": null,
+            "status": "placeholder",
+            "note": "Individual ward numbers pending ZEC Annexure B lookup for this province"
+          }
+        }
+      ],
+      "constituency_count_verified": 28,
+      "constituency_count_actual": 28,
+      "ward_count_verified": 296
+    }
+  ],
+  "metadata": {
+    "generated": "2026-08-19",
+    "source": "Ichebo Sceptre Community geographic dataset — Zimbabwe",
+    "verification": "District tier verified against Zimbabwe National Statistics Agency (ZimStat) census-tabulated districts (citypopulation.de), cross-checked against Wikipedia 'Districts of Zimbabwe'. Constituency and ward TOTALS verified against the ZEC 2023 Delimitation Report (finalized Feb 2023) as tabulated on Wikipedia's 'List of wards of Zimbabwe' — per-province figures sum exactly to the national totals of 210 constituencies and 1,970 wards. Constituency NAMES verified per-province against current (post-2023) constituency listings; 5 of 10 provinces (Bulawayo, Harare, Manicaland, Mashonaland Central, Mashonaland West) from clean single-source lists, the remaining 5 reconstructed by filtering a mixed historical/current Wikipedia list and cross-checked to match official per-province totals exactly. Checked 2026-08-19.",
+    "known_uncertainty": "Midlands Province constituency list includes both 'Chirumanzu' and 'Chirumanzu-Zibagwe' as returned by the source; these may represent a pre-2008 constituency alongside its 2008-successor rather than two distinct current constituencies. Flagged as name_confidence: flagged_for_spotcheck on the 'Chirumanzu' entry. All other entries carry name_confidence: verified. Local-authority counts for Mashonaland West and Matabeleland North are each one short of the figure stated on the wards-of-Zimbabwe summary page (13 vs 14, and 9 vs 10 respectively) — likely a single local authority not captured in the ZimStat district tabulation used here; flagged for spot-check rather than guessed at.",
+    "pattern_note": "Zimbabwe's pattern is Province -> District (Local Authority: Rural District Council or Urban Council/Municipality) -> Constituency -> Ward. Wards are numbered per local authority (not nationally unique), and constituency boundaries can span or subdivide a district's wards — the exact ward-to-constituency allocation is only confirmed in full for Bulawayo, Harare and Manicaland Provinces from the source consulted.",
+    "ward_tier_note": "Ward tier: per-province TOTAL counts (ward_count_verified) are confirmed exactly against the ZEC 2023 Delimitation Report and sum to 1,970 nationally. Individual ward-to-constituency numbering is a placeholder (count: null) at the constituency level for 7 of 10 provinces, pending ZEC Annexure B ward boundary description lookups.",
+    "materialised_path_pattern": "/global/africa/{country}/{province}/{district-or-constituency}/[{ward}/][{sceptre-community}/]"
+  }
+}

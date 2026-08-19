@@ -13,6 +13,8 @@ TIER_STEWARD_ROLE = {
     'handbook':           'branch-steward',
     'church_node':        'branch-steward',
     'church_collective':  'branch-steward',
+    'local':               'local-steward',
+    'ward':                'local-steward',
     'district':           'district-steward',
     'provincial':         'provincial-steward',
     'national':           'national-steward',
