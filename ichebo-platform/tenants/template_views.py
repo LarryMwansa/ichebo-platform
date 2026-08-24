@@ -182,7 +182,9 @@ def my_tenants(request):
         oversight_ids = get_oversight_tenant_ids(user) - direct_tenant_ids
         oversight_rows = [
             _OversightRow(t, oversight_perm.role)
-            for t in Tenant.objects.filter(id__in=oversight_ids).order_by('name')
+            for t in Tenant.objects.filter(id__in=oversight_ids)
+                .exclude(tier__in=GEOGRAPHIC_SCAFFOLD_TIERS)
+                .order_by('name')
         ]
 
     perms = list(direct_perms) + oversight_rows
