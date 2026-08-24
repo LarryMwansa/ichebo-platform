@@ -11,7 +11,7 @@ from records.models import Record, Relationship
 from activity.models import Activity
 from accounts.models import User
 from tenants.models import Tenant, UserPermission
-from tenants.service import get_oversight_tenant_ids
+from tenants.service import GEOGRAPHIC_SCAFFOLD_TIERS, get_oversight_tenant_ids
 from .models import MembershipRequest
 from .services import resolve_steward_for_tenant
 from .constants import (
@@ -251,7 +251,7 @@ def my_community(request):
         oversight_ids = get_oversight_tenant_ids(user)
         oversight_tenants = list(
             Tenant.objects.filter(id__in=oversight_ids, is_agency=False, status='active')
-            .exclude(tier__in=['handbook'])
+            .exclude(tier__in={'handbook', *GEOGRAPHIC_SCAFFOLD_TIERS})
             .order_by('tier', 'name')
         )
         # Prime Tenancy is itself agency-flagged (it's the apex of global

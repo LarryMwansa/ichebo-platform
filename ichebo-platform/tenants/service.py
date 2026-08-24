@@ -7,6 +7,19 @@ class InvitationError(Exception):
     pass
 
 
+# Tiers that are purely geographic scaffold — administrative reference
+# tenants bulk-imported from country/province/district/ward datasets
+# (see tenants/management/commands/import_geographic_tenants.py). They
+# have no membership of their own and are never a "community" a user
+# joins, switches into via sceptre, or gets placed in. Oversight still
+# cascades through them normally (get_oversight_tenant_ids doesn't
+# filter by tier) — this constant is only for views that list tenants
+# as candidate communities, not for anything that resolves the tree.
+GEOGRAPHIC_SCAFFOLD_TIERS = frozenset({
+    'continental', 'national', 'provincial', 'district', 'local', 'ward',
+})
+
+
 def get_oversight_tenant_ids(user):
     """Every tenant id a user can see: tenants they have a direct
     UserPermission on, plus every descendant of a tenant where they hold a

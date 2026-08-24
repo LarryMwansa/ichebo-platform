@@ -584,7 +584,7 @@ def induction_final_test_queue(request):
     from learn import engine
     from learn.models import AssessmentAttempt
     from tenants.models import Tenant
-    from tenants.service import get_oversight_tenant_ids
+    from tenants.service import GEOGRAPHIC_SCAFFOLD_TIERS, get_oversight_tenant_ids
 
     programme = _induction_programme()
     pending = list(engine.pending_confirmations(
@@ -613,7 +613,9 @@ def induction_final_test_queue(request):
         id__in=get_oversight_tenant_ids(request.user),
         is_agency=False,
         status='active',
-    ).exclude(tier__in=['handbook', 'induction']).order_by('name')
+    ).exclude(
+        tier__in={'handbook', 'induction', *GEOGRAPHIC_SCAFFOLD_TIERS}
+    ).order_by('name')
 
     return render(request, 'sceptre/induction/final_test_queue.html', {
         'awaiting': awaiting,

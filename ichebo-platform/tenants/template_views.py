@@ -5,8 +5,8 @@ from django.views.decorators.http import require_POST
 
 from .models import ServiceOrder, Tenant, TenantInvitation, UserPermission
 from .service import (
-    InvitationError, accept_invitation, get_oversight_tenant_ids,
-    remove_member, send_invitation,
+    GEOGRAPHIC_SCAFFOLD_TIERS, InvitationError, accept_invitation,
+    get_oversight_tenant_ids, remove_member, send_invitation,
 )
 
 TIER_STEWARD_ROLE = {
@@ -92,6 +92,7 @@ def steward_dashboard(request):
     oversight_ids = get_oversight_tenant_ids(user)
     my_tenants = list(
         Tenant.objects.filter(id__in=oversight_ids, is_agency=False)
+        .exclude(tier__in=GEOGRAPHIC_SCAFFOLD_TIERS)
         .order_by('name')
     )
 
@@ -228,6 +229,7 @@ def tenant_detail(request, tenant_id):
 
     my_tenants = list(
         Tenant.objects.filter(id__in=get_oversight_tenant_ids(user), is_agency=False)
+        .exclude(tier__in=GEOGRAPHIC_SCAFFOLD_TIERS)
         .order_by('name')
     )
     return render(request, 'tenants/tenant_detail.html', {
@@ -473,6 +475,7 @@ def create_tenant(request):
 
     my_tenants = list(
         Tenant.objects.filter(id__in=get_oversight_tenant_ids(request.user), is_agency=False)
+        .exclude(tier__in=GEOGRAPHIC_SCAFFOLD_TIERS)
         .order_by('name')
     )
     return render(request, 'tenants/create_tenant.html', {
