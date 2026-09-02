@@ -174,7 +174,7 @@ def my_tenants(request):
     oversight_perm = (
         UserPermission.objects
         .filter(user=user, is_active=True, role__in=UserPermission.STEWARD_ROLES)
-        .order_by('-level')
+        .order_by('-level', 'tenant__path')
         .first()
     )
     oversight_rows = []

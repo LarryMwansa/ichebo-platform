@@ -33,12 +33,17 @@ def _require_level(request, min_level):
 
 
 def _get_user_permissions(user):
-    """Retrieve active UserPermission rows for a user via Django ORM."""
-    # UserPermission imported at module level
+    """Retrieve active UserPermission rows for a user via Django ORM.
+
+    Ordered by level desc, then by tenant path so ties (e.g. a Level 5
+    steward on both Prime Tenancy and a child tenant like Handbook)
+    resolve deterministically to the shallower/apex tenant instead of
+    flipping between requests — Postgres gives no stable order on a tie.
+    """
     return list(
         UserPermission.objects.filter(user=user, is_active=True)
         .select_related('tenant')
-        .order_by('-level')
+        .order_by('-level', 'tenant__path')
     )
 
 
