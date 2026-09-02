@@ -1,7 +1,9 @@
-{# templates/tenants/partials/tenant_registry_node.html — one tenant row in the registry tree.
-   Recursive: children are fetched lazily via htmx the first time a node is expanded
-   (native <details> "toggle" event, hx-trigger="toggle once") rather than all at once —
-   the geographic scaffold alone is 260+ rows. #}
+{% comment %}
+templates/tenants/partials/tenant_registry_node.html — one tenant row in the registry tree.
+Recursive: children are fetched lazily via htmx the first time a node is expanded
+(native <details> "toggle" event, hx-trigger="toggle once") rather than all at once —
+the geographic scaffold alone is 260+ rows.
+{% endcomment %}
 <details class="tr-node"
     {% if tenant.child_count %}
     hx-get="{% url 'tenants:tenant-registry-children' tenant.id %}"
