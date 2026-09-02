@@ -21,5 +21,12 @@
         <span class="material-symbols-outlined">add_home</span>
         New Community
     </a>
+    {% if is_prime %}
+    <a href="{% url 'tenants:tenant-registry' %}"
+       class="ctx-btn {% if active_tenants_tab == 'registry' %}active{% endif %}">
+        <span class="material-symbols-outlined">account_tree</span>
+        Tenant Registry
+    </a>
+    {% endif %}
 
 </div>

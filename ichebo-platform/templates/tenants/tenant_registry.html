@@ -1,0 +1,100 @@
+{% extends "tenants/base_tenants.html" %}
+
+{% block tenants_content %}
+<div style="padding: 40px 48px; max-width: 1000px;">
+
+    <div style="margin-bottom: 32px;">
+        <div class="ws-label-tag" style="margin-bottom: 12px;">Platform Administration</div>
+        <h1 class="ws-page-title">Tenant <em>Registry</em></h1>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 8px; max-width: 640px;">
+            Every tenant on the platform — {{ total_count }} total — organised by hierarchy,
+            including the geographic scaffold (continent → country → province → district →
+            local/ward) and any tenant outside Prime Tenancy's own oversight tree. Expand a
+            row to load its children.
+        </p>
+    </div>
+
+    <div class="tr-tree">
+        {% for tenant in root_tenants %}
+            {% include "tenants/partials/tenant_registry_node.html" with tenant=tenant %}
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .tr-tree {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .tr-node {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--card);
+    }
+    .tr-node__summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        list-style: none;
+        user-select: none;
+    }
+    .tr-node__summary::-webkit-details-marker { display: none; }
+    .tr-node__summary::marker { content: ""; }
+    .tr-node__caret {
+        font-size: 18px;
+        color: var(--muted);
+        transition: transform 0.15s;
+        flex-shrink: 0;
+    }
+    .tr-node__caret-spacer { width: 18px; flex-shrink: 0; }
+    details[open] > .tr-node__summary .tr-node__caret { transform: rotate(90deg); }
+    .tr-node__icon { font-size: 16px; color: var(--primary); flex-shrink: 0; }
+    .tr-node__name {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+        text-decoration: none;
+    }
+    .tr-node__name:hover { text-decoration: underline; }
+    .tr-node__tier {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+    .tr-node__count {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--muted);
+        background: var(--card-2);
+        border-radius: 999px;
+        padding: 2px 8px;
+        flex-shrink: 0;
+    }
+    .tr-node__children {
+        padding: 6px 14px 10px 34px;
+        border-top: 1px solid var(--border);
+    }
+    .tr-node__list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .tr-node__loading,
+    .tr-node__empty {
+        font-size: 12px;
+        color: var(--muted);
+        padding: 6px 2px;
+    }
+</style>
+{% endblock %}

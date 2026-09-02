@@ -1,0 +1,30 @@
+{# templates/tenants/partials/tenant_registry_node.html — one tenant row in the registry tree.
+   Recursive: children are fetched lazily via htmx the first time a node is expanded
+   (native <details> "toggle" event, hx-trigger="toggle once") rather than all at once —
+   the geographic scaffold alone is 260+ rows. #}
+<details class="tr-node"
+    {% if tenant.child_count %}
+    hx-get="{% url 'tenants:tenant-registry-children' tenant.id %}"
+    hx-trigger="toggle once"
+    hx-target="find .tr-node__children"
+    hx-swap="innerHTML"
+    {% endif %}>
+    <summary class="tr-node__summary">
+        {% if tenant.child_count %}
+        <span class="material-symbols-outlined tr-node__caret">chevron_right</span>
+        {% else %}
+        <span class="tr-node__caret-spacer"></span>
+        {% endif %}
+        <span class="material-symbols-outlined tr-node__icon">
+            {% if tenant.tier == 'global' %}shield{% elif tenant.tier == 'church_node' or tenant.tier == 'church_collective' %}church{% elif tenant.tier == 'handbook' %}menu_book{% elif tenant.tier == 'induction' %}school{% else %}location_on{% endif %}
+        </span>
+        <a href="{% url 'tenants:tenant-detail' tenant.id %}" class="tr-node__name">{{ tenant.name }}</a>
+        <span class="tr-node__tier">{{ tenant.get_tier_display }}</span>
+        {% if tenant.child_count %}<span class="tr-node__count">{{ tenant.child_count }}</span>{% endif %}
+    </summary>
+    {% if tenant.child_count %}
+    <div class="tr-node__children">
+        <div class="tr-node__loading">Loading…</div>
+    </div>
+    {% endif %}
+</details>

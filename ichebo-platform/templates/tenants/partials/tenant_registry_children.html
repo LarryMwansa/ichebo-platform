@@ -1,0 +1,10 @@
+{# templates/tenants/partials/tenant_registry_children.html — htmx fragment: one node's children #}
+{% if children %}
+<div class="tr-node__list">
+    {% for tenant in children %}
+        {% include "tenants/partials/tenant_registry_node.html" with tenant=tenant %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="tr-node__empty">No sub-tenants.</div>
+{% endif %}

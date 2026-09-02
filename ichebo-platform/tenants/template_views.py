@@ -1,4 +1,6 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST
@@ -34,6 +36,17 @@ SELF_SERVICE_TIERS = [
 
 def _user_level(user):
     return getattr(user, 'competence_level', 0)
+
+
+def _is_prime(user):
+    """True for superusers and Prime Tenancy stewards — the only users
+    allowed to see agency/system tenants or the full Tenant Registry."""
+    if user.is_superuser:
+        return True
+    return UserPermission.objects.filter(
+        user=user, tenant__slug='prime', is_active=True,
+        role__in=UserPermission.STEWARD_ROLES,
+    ).exists()
 
 
 def _make_unique_slug(base_slug):
@@ -194,8 +207,59 @@ def my_tenants(request):
         'perms': perms,
         'my_tenants': my_tenants,
         'can_create': can_create,
+        'is_prime': _is_prime(user),
         'active_app': 'tenancy',
         'active_tenants_tab': 'my-tenants',
+    })
+
+
+# ---------------------------------------------------------------------------
+# Tenant Registry — the full platform ledger, every tenant, every tier.
+#
+# Distinct from my_tenants (personal, flat) and community's "All Communities"
+# (operational, excludes the geographic scaffold). This is the admin-only
+# surface: Tenant.objects.all() directly, not get_oversight_tenant_ids, so
+# it does not inherit that helper's path-prefix blind spot — a handful of
+# tenants (e.g. church nodes created before Prime's /global/ hierarchy was
+# established) sit outside Prime's path and are invisible to oversight-based
+# views. Rendered as a lazily-expanded tree (htmx-loaded children per node)
+# since the geographic scaffold alone is 260+ rows.
+# ---------------------------------------------------------------------------
+
+@login_required
+def tenant_registry(request):
+    if not _is_prime(request.user):
+        return redirect('tenants:steward-dashboard')
+
+    root_tenants = (
+        Tenant.objects.filter(parent__isnull=True)
+        .annotate(child_count=Count('children'))
+        .order_by('tier', 'name')
+    )
+    my_tenants = list(
+        Tenant.objects.filter(id__in=get_oversight_tenant_ids(request.user), is_agency=False)
+        .exclude(tier__in=GEOGRAPHIC_SCAFFOLD_TIERS)
+        .order_by('name')
+    )
+    return render(request, 'tenants/tenant_registry.html', {
+        'root_tenants': root_tenants,
+        'total_count': Tenant.objects.count(),
+        'my_tenants': my_tenants,
+        'is_prime': True,
+        'active_app': 'tenancy',
+        'active_tenants_tab': 'registry',
+    })
+
+
+@login_required
+def tenant_registry_children(request, tenant_id):
+    if not _is_prime(request.user):
+        return HttpResponseForbidden()
+
+    tenant = get_object_or_404(Tenant, id=tenant_id)
+    children = tenant.children.annotate(child_count=Count('children')).order_by('tier', 'name')
+    return render(request, 'tenants/partials/tenant_registry_children.html', {
+        'children': children,
     })
 
 
@@ -242,6 +306,7 @@ def tenant_detail(request, tenant_id):
         'is_steward': is_steward,
         'can_invite': is_steward or level >= 5,
         'my_tenants': my_tenants,
+        'is_prime': _is_prime(user),
         'active_app': 'tenancy',
         'active_tenants_tab': 'dashboard',
     })
@@ -487,6 +552,7 @@ def create_tenant(request):
         'affiliation_choices': Tenant.AFFILIATION_CHOICES,
         'all_active_tenants': all_active_tenants,
         'my_tenants': my_tenants,
+        'is_prime': _is_prime(request.user),
         'active_app': 'tenancy',
         'active_tenants_tab': 'create',
     })

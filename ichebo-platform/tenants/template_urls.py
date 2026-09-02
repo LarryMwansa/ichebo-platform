@@ -8,6 +8,9 @@ urlpatterns = [
     path('steward/',                                          template_views.steward_dashboard,   name='steward-dashboard'),
     # Member view (non-stewards, all users)
     path('',                                                  template_views.my_tenants,           name='my-tenants'),
+    # Tenant Registry — full platform ledger, admin-only
+    path('registry/',                                         template_views.tenant_registry,       name='tenant-registry'),
+    path('registry/<uuid:tenant_id>/children/',               template_views.tenant_registry_children, name='tenant-registry-children'),
     # Tenant CRUD
     path('create/',                                           template_views.create_tenant,        name='create-tenant'),
     path('<uuid:tenant_id>/created/',                         template_views.tenant_created,       name='tenant-created'),
