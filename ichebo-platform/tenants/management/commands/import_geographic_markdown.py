@@ -239,15 +239,19 @@ class Command(BaseCommand):
                 if district is None:
                     raise CommandError(f'Constituency heading before any District heading: {line!r}')
                 raw_title = line[4:].strip()
-                title_lower = raw_title.lower()
+                # Strip trailing parenthetical(s) BEFORE checking for the
+                # word "ward" — otherwise a completely normal heading like
+                # "Keembe Constituency (12 wards)" false-matches on the
+                # word "wards" inside its own ward-count annotation.
+                title_stub_lower = _clean_heading(raw_title).lower()
 
-                if title_lower.startswith('constituencies'):
+                if title_stub_lower.startswith('constituencies'):
                     collecting_names = True
                     collected_names = []
                     constituency = None
                     continue
 
-                if 'ward' in title_lower:
+                if 'ward' in title_stub_lower:
                     # Unmapped wards — file under one synthetic constituency
                     # per district so the Ward tier still exists.
                     constituency = self._get_or_create(
