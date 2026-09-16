@@ -334,8 +334,6 @@ class Command(BaseCommand):
         if existing is not None:
             if stat_key:
                 self.reused[stat_key] = self.reused.get(stat_key, 0) + 1
-            if stat_key == 'constituency':
-                self.stdout.write(f'    [debug reused constituency] {path}')
             return existing
 
         tenant = Tenant.objects.create(
