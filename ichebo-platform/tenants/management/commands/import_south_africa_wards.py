@@ -68,12 +68,15 @@ _SUFFIX_WORDS = {'local', 'metropolitan', 'municipality', 'municipalities', 'dis
 
 
 def _normalize(name):
-    """Lowercase, strip punctuation, drop generic tier-designation words —
-    so 'Buffalo City Metropolitan' and 'Buffalo City Metropolitan
-    Municipality' compare equal, and 'Mafube Local' matches the existing
-    'Mafube Local Municipality' tenant so it can be filtered out as a
-    structural reference rather than invented as a fake ward."""
-    words = re.sub(r'[^a-z0-9\s]', ' ', name.lower()).split()
+    """Lowercase, strip parenthetical asides and punctuation, drop generic
+    tier-designation words — so 'Buffalo City Metropolitan' and 'Buffalo
+    City Metropolitan Municipality' compare equal, 'Mafube Local' matches
+    the existing 'Mafube Local Municipality' tenant so it can be filtered
+    out as a structural reference rather than invented as a fake ward, and
+    'Garden Route District' matches 'Garden Route District Municipality
+    (formerly Eden)'."""
+    name = re.sub(r'\([^)]*\)', ' ', name.lower())
+    words = re.sub(r'[^a-z0-9\s]', ' ', name).split()
     core = [w for w in words if w not in _SUFFIX_WORDS]
     return ' '.join(core).strip()
 
