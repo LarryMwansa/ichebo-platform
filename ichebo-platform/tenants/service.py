@@ -16,7 +16,8 @@ class InvitationError(Exception):
 # filter by tier) — this constant is only for views that list tenants
 # as candidate communities, not for anything that resolves the tree.
 GEOGRAPHIC_SCAFFOLD_TIERS = frozenset({
-    'continental', 'national', 'provincial', 'district', 'local', 'ward',
+    'continental', 'regional', 'national', 'provincial', 'district',
+    'constituency', 'ward',
 })
 
 

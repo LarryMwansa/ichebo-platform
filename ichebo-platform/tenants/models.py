@@ -12,15 +12,18 @@ class Tenant(SoftDeleteMixin, models.Model):
         ('induction', 'Induction'),
         ('church_node', 'Church Node'),
         ('church_collective', 'Church Collective'),
-        # 'local' and 'ward' — the two geographic scaffold tiers below
-        # District. One canonical value each, reused across every country's
-        # bulk-imported geography regardless of local terminology: Zambia
-        # calls the 'local' tier Constituency, South Africa calls it Local
-        # Municipality (and a Metro also maps here — it has no separate
-        # municipality beneath it, so it plays the same ward-parent role).
+        # Canonical geographic scaffold, country-agnostic:
+        #   continental -> regional -> national -> provincial -> district
+        #     -> constituency -> ward
+        # Every country's bulk-imported geography reuses this same seven-tier
+        # vocabulary regardless of local terminology — Zambia and Zimbabwe
+        # both call the 'constituency' tier Constituency; South Africa calls
+        # it Local Municipality. A Metro (South Africa) has no Constituency
+        # layer beneath it, so it occupies the 'district' tier alongside an
+        # ordinary District Municipality — its wards attach directly to it.
         # Display label stays generic; the country-specific name lives on
-        # the Record/Tenant itself (name field), not the tier vocabulary.
-        ('local', 'Local'),
+        # the Tenant itself (name field), not the tier vocabulary.
+        ('constituency', 'Constituency'),
         ('ward', 'Ward'),
         ('district', 'District'),
         ('provincial', 'Provincial'),

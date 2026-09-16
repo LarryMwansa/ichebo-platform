@@ -9,28 +9,28 @@ Currently handles South Africa's shape only:
       province
         metro                          (leaf; wards attach directly later)
         district
-          local  (South Africa: "Local Municipality")
+          local municipality           ("Local Municipality" -> constituency tier)
 
-Zambia and Zimbabwe are NOT supported by this command yet. Both have a
-structurally different shape — District and the tier-4 node (Constituency)
-are siblings under Province rather than parent/child, and roughly 15-25% of
-them collide on name within a province (e.g. "Chisamba District" and
-"Chisamba Constituency" both resolve to the same path). That needs a source
-data decision, not an importer change, before it can run safely. Re-check
-this docstring and CURRICULUM SHAPE assumptions before pointing this command
-at either file.
+Zambia and Zimbabwe are NOT supported by this command yet — their source
+files (.docs/country_data/) have since been cleaned up to the same canonical
+Province -> District -> Constituency -> Ward shape South Africa uses, but
+they're still Markdown, not this command's JSON schema, and this command
+still hard-refuses any country_code other than 'ZA'. Turning them into
+importable JSON (and lifting the ZA-only guard) is separate follow-up work.
 
-Tier mapping (five canonical tiers, reused across every country regardless
-of local terminology — see tenants.models.Tenant.TIER_CHOICES):
+Tier mapping (canonical tiers, reused across every country regardless of
+local terminology — see tenants.models.Tenant.TIER_CHOICES):
 
     country  -> national
     province -> provincial
     district -> district
-    metro    -> local   (a Metro has no Local Municipality under it; it
-                          plays the same ward-parent role a Local does)
-    local municipality -> local
-    ward     -> not created yet; every country's ward data is placeholder
-                only (verified against all three source files 2026-08-19)
+    metro    -> district   (a Metro has no Constituency layer under it; it
+                             plays the same ward-parent role a District does)
+    local municipality -> constituency
+    ward     -> not created yet; every country's ward data was placeholder
+                only as of 2026-08-19. South Africa's .docs source now has
+                real ward-level place names — wiring those into this
+                importer is also follow-up work, not done here.
 
 Idempotent on `path` — re-running with the same input creates nothing new.
 Always dry-run against a production restore first.
@@ -48,11 +48,15 @@ from tenants.models import Tenant
 
 User = get_user_model()
 
-# tier_level string (as it appears in the JSON) -> canonical Tenant.tier value
+# tier_level string (as it appears in the JSON) -> canonical Tenant.tier value.
+# A Metro has no Constituency layer beneath it (its wards attach directly),
+# so it occupies the 'district' tier alongside an ordinary District
+# Municipality rather than the 'constituency' tier a Local Municipality maps
+# to — see the canonical tier vocabulary comment on Tenant.TIER_CHOICES.
 TIER_LEVEL_MAP = {
     'district': 'district',
-    'local_municipality': 'local',
-    'metro': 'local',
+    'local_municipality': 'constituency',
+    'metro': 'district',
 }
 
 
@@ -73,8 +77,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.dry_run = options['dry_run']
-        self.created = {'continent': 0, 'country': 0, 'province': 0, 'metro': 0, 'district': 0, 'local': 0}
-        self.reused = {'continent': 0, 'country': 0, 'province': 0, 'metro': 0, 'district': 0, 'local': 0}
+        self.created = {'continent': 0, 'country': 0, 'province': 0, 'metro': 0, 'district': 0, 'local_municipality': 0}
+        self.reused = {'continent': 0, 'country': 0, 'province': 0, 'metro': 0, 'district': 0, 'local_municipality': 0}
 
         with open(options['json_path']) as f:
             data = json.load(f)
@@ -147,20 +151,20 @@ class Command(BaseCommand):
         for metro in metros:
             self._get_or_create(
                 path=metro['path'], name=metro['name'], tier=self._tier_for(metro),
-                parent=province,
+                parent=province, stat_key='metro',
                 location={'seat': metro.get('seat'), 'places': metro.get('places', [])},
             )
 
         for dist in districts:
             district_tenant = self._get_or_create(
                 path=dist['path'], name=dist['name'], tier=self._tier_for(dist),
-                parent=province,
+                parent=province, stat_key='district',
                 location={'seat': dist.get('seat')},
             )
             for local in dist.get('locals', []):
                 self._get_or_create(
                     path=local['path'], name=local['name'], tier=self._tier_for(local),
-                    parent=district_tenant,
+                    parent=district_tenant, stat_key='local_municipality',
                     location={'places': local.get('places', [])},
                 )
 
@@ -174,11 +178,15 @@ class Command(BaseCommand):
             )
         return tier
 
-    def _get_or_create(self, path, name, tier, parent, location=None):
+    def _get_or_create(self, path, name, tier, parent, location=None, stat_key=None):
         existing = Tenant.objects.filter(path=path).first()
-        key = {
+        # Metro and District Municipality now share Tenant.tier='district'
+        # (a Metro has no Constituency layer beneath it — see TIER_LEVEL_MAP),
+        # so tier alone can no longer distinguish them for reporting; callers
+        # pass an explicit stat_key where that distinction matters.
+        key = stat_key or {
             'continental': 'continent', 'national': 'country', 'provincial': 'province',
-        }.get(tier, tier)  # 'local' bucket covers both metro and local_municipality
+        }.get(tier, tier)
 
         if existing is not None:
             self.reused[key] = self.reused.get(key, 0) + 1
@@ -244,21 +252,28 @@ class Command(BaseCommand):
         )
 
         actual_provinces = Tenant.objects.filter(parent=country, tier='provincial').count()
-        actual_geo = Tenant.objects.filter(
-            path__startswith=country.path, tier='local',
-        ).count()
+        # Metro and ordinary District Municipality share tier='district' (a
+        # Metro has no Constituency layer beneath it), so the district-tier
+        # count is compared against districts+metros combined, not districts
+        # alone.
         actual_districts = Tenant.objects.filter(
             path__startswith=country.path, tier='district',
+        ).count()
+        actual_constituencies = Tenant.objects.filter(
+            path__startswith=country.path, tier='constituency',
         ).count()
 
         if actual_provinces != expected_provinces:
             problems.append(f'expected {expected_provinces} provinces, found {actual_provinces}')
-        if actual_districts != expected_districts:
-            problems.append(f'expected {expected_districts} districts, found {actual_districts}')
-        if actual_geo != expected_metros + expected_locals:
+        if actual_districts != expected_districts + expected_metros:
             problems.append(
-                f'expected {expected_metros} metros + {expected_locals} locals '
-                f'= {expected_metros + expected_locals} local-tier tenants, found {actual_geo}'
+                f'expected {expected_districts} districts + {expected_metros} metros '
+                f'= {expected_districts + expected_metros} district-tier tenants, found {actual_districts}'
+            )
+        if actual_constituencies != expected_locals:
+            problems.append(
+                f'expected {expected_locals} local municipalities '
+                f'= {expected_locals} constituency-tier tenants, found {actual_constituencies}'
             )
 
         # Every non-root node under this country must resolve its parent
@@ -271,10 +286,13 @@ class Command(BaseCommand):
             problems.append(f'{len(orphans)} tenant(s) under this country have no parent set')
 
         self.stdout.write(f'    provinces: {actual_provinces} (expected {expected_provinces})')
-        self.stdout.write(f'    districts: {actual_districts} (expected {expected_districts})')
         self.stdout.write(
-            f'    local-tier (metro+local): {actual_geo} '
-            f'(expected {expected_metros + expected_locals})'
+            f'    district-tier (district+metro): {actual_districts} '
+            f'(expected {expected_districts + expected_metros})'
+        )
+        self.stdout.write(
+            f'    constituency-tier (local municipality): {actual_constituencies} '
+            f'(expected {expected_locals})'
         )
 
         if problems:
