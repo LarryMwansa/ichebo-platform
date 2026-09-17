@@ -1,24 +1,18 @@
 from django.db.models import Q
 from django.utils import timezone
-from .models import Tenant, TenantInvitation, UserPermission
+from .models import GEOGRAPHIC_SCAFFOLD_TIERS, Tenant, TenantInvitation, UserPermission
+
+# Re-exported for backward compatibility — existing callers do
+# `from tenants.service import GEOGRAPHIC_SCAFFOLD_TIERS`. The constant's
+# canonical home is now tenants/models.py (see the comment there for why:
+# Tenant.objects.communities() needs it at class-definition time, and this
+# module already imports from models.py, so defining it here would be
+# circular). New code listing tenants as candidate communities should use
+# Tenant.objects.communities(...) rather than this constant directly.
 
 
 class InvitationError(Exception):
     pass
-
-
-# Tiers that are purely geographic scaffold — administrative reference
-# tenants bulk-imported from country/province/district/ward datasets
-# (see tenants/management/commands/import_geographic_tenants.py). They
-# have no membership of their own and are never a "community" a user
-# joins, switches into via sceptre, or gets placed in. Oversight still
-# cascades through them normally (get_oversight_tenant_ids doesn't
-# filter by tier) — this constant is only for views that list tenants
-# as candidate communities, not for anything that resolves the tree.
-GEOGRAPHIC_SCAFFOLD_TIERS = frozenset({
-    'continental', 'regional', 'national', 'provincial', 'district',
-    'constituency', 'ward',
-})
 
 
 def get_oversight_tenant_ids(user):

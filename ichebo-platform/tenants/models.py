@@ -3,10 +3,53 @@ import secrets
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-from core.managers import SoftDeleteMixin
+from core.managers import SoftDeleteManager, SoftDeleteMixin, SoftDeleteQuerySet
+
+# Tiers that are purely geographic scaffold — administrative reference
+# tenants bulk-imported from country/province/district/ward datasets (see
+# tenants/management/commands/import_geographic_*.py). They have no
+# membership of their own and are never a "community" a user joins,
+# switches into via sceptre, or gets placed in. Oversight still cascades
+# through them normally (get_oversight_tenant_ids doesn't filter by tier)
+# — this constant is only for views that list tenants as candidate
+# communities, not for anything that resolves the tree.
+#
+# Lives here rather than tenants/service.py (which used to be its only
+# home) because Tenant.communities — the queryset method every "list
+# tenants as candidate communities" view should use instead of repeating
+# .exclude(tier__in=GEOGRAPHIC_SCAFFOLD_TIERS) by hand — needs it at
+# class-definition time; service.py already imports from models.py, so
+# defining it there would be circular. tenants/service.py still exposes it
+# under the same name for existing callers.
+GEOGRAPHIC_SCAFFOLD_TIERS = frozenset({
+    'continental', 'regional', 'national', 'provincial', 'district',
+    'constituency', 'ward',
+})
+
+
+class TenantQuerySet(SoftDeleteQuerySet):
+    def communities(self, *extra_excluded_tiers):
+        """Tenants that are real candidate communities — never the
+        geographic scaffold, and never any additional non-community tiers
+        the caller names (e.g. 'handbook', 'induction'). Use this instead
+        of a hand-written .exclude(tier__in=GEOGRAPHIC_SCAFFOLD_TIERS) —
+        that pattern was repeated at 7 call sites across 3 apps and had
+        already been missed and re-fixed 5 separate times before this
+        method existed."""
+        return self.exclude(tier__in={*GEOGRAPHIC_SCAFFOLD_TIERS, *extra_excluded_tiers})
+
+
+class TenantManager(SoftDeleteManager):
+    def get_queryset(self):
+        return TenantQuerySet(self.model, using=self._db).filter(deleted_at__isnull=True)
+
+    def communities(self, *extra_excluded_tiers):
+        return self.get_queryset().communities(*extra_excluded_tiers)
 
 
 class Tenant(SoftDeleteMixin, models.Model):
+    objects = TenantManager()
+
     TIER_CHOICES = [
         ('handbook', 'Handbook'),
         ('induction', 'Induction'),
