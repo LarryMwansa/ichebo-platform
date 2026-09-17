@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
-from .models import ServiceOrder, Tenant, TenantInvitation, UserPermission
+from .models import GEOGRAPHIC_SCAFFOLD_TIERS, ServiceOrder, Tenant, TenantInvitation, UserPermission
 from .service import (
     InvitationError, accept_invitation,
     get_oversight_tenant_ids, remove_member, send_invitation,
@@ -236,6 +236,19 @@ def tenant_registry(request):
         .annotate(child_count=Count('children'))
         .order_by('tier', 'name')
     )
+    # Geography (continent -> country -> ... -> ward) is a parallel
+    # structure to the organisational tree, not a branch of it, even
+    # though Africa's actual Tenant.parent is Prime Tenancy (it needed
+    # some real parent to anchor its materialized path when imported).
+    # Rendered in its own section here rather than left to surface
+    # wherever Prime Tenancy's children happen to be expanded — see
+    # tenant_registry_children below, which hides scaffold tiers from an
+    # organisational tenant's children for the same reason.
+    continents = (
+        Tenant.objects.filter(tier='continental')
+        .annotate(child_count=Count('children'))
+        .order_by('name')
+    )
     my_tenants = list(
         Tenant.objects.filter(id__in=get_oversight_tenant_ids(request.user), is_agency=False)
         .communities()
@@ -243,6 +256,7 @@ def tenant_registry(request):
     )
     return render(request, 'tenants/tenant_registry.html', {
         'root_tenants': root_tenants,
+        'continents': continents,
         'total_count': Tenant.objects.count(),
         'my_tenants': my_tenants,
         'is_prime': True,
@@ -257,7 +271,13 @@ def tenant_registry_children(request, tenant_id):
         return HttpResponseForbidden()
 
     tenant = get_object_or_404(Tenant, id=tenant_id)
-    children = tenant.children.annotate(child_count=Count('children')).order_by('tier', 'name')
+    children = tenant.children
+    if tenant.tier not in GEOGRAPHIC_SCAFFOLD_TIERS:
+        # An organisational tenant (Prime Tenancy, a church node, ...) —
+        # geography renders in its own section on the registry page, not
+        # nested under whichever org tenant happens to be its DB parent.
+        children = children.communities()
+    children = children.annotate(child_count=Count('children')).order_by('tier', 'name')
     return render(request, 'tenants/partials/tenant_registry_children.html', {
         'children': children,
     })

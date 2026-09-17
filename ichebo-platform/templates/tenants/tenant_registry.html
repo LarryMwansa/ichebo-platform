@@ -14,8 +14,16 @@
         </p>
     </div>
 
+    <div class="tr-section-label">Established Jurisdictions</div>
     <div class="tr-tree">
         {% for tenant in root_tenants %}
+            {% include "tenants/partials/tenant_registry_node.html" with tenant=tenant %}
+        {% endfor %}
+    </div>
+
+    <div class="tr-section-label tr-section-label--geo">Global <span class="tr-section-label__sep">→</span> Continents</div>
+    <div class="tr-tree">
+        {% for tenant in continents %}
             {% include "tenants/partials/tenant_registry_node.html" with tenant=tenant %}
         {% endfor %}
     </div>
@@ -30,7 +38,23 @@
         display: flex;
         flex-direction: column;
         gap: 6px;
+        margin-bottom: 28px;
     }
+    .tr-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 10px;
+    }
+    .tr-section-label--geo {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary);
+    }
+    .tr-section-label__sep { opacity: 0.5; font-weight: 400; }
     .tr-node {
         border: 1px solid var(--border);
         border-radius: 8px;
