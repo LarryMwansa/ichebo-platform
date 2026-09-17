@@ -506,9 +506,15 @@ def create_tenant(request):
     errors = {}
     form_data = {}
 
-    # Only non-agency active tenants as parent candidates
+    # Only non-agency active tenants as parent candidates — and never the
+    # geographic scaffold (continent/country/province/.../ward): nobody
+    # creating a community wants to page through 4,000+ wards to pick an
+    # organisational parent, and a ward isn't a sensible parent for one
+    # anyway (see Tenant.objects.communities()).
     all_active_tenants = list(
-        Tenant.objects.filter(status='active', is_agency=False).order_by('name')
+        Tenant.objects.filter(status='active', is_agency=False)
+        .communities()
+        .order_by('name')
     )
 
     if request.method == 'POST':
@@ -542,7 +548,7 @@ def create_tenant(request):
         parent = None
         if parent_id:
             try:
-                parent = Tenant.objects.get(id=parent_id, status='active', is_agency=False)
+                parent = Tenant.objects.filter(status='active', is_agency=False).communities().get(id=parent_id)
             except Tenant.DoesNotExist:
                 errors['parent_id'] = 'Selected parent does not exist.'
 
