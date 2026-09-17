@@ -14,6 +14,13 @@
         </p>
     </div>
 
+    {% if prime_tenant %}
+    <div class="tr-section-label">Prime Tenancy</div>
+    <div class="tr-tree">
+        {% include "tenants/partials/tenant_registry_node.html" with tenant=prime_tenant %}
+    </div>
+    {% endif %}
+
     <div class="tr-section-label">Established Jurisdictions</div>
     <div class="tr-tree">
         {% for tenant in root_tenants %}

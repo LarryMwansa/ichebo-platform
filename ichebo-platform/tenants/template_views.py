@@ -231,8 +231,19 @@ def tenant_registry(request):
     if not _is_prime(request.user):
         return redirect('tenants:steward-dashboard')
 
+    # Prime Tenancy gets its own section — it's the singular apex most
+    # Level 5 activity revolves around, not just another entry in a list.
+    # The other root tenants (House Of Judah, New Found Treasure) predate
+    # Prime's /global/ hierarchy and sit at their own root path entirely —
+    # "Established Jurisdictions" describes them specifically, not Prime.
+    prime_tenant = (
+        Tenant.objects.filter(parent__isnull=True, slug='prime')
+        .annotate(child_count=Count('children'))
+        .first()
+    )
     root_tenants = (
         Tenant.objects.filter(parent__isnull=True)
+        .exclude(slug='prime')
         .annotate(child_count=Count('children'))
         .order_by('tier', 'name')
     )
@@ -255,6 +266,7 @@ def tenant_registry(request):
         .order_by('name')
     )
     return render(request, 'tenants/tenant_registry.html', {
+        'prime_tenant': prime_tenant,
         'root_tenants': root_tenants,
         'continents': continents,
         'total_count': Tenant.objects.count(),
