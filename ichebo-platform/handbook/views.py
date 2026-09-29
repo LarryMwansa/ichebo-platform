@@ -731,44 +731,21 @@ def handbook_relationship_list(request, record_id):
 
 # ── Knowledge Graph ──────────────────────────────────────────────────────────
 
+# Offline: it served every user's records, journals and keys included, to anonymous visitors.
+# Must be rescoped to what the viewer may see before it returns (DOC F v2.2, Part 7.5).
+@login_required
 def handbook_graph(request):
-    qs = Record.objects.filter(deleted_at__isnull=True)
     return render(request, 'workspace/handbook/graph.html', {
-        'active_app':        'handbook',
-        'ws_page_title':     'Apostolic Web',
-        'total_nodes':       qs.count(),
-        'governance_count':  qs.filter(record_class='governance').count(),
-        'personal_count':    qs.filter(record_family='journal').count(),
-        'relationship_count': Relationship.objects.filter(deleted_at__isnull=True, to_record__isnull=False).count(),
+        'active_app':    'handbook',
+        'ws_page_title': 'Apostolic Web',
+        'graph_offline': True,
     })
 
 
+@login_required
 def handbook_graph_data(request):
     from django.http import JsonResponse
-    records_qs = Record.objects.filter(deleted_at__isnull=True)
-    node_ids = set(records_qs.values_list('id', flat=True))
-    nodes = [
-        {
-            'id':     str(r.id),
-            'title':  r.title,
-            'family': r.record_family,
-            'type':   r.record_type,
-            'level':  r.permissions_data.get('required_level', 1) if r.permissions_data else 1,
-        }
-        for r in records_qs
-    ]
-    # Only include links where both endpoints exist as active nodes.
-    # Orphaned relationships (records hard-deleted) crash D3 forceLink.
-    links = [
-        {
-            'source': str(rel.from_record_id),
-            'target': str(rel.to_record_id),
-            'type':   rel.relationship_type,
-        }
-        for rel in Relationship.objects.filter(deleted_at__isnull=True, to_record__isnull=False)
-        if rel.from_record_id in node_ids and rel.to_record_id in node_ids
-    ]
-    return JsonResponse({'nodes': nodes, 'links': links})
+    return JsonResponse({'nodes': [], 'links': []})
 
 
 # ── HTMX: Recent governance records for context bar ──────────────────────────

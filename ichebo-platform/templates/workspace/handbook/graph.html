@@ -126,6 +126,7 @@
 {% endblock %}
 
 {% block ws_options %}
+{% if not graph_offline %}
 <div style="padding: 0 4px;">
 
     <div class="ws-label-tag" style="margin-bottom: 12px;">Graph Stats</div>
@@ -201,6 +202,7 @@
     </div>
 
 </div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -227,6 +229,24 @@
 {% endblock %}
 
 {% block ws_content %}
+{% if graph_offline %}
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;
+            min-height:60vh; padding:32px; text-align:center;">
+    <span class="material-symbols-outlined"
+          style="font-size:48px; color:var(--muted); opacity:0.3; display:block; margin-bottom:16px;">hub</span>
+    <p style="font-size:14px; font-weight:700; color:var(--text); margin:0 0 8px;">Apostolic Web is temporarily offline</p>
+    <p style="font-size:13px; color:var(--muted); line-height:1.6; max-width:360px; margin:0 0 24px;">
+        The knowledge graph is being rebuilt so it shows only the records you are permitted to see.
+    </p>
+    <a href="{% url 'handbook:home' %}"
+       style="display:inline-flex; align-items:center; gap:6px; padding:10px 20px;
+              border-radius:8px; background:var(--card-2); border:1px solid var(--border);
+              font-size:13px; font-weight:600; color:var(--text); text-decoration:none;">
+        <span class="material-symbols-outlined" style="font-size:16px;">menu_book</span>
+        Back to the Handbook
+    </a>
+</div>
+{% else %}
 <div class="graph-container" id="graph-stage">
     <div class="graph-overlay">
         <h1 class="ws-page-title" style="color: #fff !important; margin: 0; font-size: 32px;">Apostolic <span style="color: var(--accent-red);">Web</span></h1>
@@ -238,9 +258,11 @@
     <div class="graph-tooltip" id="graph-tooltip"></div>
 
 </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
+{% if not graph_offline %}
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -374,4 +396,5 @@
         }
     }
 </script>
+{% endif %}
 {% endblock %}
