@@ -50,13 +50,17 @@ Verified end-to-end in a real browser: created and saved a Principle record thro
 
 ## Stage 3 — Simplify Library, Journal & Bible forms together
 
-**In progress.** Journal piece done, 2026-09-30; Bible piece not started.
+**Done, 2026-09-30.**
 
-Forms for Libraries and Journals need real simplification — they're one of the things currently making the system slow to work in. The Bible reader gets the same Context/Options treatment in this stage rather than as a separate afterthought, per explicit direction: fold it into the same pass, not a bolt-on later.
+Forms for Libraries and Journals needed real simplification — they were one of the things making the system slow to work in. The Bible reader got the same scrutiny in this stage rather than as a separate afterthought, per explicit direction: fold it into the same pass, not a bolt-on later.
 
 **Journal — done.** `workspace/records/create.html` had the exact same Context Bar/editing-action mixup Stage 2 fixed in Handbook: an "Entry Types" picker sitting in navigation. Moved it into the Options bar, above the type-specific description it already paired with by topic; Context Bar is now navigation only (My Journal, Command Center). Scope was deliberately kept to this split — the mobile quick-add drawer and the Desk's separate journal save path are different, working flows, left alone. Verified end-to-end on production: switched type via the new picker, saved a real Dream entry, confirmed it in the database.
 
-**Bible — not started.** Investigation so far found five separate base templates (`base.html`, `base_bible.html`, `base_bible_minimal.html`, `base_sidecar.html`, `base_v2.html`) plus `community_base.html` — more base-template sprawl than Handbook had before Stage 2. Scoping this properly is the next piece.
+**Bible — done, and simpler than expected.** Investigated all five base templates before touching anything. Found `base_v2.html` (1009 lines) completely orphaned — nothing extends or renders it — and `base.html` + its only child `base_bible.html` (91 lines together) equally dead, with zero references anywhere in the codebase. Deleted all three (~1100 lines, confirmed via exhaustive grep and by rendering the four live Bible pages before and after, all 200 both times).
+
+Checked the main reader (`bible/reader.html`) specifically for the Handbook/Journal anti-pattern — it doesn't have it. Its Context Bar was already pure navigation (search, book list, chapter grid) and its Options bar already carried every editing action (versions, notes, links, display, history). No split was needed. The remaining two Bible shells are intentionally outside the 4-column chrome: `base_sidecar.html` is a minimal embed shell, and `community_base.html` (bible.ichebo.org for sceptre.ichebo.org visitors) is already on the `sceptre_v2.css` flat-nav pattern that's the *target* Stage 5 wants for the rest of `app.ichebo.org` — a useful existing precedent for that stage.
+
+Cutting `reader.html` over to `apostolic_chrome.html` itself was deliberately left for Stage 5: the shell fallback that picks `workspace_shell.html` today is shared by every app on `app.ichebo.org`, not just Bible, so doing it here would jump the agreed staging order.
 
 Principle carried over from the brief: a simpler form that works beats an elaborate one that's technically impressive but slows the actual work down.
 
@@ -98,6 +102,6 @@ All six verified fixed via real browser sessions — the first four against the 
 | 0. Clone & rename shell | Done | — |
 | 1. Ecosystem launcher | Done | — |
 | 2. Handbook chrome | Done | — |
-| 3. Library/Journal/Bible forms | In progress | Scope and start the Bible reader's Context/Options treatment |
+| 3. Library/Journal/Bible forms | Done | — |
 | 4. Desk stays separate | Scope decided | — |
 | 5. app.ichebo.org lighter migration | Not started | Begins after Stage 3 proves out |
