@@ -38,11 +38,15 @@ Verified live in a real browser session: Handbook correctly shows locked for a L
 
 ## Stage 2 — Handbook gets its own chrome
 
-**In progress.** First slice shipped 2026-09-30.
+**Done, 2026-09-30.**
 
 Introduced `workspace/handbook/base.html`, extending `apostolic_chrome.html`, as the one place the Library/Mandate/Keys context nav and the shared `hb-*` styling live. `home.html`, `record.html`, `access.html`, and `graph.html` now extend it instead of each independently duplicating the same nav markup and CSS (~150 duplicated lines removed), overriding only page-specific blocks where they genuinely differ.
 
-**Still open:** `record.html`'s Context Bar currently does double duty — it's both "where am I" navigation and a type-picker that sets hidden form fields (an editing action, not navigation). That's the concrete instance of the brief's complaint that too much gets forced into the Context Bar. Splitting the type-picker out into the Options bar, where it belongs as part of editing the record, is the next piece of Stage 2.
+`record.html`'s Context Bar used to do double duty — both "where am I" navigation and a type-picker that set hidden form fields (an editing action, not navigation). The type dial now lives in the Options bar's Details tab instead, gated to Handbook pages and to records that are actually still editable, and dispatches the same `dialChanged` event the Desk's own dial uses — which also fixed a latent bug where the mobile editor's hidden type field never followed a desktop dial click. `record.html` no longer overrides `context_content` at all; its Context Bar is now identical to every other Handbook page.
+
+Along the way, fixed a second gap in the shared Options bar: its five field groups (journal/governance/activity/community/bible) had hardcoded visibility rather than being driven by the page's actual `active_family`, so Handbook always showed Journal's Mood/Tone field by default and never showed Governance's fields until a dial was clicked. Now computed server-side, correct on first load for both Desk and Handbook.
+
+Verified end-to-end in a real browser: created and saved a Principle record through the moved dial, confirmed `record_family=governance, record_type=principle` in the database, and confirmed the Context Bar carries no type-picker on any Handbook page — live on production, not just locally.
 
 ## Stage 3 — Simplify Library, Journal & Bible forms together
 
@@ -70,7 +74,7 @@ End state: the Apostolic Chrome becomes exclusive to the Handbook; `app.ichebo.o
 
 ## Incidents found and fixed along the way
 
-All four were found during Stage 0–2 verification and fixed the same day (2026-09-30), before or immediately after reaching production.
+All six were found during Stage 0–2 verification and fixed the same day (2026-09-30), before or immediately after reaching production.
 
 | Issue | Where | Fix |
 | --- | --- | --- |
@@ -78,8 +82,10 @@ All four were found during Stage 0–2 verification and fixed the same day (2026
 | Django's `{# #}` comment tag can't span multiple lines — it silently renders as visible literal text instead of being stripped | 6 templates, including an ASCII banner leaking onto the live Dashboard (twice) and a full doc-comment leaking above the title field on every Desk/Handbook editor | Converted all 6 to `{% comment %}...{% endcomment %}`, which does support multi-line content |
 | `/handbook/` 500'd in production right after the Stage 1 launcher shipped | `handbook.ichebo.org` runs a scoped urlconf (`handbook.subdomain_urls`) that only registers `handbook:`/`accounts:` namespaces; the shared launcher grid reversed `activity:`, `community:`, etc., which don't exist there | Added `components/_app_launcher_external.html` (absolute `app.ichebo.org` URLs, no `{% url %}` reverses) and switched to it when `request.site == 'handbook'` — the same pattern the old sidebar used this branch for |
 | The launcher fix didn't actually take effect once deployed — click did nothing | `collectstatic` hadn't been run on production since 2026-08-10, so the deployed `staticfiles/js/shell_v2.js` predated the new toggle functions entirely | Ran `collectstatic`; added a `?v=2` cache-bust to the script tag so browsers that had already cached the old file picked up the change too |
+| The same multi-line `{# #}` comment bug from row 2 got reintroduced, by the same person who'd just fixed it, while writing the new Type section | `dynamic_options.html`'s new Type panel | Caught in local browser verification before it reached production this time; converted to `{% comment %}`; re-scanned the whole templates tree to confirm no other instances existed |
+| Handbook's Options bar always showed the Journal "Mood / Tone" field by default and never showed Governance's fields until a dial was clicked | `dynamic_options.html`'s five field groups had hardcoded `display:none`/visible instead of being driven by `active_family` | Computed each group's visibility server-side from `active_family`, correct on first load for both Desk and Handbook |
 
-All four verified fixed via real browser sessions against the live site, not just server-side checks.
+All six verified fixed via real browser sessions — the first four against the live site, the last two caught and fixed locally before deploying.
 
 ## Status tracker
 
@@ -87,7 +93,7 @@ All four verified fixed via real browser sessions against the live site, not jus
 | --- | --- | --- |
 | 0. Clone & rename shell | Done | — |
 | 1. Ecosystem launcher | Done | — |
-| 2. Handbook chrome | In progress | Split record.html's type-picker out of the Context Bar into the Options bar |
+| 2. Handbook chrome | Done | — |
 | 3. Library/Journal/Bible forms | Not started | Scope the form simplification pass |
 | 4. Desk stays separate | Scope decided | — |
 | 5. app.ichebo.org lighter migration | Not started | Begins after Stage 3 proves out |
