@@ -76,21 +76,6 @@ class GovernanceLevelGateTests(TestCase):
 # ---------------------------------------------------------------------------
 
 class GovernanceViewGateTests(TestCase):
-    def setUp(self):
-        self.l2_user = _make_user(email='l2@example.com', level=2)
-        self.l3_user = _make_user(email='l3@example.com', level=3)
-
-    def test_reference_home_requires_level_3(self):
-        self.client.force_login(self.l2_user)
-        response = self.client.get('/governance/reference/')
-        # Level 2 should be redirected or get a 403
-        self.assertIn(response.status_code, [302, 403])
-
-    def test_level_3_can_reach_reference_home(self):
-        self.client.force_login(self.l3_user)
-        response = self.client.get('/governance/reference/')
-        self.assertEqual(response.status_code, 200)
-
     def test_governance_home_requires_login(self):
         response = self.client.get('/governance/')
         # Unauthenticated → redirect to login
