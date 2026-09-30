@@ -50,9 +50,13 @@ Verified end-to-end in a real browser: created and saved a Principle record thro
 
 ## Stage 3 — Simplify Library, Journal & Bible forms together
 
-**Not started.**
+**In progress.** Journal piece done, 2026-09-30; Bible piece not started.
 
 Forms for Libraries and Journals need real simplification — they're one of the things currently making the system slow to work in. The Bible reader gets the same Context/Options treatment in this stage rather than as a separate afterthought, per explicit direction: fold it into the same pass, not a bolt-on later.
+
+**Journal — done.** `workspace/records/create.html` had the exact same Context Bar/editing-action mixup Stage 2 fixed in Handbook: an "Entry Types" picker sitting in navigation. Moved it into the Options bar, above the type-specific description it already paired with by topic; Context Bar is now navigation only (My Journal, Command Center). Scope was deliberately kept to this split — the mobile quick-add drawer and the Desk's separate journal save path are different, working flows, left alone. Verified end-to-end on production: switched type via the new picker, saved a real Dream entry, confirmed it in the database.
+
+**Bible — not started.** Investigation so far found five separate base templates (`base.html`, `base_bible.html`, `base_bible_minimal.html`, `base_sidecar.html`, `base_v2.html`) plus `community_base.html` — more base-template sprawl than Handbook had before Stage 2. Scoping this properly is the next piece.
 
 Principle carried over from the brief: a simpler form that works beats an elaborate one that's technically impressive but slows the actual work down.
 
@@ -94,6 +98,6 @@ All six verified fixed via real browser sessions — the first four against the 
 | 0. Clone & rename shell | Done | — |
 | 1. Ecosystem launcher | Done | — |
 | 2. Handbook chrome | Done | — |
-| 3. Library/Journal/Bible forms | Not started | Scope the form simplification pass |
+| 3. Library/Journal/Bible forms | In progress | Scope and start the Bible reader's Context/Options treatment |
 | 4. Desk stays separate | Scope decided | — |
 | 5. app.ichebo.org lighter migration | Not started | Begins after Stage 3 proves out |
