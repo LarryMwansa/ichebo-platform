@@ -64,6 +64,18 @@ Cutting `reader.html` over to `apostolic_chrome.html` itself was deliberately le
 
 Principle carried over from the brief: a simpler form that works beats an elaborate one that's technically impressive but slows the actual work down.
 
+## Related — Bible reader moved to handbook.ichebo.org
+
+**Done, 2026-09-30.** Not one of the six staged UI-rework phases, but a direct follow-on from the Stage 3 Bible investigation, done at explicit request: the full authenticated reader moved from `app.ichebo.org/bible/` to `handbook.ichebo.org/bible/`, now on `apostolic_chrome.html`.
+
+- `handbook/subdomain_urls.py` registers `bible.urls` under the `bible:` namespace — it's self-contained (only reverses its own namespace), so it works unmodified there.
+- `core/context_processors.py`'s `shell_template` lookup resolves to `apostolic_chrome.html` for `request.site == 'handbook'`. `bible/reader.html` is the only other consumer of that dynamic lookup — Handbook's own pages extend `workspace/handbook/base.html` directly — so this is isolated to Bible.
+- `BibleReaderView` 301-redirects to the `handbook.ichebo.org` equivalent when reached via `app.ichebo.org`, after resolving the reading-position resume so the redirect lands on the right chapter. Every existing internal link (`_bottom_nav.html`, `_sidebar.html`, `dashboard/explore.html`) still points at `bible:reader` and keeps working unchanged — they just forward through the redirect now rather than needing to be hunted down and edited individually.
+- `apostolic_chrome.html`'s mobile shell, previously fully suppressed for `request.site == 'handbook'`, now also renders for `active_app == 'bible'` — without `_navbar.html`/`_app_drawer.html`/`_bottom_nav.html`, which reverse `dashboard:`/`notifications:`/`login`/`logout`, namespaces this subdomain's urlconf doesn't register and which would 500 immediately. Bible's own mobile content block is fully self-contained (own sticky header, own prev/next strip) and doesn't need them.
+- `bible.ichebo.org` (the separate, unauthenticated community reader) is untouched — different views, different urlconf, not part of this move.
+
+Verified live on production: an authenticated visit to the old URL gets a real 301 to the new one with reading position preserved; the new location renders the full desktop chrome (Context Bar = book/chapter nav, Options bar = versions/notes/links/display/history) and a working mobile view with functioning chapter-to-chapter navigation.
+
 ## Stage 4 — The Desk stays its own app
 
 **Decision made, no work started.**
