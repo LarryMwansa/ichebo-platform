@@ -1,0 +1,83 @@
+{% comment %}
+components/_app_launcher_external.html — launcher grid for subdomains whose
+urlconf only registers their own namespace (handbook.ichebo.org today; the
+same pattern the old workspace_shell.html used its request.site == 'handbook'
+branch for). Absolute app.ichebo.org URLs only — no {% url %} reverses into
+namespaces (activity, community, governance, tenants, learn, records) that
+don't exist on this subdomain's urlconf.
+{% endcomment %}
+
+<div class="app-launcher-grid">
+
+  <a href="https://app.ichebo.org/" class="launcher-item" hx-boost="false">
+    <div class="launcher-icon icon-slate">
+        <span class="material-symbols-outlined">dashboard</span>
+    </div>
+    <span class="launcher-label">Dashboard</span>
+  </a>
+
+  <a href="https://app.ichebo.org/activity/" class="launcher-item" hx-boost="false">
+    <div class="launcher-icon icon-teal">
+        <span class="material-symbols-outlined">task_alt</span>
+    </div>
+    <span class="launcher-label">Activity</span>
+  </a>
+
+  <a href="https://app.ichebo.org/records/" class="launcher-item" hx-boost="false">
+    <div class="launcher-icon icon-cyan">
+        <span class="material-symbols-outlined">history_edu</span>
+    </div>
+    <span class="launcher-label">My Journal</span>
+  </a>
+
+  <a href="https://app.ichebo.org/bible/" class="launcher-item" hx-boost="false">
+    <div class="launcher-icon icon-pink">
+        <span class="material-symbols-outlined">menu_book</span>
+    </div>
+    <span class="launcher-label">Bible</span>
+  </a>
+
+  <a href="https://app.ichebo.org/channel/" class="launcher-item" hx-boost="false">
+    <div class="launcher-icon icon-blue">
+        <span class="material-symbols-outlined">live_tv</span>
+    </div>
+    <span class="launcher-label">Media</span>
+  </a>
+
+  <a href="https://app.ichebo.org/community/" class="launcher-item" hx-boost="false">
+    <div class="launcher-icon icon-green">
+        <span class="material-symbols-outlined">groups</span>
+    </div>
+    <span class="launcher-label">Community</span>
+  </a>
+
+  <a href="{% if user.is_authenticated and user.competence_level == 0 %}{{ SCEPTRE_INDUCTION_URL }}{% else %}https://app.ichebo.org/learn/{% endif %}"
+     class="launcher-item" hx-boost="false">
+    <div class="launcher-icon icon-pink">
+        <span class="material-symbols-outlined">school</span>
+    </div>
+    <span class="launcher-label">Formation</span>
+  </a>
+
+  <a href="https://app.ichebo.org/governance/" class="launcher-item" hx-boost="false">
+    <div class="launcher-icon icon-purple">
+        <span class="material-symbols-outlined">gavel</span>
+    </div>
+    <span class="launcher-label">Governance</span>
+  </a>
+
+  <a href="https://app.ichebo.org/tenants/" class="launcher-item" hx-boost="false">
+    <div class="launcher-icon icon-orange">
+        <span class="material-symbols-outlined">account_balance</span>
+    </div>
+    <span class="launcher-label">Tenancy Hub</span>
+  </a>
+
+  <a href="https://identity.ichebo.org/accounts/settings/" class="launcher-item" hx-boost="false">
+    <div class="launcher-icon icon-slate">
+        <span class="material-symbols-outlined">settings</span>
+    </div>
+    <span class="launcher-label">Settings</span>
+  </a>
+
+</div>

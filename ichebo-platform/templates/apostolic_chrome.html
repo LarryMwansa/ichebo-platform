@@ -251,7 +251,11 @@
                     </button>
                 </header>
                 <div class="ics-launcher-popover__body">
-                    {% include "components/_app_launcher.html" %}
+                    {% if request.site == 'handbook' %}
+                        {% include "components/_app_launcher_external.html" %}
+                    {% else %}
+                        {% include "components/_app_launcher.html" %}
+                    {% endif %}
                 </div>
             </div>
         </div>
