@@ -1,12 +1,13 @@
 """
 URL configuration for handbook.ichebo.org.
-Public reader surface for the Ichebo Handbook — no sidebar, no workspace chrome.
+Reader + editor surface for the Ichebo Handbook, on apostolic_chrome.html.
 Mounted at the domain root via request.urlconf set by SiteRouterMiddleware.
 
-No app_name/namespace here — same pattern as sceptre/urls.py.
-The handbook app's own template_urls.py uses app_name='handbook', so all
-{% url 'handbook:...' %} calls inside views work because template_urls.py
-is included below with its namespace intact.
+No app_name/namespace here at the top level — same pattern as
+sceptre/urls.py. The handbook app's own template_urls.py uses
+app_name='handbook', so all {% url 'handbook:...' %} calls inside views
+work because template_urls.py is included below with its namespace intact.
+Same for bible.urls (app_name='bible').
 
 Handbook routes are mounted at /handbook/ (not /) to preserve every
 hardcoded /handbook/records/{pk}/ URL inside HTMX inline HTML responses.
@@ -28,6 +29,11 @@ urlpatterns = [
     # Handbook surface — mounted at /handbook/ to preserve all hardcoded paths
     path('handbook/', include('handbook.template_urls', namespace='handbook')),
     path('api/handbook/', include('handbook.api_urls')),
+
+    # Bible reader — moved here from app.ichebo.org/bible/ (which now
+    # redirects here); self-contained under the bible: namespace, no
+    # dependency on any other namespace, so it works unmodified.
+    path('bible/', include('bible.urls', namespace='bible')),
 
     # Root redirect → handbook home
     path('', RedirectView.as_view(url='/handbook/', permanent=False)),

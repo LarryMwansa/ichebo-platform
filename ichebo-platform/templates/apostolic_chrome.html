@@ -518,17 +518,30 @@
     {# ── Extra body elements (fixed overlays, portals) — rendered outside all grid/overflow containers ── #}
     {% block extra_body %}{% endblock %}
 
-    {# ── Mobile shell: visible below 1024px, hidden on desktop via shell_v2.css ── #}
-    {% if request.site != 'handbook' and request.site != 'identity' %}
+    {% comment %}
+    Mobile shell: visible below 1024px, hidden on desktop via shell_v2.css.
+    Renders for every site except identity, and except Handbook's own
+    pages — but Bible reading lives under handbook.ichebo.org too now, and
+    its mobile content block is fully self-contained (own sticky header,
+    own prev/next strip), so it gets the shell without _navbar.html/
+    _app_drawer.html/_bottom_nav.html, which reverse
+    dashboard:/notifications:/login/logout — namespaces handbook.ichebo.org's
+    urlconf doesn't register.
+    {% endcomment %}
+    {% if request.site != 'handbook' and request.site != 'identity' or active_app == 'bible' %}
     <div id="ws-mobile-shell" style="display:none;">
-        {% include "components/_navbar.html" %}
-        {% include "components/_app_drawer.html" %}
+        {% if request.site != 'handbook' %}
+            {% include "components/_navbar.html" %}
+            {% include "components/_app_drawer.html" %}
+        {% endif %}
         <main id="ws-mobile-main" class="ics-main" role="main">
             <div id="toast-container-mobile" aria-live="polite" aria-atomic="true"></div>
             {% block content %}{% endblock %}
         </main>
-        {% if not fab_hidden %}{% include "components/_fab.html" %}{% endif %}
-        {% include "components/_bottom_nav.html" %}
+        {% if request.site != 'handbook' %}
+            {% if not fab_hidden %}{% include "components/_fab.html" %}{% endif %}
+            {% include "components/_bottom_nav.html" %}
+        {% endif %}
     </div>
     {% endif %}
 

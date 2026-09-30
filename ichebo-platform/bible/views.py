@@ -33,6 +33,12 @@ class BibleReaderView(LoginRequiredMixin, View):
             if position:
                 book_code, chapter = position
 
+        # Bible reading has moved under handbook.ichebo.org — send
+        # app.ichebo.org/bible/ visitors to the new home permanently, rather
+        # than hunting down every internal link that still points here.
+        if getattr(request, 'site', 'agency') == 'agency':
+            return redirect(f'https://handbook.ichebo.org/bible/{book_code}/{chapter}/', permanent=True)
+
         translation = get_user_translation(request.user)
         books = get_all_books()
         book = BibleBook.objects.filter(code=book_code).first()
