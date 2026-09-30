@@ -1,0 +1,532 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Workspace{% endblock %} — Ichebo</title>
+    
+    <!-- Design System: Playfair Display & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/workspace.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'css/shell_v2.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'css/workspace_v2.css' %}?v=1">
+    <!-- Mobile component styles — shared across all pages using dash-* / list-item / btn-touch patterns -->
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+    <!-- Mobile nav — used by #ws-mobile-shell below 1024px -->
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bottom_bar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/app-drawer.css' %}">
+    <link rel="stylesheet" href="{% static 'css/governance.css' %}">
+    
+    {% block extra_css %}
+<style>
+    /* Apostolic Design Tokens - Phase 8 */
+    :root {
+        --ink-bg: #0E0E0E;
+        --ink-2: #161616;
+        --stone-bg: #F5F3F0;
+        --stone-2: #ECE9E4;
+        --accent-red: #AF3236;
+        --text-ink: #1A1A1A;
+        --text-muted-ink: #636e72;
+        --border-ink: rgba(0,0,0,0.05);
+    }
+
+    /* Dark Mode Sovereign Shift */
+    .dark, [data-theme="dark"] {
+        --stone-bg: #111111 !important;
+        --stone-2: #161616 !important;
+        --text-ink: #F5F3F0 !important;
+        --text-muted-ink: #9a9a9a !important;
+        --border-ink: rgba(255,255,255,0.1) !important;
+    }
+
+    .ics-sidebar {
+        background: var(--ink-bg);
+        border-right: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .ics-sidebar__item {
+        position: relative;
+        color: rgba(255,255,255,0.4);
+        transition: all 0.2s ease;
+    }
+
+    .ics-sidebar__item:hover { color: #fff; }
+    .ics-sidebar__item.active { color: #fff; }
+
+    /* Rule of Left: 3px red rule for active state */
+    .ics-sidebar__item.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 20%;
+        height: 60%;
+        width: 3px;
+        background: var(--accent-red);
+    }
+
+    .ics-context-bar {
+        background: var(--ink-2);
+        border-right: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .ics-context-bar__header {
+        color: #fff;
+        font-family: 'Playfair Display', serif;
+        letter-spacing: 0.5px;
+    }
+
+    /* The Stage: Sovereign Shift Aesthetic */
+    .ics-stage {
+        background: var(--stone-bg);
+        color: var(--text-ink);
+    }
+
+    .ics-stage__topbar {
+        background: var(--stone-bg);
+        border-bottom: 1px solid var(--border-ink);
+    }
+
+    .ws-page-title, .editorial-title, .explore-title {
+        font-family: 'Playfair Display', serif !important;
+        font-weight: 800 !important;
+        color: var(--text-ink) !important;
+    }
+
+    .ics-options-bar {
+        background: var(--stone-2);
+        border-left: 1px solid var(--border-ink);
+        color: var(--text-ink);
+    }
+
+    /* Ghost Watermark: Section identifier */
+    .ics-stage__content {
+        position: relative;
+    }
+
+    .ics-stage__content::after {
+        content: attr(data-watermark);
+        position: fixed;
+        right: 320px; /* Options bar width */
+        bottom: -20px;
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(5rem, 15vw, 12rem);
+        font-weight: 900;
+        color: var(--accent-red);
+        opacity: 0.05;
+        pointer-events: none;
+        user-select: none;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        z-index: 0;
+        transition: opacity var(--shell-transition);
+    }
+
+    .dark .ics-stage__content::after {
+        opacity: 0.03;
+    }
+
+    /* Ecosystem Launcher — Stage 1 */
+    .ics-sidebar--slim .ics-sidebar__item--launcher {
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+    }
+
+    .ics-launcher-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 950;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 16px 0 0 72px; /* clears the slim rail */
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+    }
+
+    .ics-launcher-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .ics-launcher-popover {
+        width: 360px;
+        max-width: calc(100vw - 96px);
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+        background: var(--card, var(--stone-bg));
+        border: 1px solid var(--border-ink);
+        border-radius: 16px;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+        transform: translateY(-8px);
+        transition: transform 0.15s ease;
+    }
+
+    .ics-launcher-overlay.active .ics-launcher-popover {
+        transform: translateY(0);
+    }
+
+    .ics-launcher-popover__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border-ink);
+    }
+
+    .ics-launcher-popover__body .app-launcher-grid {
+        padding: 12px 8px 16px;
+    }
+</style>
+{% endblock %}
+
+    <!-- HTMX & Markdown -->
+    <script src="{% static 'js/htmx.min.js' %}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>/* Synchronous theme init — reads canonical ics_theme key, runs before paint */
+      (function () {
+        try {
+          var theme = localStorage.getItem('ics_theme') || 'dark';
+          if (theme === 'dark') document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+    <div class="ics-shell" id="ics-shell">
+        
+        <!-- Column 1: Ecosystem Launcher Rail — moving between Ichebo applications.
+             This is deliberately slim: it is not in-app navigation (that's the
+             Context Bar, Column 2), it only opens the launcher popover. -->
+        <aside class="ics-sidebar ics-sidebar--slim" aria-label="Ecosystem Navigation">
+            <a href="https://app.ichebo.org/" class="ics-sidebar__logo">
+                <img src="{% static 'images/device.svg' %}" alt="Ichebo" class="ics-logo" style="width: 100%;">
+            </a>
+
+            <nav class="ics-sidebar__nav">
+                <button type="button"
+                        class="ics-sidebar__item ics-sidebar__item--launcher"
+                        id="ics-launcher-trigger"
+                        data-tooltip="Ichebo Apps"
+                        aria-haspopup="true" aria-expanded="false" aria-controls="ics-launcher-popover"
+                        onclick="WorkspaceUI.toggleLauncher()">
+                    <span class="material-symbols-outlined">apps</span>
+                </button>
+            </nav>
+
+            <div class="ics-sidebar__bottom">
+                <a href="https://identity.ichebo.org/accounts/you/" class="ics-sidebar__item" data-tooltip="You" hx-boost="false">
+                    <span class="material-symbols-outlined">account_circle</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Ecosystem Launcher Popover — closed by default; built from the
+             same components/_app_launcher.html grid used by the mobile drawer,
+             so the app list is defined in exactly one place. -->
+        <div id="ics-launcher-overlay" class="ics-launcher-overlay" aria-hidden="true">
+            <div id="ics-launcher-popover" class="ics-launcher-popover" role="dialog" aria-modal="true" aria-label="Ichebo Applications">
+                <header class="ics-launcher-popover__header">
+                    <span class="label-caps">Ichebo Apps</span>
+                    <button type="button" class="ws-icon-btn" onclick="WorkspaceUI.closeLauncher()" aria-label="Close">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </header>
+                <div class="ics-launcher-popover__body">
+                    {% include "components/_app_launcher.html" %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Column 2: Context Bar (App Tools / Navigation) -->
+        <nav class="ics-context-bar" id="ics-context-bar" aria-label="App Context">
+            <header class="ics-context-bar__header">
+                <span>
+                    {% block context_header %}
+                        {{ active_app|title }}
+                    {% endblock %}
+                </span>
+            </header>
+            <div class="ics-context-bar__content">
+                {% block context_content %}
+                    <!-- App-specific tools and sub-navigation live here -->
+                {% endblock %}
+            </div>
+        </nav>
+
+        <!-- Column 3: The Stage (Main Editorial Workspace) -->
+        <main class="ics-stage" id="main-stage">
+            <header class="ics-stage__topbar">
+                <div style="display: flex; align-items: center; gap: var(--space-s);">
+                    <button class="ws-icon-btn" id="ics-context-toggle" onclick="WorkspaceUI.toggleContext()" title="Toggle Context Bar (⌘+[ )">
+                        <span class="material-symbols-outlined">dock_to_right</span>
+                    </button>
+                    <div class="ws-topbar__breadcrumb">
+                        {% block breadcrumb %}
+                            <span class="ws-topbar__breadcrumb-item">{{ ws_page_title|default:"ICS" }}</span>
+                        {% endblock %}
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: var(--space-s);">
+
+                    {# Search Bar #}
+                    <div class="ws-topbar__search" onclick="window.WorkspaceUI.openSearch()" style="cursor: pointer;">
+                        <span class="material-symbols-outlined">search</span>
+                        <input type="text" placeholder="Search ( / )" aria-label="Search" readonly>
+                    </div>
+
+                    {% if request.site != 'handbook' and request.site != 'identity' %}
+                    {# Notifications — live badge via HTMX polling #}
+                    <a href="{% url 'notifications:list' %}"
+                       class="ws-icon-btn {% if active_app == 'notifications' %}active{% endif %}"
+                       title="Alerts Center"
+                       style="position: relative;">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span id="notif-badge"
+                              hx-get="{% url 'notifications:htmx-badge' %}"
+                              hx-trigger="load, every 60s"
+                              hx-target="#notif-badge"
+                              hx-swap="outerHTML"
+                              style="display: none;"></span>
+                    </a>
+                    {% endif %}
+
+                    {# Theme Toggle #}
+                    <button class="ws-icon-btn" id="ics-theme-toggle" onclick="WorkspaceUI.toggleTheme()" title="Toggle Theme">
+                        <span class="material-symbols-outlined">contrast</span>
+                    </button>
+
+                    {% if request.site != 'handbook' %}
+                    <div style="width: 1px; height: 24px; background: var(--border); margin: 0 var(--space-3xs);"></div>
+
+                    {# Level Badge (Formation History) #}
+                    <a href="https://identity.ichebo.org/accounts/formation/" class="ws-sidebar__level-dot" hx-boost="false"
+                         style="background: var(--level-{{ user.competence_level|default:0 }}); width: 24px; height: 24px; font-size: 10px; text-decoration: none; display: flex; align-items: center; justify-content: center; color: #fff;"
+                         title="Level {{ user.competence_level }} Steward — View Formation History">
+                        {{ user.competence_level|default:0 }}
+                    </a>
+
+                    {# Profile Avatar #}
+                    <a href="https://identity.ichebo.org/accounts/you/" class="ws-sidebar__avatar" style="width: 32px; height: 32px; margin: 0;" title="You — View Profile" hx-boost="false">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="{{ user.display_name }}">
+                        {% else %}
+                            {{ user.display_name|slice:":1"|upper|default:user.email|slice:":1"|upper }}
+                        {% endif %}
+                    </a>
+
+                    {# Settings #}
+                    <a href="https://identity.ichebo.org/accounts/settings/" class="ws-icon-btn {% if active_app == 'accounts' %}active{% endif %}" title="Institutional Settings" hx-boost="false">
+                        <span class="material-symbols-outlined">settings</span>
+                    </a>
+                    {% endif %}
+
+                    <button class="ws-icon-btn" id="ics-options-toggle" onclick="WorkspaceUI.toggleOptions()" title="Toggle Options (⌘+] )">
+                        <span class="material-symbols-outlined">dock_to_right</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="ics-stage__content" data-watermark="{% block watermark %}{{ active_app|upper }}{% endblock %}">
+                <div class="ics-canvas" id="ics-canvas">
+                    {% block ws_content %}{% endblock %}
+                </div>
+            </div>
+        </main>
+
+        <!-- Column 4: Options Bar (Metadata / Links / Relationships) -->
+        <aside class="ics-options-bar" id="ics-options-bar" aria-label="Metadata and Relationships">
+            <header class="ics-options-bar__header">
+                <span class="label-caps">Details & Relations</span>
+                <button class="ws-icon-btn" onclick="WorkspaceUI.toggleOptions()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </header>
+
+            {% block ws_options_tabs %}
+            <div class="ics-options-tabs">
+                <button class="ics-options-tab active" id="tab-relations" onclick="WorkspaceUI.switchOptionsTab('relations')">Relations</button>
+            </div>
+
+            <div class="ics-options-bar__content">
+                {# Relations Pane #}
+                <div class="ws-options-pane active" id="pane-relations">
+                    <div style="padding: var(--space-m);">
+                        {% block ws_options %}
+                            <div class="ws-empty-state">
+                                <span class="material-symbols-outlined">info</span>
+                                <p>Select an element to view relationships</p>
+                            </div>
+                        {% endblock %}
+                    </div>
+                </div>
+
+            </div>
+            {% endblock %}
+        </aside>
+        
+        {% if request.site != 'handbook' and request.site != 'identity' %}{% include "components/_search_overlay.html" %}{% endif %}
+
+    </div>
+
+    {# ── Django Messages Toast Container ── #}
+    <div id="ws-toast-container" aria-live="polite"
+         style="position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+                display: flex; flex-direction: column; gap: 10px; pointer-events: none;">
+        {% for message in messages %}
+        <div class="ws-toast ws-toast--{{ message.tags }}"
+             style="display: flex; align-items: center; gap: 10px;
+                    padding: 12px 16px; border-radius: 10px; min-width: 280px; max-width: 400px;
+                    background: var(--card); border: 1px solid var(--border);
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                    font-size: 13px; color: var(--text); pointer-events: all;
+                    animation: ws-toast-in 0.2s ease;">
+            <span class="material-symbols-outlined" style="font-size: 18px; flex-shrink: 0;
+                  color: {% if 'error' in message.tags %}#e53e3e{% elif 'warning' in message.tags %}#d97706{% else %}var(--primary){% endif %};">
+                {% if 'error' in message.tags %}error{% elif 'warning' in message.tags %}warning{% else %}check_circle{% endif %}
+            </span>
+            <span style="flex: 1; line-height: 1.4;">{{ message }}</span>
+            <button onclick="this.closest('.ws-toast').remove()"
+                    style="background: none; border: none; cursor: pointer; padding: 2px;
+                           color: var(--muted); display: flex; align-items: center;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <style>
+    @keyframes ws-toast-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    </style>
+
+    <!-- Core Scripts -->
+    <script src="{% static 'js/storage.js' %}"></script>
+    <script src="{% static 'js/shell_v2.js' %}"></script>
+    <script src="{% static 'js/navbar.js' %}" defer></script>
+
+    <script>
+        document.addEventListener('htmx:configRequest', (e) => {
+            e.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+
+        // Auto-dismiss toasts after 5 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.ws-toast').forEach(t => {
+                setTimeout(() => t.remove(), 5000);
+            });
+        });
+
+        // Custom HTMX confirm — inline toast-style bar instead of browser dialog
+        document.addEventListener('htmx:confirm', (e) => {
+            if (!e.detail.question) return;
+            e.preventDefault();
+
+            const existing = document.getElementById('ws-confirm-bar');
+            if (existing) existing.remove();
+
+            const isMobile = window.innerWidth < 1024;
+            const bar = document.createElement('div');
+            bar.id = 'ws-confirm-bar';
+            if (isMobile) {
+                bar.style.cssText = 'position:fixed;bottom:80px;left:12px;right:12px;z-index:10000;padding:16px;border-radius:16px;background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.22);font-size:13px;color:var(--text);pointer-events:all;animation:ws-toast-in 0.18s ease;';
+                bar.innerHTML = `
+                    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">
+                        <span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;color:#d97706;margin-top:1px;">warning</span>
+                        <span style="line-height:1.5;">${e.detail.question}</span>
+                    </div>
+                    <div style="display:flex;gap:10px;">
+                        <button id="ws-confirm-ok" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 0;background:#991b1b;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+                            <span class="material-symbols-outlined" style="font-size:16px;">check</span>Confirm
+                        </button>
+                        <button id="ws-confirm-cancel" style="flex:1;display:flex;align-items:center;justify-content:center;padding:11px 0;background:var(--card-2);color:var(--text);border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+                            Cancel
+                        </button>
+                    </div>`;
+            } else {
+                bar.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;align-items:center;gap:12px;padding:14px 20px;border-radius:12px;background:var(--card);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.22);font-size:13px;color:var(--text);pointer-events:all;animation:ws-toast-in 0.18s ease;white-space:nowrap;';
+                bar.innerHTML = `
+                    <span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;color:#d97706;">warning</span>
+                    <span style="flex:1;line-height:1.4;">${e.detail.question}</span>
+                    <button id="ws-confirm-ok" style="display:flex;align-items:center;gap:5px;padding:7px 14px;background:#991b1b;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
+                        <span class="material-symbols-outlined" style="font-size:15px;">check</span>Confirm
+                    </button>
+                    <button id="ws-confirm-cancel" style="display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--card-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
+                        Cancel
+                    </button>`;
+            }
+            document.body.appendChild(bar);
+
+            const cleanup = () => bar.remove();
+            bar.querySelector('#ws-confirm-ok').addEventListener('click', () => {
+                cleanup();
+                e.detail.issueRequest(true);
+            });
+            bar.querySelector('#ws-confirm-cancel').addEventListener('click', cleanup);
+            // Auto-dismiss after 10s if no action
+            setTimeout(cleanup, 10000);
+        });
+
+        // Inject HTMX-triggered toasts into the container
+        document.addEventListener('htmx:afterRequest', (e) => {
+            const toastJson = e.detail.xhr.getResponseHeader('X-WS-Toast');
+            if (!toastJson) return;
+            try {
+                const toasts = JSON.parse(toastJson);
+                const container = document.getElementById('ws-toast-container');
+                toasts.forEach(({level, message}) => {
+                    const icons = {error: 'error', warning: 'warning', success: 'check_circle', info: 'info'};
+                    const colors = {error: '#e53e3e', warning: '#d97706', success: 'var(--primary)', info: 'var(--muted)'};
+                    const el = document.createElement('div');
+                    el.className = `ws-toast ws-toast--${level}`;
+                    el.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;min-width:280px;max-width:400px;background:var(--card);border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.15);font-size:13px;color:var(--text);pointer-events:all;animation:ws-toast-in 0.2s ease;';
+                    el.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;flex-shrink:0;color:${colors[level]||colors.success}">${icons[level]||'check_circle'}</span><span style="flex:1;line-height:1.4">${message}</span><button onclick="this.closest('.ws-toast').remove()" style="background:none;border:none;cursor:pointer;padding:2px;color:var(--muted);display:flex;align-items:center;"><span class="material-symbols-outlined" style="font-size:16px">close</span></button>`;
+                    container.appendChild(el);
+                    setTimeout(() => el.remove(), 5000);
+                });
+            } catch {}
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+    {# ── Extra body elements (fixed overlays, portals) — rendered outside all grid/overflow containers ── #}
+    {% block extra_body %}{% endblock %}
+
+    {# ── Mobile shell: visible below 1024px, hidden on desktop via shell_v2.css ── #}
+    {% if request.site != 'handbook' and request.site != 'identity' %}
+    <div id="ws-mobile-shell" style="display:none;">
+        {% include "components/_navbar.html" %}
+        {% include "components/_app_drawer.html" %}
+        <main id="ws-mobile-main" class="ics-main" role="main">
+            <div id="toast-container-mobile" aria-live="polite" aria-atomic="true"></div>
+            {% block content %}{% endblock %}
+        </main>
+        {% if not fab_hidden %}{% include "components/_fab.html" %}{% endif %}
+        {% include "components/_bottom_nav.html" %}
+    </div>
+    {% endif %}
+
+</body>
+</html>

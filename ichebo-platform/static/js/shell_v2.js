@@ -123,6 +123,20 @@ const WorkspaceUI = {
     }
   },
 
+  toggleLauncher(force) {
+    const overlay = document.getElementById('ics-launcher-overlay');
+    const trigger = document.getElementById('ics-launcher-trigger');
+    if (!overlay) return;
+    const open = force !== undefined ? force : !overlay.classList.contains('active');
+    overlay.classList.toggle('active', open);
+    overlay.setAttribute('aria-hidden', !open);
+    if (trigger) trigger.setAttribute('aria-expanded', open);
+  },
+
+  closeLauncher() {
+    this.toggleLauncher(false);
+  },
+
   handleSearchInput(val) {
     const resultsContainer = document.getElementById('ws-global-search-results');
     if (val.startsWith('>')) {
@@ -267,9 +281,10 @@ const WorkspaceUI = {
         e.preventDefault();
         this.openSearch();
       }
-      // ESC -> Close Search
+      // ESC -> Close Search / Launcher
       if (e.key === 'Escape') {
         this.closeSearch();
+        this.closeLauncher();
       }
     });
 
@@ -278,6 +293,13 @@ const WorkspaceUI = {
     if (searchOverlay) {
         searchOverlay.addEventListener('click', (e) => {
             if (e.target === searchOverlay) this.closeSearch();
+        });
+    }
+
+    const launcherOverlay = document.getElementById('ics-launcher-overlay');
+    if (launcherOverlay) {
+        launcherOverlay.addEventListener('click', (e) => {
+            if (e.target === launcherOverlay) this.closeLauncher();
         });
     }
 

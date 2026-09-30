@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
+    {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
 {% endblock %}
 
