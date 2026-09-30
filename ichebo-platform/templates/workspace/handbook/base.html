@@ -1,0 +1,106 @@
+{% extends "apostolic_chrome.html" %}
+{% load static %}
+
+{% comment %}
+Stage 2 — Handbook's own chrome. Every Handbook page extends this instead
+of apostolic_chrome.html directly, so the Library/Journal/Mandate context
+nav and the shared hb-* styling live in exactly one place. Pages override
+the hb_context_filters block for page-specific context content, and the
+hb_extra_css block for page-specific styles, rather than re-declaring the
+shared nav and CSS from scratch.
+{% endcomment %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .hb-nav-btn {
+        display: flex; align-items: center; gap: 10px;
+        width: 100%; padding: 9px 12px;
+        border: none; background: transparent;
+        font-size: 13px; color: rgba(255,255,255,0.55);
+        cursor: pointer; border-radius: 6px;
+        text-decoration: none; transition: all 0.15s;
+        position: relative;
+    }
+    .hb-nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .hb-nav-btn.active {
+        background: rgba(255,255,255,0.08); color: #fff;
+        border-left: 3px solid var(--accent-red);
+        padding-left: 9px;
+    }
+    .hb-nav-btn .material-symbols-outlined { font-size: 16px; }
+
+    .hb-status {
+        font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+        text-transform: uppercase; padding: 2px 7px; border-radius: 4px;
+    }
+    .hb-status.draft      { background: rgba(99,110,114,0.12); color: #636e72; }
+    .hb-status.active     { background: rgba(0,184,148,0.12); color: #00b894; }
+    .hb-status.locked     { background: rgba(175,50,54,0.12); color: var(--accent-red); }
+    .hb-status.superseded { background: rgba(253,203,110,0.12); color: #e17055; }
+    .hb-status.submitted  { background: rgba(116,185,255,0.15); color: #0984e3; }
+</style>
+{% block hb_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block context_header %}Handbook{% endblock %}
+
+{% block context_content %}
+{% block hb_context %}
+<div style="padding: 0 4px;">
+    {% if can_write %}
+    <a href="{% url 'handbook:new' %}?library={{ active_library|default:'reference' }}" class="hb-nav-btn"
+       style="background: rgba(175,50,54,0.12); color: var(--accent-red); margin-bottom: 10px;">
+        <span class="material-symbols-outlined">edit_note</span>
+        Open The Desk
+    </a>
+    {% endif %}
+
+    <div class="ws-label-tag" style="margin-bottom: 8px;">Libraries</div>
+
+    <a href="{% url 'handbook:home' %}?library=reference" class="hb-nav-btn {% if active_library == 'reference' %}active{% endif %}">
+        <span class="material-symbols-outlined">library_books</span>
+        Reference Library
+    </a>
+    <a href="{% url 'handbook:home' %}?library=mandate" class="hb-nav-btn {% if active_library == 'mandate' %}active{% endif %}">
+        <span class="material-symbols-outlined">gavel</span>
+        Mandate Library
+    </a>
+    <a href="{% url 'handbook:home' %}?library=keys" class="hb-nav-btn {% if active_library == 'keys' %}active{% endif %}">
+        <span class="material-symbols-outlined">key</span>
+        Keys Library
+    </a>
+    <a href="{% url 'handbook:graph' %}" class="hb-nav-btn">
+        <span class="material-symbols-outlined">hub</span>
+        Apostolic Web
+    </a>
+
+    {% block hb_context_filters %}{% endblock %}
+
+    <div class="ctx-divider" style="margin: 12px 0;"></div>
+
+    {% if can_write %}
+    <a href="{% url 'handbook:new' %}?library={{ active_library|default:'reference' }}" class="hb-nav-btn">
+        <span class="material-symbols-outlined">add_circle</span>
+        New Record
+    </a>
+    {% endif %}
+
+    {% if is_editor %}
+    <a href="{% url 'handbook:access' %}" class="hb-nav-btn">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        Manage Access
+    </a>
+    {% endif %}
+
+    <div class="ctx-divider" style="margin: 12px 0;"></div>
+    <div class="ws-label-tag" style="margin-bottom: 8px;">Recent</div>
+    <div id="hb-recent"
+         hx-get="{% url 'handbook:htmx-recent' %}"
+         hx-trigger="load"
+         style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="padding: var(--space-s); font-size: 12px; color: rgba(255,255,255,0.3);">Loading…</div>
+    </div>
+</div>
+{% endblock %}
+{% endblock %}

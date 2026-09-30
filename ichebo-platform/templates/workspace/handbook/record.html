@@ -1,23 +1,11 @@
-{% extends "workspace_shell.html" %}
+{% extends "workspace/handbook/base.html" %}
 {% load static core_tags %}
 
 {% block title %}{% if record %}{{ record.title }}{% else %}New Record{% endif %} — Handbook{% endblock %}
 
-{% block extra_css %}
-{{ block.super }}
+{% block hb_extra_css %}
 <link rel="stylesheet" href="{% static 'css/editorial_v2.css' %}">
 <style>
-    .hb-nav-btn {
-        display: flex; align-items: center; gap: 10px;
-        width: 100%; padding: 9px 12px;
-        border: none; background: transparent;
-        font-size: 13px; color: rgba(255,255,255,0.55);
-        cursor: pointer; border-radius: 6px;
-        text-decoration: none; transition: all 0.15s;
-    }
-    .hb-nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
-    .hb-nav-btn .material-symbols-outlined { font-size: 16px; }
-
     /* ── Collapsible library sections ── */
     .hb-lib-section { margin-bottom: 4px; }
     .hb-lib-toggle {
@@ -44,19 +32,8 @@
     }
     .hb-lib-grid .ctx-btn { font-size: 11px; padding: 6px 8px; }
     .hb-lib-grid .ctx-btn .material-symbols-outlined { font-size: 14px; }
-
-    .hb-status {
-        font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
-        text-transform: uppercase; padding: 2px 7px; border-radius: 4px;
-    }
-    .hb-status.draft      { background: rgba(99,110,114,0.12); color: #636e72; }
-    .hb-status.active     { background: rgba(0,184,148,0.12); color: #00b894; }
-    .hb-status.locked     { background: rgba(175,50,54,0.12); color: var(--accent-red); }
-    .hb-status.superseded { background: rgba(253,203,110,0.12); color: #e17055; }
 </style>
 {% endblock %}
-
-{% block context_header %}Handbook{% endblock %}
 
 {% block context_content %}
 <div style="padding: 0 4px;">

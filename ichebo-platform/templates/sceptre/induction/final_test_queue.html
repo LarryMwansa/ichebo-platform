@@ -35,9 +35,11 @@
               &nbsp;·&nbsp; Submitted {{ row.cert.created_at|date:"d M Y" }}
             </div>
 
-            {# Placement is mandatory — confirming without one is refused,
-               because it would end the learner's induction membership and
-               leave them in no community at all. #}
+            {% comment %}
+            Placement is mandatory — confirming without one is refused,
+            because it would end the learner's induction membership and
+            leave them in no community at all.
+            {% endcomment %}
             <label for="placement-{{ row.learner.id }}"
                    style="display:block;font-size:10px;text-transform:uppercase;
                           letter-spacing:0.08em;color:rgba(255,255,255,0.4);

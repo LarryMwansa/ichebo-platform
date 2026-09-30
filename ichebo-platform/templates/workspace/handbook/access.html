@@ -1,22 +1,10 @@
-{% extends "workspace_shell.html" %}
+{% extends "workspace/handbook/base.html" %}
 {% load static %}
 
 {% block title %}Manage Access — Handbook{% endblock %}
 
-{% block extra_css %}
-{{ block.super }}
+{% block hb_extra_css %}
 <style>
-    .hb-nav-btn {
-        display: flex; align-items: center; gap: 10px;
-        width: 100%; padding: 9px 12px;
-        border: none; background: transparent;
-        font-size: 13px; color: rgba(255,255,255,0.55);
-        cursor: pointer; border-radius: 6px;
-        text-decoration: none; transition: all 0.15s;
-    }
-    .hb-nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
-    .hb-nav-btn .material-symbols-outlined { font-size: 16px; }
-
     .hb-access-table { width: 100%; border-collapse: collapse; }
     .hb-access-table th {
         text-align: left; font-size: 10px; font-weight: 700;
@@ -44,21 +32,6 @@
     }
     .dark .hb-grant-form { background: rgba(255,255,255,0.03); }
 </style>
-{% endblock %}
-
-{% block context_header %}Handbook{% endblock %}
-
-{% block context_content %}
-<div style="padding: 0 4px;">
-    <a href="{% url 'handbook:home' %}" class="hb-nav-btn">
-        <span class="material-symbols-outlined">arrow_back</span>
-        All Records
-    </a>
-    <a href="{% url 'handbook:new' %}" class="hb-nav-btn">
-        <span class="material-symbols-outlined">add_circle</span>
-        New Record
-    </a>
-</div>
 {% endblock %}
 
 {% block ws_content %}

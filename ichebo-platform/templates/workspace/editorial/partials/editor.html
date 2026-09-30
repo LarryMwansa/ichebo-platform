@@ -155,9 +155,11 @@ stale desktop copy, and Save submitted that stale copy instead.
 
         <div class="editorial-toolbar__right">
             <span class="editorial-status" id="word-count{{ sfx }}" style="min-width: 60px; text-align: right;"></span>
-            {# submit_label lets a consumer name the action for its own surface
-               (e.g. "Save Lesson" in Curriculum Authoring); defaults to the
-               journal/handbook wording this partial was written for. #}
+            {% comment %}
+            submit_label lets a consumer name the action for its own surface
+            (e.g. "Save Lesson" in Curriculum Authoring); defaults to the
+            journal/handbook wording this partial was written for.
+            {% endcomment %}
             <button type="submit" form="editorial-form{{ sfx }}"
                     id="editorial-save-btn{{ sfx }}"
                     class="ws-topbar__cta editorial-save-btn"

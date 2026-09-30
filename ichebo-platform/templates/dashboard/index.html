@@ -10,11 +10,11 @@
 {% endblock %}
 
 
-{# ═══════════════════════════════════════════════════════════
-   WORKSPACE LAYOUT — Level 3+ Sceptre Stewards, desktop only.
-   Uses ws-layout--grid pattern from workspace.css.
-   Completely separate from the mobile content block below.
-   ═══════════════════════════════════════════════════════════ #}
+{% comment %}
+WORKSPACE LAYOUT — Level 3+ Sceptre Stewards, desktop only.
+Uses ws-layout--grid pattern from workspace.css.
+Completely separate from the mobile content block below.
+{% endcomment %}
 
 {% block watermark %}COMMAND CENTER{% endblock %}
 
@@ -309,10 +309,10 @@ html:not(.dark) .card-ink:hover {
 </div>
 {% endblock %}
 
-{# ═══════════════════════════════════════════════════════════
-   MOBILE LAYOUT — all users on mobile shell.
-   Unchanged. Not mixed with the workspace layout above.
-   ═══════════════════════════════════════════════════════════ #}
+{% comment %}
+MOBILE LAYOUT — all users on mobile shell.
+Unchanged. Not mixed with the workspace layout above.
+{% endcomment %}
 
 {% block content %}
 <div class="dashboard">

@@ -1,19 +1,19 @@
-{#
-  Shared Writing Canvas — workspace/editorial/partials/writing_canvas.html
+{% comment %}
+Shared Writing Canvas — workspace/editorial/partials/writing_canvas.html
 
-  Required context vars:
-    save_url       — form POST target
-    submit_label   — CTA button text (default "Save Record")
+Required context vars:
+  save_url       — form POST target
+  submit_label   — CTA button text (default "Save Record")
 
-  Optional context vars:
-    record         — existing Record instance (edit mode)
-    show_summary   — bool, renders italic summary field above body
-    type_picker    — HTML string injected into toolbar left (rendered by caller via include or block)
-    record_family  — hidden field value (default 'journal')
+Optional context vars:
+  record         — existing Record instance (edit mode)
+  show_summary   — bool, renders italic summary field above body
+  type_picker    — HTML string injected into toolbar left (rendered by caller via include or block)
+  record_family  — hidden field value (default 'journal')
 
-  The caller wraps this include inside {% block governance_content %} or
-  {% block hub_stage %} — this partial is purely the toolbar + canvas unit.
-#}
+The caller wraps this include inside the governance_content block or the
+hub_stage block — this partial is purely the toolbar + canvas unit.
+{% endcomment %}
 {% load static %}
 
 <div class="editorial-stage" id="editorial-stage">
