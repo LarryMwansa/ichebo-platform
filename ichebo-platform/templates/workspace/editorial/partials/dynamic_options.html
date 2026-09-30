@@ -1,3 +1,4 @@
+{% load core_tags %}
 <div id="dynamic-stewardship-panel"
      style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
 
@@ -13,6 +14,133 @@
 
     <div id="desk-tab-details" class="desk-tab-pane"
          style="overflow-y: auto; flex: 1; padding-right: 2px;">
+
+        {% comment %}
+        Handbook type dial — editing action, lives here rather than in the
+        Context Bar (Column 2), which is navigation only. Only shown while
+        the type is actually changeable: a new record, or an existing one
+        that isn't locked.
+        {% endcomment %}
+        {% if active_library and can_write and not record or active_library and can_write and record and record.status != 'locked' %}
+        <div class="dopt-section" id="hb-type-panel">
+            <div class="ws-label-tag" style="margin-bottom: 8px;">Type</div>
+            <div id="hb-type-nav">
+
+                {# ── Reference Library ── #}
+                <div class="hb-lib-section">
+                    <button type="button"
+                            class="hb-lib-toggle {% if is_reference %}open{% endif %}"
+                            onclick="HBTypeDial.toggleSection(this, 'ref-body')">
+                        <span style="display:flex;align-items:center;gap:6px;">
+                            <span class="material-symbols-outlined" style="font-size:14px;">library_books</span>
+                            Reference Library
+                        </span>
+                        <span class="material-symbols-outlined hb-chevron">chevron_right</span>
+                    </button>
+                    <div class="hb-lib-body {% if is_reference %}open{% endif %}" id="ref-body">
+                        <div class="hb-lib-grid">
+                        {% for rt in record_types_reference %}
+                        <button type="button"
+                                class="ctx-btn {% if record and record.record_type == rt or not record and is_reference and forloop.first %}active{% endif %}"
+                                data-type="{{ rt }}" data-family="governance"
+                                onclick="HBTypeDial.setType(this, '{{ rt }}', 'governance')">
+                            <span class="material-symbols-outlined">
+                                {% if rt == 'symbol' %}emoji_symbols
+                                {% elif rt == 'principle' %}lightbulb
+                                {% elif rt == 'concept' %}psychology
+                                {% elif rt == 'divine_pattern' %}pattern
+                                {% elif rt == 'class' %}category
+                                {% elif rt == 'narrative' %}history_edu
+                                {% elif rt == 'hrs_framework' %}schema
+                                {% else %}article{% endif %}
+                            </span>
+                            {{ type_labels|get_item:rt|default:rt }}
+                        </button>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {# ── Mandate Library ── #}
+                <div class="hb-lib-section">
+                    <button type="button"
+                            class="hb-lib-toggle {% if is_mandate %}open{% endif %}"
+                            onclick="HBTypeDial.toggleSection(this, 'mandate-body')">
+                        <span style="display:flex;align-items:center;gap:6px;">
+                            <span class="material-symbols-outlined" style="font-size:14px;">gavel</span>
+                            Mandate Library
+                        </span>
+                        <span class="material-symbols-outlined hb-chevron">chevron_right</span>
+                    </button>
+                    <div class="hb-lib-body {% if is_mandate %}open{% endif %}" id="mandate-body">
+                        <div class="hb-lib-grid">
+                        {% for rt in record_types_mandate %}
+                        <button type="button"
+                                class="ctx-btn {% if record and record.record_type == rt or not record and is_mandate and forloop.first %}active{% endif %}"
+                                data-type="{{ rt }}" data-family="governance"
+                                onclick="HBTypeDial.setType(this, '{{ rt }}', 'governance')">
+                            <span class="material-symbols-outlined">
+                                {% if rt == 'mandate' %}gavel
+                                {% elif rt == 'statement' %}format_quote
+                                {% elif rt == 'framework' %}account_tree
+                                {% elif rt == 'protocol' %}rule
+                                {% elif rt == 'procedure' %}checklist
+                                {% elif rt == 'programme' %}school
+                                {% else %}description{% endif %}
+                            </span>
+                            {{ type_labels|get_item:rt|default:rt }}
+                        </button>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {# ── Keys Library ── #}
+                <div class="hb-lib-section">
+                    <button type="button"
+                            class="hb-lib-toggle {% if is_key %}open{% endif %}"
+                            onclick="HBTypeDial.toggleSection(this, 'keys-body')">
+                        <span style="display:flex;align-items:center;gap:6px;">
+                            <span class="material-symbols-outlined" style="font-size:14px;">key</span>
+                            Keys Library
+                        </span>
+                        <span class="material-symbols-outlined hb-chevron">chevron_right</span>
+                    </button>
+                    <div class="hb-lib-body {% if is_key %}open{% endif %}" id="keys-body">
+                        <div class="hb-lib-grid">
+                        <button type="button"
+                                class="ctx-btn {% if is_key %}active{% endif %}"
+                                data-type="key" data-family="reference"
+                                onclick="HBTypeDial.setType(this, 'key', 'reference')">
+                            <span class="material-symbols-outlined">key</span>
+                            Key
+                        </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="dopt-divider"></div>
+        <script>
+        const HBTypeDial = {
+            setType(btn, type, family) {
+                document.querySelectorAll('#hb-type-nav .ctx-btn').forEach(b => b.classList.remove('active'));
+                if (btn) btn.classList.add('active');
+                document.body.dispatchEvent(new CustomEvent('dialChanged', {
+                    detail: { family: family || btn?.dataset.family || 'governance', type }
+                }));
+            },
+            toggleSection(toggleBtn, bodyId) {
+                const body = document.getElementById(bodyId);
+                if (!body) return;
+                const isOpen = body.classList.contains('open');
+                body.classList.toggle('open', !isOpen);
+                toggleBtn.classList.toggle('open', !isOpen);
+            }
+        };
+        </script>
+        {% endif %}
 
         {# Status #}
         <div class="dopt-section" id="hb-status-panel">
@@ -63,7 +191,8 @@
         <div class="dopt-divider"></div>
 
         {# ── Journal fields ── #}
-        <div id="fields-journal" class="dynamic-field-group dopt-section">
+        <div id="fields-journal" class="dynamic-field-group dopt-section"
+             {% if active_family and active_family != 'journal' %}style="display: none;"{% endif %}>
             <div class="ws-label-tag" style="margin-bottom: 8px;">Journal</div>
             <div class="dopt-field">
                 <label class="dopt-label">Mood / Tone</label>
@@ -79,7 +208,8 @@
         </div>
 
         {# ── Governance fields ── #}
-        <div id="fields-governance" class="dynamic-field-group dopt-section" style="display: none;">
+        <div id="fields-governance" class="dynamic-field-group dopt-section"
+             {% if active_family != 'governance' %}style="display: none;"{% endif %}>
             <div class="ws-label-tag" style="margin-bottom: 8px;">Governance</div>
             <div class="dopt-field">
                 <label class="dopt-label">Record Class</label>
@@ -103,7 +233,8 @@
         </div>
 
         {# ── Activity fields ── #}
-        <div id="fields-activity" class="dynamic-field-group dopt-section" style="display: none;">
+        <div id="fields-activity" class="dynamic-field-group dopt-section"
+             {% if active_family != 'activity' %}style="display: none;"{% endif %}>
             <div class="ws-label-tag" style="margin-bottom: 8px;">Activity</div>
             <div class="dopt-field">
                 <label class="dopt-label">Due Date</label>
@@ -134,7 +265,8 @@
         </div>
 
         {# ── Community fields ── #}
-        <div id="fields-community" class="dynamic-field-group dopt-section" style="display: none;">
+        <div id="fields-community" class="dynamic-field-group dopt-section"
+             {% if active_family != 'community' %}style="display: none;"{% endif %}>
             <div class="ws-label-tag" style="margin-bottom: 8px;">Gathering</div>
             <div class="dopt-field">
                 <label class="dopt-label">Scheduled At</label>
@@ -157,7 +289,8 @@
         </div>
 
         {# ── Bible fields ── #}
-        <div id="fields-bible" class="dynamic-field-group dopt-section" style="display: none;">
+        <div id="fields-bible" class="dynamic-field-group dopt-section"
+             {% if active_family != 'bible' %}style="display: none;"{% endif %}>
             <div class="ws-label-tag" style="margin-bottom: 8px;">Scripture</div>
             <div class="dopt-field">
                 <label class="dopt-label">Passage</label>
