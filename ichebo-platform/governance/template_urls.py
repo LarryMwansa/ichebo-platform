@@ -12,7 +12,7 @@ urlpatterns = [
     path('library/<uuid:record_id>/', views.library_detail, name='library-detail'),
     path('library/<str:record_type>/', views.library_list, name='library-list'),
 
-    # ── Mandate Branch ───────────────────────────────────────────────────────
+    # ── Mandate Library ───────────────────────────────────────────────────────
     path('mandate/', views.mandate_home, name='mandate-home'),
     path('mandate/<uuid:record_id>/', views.mandate_detail, name='mandate-detail'),
     path('mandate/<str:record_type>/', views.mandate_list, name='mandate-list'),

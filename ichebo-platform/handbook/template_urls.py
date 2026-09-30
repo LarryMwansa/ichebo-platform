@@ -21,6 +21,7 @@ urlpatterns = [
     path('htmx/<uuid:record_id>/links/', views.handbook_linked_records, name='htmx-links'),
     path('htmx/<uuid:record_id>/relationships/', views.handbook_relationship_list, name='htmx-relationship-list'),
     path('htmx/relationship/create/', views.handbook_relationship_create, name='htmx-relationship-create'),
+    path('htmx/<uuid:record_id>/analysis/', views.handbook_analysis, name='htmx-analysis'),
     path('htmx/recent/', views.handbook_recent, name='htmx-recent'),
 
     # ── Knowledge Graph ───────────────────────────────────────────────────────

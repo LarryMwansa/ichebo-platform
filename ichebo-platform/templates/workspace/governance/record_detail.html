@@ -16,42 +16,6 @@
 {% endblock %}
 
 {% block ws_options %}
-    {# ── Options Bar: Stewardship Attributes ── #}
-    <div class="ws-options-section">
-        <div class="ws-label-tag">Stewardship Attributes</div>
-        
-        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: var(--space-m);">
-            {% with cf=record.custom_fields %}
-            <div class="ws-stat-card">
-                <div class="ws-stat-card__label">Complexity</div>
-                <div class="ws-stat-card__value" style="font-size: 14px;">{{ cf.complexity|default:"Not Defined" }}</div>
-            </div>
-            <div class="ws-stat-card">
-                <div class="ws-stat-card__label">Relationship Polarity</div>
-                <div class="ws-stat-card__value" style="font-size: 14px;">{{ cf.polarity|title|default:"Not Defined" }}</div>
-            </div>
-            <div class="ws-stat-card">
-                <div class="ws-stat-card__label">Direction & Speed</div>
-                <div class="ws-stat-card__value" style="font-size: 14px;">
-                    {{ cf.direction|title|default:"—" }} / {{ cf.speed|title|default:"—" }}
-                </div>
-            </div>
-            <div class="ws-stat-card">
-                <div class="ws-stat-card__label">Emotional Tone</div>
-                <div class="ws-stat-card__value" style="font-size: 14px;">{{ cf.emotional_tone|default:"Neutral" }}</div>
-            </div>
-            {% if cf.symbol %}
-            <div class="ws-stat-card">
-                <div class="ws-stat-card__label">Prophetic Symbol</div>
-                <div class="ws-stat-card__value" style="font-size: 18px;">{{ cf.symbol }}</div>
-            </div>
-            {% endif %}
-            {% endwith %}
-        </div>
-    </div>
-
-    <div class="ws-sidebar__divider" style="margin: var(--space-m) 0;"></div>
-
     <div class="ws-options-section">
         <div class="ws-label-tag">Relationships</div>
         <div id="linked-records-area" hx-get="{% url 'governance:htmx-linked-records' record.id %}" hx-trigger="load">

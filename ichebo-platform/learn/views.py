@@ -664,7 +664,7 @@ def author_programme_form(request, record_id=None):
         # Check if this is a submit action (not just save)
         is_submit = request.POST.get('action') == 'submit'
 
-        # 'induction' type is only available to Level 5 (Architect)
+        # 'induction' type is only available to Level 5 (Apostolic Steward)
         raw_type = request.POST.get('programme_type', 'programme')
         if raw_type == 'induction' and _user_level(request.user) < 5:
             raw_type = 'programme'
@@ -916,7 +916,7 @@ def htmx_author_delete(request, record_id):
 
     user_level = _user_level(request.user)
     if user_level >= 5:
-        # Architects can delete any learning record regardless of owner or status
+        # Level 5 can delete any learning record regardless of owner or status
         record = get_object_or_404(
             Record,
             id=record_id,

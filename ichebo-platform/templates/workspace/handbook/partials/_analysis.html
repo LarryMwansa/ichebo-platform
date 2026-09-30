@@ -1,0 +1,46 @@
+{# Narrative analysis: the records playing the subject and entity roles (DOC F 3.5). #}
+<div class="dopt-section">
+    <div class="ws-label-tag" style="margin-bottom: 4px;">Subjects</div>
+    <p style="font-size: 11px; color: var(--muted); margin: 0 0 10px; line-height: 1.5;">
+        The person or thing actively working on an entity.
+    </p>
+    {% for rel in subjects %}
+    <a href="{% url 'handbook:record' rel.to_record.id %}" class="dopt-rel-card" style="display: block; text-decoration: none;">
+        <div style="font-size: 12px; font-weight: 600; color: var(--text);">{{ rel.to_record.title }}</div>
+        {% if rel.notes %}<div style="font-size: 11px; color: var(--muted); margin-top: 2px; font-style: italic;">{{ rel.notes }}</div>{% endif %}
+    </a>
+    {% empty %}
+    <p style="font-size: 12px; color: var(--muted); font-style: italic; margin: 0;">No subjects identified yet.</p>
+    {% endfor %}
+    {% if can_write %}
+    <button type="button" class="hb-analysis-add" onclick="HBAnalysis.add('has_subject')">
+        <span class="material-symbols-outlined" style="font-size: 15px;">add</span> Add a subject
+    </button>
+    {% endif %}
+</div>
+
+<div class="dopt-divider"></div>
+
+<div class="dopt-section">
+    <div class="ws-label-tag" style="margin-bottom: 4px;">Entities</div>
+    <p style="font-size: 11px; color: var(--muted); margin: 0 0 10px; line-height: 1.5;">
+        The person or thing toward which the subject's condition or action is directed.
+    </p>
+    {% for rel in entities %}
+    <a href="{% url 'handbook:record' rel.to_record.id %}" class="dopt-rel-card" style="display: block; text-decoration: none;">
+        <div style="font-size: 12px; font-weight: 600; color: var(--text);">{{ rel.to_record.title }}</div>
+        {% if rel.notes %}<div style="font-size: 11px; color: var(--muted); margin-top: 2px; font-style: italic;">{{ rel.notes }}</div>{% endif %}
+    </a>
+    {% empty %}
+    <p style="font-size: 12px; color: var(--muted); font-style: italic; margin: 0;">No entities identified yet.</p>
+    {% endfor %}
+    {% if can_write %}
+    <button type="button" class="hb-analysis-add" onclick="HBAnalysis.add('has_entity')">
+        <span class="material-symbols-outlined" style="font-size: 15px;">add</span> Add an entity
+    </button>
+    {% endif %}
+</div>
+
+<p style="font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 14px;">
+    The hierarchy and relationship between them is written in the narrative itself.
+</p>

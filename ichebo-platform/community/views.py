@@ -378,7 +378,7 @@ def member_directory(request):
         'order_choices':       KGS_SERVICE_ORDER_CHOICES,
         'level_choices': [
             (0, 'Seeker'), (1, 'Member'), (2, 'Disciple'),
-            (3, 'Steward'), (4, 'Senior Steward'), (5, 'Architect')
+            (3, 'Steward'), (4, 'Senior Steward'), (5, 'Apostolic Steward')
         ],
         'active_app':          'community',
         'ws_page_title':       'Members',

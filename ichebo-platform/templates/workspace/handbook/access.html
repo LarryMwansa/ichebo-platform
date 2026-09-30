@@ -73,7 +73,7 @@
 
         {# ── Grant Access Form ── #}
         <div class="hb-grant-form">
-            <div style="font-size: 13px; font-weight: 700; margin-bottom: 16px;">Grant Access</div>
+            <div style="font-size: 13px; font-weight: 700; margin-bottom: 16px;">Appoint a Handbook Steward</div>
             <form method="post" action="{% url 'handbook:access' %}"
                   style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
                 {% csrf_token %}
@@ -109,7 +109,7 @@
                 </button>
             </form>
             <div style="margin-top: 12px; font-size: 11px; color: var(--text-muted-ink); line-height: 1.6;">
-                <strong>Reader</strong> — read-only access to Reference Library and Mandate Branch.<br>
+                <strong>Reader</strong> — read-only access to Reference Library and Mandate Library.<br>
                 <strong>Author</strong> — create, draft, publish, and lock governance records.<br>
                 <strong>Editor</strong> — all Author permissions plus access management.
             </div>
@@ -198,7 +198,7 @@
         {# ── Grant form ── #}
         <div style="background:var(--card-2);border:1px solid var(--border);border-radius:12px;
                     padding:20px;margin-bottom:var(--space-l);">
-            <div style="font-size:13px;font-weight:700;margin-bottom:16px;">Grant Access</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:16px;">Appoint a Handbook Steward</div>
             <form method="post" action="{% url 'handbook:access' %}"
                   style="display:flex;flex-direction:column;gap:12px;">
                 {% csrf_token %}

@@ -86,7 +86,7 @@
         {# ── Reference Library ── #}
         <div class="hb-lib-section">
             <button type="button"
-                    class="hb-lib-toggle {% if is_reference or not record %}open{% endif %}"
+                    class="hb-lib-toggle {% if is_reference %}open{% endif %}"
                     onclick="HBDial.toggleSection(this, 'ref-body')">
                 <span style="display:flex;align-items:center;gap:6px;">
                     <span class="material-symbols-outlined" style="font-size:14px;">library_books</span>
@@ -94,24 +94,24 @@
                 </span>
                 <span class="material-symbols-outlined hb-chevron">chevron_right</span>
             </button>
-            <div class="hb-lib-body {% if is_reference or not record %}open{% endif %}" id="ref-body">
+            <div class="hb-lib-body {% if is_reference %}open{% endif %}" id="ref-body">
                 <div class="hb-lib-grid">
                 {% for rt in record_types_reference %}
                 <button type="button"
-                        class="ctx-btn {% if record and record.record_type == rt or not record and forloop.first %}active{% endif %}"
+                        class="ctx-btn {% if record and record.record_type == rt or not record and is_reference and forloop.first %}active{% endif %}"
                         data-type="{{ rt }}" data-family="governance"
                         onclick="HBDial.setType(this, '{{ rt }}', 'governance')">
                     <span class="material-symbols-outlined">
-                        {% if rt == 'class' %}category
+                        {% if rt == 'symbol' %}emoji_symbols
                         {% elif rt == 'principle' %}lightbulb
                         {% elif rt == 'concept' %}psychology
                         {% elif rt == 'divine_pattern' %}pattern
+                        {% elif rt == 'class' %}category
                         {% elif rt == 'narrative' %}history_edu
-                        {% elif rt == 'subject' %}topic
-                        {% elif rt == 'entity' %}badge
+                        {% elif rt == 'hrs_framework' %}schema
                         {% else %}article{% endif %}
                     </span>
-                    {{ rt|title|cut:"_" }}
+                    {{ type_labels|get_item:rt|default:rt }}
                 </button>
                 {% endfor %}
                 </div>
@@ -121,7 +121,7 @@
         {# ── Mandate Library ── #}
         <div class="hb-lib-section">
             <button type="button"
-                    class="hb-lib-toggle {% if not is_reference and record and record.record_type not in record_types_reference and record.record_type != 'key' %}open{% endif %}"
+                    class="hb-lib-toggle {% if is_mandate %}open{% endif %}"
                     onclick="HBDial.toggleSection(this, 'mandate-body')">
                 <span style="display:flex;align-items:center;gap:6px;">
                     <span class="material-symbols-outlined" style="font-size:14px;">gavel</span>
@@ -129,11 +129,11 @@
                 </span>
                 <span class="material-symbols-outlined hb-chevron">chevron_right</span>
             </button>
-            <div class="hb-lib-body {% if not is_reference and record and record.record_type not in record_types_reference and record.record_type != 'key' %}open{% endif %}" id="mandate-body">
+            <div class="hb-lib-body {% if is_mandate %}open{% endif %}" id="mandate-body">
                 <div class="hb-lib-grid">
                 {% for rt in record_types_mandate %}
                 <button type="button"
-                        class="ctx-btn {% if record and record.record_type == rt %}active{% endif %}"
+                        class="ctx-btn {% if record and record.record_type == rt or not record and is_mandate and forloop.first %}active{% endif %}"
                         data-type="{{ rt }}" data-family="governance"
                         onclick="HBDial.setType(this, '{{ rt }}', 'governance')">
                     <span class="material-symbols-outlined">
@@ -145,7 +145,7 @@
                         {% elif rt == 'programme' %}school
                         {% else %}description{% endif %}
                     </span>
-                    {{ rt|title|cut:"_" }}
+                    {{ type_labels|get_item:rt|default:rt }}
                 </button>
                 {% endfor %}
                 </div>
@@ -155,7 +155,7 @@
         {# ── Keys Library ── #}
         <div class="hb-lib-section">
             <button type="button"
-                    class="hb-lib-toggle {% if record and record.record_family == 'reference' %}open{% endif %}"
+                    class="hb-lib-toggle {% if is_key %}open{% endif %}"
                     onclick="HBDial.toggleSection(this, 'keys-body')">
                 <span style="display:flex;align-items:center;gap:6px;">
                     <span class="material-symbols-outlined" style="font-size:14px;">key</span>
@@ -163,35 +163,14 @@
                 </span>
                 <span class="material-symbols-outlined hb-chevron">chevron_right</span>
             </button>
-            <div class="hb-lib-body {% if record and record.record_type in 'key,subject,entity,narrative' %}open{% endif %}" id="keys-body">
+            <div class="hb-lib-body {% if is_key %}open{% endif %}" id="keys-body">
                 <div class="hb-lib-grid">
                 <button type="button"
-                        class="ctx-btn {% if record and record.record_type == 'key' %}active{% endif %}"
+                        class="ctx-btn {% if is_key %}active{% endif %}"
                         data-type="key" data-family="reference"
                         onclick="HBDial.setType(this, 'key', 'reference')">
                     <span class="material-symbols-outlined">key</span>
                     Key
-                </button>
-                <button type="button"
-                        class="ctx-btn {% if record and record.record_type == 'subject' and record.record_family == 'reference' %}active{% endif %}"
-                        data-type="subject" data-family="reference"
-                        onclick="HBDial.setType(this, 'subject', 'reference')">
-                    <span class="material-symbols-outlined">topic</span>
-                    Subject
-                </button>
-                <button type="button"
-                        class="ctx-btn {% if record and record.record_type == 'entity' and record.record_family == 'reference' %}active{% endif %}"
-                        data-type="entity" data-family="reference"
-                        onclick="HBDial.setType(this, 'entity', 'reference')">
-                    <span class="material-symbols-outlined">badge</span>
-                    Entity
-                </button>
-                <button type="button"
-                        class="ctx-btn {% if record and record.record_type == 'narrative' and record.record_family == 'reference' %}active{% endif %}"
-                        data-type="narrative" data-family="reference"
-                        onclick="HBDial.setType(this, 'narrative', 'reference')">
-                    <span class="material-symbols-outlined">history_edu</span>
-                    Narrative
                 </button>
                 </div>
             </div>
@@ -322,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div style="display:flex;align-items:center;justify-content:space-between;
                 padding:12px var(--space-s);border-bottom:1px solid var(--border);
                 position:sticky;top:0;background:var(--bg);z-index:10;">
-        <a href="{% url 'handbook:home' %}{% if record %}?branch={% if is_key %}keys{% elif is_reference %}reference{% else %}mandate{% endif %}{% endif %}"
+        <a href="{% url 'handbook:home' %}{% if active_library %}?library={{ active_library }}{% endif %}"
            style="display:flex;align-items:center;gap:4px;color:var(--muted);
                   font-size:12px;font-weight:700;text-decoration:none;text-transform:uppercase;letter-spacing:0.05em;">
             <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>

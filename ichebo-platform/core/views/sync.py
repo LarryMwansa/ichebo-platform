@@ -31,7 +31,7 @@ from notifications.serializers import NotificationSerializer
 from tenants.models import UserPermission as _UserPermission
 
 from core.models import SyncChangelog, OP_CREATE, OP_UPDATE, OP_DELETE
-from governance.services import MANDATE_TYPES
+from handbook.registry import MANDATE_TYPES
 
 # Maximum entities returned per type per pull response (DOC C §7.2)
 PULL_PAGE_SIZE = 500

@@ -60,24 +60,24 @@
 {% block context_content %}
 <div style="padding: 0 4px;">
     {% if can_write %}
-    <a href="{% url 'handbook:new' %}?branch={{ active_branch }}" class="hb-nav-btn"
+    <a href="{% url 'handbook:new' %}?library={{ active_library }}" class="hb-nav-btn"
        style="background: rgba(175,50,54,0.12); color: var(--accent-red); margin-bottom: 10px;">
         <span class="material-symbols-outlined">edit_note</span>
         Open The Desk
     </a>
     {% endif %}
 
-    <div class="ws-label-tag" style="margin-bottom: 8px;">Branches</div>
+    <div class="ws-label-tag" style="margin-bottom: 8px;">Libraries</div>
 
-    <a href="?branch=reference" class="hb-nav-btn {% if active_branch == 'reference' %}active{% endif %}">
+    <a href="?library=reference" class="hb-nav-btn {% if active_library == 'reference' %}active{% endif %}">
         <span class="material-symbols-outlined">library_books</span>
         Reference Library
     </a>
-    <a href="?branch=mandate" class="hb-nav-btn {% if active_branch == 'mandate' %}active{% endif %}">
+    <a href="?library=mandate" class="hb-nav-btn {% if active_library == 'mandate' %}active{% endif %}">
         <span class="material-symbols-outlined">gavel</span>
-        Mandate Branch
+        Mandate Library
     </a>
-    <a href="?branch=keys" class="hb-nav-btn {% if active_branch == 'keys' %}active{% endif %}">
+    <a href="?library=keys" class="hb-nav-btn {% if active_library == 'keys' %}active{% endif %}">
         <span class="material-symbols-outlined">key</span>
         Keys Library
     </a>
@@ -89,22 +89,22 @@
     <div class="ctx-divider" style="margin: 12px 0;"></div>
     <div class="ws-label-tag" style="margin-bottom: 8px;">Filter</div>
 
-    <a href="?branch={{ active_branch }}&status=draft"
+    <a href="?library={{ active_library }}&status=draft"
        class="hb-nav-btn {% if status_filter == 'draft' %}active{% endif %}">
         <span style="width:6px;height:6px;border-radius:50%;background:#636e72;flex-shrink:0;"></span>Drafts
     </a>
-    <a href="?branch={{ active_branch }}&status=active"
+    <a href="?library={{ active_library }}&status=active"
        class="hb-nav-btn {% if status_filter == 'active' %}active{% endif %}">
         <span style="width:6px;height:6px;border-radius:50%;background:#00b894;flex-shrink:0;"></span>Active
     </a>
-    <a href="?branch={{ active_branch }}&status=locked"
+    <a href="?library={{ active_library }}&status=locked"
        class="hb-nav-btn {% if status_filter == 'locked' %}active{% endif %}">
         <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-red);flex-shrink:0;"></span>Locked
     </a>
 
     {% if can_write %}
     <div class="ctx-divider" style="margin: 12px 0;"></div>
-    <a href="{% url 'handbook:new' %}?branch={{ active_branch }}" class="hb-nav-btn">
+    <a href="{% url 'handbook:new' %}?library={{ active_library }}" class="hb-nav-btn">
         <span class="material-symbols-outlined">add_circle</span>
         New Record
     </a>
@@ -133,18 +133,18 @@
 
     <div style="padding: 28px 24px 12px; border-bottom: 1px solid var(--border-ink);">
         <div class="ws-label-tag" style="color: var(--accent-red); margin-bottom: 8px;">
-            {% if active_branch == 'reference' %}Reference Library
-            {% elif active_branch == 'mandate' %}Mandate Branch
+            {% if active_library == 'reference' %}Reference Library
+            {% elif active_library == 'mandate' %}Mandate Library
             {% else %}Keys Library{% endif %}
         </div>
         <h1 class="ws-page-title" style="font-size: 22px; margin: 0;">
-            {% if active_branch == 'reference' %}Principles, Classes &amp; Concepts
-            {% elif active_branch == 'mandate' %}Mandates, Frameworks &amp; Procedures
+            {% if active_library == 'reference' %}Symbols, Principles, Concepts &amp; Divine Patterns
+            {% elif active_library == 'mandate' %}Mandates, Frameworks &amp; Procedures
             {% else %}My Keys{% endif %}
         </h1>
     </div>
 
-    {% if not has_access and active_branch != 'keys' %}
+    {% if not has_access and active_library != 'keys' %}
     <div style="padding: 80px 24px; text-align: center;">
         <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.15; display: block; margin-bottom: 16px;">lock</span>
         <p style="font-size: 14px; color: var(--text-muted-ink); margin-bottom: 8px;">
@@ -158,13 +158,7 @@
         {% for rtype, records in records_by_type.items %}
         <div class="hb-type-section" style="margin-top: 20px;">
             <div class="hb-type-header">
-                {% if active_branch == 'reference' %}
-                    {{ library_type_labels|get_item:rtype|default:rtype }}
-                {% elif active_branch == 'mandate' %}
-                    {{ mandate_type_labels|get_item:rtype|default:rtype }}
-                {% else %}
-                    Keys
-                {% endif %}
+                {{ type_labels|get_item:rtype|default:rtype }}
             </div>
             {% for record in records %}
             <a href="{% url 'handbook:record' record.id %}" class="hb-row">
@@ -179,9 +173,9 @@
     <div style="padding: 60px 24px; text-align: center;">
         <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.15; display: block; margin-bottom: 16px;">auto_stories</span>
         <p style="font-size: 13px; color: var(--text-muted-ink);">
-            No records in this branch yet.
+            No records in this library yet.
             {% if can_write %}
-            <a href="{% url 'handbook:new' %}?branch={{ active_branch }}" style="color: var(--accent-red);">Create the first.</a>
+            <a href="{% url 'handbook:new' %}?library={{ active_library }}" style="color: var(--accent-red);">Create the first.</a>
             {% endif %}
         </p>
     </div>
@@ -200,12 +194,12 @@
         <div><strong style="color: var(--text-ink);">Access</strong></div>
         {% if access.role == 'reader' %}
         <div>Reference Library — read</div>
-        <div>Mandate Branch — read</div>
+        <div>Mandate Library — read</div>
         {% else %}
-        <div>All branches — read &amp; write</div>
+        <div>All libraries — read &amp; write</div>
         {% endif %}
     </div>
-    {% elif active_branch == 'keys' %}
+    {% elif active_library == 'keys' %}
     <p style="font-size: 12px; color: var(--text-muted-ink);">Keys are personal — no access grant needed.</p>
     {% else %}
     <p style="font-size: 12px; color: var(--text-muted-ink);">No access. Contact an editor.</p>
@@ -213,11 +207,11 @@
 
     {% if can_write %}
     <div style="height: 1px; background: var(--border-ink); margin: 16px 0;"></div>
-    <a href="{% url 'handbook:new' %}?branch={{ active_branch }}"
+    <a href="{% url 'handbook:new' %}?library={{ active_library }}"
        style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700;
               color: var(--accent-red); text-decoration: none;">
         <span class="material-symbols-outlined" style="font-size: 16px;">add_circle</span>
-        New {{ active_branch|title }} Record
+        New {{ library_label }} Record
     </a>
     {% endif %}
 </div>
@@ -232,8 +226,8 @@
         <div class="page-hero__eyebrow">
             <div class="page-hero__eyebrow-line"></div>
             <span class="page-hero__label">
-                {% if active_branch == 'reference' %}Reference Library
-                {% elif active_branch == 'mandate' %}Mandate Branch
+                {% if active_library == 'reference' %}Reference Library
+                {% elif active_library == 'mandate' %}Mandate Library
                 {% else %}Keys Library{% endif %}
             </span>
         </div>
@@ -242,30 +236,30 @@
 
     <div style="padding: 0 var(--space-s);">
 
-        {# ── Branch tabs ── #}
+        {# ── Library tabs ── #}
         <div style="display: flex; gap: 6px; margin-bottom: var(--space-m);
                     overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
-            <a href="?branch=reference"
+            <a href="?library=reference"
                style="flex-shrink:0; padding:6px 14px; border-radius:var(--radius-pill);
                       font-size:12px; font-weight:700; text-decoration:none;
                       border:1px solid var(--border); white-space:nowrap;
-                      {% if active_branch == 'reference' %}background:var(--primary);color:#fff;border-color:var(--primary);
+                      {% if active_library == 'reference' %}background:var(--primary);color:#fff;border-color:var(--primary);
                       {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
                 Reference
             </a>
-            <a href="?branch=mandate"
+            <a href="?library=mandate"
                style="flex-shrink:0; padding:6px 14px; border-radius:var(--radius-pill);
                       font-size:12px; font-weight:700; text-decoration:none;
                       border:1px solid var(--border); white-space:nowrap;
-                      {% if active_branch == 'mandate' %}background:var(--primary);color:#fff;border-color:var(--primary);
+                      {% if active_library == 'mandate' %}background:var(--primary);color:#fff;border-color:var(--primary);
                       {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
                 Mandate
             </a>
-            <a href="?branch=keys"
+            <a href="?library=keys"
                style="flex-shrink:0; padding:6px 14px; border-radius:var(--radius-pill);
                       font-size:12px; font-weight:700; text-decoration:none;
                       border:1px solid var(--border); white-space:nowrap;
-                      {% if active_branch == 'keys' %}background:var(--primary);color:#fff;border-color:var(--primary);
+                      {% if active_library == 'keys' %}background:var(--primary);color:#fff;border-color:var(--primary);
                       {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
                 Keys
             </a>
@@ -275,7 +269,7 @@
         {% if can_write %}
         <div style="display: flex; gap: 6px; margin-bottom: var(--space-m);
                     overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
-            <a href="?branch={{ active_branch }}"
+            <a href="?library={{ active_library }}"
                style="flex-shrink:0; padding:4px 10px; border-radius:var(--radius-pill);
                       font-size:11px; font-weight:700; text-decoration:none;
                       border:1px solid var(--border); white-space:nowrap;
@@ -283,7 +277,7 @@
                       {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
                 All
             </a>
-            <a href="?branch={{ active_branch }}&status=draft"
+            <a href="?library={{ active_library }}&status=draft"
                style="flex-shrink:0; padding:4px 10px; border-radius:var(--radius-pill);
                       font-size:11px; font-weight:700; text-decoration:none;
                       border:1px solid var(--border); white-space:nowrap;
@@ -291,7 +285,7 @@
                       {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
                 Drafts
             </a>
-            <a href="?branch={{ active_branch }}&status=active"
+            <a href="?library={{ active_library }}&status=active"
                style="flex-shrink:0; padding:4px 10px; border-radius:var(--radius-pill);
                       font-size:11px; font-weight:700; text-decoration:none;
                       border:1px solid var(--border); white-space:nowrap;
@@ -299,7 +293,7 @@
                       {% else %}background:var(--card-2);color:var(--muted);{% endif %}">
                 Active
             </a>
-            <a href="?branch={{ active_branch }}&status=locked"
+            <a href="?library={{ active_library }}&status=locked"
                style="flex-shrink:0; padding:4px 10px; border-radius:var(--radius-pill);
                       font-size:11px; font-weight:700; text-decoration:none;
                       border:1px solid var(--border); white-space:nowrap;
@@ -311,7 +305,7 @@
         {% endif %}
 
         {# ── Record list ── #}
-        {% if not has_access and active_branch != 'keys' %}
+        {% if not has_access and active_library != 'keys' %}
         <div style="padding:60px 0;text-align:center;color:var(--muted);">
             <span class="material-symbols-outlined" style="font-size:40px;opacity:0.15;display:block;margin-bottom:12px;">lock</span>
             <p style="font-size:13px;">The Handbook is for invited architects.</p>
@@ -320,9 +314,7 @@
             {% for rtype, records in records_by_type.items %}
             <div style="margin-bottom: var(--space-l);">
                 <div class="ws-label-tag" style="margin-bottom: 8px;">
-                    {% if active_branch == 'reference' %}{{ library_type_labels|get_item:rtype|default:rtype }}
-                    {% elif active_branch == 'mandate' %}{{ mandate_type_labels|get_item:rtype|default:rtype }}
-                    {% else %}Keys{% endif %}
+                    {{ type_labels|get_item:rtype|default:rtype }}
                 </div>
                 <div class="list-group">
                     {% for record in records %}
@@ -343,9 +335,9 @@
         {% else %}
         <div style="padding:60px 0;text-align:center;color:var(--muted);">
             <span class="material-symbols-outlined" style="font-size:40px;opacity:0.15;display:block;margin-bottom:12px;">auto_stories</span>
-            <p style="font-size:13px;">No records in this branch yet.</p>
+            <p style="font-size:13px;">No records in this library yet.</p>
             {% if can_write %}
-            <a href="{% url 'handbook:new' %}?branch={{ active_branch }}"
+            <a href="{% url 'handbook:new' %}?library={{ active_library }}"
                style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;
                       padding:8px 18px;border-radius:8px;background:var(--primary);
                       color:#fff;font-size:13px;font-weight:600;text-decoration:none;">
@@ -360,7 +352,7 @@
 
     {# ── FAB: New record ── #}
     {% if can_write %}
-    <a href="{% url 'handbook:new' %}?branch={{ active_branch }}"
+    <a href="{% url 'handbook:new' %}?library={{ active_library }}"
        style="position:fixed;bottom:80px;right:20px;z-index:200;
               width:52px;height:52px;border-radius:50%;
               background:var(--primary);color:#fff;

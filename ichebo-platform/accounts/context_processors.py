@@ -13,7 +13,7 @@ LEVEL_NAMES = {
     2: 'Disciple',
     3: 'Steward',
     4: 'Senior Steward',
-    5: 'Architect',
+    5: 'Apostolic Steward',
 }
 
 APP_LEVEL_REQUIREMENTS = {

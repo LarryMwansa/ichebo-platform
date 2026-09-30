@@ -193,7 +193,7 @@ class TestNowPlayingAPIEndpoint(TestCase):
 
 
 class TestChannelSchedulerAccessControl(TestCase):
-    """Channel scheduler UI — accessible only to Level 5 (Architect)."""
+    """Channel scheduler UI — accessible only to Level 5 (Apostolic Steward)."""
 
     def setUp(self):
         self.owner = _make_user('sched-owner@example.com', level=5)

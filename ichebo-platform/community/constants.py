@@ -41,7 +41,7 @@ KGS_PARTICIPATION_STAGES = {
     2: ("Disciple",        "Alignment"),
     3: ("Steward",         "Service"),
     4: ("Senior Steward",  "Leadership"),
-    5: ("Architect",       "Apostolic Stewardship"),
+    5: ("Apostolic Steward", "Apostolic Stewardship"),
 }
 
 KGS_COMPETENCE_LABELS = {
@@ -50,5 +50,5 @@ KGS_COMPETENCE_LABELS = {
     2: "Disciple",
     3: "Steward",
     4: "Senior Steward",
-    5: "Architect",
+    5: "Apostolic Steward",
 }

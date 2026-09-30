@@ -6,116 +6,16 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from governance.services import create_new_version
 from records.models import Record, Relationship
 from activity.models import Activity
+from . import access as rules
 from .models import HandbookAccess
-
-# ── Governance record type groupings (mirrors governance/services.py) ─────────
-
-LIBRARY_TYPES = ['class', 'principle', 'concept', 'divine_pattern', 'narrative', 'subject', 'entity']
-MANDATE_TYPES = [
-    'mandate', 'statement', 'framework', 'protocol', 'procedure', 'programme',
-]
-KEY_TYPES = ['key', 'subject', 'entity', 'narrative']
-
-LIBRARY_TYPE_LABELS = {
-    'class':          'Classes',
-    'principle':      'Principles',
-    'concept':        'Concepts',
-    'divine_pattern': 'Divine Patterns',
-    'narrative':      'Narratives',
-    'subject':        'Subjects',
-    'entity':         'Entities',
-}
-MANDATE_TYPE_LABELS = {
-    'mandate':   'Mandates',
-    'statement': 'Statements',
-    'framework': 'Frameworks',
-    'protocol':  'Protocols',
-    'procedure': 'Procedures',
-    'programme': 'Programmes',
-}
-
-ALL_GOVERNANCE_TYPES = LIBRARY_TYPES + MANDATE_TYPES + KEY_TYPES
-
-HRS_ATTRS = [
-    ('complexity',            'Complexity'),
-    ('relationship_position', 'Relationship Position'),
-    ('position',              'Position'),
-    ('direction',             'Direction'),
-    ('speed',                 'Speed'),
-    ('emotional_tone',        'Emotional Tone'),
-]
-
-RECORD_TYPES_BY_BRANCH = {
-    'reference': LIBRARY_TYPES,
-    'mandate':   MANDATE_TYPES,
-    'keys':      KEY_TYPES,
-}
-
-STATUS_CHOICES = ['draft', 'active', 'locked', 'superseded', 'submitted']
-
-
-# ── Access level constants ─────────────────────────────────────────────────────
-# Will be moved to PlatformConfig (L10.6) for System Panel configuration.
-KEYS_ACCESS_LEVEL      = 4   # Keys Library — entity/narrative are L4-5 content
-REFERENCE_ACCESS_LEVEL = 3   # Reference Library
-MANDATE_ACCESS_LEVEL   = 4   # Handbook authoring of Mandate records — canonical value, matches governance/views.py
-
-
-# ── Helpers ───────────────────────────────────────────────────────────────────
-
-def _get_access(user):
-    return HandbookAccess.objects.filter(user=user).first()
-
-
-def _can_write(access):
-    return access and access.role in (HandbookAccess.ROLE_AUTHOR, HandbookAccess.ROLE_EDITOR)
-
-
-def _is_editor(access):
-    return access and access.role == HandbookAccess.ROLE_EDITOR
-
-
-def _governance_qs(user, access, include_drafts=False):
-    """Governance records this user may read: Reference from Level 3, Mandate from Level 4 (DOC F 5.1)."""
-    qs = Record.objects.filter(
-        record_family='governance',
-        deleted_at__isnull=True,
-    ).exclude(record_type='key')
-
-    if user.is_superuser or user.is_staff or _can_write(access):
-        return qs  # authors/editors see everything including drafts
-    level = _level(user)
-    if level < REFERENCE_ACCESS_LEVEL:
-        return qs.none()
-    if level < MANDATE_ACCESS_LEVEL:
-        qs = qs.exclude(record_type__in=MANDATE_TYPES)
-    if include_drafts:
-        return qs
-    return qs.filter(status__in=['active', 'locked'])
-
-
-def _can_see_record(user, access, record):
-    """Whether one record may be shown to this user in the Handbook (DOC F 5.1, 6.1, 6.2).
-
-    Personal records (journals, keys, notes) are visible to their owner only — not to
-    authors, editors or superusers. Governance records follow _governance_qs.
-    """
-    if record.created_by_id == user.pk:
-        return True
-    if record.record_family != 'governance':
-        return False
-    if record.record_type == 'key':
-        return False
-    if user.is_superuser or user.is_staff or _can_write(access):
-        return True
-    level = _level(user)
-    if level < REFERENCE_ACCESS_LEVEL:
-        return False
-    if level < MANDATE_ACCESS_LEVEL and record.record_type in MANDATE_TYPES:
-        return False
-    return bool(access) or record.status in ('active', 'locked')
+from .registry import (
+    ANALYSIS_LINK_TYPES, GOVERNANCE_TYPES, KEY_TYPES, LIBRARY_KEYS, LIBRARY_LABELS,
+    LIBRARY_MANDATE, LIBRARY_REFERENCE, LIBRARY_TYPES, LINK_TYPES, LINK_TYPE_VALUES,
+    MANDATE_TYPES, REFERENCE_TYPES, TYPE_LABELS, TYPE_SINGULAR_LABELS, library_of,
+)
 
 
 def _keys_qs(user):
@@ -127,67 +27,64 @@ def _keys_qs(user):
     )
 
 
-def _level(user):
-    return getattr(user, 'competence_level', 0)
+def _link_types_for(record):
+    """Record links offered for this record; the HRS analysis links only on a narrative."""
+    if record.record_type == 'narrative':
+        return LINK_TYPES
+    return [(value, label) for value, label in LINK_TYPES if value not in ANALYSIS_LINK_TYPES]
+
+
+def _requested_library(request):
+    """The Library named in the URL. `branch` is the pre-v2.0 name, kept as an alias."""
+    library = request.GET.get('library') or request.GET.get('branch') or LIBRARY_REFERENCE
+    return library if library in LIBRARY_TYPES else LIBRARY_REFERENCE
 
 
 # ── Handbook Home ─────────────────────────────────────────────────────────────
 
 @login_required
 def handbook_home(request):
-    access = _get_access(request.user)
+    access = rules.get_access(request.user)
     is_superuser = request.user.is_staff or request.user.is_superuser
-    is_author = is_superuser or _can_write(access)
+    is_author = is_superuser or rules.can_write(access)
 
-    if _level(request.user) < REFERENCE_ACCESS_LEVEL and not is_author:
+    if rules.level(request.user) < rules.REFERENCE_ACCESS_LEVEL and not is_author:
         return HttpResponseForbidden('The Handbook requires Level 3 or above.')
 
-    active_branch = request.GET.get('branch', 'reference')
-    if active_branch not in RECORD_TYPES_BY_BRANCH:
-        active_branch = 'reference'
+    library = _requested_library(request)
 
-    if active_branch == 'mandate' and _level(request.user) < MANDATE_ACCESS_LEVEL and not is_author:
+    if library == LIBRARY_MANDATE and rules.level(request.user) < rules.MANDATE_ACCESS_LEVEL and not is_author:
         return HttpResponseForbidden('The Mandate Library requires Level 4 or above.')
 
-    if active_branch == 'keys':
-        if _level(request.user) < KEYS_ACCESS_LEVEL and not is_superuser:
-            return HttpResponseForbidden('Keys Library requires Level 4 or above.')
-
     status_filter = request.GET.get('status', '')
-    records_by_type = {}
 
-    if active_branch == 'keys':
+    if library == LIBRARY_KEYS:
         qs = _keys_qs(request.user)
         if status_filter:
             qs = qs.filter(status=status_filter)
-        for rtype in KEY_TYPES:
-            type_qs = qs.filter(record_type=rtype).order_by('-updated_at')[:30]
-            if type_qs.exists():
-                records_by_type[rtype] = list(type_qs)
-        can_write_branch = True
     else:
-        qs = _governance_qs(request.user, access, include_drafts=is_author)
+        qs = rules.governance_qs(request.user, access, include_drafts=is_author)
         if status_filter and (access or is_superuser):
             qs = qs.filter(status=status_filter)
-        for rtype in RECORD_TYPES_BY_BRANCH.get(active_branch, []):
-            type_qs = qs.filter(record_type=rtype).order_by('-updated_at')[:20]
-            if type_qs.exists():
-                records_by_type[rtype] = list(type_qs)
-        can_write_branch = is_superuser or _can_write(access)
+
+    records_by_type = {}
+    for rtype in LIBRARY_TYPES[library]:
+        records = list(qs.filter(record_type=rtype).order_by('-updated_at')[:30])
+        if records:
+            records_by_type[rtype] = records
 
     return render(request, 'workspace/handbook/home.html', {
-        'active_app':            'handbook',
-        'ws_page_title':         'Handbook',
-        'access':                access,
-        'can_write':             can_write_branch,
-        'is_editor':             is_superuser or _is_editor(access),
-        'active_branch':         active_branch,
-        'record_types_by_branch': RECORD_TYPES_BY_BRANCH,
-        'library_type_labels':   LIBRARY_TYPE_LABELS,
-        'mandate_type_labels':   MANDATE_TYPE_LABELS,
-        'records_by_type':       records_by_type,
-        'status_filter':         status_filter,
-        'has_access':            access is not None or is_superuser,
+        'active_app':      'handbook',
+        'ws_page_title':   'Handbook',
+        'access':          access,
+        'can_write':       library == LIBRARY_KEYS or is_author,
+        'is_editor':       is_superuser or rules.is_editor(access),
+        'active_library':  library,
+        'library_label':   LIBRARY_LABELS[library],
+        'type_labels':     TYPE_LABELS,
+        'records_by_type': records_by_type,
+        'status_filter':   status_filter,
+        'has_access':      access is not None or is_superuser,
     })
 
 
@@ -195,7 +92,7 @@ def handbook_home(request):
 
 @login_required
 def handbook_record(request, record_id):
-    access = _get_access(request.user)
+    access = rules.get_access(request.user)
     is_superuser = request.user.is_staff or request.user.is_superuser
 
     # Keys — personal records stored under record_family='reference'
@@ -208,15 +105,15 @@ def handbook_record(request, record_id):
     ).first()
 
     if key_record:
-        if _level(request.user) < KEYS_ACCESS_LEVEL and not is_superuser:
-            return HttpResponseForbidden('Keys Library requires Level 4 or above.')
+        if rules.level(request.user) < rules.KEYS_ACCESS_LEVEL and not is_superuser:
+            return HttpResponseForbidden('The Keys Library requires Level 3 or above.')
         record = key_record
         can_write = True
     else:
         # Grant holders see drafts; everyone else sees published, level-gated
-        qs = _governance_qs(request.user, access, include_drafts=bool(access) or is_superuser)
+        qs = rules.governance_qs(request.user, access, include_drafts=bool(access) or is_superuser)
         record = get_object_or_404(qs, pk=record_id)
-        can_write = is_superuser or _can_write(access)
+        can_write = is_superuser or rules.can_write(access)
 
     # Version chain
     history = []
@@ -228,9 +125,11 @@ def handbook_record(request, record_id):
         except Record.DoesNotExist:
             break
 
-    outgoing = record.outgoing_relationships.select_related(
-        'to_record', 'bible_verse', 'bible_verse__book'
-    )
+    outgoing = [
+        rel for rel in record.outgoing_relationships.select_related('to_record', 'bible_verse', 'bible_verse__book')
+        if rel.to_record is None or rules.can_see_record(request.user, access, rel.to_record)
+    ]
+    library = library_of(record.record_type)
 
     from django.urls import reverse
     recent_records = Record.objects.filter(
@@ -253,12 +152,15 @@ def handbook_record(request, record_id):
         'history':              history,
         'outgoing':             outgoing,
         'can_write':            can_write,
-        'is_editor':            _is_editor(access),
-        'is_reference':         record.record_type in LIBRARY_TYPES,
-        'is_key':               record.record_type in KEY_TYPES and record.record_family == 'reference',
-        'show_hrs':             record.record_type in LIBRARY_TYPES or (record.record_type in KEY_TYPES and record.record_family == 'reference'),
-        'hrs_attrs':            HRS_ATTRS,
-        'record_types_reference': LIBRARY_TYPES,
+        'is_editor':            rules.is_editor(access),
+        'active_library':       library,
+        'is_reference':         library == LIBRARY_REFERENCE,
+        'is_mandate':           library == LIBRARY_MANDATE,
+        'is_key':               library == LIBRARY_KEYS,
+        'is_narrative':         record.record_type == 'narrative',
+        'type_labels':          TYPE_SINGULAR_LABELS,
+        'link_types':           _link_types_for(record),
+        'record_types_reference': REFERENCE_TYPES,
         'record_types_mandate':   MANDATE_TYPES,
         # Editor canvas context
         'save_url':             reverse('handbook:save'),
@@ -277,21 +179,15 @@ def handbook_record(request, record_id):
 
 @login_required
 def handbook_new(request):
-    if _level(request.user) < 3:
+    if rules.level(request.user) < rules.REFERENCE_ACCESS_LEVEL:
         return HttpResponseForbidden()
 
-    access = _get_access(request.user)
+    access = rules.get_access(request.user)
     is_superuser = request.user.is_staff or request.user.is_superuser
-    active_branch = request.GET.get('branch', 'reference')
-    if active_branch not in RECORD_TYPES_BY_BRANCH:
-        active_branch = 'reference'
+    library = _requested_library(request)
 
-    if active_branch == 'keys':
-        can_write = True
-    else:
-        if not _can_write(access) and not is_superuser:
-            return HttpResponseForbidden()
-        can_write = True
+    if library != LIBRARY_KEYS and not rules.can_write(access) and not is_superuser:
+        return HttpResponseForbidden()
 
     from django.urls import reverse
     recent_records = Record.objects.filter(
@@ -306,25 +202,10 @@ def handbook_new(request):
         deleted_at__isnull=True,
     ).order_by('-updated_at')[:5]
 
-    # Bug found 2026-06-24, real privacy impact: this used to be a two-way
-    # ternary (LIBRARY_TYPES[0] if reference else MANDATE_TYPES[0]) with no
-    # 'keys' case at all — creating a record from the Keys branch silently
-    # defaulted active_type to 'mandate' and active_family (below) to
-    # 'governance', so the record the editor actually saved
-    # (handbook_save reads record_type/record_family straight from these
-    # dial values) was a real governance/Handbook record, not a personal
-    # Key — visible to every Handbook author/editor instead of just the
-    # creator. See video-direction-v2-plan.md-adjacent fix notes; two real
-    # affected records found and corrected on production in the same pass.
-    if active_branch == 'keys':
-        default_type = KEY_TYPES[0]
-        default_family = 'reference'
-    elif active_branch == 'reference':
-        default_type = LIBRARY_TYPES[0]
-        default_family = 'governance'
-    else:
-        default_type = MANDATE_TYPES[0]
-        default_family = 'governance'
+    # A Key is personal: it must default to the 'reference' family, never 'governance',
+    # or the editor saves it as a Handbook record every author can read.
+    default_type = LIBRARY_TYPES[library][0]
+    default_family = 'reference' if library == LIBRARY_KEYS else 'governance'
 
     return render(request, 'workspace/handbook/record.html', {
         'active_app':             'handbook',
@@ -333,14 +214,16 @@ def handbook_new(request):
         'record':                 None,
         'history':                [],
         'outgoing':               [],
-        'can_write':              can_write,
-        'is_editor':              _is_editor(access),
-        'is_key':                 active_branch == 'keys',
-        'is_reference':           active_branch == 'reference',
-        'show_hrs':               active_branch in ('reference', 'keys'),
-        'active_branch':          active_branch,
-        'hrs_attrs':              HRS_ATTRS,
-        'record_types_reference': LIBRARY_TYPES,
+        'can_write':              True,
+        'is_editor':              rules.is_editor(access),
+        'active_library':         library,
+        'is_key':                 library == LIBRARY_KEYS,
+        'is_reference':           library == LIBRARY_REFERENCE,
+        'is_mandate':             library == LIBRARY_MANDATE,
+        'is_narrative':           False,
+        'type_labels':            TYPE_SINGULAR_LABELS,
+        'link_types':             [],
+        'record_types_reference': REFERENCE_TYPES,
         'record_types_mandate':   MANDATE_TYPES,
         # Editor canvas context
         'save_url':               reverse('handbook:save'),
@@ -359,9 +242,9 @@ def handbook_new(request):
 
 @login_required
 def handbook_access(request):
-    access = _get_access(request.user)
+    access = rules.get_access(request.user)
     is_superuser = request.user.is_staff or request.user.is_superuser
-    if not _is_editor(access) and not is_superuser:
+    if not rules.is_editor(access) and not is_superuser:
         return HttpResponseForbidden()
 
     if request.method == 'POST':
@@ -397,7 +280,7 @@ def handbook_save(request):
     if request.method != 'POST':
         return HttpResponse(status=405)
 
-    access = _get_access(request.user)
+    access = rules.get_access(request.user)
     is_superuser = request.user.is_staff or request.user.is_superuser
     record_id = request.POST.get('record_id', '').strip()
     title = request.POST.get('title', 'Untitled').strip()
@@ -410,23 +293,18 @@ def handbook_save(request):
         record_family = 'governance'
 
     is_key = record_type in KEY_TYPES and record_family == 'reference'
+    if not is_key and record_type not in GOVERNANCE_TYPES:
+        return HttpResponse('Unknown record type.', status=400)
 
-    # Keys: any Level 3+ user can write their own; others need write access
-    if not is_key and not _can_write(access) and not is_superuser:
+    if is_key:
+        if rules.level(request.user) < rules.KEYS_ACCESS_LEVEL and not is_superuser:
+            return HttpResponseForbidden()
+    elif not rules.can_write(access) and not is_superuser:
         return HttpResponseForbidden()
 
-    custom_fields = {
-        'complexity':            request.POST.get('complexity', ''),
-        'polarity':              request.POST.get('polarity', ''),
-        'relationship_position': request.POST.get('relationship_position', ''),
-        'position':              request.POST.get('position', ''),
-        'direction':             request.POST.get('direction', ''),
-        'speed':                 request.POST.get('speed', ''),
-        'emotional_tone':        request.POST.get('emotional_tone', ''),
-        'symbol':                request.POST.get('symbol', ''),
-    }
-    # Strip empty
-    custom_fields = {k: v for k, v in custom_fields.items() if v}
+    # The retired HRS attributes (DOC F 3.7) are no longer written; stored values are left untouched.
+    symbol = request.POST.get('symbol', '')
+    custom_fields = {'symbol': symbol} if symbol else {}
 
     if record_id:
         try:
@@ -470,8 +348,8 @@ def handbook_save(request):
 def handbook_lock(request, record_id):
     if request.method != 'POST':
         return HttpResponse(status=405)
-    access = _get_access(request.user)
-    if not _can_write(access):
+    access = rules.get_access(request.user)
+    if not rules.can_write(access):
         return HttpResponseForbidden()
     record = get_object_or_404(Record, pk=record_id, record_family='governance', deleted_at__isnull=True)
     record.status = 'locked'
@@ -485,10 +363,12 @@ def handbook_lock(request, record_id):
 def handbook_publish(request, record_id):
     if request.method != 'POST':
         return HttpResponse(status=405)
-    access = _get_access(request.user)
-    if not _can_write(access):
+    access = rules.get_access(request.user)
+    if not rules.can_write(access):
         return HttpResponseForbidden()
     record = get_object_or_404(Record, pk=record_id, record_family='governance', deleted_at__isnull=True)
+    if rules.has_journal_link(record):
+        return HttpResponse(JOURNAL_LINK_BLOCK, status=422)
     record.status = 'active'
     record.save(update_fields=['status', 'updated_at'])
     return HttpResponse('<span style="color:#00b894;font-size:12px;font-weight:700;">Published</span>')
@@ -500,27 +380,11 @@ def handbook_publish(request, record_id):
 def handbook_new_version(request, record_id):
     if request.method != 'POST':
         return HttpResponse(status=405)
-    access = _get_access(request.user)
-    if not _can_write(access):
+    access = rules.get_access(request.user)
+    if not rules.can_write(access):
         return HttpResponseForbidden()
     old = get_object_or_404(Record, pk=record_id, record_family='governance', deleted_at__isnull=True)
-
-    new_record = Record.objects.create(
-        created_by=request.user,
-        record_class=old.record_class,
-        record_family='governance',
-        record_type=old.record_type,
-        title=old.title,
-        content=old.content,
-        summary=old.summary if hasattr(old, 'summary') else '',
-        status='draft',
-        previous_version_id=old.pk,
-        custom_fields=dict(old.custom_fields),
-    )
-    # Mark old as superseded
-    old.status = 'superseded'
-    old.superseded_by_id = new_record.pk
-    old.save(update_fields=['status', 'superseded_by_id', 'updated_at'])
+    new_record = create_new_version(old, request.user)
 
     from django.urls import reverse
     response = HttpResponse(status=204)
@@ -542,7 +406,7 @@ def handbook_new_version(request, record_id):
 # be deleted by the user who created it (personal data — _can_write's
 # HandbookAccess role is for institutional Handbook content, not personal
 # Keys, and was never the right check here); a governance record follows
-# the same _can_write(access) rule as Lock/Publish/New Version above.
+# the same rules.can_write(access) rule as Lock/Publish/New Version above.
 @login_required
 def handbook_delete(request, record_id):
     if request.method != 'POST':
@@ -556,9 +420,9 @@ def handbook_delete(request, record_id):
     if key_record:
         record = key_record
     else:
-        access = _get_access(request.user)
+        access = rules.get_access(request.user)
         is_superuser = request.user.is_staff or request.user.is_superuser
-        if not (is_superuser or _can_write(access)):
+        if not (is_superuser or rules.can_write(access)):
             return HttpResponseForbidden()
         record = get_object_or_404(
             Record, pk=record_id, record_family='governance', deleted_at__isnull=True
@@ -569,23 +433,23 @@ def handbook_delete(request, record_id):
                 status=403,
             )
 
-    if key_record:
-        branch = 'keys'
-    elif record.record_type in LIBRARY_TYPES:
-        branch = 'reference'
-    else:
-        branch = 'mandate'
+    library = LIBRARY_KEYS if key_record else (library_of(record.record_type) or LIBRARY_REFERENCE)
 
     record.deleted_at = timezone.now()
     record.save(update_fields=['deleted_at'])
 
     from django.urls import reverse
     response = HttpResponse(status=204)
-    response['HX-Redirect'] = f"{reverse('handbook:home')}?branch={branch}"
+    response['HX-Redirect'] = f"{reverse('handbook:home')}?library={library}"
     return response
 
 
 # ── HTMX: Set status ─────────────────────────────────────────────────────────
+
+JOURNAL_LINK_BLOCK = (
+    '<span style="color:#e17055;font-size:12px;">This record is linked to a journal entry. '
+    'Journals are private, so remove the link before publishing.</span>'
+)
 
 VALID_STATUS_TRANSITIONS = {
     'draft':      ['active', 'archived'],
@@ -602,7 +466,7 @@ def handbook_set_status(request, record_id):
     if request.method != 'POST':
         return HttpResponse(status=405)
 
-    access = _get_access(request.user)
+    access = rules.get_access(request.user)
     is_superuser = request.user.is_staff or request.user.is_superuser
 
     # Try personal (keys) record first, then governance
@@ -612,7 +476,7 @@ def handbook_set_status(request, record_id):
         deleted_at__isnull=True,
     ).first()
     if not record:
-        if not _can_write(access) and not is_superuser:
+        if not rules.can_write(access) and not is_superuser:
             return HttpResponseForbidden()
         record = get_object_or_404(Record, pk=record_id, record_family='governance', deleted_at__isnull=True)
 
@@ -623,6 +487,10 @@ def handbook_set_status(request, record_id):
             f'<span style="color:#e17055;font-size:12px;">Cannot move {record.status} → {escape(new_status)}</span>',
             status=422,
         )
+
+    if (record.record_family == 'governance' and new_status in rules.PUBLISHED_STATUSES
+            and rules.has_journal_link(record)):
+        return HttpResponse(JOURNAL_LINK_BLOCK, status=422)
 
     record.status = new_status
     record.save(update_fields=['status', 'updated_at'])
@@ -652,23 +520,23 @@ def handbook_set_status(request, record_id):
 
 @login_required
 def handbook_linked_records(request, record_id):
-    access = _get_access(request.user)
+    access = rules.get_access(request.user)
     record = get_object_or_404(Record, pk=record_id, record_family='governance', deleted_at__isnull=True)
-    if not _can_see_record(request.user, access, record):
+    if not rules.can_see_record(request.user, access, record):
         raise Http404
     outgoing = [
         rel for rel in record.outgoing_relationships.select_related('to_record', 'bible_verse', 'bible_verse__book')
-        if rel.to_record is None or _can_see_record(request.user, access, rel.to_record)
+        if rel.to_record is None or rules.can_see_record(request.user, access, rel.to_record)
     ]
     incoming = [
         rel for rel in record.incoming_relationships.select_related('from_record')
-        if _can_see_record(request.user, access, rel.from_record)
+        if rules.can_see_record(request.user, access, rel.from_record)
     ]
     return render(request, 'workspace/handbook/partials/_linked_records.html', {
         'record':   record,
         'outgoing': outgoing,
         'incoming': incoming,
-        'can_write': _can_write(access),
+        'can_write': rules.can_write(access),
     })
 
 
@@ -679,9 +547,9 @@ def handbook_relationship_create(request):
     if request.method != 'POST':
         return HttpResponse(status=405)
 
-    access = _get_access(request.user)
+    access = rules.get_access(request.user)
     is_superuser = request.user.is_staff or request.user.is_superuser
-    if not _can_write(access) and not is_superuser:
+    if not rules.can_write(access) and not is_superuser:
         return HttpResponseForbidden()
 
     from_id  = request.POST.get('from_record_id', '').strip()
@@ -694,15 +562,23 @@ def handbook_relationship_create(request):
 
     from_record = get_object_or_404(Record, pk=from_id, deleted_at__isnull=True)
     to_record   = get_object_or_404(Record, pk=to_id,   deleted_at__isnull=True)
-    if not (_can_see_record(request.user, access, from_record)
-            and _can_see_record(request.user, access, to_record)):
+    if not (rules.can_see_record(request.user, access, from_record)
+            and rules.can_see_record(request.user, access, to_record)):
         raise Http404
+    if rel_type not in LINK_TYPE_VALUES:
+        return HttpResponse('Unknown link type.', status=400)
+    if rel_type in ANALYSIS_LINK_TYPES and from_record.record_type != 'narrative':
+        return HttpResponse('Subjects and entities can only be linked from a narrative.', status=400)
+    for end, other in ((from_record, to_record), (to_record, from_record)):
+        if (end.record_family == 'journal' and other.record_family == 'governance'
+                and other.status in rules.PUBLISHED_STATUSES):
+            return HttpResponse('A published record cannot be linked to a journal entry.', status=400)
 
     Relationship.objects.get_or_create(
         from_record=from_record,
         to_record=to_record,
         relationship_type=rel_type,
-        defaults={'notes': notes},
+        defaults={'notes': notes, 'created_by': request.user},
     )
     return HttpResponse(status=204)
 
@@ -712,16 +588,16 @@ def handbook_relationship_create(request):
 @login_required
 def handbook_relationship_list(request, record_id):
     record = get_object_or_404(Record, pk=record_id, deleted_at__isnull=True)
-    access = _get_access(request.user)
-    if not _can_see_record(request.user, access, record):
+    access = rules.get_access(request.user)
+    if not rules.can_see_record(request.user, access, record):
         raise Http404
     outgoing = [
         rel for rel in record.outgoing_relationships.select_related('to_record').order_by('relationship_type')
-        if rel.to_record is not None and _can_see_record(request.user, access, rel.to_record)
+        if rel.to_record is not None and rules.can_see_record(request.user, access, rel.to_record)
     ]
     incoming = [
         rel for rel in record.incoming_relationships.select_related('from_record').order_by('relationship_type')
-        if _can_see_record(request.user, access, rel.from_record)
+        if rules.can_see_record(request.user, access, rel.from_record)
     ]
 
     rows = ''
@@ -755,6 +631,27 @@ def handbook_relationship_list(request, record_id):
     return HttpResponse(rows)
 
 
+# ── HTMX: Narrative analysis (subjects and entities) ─────────────────────────
+
+@login_required
+def handbook_analysis(request, record_id):
+    access = rules.get_access(request.user)
+    is_superuser = request.user.is_staff or request.user.is_superuser
+    qs = rules.governance_qs(request.user, access, include_drafts=bool(access) or is_superuser)
+    narrative = get_object_or_404(qs, pk=record_id, record_type='narrative')
+    links = [
+        rel for rel in narrative.outgoing_relationships
+        .filter(relationship_type__in=ANALYSIS_LINK_TYPES, deleted_at__isnull=True)
+        .select_related('to_record')
+        if rel.to_record is not None and rules.can_see_record(request.user, access, rel.to_record)
+    ]
+    return render(request, 'workspace/handbook/partials/_analysis.html', {
+        'subjects':  [rel for rel in links if rel.relationship_type == 'has_subject'],
+        'entities':  [rel for rel in links if rel.relationship_type == 'has_entity'],
+        'can_write': is_superuser or rules.can_write(access),
+    })
+
+
 # ── Knowledge Graph ──────────────────────────────────────────────────────────
 
 # Offline: it served every user's records, journals and keys included, to anonymous visitors.
@@ -778,10 +675,10 @@ def handbook_graph_data(request):
 
 @login_required
 def handbook_recent(request):
-    access = _get_access(request.user)
+    access = rules.get_access(request.user)
     if not access:
         return HttpResponse('')
-    qs = _governance_qs(request.user, access).order_by('-updated_at')[:6]
+    qs = rules.governance_qs(request.user, access).order_by('-updated_at')[:6]
     items = ''.join(
         f'<a href="/handbook/records/{r.pk}/" class="ctx-btn" style="font-size:12px;">'
         f'<span class="material-symbols-outlined" style="font-size:14px;">article</span>'

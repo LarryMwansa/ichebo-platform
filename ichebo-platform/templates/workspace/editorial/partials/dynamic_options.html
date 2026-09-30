@@ -4,8 +4,8 @@
     {# ── Tab bar ── #}
     <div style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px; flex-shrink: 0;">
         <button class="desk-tab desk-tab--active" data-tab="details"   onclick="DeskTabs.show('details', this)">Details</button>
-        {% if show_hrs %}
-        <button class="desk-tab"                  data-tab="hrs"       onclick="DeskTabs.show('hrs', this)">HRS</button>
+        {% if is_narrative and record %}
+        <button class="desk-tab"                  data-tab="analysis"  onclick="DeskTabs.show('analysis', this)">Analysis</button>
         {% endif %}
         <button class="desk-tab"                  data-tab="relations" onclick="DeskTabs.show('relations', this)">Relations</button>
         <button class="desk-tab"                  data-tab="recent"    onclick="DeskTabs.show('recent', this)">Recent</button>
@@ -78,7 +78,7 @@
             </div>
         </div>
 
-        {# ── Governance fields + HRS Stewardship Attributes ── #}
+        {# ── Governance fields ── #}
         <div id="fields-governance" class="dynamic-field-group dopt-section" style="display: none;">
             <div class="ws-label-tag" style="margin-bottom: 8px;">Governance</div>
             <div class="dopt-field">
@@ -93,51 +93,6 @@
                 <label class="dopt-label">Version</label>
                 <input type="number" name="version" value="1" min="1"
                        class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-            </div>
-
-            <div class="dopt-divider"></div>
-
-            <div class="ws-label-tag" style="margin-bottom: 4px; color: var(--accent-red);">HRS Stewardship</div>
-            <p style="font-size: 11px; color: var(--muted); margin: 0 0 12px; line-height: 1.5;">
-                Tune the HRS properties of this act.
-            </p>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Complexity</label>
-                <select name="complexity" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    <option value="Transcendent">Transcendent</option>
-                </select>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Polarity</label>
-                <select name="polarity" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="subjective">Subjective</option>
-                    <option value="objective">Objective</option>
-                </select>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Position / Direction</label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                    <select name="position" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                        <option value="">Pos</option>
-                        <option value="up">Up</option>
-                        <option value="down">Down</option>
-                        <option value="left">Left</option>
-                        <option value="right">Right</option>
-                    </select>
-                    <select name="direction" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                        <option value="">Dir</option>
-                        <option value="forward">Forward</option>
-                        <option value="backward">Backward</option>
-                    </select>
-                </div>
             </div>
 
             <div class="dopt-field">
@@ -262,8 +217,11 @@
 
             {# Relationship type picker #}
             <div class="dopt-field">
-                <label class="dopt-label">Relationship Type</label>
+                <label class="dopt-label">Link Type</label>
                 <select id="rel-type-picker" class="editorial-type-picker" style="width: 100%;">
+                    {% for value, label in link_types %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% empty %}
                     <option value="part_of">Part Of</option>
                     <option value="derived_from">Derived From</option>
                     <option value="aligns_with">Aligns With</option>
@@ -271,6 +229,7 @@
                     <option value="references">References</option>
                     <option value="tracks">Tracks</option>
                     <option value="community_ref">Community Ref</option>
+                    {% endfor %}
                 </select>
             </div>
 
@@ -345,97 +304,11 @@
         </div>
     </div>
 
-    {% if show_hrs %}
-    <div id="desk-tab-hrs" class="desk-tab-pane" style="display: none; overflow-y: auto; flex: 1; padding-right: 2px;">
-
-        <div class="dopt-section">
-            <div class="ws-label-tag" style="margin-bottom: 4px; color: var(--accent-red);">HRS Stewardship</div>
-            <p style="font-size: 11px; color: var(--muted); margin: 0 0 14px; line-height: 1.5;">
-                Hierarchy Relationship System attributes for this record.
-            </p>
-
-            {% with cf=record.custom_fields %}
-            <div class="dopt-field">
-                <label class="dopt-label">Complexity</label>
-                <select name="complexity" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="Low"          {% if cf.complexity == 'Low'          %}selected{% endif %}>Low</option>
-                    <option value="Medium"       {% if cf.complexity == 'Medium'       %}selected{% endif %}>Medium</option>
-                    <option value="High"         {% if cf.complexity == 'High'         %}selected{% endif %}>High</option>
-                    <option value="Transcendent" {% if cf.complexity == 'Transcendent' %}selected{% endif %}>Transcendent</option>
-                </select>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Polarity</label>
-                <select name="polarity" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="subjective" {% if cf.polarity == 'subjective' %}selected{% endif %}>Subjective</option>
-                    <option value="objective"  {% if cf.polarity == 'objective'  %}selected{% endif %}>Objective</option>
-                </select>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Relationship Position</label>
-                <select name="relationship_position" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="up"    {% if cf.relationship_position == 'up'    %}selected{% endif %}>Up</option>
-                    <option value="down"  {% if cf.relationship_position == 'down'  %}selected{% endif %}>Down</option>
-                    <option value="left"  {% if cf.relationship_position == 'left'  %}selected{% endif %}>Left</option>
-                    <option value="right" {% if cf.relationship_position == 'right' %}selected{% endif %}>Right</option>
-                </select>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Position / Direction</label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                    <select name="position" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                        <option value="">Pos —</option>
-                        <option value="up"    {% if cf.position == 'up'    %}selected{% endif %}>Up</option>
-                        <option value="down"  {% if cf.position == 'down'  %}selected{% endif %}>Down</option>
-                        <option value="left"  {% if cf.position == 'left'  %}selected{% endif %}>Left</option>
-                        <option value="right" {% if cf.position == 'right' %}selected{% endif %}>Right</option>
-                    </select>
-                    <select name="direction" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                        <option value="">Dir —</option>
-                        <option value="forward"  {% if cf.direction == 'forward'  %}selected{% endif %}>Forward</option>
-                        <option value="backward" {% if cf.direction == 'backward' %}selected{% endif %}>Backward</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Speed</label>
-                <select name="speed" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="fast" {% if cf.speed == 'fast' %}selected{% endif %}>Fast</option>
-                    <option value="slow" {% if cf.speed == 'slow' %}selected{% endif %}>Slow</option>
-                </select>
-            </div>
-
-            <div class="dopt-field">
-                <label class="dopt-label">Emotional Tone</label>
-                <select name="emotional_tone" class="editorial-type-picker" style="width: 100%;" form="editorial-form">
-                    <option value="">—</option>
-                    <option value="reflective" {% if cf.emotional_tone == 'reflective' %}selected{% endif %}>Reflective</option>
-                    <option value="grateful"   {% if cf.emotional_tone == 'grateful'   %}selected{% endif %}>Grateful</option>
-                    <option value="burdened"   {% if cf.emotional_tone == 'burdened'   %}selected{% endif %}>Burdened</option>
-                    <option value="hopeful"    {% if cf.emotional_tone == 'hopeful'    %}selected{% endif %}>Hopeful</option>
-                    <option value="urgent"     {% if cf.emotional_tone == 'urgent'     %}selected{% endif %}>Urgent</option>
-                    <option value="joyful"     {% if cf.emotional_tone == 'joyful'     %}selected{% endif %}>Joyful</option>
-                    <option value="solemn"     {% if cf.emotional_tone == 'solemn'     %}selected{% endif %}>Solemn</option>
-                </select>
-            </div>
-            {% endwith %}
-
-            <div class="dopt-field">
-                <label class="dopt-label">Symbol</label>
-                <input type="text" name="symbol" placeholder="Prophetic symbol…"
-                       class="editorial-type-picker" style="width: 100%;" form="editorial-form"
-                       value="{{ record.custom_fields.symbol|default:'' }}">
-            </div>
-
-        </div>
+    {% if is_narrative and record %}
+    <div id="desk-tab-analysis" class="desk-tab-pane"
+         style="display: none; overflow-y: auto; flex: 1; padding-right: 2px;"
+         hx-get="{% url 'handbook:htmx-analysis' record.id %}"
+         hx-trigger="load, analysis-changed from:body">
     </div>
     {% endif %}
 
@@ -546,6 +419,23 @@
     transition: border-color 0.12s;
 }
 .dopt-rel-card:hover { border-color: var(--primary-alpha); }
+#desk-tab-analysis .dopt-rel-card + .dopt-rel-card { margin-top: 6px; }
+
+.hb-analysis-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 10px;
+    padding: 6px 10px;
+    background: transparent;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+}
+.hb-analysis-add:hover { border-color: var(--primary); color: var(--text); }
 
 /* ── Search result items ── */
 .rel-result-item {
@@ -601,6 +491,16 @@ document.body.addEventListener('dialChanged', (e) => {
 });
 
 /* ── Relationship panel ── */
+// Narrative analysis: adding a subject or entity reuses the link panel with the type preset.
+const HBAnalysis = {
+    add(linkType) {
+        const tab = document.querySelector('.desk-tab[data-tab="relations"]');
+        DeskTabs.show('relations', tab);
+        document.getElementById('rel-type-picker').value = linkType;
+        document.getElementById('rel-search-input').focus();
+    }
+};
+
 const RelPanel = {
     _searchTimer: null,
 
@@ -719,7 +619,7 @@ const RelPanel = {
             headers: { 'HX-Request': 'true' }
         })
         .then(r => {
-            if (!r.ok) throw new Error(r.status);
+            if (!r.ok) return r.text().then(t => { throw new Error(t); });
             return fetch(listUrl, { headers: { 'HX-Request': 'true' } });
         })
         .then(r => r.text())
@@ -730,8 +630,9 @@ const RelPanel = {
             document.getElementById('rel-selected-record').style.display = 'none';
             document.getElementById('rel-notes').value = '';
             RelPanel._pulse('Link established');
+            document.body.dispatchEvent(new Event('analysis-changed'));
         })
-        .catch(() => RelPanel._pulse('Error — try again'));
+        .catch(e => RelPanel._pulse(e.message && e.message.length < 90 ? e.message : 'Error — try again'));
     },
 
     _pulse(msg) {

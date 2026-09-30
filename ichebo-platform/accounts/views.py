@@ -121,7 +121,7 @@ COMPETENCE_LABELS = {
     2: ('Disciple',        'Level 2 — Alignment'),
     3: ('Steward',         'Level 3 — Service'),
     4: ('Senior Steward',  'Level 4 — Leadership'),
-    5: ('Architect',       'Level 5 — Apostolic Stewardship'),
+    5: ('Apostolic Steward', 'Level 5 — Apostolic Stewardship'),
 }
 
 
