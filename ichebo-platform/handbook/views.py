@@ -1,6 +1,7 @@
 import json
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseForbidden
+from django.utils.html import escape
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -77,17 +78,44 @@ def _is_editor(access):
 
 
 def _governance_qs(user, access, include_drafts=False):
-    """Base queryset for governance records, respecting access role."""
+    """Governance records this user may read: Reference from Level 3, Mandate from Level 4 (DOC F 5.1)."""
     qs = Record.objects.filter(
         record_family='governance',
         deleted_at__isnull=True,
     ).exclude(record_type='key')
 
-    if _can_write(access):
+    if user.is_superuser or user.is_staff or _can_write(access):
         return qs  # authors/editors see everything including drafts
+    level = _level(user)
+    if level < REFERENCE_ACCESS_LEVEL:
+        return qs.none()
+    if level < MANDATE_ACCESS_LEVEL:
+        qs = qs.exclude(record_type__in=MANDATE_TYPES)
     if include_drafts:
         return qs
     return qs.filter(status__in=['active', 'locked'])
+
+
+def _can_see_record(user, access, record):
+    """Whether one record may be shown to this user in the Handbook (DOC F 5.1, 6.1, 6.2).
+
+    Personal records (journals, keys, notes) are visible to their owner only — not to
+    authors, editors or superusers. Governance records follow _governance_qs.
+    """
+    if record.created_by_id == user.pk:
+        return True
+    if record.record_family != 'governance':
+        return False
+    if record.record_type == 'key':
+        return False
+    if user.is_superuser or user.is_staff or _can_write(access):
+        return True
+    level = _level(user)
+    if level < REFERENCE_ACCESS_LEVEL:
+        return False
+    if level < MANDATE_ACCESS_LEVEL and record.record_type in MANDATE_TYPES:
+        return False
+    return bool(access) or record.status in ('active', 'locked')
 
 
 def _keys_qs(user):
@@ -105,20 +133,23 @@ def _level(user):
 
 # ── Handbook Home ─────────────────────────────────────────────────────────────
 
+@login_required
 def handbook_home(request):
-    is_authenticated = request.user.is_authenticated
-    access = _get_access(request.user) if is_authenticated else None
-    is_superuser = is_authenticated and (request.user.is_staff or request.user.is_superuser)
+    access = _get_access(request.user)
+    is_superuser = request.user.is_staff or request.user.is_superuser
+    is_author = is_superuser or _can_write(access)
+
+    if _level(request.user) < REFERENCE_ACCESS_LEVEL and not is_author:
+        return HttpResponseForbidden('The Handbook requires Level 3 or above.')
 
     active_branch = request.GET.get('branch', 'reference')
     if active_branch not in RECORD_TYPES_BY_BRANCH:
         active_branch = 'reference'
 
-    # Keys branch requires auth + Level 4
+    if active_branch == 'mandate' and _level(request.user) < MANDATE_ACCESS_LEVEL and not is_author:
+        return HttpResponseForbidden('The Mandate Library requires Level 4 or above.')
+
     if active_branch == 'keys':
-        if not is_authenticated:
-            from django.contrib.auth.views import redirect_to_login
-            return redirect_to_login(request.get_full_path())
         if _level(request.user) < KEYS_ACCESS_LEVEL and not is_superuser:
             return HttpResponseForbidden('Keys Library requires Level 4 or above.')
 
@@ -135,17 +166,8 @@ def handbook_home(request):
                 records_by_type[rtype] = list(type_qs)
         can_write_branch = True
     else:
-        # Authenticated authors/editors see drafts; everyone else (including anonymous) sees published
-        include_drafts = is_superuser or _can_write(access)
-        if is_authenticated and (access or is_superuser):
-            qs = _governance_qs(request.user, access, include_drafts=include_drafts)
-        else:
-            qs = Record.objects.filter(
-                record_family='governance',
-                status__in=['active', 'locked'],
-                deleted_at__isnull=True,
-            ).exclude(record_type='key')
-        if status_filter and is_authenticated and (access or is_superuser):
+        qs = _governance_qs(request.user, access, include_drafts=is_author)
+        if status_filter and (access or is_superuser):
             qs = qs.filter(status=status_filter)
         for rtype in RECORD_TYPES_BY_BRANCH.get(active_branch, []):
             type_qs = qs.filter(record_type=rtype).order_by('-updated_at')[:20]
@@ -171,21 +193,19 @@ def handbook_home(request):
 
 # ── Handbook Record Detail ────────────────────────────────────────────────────
 
+@login_required
 def handbook_record(request, record_id):
-    is_authenticated = request.user.is_authenticated
-    access = _get_access(request.user) if is_authenticated else None
-    is_superuser = is_authenticated and (request.user.is_staff or request.user.is_superuser)
+    access = _get_access(request.user)
+    is_superuser = request.user.is_staff or request.user.is_superuser
 
     # Keys — personal records stored under record_family='reference'
-    key_record = None
-    if is_authenticated:
-        key_record = Record.objects.filter(
-            pk=record_id,
-            record_family='reference',
-            record_type__in=KEY_TYPES,
-            created_by=request.user,
-            deleted_at__isnull=True,
-        ).first()
+    key_record = Record.objects.filter(
+        pk=record_id,
+        record_family='reference',
+        record_type__in=KEY_TYPES,
+        created_by=request.user,
+        deleted_at__isnull=True,
+    ).first()
 
     if key_record:
         if _level(request.user) < KEYS_ACCESS_LEVEL and not is_superuser:
@@ -193,15 +213,8 @@ def handbook_record(request, record_id):
         record = key_record
         can_write = True
     else:
-        # Authenticated authors/editors see drafts; anonymous and readers see only published
-        if is_authenticated and (access or is_superuser):
-            qs = _governance_qs(request.user, access, include_drafts=True)
-        else:
-            qs = Record.objects.filter(
-                record_family='governance',
-                status__in=['active', 'locked'],
-                deleted_at__isnull=True,
-            ).exclude(record_type='key')
+        # Grant holders see drafts; everyone else sees published, level-gated
+        qs = _governance_qs(request.user, access, include_drafts=bool(access) or is_superuser)
         record = get_object_or_404(qs, pk=record_id)
         can_write = is_superuser or _can_write(access)
 
@@ -220,21 +233,17 @@ def handbook_record(request, record_id):
     )
 
     from django.urls import reverse
-    if is_authenticated:
-        recent_records = Record.objects.filter(
-            created_by=request.user,
-            record_family='governance',
-            deleted_at__isnull=True,
-        ).order_by('-updated_at')[:8]
-        gov_drafts = Record.objects.filter(
-            created_by=request.user,
-            record_family='governance',
-            status='draft',
-            deleted_at__isnull=True,
-        ).order_by('-updated_at')[:5]
-    else:
-        recent_records = []
-        gov_drafts = []
+    recent_records = Record.objects.filter(
+        created_by=request.user,
+        record_family='governance',
+        deleted_at__isnull=True,
+    ).order_by('-updated_at')[:8]
+    gov_drafts = Record.objects.filter(
+        created_by=request.user,
+        record_family='governance',
+        status='draft',
+        deleted_at__isnull=True,
+    ).order_by('-updated_at')[:5]
 
     return render(request, 'workspace/handbook/record.html', {
         'active_app':           'handbook',
@@ -611,7 +620,7 @@ def handbook_set_status(request, record_id):
     allowed = VALID_STATUS_TRANSITIONS.get(record.status, [])
     if new_status not in allowed:
         return HttpResponse(
-            f'<span style="color:#e17055;font-size:12px;">Cannot move {record.status} → {new_status}</span>',
+            f'<span style="color:#e17055;font-size:12px;">Cannot move {record.status} → {escape(new_status)}</span>',
             status=422,
         )
 
@@ -645,8 +654,16 @@ def handbook_set_status(request, record_id):
 def handbook_linked_records(request, record_id):
     access = _get_access(request.user)
     record = get_object_or_404(Record, pk=record_id, record_family='governance', deleted_at__isnull=True)
-    outgoing = record.outgoing_relationships.select_related('to_record', 'bible_verse', 'bible_verse__book')
-    incoming = record.incoming_relationships.select_related('from_record')
+    if not _can_see_record(request.user, access, record):
+        raise Http404
+    outgoing = [
+        rel for rel in record.outgoing_relationships.select_related('to_record', 'bible_verse', 'bible_verse__book')
+        if rel.to_record is None or _can_see_record(request.user, access, rel.to_record)
+    ]
+    incoming = [
+        rel for rel in record.incoming_relationships.select_related('from_record')
+        if _can_see_record(request.user, access, rel.from_record)
+    ]
     return render(request, 'workspace/handbook/partials/_linked_records.html', {
         'record':   record,
         'outgoing': outgoing,
@@ -677,6 +694,9 @@ def handbook_relationship_create(request):
 
     from_record = get_object_or_404(Record, pk=from_id, deleted_at__isnull=True)
     to_record   = get_object_or_404(Record, pk=to_id,   deleted_at__isnull=True)
+    if not (_can_see_record(request.user, access, from_record)
+            and _can_see_record(request.user, access, to_record)):
+        raise Http404
 
     Relationship.objects.get_or_create(
         from_record=from_record,
@@ -693,30 +713,36 @@ def handbook_relationship_create(request):
 def handbook_relationship_list(request, record_id):
     record = get_object_or_404(Record, pk=record_id, deleted_at__isnull=True)
     access = _get_access(request.user)
-    is_superuser = request.user.is_staff or request.user.is_superuser
-    can_write = is_superuser or _can_write(access) or record.record_family == 'reference'
-    outgoing = record.outgoing_relationships.select_related('to_record').order_by('relationship_type')
-    incoming = record.incoming_relationships.select_related('from_record').order_by('relationship_type')
+    if not _can_see_record(request.user, access, record):
+        raise Http404
+    outgoing = [
+        rel for rel in record.outgoing_relationships.select_related('to_record').order_by('relationship_type')
+        if rel.to_record is not None and _can_see_record(request.user, access, rel.to_record)
+    ]
+    incoming = [
+        rel for rel in record.incoming_relationships.select_related('from_record').order_by('relationship_type')
+        if _can_see_record(request.user, access, rel.from_record)
+    ]
 
     rows = ''
     for rel in outgoing:
         rows += f'''
         <div class="dopt-rel-card">
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;
-                        letter-spacing:0.06em;margin-bottom:2px;">{rel.relationship_type.replace("_"," ")}</div>
+                        letter-spacing:0.06em;margin-bottom:2px;">{escape(rel.relationship_type.replace("_"," "))}</div>
             <a href="/handbook/records/{rel.to_record.pk}/"
                style="font-size:13px;font-weight:600;color:var(--text);text-decoration:none;">
-               {rel.to_record.title[:60]}
+               {escape(rel.to_record.title[:60])}
             </a>
         </div>'''
     for rel in incoming:
         rows += f'''
         <div class="dopt-rel-card">
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;
-                        letter-spacing:0.06em;margin-bottom:2px;">← {rel.relationship_type.replace("_"," ")}</div>
+                        letter-spacing:0.06em;margin-bottom:2px;">← {escape(rel.relationship_type.replace("_"," "))}</div>
             <a href="/handbook/records/{rel.from_record.pk}/"
                style="font-size:13px;font-weight:600;color:var(--text);text-decoration:none;">
-               {rel.from_record.title[:60]}
+               {escape(rel.from_record.title[:60])}
             </a>
         </div>'''
 
@@ -759,7 +785,7 @@ def handbook_recent(request):
     items = ''.join(
         f'<a href="/handbook/records/{r.pk}/" class="ctx-btn" style="font-size:12px;">'
         f'<span class="material-symbols-outlined" style="font-size:14px;">article</span>'
-        f'{r.title[:40]}</a>'
+        f'{escape(r.title[:40])}</a>'
         for r in qs
     )
     return HttpResponse(items or '<div style="padding:var(--space-s);font-size:12px;color:var(--muted);">No records yet.</div>')

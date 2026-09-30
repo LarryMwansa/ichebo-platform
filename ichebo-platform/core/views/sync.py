@@ -31,9 +31,12 @@ from notifications.serializers import NotificationSerializer
 from tenants.models import UserPermission as _UserPermission
 
 from core.models import SyncChangelog, OP_CREATE, OP_UPDATE, OP_DELETE
+from governance.services import MANDATE_TYPES
 
 # Maximum entities returned per type per pull response (DOC C §7.2)
 PULL_PAGE_SIZE = 500
+
+PUBLISHED_GOVERNANCE_STATUSES = ('active', 'locked', 'superseded')
 
 
 # ── Steward role set (used by both views) ─────────────────────────────────────
@@ -147,7 +150,11 @@ class SyncPullView(APIView):
 
         record_filter = Q(created_by=user) | Q(tenant_id__in=direct_tenant_ids)
         if user.competence_level >= 3:
-            record_filter |= Q(record_class='governance')
+            # Published governance records only (DOC F 7.2); Mandate Library from Level 4 (5.1).
+            governance = Q(record_class='governance', status__in=PUBLISHED_GOVERNANCE_STATUSES)
+            if user.competence_level < 4:
+                governance &= ~Q(record_type__in=MANDATE_TYPES)
+            record_filter |= governance
         for path in oversight_paths:
             record_filter |= Q(tenant__path__startswith=path)
         record_qs = record_qs.filter(record_filter).distinct().order_by('updated_at')
