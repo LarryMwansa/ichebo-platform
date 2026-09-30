@@ -14,26 +14,15 @@
     <span class="ws-topbar__breadcrumb-item">New Entry</span>
 {% endblock %}
 
+{% comment %}
+Context Bar is navigation only — "Entry Types" used to live here too, but
+choosing what kind of entry to write is an editing action on the draft,
+not a place to navigate to, so it now lives in the Options bar instead
+(same move Stage 2 made for the Handbook's Context Bar/type-picker split).
+{% endcomment %}
 {% block context_header %}Journal{% endblock %}
 {% block context_content %}
 <div style="display: flex; flex-direction: column; gap: 4px; padding: var(--space-s) 0;">
-    <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Entry Types</div>
-    {% for value, label in record_types %}
-    <a href="?record_type={{ value }}"
-       class="ctx-btn {% if value == active_type %}active{% endif %}">
-        <span class="material-symbols-outlined">
-            {% if value == 'prayer' %}self_improvement
-            {% elif value == 'spirit' %}auto_awesome
-            {% elif value == 'dream' %}bedtime
-            {% elif value == 'dar' %}assignment
-            {% else %}edit_note{% endif %}
-        </span>
-        {{ label }}
-    </a>
-    {% endfor %}
-
-    <div class="ctx-divider"></div>
-
     <div class="ws-label-tag" style="margin-bottom: var(--space-2xs);">Navigate</div>
     <a href="{% url 'records:records-home' %}" class="ctx-btn">
         <span class="material-symbols-outlined">history_edu</span>
@@ -89,6 +78,25 @@
 
 {% block ws_options %}
 <div style="padding: 0 4px;">
+    <div class="ws-label-tag" style="margin-bottom: 8px;">Entry Type</div>
+    <div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px;">
+        {% for value, label in record_types %}
+        <a href="?record_type={{ value }}"
+           class="ctx-btn {% if value == active_type %}active{% endif %}">
+            <span class="material-symbols-outlined">
+                {% if value == 'prayer' %}self_improvement
+                {% elif value == 'spirit' %}auto_awesome
+                {% elif value == 'dream' %}bedtime
+                {% elif value == 'dar' %}assignment
+                {% else %}edit_note{% endif %}
+            </span>
+            {{ label }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <div style="height: 1px; background: var(--border); margin: 16px 0;"></div>
+
     <div class="ws-label-tag" style="margin-bottom: 12px;">About This Entry</div>
 
     {% if active_type == 'dar' %}
