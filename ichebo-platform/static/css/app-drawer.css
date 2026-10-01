@@ -262,3 +262,11 @@ html.dark .icon-slate  { --icon-bg: rgba(51, 65, 85, 0.15);    --icon-fg: #94a3b
 .drawer-header {
     transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
+
+/* Hide mobile bottom sheet drawer and backdrop overlay on desktop screens */
+@media (min-width: 1024px) {
+    .drawer,
+    .overlay {
+        display: none !important;
+    }
+}
