@@ -18,7 +18,7 @@ def htmx_base(request):
     agency workspace_shell.html).
     """
     site = getattr(request, 'site', 'agency')
-    shell = _SUBDOMAIN_SHELLS.get(site, 'app_shell.html')
+    shell = _SUBDOMAIN_SHELLS.get(site, 'workspace_shell.html')
 
     base = 'base_partial.html' if request.headers.get('HX-Request') else 'base.html'
     return {
