@@ -149,15 +149,17 @@
     .ics-launcher-overlay {
         position: fixed;
         inset: 0;
-        z-index: 950;
-        background: rgba(0, 0, 0, 0.45);
+        z-index: 10000;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
         display: flex;
         align-items: flex-start;
         justify-content: flex-start;
-        padding: 16px 0 0 72px; /* clears the slim rail */
+        padding: 20px 0 0 80px; /* clears the 72px slim rail */
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.15s ease;
+        transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .ics-launcher-overlay.active {
@@ -166,32 +168,92 @@
     }
 
     .ics-launcher-popover {
-        width: 360px;
-        max-width: calc(100vw - 96px);
-        max-height: calc(100vh - 32px);
+        width: 320px;
+        max-width: calc(100vw - 100px);
+        max-height: calc(100vh - 40px);
         overflow-y: auto;
-        background: var(--card, var(--stone-bg));
-        border: 1px solid var(--border-ink);
+        background: #18181b;
+        border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 16px;
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
-        transform: translateY(-8px);
-        transition: transform 0.15s ease;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+        transform: translateY(-10px) scale(0.97);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dark .ics-launcher-popover {
+        background: #141416;
+        border-color: rgba(255, 255, 255, 0.12);
     }
 
     .ics-launcher-overlay.active .ics-launcher-popover {
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 
     .ics-launcher-popover__header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 14px 16px;
-        border-bottom: 1px solid var(--border-ink);
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .ics-launcher-popover__title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--accent-red, #af3236);
+        white-space: nowrap;
+        margin: 0;
     }
 
     .ics-launcher-popover__body .app-launcher-grid {
-        padding: 12px 8px 16px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        padding: 16px 12px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .ics-launcher-popover__body .launcher-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        padding: 8px 4px;
+        border-radius: 12px;
+        transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .ics-launcher-popover__body .launcher-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .ics-launcher-popover__body .launcher-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .ics-launcher-popover__body .launcher-icon .material-symbols-outlined {
+        font-size: 22px;
+    }
+
+    .ics-launcher-popover__body .launcher-label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        white-space: nowrap;
     }
 </style>
 {% endblock %}
@@ -245,7 +307,7 @@
         <div id="ics-launcher-overlay" class="ics-launcher-overlay" aria-hidden="true">
             <div id="ics-launcher-popover" class="ics-launcher-popover" role="dialog" aria-modal="true" aria-label="Ichebo Applications">
                 <header class="ics-launcher-popover__header">
-                    <span class="label-caps">Ichebo Apps</span>
+                    <span class="ics-launcher-popover__title">Ichebo Apps</span>
                     <button type="button" class="ws-icon-btn" onclick="WorkspaceUI.closeLauncher()" aria-label="Close">
                         <span class="material-symbols-outlined">close</span>
                     </button>
